@@ -92,10 +92,6 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-xml-service</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-feature-catalogue</artifactId>
     </dependency>
     <dependency>

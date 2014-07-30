@@ -47,13 +47,13 @@ public class ISOMarshallerPool {
             throw new AssertionError(ex); // Should never happen, unless we have a build configuration problem.
         }
     }
-    
+
     private ISOMarshallerPool() {}
 
     public static MarshallerPool getInstance() {
         return instance;
     }
-    
+
     private static Class[] getAllClassesList() {
         final List<Class> classeList = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class ISOMarshallerPool {
         // Inspire classes
         classeList.add(org.geotoolkit.inspire.xml.ObjectFactory.class);
 
-        
+
         // GML base factory
         classeList.add(org.apache.sis.internal.jaxb.geometry.ObjectFactory.class);
         classeList.add(org.geotoolkit.gml.xml.v311.ObjectFactory.class);
@@ -76,8 +76,8 @@ public class ISOMarshallerPool {
         } catch (ClassNotFoundException ex) {}
 
         // we add the extensions classes
-        classeList.add(org.geotoolkit.service.ServiceIdentificationImpl.class);
-      
+        classeList.add(org.apache.sis.metadata.iso.service.DefaultServiceIdentification.class);
+
          return classeList.toArray(new Class[classeList.size()]);
     }
 }

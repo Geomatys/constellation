@@ -37,7 +37,7 @@ import org.geotoolkit.feature.catalog.FeatureAttributeImpl;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.feature.catalog.FeatureTypeImpl;
 import org.geotoolkit.feature.catalog.PropertyTypeImpl;
-import org.geotoolkit.service.ServiceIdentificationImpl;
+import org.apache.sis.metadata.iso.service.DefaultServiceIdentification;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.sml.xml.v100.IoComponentPropertyType;
 import org.geotoolkit.sml.xml.v100.SensorML;
@@ -159,9 +159,9 @@ public final class MetadataUtilities {
                     assertEqualsMode(expDid.getSupplementalInformation(), resDid.getSupplementalInformation(), mode);
                     assertEqualsMode(expDid.getTopicCategories(), resDid.getTopicCategories(), mode);
 
-                } else if (expId instanceof ServiceIdentificationImpl) {
-                    ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
-                    ServiceIdentificationImpl resService = (ServiceIdentificationImpl) result.getIdentificationInfo().iterator().next();
+                } else if (expId instanceof DefaultServiceIdentification) {
+                    DefaultServiceIdentification expService = (DefaultServiceIdentification) expId;
+                    DefaultServiceIdentification resService = (DefaultServiceIdentification) result.getIdentificationInfo().iterator().next();
                     assertEqualsMode(expService.getOperatesOn(), resService.getOperatesOn(), mode);
                     assertEqualsMode(expService, resService, mode);
                 }
@@ -439,12 +439,12 @@ public final class MetadataUtilities {
                     assertEquals(idExpResult.getTopicCategories(), idResult.getTopicCategories());
 
                     assertEquals(idExpResult, idResult);
-                } else if (expId instanceof ServiceIdentificationImpl) {
-                    ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
-                    ServiceIdentificationImpl resService = (ServiceIdentificationImpl) result.getIdentificationInfo().iterator().next();
+                } else if (expId instanceof DefaultServiceIdentification) {
+                    DefaultServiceIdentification expService = (DefaultServiceIdentification) expId;
+                    DefaultServiceIdentification resService = (DefaultServiceIdentification) result.getIdentificationInfo().iterator().next();
                     assertEquals(expService.getAccessProperties(), resService.getAccessProperties());
                     assertEquals(expService.getContainsOperations(), resService.getContainsOperations());
-                    assertEquals(expService.getCoupledResource(), resService.getCoupledResource());
+                    assertEquals(expService.getCoupledResources(), resService.getCoupledResources());
                     assertEquals(expService.getCouplingType(), resService.getCouplingType());
                     extentsEquals(expService.getExtents(), resService.getExtents());
                     assertEquals(expService.getOperatesOn().size(), resService.getOperatesOn().size());
@@ -457,9 +457,9 @@ public final class MetadataUtilities {
                         assertEquals(expOo, resOo);
                     }
                     assertEquals(expService.getOperatesOn(), resService.getOperatesOn());
-                    assertEquals(expService.getRestrictions(), resService.getRestrictions());
+//                  assertEquals(expService.getRestrictions(), resService.getRestrictions());
                     assertEquals(expService.getServiceType(), resService.getServiceType());
-                    assertEquals(expService.getServiceTypeVersion(), resService.getServiceTypeVersion());
+                    assertEquals(expService.getServiceTypeVersions(), resService.getServiceTypeVersions());
                     assertEquals(expService, resService);
                 }
             }

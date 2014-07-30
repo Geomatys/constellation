@@ -43,7 +43,7 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Details;
-import org.geotoolkit.service.ServiceIdentificationImpl;
+import org.apache.sis.metadata.iso.service.DefaultServiceIdentification;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
@@ -275,7 +275,7 @@ public class MetadataFeeder {
 
      private Identification getServiceIdentification(DefaultMetadata metadata) {
         if (metadata.getIdentificationInfo().isEmpty()) {
-            metadata.getIdentificationInfo().add(new ServiceIdentificationImpl());
+            metadata.getIdentificationInfo().add(new DefaultServiceIdentification());
         }
 
         return metadata.getIdentificationInfo().iterator().next();
@@ -624,10 +624,10 @@ public class MetadataFeeder {
 
     public String getServiceType() {
         final Collection<Identification> idents = eater.getIdentificationInfo();
-        ServiceIdentificationImpl servIdent = null;
+        DefaultServiceIdentification servIdent = null;
         for (Identification ident : idents) {
-            if (ident instanceof ServiceIdentificationImpl) {
-                servIdent = (ServiceIdentificationImpl) ident;
+            if (ident instanceof DefaultServiceIdentification) {
+                servIdent = (DefaultServiceIdentification) ident;
             }
         }
         if (servIdent != null && servIdent.getServiceType() != null) {
@@ -659,7 +659,7 @@ public class MetadataFeeder {
                ((AbstractIdentification)servIdent).setCitation(cit);
            }
         } else {
-            final ServiceIdentificationImpl ident = new ServiceIdentificationImpl();
+            final DefaultServiceIdentification ident = new DefaultServiceIdentification();
             final DefaultCitation cit = new DefaultCitation();
             cit.setOtherCitationDetails(new SimpleInternationalString(serviceInstance));
             ident.setCitation(cit);
@@ -670,14 +670,14 @@ public class MetadataFeeder {
 
     public void addServiceInformation(final String serviceType, final String url) {
         final Collection<Identification> idents = eater.getIdentificationInfo();
-        ServiceIdentificationImpl servIdent = null;
+        DefaultServiceIdentification servIdent = null;
         for (Identification ident : idents) {
-            if (ident instanceof ServiceIdentificationImpl) {
-                servIdent = (ServiceIdentificationImpl) ident;
+            if (ident instanceof DefaultServiceIdentification) {
+                servIdent = (DefaultServiceIdentification) ident;
             }
         }
         if (servIdent == null) {
-            servIdent = new ServiceIdentificationImpl();
+            servIdent = new DefaultServiceIdentification();
             eater.getIdentificationInfo().add(servIdent);
         }
         final NameFactory nameFacto = new DefaultNameFactory();
@@ -702,10 +702,10 @@ public class MetadataFeeder {
 
     public void updateServiceURL(final String url) {
         final Collection<Identification> idents = eater.getIdentificationInfo();
-        ServiceIdentificationImpl servIdent = null;
+        DefaultServiceIdentification servIdent = null;
         for (Identification ident : idents) {
-            if (ident instanceof ServiceIdentificationImpl) {
-                servIdent = (ServiceIdentificationImpl) ident;
+            if (ident instanceof DefaultServiceIdentification) {
+                servIdent = (DefaultServiceIdentification) ident;
             }
         }
         if (servIdent != null) {
@@ -798,14 +798,14 @@ public class MetadataFeeder {
 
     public void setServiceMetadataIdForData(final List<String> layerIds) {
         final Collection<Identification> idents = eater.getIdentificationInfo();
-        ServiceIdentificationImpl servIdent = null;
+        DefaultServiceIdentification servIdent = null;
         for (Identification ident : idents) {
-            if (ident instanceof ServiceIdentificationImpl) {
-                servIdent = (ServiceIdentificationImpl) ident;
+            if (ident instanceof DefaultServiceIdentification) {
+                servIdent = (DefaultServiceIdentification) ident;
             }
         }
         if (servIdent == null) {
-            servIdent = new ServiceIdentificationImpl();
+            servIdent = new DefaultServiceIdentification();
             eater.getIdentificationInfo().add(servIdent);
         }
 
@@ -820,14 +820,14 @@ public class MetadataFeeder {
 
     public void addServiceMetadataIdForData(final String layerId) {
         final Collection<Identification> idents = eater.getIdentificationInfo();
-        ServiceIdentificationImpl servIdent = null;
+        DefaultServiceIdentification servIdent = null;
         for (Identification ident : idents) {
-            if (ident instanceof ServiceIdentificationImpl) {
-                servIdent = (ServiceIdentificationImpl) ident;
+            if (ident instanceof DefaultServiceIdentification) {
+                servIdent = (DefaultServiceIdentification) ident;
             }
         }
         if (servIdent == null) {
-            servIdent = new ServiceIdentificationImpl();
+            servIdent = new DefaultServiceIdentification();
             eater.getIdentificationInfo().add(servIdent);
         }
 

@@ -509,7 +509,7 @@
                 <artifactId>sis-utility</artifactId>
                 <version>${sis.version}</version>
             </dependency>
-            
+
             <!-- Geotoolkit version -->
             <dependency>
                 <groupId>org.geotoolkit</groupId>
@@ -807,11 +807,6 @@
             <dependency>
                 <groupId>org.geotoolkit</groupId>
                 <artifactId>geotk-xml-wmts</artifactId>
-                <version>${geotoolkit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit</groupId>
-                <artifactId>geotk-xml-service</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>

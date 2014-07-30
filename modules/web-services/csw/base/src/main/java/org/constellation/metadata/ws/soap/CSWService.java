@@ -66,7 +66,7 @@ import java.util.logging.Level;
              org.apache.sis.internal.profile.fra.IndirectReferenceSystem.class,
              org.apache.sis.internal.profile.fra.LegalConstraints.class,
              org.apache.sis.internal.profile.fra.SecurityConstraints.class,
-             org.geotoolkit.service.ServiceIdentificationImpl.class,
+             org.apache.sis.metadata.iso.service.DefaultServiceIdentification.class,
              org.geotoolkit.feature.catalog.AssociationRoleImpl.class,
              org.geotoolkit.feature.catalog.BindingImpl.class,
              org.geotoolkit.feature.catalog.BoundFeatureAttributeImpl.class,
