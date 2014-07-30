@@ -332,16 +332,22 @@ ul.unstyled {
  * Service
  */
 .service-item .well.started {
-    border-left: #cedd9c 20px solid;
-    min-height: 214px;
+    border-left: #62c462 20px solid;
+    min-height: 180px;
+    padding-top:15px;
+    padding-right: 10px;
 }
 .service-item .well.stopped {
-    border-left: #db9080 20px solid;
-    min-height: 214px;
+    border-left: #ee5f5b 20px solid;
+    min-height: 180px;
+    padding-top:15px;
+    padding-right: 10px;
 }
 .service-item .well.not-started {
     border-left: #777777 20px solid;
-    min-height: 214px;
+    min-height: 180px;
+    padding-top:15px;
+    padding-right: 10px;
 }
 .service-item .btn.dropdown-toggle {
 
@@ -605,6 +611,29 @@ p.error-select-one{
 }
 .form_service_md .control-group{
     margin-bottom: 10px;
+}
+
+/*service type image*/
+.serviceTypeCSW{
+    background: #f5f5f5 url('../images/serviceType-csw.svg') right bottom no-repeat;
+}
+.serviceTypeWMS{
+    background: #f5f5f5 url('../images/serviceType-wms.svg') right bottom no-repeat;
+}
+.serviceTypeSOS{
+    background: #f5f5f5 url('../images/serviceType-sos.svg') right bottom no-repeat;
+}
+.serviceTypeWMTS{
+    background: #f5f5f5 url('../images/serviceType-wmts.svg') right bottom no-repeat;
+}
+.serviceTypeWPS{
+    background: #f5f5f5 url('../images/serviceType-wps.svg') right bottom no-repeat;
+}
+.serviceTypeWFS{
+    background: #f5f5f5 url('../images/serviceType-wfs.svg') right bottom no-repeat;
+}
+.serviceTypeWCS{
+    background: #f5f5f5 url('../images/serviceType-wcs.svg') right bottom no-repeat;
 }
 /*
  * Dashboards
