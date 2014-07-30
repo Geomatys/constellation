@@ -413,8 +413,8 @@ public abstract class FilterParser {
                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         
         // none constraint type are filled we throw an exception
-        } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
-            throw new FilterParserException("The query constraint must contain a Filter or a CQL query.",
+        } else if ((constraint.getCqlText() == null || constraint.getCqlText().isEmpty()) && constraint.getFilter() == null) {
+            throw new FilterParserException("The query constraint must contain a Filter or a CQL query (not empty).",
                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         
         // for a CQL request we transform it in Filter
@@ -426,9 +426,9 @@ public abstract class FilterParser {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 throw new FilterParserException("JAXBException while parsing CQL query: " + ex.getMessage(), NO_APPLICABLE_CODE, QUERY_CONSTRAINT);
             } catch (CQLException ex) {
-                throw new FilterParserException("The CQL query is malformed: " + ex.getMessage() + '\n',
-                                            //     + "syntax Error: " + ex.getSyntaxError(),
-                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+                throw new FilterParserException("The CQL query is malformed: " + ex.getMessage(), INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+            } catch (UnsupportedOperationException ex) {
+                throw new FilterParserException("The CQL query is not supported: " + ex.getMessage(), INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             
         // for a filter we return directly it
