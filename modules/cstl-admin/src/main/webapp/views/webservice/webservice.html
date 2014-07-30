@@ -47,7 +47,7 @@
 
             <div class="row bg-white dash-inner" id="list-services">
                 <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter">
-                    <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info">{{service.name}} ({{service.identifier}})</h3></a>
+                    <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info">{{service.identifier}} : {{service.name}} </h3></a>
                     <div class="well" ng-class="{'started':service.status=='STARTED','stopped':service.status=='ERROR','not-started':service.status=='STOPPED'}" data-state="wms-test">
                         <div class="row service-button">
                             <div class="col-sm-7 col-sm-offset-5 col-md-5 col-md-offset-7 col-lg-4 col-lg-offset-8">
