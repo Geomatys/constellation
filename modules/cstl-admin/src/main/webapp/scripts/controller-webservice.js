@@ -34,6 +34,8 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
         webService.listAll({lang: $scope.getCurrentLang()}, function(response){
             $scope.services = response;
             modalLoader.close();
+        }, function() {
+            modalLoader.close();
         });
 
 

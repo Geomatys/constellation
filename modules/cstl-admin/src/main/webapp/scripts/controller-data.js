@@ -32,6 +32,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 $dashboard($scope, response, true);
                 $scope.filtertype = "";
                 modalLoader.close();
+            }, function() {
+                modalLoader.close();
             });
         };
 
