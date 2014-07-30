@@ -292,19 +292,14 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
         }
     }]);
 
-cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataListing', '$cookies',
-    function($scope, dataListing, $cookies) {
+cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataListing', '$cookies', '$growl',
+    function($scope, dataListing, $cookies, $growl) {
         $scope.loader = {
             upload: false
         };
 
         $scope.import.next = function() {
             $scope.uploadData();
-        };
-
-        $scope.metadataChosen = function(md) {
-            $scope.import.metadata = md.value;
-            $scope.$digest();
         };
 
         $scope.uploadData = function() {
@@ -328,7 +323,7 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
                     });
                 },
                 error: function(){
-                    console.log("error post ajax");
+                    $growl('error', 'Error', 'error while uploading data');
                 }
             });
         };
@@ -457,13 +452,28 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl',
     function($scope, $cookies, $growl) {
 
-        $scope.suggestDataName = function(){
+        $scope.import.allowNext = false;
+        if ($scope.import.dataPath != null && $scope.import.dataPath.length > 0){
+            $scope.import.identifier = $scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').substr(0,$scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').lastIndexOf('.'));
+        }
+        if ($scope.import.identifier != null && $scope.import.identifier.length > 0) {
+            $scope.import.allowNext = true;
+        }
 
-            $scope.import.identifier =  $scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').substr(0,$scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').lastIndexOf('.'));
+
+
+        $scope.verifyAllowNext = function(){
+
+                if (($scope.import.identifier != null && $scope.import.identifier.length > 0) || ($scope.import.metadata  != null && $scope.import.metadata.length > 0)) {
+                    $scope.import.allowNext = true;
+                }else{
+                    $scope.import.allowNext = false;
+                }
+
         };
 
         $scope.import.next = function() {
-            if ($scope.import.metadata || $scope.import.identifier) {
+            if ($scope.import.metadata != null || $scope.import.identifier != null) {
                 $scope.uploadMetadata();
             } else {
                 $scope.selectType();
@@ -514,14 +524,15 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
         };
 
         $scope.metadataChosen = function(md) {
-            $scope.import.metadata = md.value;
-            $scope.import.identifier = null;
-            $scope.$digest();
+            $scope.$apply(function() {
+                $scope.import.metadata = md.value;
+                $scope.import.identifier = null;
+                if ($scope.import.metadata != null && $scope.import.metadata.length > 0){
+                    $scope.import.allowNext = true;
+                }
+            });
         };
-        $scope.identifierChosen = function(identifier) {
-            $scope.import.identifier = identifier.value;
-            $scope.$digest();
-        };
+
     }]);
 
 cstlAdminApp.controller('ModalImportDataStep3TypeController', ['$scope',
