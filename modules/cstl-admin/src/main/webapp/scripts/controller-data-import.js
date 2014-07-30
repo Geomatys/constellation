@@ -456,6 +456,12 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
 
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl',
     function($scope, $cookies, $growl) {
+
+        $scope.suggestDataName = function(){
+
+            $scope.import.identifier =  $scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').substr(0,$scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').lastIndexOf('.'));
+        };
+
         $scope.import.next = function() {
             if ($scope.import.metadata || $scope.import.identifier) {
                 $scope.uploadMetadata();
@@ -509,6 +515,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
 
         $scope.metadataChosen = function(md) {
             $scope.import.metadata = md.value;
+            $scope.import.identifier = null;
             $scope.$digest();
         };
         $scope.identifierChosen = function(identifier) {

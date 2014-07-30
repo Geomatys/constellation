@@ -20,7 +20,7 @@
         <div class="form-group">
             <label translate="data.modal.dataName.label">Or fill an identifier for this data</label>
             <div class="col-sm-6" style="padding-left:0;">
-                <input class="form-control col-sm-6" type="text" name="identifier" onchange="angular.element(this).scope().identifierChosen(this);">
+                <input class="form-control col-sm-6" ng-model="import.identifier" ng-init="suggestDataName()" type="text" name="identifier" onchange="angular.element(this).scope().identifierChosen(this);">
             </div>
         </div>
     </form>
