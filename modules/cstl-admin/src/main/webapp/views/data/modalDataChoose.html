@@ -70,15 +70,15 @@
                                     <div class="top">
                                         <span class="item-title title-modal">{{data.Name}}</span>
                                         <span class="pull-right text-right item-list-style"  style="font-size:14px;">{{data.Type}}</span>
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data!=selected" src="images/vector-multipoint.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data!=selected" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data!=selected" src="images/vector-polyline.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                        <img ng-if="data.Subtype=='Geometry' && data!=selected" src="images/vector-multigeometry.svg" class="pull-right" style="margin-top:6px; margin-right:10px; width:22px;" >
+                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && !isInSelected(data)" src="images/vector-multipoint.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && !isInSelected(data)" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && !isInSelected(data)" src="images/vector-polyline.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                        <img ng-if="data.Subtype=='Geometry' && !isInSelected(data)" src="images/vector-multigeometry.svg" class="pull-right" style="margin-top:6px; margin-right:10px; width:22px;" >
 
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data==selected" src="images/vector-multipoint-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data==selected" src="images/vector-poly-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data==selected" src="images/vector-polyline-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                        <img ng-if="data.Subtype=='Geometry' && data==selected" src="images/vector-multigeometry-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px; width:22px;" >
+                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && isInSelected(data)" src="images/vector-multipoint-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && isInSelected(data)" src="images/vector-poly-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && isInSelected(data)" src="images/vector-polyline-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                        <img ng-if="data.Subtype=='Geometry' && isInSelected(data)" src="images/vector-multigeometry-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px; width:22px;" >
 
                                     </div>
                                     <div class="bottom">
