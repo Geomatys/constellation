@@ -687,7 +687,7 @@ public class DataRest {
     @Path("metadata")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response saveMetadata(final ParameterValues values) {
+    public Response saveMetadata(final ParameterValues values) throws TransformException {
         final String providerId         = values.getValues().get("providerId");
         final String dataType           = values.getValues().get("dataType");
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
