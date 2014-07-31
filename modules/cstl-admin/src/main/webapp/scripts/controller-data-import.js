@@ -280,12 +280,11 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             provider.createPRJ({ id: $scope.import.fileName },{codeEpsg: codeEpsg},
                 function(){
                     //success
-                    console.log('prj created')
+
                     $modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
                 },
                 function(){
-                    //
-                    console.error('prj not created')
+                    // error
                     $growl('error','Error','Impossible to set projection for data '+ $scope.import.fileName );
                 }
             );
@@ -464,9 +463,15 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
 
 
         $scope.verifyAllowNext = function(){
-
                 if (($scope.import.identifier != null && $scope.import.identifier.length > 0) || ($scope.import.metadata  != null && $scope.import.metadata.length > 0)) {
-                    $scope.import.allowNext = true;
+                    var letters = /^[A-Za-zàèìòùáéíóúäëïöüñãõåæøâêîôû0-9]+$/;
+                    var id = $scope.import.identifier;
+                    if(!id.match(letters)) {
+                        $scope.import.allowNext = false;
+                        $growl('error','Error','fill identifier without special chars like space');
+                    }else {
+                        $scope.import.allowNext = true;
+                    }
                 }else{
                     $scope.import.allowNext = false;
                 }
