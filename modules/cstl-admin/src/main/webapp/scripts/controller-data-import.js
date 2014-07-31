@@ -464,7 +464,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
 
         $scope.verifyAllowNext = function(){
                 if (($scope.import.identifier != null && $scope.import.identifier.length > 0) || ($scope.import.metadata  != null && $scope.import.metadata.length > 0)) {
-                    var letters = /^[A-Za-zàèìòùáéíóúäëïöüñãõåæøâêîôû0-9]+$/;
+                    var letters = /^[A-Za-zàèìòùáéíóúäëïöüñãõåæøâêîôû0-9\-_]+$/;
                     var id = $scope.import.identifier;
                     if(!id.match(letters)) {
                         $scope.import.allowNext = false;
