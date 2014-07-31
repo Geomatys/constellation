@@ -299,8 +299,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         this.gml31Package         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311","org.geotoolkit.gml.xml");
         this.gml32Package         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v321","org.geotoolkit.gml.xml");
 
-        this.opengisPackage     = FileUtilities.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
-                                                               "org.opengis.service", "org.opengis.feature.catalog");
+        this.opengisPackage     = FileUtilities.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal", "org.opengis.feature.catalog");
         this.cswPackage         = FileUtilities.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
                                                                "org.geotoolkit.ogc.xml.v110","org.geotoolkit.csw.xml");
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
@@ -1094,7 +1093,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             else*/ if ("MD_ScopeCode".equals(className)) {
                 packageName = "org.opengis.metadata.maintenance";
             } else if ("SV_ServiceIdentification".equals(className)) {
-                packageName = "org.geotoolkit.service";
+                packageName = "org.apache.sis.metadata.iso.service";
             } else if (className.startsWith("FRA_")) {
                 packageName = "org.apache.sis.internal.profile.fra";
                 className = className.substring(4); // Remove "FRA_" prefix.

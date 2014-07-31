@@ -25,7 +25,7 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
-import org.geotoolkit.service.ServiceTypeImpl;
+import org.geotoolkit.service.ServiceType;
 import org.geotoolkit.wms.xml.AbstractCapability;
 import org.geotoolkit.wms.xml.AbstractContactAddress;
 import org.geotoolkit.wms.xml.AbstractContactInformation;
@@ -77,7 +77,7 @@ public final class WMSConstant {
     public static final String DESCRIBELAYER    = "DescribeLayer";
     public static final String GETLEGENDGRAPHIC = "GetLegendGraphic";
     public static final String GETORIGFILE      = "GetOrigFile";
-    
+
     /**
      * WMS Query service
      */
@@ -159,11 +159,11 @@ public final class WMSConstant {
     public static final String KEY_EXTRA_PARAMETERS = "EXTRA";
     /** Parameter INSPIRE used to choose the language of the capabilities document */
     public static final String KEY_LANGUAGE = "LANGUAGE";
-    
+
     public static final String KEY_EXCEPTIONS = "EXCEPTIONS";
-    
+
     public static final String EXCEPTIONS_INIMAGE = "INIMAGE";
-    
+
     private WMSConstant() {}
 
     public static Request createRequest130(final List<String> gfi_mimetypes){
@@ -283,7 +283,7 @@ public final class WMSConstant {
         // extension
         final NameFactory nf = new DefaultNameFactory();
         final LocalName servType = nf.createLocalName(null, "view");
-        final ExtendedCapabilitiesType ext = new ExtendedCapabilitiesType(ScopeCode.SERVICE, new ServiceTypeImpl(servType));
+        final ExtendedCapabilitiesType ext = new ExtendedCapabilitiesType(ScopeCode.SERVICE, new ServiceType(servType));
         final org.geotoolkit.inspire.xml.vs.ObjectFactory factory = new org.geotoolkit.inspire.xml.vs.ObjectFactory();
         final JAXBElement<?> extension = factory.createExtendedCapabilities(ext);
         // Create capabilities base.
