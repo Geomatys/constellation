@@ -26,6 +26,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
+import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
@@ -58,11 +59,13 @@ import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
 import org.geotoolkit.process.metadata.merge.MergeDescriptor;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
@@ -297,7 +300,7 @@ public final class MetadataUtilities {
      * @return
      * @throws DataStoreException
      */
-    public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException{
+    public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException, TransformException {
     	
     	final DataStore dataStore = dataProvider.getMainStore();
     	final FeatureStore featureStore =(FeatureStore)dataStore;
@@ -307,11 +310,12 @@ public final class MetadataUtilities {
         final DefaultDataIdentification ident = new DefaultDataIdentification();
         md.getIdentificationInfo().add(ident);
 
-        final Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
+        Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
         if (env == null) {
             return md;
         }
 
+        env = CRS.transform(env, CommonCRS.WGS84.normalizedGeographic());
         final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(
                 env.getMinimum(0), env.getMaximum(0), env.getMinimum(1), env.getMaximum(1)
         );
