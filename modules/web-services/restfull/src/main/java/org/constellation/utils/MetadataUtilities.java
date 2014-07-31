@@ -104,98 +104,7 @@ public final class MetadataUtilities {
     private static final Logger LOGGER = Logger.getLogger(MetadataUtilities.class.getName());
 
     private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-    /**
-     * Generate {@link org.constellation.dto.DataInformation} for require file data
-     *
-     * @param file         data {@link java.io.File}
-     * @param metadataFile
-     * @param dataType     @return a {@link org.constellation.dto.DataInformation}
-     */
-    public static DataInformation generateMetadatasInformation(final File file, final File metadataFile, final String dataType) {
 
-        final Unmarshaller xmlReader;
-        DefaultMetadata templateMetadata = null;
-
-        try {
-            xmlReader = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-            if (metadataFile != null) {
-                templateMetadata = (DefaultMetadata) xmlReader.unmarshal(metadataFile);
-            }
-        } catch (JAXBException e) {
-            LOGGER.log(Level.WARNING, "", e);
-        }
-
-        switch (dataType) {
-            case "raster":
-                try {
-                    final GridCoverageReader coverageReader = CoverageIO.createSimpleReader(file);
-                    final DataInformation di = getRasterDataInformation(coverageReader, templateMetadata, dataType);
-                    di.setPath(file.getPath());
-                    coverageReader.dispose();
-                    return di;
-                } catch (CoverageStoreException | NoSuchIdentifierException | ProcessException | JAXBException e) {
-                    LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-                }
-                break;
-            case "vector":
-                try {
-                    final String extension = Files.getFileExtension(file.getName());
-                    final String fileName = Files.getNameWithoutExtension(file.getName());
-                    final File parent = new File(file.getParent(), fileName);
-                    ShapefileFeatureStore shapeStore = null;
-                    if (extension.equalsIgnoreCase("zip")) {
-                        //unzip file
-                        parent.mkdirs();
-                        FileUtilities.unzip(file, parent, null);
-                        final FileFilter shapeFilter = new SuffixFileFilter(".shp");
-                        final File[] files = parent.listFiles(shapeFilter);
-                        if (files.length > 0) {
-                            shapeStore = new ShapefileFeatureStore(files[0].toURI().toURL());
-                        }
-                    }
-
-                    String crsName = "";
-                    final DataInformation information;
-                    if (shapeStore != null) {
-                        final CoordinateReferenceSystem crs = shapeStore.getFeatureType().getCoordinateReferenceSystem();
-                        if (crs != null) {
-                            crsName = crs.getName().toString();
-                        }
-                        information = new DataInformation(shapeStore.getName().getLocalPart(), parent.getAbsolutePath(), dataType, crsName);
-                    } else {
-                        information = new DataInformation(fileName, parent.getAbsolutePath(), dataType, crsName);
-                    }
-                    final ArrayList<SimplyMetadataTreeNode> metadataList = getVectorDataInformation(templateMetadata);
-                    information.setFileMetadata(metadataList);
-                    return information;
-
-                } catch (MalformedURLException e) {
-                    LOGGER.log(Level.WARNING, "error on file URL", e);
-                } catch (DataStoreException e) {
-                    LOGGER.log(Level.WARNING, "error on data store creation", e);
-                } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "error on un zip", e);
-                }
-                break;
-                
-            case "observation":
-                final String extension = Files.getFileExtension(file.getName());
-                final String fileName  = Files.getNameWithoutExtension(file.getName());
-                ObservationStore store = null;
-                if (extension.equalsIgnoreCase("nc")) {
-                    store = new FileObservationStore(file);
-                } else if (extension.equalsIgnoreCase("xml")) {
-                    store = new XmlObservationStore(file);
-                }
-                
-                final DataInformation di = new DataInformation(fileName, file.getPath(), dataType, null);
-                di.setPath(file.getPath());
-                di.setFileMetadata(getSensorInformations(fileName, store));
-                return di;
-                
-        }
-        return null;
-    }
 
 
     public static ArrayList<SimplyMetadataTreeNode> getSensorInformations(final String fileName, final ObservationStore store) {
@@ -271,7 +180,7 @@ public final class MetadataUtilities {
      * @throws org.geotoolkit.process.ProcessException
      * @throws javax.xml.bind.JAXBException
      */
-    public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final DefaultMetadata metadata, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+    public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final DefaultMetadata metadata, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException {
 
         final CoordinateReferenceSystem crs;
         try {
@@ -344,13 +253,15 @@ public final class MetadataUtilities {
             final SpatialMetadata sm = coverageReader.getCoverageMetadata(i);
             if (sm != null) {
                 final String rootNodeName = sm.getNativeMetadataFormatName();
-                final Node coverageRootNode = sm.getAsTree(rootNodeName);
+                if (!(rootNodeName ==null)) {
+                    final Node coverageRootNode = sm.getAsTree(rootNodeName);
 
-                MetadataMapBuilder.setCounter(0);
-                final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
+                    MetadataMapBuilder.setCounter(0);
+                    final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
 
-                final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-                nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
+                    final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                    nameSpatialMetadataMap.put(name.toString(), coverageMetadataBean);
+                }
             }
         }
 

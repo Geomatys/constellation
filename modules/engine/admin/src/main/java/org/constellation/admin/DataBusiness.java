@@ -84,7 +84,7 @@ public class DataBusiness {
         Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
         MarshallerPool pool = ISOMarshallerPool.getInstance();
         try {
-            if (data.getIsoMetadata() != null) {
+            if (data != null && data.getIsoMetadata() != null) {
                 InputStream sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
                 final Unmarshaller m = pool.acquireUnmarshaller();
                 metadata = (DefaultMetadata) m.unmarshal(sr);

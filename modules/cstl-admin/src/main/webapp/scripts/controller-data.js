@@ -363,7 +363,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
 
         $scope.save = function() {
             $scope.metadata.dataName = $scope.provider;
-//            $scope.metadata.dataPath = $uploadFiles.files.file;
             $scope.metadata.type = $scope.type;
 
             dataListing.mergeMetadata({}, $scope.metadata,
@@ -391,7 +390,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
                     upMdFile = upMdFile.substring(upMdFile.lastIndexOf("/")+1);
                 }
             }
-            dataListing.loadData({}, {values: {'filePath': upFile, 'metadataFilePath': upMdFile, dataType: $scope.type}}, function(response) {
+
+            dataListing.loadData({}, {values: {'filePath': upFile, 'metadataFilePath': upMdFile, dataType: $scope.type, providerId: $uploadFiles.files.providerId}}, function(response) {
                 if (isCoverageMetadata) {
                     for (var key in response.coveragesMetadata) {
                         var metadataList = response.coveragesMetadata[key].coverageMetadataTree;

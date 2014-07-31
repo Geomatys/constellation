@@ -129,7 +129,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                             dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData, dataName: $scope.import.dataName}});
                                         }
                                         //update data & metadata files reminder for further use
-                                        $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData};
+                                        $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData, providerId: $scope.import.providerId};
 
                                         $growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
                                         if ($scope.sensor.checked) {
@@ -177,7 +177,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                             dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
                                         }
                                         //update data & metadata files reminder for further use
-                                        $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData};
+                                        $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData, providerId: $scope.import.providerId};
 
                                         if (!fileExtension || fileExtension !== "nc") {
                                             $growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
@@ -280,7 +280,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             provider.createPRJ({ id: $scope.import.fileName },{codeEpsg: codeEpsg},
                 function(){
                     //success
-
+                    $uploadFiles.files = {file: $scope.import.providerId, mdFile: $scope.import.metadata, providerId: $scope.import.providerId};
                     $modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
                 },
                 function(){

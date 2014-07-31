@@ -64,6 +64,7 @@ import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
+import org.constellation.utils.ISOMarshallerPool;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
@@ -86,6 +87,7 @@ import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
+import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -100,6 +102,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
@@ -552,30 +555,50 @@ public class DataRest {
     @Path("load")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response loadData(final ParameterValues values) {
+    public Response loadData(@PathParam("domainId") int domainId, final ParameterValues values) throws JAXBException, DataStoreException, NoSuchIdentifierException, ProcessException {
         final String filePath = values.getValues().get("filePath");
         final String metadataFilePath = values.getValues().get("metadataFilePath");
         final String dataType = values.getValues().get("dataType");
-
-        File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
-        final File choosingFile = new File(dataIntegratedDirectory, filePath);
-
-        File choosingMetadataFile = null;
-        if (metadataFilePath != null && !metadataFilePath.isEmpty()) {
-            choosingMetadataFile = new File(dataIntegratedDirectory.getAbsolutePath(), metadataFilePath);
+        final String providerId = values.getValues().get("providerId");
+        DataInformation information = null;
+        final DataProvider dataProvider;
+        if (providerId !=null && providerId.length()>0){
+            dataProvider = DataProviders.getInstance().getProvider(providerId);
+        }else{
+            return Response.status(404).build();
         }
-        
-        if (choosingFile.exists()) {
-            final DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, choosingMetadataFile, dataType);
-            final String choosingName = choosingFile.getName();
-            String dataName = choosingName;
-            if (!choosingFile.isDirectory()) {
-                dataName = choosingName.substring(0, choosingName.lastIndexOf("."));
-            }
-            information.setName(dataName);
-            return Response.status(200).entity(information).build();
+
+        final Provider providerDB = providerBusiness.getProvider(providerId, domainId);
+        final List<org.constellation.engine.register.Data> datasFromProviderId = providerBusiness.getDatasFromProviderId(providerDB.getId());
+        final String metadata;
+        if (datasFromProviderId.size()>1){
+            metadata = providerDB.getMetadataIso();
+        }else{
+            metadata = datasFromProviderId.get(0).getIsoMetadata();
         }
-        return Response.status(418).build();
+        final MarshallerPool pool = ISOMarshallerPool.getInstance();
+        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        final DefaultMetadata defaultMetadata = (DefaultMetadata) unmarshaller.unmarshal(new ByteArrayInputStream(metadata.getBytes()));
+
+        switch (dataType) {
+            case "raster":
+                final Name nameCoverage = ((CoverageStore) dataProvider.getMainStore()).getNames().iterator().next();
+                final GridCoverageReader gridCoverageReader = ((CoverageStore) dataProvider.getMainStore()).getCoverageReference(nameCoverage).acquireReader();
+                information = MetadataUtilities.getRasterDataInformation(gridCoverageReader, defaultMetadata, providerDB.getType());
+                break;
+            case "vector":
+                final Name nameFeature = ((CoverageStore) dataProvider.getMainStore()).getNames().iterator().next();
+                information = new DataInformation(providerId, null, providerDB.getType(), dataProvider.get(nameFeature).getEnvelope().getCoordinateReferenceSystem().getName().toString());
+                information.setFileMetadata(MetadataUtilities.getVectorDataInformation(defaultMetadata));
+                break;
+            case "observation":
+                final ObservationStore store = (ObservationStore) dataProvider.getMainStore();
+                information = new DataInformation(providerId, null, dataType, null);
+                information.setFileMetadata(MetadataUtilities.getSensorInformations(providerId, store));
+                break;
+
+        }
+        return Response.ok(information).build();
     }
 
     /**
