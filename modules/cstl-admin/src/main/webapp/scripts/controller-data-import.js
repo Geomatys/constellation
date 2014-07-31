@@ -159,6 +159,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     }
                                 );
 
+                            }, function(){
+                                $growl('error','Error','Impossible to create dataSet');
                             });
                         } else if ($scope.import.uploadType === "raster") {
                             provider.create({
@@ -211,6 +213,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                 );
 
 
+                            } , function(){
+                                $growl('error','Error','Impossible to create dataSet');
                             });
                         } else if ($scope.import.uploadType === "observation" && fileExtension === "xml") {
                             provider.create({
@@ -231,6 +235,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                 $scope.showAssociate();
                                 //$modalInstance.close({type: "observation", file: fileName, missing: $scope.metadata == null});
 
+                            }, function(){
+                                $growl('error','Error','Impossible to create dataSet');
                             });
 
                         } else if ($scope.import.uploadType === "observation") {
@@ -256,6 +262,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 //                                } else {
 //                                    displayNetCDF(fileName);
 //                                }
+                            }, function(){
+                                $growl('error','Error','Impossible to create dataSet');
                             });
                         } else {
                             $growl('warning','Warning','Not implemented choice');
