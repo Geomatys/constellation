@@ -18,16 +18,17 @@
  */
 package org.constellation.process;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.StyleBusiness;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.geotoolkit.io.X364;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -41,6 +42,12 @@ public abstract class AbstractCstlProcess extends AbstractProcess {
     
     @Autowired
     protected ServiceBusiness serviceBusiness;
+    
+    @Autowired
+    protected StyleBusiness styleBusiness;
+    
+    @Autowired
+    protected DomainRepository domainRepository;
     
     public AbstractCstlProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);

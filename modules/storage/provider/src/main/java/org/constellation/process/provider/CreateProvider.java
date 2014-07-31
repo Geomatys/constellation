@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
 import static org.constellation.process.provider.CreateProviderDescriptor.DOMAIN_ID;
 import static org.constellation.process.provider.CreateProviderDescriptor.PROVIDER_TYPE;
@@ -40,7 +39,6 @@ import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Create a new provider in constellation.
@@ -48,9 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public final class CreateProvider extends AbstractCstlProcess {
 
-    @Autowired
-    protected DomainRepository domainRepository;
-    
     public CreateProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
