@@ -79,7 +79,6 @@ import org.opengis.metadata.distribution.Format;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.identification.AssociationType;
-import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.InitiativeType;
@@ -103,6 +102,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -360,7 +360,7 @@ public class MetadataUnmarshallTest extends DefaultMetadataTest {
          */
         metadata.setFileIdentifier("42292_5p_19900609195600");
         metadata.setLanguage(Locale.ENGLISH);
-        metadata.setCharacterSet(CharacterSet.UTF_8);
+        metadata.setCharacterSet(StandardCharsets.UTF_8);
         Set set = new HashSet();
         set.add(ScopeCode.DATASET);
         metadata.setHierarchyLevels(set);
