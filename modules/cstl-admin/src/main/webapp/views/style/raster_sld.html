@@ -1,33 +1,44 @@
 <form class="form-horizontal" role="form" ng-init="loadDataProperties();">
 	<ul class="nav nav-pills" role="tablist">
-		<li ng-class="{active:symbolPills==='color'}"><a ng-click="symbolPills='color';$broadcast('rzSliderForceRender')" role="tab"> <span
-				translate="label.color">Color</span>
-		</a></li>
-		<li ng-class="{active:symbolPills==='outline'}"><a ng-click="symbolPills='outline'" role="tab"> <span
-				translate="label.outline">Outline</span>
-		</a></li>
-		<li ng-class="{active:symbolPills==='contrast'}"><a ng-click="symbolPills='contrast'" role="tab"> <span
-				translate="label.contrast">Contrast and relief</span>
-		</a></li>
+		<li ng-class="{active:optionsSLD.rasterPalette.symbolPills==='color'}">
+            <a ng-click="optionsSLD.rasterPalette.symbolPills='color';$broadcast('rzSliderForceRender')"
+               role="tab">
+                <span translate="label.color">Color</span>
+		    </a>
+        </li>
+		<li ng-class="{active:optionsSLD.rasterPalette.symbolPills==='outline'}">
+            <a ng-click="optionsSLD.rasterPalette.symbolPills='outline'"
+               role="tab">
+                <span translate="label.outline">Outline</span>
+		    </a>
+        </li>
+		<li ng-class="{active:optionsSLD.rasterPalette.symbolPills==='contrast'}">
+            <a ng-click="optionsSLD.rasterPalette.symbolPills='contrast'"
+               role="tab">
+                <span translate="label.contrast">Contrast and relief</span>
+		    </a>
+        </li>
 	</ul>
 
 	<div class="tab-content">
-	<!-- color Pane -->
-		<div class="tab-pane colormodel" ng-class="{active:symbolPills==='color'}">
-			<!-- choose between gray scale and palette -->
+		<div class="tab-pane colormodel" ng-class="{active:optionsSLD.rasterPalette.symbolPills==='color'}">
 			<div class="form-group">
-				<label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label" for="colormodel" translate="label.color.model">Color
-					model</label>
+				<label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label"
+                       for="colormodel"
+                       translate="label.color.model">Color model</label>
 				<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-					<select class="form-control" id="colormodel" data-ng-model="colorModel"
-						ng-options="colorModel.value for colorModel in colorModels">
+					<select id="colormodel"
+                            class="form-control form-control-fix"
+                            ng-model="optionsSLD.rasterPalette.colorModel">
+                        <option value="palette">Palette mode</option>
+                        <option value="rgb">RGB composition mode</option>
+                        <option value="grayscale">Grayscale mode</option>
 					</select>
 				</div>
 			</div>
-		
-		
-			<!-- Accordion to switch between edition and result -->
-			<accordion close-others="true" ng-show="colorModel.name === 'palette'" ng-init="status.open=true">
+			<accordion close-others="true"
+                       ng-show="optionsSLD.rasterPalette.colorModel === 'palette'"
+                       ng-init="status.open=true">
 				<accordion-group heading="Edition" is-open="status.open">
 						<accordion-heading>
                              <div style="cursor: pointer;">
@@ -36,127 +47,157 @@
                                  <span style="margin-left: 10pt;font-size: 14px;">Edition</span>
                              </div>
                          </accordion-heading>
-				
-						<!-- palette model -->
 						<div id="palette">
 							<form name="paletteForm" class="form_classification form-horizontal form-style" role="form" novalidate>
-								<!-- Choose band edition -->
 								<div class="form-group">
-									<label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label" translate="sldeditor.raster.1band.band">Band</label>
-									<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-										<select class="form-control" ng-model="band.selected" ng-options="dp.name for dp in $parent.dataProperties.bands">
-										</select>
+									<label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
+                                           translate="sldeditor.raster.1band.band">Band</label>
+									<div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                        <select class="form-control form-control-fix"
+                                                ng-model="optionsSLD.rasterPalette.band.selected"
+                                                ng-options="dp.name for dp in $parent.dataProperties.bands"
+                                                ng-change="fixRZSlider();"/>
 									</div>
 								</div>
-								
-								<!-- Set palette range -->
-								<div class="form-group" ng-show="band.selected.minValue">
-									<div class="col-md-offset-1 col-xs-3 col-sm-3 col-md-3 col-lg-3" style="top: 10px;">
-										<span class="control-label" translate="sldeditor.raster.repartition">distribution</span>
-									</div>
-									<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-										<input type="text" class="form-control" ng-model="palette.rasterMinValue" id="minValue" required>
-									</div>
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-										<rzslider rz-slider-floor="band.selected.minValue" rz-slider-ceil="band.selected.maxValue"
-											rz-slider-model="palette.rasterMinValue" rz-slider-high="palette.rasterMaxValue" rz-slider-step="1">
-										</rzslider>
-									</div>
-									<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-										<input type="text" class="form-control" ng-model="palette.rasterMaxValue" required
-											max="{{dataBands[0].maxValue}}" min="{{dataBands[0].minValue}}">
-									</div>
+								<div class="form-group" ng-show="optionsSLD.rasterPalette.band.selected.minValue !== undefined">
+									<!--div class="col-md-offset-1 col-xs-3 col-sm-3 col-md-3 col-lg-3"
+                                         style="top: 10px;">
+										<span class="control-label"
+                                              translate="sldeditor.raster.repartition">Distribution</span>
+									</div-->
+                                    <label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
+                                           translate="sldeditor.raster.repartition">Distribution</label>
+                                    <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="padding: 0;">
+                                            <input type="text" id="minValue"
+                                                   class="form-control form-control-fix"
+                                                   ng-model="optionsSLD.rasterPalette.palette.rasterMinValue" required/>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 styleRZSlider" style="padding:0 10px;">
+                                            <rzslider rz-slider-floor="optionsSLD.rasterPalette.band.selected.minValue"
+                                                      rz-slider-ceil="optionsSLD.rasterPalette.band.selected.maxValue"
+                                                      rz-slider-model="optionsSLD.rasterPalette.palette.rasterMinValue"
+                                                      rz-slider-high="optionsSLD.rasterPalette.palette.rasterMaxValue"
+                                                      rz-slider-step="1">
+                                            </rzslider>
+                                        </div>
+                                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="padding: 0;">
+                                            <input type="text"
+                                                   class="form-control form-control-fix"
+                                                   min="{{dataBands[0].minValue}}"
+                                                   max="{{dataBands[0].maxValue}}"
+                                                   ng-model="optionsSLD.rasterPalette.palette.rasterMaxValue"
+                                                   required/>
+                                        </div>
+                                    </div>
 								</div>
-			
-								<!-- Set palette type -->
 								<div class="form-group">
-									<label class="col-md-offset-2 col-sm-3 col-md-2 control-label " translate="sldeditor.raster.1band.Palette">Palette</label>
-									<div class="col-sm-7 col-md-8 pull-right">
-										<div class="btn-group select select-block">
-											<button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
-												<span class="filter-option pull-left"><img class="img_palette" src={{palette.img_palette}}></span>&nbsp;
+									<label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
+                                           translate="sldeditor.raster.1band.Palette">Palette</label>
+									<div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+										<div class="pull-right btn-group select select-block">
+											<button class="btn dropdown-toggle btn-default" data-toggle="dropdown" style="padding-right: 25px;">
+												<span class="filter-option pull-left">
+                                                    <img class="img_palette img_palette_ajust" ng-src="{{optionsSLD.rasterPalette.palette.img_palette}}"/>
+                                                </span>&nbsp;
 												<span class="caret"></span>
 											</button>
 											<span class="dropdown-arrow dropdown-arrow-inverse"></span>
 											<ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu"
 												style="overflow-y: auto; min-width: 70px; min-height: 108px;">
-												<li ng-click="$parent.choosePalette(1)"><a><img class="img_palette" src="images/palette1.png"></a></li>
-												<li ng-click="$parent.choosePalette(2)"><a><img class="img_palette" src="images/palette2.png"></a></li>
-												<li ng-click="$parent.choosePalette(3)"><a><img class="img_palette" src="images/palette3.png"></a></li>
-												<li ng-click="$parent.choosePalette(4)"><a><img class="img_palette" src="images/palette4.png"></a></li>
-												<li ng-click="$parent.choosePalette(5)"><a><img class="img_palette" src="images/palette5.png"></a></li>
+												<li ng-click="$parent.choosePalette(1)"><a><img class="img_palette img_palette_ajust" src="images/palette1.png"/></a></li>
+												<li ng-click="$parent.choosePalette(2)"><a><img class="img_palette img_palette_ajust" src="images/palette2.png"/></a></li>
+												<li ng-click="$parent.choosePalette(3)"><a><img class="img_palette img_palette_ajust" src="images/palette3.png"/></a></li>
+												<li ng-click="$parent.choosePalette(4)"><a><img class="img_palette img_palette_ajust" src="images/palette4.png"/></a></li>
+												<li ng-click="$parent.choosePalette(5)"><a><img class="img_palette img_palette_ajust" src="images/palette5.png"/></a></li>
 											</ul>
 										</div>
 									</div>
 								</div>
-								
-								<!-- choose between categorize and interpolation -->
 								<div class="form-group">
-									<div class="col-md-10 col-md-offset-4">
-										<label class="radio-inline"> 
-											<input type="radio" name="interpolation" ng-model="palette.interpolation" id="categorize" value="categorize">
-											<span translate="sldeditor.interpolation.solidcolor">aplat de couleur</span>
+									<div class="col-xs-8 col-sm-9 col-md-9 col-lg-8 pull-right">
+										<label class="radio-inline" style="font-size: 12px;margin-left: 0;">
+											<input id="categorize"
+                                                   type="radio"
+                                                   name="categorize"
+                                                   ng-model="optionsSLD.rasterPalette.palette.interpolation"
+                                                   value="categorize"/>
+											<span translate="sldeditor.interpolation.solidcolor">Solid color</span>
 										</label> 
-										<label class="radio-inline"> 
-											<input type="radio" name="interpolation" ng-model="palette.interpolation" id="interpolation" value="interpolate"> 
-											<span translate="sldeditor.interpolation.interpolatecolor">interpolate color</span>
+										<label class="radio-inline" style="font-size: 12px;margin-left: 0;">
+											<input id="interpolation"
+                                                   type="radio"
+                                                   name="interpolation"
+                                                   ng-model="optionsSLD.rasterPalette.palette.interpolation"
+                                                   value="interpolate"/>
+											<span translate="sldeditor.interpolation.interpolatecolor">Interpolate color</span>
 										</label>
 									</div>
 								</div>
-								
-								<!-- Set palette division -->
 								<div class="form-group">
-									<label class="col-md-offset-1 col-sm-3 col-md-3 control-label">Intervalles</label>
-									<div class="col-sm-9 col-md-8">
-										<input type="number" class="form-control" ng-model="palette.intervalles">
+									<label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
+                                            translate="sldeditor.edition.intervalsCount">Intervals count</label>
+									<div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+										<input type="number"
+                                               class="form-control form-control-fix"
+                                               ng-model="optionsSLD.rasterPalette.palette.intervalsCount"/>
 									</div>
 								</div>
-								
 								<div class="form-group">
-									<!-- reverse palette -->
-									<div class="checkbox col-md-4 col-md-offset-4">
-										<label> <input type="checkbox" ng-model="palette.inverse" translate="sldeditor.edition.reversecolors">
-											Reverse colors
-										</label>
-									</div>
-									
-									<!--  nan color -->
-									<div class="checkbox col-md-1">
-										<label> 
-											<input type="checkbox" ng-model="palette.nan.selected"> 
-											<span
-											translate="sldeditor.raster.1band.NaN">NaN</span>
-										</label>
-									</div>
-									<div class="col-md-2" ng-if="palette.nan.selected">
-										<input type='text' name="picker" class="picker" spectrum
-											ng-model="palette.nan.color" />
-									</div>
-								
+                                    <div class="col-xs-8 col-sm-9 col-md-9 col-lg-8 pull-right" style="padding-right: 10px;">
+                                        <div class="checkbox checkbox-inline">
+                                            <label>
+                                                <input type="checkbox"
+                                                       ng-model="optionsSLD.rasterPalette.palette.inverse">
+                                                    <span translate="sldeditor.edition.reversecolors">Reverse colors</span>
+                                                </input>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox checkbox-inline">
+                                            <label>
+                                                <input type="checkbox"
+                                                       ng-model="optionsSLD.rasterPalette.palette.nan.selected">
+                                                    <span translate="sldeditor.raster.1band.NaN">NaN</span>
+                                                </input>
+                                            </label>
+                                        </div>
+                                        <div class="pull-right" ng-if="optionsSLD.rasterPalette.palette.nan.selected">
+                                            <input type='text' name="picker" class="picker" spectrum
+                                                ng-model="optionsSLD.rasterPalette.palette.nan.color" />
+                                        </div>
+                                    </div>
 								</div>
 								<div class="form-group">
-									<button type="button" ng-click="displayCurrentStyle('styledMapOL')" class="btn btn-generer btn-default pull-right">Générer
-										la palette</button>
+									<button type="button"
+                                            ng-click="generateRasterPalette();"
+                                            class="btn btn-generer btn-default pull-right"
+                                            style="margin-top: 15px;">
+                                        <span translate="sldeditor.edition.rasterPalette.generate">Generate palette</span>
+                                    </button>
 								</div>
 							</form>
-							
 						</div>
 				</accordion-group>
-				
-				<accordion-group heading="Palette" is-open="palette.open">
+				<accordion-group heading="Palette" is-open="optionsSLD.rasterPalette.palette.open">
 					<accordion-heading>
                         <div style="cursor: pointer;">
                             <i class="pull-left glyphicon"
-                               ng-class="{'glyphicon-chevron-down': palette.open, 'glyphicon-chevron-right': !palette.open}"></i>
+                               ng-class="{'glyphicon-chevron-down': optionsSLD.rasterPalette.palette.open, 'glyphicon-chevron-right': !optionsSLD.rasterPalette.palette.open}"></i>
                             <span style="margin-left: 10pt;font-size: 15px;">Palette</span>
                         </div>
                     </accordion-heading>
-					<div class="style_bloc" ng-show="repartition">
+					<div class="style_bloc" ng-show="optionsSLD.rasterPalette.repartition !== undefined">
                         <div class="palette-array">
                             <table class="table">
-                                    <tr ng-repeat="data in repartition">
-                                        <td><div style="background-color: {{data.color}};width: 20px;height: 20px"/></td>
-                                        <td><span>{{data.data}}</span><span ng-if="$index != $last"> &gt; {{repartition[$index+1].data}}</span></td>
+                                    <tr ng-repeat="data in optionsSLD.rasterPalette.repartition">
+                                        <td>
+                                            <div ng-style="{'background-color':data.color,'width':'20px','height':'20px'}"></div>
+                                        </td>
+                                        <td>
+                                            <span>{{data.data}}</span>
+                                            <span ng-if="!$last"> -&gt; {{optionsSLD.rasterPalette.repartition[$index+1].data}}</span>
+                                            <span ng-if="$last"> -&gt; {{optionsSLD.rasterPalette.palette.rasterMaxValue}}</span>
+                                        </td>
                                         <td>
                                             <button type="button" class="btn btn-default btn-xs btn-remove">
                                                 <span class="glyphicon glyphicon-remove"></span>
@@ -166,19 +207,19 @@
                                 </table>
                         </div>
                         <div class="col-xs-12 div-btn-add">
-                            <button type="button" class="btn-apercu btn btn-default">Ajouter une valeur</button>
+                            <button type="button" class="btn-apercu btn btn-default">
+                                <span translate="sldeditor.edition.rasterPalette.addNewValue">Add new value</span>
+                            </button>
                         </div>
                     </div>
 				</accordion-group>
 			</accordion>
-			
-			<!-- Choose on grayscale or RGB -->
-			<div id="grayscale" ng-show="colorModel.name === 'grayscale'">
+			<div ng-show="optionsSLD.rasterPalette.colorModel === 'rgb'">
 				<form class="form_classification form-horizontal" role="form">
 					<div class="form-group bande_rouge">
-						<label class="col-sm-3 control-label">Bande rouge</label>
+						<label class="col-sm-3 control-label" translate="sldeditor.edition.rasterPalette.redChannel">Red channel</label>
 						<div class="col-sm-9">
-							<select class="form-control">
+							<select class="form-control form-control-fix">
 								<option>Bande 1</option>
 								<option>Bande 2</option>
 								<option>Bande 3</option>
@@ -188,9 +229,9 @@
 						</div>
 					</div>
 					<div class="form-group bande_verte">
-						<label class="col-sm-3 control-label">Bande verte</label>
+						<label class="col-sm-3 control-label" translate="sldeditor.edition.rasterPalette.greenChannel">Green channel</label>
 						<div class="col-sm-9">
-							<select class="form-control">
+							<select class="form-control form-control-fix">
 								<option>Bande 1</option>
 								<option>Bande 2</option>
 								<option>Bande 3</option>
@@ -200,9 +241,9 @@
 						</div>
 					</div>
 					<div class="form-group bande_bleue">
-						<label class="col-sm-3 control-label">Bande bleue</label>
+						<label class="col-sm-3 control-label" translate="sldeditor.edition.rasterPalette.blueChannel">Blue channel</label>
 						<div class="col-sm-9">
-							<select class="form-control">
+							<select class="form-control form-control-fix">
 								<option>Bande 1</option>
 								<option>Bande 2</option>
 								<option>Bande 3</option>
@@ -214,7 +255,7 @@
 				</form>
 			</div>
 		</div>
-		<div class="tab-pane" ng-class="{active:symbolPills==='outline'}">outline</div>
-		<div class="tab-pane" ng-class="{active:symbolPills==='contrast'}">contrast</div>
+		<div class="tab-pane" ng-class="{active:optionsSLD.rasterPalette.symbolPills==='outline'}">outline</div>
+		<div class="tab-pane" ng-class="{active:optionsSLD.rasterPalette.symbolPills==='contrast'}">contrast</div>
 	</div>
 </form>

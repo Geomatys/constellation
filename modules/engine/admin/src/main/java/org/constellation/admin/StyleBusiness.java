@@ -318,32 +318,31 @@ public final class StyleBusiness {
      */
     public Function getFunctionColorMap(String providerId, String styleName, String ruleName) throws TargetNotFoundException {
         // get style
-        Style style = ensureExistingStyle(providerId, styleName);
-        MutableStyle mStyle = parseStyle(style.getName(), style.getBody());
-        List<MutableRule> mutableRules = new ArrayList<MutableRule>(0);
+        final Style style = ensureExistingStyle(providerId, styleName);
+        final MutableStyle mStyle = parseStyle(style.getName(), style.getBody());
+        final List<MutableRule> mutableRules = new ArrayList<MutableRule>(0);
         if (!mStyle.featureTypeStyles().isEmpty()) {
             mutableRules.addAll(mStyle.featureTypeStyles().get(0).rules());
         }
 
         // search related rule
         MutableRule searchedRule = null;
-        for (MutableRule mutableRule : mutableRules) {
+        for (final MutableRule mutableRule : mutableRules) {
             if (mutableRule.getName().equalsIgnoreCase(ruleName)) {
-
                 searchedRule = mutableRule;
-                for (Symbolizer symbolizer : searchedRule.symbolizers()) {
-
+                for (final Symbolizer symbolizer : searchedRule.symbolizers()) {
                     // search raster symbolizer and return function
                     if (symbolizer instanceof RasterSymbolizer) {
-                        RasterSymbolizer rasterSymbolizer = (RasterSymbolizer) symbolizer;
-                        Function colorMapFunction = rasterSymbolizer.getColorMap().getFunction();
-                        return colorMapFunction;
+                        final RasterSymbolizer rasterSymbolizer = (RasterSymbolizer) symbolizer;
+                        if(rasterSymbolizer.getColorMap() != null){
+                            final Function colorMapFunction = rasterSymbolizer.getColorMap().getFunction();
+                            return colorMapFunction;
+                        }
                     }
                 }
+                break;
             }
-            break;
         }
-
         return null;
     }
 

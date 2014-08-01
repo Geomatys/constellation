@@ -286,7 +286,7 @@ cstlAdminApp.factory('style', ['$resource',
             'generateAutoIntervalStyle':{method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoInterval;jsessionid='},
             'generateAutoUniqueStyle':  {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoUnique;jsessionid='},
             'getChartDataJson':         {method: 'POST',   url: '@cstl/api/1/SP/getChartDataJson;jsessionid='},
-            'paletteStyle':             {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name/:ruleName;jsessionid=', isArray: true},
+            'paletteStyle':             {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name/:ruleName;jsessionid='},
             'statistics':               {method: 'POST',   url: '@cstl/api/1/SP/statistics;jsessionid='}
         });
     }]);

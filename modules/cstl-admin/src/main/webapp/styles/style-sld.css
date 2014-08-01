@@ -278,6 +278,9 @@ ul.dropdown-images li a:hover{
     padding: 6px;
     font-size: 12px;
 }
+select.form-control-fix{
+    padding:2px;
+}
 
 .vectorChart g.c3-event-rects{
     cursor:default !important;
@@ -287,6 +290,25 @@ ul.dropdown-images li a:hover{
 }
 .vectorChart .c3-axis-x text{
     display:none !important;
+}
+.chartPanelBackground{
+    background: transparent url('../images/background-white.png') repeat;
+}
+
+.styleRZSlider rzslider span.bubble.limit{
+    display:none;
+}
+.styleRZSlider rzslider span.bubble {
+    display:none;
+}
+.styleRZSlider rzslider span.pointer {
+    width: 6px;
+}
+.styleRZSlider rzslider {
+    margin: 15px 0;
+}
+.styleRZSlider rzslider span.bar{
+    background-color: #c3c3c3;
 }
 
 /* Small devices (tablets, 768px and up) */
@@ -353,7 +375,7 @@ ul.dropdown-images li a:hover{
 		width: 235px;
 	}
     img.img_palette_ajust{
-        width: 160px;
+        width: 90%;
     }
 	.bloc_apercu{
 		width:430px;
@@ -380,7 +402,7 @@ ul.dropdown-images li a:hover{
 		width: 235px;
 	}
     img.img_palette_ajust{
-        width: 160px;
+        width: 90%;
     }
 	.bloc_apercu{
 		width:465px;

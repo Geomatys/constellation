@@ -20,7 +20,7 @@
                         </button>
                         <button type="button" class="btn btn-add "
                                 ng-class="{'bouton-choix-style-selected': isSelectedChooser('new'), 'bouton-choix-style-normal':isSelectedChooser('existing')}"
-                                ng-click="setStyleChooser('new');"
+                                ng-click="editNewStyle();"
                                 style="font-size: 12px;">
                             <span translate="edition.style.label.choice.new" >Create new style</span>
                         </button>
@@ -116,7 +116,7 @@
                                         </div>
                                         <div class="item style-{{style.Type | lowercase}}"
                                              ng-class="{selected:style==selected}"
-                                             ng-click="select(style);displayCurrentStyle('styledMapWithSelectedStyle');">
+                                             ng-click="select(style);displayCurrentStyle('styledMapWithSelectedStyle',null);">
                                             <div class="top">
                                                 <span class="item-title" style="width: 100%;">{{style.Name}}</span>
                                                 <span class="pull-right text-right item-list-style">{{style.Type}}</span>
@@ -144,7 +144,7 @@
         <div class="modal-footer" style="margin-top: 0;">
             <button type="button"
                     class="btn btn-default"
-                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor"
+                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
                     ng-click="close()" >
                 <span translate="sldeditor.button.cancel">Cancel</span>
             </button>
@@ -156,20 +156,20 @@
             </button>
             <button type="button"
                     class="btn btn-add"
-                    ng-show="isSelectedChooser('edit') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor"
+                    ng-show="isSelectedChooser('edit') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
                     ng-disabled="!selected && isSelectedChooser('existing')"
                     ng-click="updateStyle();">
                 <span translate="sldeditor.button.validateandsave">Save and validate</span>
             </button>
             <button type="button"
                     class="btn btn-add"
-                    ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor"
+                    ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
                     ng-click="createStyle();">
                 <span translate="sldeditor.button.create">Create</span>
             </button>
             <button type="button"
                     class="btn btn-add"
-                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor"
+                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor || optionsSLD.enableRasterPalette || optionsSLD.enableRasterCells"
                     ng-click="goBack();">
                 <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>
             </button>

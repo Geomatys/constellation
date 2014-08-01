@@ -19,9 +19,10 @@
 
 package org.constellation.rest.dto;
 
+import org.constellation.json.binding.InterpolationPoint;
+
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * This model used as a response json from server to client.
@@ -30,27 +31,21 @@ import java.util.Map;
  * @version 0.9
  * @since 0.9
  */
-public class ChartDataModelDTO implements Serializable {
+public class RepartitionDTO implements Serializable {
 
-    private boolean isNumberField;
+    private List<InterpolationPoint> points;
 
-    private Map<Object,Long> mapping = new LinkedHashMap<>();
+    public RepartitionDTO(){}
 
-    public ChartDataModelDTO(){}
-
-    public Map<Object, Long> getMapping() {
-        return mapping;
+    public RepartitionDTO(final List<InterpolationPoint> points){
+        this.points = points;
     }
 
-    public void setMapping(Map<Object, Long> mapping) {
-        this.mapping = mapping;
+    public List<InterpolationPoint> getPoints() {
+        return points;
     }
 
-    public boolean isNumberField() {
-        return isNumberField;
-    }
-
-    public void setNumberField(boolean isNumberField) {
-        this.isNumberField = isNumberField;
+    public void setPoints(List<InterpolationPoint> points) {
+        this.points = points;
     }
 }

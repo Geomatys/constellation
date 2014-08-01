@@ -25,17 +25,19 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
                 templateUrl: 'views/modalLoader.html',
                 controller: 'ModalInstanceCtrl'
             });
-            style.listAll({provider: 'sld'},
-                function(response) {
-                    $dashboard($scope, response.styles, true);
-                    $scope.filtertype = "";
-                    $scope.ordertype = "Name";
-                    modalLoader.close();
-                },
-                function() {
-                    modalLoader.close();
-                }
-            );
+            modalLoader.opened.then(function() {
+                style.listAll({provider: 'sld'},
+                    function(response) {
+                        $dashboard($scope, response.styles, true);
+                        $scope.filtertype = "";
+                        $scope.ordertype = "Name";
+                        modalLoader.close();
+                    },
+                    function() {
+                        modalLoader.close();
+                    }
+                );
+            });
         };
 
         /**
@@ -126,17 +128,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             pageSld: 'views/style/chooseType.html'
         };
 
-        $scope.openPalette = false;
-        
-        $scope.repartition = undefined;
-
         /**
          * SLD model object that store all needed variables to avoid angular bug behaviour in modal.
          */
-
         function initOptionsSLD(){
             $scope.optionsSLD={
                 viewMode:'carto',
+                enabledRasterChart:false,
                 autoPreview:true,
                 selectedRule:null,
                 enableRuleEditor:false,
@@ -146,7 +144,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     "method":"equidistant",
                     "symbol":"polygon",
                     "palette": {
-                        index: 0,
+                        index: 1,
                         img_palette: 'images/palette1.png',
                         colors:[],
                         reverseColors:false
@@ -162,7 +160,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     "attr":"",
                     "symbol":"polygon",
                     "palette": {
-                        index: 0,
+                        index: 1,
                         img_palette: 'images/palette1.png',
                         colors:[],
                         reverseColors:false
@@ -174,6 +172,34 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     }
                 },
                 enableAutoUniqueEditor:false,
+                rasterPalette:{
+                    "symbolPills":'color',
+                    "colorModel":'palette',
+                    band: {
+                        "selected":undefined
+                    },
+                    palette: {
+                        "index": undefined,
+                        "img_palette": 'images/palette0.png',
+                        "rasterMinValue": 0,
+                        "rasterMaxValue": 0,
+                        "intervalsCount": 5,
+                        "channelSelection": undefined,
+                        nan: {
+                            "color":undefined,
+                            "selected":false
+                        },
+                        "inverse": false,
+                        "interpolation":'interpolate',
+                        "open":false
+                    },
+                    repartition:undefined
+                },
+                enableRasterPalette:false,
+                rasterCells:{
+                    //@TODO add properties
+                },
+                enableRasterCells:false,
                 selectedSymbolizerType:"",
                 selectedSymbolizer:null,
                 filtersEnabled:false,
@@ -191,22 +217,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
         initOptionsSLD();
 
-        
-        
-        $scope.colorModels = [
-          {name:'palette', value:'Palette'},
-          {name:'grayscale', value:'Grascale /RGB'}];
-
-	      $scope.colorModel= $scope.colorModels[0];
-	
-	      $scope.symbolPills = 'color';
-	      
-	      $scope.selectedBand = undefined;
-        
-	      $scope.band = {
-	    		  'selected':undefined
-	      };
-	      
         /**
          * The json model that represents the style sld.
          */
@@ -224,7 +234,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 }
                 //using $timeout to fix Angular bug :
                 // with modal to let OpenLayers map initialization when the map div is not rendered yet.
-                $timeout(function(){$scope.displayCurrentStyle(mapId);},100);
+                $timeout(function(){$scope.displayCurrentStyle(mapId,null);},100);
             }
         },true);
 
@@ -242,29 +252,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         });
 
         /**
-         * The layer's attributes json object.
+         * The layer's metadata properties.
          */
         $scope.dataProperties = null;
         $scope.attributesTypeNumber = [];
         $scope.attributesExcludeGeometry = [];
         $scope.dataBbox = null;
         $scope.dataBands = null;
-
-        $scope.palette = {
-            index: undefined,
-            img_palette: 'images/palette0.png',
-            rasterMinValue: 0,
-            rasterMaxValue: 0,
-            intervalles: 1,
-            channelSelection: undefined,
-            nan: {
-            	color:undefined,
-            	selected:false
-            },
-            inverse: false,
-            interpolation:'interpolate',
-            open:false
-        };
 
         /**
          * Affect alpha from colorpicker into param.opacity
@@ -368,6 +362,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.optionsSLD.enableRuleEditor = false;
             $scope.optionsSLD.enableAutoIntervalEditor = false;
             $scope.optionsSLD.enableAutoUniqueEditor = false;
+            $scope.optionsSLD.enableRasterPalette = false;
+            $scope.optionsSLD.enableRasterCells = false;
         };
 
         /**
@@ -392,13 +388,36 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.setStyleChooser('edit');
             var styleName = styleObj.Name;
             var providerId = styleObj.Provider;
-            style.get({provider: providerId, name: styleName}, function(response) {
-                $scope.newStyle = response;
-                $scope.selectedStyle = styleObj;
-                initOptionsSLD();
-                $scope.loadDataProperties();
-                $scope.initPlot();
-            });
+            if(styleObj.Type === 'VECTOR'){
+                style.get({provider: providerId, name: styleName}, function(response) {
+                    $scope.newStyle = response;
+                    $scope.selectedStyle = styleObj;
+                    initOptionsSLD();
+                    $scope.loadDataProperties();
+                    $scope.initPlot();
+                });
+            }else {
+                style.get({provider: providerId, name: styleName}, function(response) {
+                    $scope.newStyle = response;
+                    $scope.selectedStyle = styleObj;
+                    initOptionsSLD();
+                    $scope.loadDataProperties();
+                    //@TODO affect properties from current style to OptionsSLD
+                });
+            }
+        };
+
+        /**
+         * Reset sld editor for new style creation.
+         */
+        $scope.editNewStyle = function() {
+            //init all necessary objects for new style
+            $scope.setStyleChooser('new');
+            $scope.newStyle = null;
+            $scope.selectedStyle = null;
+            initOptionsSLD();
+            initSldPage();
+            $scope.loadDataProperties();
         };
 
         /**
@@ -417,9 +436,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.setStyleChooser = function(choice) {
             $scope.stylechooser = choice;
             if(choice ==='existing'){
-                setTimeout(function(){$scope.displayCurrentStyle('styledMapWithSelectedStyle');},100);
+                setTimeout(function(){$scope.displayCurrentStyle('styledMapWithSelectedStyle',null);},100);
             }else {
-                setTimeout(function(){$scope.displayCurrentStyle('styledMapOL');},100);
+                setTimeout(function(){$scope.displayCurrentStyle('styledMapOL',null);},100);
             }
         };
 
@@ -464,7 +483,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "method":"equidistant",
                         "symbol":"polygon",
                         "palette": {
-                            index: 0,
+                            index: 1,
                             img_palette: 'images/palette1.png',
                             colors:[],
                             reverseColors:false
@@ -481,7 +500,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "attr":"",
                         "symbol":"polygon",
                         "palette": {
-                            index: 0,
+                            index: 1,
                             img_palette: 'images/palette1.png',
                             colors:[],
                             reverseColors:false
@@ -494,32 +513,55 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     };
                     $scope.editAutoUniquePanel();
                 }else if(mode ==='raster_palette'){
+                    $scope.optionsSLD.rasterPalette = {
+                        "symbolPills":'color',
+                        "colorModel":'palette',
+                        band: {
+                            "selected":undefined
+                        },
+                        palette: {
+                            "index": undefined,
+                            "img_palette": 'images/palette0.png',
+                            "rasterMinValue": 0,
+                            "rasterMaxValue": 0,
+                            "intervalsCount": 5,
+                            "channelSelection": undefined,
+                            nan: {
+                                "color":undefined,
+                                "selected":false
+                            },
+                            "inverse": false,
+                            "interpolation":'interpolate',
+                            "open":false
+                        },
+                        repartition:undefined
+                    };
                     var rule = {
                         "name": 'palette-rule',
                         "title":'',
                         "description":'',
                         "maxScale":500000000,
-                        "symbolizers": [],
+                        "symbolizers": [{'@symbol':'raster'}],
                         "filter": null
                     };
-                    
-                    rule.symbolizers.push({'@symbol':'raster'});
-                    
                     $scope.newStyle.rules.push(rule);
                     $scope.setSelectedRule(rule);
-                    $scope.editSelectedRule();
+                    $scope.editRasterPalette();
                 }else if(mode ==='raster_cellule'){
+                    $scope.optionsSLD.rasterCells = {
+                        //@TODO add properties
+                    };
                     var rule = {
                         "name": 'cell-rule',
                         "title":'',
                         "description":'',
                         "maxScale":500000000,
-                        "symbolizers": [],
+                        "symbolizers": [{'@symbol':'raster'}],
                         "filter": null
                     };
                     $scope.newStyle.rules.push(rule);
                     $scope.setSelectedRule(rule);
-                    $scope.editSelectedRule();
+                    $scope.editRasterCells();
                 }
                 $scope.optionsSLD.viewMode = 'carto';
                 $scope.optionsSLD.filtersEnabled=false;
@@ -564,7 +606,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         /**
-         * Open the rule editor and make sure before that there is a selectedRule object not null into the scope.
+         * For Vector : Open the rule editor and make sure before that there is a selectedRule object not null into the scope.
+         * make the rule editor panel visible.
          */
         $scope.editSelectedRule = function(){
             if($scope.optionsSLD.selectedRule !== null){
@@ -573,7 +616,30 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 $scope.optionsSLD.enableAutoUniqueEditor = false;
             }
         };
+        /**
+         * Edit rule for raster.
+         * @TODO we need to identify raster palette against raster cells to open the good panel.
+         * and restore $scope.optionsSLD.rasterPalette with the selected rule properties
+         */
+        $scope.editSelectedRasterRule = function(){
 
+            //@TODO init $scope.optionsSLD.rasterPalette for the $scope.optionsSLD.selectedRule
+
+            if($scope.optionsSLD.selectedRule.symbolizers &&
+                $scope.optionsSLD.selectedRule.symbolizers.length>0 &&
+                $scope.optionsSLD.selectedRule.symbolizers[0].colorMap){
+                //@TODO open for raster palette, the if test is ok?
+                $scope.optionsSLD.enableRasterPalette = true;
+                $scope.optionsSLD.enableRasterCells = false;
+            }else {
+                //open raster cells panel
+                $scope.optionsSLD.enableRasterPalette = false;
+                $scope.optionsSLD.enableRasterCells = true;
+            }
+        };
+        /**
+         * For Vector : make autoInterval Panel visible.
+         */
         $scope.editAutoIntervalPanel = function(){
             if($scope.optionsSLD.autoIntervalValues !== null){
                 $scope.optionsSLD.enableAutoIntervalEditor=true;
@@ -581,12 +647,32 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 $scope.optionsSLD.enableAutoUniqueEditor = false;
             }
         };
-
+        /**
+         * For Vector : make autoUnique values panel to visible.
+         */
         $scope.editAutoUniquePanel = function(){
             if($scope.optionsSLD.autoUniqueValues !== null){
                 $scope.optionsSLD.enableAutoUniqueEditor = true;
                 $scope.optionsSLD.enableAutoIntervalEditor=false;
                 $scope.optionsSLD.enableRuleEditor = false;
+            }
+        };
+        /**
+         * For Raster : make raster palette panel to visible
+         */
+        $scope.editRasterPalette = function() {
+            if($scope.optionsSLD.rasterPalette !== null) {
+                $scope.optionsSLD.enableRasterPalette = true;
+                $scope.optionsSLD.enableRasterCells = false;
+            }
+        };
+        /**
+         * For Raster : make raster cells panel to visible
+         */
+        $scope.editRasterCells = function() {
+            if($scope.optionsSLD.rasterPalette !== null) {
+                $scope.optionsSLD.enableRasterPalette = false;
+                $scope.optionsSLD.enableRasterCells = true;
             }
         };
 
@@ -981,7 +1067,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.dataType = 'vector';
             $scope.providerId = 'generic_shp';
             $scope.layerName = 'CNTR_RG_60M_2006';
-            $scope.displayCurrentStyle('styledMapOL');
+            $scope.displayCurrentStyle('styledMapOL',null);
         };
 
         /**
@@ -993,7 +1079,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.dataType = 'raster';
             $scope.providerId = 'generic_world_tif';
             $scope.layerName = 'cloudsgrey';
-            $scope.displayCurrentStyle('styledMapOL');
+            $scope.displayCurrentStyle('styledMapOL',null);
         };
 
         /**
@@ -1013,16 +1099,27 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     }
 
                     //for raster only
-                    if($scope.dataProperties.bands){
-                        $scope.band.selected = $scope.dataProperties.bands[0];
-                        $scope.palette.rasterMinValue = $scope.band.selected.minValue;
-                        $scope.palette.rasterMaxValue = $scope.band.selected.maxValue;
+                    if($scope.dataType === 'raster'){
+                        $scope.dataBands = response.bands;
+                        if($scope.dataBands && $scope.dataBands.length > 0){
+                            $scope.optionsSLD.rasterPalette.band.selected = $scope.dataBands[0];
+                            $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
+                            $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+                        }
                     }
                 },
                 function() {
                     $growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
                 }
             );
+        };
+
+        /**
+         * Fix rzslider bug with angular on value changed for band selector.
+         */
+        $scope.fixRZSlider = function(){
+            $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
+            $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
         };
 
         /**
@@ -1071,13 +1168,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.initDataLayerProperties = function(callback) {
             provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
                 function(response) {
-                    $scope.dataProperties = response.properties;
                     $scope.dataBbox = response.boundingBox;
-                    $scope.dataBands = response.bands;
-                    if ($scope.dataBands && $scope.dataBands.length > 0) {
-                        $scope.palette.rasterMinValue = $scope.dataBands[0].minValue;
-                        $scope.palette.rasterMaxValue = $scope.dataBands[0].maxValue;
-                    }
                     if(typeof callback =='function'){
                         callback();
                     }
@@ -1085,23 +1176,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $growl('error', 'Error', 'Unable to get data description');
                 }
             );
-        };
-
-        $scope.isgeophys = false;
-        $scope.initRaster1Band = function() {
-            $scope.dataType = 'coverage';
-            $scope.providerId = 'generic_world_tif';
-            $scope.layerName = 'cloudsgrey';
-            $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'raster';
-            $scope.initDataLayerProperties();
-
-            provider.isGeophysic({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
-                $scope.isgeophys = (response.value == 'true');
-            });
-        };
-
-        $scope.initRasterNBands = function() {
-            // todo
         };
 
         $scope.aceLoaded = function(_editor) {
@@ -1156,8 +1230,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.choosePalette = function(index) {
-            $scope.palette.img_palette = 'images/palette' + index + '.png';
-            $scope.palette.index = index;
+            $scope.optionsSLD.rasterPalette.palette.img_palette = 'images/palette' + index + '.png';
+            $scope.optionsSLD.rasterPalette.palette.index = index;
         };
 
         $scope.choosePaletteVectorInterval = function(index) {
@@ -1336,115 +1410,172 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             );
         };
 
-      
-        $scope.addPalette = function() {
-            if ($scope.palette.index == undefined) {
+        $scope.generateRasterPalette = function() {
+            if($scope.optionsSLD.selectedRule){
+                //first of all, add Palette and ensure that the temporary style exists in server.
+                $scope.addPalette($scope.optionsSLD.selectedRule);
+                $scope.displayCurrentStyle('styledMapOL', function(createdTmpStyle){
+                    //get interpolation points for ui
+                    if ($scope.optionsSLD.rasterPalette.palette.index !== undefined) {
+                        //show palette
+                        style.paletteStyle({provider: 'sld_temp', name : $scope.newStyle.name, ruleName : $scope.optionsSLD.selectedRule.name},
+                            function(response) {
+                                if(response.points){
+                                    $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points = response.points;
+                                    $scope.optionsSLD.rasterPalette.repartition = $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points;
+                                }
+                            },
+                            function() {
+                                $growl('error', 'Error', 'Unable to get palette for '+$scope.layerName);
+                            }
+                        );
+
+                        ///show histogram
+                        var values = {
+                            "values":{
+                                "dataProvider":$scope.providerId,
+                                "dataId":$scope.layerName
+                            }
+                        };
+                        style.statistics({}, values,
+                            function(response){
+                                console.debug(response);
+                            },
+                            function(){
+                                $growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
+                            }
+                        );
+                        $scope.optionsSLD.rasterPalette.palette.open = true;
+                    }
+                });
+            }
+        };
+
+        /**
+         * Apply colorMap on rule for selected palette.
+         */
+        $scope.addPalette = function(rule) {
+            var palette = $scope.optionsSLD.rasterPalette.palette;
+            if (palette.index == undefined) {
                 return;
             }
-            
-            if ($scope.newStyle.rules[0].symbolizers[0].colorMap == undefined || 
-            		$scope.newStyle.rules[0].symbolizers[0].colorMap.function == undefined ||
-            		$scope.newStyle.rules[0].symbolizers[0].colorMap.function['@function'] != $scope.palette.interpolation) {
-            	$scope.newStyle.rules[0].symbolizers[0].colorMap = {'function': {'@function': $scope.palette.interpolation}};
+
+            //set channel selection
+            rule.symbolizers[0].channelSelection = {
+                greyChannel :{
+                    name: $scope.optionsSLD.rasterPalette.band.selected.name
+                },
+                rgbChannels : null
+                // rgbChannels : [{name:'0'},{name,'1'},{name:'2'}]
             }
+
+            var colorMap = rule.symbolizers[0].colorMap;
+
+            if (colorMap == undefined ||
+                colorMap.function == undefined ||
+                colorMap.function['@function'] != palette.interpolation) {
+                colorMap = {'function': {'@function': palette.interpolation}};
+            }
+
+            colorMap.function.interval = palette.intervalsCount;
+            colorMap.function.nanColor = palette.nan.color;
             
-            $scope.newStyle.rules[0].symbolizers[0].colorMap.function.interval = $scope.palette.intervalles;
-            $scope.newStyle.rules[0].symbolizers[0].colorMap.function.nanColor = $scope.palette.nan.color;
-            
-            switch ($scope.palette.index) {
+            switch (palette.index) {
                 case 1:
-                    var delta = $scope.palette.rasterMaxValue - $scope.palette.rasterMinValue;
-                    if (!$scope.palette.inverse) {
-                        if ($scope.newStyle.rules[0].symbolizers[0].colorMap.function == undefined) {
-                            $scope.newStyle.rules[0].symbolizers[0].colorMap.function = {};
+                    var delta = palette.rasterMaxValue - palette.rasterMinValue;
+                    if (!palette.inverse) {
+                        if (colorMap.function == undefined) {
+                            colorMap.function = {};
                         }
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#e52520'},
-                                    {data: delta * 0.25 + $scope.palette.rasterMinValue, color: '#ffde00'},
-                                    {data: delta * 0.5 + $scope.palette.rasterMinValue, color: '#95c11f'},
-                                    {data: delta * 0.75 + $scope.palette.rasterMinValue, color: '#1d71b8'},
-                                    {data: $scope.palette.rasterMinValue, color: '#662483'}
+                                    {data: palette.rasterMinValue, color: '#e52520'},
+                                    {data: delta * 0.25 + palette.rasterMinValue, color: '#ffde00'},
+                                    {data: delta * 0.5 + palette.rasterMinValue, color: '#95c11f'},
+                                    {data: delta * 0.75 + palette.rasterMinValue, color: '#1d71b8'},
+                                    {data: palette.rasterMaxValue, color: '#662483'}
                                 ];
                     } else {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#662483'},
-                                    {data: delta * 0.25 + $scope.palette.rasterMinValue, color: '#1d71b8'},
-                                    {data: delta * 0.5 + $scope.palette.rasterMinValue, color: '#95c11f'},
-                                    {data: delta * 0.75 + $scope.palette.rasterMinValue, color: '#ffde00'},
-                                    {data: $scope.palette.rasterMinValue, color: '#e52520'}
+                                    {data: palette.rasterMinValue, color: '#662483'},
+                                    {data: delta * 0.25 + palette.rasterMinValue, color: '#1d71b8'},
+                                    {data: delta * 0.5 + palette.rasterMinValue, color: '#95c11f'},
+                                    {data: delta * 0.75 + palette.rasterMinValue, color: '#ffde00'},
+                                    {data: palette.rasterMaxValue, color: '#e52520'}
                                 ];
                     }
                     break;
                 case 2:
-                    if (!$scope.palette.inverse) {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                    if (!palette.inverse) {
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#3F3460'},
-                                    {data: $scope.palette.rasterMaxValue, color: '#EC1876'}
+                                    {data: palette.rasterMinValue, color: '#3F3460'},
+                                    {data: palette.rasterMaxValue, color: '#EC1876'}
                                 ];
                     } else {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#EC1876'},
-                                    {data: $scope.palette.rasterMaxValue, color: '#3F3460'}
+                                    {data: palette.rasterMinValue, color: '#EC1876'},
+                                    {data: palette.rasterMaxValue, color: '#3F3460'}
                                 ];
                     }
                     break;
                 case 3:
-                    if (!$scope.palette.inverse) {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                    if (!palette.inverse) {
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#036531'},
-                                    {data: $scope.palette.rasterMaxValue, color: '#FDF01A'}
+                                    {data: palette.rasterMinValue, color: '#036531'},
+                                    {data: palette.rasterMaxValue, color: '#FDF01A'}
                                 ];
                     } else {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#FDF01A'},
-                                    {data: $scope.palette.rasterMaxValue, color: '#036531'}
+                                    {data: palette.rasterMinValue, color: '#FDF01A'},
+                                    {data: palette.rasterMaxValue, color: '#036531'}
                                 ];
                     }
                     break;
                 case 4:
-                    var delta = $scope.palette.rasterMaxValue - $scope.palette.rasterMinValue;
-                    if (!$scope.palette.inverse) {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                    var delta = palette.rasterMaxValue - palette.rasterMinValue;
+                    if (!palette.inverse) {
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#2d2e83'},
-                                    {data: delta * 0.25 + $scope.palette.rasterMinValue, color: '#1d71b8'},
-                                    {data: delta * 0.5 + $scope.palette.rasterMinValue, color: '#ffde00'},
-                                    {data: $scope.palette.rasterMinValue, color: '#e52520'}
+                                    {data: palette.rasterMinValue, color: '#2d2e83'},
+                                    {data: delta * 0.25 + palette.rasterMinValue, color: '#1d71b8'},
+                                    {data: delta * 0.5 + palette.rasterMinValue, color: '#ffde00'},
+                                    {data: palette.rasterMinValue, color: '#e52520'}
                                 ];
                     } else {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#e52520'},
-                                    {data: delta * 0.5 + $scope.palette.rasterMinValue, color: '#ffde00'},
-                                    {data: delta * 0.75 + $scope.palette.rasterMinValue, color: '#1d71b8'},
-                                    {data: $scope.palette.rasterMinValue, color: '#2d2e83'}
+                                    {data: palette.rasterMinValue, color: '#e52520'},
+                                    {data: delta * 0.5 + palette.rasterMinValue, color: '#ffde00'},
+                                    {data: delta * 0.75 + palette.rasterMinValue, color: '#1d71b8'},
+                                    {data: palette.rasterMinValue, color: '#2d2e83'}
                                 ];
                     }
                     break;
                 case 5:
-                    if (!$scope.palette.inverse) {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                    if (!palette.inverse) {
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#000000'},
-                                    {data: $scope.palette.rasterMaxValue, color: '#FFFFFF'}
+                                    {data: palette.rasterMinValue, color: '#000000'},
+                                    {data: palette.rasterMaxValue, color: '#FFFFFF'}
                                 ];
                     } else {
-                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        colorMap.function.points =
                                 [
-                                    {data: $scope.palette.rasterMinValue, color: '#FFFFFF'},
-                                    {data: $scope.palette.rasterMaxValue, color: '#000000'}
+                                    {data: palette.rasterMinValue, color: '#FFFFFF'},
+                                    {data: palette.rasterMaxValue, color: '#000000'}
                                 ];
                     }
                     break;
                 default:
                     break;
             }
+
+            rule.symbolizers[0].colorMap = colorMap;
         };
 
 
@@ -1476,12 +1607,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if ($scope.newStyle.name === "") {
                 $scope.noName = true;
             } else {
-                //case for raster we need to treat the palette
-                if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
-                    $scope.addPalette();
-                }
                 //write style in server side.
-                style.createjson({provider: 'sld'}, $scope.newStyle, function() {
+                style.createjson({provider: 'sld'}, $scope.newStyle, function(response) {
                     $growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully created');
                     $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
                 }, function() {
@@ -1494,7 +1621,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         /**
          * Performs a preview of current style in map
          */
-        $scope.displayCurrentStyle = function(mapId) {
+        $scope.displayCurrentStyle = function(mapId, callbackAfterCreate) {
             //skip if layerName is undefined
             if(! $scope.layerName){
                 return;
@@ -1527,17 +1654,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     }
                 });
             }else {
-                if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
-                    $scope.addPalette();
-                }
-
                 if ($scope.newStyle.name === "") {
                     $scope.newStyle.name = 'default-sld';
                 }
 
                 //creates the current style in a temporary provider.
                 style.createjson({provider: 'sld_temp'}, $scope.newStyle,
-                    function() {
+                    function(response) {
+                        //$scope.newStyle.rules = response.rules;
                         var layerData;
                         var layerBackground = null;
                         if($scope.selectedLayer !== null){
@@ -1549,7 +1673,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
                         }else {
                             //if there is no selectedLayer ie the sld editor in styles dashboard
-                            if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
+                            if ($scope.dataType.toLowerCase() === 'raster') {
                                 //to avoid layer disappear when rules is empty
                                 if($scope.newStyle.rules.length ==0){
                                     layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
@@ -1582,39 +1706,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             setCurrentScale();
                         });
                         setCurrentScale();
+                        if(typeof callbackAfterCreate ==='function'){
+                            callbackAfterCreate(response);
+                        }
                     }
                 );
-            }
-
-            //For raster only
-            if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
-                //show palette
-                style.paletteStyle({provider: 'sld_temp', name : $scope.newStyle.name, ruleName : $scope.newStyle.rules[0].name},
-                    function(response) {
-                        $scope.repartition = response;
-                    },
-                    function() {
-                        $growl('error', 'Error', 'Unable to get palette for '+$scope.layerName);
-                    });
-
-                ///show histogram
-                var values = {
-                    "values":{
-                        "dataProvider":$scope.providerId,
-                        "dataId":$scope.layerName
-                    }
-                };
-
-                style.statistics({}, values,
-                    function(response){
-                        console.log("repartition size => "+response.bands[0].repartition);
-                    },
-                    function(){
-                        $growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
-
-                    });
-
-                $scope.palette.open = true;
             }
         };
 
@@ -1722,7 +1818,16 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     x: [],
                     data1: []
                 }
-            },'',true);
+            },'',true,460,400);
+        };
+
+        $scope.initRasterPlot = function() {
+            $scope.loadPlot({
+                json: {
+                    x: [],
+                    data1: []
+                }
+            },'',true,460,200);
         };
 
         /**
@@ -1730,13 +1835,15 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * @param data
          * @param attr
          * @param useCategories
+         * @param width
+         * @param height
          */
-        $scope.loadPlot = function(data, attr,useCategories) {
+        $scope.loadPlot = function(data, attr,useCategories,width,height) {
             $scope.optionsSLD.chart.widget = c3.generate({
                 bindto: '#chart',
                 size: {
-                    height: 400,
-                    width: 460
+                    height: height,
+                    width: width
                 },
                 padding: {
                     top: 20,
@@ -1822,7 +1929,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                   data1: yarray
                               }
                         };
-                        $scope.loadPlot(dataRes,$scope.optionsSLD.chart.attribute, true);
+                        $scope.loadPlot(dataRes,$scope.optionsSLD.chart.attribute, true,460,400);
                     }
                 }
             );

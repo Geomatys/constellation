@@ -26,6 +26,9 @@ import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
+import org.constellation.json.binding.ChannelSelection;
+import org.constellation.json.binding.InterpolationPoint;
+import org.constellation.json.binding.RasterSymbolizer;
 import org.constellation.json.binding.Style;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
@@ -46,15 +49,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
-import org.geotoolkit.style.DefaultDescription;
-import org.geotoolkit.style.DefaultLineSymbolizer;
-import org.geotoolkit.style.DefaultMutableStyle;
-import org.geotoolkit.style.DefaultPointSymbolizer;
-import org.geotoolkit.style.DefaultPolygonSymbolizer;
-import org.geotoolkit.style.MutableRule;
-import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.MutableStyleFactory;
-import org.geotoolkit.style.StyleConstants;
+import org.geotoolkit.style.*;
 import org.geotoolkit.style.function.Categorize;
 import org.geotoolkit.style.function.Interpolate;
 import org.geotoolkit.style.interval.DefaultIntervalPalette;
@@ -67,15 +62,8 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.style.Fill;
-import org.opengis.style.Graphic;
-import org.opengis.style.GraphicalSymbol;
-import org.opengis.style.LineSymbolizer;
-import org.opengis.style.Mark;
-import org.opengis.style.PointSymbolizer;
-import org.opengis.style.PolygonSymbolizer;
+import org.opengis.style.*;
 import org.opengis.style.Stroke;
-import org.opengis.style.Symbolizer;
 import org.opengis.util.NoSuchIdentifierException;
 
 import javax.inject.Inject;
@@ -133,6 +121,21 @@ public final class StyleRest {
     @PUT
     @Path("{id}/style/create")
     public Response createStyleJson(final @PathParam("id") String id, final Style style) throws Exception {
+        /*if(style.getRules().size()>0 && style.getRules().get(0).getSymbolizers().size()>0){
+            final MutableStyleFactory SF = (MutableStyleFactory) FactoryFinder.getStyleFactory(
+                    new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+            ChannelSelection cs = new ChannelSelection(
+                    SF.channelSelection(
+                            SF.selectedChannelType("0",(ContrastEnhancement)null),
+                            SF.selectedChannelType("1",(ContrastEnhancement)null),
+                            SF.selectedChannelType("2",(ContrastEnhancement)null)));
+            ((RasterSymbolizer)style.getRules().get(0).getSymbolizers().get(0)).setChannelSelection(cs);
+        }
+
+        final MutableStyle mstyle = style.toType();
+        styleBusiness.createStyle(id, mstyle);
+        return ok(new Style(mstyle));*/
+
         styleBusiness.createStyle(id, style.toType());
         return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully added to provider with id \"" + id + "\"."));
     }
@@ -143,7 +146,8 @@ public final class StyleRest {
     @GET
     @Path("{id}/style/{styleId}")
     public Response getStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
-    	return ok(new Style(styleBusiness.getStyle(id, styleId)));
+        final MutableStyle mutableStyle = styleBusiness.getStyle(id, styleId);
+    	return ok(new Style(mutableStyle));
     }
 
     /**
@@ -154,11 +158,17 @@ public final class StyleRest {
     public Response getPaletteStyle(@PathParam("id") String id, @PathParam("styleId") String styleId, @PathParam("ruleName") String ruleName) throws Exception{
     	Function function = styleBusiness.getFunctionColorMap(id, styleId, ruleName);
     	if(function instanceof Categorize){
-    		return ok(new org.constellation.json.binding.Categorize((Categorize)function).getPoints());
+            final Categorize categ = (Categorize) function;
+            final org.constellation.json.binding.Categorize categorize = new org.constellation.json.binding.Categorize(categ);
+            final List<InterpolationPoint> points = categorize.getPoints();
+    		return ok(new RepartitionDTO(points));
     	}else if(function instanceof Interpolate){
-    		return ok(new org.constellation.json.binding.Interpolate((Interpolate)function).getPoints());
+            final Interpolate interpolateFunc = (Interpolate) function;
+            final org.constellation.json.binding.Interpolate interpolate =new org.constellation.json.binding.Interpolate(interpolateFunc);
+            final List<InterpolationPoint> points = interpolate.getPoints();
+    		return ok(new RepartitionDTO(points));
     	}
-    	return ok(new AcknowlegementType("Failure", "function unknow"));
+    	return ok(new AcknowlegementType("Failure", "cannot get interpolation palette because the function of colormap is unrecognized."));
     }
 
     /**
@@ -724,19 +734,25 @@ public final class StyleRest {
    @Path("statistics")
    public Response getHistogram(final ParameterValues values) throws NoSuchIdentifierException, ProcessException, DataStoreException {
        final DataProvider provider = DataProviders.getInstance().getProvider(values.get("dataProvider"));
-       final CoverageReference coverageReference = ((CoverageStore) provider.getMainStore()).getCoverageReference(new DefaultName(values.get("dataId")));
-       GridCoverageReadParam params = new GridCoverageReadParam();
-       params.setDeferred(true);
-       final GridCoverage coverage = coverageReference.acquireReader().read(coverageReference.getImageIndex(), params);
+       final DataStore store = provider.getMainStore();
+       if(store instanceof CoverageStore){
+           final CoverageStore coverageStore = (CoverageStore) store;
+           final CoverageReference coverageReference = coverageStore.getCoverageReference(new DefaultName(values.get("dataId")));
+           GridCoverageReadParam params = new GridCoverageReadParam();
+           params.setDeferred(true);
+           final GridCoverage coverage = coverageReference.acquireReader().read(coverageReference.getImageIndex(), params);
+           //@TODO handle GridCoverageStack case
 
-       //call process to get Histograms
-       final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("coverage", "statistic");
-       final ParameterValueGroup procparams = desc.getInputDescriptor().createValue();
-       procparams.parameter("inCoverage").setValue(coverage);
-       final org.geotoolkit.process.Process process = desc.createProcess(procparams);
-       final ParameterValueGroup result = process.call();
-       ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
-       return ok(statistics);
+           //call process to get Histograms
+           final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("coverage", "statistic");
+           final ParameterValueGroup procparams = desc.getInputDescriptor().createValue();
+           procparams.parameter("inCoverage").setValue(coverage);
+           final org.geotoolkit.process.Process process = desc.createProcess(procparams);
+           final ParameterValueGroup result = process.call();
+           ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
+           return ok(statistics);
+       }
+       return ok(new AcknowlegementType("Failure", "datastore is not coverage store."));
    }
 
 }

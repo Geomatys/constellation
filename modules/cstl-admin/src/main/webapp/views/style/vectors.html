@@ -417,7 +417,7 @@
                                 <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label " translate="sldeditor.edition.palette.label">Palette</label>
                                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                                     <div class="pull-right btn-group dropup select select-block">
-                                        <button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
+                                        <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" style="padding-right: 25px;">
                                             <span class="filter-option pull-left">
                                                 <img class="img_palette img_palette_ajust" ng-src="{{optionsSLD.autoIntervalValues.palette.img_palette}}"/>
                                             </span>&nbsp;
@@ -615,7 +615,7 @@
             </div>
             <div class="col-xs-4">
                 <button type="button" class="pull-right btn btn-add"
-                        ng-click="displayCurrentStyle('styledMapOL');"
+                        ng-click="displayCurrentStyle('styledMapOL',null);"
                         ng-show="! optionsSLD.autoPreview"
                         style="font-size: 13px;">
                     <span translate="sldeditor.apercu.titre">Data preview</span>
@@ -627,7 +627,7 @@
                 <button type="button"
                         class="btn"
                         ng-class="{'btn-info': optionsSLD.viewMode==='carto','btn-default': optionsSLD.viewMode!=='carto'}"
-                        ng-click="optionsSLD.viewMode = 'carto';displayCurrentStyle('styledMapOL')"
+                        ng-click="optionsSLD.viewMode = 'carto';displayCurrentStyle('styledMapOL',null)"
                         style="border-top-left-radius: 0;">
                     <i class="glyphicon glyphicon-globe"></i>
                 </button>

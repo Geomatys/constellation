@@ -51,9 +51,13 @@ public final class Interpolate implements Function {
 
     public Interpolate(final org.geotoolkit.style.function.Interpolate interpolate) {
         ensureNonNull("interpolate", interpolate);
-        for (final org.geotoolkit.style.function.InterpolationPoint point : interpolate.getInterpolationPoints()) {
-            this.points.add(new InterpolationPoint(point));
+        if(interpolate.getInterpolationPoints() != null){
+            for (final org.geotoolkit.style.function.InterpolationPoint point : interpolate.getInterpolationPoints()) {
+                this.points.add(new InterpolationPoint(point));
+            }
+            this.interval = (double)interpolate.getInterpolationPoints().size();
         }
+        //@FIXME set nanColor
     }
 
     public List<InterpolationPoint> getPoints() {

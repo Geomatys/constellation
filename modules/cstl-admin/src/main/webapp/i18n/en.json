@@ -848,6 +848,11 @@
     "sldeditor.edition.filter.scale.help":"You can add a filter by specifying the scale where the data will be displayed",
     "sldeditor.edition.filter.getScale":"Get the current scale of the map.",
     "sldeditor.edition.duplicate":"Duplicate",
+    "sldeditor.edition.rasterPalette.generate":"Generate palette",
+    "sldeditor.edition.rasterPalette.addNewValue":"Add new value",
+    "sldeditor.edition.rasterPalette.redChannel":"Red channel",
+    "sldeditor.edition.rasterPalette.greenChannel":"Green channel",
+    "sldeditor.edition.rasterPalette.blueChannel":"Blue channel",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",
