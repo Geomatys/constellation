@@ -35,6 +35,7 @@ public class SpringHelper {
     public static void injectDependencies(Object object) {
         if (SpringHelper.applicationContext != null) {
             SpringHelper.applicationContext.getAutowireCapableBeanFactory().autowireBean(object);
+            LOGGER.info("spring application context loaded");
         } else {
             LOGGER.warning("No spring application context available");
         }
