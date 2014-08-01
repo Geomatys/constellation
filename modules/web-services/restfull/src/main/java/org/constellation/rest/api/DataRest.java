@@ -1365,7 +1365,7 @@ public class DataRest {
             final Provider provider = providerBusiness.getProvider(providerId);
             final List<org.constellation.engine.register.Data> datas = providerBusiness.getDatasFromProviderId(provider.getId());
             for (final org.constellation.engine.register.Data data : datas) {
-                if (type != null && !data.getType().equals(type)) {
+                if (type != null && !type.equalsIgnoreCase(data.getType())) {
                     continue;
                 }
 
