@@ -622,46 +622,49 @@
                 </button>
             </div>
         </div>
-        <div style="position: absolute;z-index: 800;" ng-if="displayViewModePanel()">
-            <div class="btn-group-vertical" ng-init="optionsSLD.viewMode='carto'">
+        <div style="position: absolute;z-index: 800;" ng-if="shouldDisplayVectorChart()">
+            <div class="btn-group-vertical">
                 <button type="button"
                         class="btn"
-                        ng-class="{'btn-info': optionsSLD.viewMode==='carto','btn-default': optionsSLD.viewMode!=='carto'}"
-                        ng-click="optionsSLD.viewMode = 'carto';displayCurrentStyle('styledMapOL',null)"
-                        style="border-top-left-radius: 0;">
-                    <i class="glyphicon glyphicon-globe"></i>
-                </button>
-                <button type="button"
-                        class="btn"
-                        ng-class="{'btn-info': optionsSLD.viewMode==='chart','btn-default': optionsSLD.viewMode !=='chart'}"
-                        ng-click="optionsSLD.viewMode = 'chart'"
-                        style="border-bottom-left-radius:0;">
+                        ng-class="{'btn-info': optionsSLD.enabledVectorChart,'btn-default': !optionsSLD.enabledVectorChart}"
+                        ng-click="optionsSLD.enabledVectorChart= !optionsSLD.enabledVectorChart;"
+                        style="border-bottom-left-radius:0;"
+                        title="{{'sldeditor.edition.histogram.title' | translate}}">
                     <i class="glyphicon glyphicon-stats"></i>
                 </button>
             </div>
         </div>
-        <div id="styledMapOL" ng-show="optionsSLD.viewMode==='carto'" class="bloc_apercu" style="height: 448px;"></div>
-        <div class="bloc_apercu vectorChart"
-             ng-show="optionsSLD.viewMode==='chart'"
-             ng-if="displayViewModePanel()"
-             style="height: 448px;">
-            <div style="margin-top:5px;height: 40px;position: relative;">
-                <div class="form-group col-xs-10 col-sm-10 col-md-10 col-lg-10 pull-right" style="z-index: 800;margin-bottom:0px;">
-                    <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
-                           style="font-weight: normal;font-size: 12px;margin-top: 5px;"
-                           translate="sldeditor.edition.field">Attribute field</label>
-                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                        <select class="form-control form-control-fix"
-                                ng-init="loadDataProperties();"
-                                ng-model="optionsSLD.chart.attribute"
-                                ng-change="loadPlotForAttribute();">
-                            <option value=""></option>
-                            <option ng-repeat="dp in $parent.attributesExcludeGeometry" ng-value="dp.name">{{dp.name}}</option>
-                        </select>
+        <div id="styledMapOL" class="bloc_apercu" style="height: 448px;"></div>
+        <div class="bloc_apercu_chart c3Chart chartPanelBackground"
+             ng-if="shouldDisplayVectorChart()"
+             collapse="!optionsSLD.enabledVectorChart"
+             style="bottom: 0;position: absolute;z-index: 800;border: 1px solid #CFCFCF;">
+            <div style="height: 300px;position: relative;">
+                <div style="margin-top:5px;height: 40px;position: relative;">
+                    <div class="form-group col-xs-10 col-sm-10 col-md-10 col-lg-10 pull-right" style="z-index: 800;margin-bottom:0px;">
+                        <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
+                               style="font-weight: normal;font-size: 12px;margin-top: 5px;"
+                               translate="sldeditor.edition.field">Attribute field</label>
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <select class="form-control form-control-fix"
+                                    ng-init="loadDataProperties();"
+                                    ng-model="optionsSLD.chart.attribute"
+                                    ng-change="loadPlotForAttribute();"
+                                    style="height:26px;">
+                                <option value=""></option>
+                                <option ng-repeat="dp in $parent.attributesExcludeGeometry" ng-value="dp.name">{{dp.name}}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
+                <div style="height: 250px;position: relative;">
+                    <div id="chart" ng-init="initVectorPlot();"></div>
+                </div>
             </div>
-            <div id="chart" style="height: 410px;" ng-init="initPlot();"></div>
+            <button class="close"
+                    ng-click="optionsSLD.enabledVectorChart=false;"
+                    type="button"
+                    style="position: absolute;right: 5px;top: 0;">×</button>
         </div>
     </div>
 </div>

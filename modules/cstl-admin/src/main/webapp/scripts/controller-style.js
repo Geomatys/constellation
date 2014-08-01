@@ -133,7 +133,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          */
         function initOptionsSLD(){
             $scope.optionsSLD={
-                viewMode:'carto',
+                enabledVectorChart:false,
                 enabledRasterChart:false,
                 autoPreview:true,
                 selectedRule:null,
@@ -371,7 +371,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * the view mode must be activated only if the layer data exists.
          * @returns {boolean}
          */
-        $scope.displayViewModePanel = function() {
+        $scope.shouldDisplayVectorChart = function() {
             if($scope.selectedLayer){
                 return true;
             }else {
@@ -394,7 +394,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $scope.selectedStyle = styleObj;
                     initOptionsSLD();
                     $scope.loadDataProperties();
-                    $scope.initPlot();
+                    $scope.initVectorPlot();
                 });
             }else {
                 style.get({provider: providerId, name: styleName}, function(response) {
@@ -563,7 +563,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $scope.setSelectedRule(rule);
                     $scope.editRasterCells();
                 }
-                $scope.optionsSLD.viewMode = 'carto';
                 $scope.optionsSLD.filtersEnabled=false;
                 $scope.optionsSLD.filters=[{
                     "attribute":"",
@@ -1430,21 +1429,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             }
                         );
 
-                        ///show histogram
-                        var values = {
-                            "values":{
-                                "dataProvider":$scope.providerId,
-                                "dataId":$scope.layerName
-                            }
-                        };
-                        style.statistics({}, values,
-                            function(response){
-                                console.debug(response);
-                            },
-                            function(){
-                                $growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
-                            }
-                        );
+                        //@TODO add on graph the intervals
+
                         $scope.optionsSLD.rasterPalette.palette.open = true;
                     }
                 });
@@ -1624,10 +1610,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.displayCurrentStyle = function(mapId, callbackAfterCreate) {
             //skip if layerName is undefined
             if(! $scope.layerName){
-                return;
-            }
-            //skip if view mode is not carto for styledMapOL case
-            if(mapId ==='styledMapOL' && $scope.optionsSLD.viewMode !== 'carto'){
                 return;
             }
 
@@ -1812,13 +1794,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         /**
          * binding for ng-init to display zero data chart.
          */
-        $scope.initPlot = function() {
+        $scope.initVectorPlot = function() {
             $scope.loadPlot({
                 json: {
                     x: [],
                     data1: []
                 }
-            },'',true,460,400);
+            },'',true,460,250,'#chart',{top: 20,right: 10,bottom: 6,left: 50});
         };
 
         $scope.initRasterPlot = function() {
@@ -1827,7 +1809,46 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     x: [],
                     data1: []
                 }
-            },'',true,460,200);
+            },'',true,460,205,
+                '#chartRaster',{}
+            );
+
+            if($scope.layerName && $scope.providerId){
+                $('#chart_ajax_loader').show();
+                ///show histogram
+                var values = {
+                    "values":{
+                        "dataProvider":$scope.providerId,
+                        "dataId":$scope.layerName
+                    }
+                };
+                style.statistics({}, values,
+                    function(response){
+                        if(response.bands && response.bands.length>0){
+                            var repartition = response.bands[0].repartition;
+                            var xArray=[],yArray=[];
+                            for(var key in repartition){
+                                xArray.push(key);
+                                yArray.push(repartition[key]);
+                            }
+                            var dataRes = {
+                                json:{
+                                    x: xArray,
+                                    data1: yArray
+                                }
+                            };
+                            //@TODO get first band name in response, the server side must fill this info.
+                            $scope.loadPlot(dataRes,'Band 0',
+                                true,460,205,'#chartRaster',{}
+                            );
+                            $('#chart_ajax_loader').hide();
+                        }
+                    },
+                    function(){
+                        $growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
+                    }
+                );
+            }
         };
 
         /**
@@ -1837,20 +1858,17 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * @param useCategories
          * @param width
          * @param height
+         * @param bindTo
+         * @param padding
          */
-        $scope.loadPlot = function(data, attr,useCategories,width,height) {
-            $scope.optionsSLD.chart.widget = c3.generate({
-                bindto: '#chart',
+        $scope.loadPlot = function(data, attr,useCategories,width,height,bindTo,padding) {
+            window.c3chart = c3.generate({
+                bindto: bindTo,
                 size: {
                     height: height,
                     width: width
                 },
-                padding: {
-                    top: 20,
-                    right: 10,
-                    bottom: 6,
-                    left: 50
-                },
+                padding: padding,
                 data: {
                     x: 'x',
                     json: data.json,
@@ -1885,7 +1903,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 }
             });
             $(window).resize(function() {
-                $scope.optionsSLD.chart.widget.resize();
+                console.debug(window.c3chart);
+                if(window.c3chart){
+                    window.c3chart.resize();
+                }
             });
         };
 
@@ -1897,7 +1918,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 return;
             }
             if($scope.optionsSLD.chart.attribute ===''){
-                $scope.initPlot();
+                $scope.initVectorPlot();
                 return;
             }
 
@@ -1929,7 +1950,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                   data1: yarray
                               }
                         };
-                        $scope.loadPlot(dataRes,$scope.optionsSLD.chart.attribute, true,460,400);
+                        $scope.loadPlot(dataRes,$scope.optionsSLD.chart.attribute, true,460,250,'#chart',{top: 20,right: 10,bottom: 6,left: 50});
                     }
                 }
             );

@@ -252,16 +252,26 @@
                         class="btn"
                         ng-class="{'btn-info': optionsSLD.enabledRasterChart,'btn-default': !optionsSLD.enabledRasterChart}"
                         ng-click="optionsSLD.enabledRasterChart= !optionsSLD.enabledRasterChart;"
-                        style="border-bottom-left-radius:0;">
+                        style="border-bottom-left-radius:0;"
+                        title="{{'sldeditor.edition.histogram.title' | translate}}">
                     <i class="glyphicon glyphicon-stats"></i>
                 </button>
             </div>
         </div>
         <div class="bloc_apercu" id="styledMapOL" style="height: 448px;"></div>
-        <div class="rasterChart chartPanelBackground"
-             ng-show="optionsSLD.enabledRasterChart"
-             style="bottom: 0;height: 224px;width: 465px;position: absolute;z-index: 800;border: 1px solid #CFCFCF;">
-            <div id="chart" style="height: 180px;" ng-init="initRasterPlot();"></div>
+        <div class="bloc_apercu_chart c3Chart chartPanelBackground"
+             collapse="!optionsSLD.enabledRasterChart"
+             style="bottom: 0;position: absolute;z-index: 800;border: 1px solid #CFCFCF;">
+            <div style="height: 220px;position: relative;">
+                <div style="height: 220px;position: relative;">
+                    <div id="chartRaster" ng-init="initRasterPlot();" style="padding-top: 10pt;"></div>
+                    <div id="chart_ajax_loader"></div>
+                </div>
+            </div>
+            <button class="close"
+                    ng-click="optionsSLD.enabledRasterChart=false;"
+                    type="button"
+                    style="position: absolute;right: 5px;top: 0;">×</button>
         </div>
     </div>
 </div>

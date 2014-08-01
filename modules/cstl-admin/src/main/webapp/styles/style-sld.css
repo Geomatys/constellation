@@ -281,18 +281,26 @@ ul.dropdown-images li a:hover{
 select.form-control-fix{
     padding:2px;
 }
-
-.vectorChart g.c3-event-rects{
+.c3Chart g.c3-event-rects{
     cursor:default !important;
 }
-.vectorChart .c3-zoom-rect{
+.c3Chart .c3-zoom-rect{
     cursor:default !important;
 }
-.vectorChart .c3-axis-x text{
+.c3Chart .c3-axis-x text{
     display:none !important;
 }
 .chartPanelBackground{
     background: transparent url('../images/background-white.png') repeat;
+}
+#chart_ajax_loader{
+    background: transparent url('../images/loader.gif') center center no-repeat;
+    width: 32px;
+    height: 32px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    display: none;
 }
 
 .styleRZSlider rzslider span.bubble.limit{
@@ -342,6 +350,9 @@ select.form-control-fix{
 	.bloc_apercu{
 		width:305px;
 	}
+    .bloc_apercu_chart{
+        width:305px;
+    }
 	.dashed-pb{
 		margin-top:40px;
 	}
@@ -380,6 +391,9 @@ select.form-control-fix{
 	.bloc_apercu{
 		width:430px;
 	}
+    .bloc_apercu_chart{
+        width:430px;
+    }
 	.dashed-pb{
 		height:30px;
 		margin-top:40px;
@@ -407,4 +421,7 @@ select.form-control-fix{
 	.bloc_apercu{
 		width:465px;
 	}
+    .bloc_apercu_chart{
+        width:465px;
+    }
  }

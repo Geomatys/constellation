@@ -855,6 +855,7 @@
     "sldeditor.edition.rasterPalette.redChannel":"Red channel",
     "sldeditor.edition.rasterPalette.greenChannel":"Green channel",
     "sldeditor.edition.rasterPalette.blueChannel":"Blue channel",
+    "sldeditor.edition.histogram.title":"Toggle histogram values",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",
