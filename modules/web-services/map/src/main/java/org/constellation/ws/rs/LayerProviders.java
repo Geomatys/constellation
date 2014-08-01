@@ -532,6 +532,9 @@ public final class LayerProviders {
     private static MutableStyle generateCoverageStyle(final Data layer) throws DataStoreException, IOException {
         // Acquire coverage data.
         final CoverageReference ref = (CoverageReference) layer.getOrigin();
+        if (ref == null) {
+            return null;
+        }
         final GridCoverageReader reader = ref.acquireReader();
         final List<GridSampleDimension> dims = reader.getSampleDimensions(ref.getImageIndex());
         ref.recycle(reader);
