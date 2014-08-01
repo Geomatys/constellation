@@ -345,64 +345,59 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
                         $scope.import.uploadType = response.dataType;
                     }
                     $scope.import.allowNext = true;
-                });
+                }
+            );
         };
     }]);
 
 cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'dataListing',
     function($scope, dataListing) {
+        $scope.import.allowNext = false;
         $scope.columns = [];
         // current path chosen in server data dir
-        $scope.currentPath = 'root';
-        $scope.hasSelectedSomething = false;
+//        $scope.currentPath = 'root';
 
-        $scope.load = function(path){
-            $scope.currentPath = path;
-            $scope.columns.push(dataListing.dataFolder({}, path, function(files) {
-                if ($scope.currentPath === 'root') {
-                    // When initializing popup, get the default directory
-                    $scope.currentPath = files[0].parentPath;
-                }
-            }));
+
+        $scope.load = function(){
+            $scope.import.allowNext = false;
+            var path = $scope.currentPath;
+            dataListing.dataFolder({}, path, function(files) {
+                $scope.currentPath = files[0].parentPath;
+                $scope.columns = files;
+            });
         };
 
         $scope.open = function(path, depth) {
-            if (depth < $scope.columns.length) {
-                $scope.columns.splice(depth + 1, $scope.columns.length - depth);
-            }
+//            if (depth < $scope.columns.length) {
+//                $scope.columns.splice(depth + 1, $scope.columns.length - depth);
+//            }
             $scope.load(path);
         };
 
-        $scope.chooseFile = function(path, depth) {
-            if (depth < $scope.columns.length) {
-                $scope.columns.splice(depth + 1, $scope.columns.length - depth);
-            }
-            $scope.currentPath = path;
-        };
 
-        $scope.select = function(item,depth) {
-            $scope.hasSelectedSomething = true;
-            if (item.folder) {
-                $scope.open(item.path, depth);
-            } else {
-                $scope.chooseFile(item.path, depth);
+
+        $scope.select = function(item) {
+            $scope.currentPath = item.path;
+            if (!item.folder) {
+                $scope.import.allowNext = true;
+            }else{
+                $scope.load();
             }
+
         };
 
         $scope.startWith = function(path) {
             return $scope.currentPath.indexOf(path) === 0;
         };
 
-        $scope.load($scope.currentPath);
-
-        $scope.navServer = function() {
-            if($scope.columns.length>3) {
-                $(".block-folders").slice(0,$scope.columns.length-3).hide();
-                $(".block-folders").slice($scope.columns.length-3,$scope.columns.length-1).show();
-            } else {
-                $(".block-folders").show();
-            }
-        };
+//        $scope.navServer = function() {
+//            if($scope.columns.length>3) {
+//                $(".block-folders").slice(0,$scope.columns.length-3).hide();
+//                $(".block-folders").slice($scope.columns.length-3,$scope.columns.length-1).show();
+//            } else {
+//                $(".block-folders").show();
+//            }
+//        };
 
         $scope.import.next = function() {
             var lastPointIndex = $scope.currentPath.lastIndexOf(".");

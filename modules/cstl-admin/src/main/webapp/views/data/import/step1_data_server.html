@@ -1,16 +1,35 @@
 <div id="part1DataServer"class="container" id="folderPart" ng-controller="ModalImportDataStep1ServerController">
+
     <ul class="breadcrumb col-sm-12">
-        <li class="active"><span class="divider">{{currentPath}}</span></li>
+        <label class="col-sm-4 col-xs-5" translate="data.modal.import.server.label">Fill the server Path</label>
+
+        <div class="btn-lg tooltipicon">
+            <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.data.add.choicedata' | translate }}" ></span>
+        </div>
+        <input type="text" placeholder="{{'data.modal.import.server.label'| translate}}" ng-model="currentPath" size="70">
+        <button class="btn btn-add ng-scope" role="button" translate="data.modal.import.server.label.list" ng-click="load()" ng-show="currentPath!=null">List files</button>
     </ul>
     <div class="row">
-        <div ng-repeat="col in columns" ng-click="navServer()" class="col-sm-3 well block-folders" style="overflow:auto; height:275px; margin-bottom:20px; margin-left:20px;">
-            <input type="text" style="margin-bottom:10px;" placeholder="filter" class="col-sm-12" ng-model="search">
+        <div class="col-sm-12 well block-folders" style="overflow:auto; height:275px;">
             <ul class="unstyled">
-                <li ng-repeat="item in col | filter:search">
+                <li ng-repeat="item in columns | filter:search">
                     <i ng-class="{'icon-folder-close-alt':item.folder && !startWith(item.path),'icon-folder-open-alt':item.folder && startWith(item.path),'icon-file':!item.folder}"></i>
-                    <a ng-class="{'link-sel':startWith(item.path)}" class="trim-name" title="{{item.name}}" type="button" ng-click="select(item,$parent.$index)">{{item.name}}</a>
+                    <a ng-class="{'link-sel':startWith(item.path)}" title="{{item.name}}" type="button" ng-click="select(item)">{{item.name}}</a>
                 </li>
             </ul>
         </div>
     </div>
+    </div>
+    <!--<div class="row">-->
+        <!--<div ng-repeat="col in columns" ng-click="navServer()" class="col-sm-3 well block-folders" style="overflow:auto; height:275px; margin-bottom:20px; margin-left:20px;">-->
+            <!--<input type="text" placeholder="{{''| translate}}">-->
+            <!--<input type="text" style="margin-bottom:10px;" placeholder="filter" class="col-sm-12" ng-model="search">-->
+            <!--<ul class="unstyled">-->
+                <!--<li ng-repeat="item in col | filter:search">-->
+                    <!--<i ng-class="{'icon-folder-close-alt':item.folder && !startWith(item.path),'icon-folder-open-alt':item.folder && startWith(item.path),'icon-file':!item.folder}"></i>-->
+                    <!--<a ng-class="{'link-sel':startWith(item.path)}" class="trim-name" title="{{item.name}}" type="button" ng-click="select(item,$parent.$index)">{{item.name}}</a>-->
+                <!--</li>-->
+            <!--</ul>-->
+        <!--</div>-->
+    <!--</div>-->
 </div>

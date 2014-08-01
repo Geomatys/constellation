@@ -128,6 +128,8 @@
     "data.modal.validate": "Valider",
     "data.modal.view.metadata.title": "Voir la métadonnée",
     "data.modal.dataName.label": "Ou saisisser un identifiant pour ce jeu de donnée",
+    "data.modal.import.server.label": "Saisir le répertoire Serveur à parcourir",
+    "data.modal.import.server.label.list": "Lister les fichiers",
     
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",

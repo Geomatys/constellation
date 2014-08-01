@@ -263,13 +263,15 @@ public class DataRest {
         final List<FileBean> listBean = new ArrayList<>();
         final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();
 
-        final File root = ConfigDirectory.getUserHomeDirectory();
+//        final File root = ConfigDirectory.getUserHomeDirectory();
         final File[] children;
-        if ("root".equalsIgnoreCase(path)) {
-            children = root.listFiles();
-        } else {
+        if (Paths.get(path).toFile().exists()) {
             final File nextRoot = new File(path);
             children = nextRoot.listFiles();
+        }else{
+            HashMap hashMap = new HashMap();
+            hashMap.put("msg", "invalid path");
+            return Response.status(500).entity(hashMap).build();
         }
 
         //loop on subfiles/folders to create bean

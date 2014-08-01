@@ -129,6 +129,8 @@
     "data.modal.validate":"Validate",
     "data.modal.view.metadata.title":"View metadata",
     "data.modal.dataName.label": "Or fill an identifier for this dataset",
+    "data.modal.import.server.label": "Fill the path of file to import",
+    "data.modal.import.server.label.list": "List Files",
 
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",
