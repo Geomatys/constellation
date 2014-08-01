@@ -290,6 +290,8 @@
     "label.logical": "Logical",
     "label.mapcontext.system":"Map context",
     "label.name": "Name",
+    "label.new.style": "Associate a new style",
+    "label.new.sensor": "Associate a new sensor",
     "label.no.association": "No association.",
     "label.no.available.data": "No available data.",
     "label.no.available.layer": "No available layer.",

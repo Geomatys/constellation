@@ -330,6 +330,8 @@
     "label.logical": "Logique",
     "label.mapcontext.system":"Composition cartographique",
     "label.name": "Nom",
+    "label.new.style": "Associer un nouveau style",
+    "label.new.sensor": "Associer un nouveau capteur",
     "label.no.association": "Aucune association.",
     "label.no.available.data": "Aucune donnée disponible.",
     "label.no.available.layer": "Aucune couche disponible.",
