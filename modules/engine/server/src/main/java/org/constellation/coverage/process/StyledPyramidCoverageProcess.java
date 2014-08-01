@@ -42,6 +42,7 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.ProviderParameters;
+import org.constellation.util.StyleReference;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -92,7 +93,7 @@ public class StyledPyramidCoverageProcess extends AbstractCstlProcess {
     
         final String providerID       = value(PROVIDER_OUT_ID, inputParameters);
         final String imageFilePath    = value(IMAGE_FILE_PATH, inputParameters);
-        final String styleName        = value(STYLE, inputParameters);
+        final StyleReference styleRef = value(STYLE, inputParameters);
         final File pyramidFolder      = value(PYRAMID_FOLDER, inputParameters);
         final String coverageBaseName = value(COVERAGE_BASE_NAME, inputParameters);
         final Integer domainId        = value(DOMAIN_ID, inputParameters);
@@ -214,7 +215,7 @@ public class StyledPyramidCoverageProcess extends AbstractCstlProcess {
 
             final MutableStyle style;
             try {
-                style = styleBusiness.getStyle("sld", styleName);
+                style = styleBusiness.getStyle(styleRef.getProviderId(), styleRef.getLayerId().getLocalPart());
             } catch (TargetNotFoundException ex){
                 throw new ProcessException("Style not found: "+ ex.getMessage(), this, ex);
             }

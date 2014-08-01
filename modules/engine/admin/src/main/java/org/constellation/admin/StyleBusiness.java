@@ -632,7 +632,7 @@ public final class StyleBusiness {
         styleRepository.linkStyleToLayer(style.getId(), layer.getId());
     }
 
-    private MutableStyle parseStyle(final String name, final String xml) {
+    public MutableStyle parseStyle(final String name, final String xml) {
         MutableStyle value = null;
         StringReader sr = new StringReader(xml);
         final String baseErrorMsg = "SLD Style ";
