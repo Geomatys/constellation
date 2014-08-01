@@ -54,22 +54,25 @@ public class Categorize implements Function{
 	@SuppressWarnings("rawtypes")
 	public Categorize(final org.geotoolkit.style.function.Categorize categorize){
 		ensureNonNull("categorize", categorize);
-		for (Expression expression : categorize.getThresholds().keySet()) {
-			InterpolationPoint ip = new InterpolationPoint();
-			Expression colorHexExp = categorize.getThresholds().get(expression);
-			if(colorHexExp instanceof DefaultLiteral){
-				Object colorHex = ((DefaultLiteral)colorHexExp).getValue();
-				ip.setColor("#"+Integer.toHexString(((Color)colorHex).getRGB()).substring(2));
-			}
-			
-			if(expression instanceof DefaultLiteral){
-				Object obj = ((DefaultLiteral)expression).getValue();
-				if(obj instanceof Double){
-					ip.setData((Number)obj);
-				}
-			}
-			points.add(ip);
-		}
+        if(categorize.getThresholds()!=null){
+            for (Expression expression : categorize.getThresholds().keySet()) {
+                InterpolationPoint ip = new InterpolationPoint();
+                Expression colorHexExp = categorize.getThresholds().get(expression);
+                if(colorHexExp instanceof DefaultLiteral){
+                    Object colorHex = ((DefaultLiteral)colorHexExp).getValue();
+                    ip.setColor("#"+Integer.toHexString(((Color)colorHex).getRGB()).substring(2));
+                }
+
+                if(expression instanceof DefaultLiteral){
+                    Object obj = ((DefaultLiteral)expression).getValue();
+                    if(obj instanceof Double){
+                        ip.setData((Number)obj);
+                    }
+                }
+                points.add(ip);
+            }
+            this.interval = (double)categorize.getThresholds().size();
+        }
 	}
 
 
