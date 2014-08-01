@@ -263,73 +263,115 @@
 
                                         <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
                                     </div>
+
+
                                     <div class="selected-item" id="selected-item" ng-hide="selected == null">
                                         <div ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'sos'">
+
                                             <div class="block-header" ng-click="toggleUpDownSelected()">
                                                 <strong class="item-title title-bloc-service" title="{{selected.Name}}">{{selected.Name}}</strong><i class="icon-chevron-down pull-right"></i>
                                             </div>
-                                            <div class="block-content">
-                                                <h6 translate="label.owner">Owner</h6>
-                                                <span>{{selected.Owner}}</span>
 
-                                                <div class="separator"></div>
-                                                <h6 translate="label.date">Date</h6>
-                                                <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
+                                            <div class="block-content" ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
+                                                <div class="row description-block">
+                                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-owner.svg" alt="" /></div>
+                                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.Owner}}</span></div>
+                                                </div>
+                                                <div class="row description-block">
+                                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-date.svg" alt="" /></div>
+                                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.Date | date:'yyyy-MM-dd'}}</span></div>
+                                                </div>
+                                            </div>
 
-                                                <div class="separator"></div>
-                                                <h6 translate="label.type">Type</h6>
-                                                <span>{{selected.Type==='coverage'?'raster':selected.Type==='feature-store'?'vector':selected.Type==='observation-store'?'vector':selected.Type.toLowerCase()}}</span>
 
-                                                <div ng-if="service.type.toLowerCase() === 'wms'">
-                                                    <div class="separator"></div>
-                                                    <h6>
-                                                        <span translate="label.related.style">Related styles</span>
-                                                        <button type="button" ng-click="showStyleList();"
-                                                                class="btn btn-sm pull-right">
-                                                            <i class="icon-plus"></i></button>
-                                                    </h6>
+                                            <div class="block-action">
+                                                <div class="row" style="padding-bottom: 5px">
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button type="button" class="btn btn-info"
+                                                                data-placement="bottom" title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
+                                                                <i class="icon-download-alt"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
 
-                                                    <div id="linkedList">
-                                                        <span ng-show="selected.TargetStyle.length == 0" translate="label.no.association">No association</span>
-                                                        <div ng-show="selected.TargetStyle.length > 0" class="style" ng-repeat="style in selected.TargetStyle">
-                                                            <button type="button" ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
-                                                                    class="btn btn-small"><i class="icon-minus"></i></button>
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button type="button" class="btn btn-warning"
+                                                                data-placement="bottom" title="{{'layer.listing.selected.metadata.button' | translate }}" tooltip>
+                                                                <i class="glyphicon glyphicon-file"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button id="showData"
+                                                                    class="btn btn-success"
+                                                                    type="button"
+                                                                    ng-click="showLayer()"
+                                                                    ng-if="service.status=='STARTED'"
+                                                                    data-placement="bottom" title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
+                                                                <i class="glyphicon glyphicon-map-marker"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button type="button" id="deleteLayer" class="btn btn-danger" ng-click="deleteLayer();"
+                                                                data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                                <i class="glyphicon glyphicon-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div ng-if="service.type.toLowerCase() === 'wms'">
+                                                <div class=" row block-association block-association-wms" ng-init="assocStyle=false;">
+                                                    <div class="col-sm-12" ng-click="assocStyle=!assocStyle">
+                                                        <div ng-class="{'selected':assocStyle==true}" class="block-associated block-associated-style">
+                                                            <div class="block-associated-title" translate="label.related.style">Associated Styles</div>
+                                                            <div>{{selected.TargetStyle.length}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div ng-if="assocStyle==true" style="margin-top:15px;">
+                                                    <div class="block-header block-assoc-style">
+                                                        <strong>
+                                                            <span translate="label.related.style">Related style(s)</span>
+                                                        </strong>
+                                                    </div>
+                                                    <div id="linkedList" class="block-content" >
+                                                         <span ng-show="selected.TargetStyle.length == 0"
+                                                             translate="label.no.association">No association</span>
+                                                        <div ng-show="selected.TargetStyle.length > 0"
+                                                             class="style"
+                                                             ng-repeat="style in selected.TargetStyle"
+                                                             style="margin-bottom:5px;">
+                                                            <button type="button"
+                                                                    ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
+                                                                    class="btn btn-small">
+                                                                <i class="glyphicon glyphicon-trash"></i>
+                                                            </button>
                                                             {{style.Name}}
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-xs-12">
+                                                                <button type="button"
+                                                                        ng-click="showStyleList();"
+                                                                        class="btn btn-sm pull-right">
+                                                                    <i class="glyphicon glyphicon-plus"></i><span translate="label.new.style" style="margin-left:5px;">Add new style</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="block-action">
-                                                <div class="row" style="padding-bottom: 5px">
-                                                    <div class="col-sm-6">
-                                                        <button type="button" class="btn btn-info">
-                                                            <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <button type="button" class="btn btn-warning">
-                                                            <i class="icon-file-alt"></i> <span translate="layer.listing.selected.metadata.button">Metadata</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <button id="showData"
-                                                                class="btn btn-success"
-                                                                type="button"
-                                                                ng-click="showLayer()"
-                                                                ng-show="service.status=='STARTED'">
-                                                            <i class="icon-map-marker"></i>
-                                                            <span translate="layer.listing.selected.data.button">View</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <button type="button" id="deleteLayer" class="btn btn-danger" ng-click="deleteLayer();">
-                                                            <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+
+
                                             <!-- Modal -->
                                             <div id="viewerData" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog">
@@ -348,103 +390,120 @@
                                                 </div>
                                             </div>
                                         </div>
+
+
                                         <div ng-if="service.type.toLowerCase() === 'csw'">
-                                            <div class="block-header" ng-click="toggleUpDownSelected()">
+                                            <div class="block-header block-header-md" ng-click="toggleUpDownSelected()">
                                                 <strong class="item-title title-bloc-service" title="{{selected.title ? selected.title : selected.identifier}}">{{selected.title ? selected.title : selected.identifier}}</strong><i class="icon-chevron-up pull-right"></i>
                                             </div>
+
                                             <div>
                                                 <div class="block-content">
-                                                    <h6 translate="label.owner">Owner</h6>
-                                                    <span>{{selected.creator}}</span>
 
-                                                    <div class="separator"></div>
-                                                    <h6 translate="label.date">Date</h6>
-                                                    <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
+                                                    <div class="row description-block">
+                                                        <div class="col-sm-3 col-md-2"><img src="images/block-content-owner.svg" alt="" /></div>
+                                                        <div class="col-sm-9 col-md-10 description-text"><span>{{selected.creator}}</span></div>
+                                                    </div>
+
+                                                    <div class="row description-block">
+                                                        <div class="col-sm-3 col-md-2"><img src="images/block-content-date.svg" alt="" /></div>
+                                                        <div class="col-sm-9 col-md-10 description-text"><span>{{selected.createDate | date:'yyyy-MM-dd'}}</span></div>
+                                                    </div>
+
                                                 </div>
-                                                <div class="block-content" ng-if="selectedMetadataChild != null">
+                                                <div class="block-content" ng-class="{'block-vector':selectedMetadataChild.Type=='VECTOR','block-raster':selectedMetadataChild.Type=='COVERAGE'}" ng-if="selectedMetadataChild != null">
                                                     <h6 translate="label.title">Title</h6>
                                                     <span>{{selectedMetadataChild.Name}}</span>
 
-                                                    <div class="separator"></div>
-                                                    <h6 translate="label.type">Type</h6>
-                                                    <span>{{selectedMetadataChild.Type}}</span>
+                                                    <div class="row description-block">
+                                                        <div class="col-sm-3 col-md-2"><img src="images/block-content-owner.svg" alt="" /></div>
+                                                        <div class="col-sm-9 col-md-10 description-text"><span>{{selectedMetadataChild.Owner}}</span></div>
+                                                    </div>
 
-                                                    <div class="separator"></div>
-                                                    <h6 translate="label.owner">Owner</h6>
-                                                    <span>{{selectedMetadataChild.Owner}}</span>
+                                                    <div class="row description-block">
+                                                        <div class="col-sm-3 col-md-2"><img src="images/block-content-date.svg" alt="" /></div>
+                                                        <div class="col-sm-9 col-md-10 description-text"><span>{{selectedMetadataChild.Date | date:'yyyy-MM-dd'}}</span></div>
+                                                    </div>
 
-                                                    <div class="separator"></div>
-                                                    <h6 translate="label.date">Date</h6>
-                                                    <span>{{selectedMetadataChild.Date | date:'yyyy-MM-dd'}}</span>
+
                                                 </div>
                                             </div>
 
-                                            <div class="block-action block-action-metadata">
+                                            <div class="block-action">
                                                 <div class="row" style="padding-bottom: 5px">
-                                                    <div class="col-sm-6">
-                                                        <a id="exportMD"
-                                                           class="btn btn-info"
-                                                           ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{cstlSessionId}}">
-                                                            <i class="icon-download-alt"></i>
-                                                            <span translate="layer.listing.selected.export.button">Export</span>
-                                                        </a>
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <a id="exportMD"
+                                                               class="btn btn-info btn-csw"
+                                                               ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{cstlSessionId}}"
+                                                               data-placement="bottom" title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
+                                                                <i class="icon-download-alt"></i>
+                                                            </a>
+                                                        </span>
                                                     </div>
-                                                    <div class="col-sm-6">
-                                                        <button type="button"
-                                                                id="deleteMetadata"
-                                                                class="btn btn-danger"
-                                                                ng-click="deleteMetadata();">
-                                                            <i class="icon-trash"></i>
-                                                            <span translate="layer.listing.selected.delete.button">Delete</span>
-                                                        </button>
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button type="button"
+                                                                    id="deleteMetadata"
+                                                                    class="btn btn-danger btn-csw"
+                                                                    ng-click="deleteMetadata();"
+                                                                    data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                                <i class="glyphicon glyphicon-trash"></i>
+                                                            </button>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
+
                                         <div ng-if="service.type.toLowerCase() === 'sos'">
-                                            <div class="block-header" ng-click="toggleUpDownSelected()">
+                                            <div class="block-header block-header-sos" ng-click="toggleUpDownSelected()">
                                                 <strong>{{selected.id}}</strong>
                                                 <i class="icon-chevron-up pull-right"></i>
                                             </div>
-                                            <div>
-                                                <div class="block-content">
-                                                    <h6 translate="label.owner">Owner</h6>
-                                                    <span>{{selected.creator}}</span>
 
-                                                    <div class="separator"></div>
-                                                    <h6 translate="label.type">Type</h6>
-                                                    <span translate="label.sensor.system">Sensor system</span>
-
-                                                    <div class="separator"></div>
-                                                    <h6 translate="label.date">Date</h6>
-                                                    <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
+                                            <div class="block-content">
+                                                <div class="row description-block">
+                                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-owner.svg" alt="" /></div>
+                                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.creator}}</span></div>
                                                 </div>
 
-                                                <div class="block-content" ng-if="selectedSensorsChild != null">
+                                                <div class="row description-block">
+                                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-date.svg" alt="" /></div>
+                                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.createDate | date:'yyyy-MM-dd'}}</span></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="block-content" ng-if="selectedSensorsChild != null">
                                                     <h6 translate="label.title">Title</h6>
                                                     <span>{{selectedSensorsChild.id}}</span>
 
                                                     <div class="separator"></div>
                                                     <h6 translate="label.type">Type</h6>
                                                     <span translate="label.sensor">sensor</span>
-                                                </div>
                                             </div>
+
                                             <div class="block-action block-action-sensor">
                                                 <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <button class="btn btn-success"
-                                                                type="button"
-                                                                ng-click="showSensor()"
-                                                                ng-show="service.status=='STARTED'">
-                                                            <i class="icon-map-marker"></i>
-                                                            <span translate="layer.listing.selected.data.button">View</span>
-                                                        </button>
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button class="btn btn-sos"
+                                                                    type="button"
+                                                                    ng-click="showSensor()"
+                                                                    ng-show="service.status=='STARTED'"
+                                                                    data-placement="bottom" title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
+                                                                <i class="glyphicon glyphicon-map-marker"></i>
+                                                            </button>
+                                                        </span>
                                                     </div>
-                                                    <div class="col-sm-6">
-                                                        <button type="button" class="btn btn-danger" ng-click="deleteLayer();">
-                                                            <i class="icon-trash"></i>
-                                                            <span translate="layer.listing.selected.delete.button">Delete</span>
-                                                        </button>
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button type="button" class="btn btn-sos" ng-click="deleteLayer();"
+                                                                    data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                                <i class="glyphicon glyphicon-trash"></i>
+                                                            </button>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
