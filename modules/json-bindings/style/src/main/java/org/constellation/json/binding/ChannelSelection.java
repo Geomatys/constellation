@@ -38,14 +38,18 @@ public final class ChannelSelection implements StyleElement<org.opengis.style.Ch
 
     public ChannelSelection(final org.opengis.style.ChannelSelection channelSelection) {
         ensureNonNull("channelSelection", channelSelection);
+        /*
+         * A channel selection cannot contains both gray channel and rgb channel because it is exclusive in geotk.
+         */
         if (channelSelection.getGrayChannel() != null) {
             greyChannel = new SelectedChannelType(channelSelection.getGrayChannel());
-        }
-        if (channelSelection.getRGBChannels() != null && channelSelection.getRGBChannels().length > 2) {
+            rgbChannels = null;
+        }else if (channelSelection.getRGBChannels() != null && channelSelection.getRGBChannels().length > 2) {
             rgbChannels = new SelectedChannelType[3];
             rgbChannels[0] = new SelectedChannelType(channelSelection.getRGBChannels()[0]);
             rgbChannels[1] = new SelectedChannelType(channelSelection.getRGBChannels()[1]);
             rgbChannels[2] = new SelectedChannelType(channelSelection.getRGBChannels()[2]);
+            greyChannel = null;
         }
     }
 
