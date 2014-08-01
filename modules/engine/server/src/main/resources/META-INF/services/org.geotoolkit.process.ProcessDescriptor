@@ -1,1 +1,2 @@
 org.constellation.coverage.process.PyramidCoverageDescriptor
+org.constellation.coverage.process.StyledPyramidCoverageDescriptor
