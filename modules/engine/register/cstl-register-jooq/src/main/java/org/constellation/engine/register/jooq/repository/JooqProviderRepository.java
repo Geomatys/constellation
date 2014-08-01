@@ -126,7 +126,7 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
 
     @Override
     public List<org.constellation.engine.register.Data> findDatasByProviderId(Integer id) {
-        return dsl.select().from(DATA).join(PROVIDER).on(DATA.PROVIDER.eq(PROVIDER.ID))
+        return dsl.select(DATA.fields()).from(DATA).join(PROVIDER).on(DATA.PROVIDER.eq(PROVIDER.ID))
                 .where(PROVIDER.ID.eq(id)).fetchInto(org.constellation.engine.register.Data.class);
     }
 
