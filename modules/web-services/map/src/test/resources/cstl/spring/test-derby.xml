@@ -1,0 +1,39 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+
+
+  <context:component-scan base-package="org.constellation.engine.register.jooq, org.constellation.admin" />
+  <context:component-scan base-package="org.constellation.map.configuration"  />
+  
+  <tx:annotation-driven transaction-manager="transactionManager" />
+
+  <bean id="dataSource"
+    class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+    p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" p:url="jdbc:derby:memory:db;create=true" />
+
+
+
+  <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+    <property name="dataSource" ref="dataSource" />
+    <property name="changeLog" value="classpath:/cstl/db/db-changelog.xml" />
+
+      <!--
+      contexts specifies the runtime contexts to use.
+      -->
+    <property name="contexts" value="test, production" />
+  </bean>
+
+  <bean id="securityManager" class="org.constellation.security.spring.SpringSecurityManager"></bean>
+
+  <import resource="cstl-tx.xml" />
+
+</beans>
+
