@@ -110,47 +110,49 @@
                     <div id="selection">
                         <div class="alert alert-sos alert-info alert-data" ng-class="{hide: selected != null}">
                             <h4 translate="label.no.selected.sensor">No selected sensor</h4>
-
                             <p translate="msg.no.selected.sensor" style="font-weight:normal;">Click on a data to display more information</p>
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
-                            <div class="block-header" ng-click="toggleUpDownSelected()">
+                            <div class="block-header block-header-sos" ng-click="toggleUpDownSelected()">
                                 <strong class="item-title title-bloc" title="{{selected.id}}">{{selected.id}}</strong><i class="icon-chevron-down pull-right"></i>
                             </div>
-                            <div>
-                                <div class="block-content">
-                                    <h6 translate="label.owner">Owner</h6>
-                                    <span>{{selected.creator}}</span>
 
-                                    <div class="separator"></div>
-                                    <h6 translate="label.type">Type</h6>
-                                    <span translate="label.sensor.system">Sensor system</span>
-
-                                    <div class="separator"></div>
-                                    <h6 translate="label.date">Date</h6>
-                                    <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
+                            <div class="block-content">
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-owner.svg" alt="" /></div>
+                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.creator}}</span></div>
                                 </div>
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-date.svg" alt="" /></div>
+                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.createDate | date:'yyyy-MM-dd'}}</span></div>
+                                </div>
+                            </div>
 
-                                <div class="block-content" ng-if="selectedSensorsChild != null">
+                            <div class="block-content" ng-if="selectedSensorsChild != null">
                                     <h6 translate="label.title">Title</h6>
                                     <span>{{selectedSensorsChild.id}}</span>
 
                                     <div class="separator"></div>
                                     <h6 translate="label.type">Type</h6>
                                     <span translate="label.sensor">sensor</span>
-                                </div>
                             </div>
-                            <div class="block-action block-action-sensor">
+                            <div class="block-action">
                                 <div class="row">
-                                    <div class="col-sm-6">
-                                        <button class="btn btn-success" type="button" ng-click="showSensor()">
-                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button class="btn btn-sos" type="button" ng-click="showSensor()"
+                                                    data-placement="bottom" title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-map-marker"></i>
+                                            </button>
+                                        </span>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <button type="button" class="btn btn-danger" ng-click="deleteSensor();">
-                                            <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button" class="btn btn-sos" ng-click="deleteSensor();"
+                                                    data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

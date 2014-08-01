@@ -151,35 +151,37 @@
                             <p translate="msg.no.selected.style">Click on a style to display more information</p>
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
-                            <div class="block-header" ng-click="toggleUpDownSelected()">
+                            <div class="block-header block-header-style" ng-click="toggleUpDownSelected()">
                                 <strong class="item-title title-bloc" title="{{selected.Name}}">{{selected.Name}}</strong>
                                 <i class="icon-chevron-down pull-right"></i>
                             </div>
-                            <div class="block-content">
-                                <h6 translate="label.owner">Owner</h6>
-                                <span>{{selected.Owner}}</span>
-
-                                <div class="separator"></div>
-                                <h6 translate="label.date">Date</h6>
-                                <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
-
-                                <div class="separator"></div>
-                                <h6 translate="label.type">Type</h6>
-                                <span>{{selected.Type}}</span>
+                            <div class="block-content" ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-owner.svg" alt="" /></div>
+                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.Owner}}</span></div>
+                                </div>
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-date.svg" alt="" /></div>
+                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.Date | date:'yyyy-MM-dd'}}</span></div>
+                                </div>
                             </div>
                             <div class="block-action block-action-style">
                                 <div class="row" style="padding-bottom: 5px">
-                                    <div class="col-sm-6">
-                                        <button type="button" id="editStyleBtn" class="btn btn-info" ng-click="editStyle()">
-                                            <i class="icon-pencil"></i>
-                                            <span translate="style.listing.selected.edit.button">Edit</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button" id="editStyleBtn" class="btn btn-style" ng-click="editStyle()"
+                                                    data-placement="bottom" title="{{'style.listing.selected.edit.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-pencil"></i>
+                                            </button>
+                                        </span>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <button type="button" id="deleteStyleBtn" class="btn btn-danger" ng-click="deleteStyle()">
-                                            <i class="icon-trash"></i>
-                                            <span translate="style.listing.selected.delete.button">Delete</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button" id="deleteStyleBtn" class="btn btn-style" ng-click="deleteStyle()"
+                                                    data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

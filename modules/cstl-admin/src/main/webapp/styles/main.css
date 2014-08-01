@@ -226,50 +226,6 @@ ul.unstyled {
 .dashboard rzslider .bubble{
     display: none;
 }
-.dashboard .selected-item .block-action.block-action-style {
-    background-color:#ededf3;
-}
-.block-action-style .btn:hover, .block-action-style .btn:focus{
-    background-color:#9e96c2;
-    color:#fff;
-    border-color:#8f86b9;
-}
-
-.dashboard .selected-item .block-action.block-action-sensor {
-    background-color:#d5ebe7;
-}
-.block-action-sensor .btn:hover, .block-action-sensor .btn:focus{
-    background-color:#7cc3b5;
-    color:#fff;
-    border-color:#59b3a1;
-}
-
-.dashboard .selected-item .block-action.block-action-metadata {
-    background-color:#faf1e8;
-}
-.block-action-metadata .btn:hover, .block-action-metadata .btn:focus{
-    background-color:#e3b07f;
-    color:#fff;
-    border-color:#dfa36a;
-}
-
-.dashboard .selected-item .block-action.block-action-mapcontext {
-    background-color:#f5f3ed;
-}
-.block-action-mapcontext .btn:hover, .block-action-mapcontext .btn:focus{
-    background-color:#dad2bc;
-    color:#fff;
-    border-color:#c8bc9b;
-}
-
-.dashboard .selected-item .block-action.block-action-process {
-    background-color:#cae4c4;
-}
-.block-action-process .btn:hover, .block-action-process .btn:focus{
-    background-color:#9ccc8f;
-    color:#fff;
-    border-color:#7dbc6c;
-}
 
 /*
  * Accueil
@@ -759,6 +715,21 @@ p.error-select-one{
     border: solid 1px #59b3a1;
     color: #ffffff;
 }
+.dashboard .selected-item .block-header.block-header-style {
+    background-color: #9e96c2;
+    border: solid 1px #8f86b9;
+    color: #ffffff;
+}
+.dashboard .selected-item .block-header.block-header-mapcontext {
+    background-color: #dad2bc;
+    border: solid 1px #c8bc9b;
+    color:#ffffff;
+}
+.dashboard .selected-item .block-header.block-header-process {
+    background-color: #9ccc8f;
+    border: solid 1px #7dbc6c;
+    color:#ffffff;
+}
 
 .dashboard .selected-item .block-header i[class^="icon-"], .dashboard .selected-item .block-header i[class*=" icon-"], .dashboard .selected-item .block-header strong {
     line-height: 40px;
@@ -823,6 +794,40 @@ p.error-select-one{
     background-color: #e3b07f;
     border: solid 1px #dfa36a;
 }
+.dashboard .selected-item .block-action .btn.btn-sos {
+    background-color: #8fcbbf;
+    border: solid 1px #7cc3b5;
+}
+.dashboard .selected-item .block-action .btn.btn-sos:hover, .dashboard .selected-item .block-action .btn.btn-sos:focus {
+    background-color: #7cc3b5;
+    border: solid 1px #59b3a1;
+}
+.dashboard .selected-item .block-action .btn.btn-style {
+    background-color: #9e96c2;
+    border: solid 1px #8f86b9;
+}
+.dashboard .selected-item .block-action .btn.btn-style:hover, .dashboard .selected-item .block-action .btn.btn-style:focus {
+    background-color: #8f86b9;
+    border-color: #8076b0;
+}
+.dashboard .selected-item .block-action .btn.btn-mapcontext {
+    background-color: #dad2bc;
+    border: solid 1px #c8bc9b;
+}
+.dashboard .selected-item .block-action .btn.btn-mapcontext:hover, .dashboard .selected-item .block-action .btn.btn-mapcontext:focus {
+    background-color: #c8bc9b;
+    border: solid 1px #b6a67a;
+}
+.dashboard .selected-item .block-action .btn.btn-process {
+    background-color: #9ccc8f;
+    border: solid 1px #7dbc6c;
+}
+.dashboard .selected-item .block-action .btn.btn-process:hover, .dashboard .selected-item .block-action .btn.btn-process:focus {
+    background-color: #7dbc6c;
+    border: solid 1px #60a84d;
+}
+
+
 .dashboard .selected-item .block-action .col-sm-6 {
     padding: 0 3px;
 }

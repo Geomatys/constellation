@@ -156,49 +156,57 @@
                             <p translate="msg.no.selected.mapcontext" style="font-weight:normal;">Click on a map context to display more information</p>
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
-                            <div class="block-header" ng-click="toggleUpDownSelected()">
+                            <div class="block-header block-header-mapcontext" ng-click="toggleUpDownSelected()">
                                 <strong class="item-title title-bloc" title="{{selected.name}}">{{selected.name}}</strong><i class="icon-chevron-down pull-right"></i>
                             </div>
                             <div class="block-content">
-                                <h6 translate="label.description">Description</h6>
-                                <span>{{selected.description}}</span>
-
-                                <div class="separator"></div>
-
-                                <h6 translate="label.owner">Owner</h6>
-                                <span>{{selected.owner}}</span>
-
-                                <div ng-if="selected.keywords">
-                                    <div class="separator"></div>
-                                    <h6 translate="mapcontext.modal.label.keywords">Keywords</h6>
-                                    <span>{{selected.keywords}}</span>
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-tag.svg" alt="" /></div>
+                                    <div class="col-sm-9 col-md-10 description-text">{{selected.description}}</div>
+                                </div>
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-owner.svg" alt="" /></div>
+                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.owner}}</span></div>
+                                </div>
+                                <div class="row description-block" ng-if="selected.keywords">
+                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-description.svg" alt="" /></div>
+                                    <div class="col-sm-9 col-md-10 description-text">{{selected.keywords}}</div>
                                 </div>
                             </div>
-                            <div class="block-action block-action-mapcontext">
+                            <div class="block-action">
                                 <div class="row" style="padding-bottom: 5px;">
-                                    <div class="col-sm-6">
-                                        <a class="btn btn-info"
-                                           ng-href="{{cstlUrl}}api/1/context/{{selected.id}}/export;jsessionid={{cstlSessionId}}">
-                                            <i class="icon-download-alt"></i>
-                                            <span translate="layer.listing.selected.export.button">Export</span>
-                                        </a>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <a class="btn btn-mapcontext"
+                                               ng-href="{{cstlUrl}}api/1/context/{{selected.id}}/export;jsessionid={{cstlSessionId}}"
+                                               data-placement="bottom" title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
+                                                <i class="icon-download-alt"></i>
+                                            </a>
+                                        </span>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <button class="btn btn-warning" type="button" ng-click="editMapContext()">
-                                            <i class="icon-edit"></i> <span translate="layer.listing.selected.edit.button">Edit</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button class="btn btn-mapcontext" type="button" ng-click="editMapContext()"
+                                                    data-placement="bottom" title="{{'layer.listing.selected.edit.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-edit"></i>
+                                            </button>
+                                        </span>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <button class="btn btn-success" type="button" ng-click="showMapContext()">
-                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button class="btn btn-mapcontext" type="button" ng-click="showMapContext()"
+                                                    data-placement="bottom" title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-map-marker"></i>
+                                            </button>
+                                        </span>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <button class="btn btn-danger" type="button" ng-click="deleteMapContext()">
-                                            <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button class="btn btn-mapcontext" type="button" ng-click="deleteMapContext()"
+                                                    data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

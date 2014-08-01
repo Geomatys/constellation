@@ -76,30 +76,35 @@
                             <p translate="msg.no.selected.task" style="font-weight:normal;">Click on a data to display more information</p>
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
-                            <div class="block-header" ng-click="toggleUpDownSelected()">
+                            <div class="block-header block-header-process" ng-click="toggleUpDownSelected()">
                                 <strong class="item-title title-bloc" title="{{selected.Name}}">{{selected.name}}</strong><i class="icon-chevron-down pull-right"></i>
                             </div>
-                            <div>
-                                <div class="block-content" ng-if="selectedProcessChild != null">
+                            <div class="block-content" ng-if="selectedProcessChild != null">
                                     <h6 translate="label.title">Title</h6>
                                     <span>{{selectedProcessChild.id}}</span>
 
-                                    <div class="separator"></div>
-                                    <h6 translate="label.description">Description</h6>
-                                    <span>{{selectedProcessChild.description}}</span>
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2"><img src="images/block-content-description.svg" alt="" /></div>
+                                    <div class="col-sm-9 col-md-10 description-text">{{selectedProcessChild.description}}</div>
                                 </div>
                             </div>
                             <div class="block-action block-action-process">
                                 <div class="row">
-                                    <div class="col-sm-6">
-                                        <button class="btn btn-success" type="button" ng-click="showSensor()" ng-show="service.status=='STARTED'">
-                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button class="btn btn-process" type="button" ng-click="showSensor()" ng-show="service.status=='STARTED'"
+                                                    data-placement="bottom" title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-map-marker"></i>
+                                            </button>
+                                        </span>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <button type="button" class="btn btn-danger" ng-click="deleteLayer();">
-                                            <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
-                                        </button>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button" class="btn btn-process" ng-click="deleteLayer();"
+                                                    data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
