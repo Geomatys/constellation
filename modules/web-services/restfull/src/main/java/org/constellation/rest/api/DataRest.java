@@ -283,7 +283,7 @@ public class DataRest {
                     final int lastIndexPoint = child.getName().lastIndexOf('.');
                     final String extension = child.getName().substring(lastIndexPoint + 1);
 
-                    if (extensions.contains(extension.toLowerCase()) || "zip".equalsIgnoreCase(extension)) {
+                    if (extensions.contains(extension.toLowerCase()) /*|| "zip".equalsIgnoreCase(extension)*/) {
                         listBean.add(bean);
                     }
 
