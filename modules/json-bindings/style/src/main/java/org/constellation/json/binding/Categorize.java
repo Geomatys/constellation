@@ -69,7 +69,11 @@ public class Categorize implements Function{
                 if(expression instanceof DefaultLiteral){
                     final Object obj = ((DefaultLiteral)expression).getValue();
                     if(obj instanceof Double){
-                        ip.setData((Number)obj);
+                        if(Double.isNaN((double)obj)){
+                            ip.setData(null);
+                        }else {
+                            ip.setData((Number)obj);
+                        }
                     }else if(StyleConstants.CATEGORIZE_LESS_INFINITY.equals(expression)){
                         continue; //skip for infinity first key it will be restored later.
                     }
@@ -106,30 +110,48 @@ public class Categorize implements Function{
 	}
 
 	public org.opengis.filter.expression.Function toType() {
-		
+
+        //remove nan point if exists because it is added later, and it cause error for max/min values
+        if(nanColor!=null) {
+            InterpolationPoint nanPoint = null;
+            for (final InterpolationPoint ip : points) {
+                if(ip.getData() == null && nanColor.equals(ip.getColor())){
+                    nanPoint = ip;
+                    break;
+                }
+            }
+            if(nanPoint != null){
+                points.remove(nanPoint);
+            }
+        }
+
+
 		// create first threshold map to create first categorize function.
 		Map<Expression, Expression> values = new HashMap<>(0);
 		values.put(StyleConstants.CATEGORIZE_LESS_INFINITY, new DefaultLiteral<Color>(Color.GRAY));
-		for (InterpolationPoint interpolationPoint : points) {
-			Color c = Color.decode(interpolationPoint.getColor());
-			values.put(new DefaultLiteral<Double>(interpolationPoint.getData().doubleValue()), new DefaultLiteral<Color>(c));
+		for (final InterpolationPoint ip : points) {
+			final Color c = Color.decode(ip.getColor());
+			values.put(new DefaultLiteral<Double>(ip.getData().doubleValue()), new DefaultLiteral<Color>(c));
 		}
-		org.geotoolkit.style.function.Categorize categorize = SF.categorizeFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, values, ThreshholdsBelongTo.PRECEDING, StyleConstants.DEFAULT_FALLBACK);
+		final org.geotoolkit.style.function.Categorize categorize = SF.categorizeFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, values, ThreshholdsBelongTo.PRECEDING, StyleConstants.DEFAULT_FALLBACK);
 
         // Iteration to find min and max values
 		Double min = null, max= null;
-        for (InterpolationPoint interpolationPoint : points) {
+        for (final InterpolationPoint ip : points) {
 			if(min==null && max==null){
-				min = interpolationPoint.getData().doubleValue();
-				max = interpolationPoint.getData().doubleValue();
+				min = ip.getData().doubleValue();
+				max = ip.getData().doubleValue();
 			}
-			
-			min = Math.min(min,  interpolationPoint.getData().doubleValue());
-			max = Math.max(max,  interpolationPoint.getData().doubleValue());
+			min = Math.min(min,ip.getData().doubleValue());
+			max = Math.max(max,ip.getData().doubleValue());
 		}
         
         //init final threshold map and coefficient
-		final Map<Expression, Expression> valuesRecompute = new HashMap<>(0);
+		final Map<Expression, Expression> valuesRecompute = new HashMap<>();
+        if(nanColor !=null){
+            valuesRecompute.put(new DefaultLiteral<Double>(Double.NaN), new DefaultLiteral<Color>(Color.decode(nanColor)));
+        }
+
         if(min != null && max != null){
             valuesRecompute.put(StyleConstants.CATEGORIZE_LESS_INFINITY, new DefaultLiteral<Color>(categorize.evaluate(min, Color.class)));
             double coefficient = max-min;
@@ -145,9 +167,7 @@ public class Categorize implements Function{
                 }
             }
         }
-        if(nanColor !=null){
-            valuesRecompute.put(new DefaultLiteral<Double>(Double.NaN), new DefaultLiteral<Color>(Color.decode(nanColor)));
-        }
+
 		return SF.categorizeFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, valuesRecompute, ThreshholdsBelongTo.PRECEDING, StyleConstants.DEFAULT_FALLBACK);
 		
 	}

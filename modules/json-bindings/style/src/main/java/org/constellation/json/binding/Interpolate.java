@@ -54,10 +54,12 @@ public final class Interpolate implements Function {
         if(interpolate.getInterpolationPoints() != null){
             for (final org.geotoolkit.style.function.InterpolationPoint point : interpolate.getInterpolationPoints()) {
                 this.points.add(new InterpolationPoint(point));
+                if(nanColor == null && point.getData() instanceof Double && Double.isNaN((double) point.getData())){
+                    nanColor = point.getValue().toString();
+                }
             }
             this.interval = (double)interpolate.getInterpolationPoints().size();
         }
-        //@FIXME set nanColor
     }
 
     public List<InterpolationPoint> getPoints() {
@@ -87,31 +89,45 @@ public final class Interpolate implements Function {
 	}
 
 	public org.opengis.filter.expression.Function toType() {
-		if(nanColor !=null){
-			InterpolationPoint nanPoint = new InterpolationPoint();
-			nanPoint.setColor(nanColor);
-			nanPoint.setData(Double.NaN);
-			points.add(nanPoint);
-		}
-		
-		
-        org.geotoolkit.style.function.Interpolate inter =  SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(points), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
+
+        //remove nan point if exists because it is added later, and it cause error for max/min values
+        if(nanColor!=null) {
+            InterpolationPoint nanPoint = null;
+            for (final InterpolationPoint ip : points) {
+                if(ip.getData() == null && nanColor.equals(ip.getColor())){
+                    nanPoint = ip;
+                    break;
+                }
+            }
+            if(nanPoint != null){
+                points.remove(nanPoint);
+            }
+        }
+
+        final org.geotoolkit.style.function.Interpolate inter =  SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(points), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
         
         Double min = null, max= null;
         
         // Iteration to find min and max values
-        for (InterpolationPoint interpolationPoint : points) {
-			if(min==null && max==null){
-				min = interpolationPoint.getData().doubleValue();
-				max = interpolationPoint.getData().doubleValue();
+        for (final InterpolationPoint ip : points) {
+            if(min==null && max==null){
+				min = ip.getData().doubleValue();
+				max = ip.getData().doubleValue();
 			}
-			
-			min = Math.min(min,  interpolationPoint.getData().doubleValue());
-			max = Math.max(max,  interpolationPoint.getData().doubleValue());
+			min = Math.min(min,ip.getData().doubleValue());
+			max = Math.max(max,ip.getData().doubleValue());
 		}
         
         //init final InterpolationPoint list and coefficient
         final List<InterpolationPoint> recomputePoints = new ArrayList<>();
+
+        if(nanColor !=null){
+            final InterpolationPoint nanPoint = new InterpolationPoint();
+            nanPoint.setColor(nanColor);
+            nanPoint.setData(Double.NaN);
+            recomputePoints.add(nanPoint);
+        }
+
         if(max !=null && min != null){
             double coefficient = max-min;
             if(interval!=null){

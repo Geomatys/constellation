@@ -191,7 +191,8 @@
                                         <td>
                                             <input type="number" class="form-control form-control-fix"
                                                    ng-model="point.data" style="width:80px;height:28px;float:left;"
-                                                   ng-change="drawThresholds();"/>
+                                                   ng-change="drawThresholds();" ng-if="point.data !== null"/>
+                                            <span ng-if="point.data === null">NaN</span>
                                             <span ng-if="!$last && optionsSLD.rasterPalette.palette.method =='categorize'"> -&gt; {{optionsSLD.rasterPalette.repartition[$index+1].data}}</span>
                                         </td>
                                         <td>

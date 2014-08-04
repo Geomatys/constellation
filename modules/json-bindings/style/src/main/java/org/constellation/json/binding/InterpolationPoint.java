@@ -45,9 +45,13 @@ public final class InterpolationPoint implements StyleElement<org.geotoolkit.sty
     public InterpolationPoint(final org.geotoolkit.style.function.InterpolationPoint interpolationPoint) {
         ensureNonNull("interpolationPoint", interpolationPoint);
         double value = interpolationPoint.getData().doubleValue();
-        data = Math.round(value*1000d)/1000d;
+        if(Double.isNaN(value)){
+            data = null;
+        }else {
+            data = Math.round(value*1000d)/1000d; //FIXME why?
+        }
 		if(interpolationPoint.getValue() instanceof DefaultLiteral){
-			Object obj = ((DefaultLiteral)interpolationPoint.getValue()).getValue();
+			final Object obj = ((DefaultLiteral)interpolationPoint.getValue()).getValue();
 			if(obj instanceof Color){
 				color = "#"+Integer.toHexString(((Color)obj).getRGB()).substring(2);
 			}

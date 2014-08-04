@@ -1542,7 +1542,15 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
 
             colorMap.function.interval = palette.intervalsCount;
-            colorMap.function.nanColor = palette.nan.color;
+            if(palette.nan.selected){
+                if(palette.nan.color){
+                    colorMap.function.nanColor = palette.nan.color;
+                }else {
+                    colorMap.function.nanColor = '#ffffff';
+                }
+            }else {
+                colorMap.function.nanColor = null;
+            }
             
             switch (palette.index) {
                 case 1:
