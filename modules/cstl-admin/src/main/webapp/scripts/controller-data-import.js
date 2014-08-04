@@ -99,7 +99,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                     fileName = fileName.substring(0, fileName.lastIndexOf("."));
                     fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
                 }
-                dataListing.importData({values: {'dataPath': $scope.import.dataPath, 'metadataFilePath': $scope.import.mdPath, dataType: $scope.import.uploadType, dataName: $scope.import.dataName}}, function(response) {
+                dataListing.importData({values: {'dataPath': $scope.import.dataPath, 'metadataFilePath': $scope.import.mdPath, dataType: $scope.import.uploadType, dataName: $scope.import.dataName, fsServer: $scope.import.fsserver }}, function(response) {
 
                     var importedData = response.dataFile;
                     var importedMetaData = response.metadataFile;
@@ -112,12 +112,19 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                         $scope.import.providerId = $scope.import.dataName;
                         $scope.import.uploadType = selectedExtension.dataType;
 
+
                         if ($scope.import.uploadType === "vector") {
+
+                            if (fileExtension=="shp" || fileExtension=="SHP") {
+                                var subType = "";
+                            } else {
+                                var subType = "shapefile";
+                            }
                             provider.create({
                                 id: $scope.import.providerId
                             }, {
                                 type: "feature-store",
-                                subType: "shapefile",
+                                subType: subType,
                                 parameters: {
                                     path: importedData
                                 }
@@ -297,7 +304,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                 }
             );
 
-        }
+        };
     }]);
 
 cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataListing', '$cookies', '$growl',
@@ -353,6 +360,7 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
 cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'dataListing',
     function($scope, dataListing) {
         $scope.import.allowNext = false;
+        $scope.import.fsserver = true;
         $scope.columns = [];
         // current path chosen in server data dir
 //        $scope.currentPath = 'root';

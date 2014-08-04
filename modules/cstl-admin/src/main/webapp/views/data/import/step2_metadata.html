@@ -23,5 +23,10 @@
                 <input class="form-control col-sm-6" ng-model="import.identifier" type="text" name="identifier" ng-change="verifyAllowNext()" ng-trim="false">
             </div>
         </div>
+        <div class="col-xs-12" ng-show="import.enableSelectEPSGCode">
+            <label class="col-sm-12"translate="layer.listing.data.upload.selectEPSG">Select EPSG code</label>
+            <input type="text" ng-model="import.epsgSelected" typeahead="epsgCode for epsgCode in epsgList | filter:$viewValue | limitTo:8" class="form-control" placeholder="{{'layer.listing.data.upload.typeEPSG' | translate}}">
+            <!--<button type="button" id="addProjectionButton" ng-show="import.epsgSelected!=null" class="btn btn-add ng-scope" ng-click="addProjection();" translate="layer.listing.data.upload.createEPSG">Affect projection</button>-->
+        </div>
     </form>
 </div>

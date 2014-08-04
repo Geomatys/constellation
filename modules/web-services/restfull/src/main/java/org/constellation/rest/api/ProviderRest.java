@@ -285,7 +285,7 @@ public final class ProviderRest {
                                     final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
                                     for (String tempExtension : fileFactory.getFileExtensions()) {
                                         //we do not want shapefiles or dbf types, a folder provider will be created in those cases
-                                        if (candidateName.endsWith(tempExtension) && !tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf")) {
+                                        if (candidateName.endsWith(tempExtension) /*&& !tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf")*/) {
                                             //found a factory which can handle it
                                             final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
                                                     factory.getParametersDescriptor().getName().getCode());

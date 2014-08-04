@@ -439,30 +439,35 @@ public class DataRest {
         final String metadataFilePath = values.getValues().get("metadataFilePath");
         final String dataType = values.getValues().get("dataType");
         final String dataName= values.getValues().get("dataName");
+        final String fsServer = values.getValues().get("fsServer");
 
         try{
             final File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
             final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
             final ImportedData importedData = new ImportedData();
-            if (filePath != null) {
-                filePath = renameDataFile(dataName, filePath);
-                if (filePath.toLowerCase().endsWith(".zip")) {
-                    final File zipFile = new File(filePath);
-                    final String fileNameWithoutExt = zipFile.getName().substring(0, zipFile.getName().indexOf("."));
-                    final File zipDir = new File(dataIntegratedDirectory, dataName);
-                    if (zipDir.exists()) {
-                        recursiveDelete(zipDir);
+            if (fsServer != null && fsServer.equalsIgnoreCase("true")) {
+                importedData.setDataFile(filePath);
+            } else {
+                if (filePath != null) {
+                    filePath = renameDataFile(dataName, filePath);
+                    if (filePath.toLowerCase().endsWith(".zip")) {
+                        final File zipFile = new File(filePath);
+                        final String fileNameWithoutExt = zipFile.getName().substring(0, zipFile.getName().indexOf("."));
+                        final File zipDir = new File(dataIntegratedDirectory, dataName);
+                        if (zipDir.exists()) {
+                            recursiveDelete(zipDir);
+                        }
+                        FileUtilities.unzip(zipFile, zipDir, new CRC32());
+                        filePath = zipDir.getAbsolutePath();
                     }
-                    FileUtilities.unzip(zipFile, zipDir, new CRC32());
-                    filePath = zipDir.getAbsolutePath();
-                }
 
-                if (filePath.startsWith(uploadFolder.getAbsolutePath())) {
-                    final File destFile = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName());
-                    Files.move(Paths.get(filePath), Paths.get(destFile.getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
-                    importedData.setDataFile(destFile.getAbsolutePath());
-                } else {
-                    importedData.setDataFile(filePath);
+                    if (filePath.startsWith(uploadFolder.getAbsolutePath())) {
+                        final File destFile = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName());
+                        Files.move(Paths.get(filePath), Paths.get(destFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+                        importedData.setDataFile(destFile.getAbsolutePath());
+                    } else {
+                        importedData.setDataFile(filePath);
+                    }
                 }
             }
 
