@@ -56,15 +56,10 @@
                                         <select class="form-control form-control-fix"
                                                 ng-model="optionsSLD.rasterPalette.band.selected"
                                                 ng-options="dp.name for dp in $parent.dataProperties.bands"
-                                                ng-change="fixRZSlider();"/>
+                                                ng-change="fixRZSlider();"></select>
 									</div>
 								</div>
 								<div class="form-group" ng-show="optionsSLD.rasterPalette.band.selected.minValue !== undefined">
-									<!--div class="col-md-offset-1 col-xs-3 col-sm-3 col-md-3 col-lg-3"
-                                         style="top: 10px;">
-										<span class="control-label"
-                                              translate="sldeditor.raster.repartition">Distribution</span>
-									</div-->
                                     <label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
                                            translate="sldeditor.raster.repartition">Distribution</label>
                                     <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">

@@ -193,7 +193,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "interpolation":'interpolate',
                         "open":false
                     },
-                    repartition:undefined
+                    repartition:undefined,
+                    dataXArray:[]
                 },
                 enableRasterPalette:false,
                 rasterCells:{
@@ -259,6 +260,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.attributesExcludeGeometry = [];
         $scope.dataBbox = null;
         $scope.dataBands = null;
+        /**
+         * This is the distribution for all bands from current raster layer.
+         */
+        $scope.dataBandsRepartition = null;
 
         /**
          * Affect alpha from colorpicker into param.opacity
@@ -534,7 +539,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             "interpolation":'interpolate',
                             "open":false
                         },
-                        repartition:undefined
+                        repartition:undefined,
+                        dataXArray:[]
                     };
                     var rule = {
                         "name": 'palette-rule',
@@ -1422,6 +1428,51 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                 if(response.points){
                                     $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points = response.points;
                                     $scope.optionsSLD.rasterPalette.repartition = $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points;
+
+
+                                    //@TODO load the selected band on the graph, the repartition of statistics is already present.
+                                    if($scope.dataBandsRepartition != null){
+                                        var loader = $('#chart_ajax_loader');
+                                        loader.show();
+                                        var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
+
+                                        var repartition = $scope.dataBandsRepartition[selectedBand].repartition;
+
+                                        var xArray=[],yArray=[];
+                                        for(var key in repartition){
+                                            xArray.push(key);
+                                            yArray.push(repartition[key]);
+                                        }
+                                        $scope.optionsSLD.rasterPalette.dataXArray = xArray;
+                                        var dataRes = {
+                                            json:{
+                                                x: xArray,
+                                                data1: yArray
+                                            }
+                                        };
+                                        //@TODO load data only and dataName without rerender entire of graph. ie use c3
+                                        $scope.loadPlot(dataRes,'Band '+selectedBand,
+                                            true,460,205,'#chartRaster',{}
+                                        );
+                                        loader.hide();
+                                    }
+
+                                    //Add on graph the vertical thresholds
+                                    if($scope.optionsSLD.rasterPalette.dataXArray && $scope.optionsSLD.rasterPalette.dataXArray.length>0){
+                                        var gridsArray = [];
+                                        for(var i=0;i<$scope.optionsSLD.rasterPalette.repartition.length;i++){
+                                            var threshold = $scope.optionsSLD.rasterPalette.repartition[i].data;
+                                            for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
+                                                if($scope.optionsSLD.rasterPalette.dataXArray[j] >= threshold){
+                                                    gridsArray.push(
+                                                        {value:j,
+                                                         text:$scope.optionsSLD.rasterPalette.repartition[i].data});
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        window.c3chart.xgrids(gridsArray);
+                                    }
                                 }
                             },
                             function() {
@@ -1429,7 +1480,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             }
                         );
 
-                        //@TODO add on graph the intervals
 
                         $scope.optionsSLD.rasterPalette.palette.open = true;
                     }
@@ -1825,12 +1875,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 style.statistics({}, values,
                     function(response){
                         if(response.bands && response.bands.length>0){
+                            $scope.dataBandsRepartition = response.bands;
                             var repartition = response.bands[0].repartition;
                             var xArray=[],yArray=[];
                             for(var key in repartition){
                                 xArray.push(key);
                                 yArray.push(repartition[key]);
                             }
+                            $scope.optionsSLD.rasterPalette.dataXArray = xArray;
                             var dataRes = {
                                 json:{
                                     x: xArray,
@@ -1903,7 +1955,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 }
             });
             $(window).resize(function() {
-                console.debug(window.c3chart);
                 if(window.c3chart){
                     window.c3chart.resize();
                 }
