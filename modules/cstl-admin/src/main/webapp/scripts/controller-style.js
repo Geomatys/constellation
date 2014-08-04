@@ -190,7 +190,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             "selected":false
                         },
                         "inverse": false,
-                        "interpolation":'interpolate',
+                        "method":'interpolate',
                         "open":false
                     },
                     repartition:undefined,
@@ -536,7 +536,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                 "selected":false
                             },
                             "inverse": false,
-                            "interpolation":'interpolate',
+                            "method":'interpolate',
                             "open":false
                         },
                         repartition:undefined,
@@ -1415,6 +1415,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             );
         };
 
+        /**
+         * Binding action to generate raster palette.
+         */
         $scope.generateRasterPalette = function() {
             if($scope.optionsSLD.selectedRule){
                 //first of all, add Palette and ensure that the temporary style exists in server.
@@ -1429,15 +1432,12 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                     $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points = response.points;
                                     $scope.optionsSLD.rasterPalette.repartition = $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points;
 
-
-                                    //@TODO load the selected band on the graph, the repartition of statistics is already present.
+                                    //Load the selected band on the graph, the repartition of statistics is already present.
                                     if($scope.dataBandsRepartition != null){
                                         var loader = $('#chart_ajax_loader');
                                         loader.show();
                                         var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
-
                                         var repartition = $scope.dataBandsRepartition[selectedBand].repartition;
-
                                         var xArray=[],yArray=[];
                                         for(var key in repartition){
                                             xArray.push(key);
@@ -1450,7 +1450,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                                 data1: yArray
                                             }
                                         };
-                                        //@TODO load data only and dataName without rerender entire of graph. ie use c3
+                                        //load data on graph
                                         $scope.loadPlot(dataRes,'Band '+selectedBand,
                                             true,460,205,'#chartRaster',{}
                                         );
@@ -1458,21 +1458,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                     }
 
                                     //Add on graph the vertical thresholds
-                                    if($scope.optionsSLD.rasterPalette.dataXArray && $scope.optionsSLD.rasterPalette.dataXArray.length>0){
-                                        var gridsArray = [];
-                                        for(var i=0;i<$scope.optionsSLD.rasterPalette.repartition.length;i++){
-                                            var threshold = $scope.optionsSLD.rasterPalette.repartition[i].data;
-                                            for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
-                                                if($scope.optionsSLD.rasterPalette.dataXArray[j] >= threshold){
-                                                    gridsArray.push(
-                                                        {value:j,
-                                                         text:$scope.optionsSLD.rasterPalette.repartition[i].data});
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        window.c3chart.xgrids(gridsArray);
-                                    }
+                                    $scope.drawThresholds();
                                 }
                             },
                             function() {
@@ -1484,6 +1470,48 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         $scope.optionsSLD.rasterPalette.palette.open = true;
                     }
                 });
+            }
+        };
+
+        /**
+         * Remove repartition entry and apply this change on the histogram.
+         * @param point
+         */
+        $scope.removeRepartitionEntry = function(point){
+            if ($scope.optionsSLD.rasterPalette.repartition && confirm("Are you sure?")) {
+                var indexToRemove = $scope.optionsSLD.rasterPalette.repartition.indexOf(point);
+                if(indexToRemove>-1){
+                    $scope.optionsSLD.rasterPalette.repartition.splice(indexToRemove, 1);
+                }
+            }
+            //remove threshold vertical line on graph.
+            for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
+                if($scope.optionsSLD.rasterPalette.dataXArray[j] >= point.data){
+                    window.c3chart.xgrids.remove({value:j});
+                    break;
+                }
+            }
+        };
+
+        /**
+         * Draw xgrids thresholds.
+         */
+        $scope.drawThresholds = function(){
+            if($scope.optionsSLD.rasterPalette.dataXArray && $scope.optionsSLD.rasterPalette.dataXArray.length>0){
+                var gridsArray = [];
+                var paletteRepartition = $scope.optionsSLD.rasterPalette.repartition;
+                for(var i=0;i<paletteRepartition.length;i++){
+                    var threshold = paletteRepartition[i].data;
+                    for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
+                        if($scope.optionsSLD.rasterPalette.dataXArray[j] >= threshold){
+                            gridsArray.push(
+                                {value:j,
+                                    text:threshold});
+                            break;
+                        }
+                    }
+                }
+                window.c3chart.xgrids(gridsArray);
             }
         };
 
@@ -1509,8 +1537,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
             if (colorMap == undefined ||
                 colorMap.function == undefined ||
-                colorMap.function['@function'] != palette.interpolation) {
-                colorMap = {'function': {'@function': palette.interpolation}};
+                colorMap.function['@function'] != palette.method) {
+                colorMap = {'function': {'@function': palette.method}};
             }
 
             colorMap.function.interval = palette.intervalsCount;

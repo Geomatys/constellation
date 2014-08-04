@@ -121,18 +121,7 @@ public final class StyleRest {
     @PUT
     @Path("{id}/style/create")
     public Response createStyleJson(final @PathParam("id") String id, final Style style) throws Exception {
-        /*if(style.getRules().size()>0 && style.getRules().get(0).getSymbolizers().size()>0){
-            final MutableStyleFactory SF = (MutableStyleFactory) FactoryFinder.getStyleFactory(
-                    new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
-            ChannelSelection cs = new ChannelSelection(
-                    SF.channelSelection(
-                            SF.selectedChannelType("0",(ContrastEnhancement)null),
-                            SF.selectedChannelType("1",(ContrastEnhancement)null),
-                            SF.selectedChannelType("2",(ContrastEnhancement)null)));
-            ((RasterSymbolizer)style.getRules().get(0).getSymbolizers().get(0)).setChannelSelection(cs);
-        }
-
-        final MutableStyle mstyle = style.toType();
+        /*final MutableStyle mstyle = style.toType();
         styleBusiness.createStyle(id, mstyle);
         return ok(new Style(mstyle));*/
 

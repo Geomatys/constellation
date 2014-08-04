@@ -111,21 +111,24 @@ public final class Interpolate implements Function {
 		}
         
         //init final InterpolationPoint list and coefficient
-        List<InterpolationPoint> recomputePoints = new ArrayList<>(0);
-		double coefficient = max-min;
-		if(interval!=null || coefficient!=1){
-			coefficient = coefficient/(interval-1);
-		}
-        
-		// Loop to create points with new point evaluation
-        for (int i = 0; i < interval; i++) {
-			double val = min + (coefficient * i);
-			Color color = inter.evaluate(val, Color.class);
-			InterpolationPoint point = new InterpolationPoint();
-			point.setColor("#"+Integer.toHexString(color.getRGB()).substring(2));
-			point.setData(val);
-			recomputePoints.add(point);
-		}
+        final List<InterpolationPoint> recomputePoints = new ArrayList<>();
+        if(max !=null && min != null){
+            double coefficient = max-min;
+            if(interval!=null){
+                if(coefficient!=1){
+                    coefficient = coefficient/(interval-1);
+                }
+                // Loop to create points with new point evaluation
+                for (int i = 0; i < interval; i++) {
+                    final double val = min + (coefficient * i);
+                    final Color color = inter.evaluate(val, Color.class);
+                    final InterpolationPoint point = new InterpolationPoint();
+                    point.setColor("#"+Integer.toHexString(color.getRGB()).substring(2));
+                    point.setData(val);
+                    recomputePoints.add(point);
+                }
+            }
+        }
         
         return SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(recomputePoints), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
         

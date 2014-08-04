@@ -115,23 +115,22 @@
 											<input id="categorize"
                                                    type="radio"
                                                    name="categorize"
-                                                   ng-model="optionsSLD.rasterPalette.palette.interpolation"
+                                                   ng-model="optionsSLD.rasterPalette.palette.method"
                                                    value="categorize"/>
-											<span translate="sldeditor.interpolation.solidcolor">Solid color</span>
+											<span translate="sldeditor.paletteMethod.solidcolor">Solid color</span>
 										</label> 
 										<label class="radio-inline" style="font-size: 12px;margin-left: 0;">
 											<input id="interpolation"
                                                    type="radio"
                                                    name="interpolation"
-                                                   ng-model="optionsSLD.rasterPalette.palette.interpolation"
+                                                   ng-model="optionsSLD.rasterPalette.palette.method"
                                                    value="interpolate"/>
-											<span translate="sldeditor.interpolation.interpolatecolor">Interpolate color</span>
+											<span translate="sldeditor.paletteMethod.interpolatecolor">Interpolate color</span>
 										</label>
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
-                                            translate="sldeditor.edition.intervalsCount">Intervals count</label>
+									<label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label">Divisions</label>
 									<div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
 										<input type="number"
                                                class="form-control form-control-fix"
@@ -183,29 +182,34 @@
                     </accordion-heading>
 					<div class="style_bloc" ng-show="optionsSLD.rasterPalette.repartition !== undefined">
                         <div class="palette-array">
-                            <table class="table">
-                                    <tr ng-repeat="data in optionsSLD.rasterPalette.repartition">
-                                        <td>
-                                            <div ng-style="{'background-color':data.color,'width':'20px','height':'20px'}"></div>
+                            <table class="sldTable table table-striped">
+                                <tbody>
+                                    <tr ng-repeat="point in optionsSLD.rasterPalette.repartition">
+                                        <td style="width:50px;">
+                                            <div ng-style="{'background-color':point.color,'width':'40px','height':'28px'}"></div>
                                         </td>
                                         <td>
-                                            <span>{{data.data}}</span>
-                                            <span ng-if="!$last"> -&gt; {{optionsSLD.rasterPalette.repartition[$index+1].data}}</span>
-                                            <span ng-if="$last"> -&gt; {{optionsSLD.rasterPalette.palette.rasterMaxValue}}</span>
+                                            <input type="number" class="form-control form-control-fix"
+                                                   ng-model="point.data" style="width:80px;height:28px;float:left;"
+                                                   ng-change="drawThresholds();"/>
+                                            <span ng-if="!$last && optionsSLD.rasterPalette.palette.method =='categorize'"> -&gt; {{optionsSLD.rasterPalette.repartition[$index+1].data}}</span>
                                         </td>
                                         <td>
-                                            <button type="button" class="btn btn-default btn-xs btn-remove">
+                                            <button type="button"
+                                                    class="btn btn-default btn-xs btn-remove"
+                                                    ng-click="removeRepartitionEntry(point);">
                                                 <span class="glyphicon glyphicon-remove"></span>
                                             </button>
                                         </td>
                                     </tr>
-                                </table>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-xs-12 div-btn-add">
-                            <button type="button" class="btn-apercu btn btn-default">
+                        <!--div class="col-xs-12 div-btn-add">
+                            <button type="button" class="btn-apercu btn btn-default pull-right">
                                 <span translate="sldeditor.edition.rasterPalette.addNewValue">Add new value</span>
                             </button>
-                        </div>
+                        </div-->
                     </div>
 				</accordion-group>
 			</accordion>

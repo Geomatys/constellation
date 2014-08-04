@@ -76,7 +76,6 @@ a.choix_type:hover{
 
 /*Polygone*/
 .style_bloc{
-	background-color: #eee;
 	border: solid 1px #bbb;
 	padding: 10px;
 	margin-bottom: 20px;
@@ -136,7 +135,7 @@ a.choix_type:hover{
 	border-color: #357ebd;
 }
 .tab-style-edition .style_bloc{
-	padding:15px 10px 0 10px;	
+	padding:2px 0 0;
 }
 /*raster*/
 .bande_rouge{
@@ -271,7 +270,7 @@ ul.dropdown-images li a:hover{
 
 .palette-array{
     overflow: auto;
-    height: 147px;
+    max-height: 200px;
 }
 
 .form-control-fix{
@@ -317,6 +316,11 @@ select.form-control-fix{
 }
 .styleRZSlider rzslider span.bar{
     background-color: #c3c3c3;
+}
+
+.sldTable>tbody>tr>td{
+    border-top: 1px solid #DDDDDD;
+    padding: 5px;
 }
 
 /* Small devices (tablets, 768px and up) */
