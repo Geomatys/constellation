@@ -361,9 +361,9 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
     function($scope, dataListing) {
         $scope.import.allowNext = false;
         $scope.import.fsserver = true;
+
         $scope.columns = [];
-        // current path chosen in server data dir
-//        $scope.currentPath = 'root';
+
 
 
         $scope.load = function(){
@@ -376,9 +376,6 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
         };
 
         $scope.open = function(path, depth) {
-//            if (depth < $scope.columns.length) {
-//                $scope.columns.splice(depth + 1, $scope.columns.length - depth);
-//            }
             $scope.load(path);
         };
 
@@ -398,14 +395,6 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
             return $scope.currentPath.indexOf(path) === 0;
         };
 
-//        $scope.navServer = function() {
-//            if($scope.columns.length>3) {
-//                $(".block-folders").slice(0,$scope.columns.length-3).hide();
-//                $(".block-folders").slice($scope.columns.length-3,$scope.columns.length-1).show();
-//            } else {
-//                $(".block-folders").show();
-//            }
-//        };
 
         $scope.import.next = function() {
             var lastPointIndex = $scope.currentPath.lastIndexOf(".");
@@ -460,8 +449,46 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
     }]);
 
 
-cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl',
-    function($scope, $cookies, $growl) {
+cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl', 'dataListing',
+    function($scope, $cookies, $growl, dataListing) {
+
+
+        $scope.columns = [];
+
+
+
+        $scope.load = function(){
+            $scope.import.allowNext = false;
+            var path = $scope.currentPath;
+            dataListing.metadataFolder({}, path, function(files) {
+                $scope.currentPath = files[0].parentPath;
+                $scope.columns = files;
+            });
+        };
+
+        $scope.open = function(path, depth) {
+            $scope.load(path);
+        };
+
+
+
+        $scope.select = function(item) {
+
+            if (!item.folder) {
+                $scope.import.metadata = item.path;
+                $scope.currentPath = item.path;
+                $scope.import.identifier = null;
+                $scope.verifyAllowNext();
+            }else{
+                $scope.currentPath = item.path;
+                $scope.load();
+            }
+
+        };
+
+        $scope.startWith = function(path) {
+            return $scope.currentPath.indexOf(path) === 0;
+        };
 
         $scope.import.allowNext = false;
         if ($scope.import.dataPath != null && $scope.import.dataPath.length > 0){
@@ -474,7 +501,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
 
 
         $scope.verifyAllowNext = function(){
-                if (($scope.import.identifier != null && $scope.import.identifier.length > 0) || ($scope.import.metadata  != null && $scope.import.metadata.length > 0)) {
+                if (($scope.import.identifier != null && $scope.import.identifier.length > 0) ) {
                     var letters = /^[A-Za-zàèìòùáéíóúäëïöüñãõåæøâêîôû0-9\-_]+$/;
                     var id = $scope.import.identifier;
                     if(!id.match(letters)) {
@@ -483,7 +510,9 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                     }else {
                         $scope.import.allowNext = true;
                     }
-                }else{
+                }else if ($scope.import.metadata  != null && $scope.import.metadata.length > 0) {
+                    $scope.import.allowNext = true;
+                } else {
                     $scope.import.allowNext = false;
                 }
 

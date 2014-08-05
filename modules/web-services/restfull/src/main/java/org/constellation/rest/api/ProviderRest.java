@@ -285,16 +285,18 @@ public final class ProviderRest {
                                     final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
                                     for (String tempExtension : fileFactory.getFileExtensions()) {
                                         //we do not want shapefiles or dbf types, a folder provider will be created in those cases
-                                        if (candidateName.endsWith(tempExtension) /*&& !tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf")*/) {
-                                            //found a factory which can handle it
-                                            final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
-                                                    factory.getParametersDescriptor().getName().getCode());
-                                            params.parameter("url").setValue(url);
-                                            params.parameter("namespace").setValue("no namespace");
-                                            foundProvider = true;
-                                            //TODO we should add all files which define a possible feature-store
-                                            //but the web interfaces do not handle that yet, so we limit to one for now.
-                                            break search;
+                                        if (candidateName.endsWith(tempExtension)) {
+                                            if (!tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf") && candidates.length>1) {
+                                                //found a factory which can handle it
+                                                final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
+                                                        factory.getParametersDescriptor().getName().getCode());
+                                                params.parameter("url").setValue(url);
+                                                params.parameter("namespace").setValue("no namespace");
+                                                foundProvider = true;
+                                                //TODO we should add all files which define a possible feature-store
+                                                //but the web interfaces do not handle that yet, so we limit to one for now.
+                                                break search;
+                                            }
                                         }
                                     }
                                 } else {

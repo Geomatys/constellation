@@ -297,6 +297,52 @@ public class DataRest {
     }
 
     /**
+     * Give subfolder list from a server file path
+     *
+     * @param path server file path
+     * @param filtered {@code True} if we want to keep only known files.
+     * @return a {@link javax.ws.rs.core.Response} which contain file list
+     */
+    @POST
+    @Path("metadatapath/{filtered}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getMetaDataFolder(@PathParam("filtered") final Boolean filtered, String path) {
+        final List<FileBean> listBean = new ArrayList<>();
+
+        final File[] children;
+        if (Paths.get(path).toFile().exists()) {
+            final File nextRoot = new File(path);
+            children = nextRoot.listFiles();
+        }else{
+            HashMap hashMap = new HashMap();
+            hashMap.put("msg", "invalid path");
+            return Response.status(500).entity(hashMap).build();
+        }
+
+        //loop on subfiles/folders to create bean
+        if (children != null) {
+            for (File child : children) {
+                final FileBean bean = new FileBean(child.getName(), child.isDirectory(), child.getAbsolutePath(), child.getParentFile().getAbsolutePath());
+
+                if (!child.isDirectory() || !filtered) {
+                    final int lastIndexPoint = child.getName().lastIndexOf('.');
+                    final String extension = child.getName().substring(lastIndexPoint + 1);
+
+                    if ("xml".equalsIgnoreCase(extension)) {
+                        listBean.add(bean);
+                    }
+
+                } else {
+                    listBean.add(bean);
+                }
+            }
+        }
+        Collections.sort(listBean);
+        return Response.status(200).entity(listBean).build();
+    }
+
+    /**
      * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
      *
      * @param fileIs
@@ -355,6 +401,7 @@ public class DataRest {
     public Response uploadMetadata(@FormDataParam("metadata") InputStream mdFileIs,
                                @FormDataParam("metadata") FormDataContentDisposition fileMetaDetail,
                                @FormDataParam("identifier") String identifier,
+                               @FormDataParam("serverMetadataPath") String serverMetadataPath,
                                @Context HttpServletRequest request) {
     	final String sessionId = request.getSession(false).getId();
         final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
@@ -363,7 +410,14 @@ public class DataRest {
             //dataName = identifier + addExtentionIfExist(fileDetail.getFileName());
             hashMap.put("dataName", identifier);
         } else {
-            if (fileMetaDetail.getFileName().length() > 0) {
+            if (serverMetadataPath !=null && serverMetadataPath.length()>0){
+                hashMap.put("metadataPath", serverMetadataPath);
+                try {
+                    hashMap = extractIdentifierFromMetadataFile(hashMap,new File(serverMetadataPath));
+                }catch (ConstellationException ex){
+                    return Response.status(500).entity(hashMap.put("msg", ex.getMessage())).build();
+                }
+            } else  if (fileMetaDetail.getFileName().length() > 0) {
                 final File newFileMetaData = new File(uploadDirectory, fileMetaDetail.getFileName());
                 try {
                     if (mdFileIs != null) {
@@ -373,36 +427,11 @@ public class DataRest {
                         Files.copy(mdFileIs, newFileMetaData.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         mdFileIs.close();
 
-                        Object obj;
                         try {
-                            final MarshallerPool pool = CSWMarshallerPool.getInstance();
-                            final Unmarshaller unmarsh = pool.acquireUnmarshaller();
-                            obj = unmarsh.unmarshal(newFileMetaData);
-                            pool.recycle(unmarsh);
-                        } catch (JAXBException ex) {
-                            LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
-                            hashMap.put("msg", "metadata file is incorrect");
-                            return Response.status(500).entity(hashMap).build();
+                            extractIdentifierFromMetadataFile(hashMap, newFileMetaData);
+                        }catch (ConstellationException ex){
+                            return Response.status(500).entity(hashMap.put("msg", ex.getMessage())).build();
                         }
-
-                        if (!(obj instanceof DefaultMetadata)) {
-                            hashMap.put("msg", "metadata file is incorrect");
-                            return Response.status(500).entity(hashMap).build();
-                        }
-
-                        final DefaultMetadata metadata = (DefaultMetadata)obj;
-                        final String metaIdentifier = new MetadataFeeder(metadata).getIdentifier();
-                        if (metaIdentifier!=null && metaIdentifier.length()>0) {
-                            //dataName = metaIdentifier + addExtentionIfExist(fileDetail.getFileName());
-                            hashMap.put("dataName", metaIdentifier);
-                        }
-
-
-                        hashMap.put("metadataPath",newFileMetaData.getAbsolutePath());
-
-                        final String title = new MetadataFeeder(metadata).getTitle();
-                        hashMap.put("metatitle",title);
-                        hashMap.put("metaIdentifier",metaIdentifier);
                     }
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
@@ -419,6 +448,40 @@ public class DataRest {
         }
 
         return Response.status(200).entity(hashMap).build();
+    }
+
+    private HashMap extractIdentifierFromMetadataFile(HashMap<String, String> hashMap, File newFileMetaData) {
+        Object obj;
+        try {
+            final MarshallerPool pool = CSWMarshallerPool.getInstance();
+            final Unmarshaller unmarsh = pool.acquireUnmarshaller();
+            obj = unmarsh.unmarshal(newFileMetaData);
+            pool.recycle(unmarsh);
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
+            throw new ConstellationException(new Exception("metadata file is incorrect"));
+
+        }
+
+        if (!(obj instanceof DefaultMetadata)) {
+            throw new ConstellationException(new Exception("metadata file is incorrect"));
+        }
+
+
+        final DefaultMetadata metadata = (DefaultMetadata)obj;
+        final String metaIdentifier = new MetadataFeeder(metadata).getIdentifier();
+        if (metaIdentifier!=null && metaIdentifier.length()>0) {
+            //dataName = metaIdentifier + addExtentionIfExist(fileDetail.getFileName());
+            hashMap.put("dataName", metaIdentifier);
+        }
+
+
+        hashMap.put("metadataPath",newFileMetaData.getAbsolutePath());
+
+        final String title = new MetadataFeeder(metadata).getTitle();
+        hashMap.put("metatitle",title);
+        hashMap.put("metaIdentifier",metaIdentifier);
+        return hashMap;
     }
 
 
