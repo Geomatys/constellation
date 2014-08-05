@@ -71,6 +71,7 @@ public class Categorize implements Function{
                     if(obj instanceof Double){
                         if(Double.isNaN((double)obj)){
                             ip.setData(null);
+                            nanColor = ip.getColor();
                         }else {
                             ip.setData((Number)obj);
                         }
@@ -112,19 +113,13 @@ public class Categorize implements Function{
 	public org.opengis.filter.expression.Function toType() {
 
         //remove nan point if exists because it is added later, and it cause error for max/min values
-        if(nanColor!=null) {
-            InterpolationPoint nanPoint = null;
-            for (final InterpolationPoint ip : points) {
-                if(ip.getData() == null && nanColor.equals(ip.getColor())){
-                    nanPoint = ip;
-                    break;
-                }
-            }
-            if(nanPoint != null){
-                points.remove(nanPoint);
+        final List<InterpolationPoint> nullPoints = new ArrayList<>();
+        for (final InterpolationPoint ip : points) {
+            if(ip.getData() == null){
+                nullPoints.add(ip);
             }
         }
-
+        points.removeAll(nullPoints);
 
 		// create first threshold map to create first categorize function.
 		Map<Expression, Expression> values = new HashMap<>(0);

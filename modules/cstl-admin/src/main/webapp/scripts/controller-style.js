@@ -358,7 +358,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         //Call the initSldPage() function to determine which page we are going to open.
         initSldPage();
 
-
         /**
          * Function to allow the user to go back to rules list using the breadcrumb after opening a rule.
          *
@@ -407,7 +406,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $scope.selectedStyle = styleObj;
                     initOptionsSLD();
                     $scope.loadDataProperties();
-                    //@TODO affect properties from current style to OptionsSLD
                 });
             }
         };
@@ -623,19 +621,69 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
         /**
          * Edit rule for raster.
-         * @TODO we need to identify raster palette against raster cells to open the good panel.
          * and restore $scope.optionsSLD.rasterPalette with the selected rule properties
+         * @TODO the test to identify raster palette and raster cells is not generic
          */
         $scope.editSelectedRasterRule = function(){
-
-            //@TODO init $scope.optionsSLD.rasterPalette for the $scope.optionsSLD.selectedRule
-
             if($scope.optionsSLD.selectedRule.symbolizers &&
                 $scope.optionsSLD.selectedRule.symbolizers.length>0 &&
-                $scope.optionsSLD.selectedRule.symbolizers[0].colorMap){
-                //@TODO open for raster palette, the if test is ok?
+                $scope.optionsSLD.selectedRule.symbolizers[0].colorMap){ //FIXME bug when editing raster and do nothing and then reopen the rule.
+
                 $scope.optionsSLD.enableRasterPalette = true;
                 $scope.optionsSLD.enableRasterCells = false;
+
+                //init sld editor values with selected rule.
+                var channelSelection = $scope.optionsSLD.selectedRule.symbolizers[0].channelSelection;
+                if(channelSelection && channelSelection.greyChannel && $scope.optionsSLD.rasterPalette.band && $scope.dataBands) {
+                    var bandIdentified = null;
+                    for(var i=0;i<$scope.dataBands.length;i++){
+                        if($scope.dataBands[i].name === channelSelection.greyChannel.name){
+                            bandIdentified =$scope.dataBands[i];
+                            break;
+                        }
+                    }
+                    if(bandIdentified===null){
+                        bandIdentified = $scope.dataBands[0];
+                    }
+                    $scope.optionsSLD.rasterPalette.band.selected = bandIdentified;
+                    $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
+                    $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+                }
+                var colorMap = $scope.optionsSLD.selectedRule.symbolizers[0].colorMap;
+                $scope.optionsSLD.rasterPalette.palette.method = colorMap.function['@function'];
+                $scope.optionsSLD.rasterPalette.palette.intervalsCount = colorMap.function.interval;
+
+                if(colorMap.function.nanColor && colorMap.function.nanColor != null){
+                    $scope.optionsSLD.rasterPalette.palette.nan.selected = true;
+                    $scope.optionsSLD.rasterPalette.palette.nan.color = colorMap.function.nanColor;
+                }
+                $scope.optionsSLD.rasterPalette.repartition = colorMap.function.points;
+
+                //Load the selected band on the graph, the repartition of statistics is already present.
+                if($scope.dataBandsRepartition != null && $scope.optionsSLD.rasterPalette.band.selected){
+                    var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
+
+                    var repartitionBand = $scope.dataBandsRepartition[selectedBand].repartition;
+                    var xArray=[],yArray=[];
+                    for(var key in repartitionBand){
+                        xArray.push(key);
+                        yArray.push(repartitionBand[key]);
+                    }
+                    $scope.optionsSLD.rasterPalette.dataXArray = xArray;
+                    var dataRes = {
+                        json:{
+                            x: xArray,
+                            data1: yArray
+                        }
+                    };
+                    //load data on graph
+                    $scope.loadPlot(dataRes,'Band '+selectedBand,
+                        true,460,205,'#chartRaster',{}
+                    );
+                }
+                //Add on graph the vertical thresholds
+                $scope.drawThresholds();
+                $scope.optionsSLD.rasterPalette.palette.open = true;
             }else {
                 //open raster cells panel
                 $scope.optionsSLD.enableRasterPalette = false;
@@ -1102,7 +1150,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     if($scope.attributesExcludeGeometry.length>0){
                         $scope.optionsSLD.autoUniqueValues.attr=$scope.attributesExcludeGeometry[0].name;
                     }
-
                     //for raster only
                     if($scope.dataType === 'raster'){
                         $scope.dataBands = response.bands;
@@ -1118,6 +1165,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 }
             );
         };
+        $scope.loadDataProperties();
 
         /**
          * Fix rzslider bug with angular on value changed for band selector.
@@ -1485,12 +1533,23 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 }
             }
             //remove threshold vertical line on graph.
-            for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
-                if($scope.optionsSLD.rasterPalette.dataXArray[j] >= point.data){
-                    window.c3chart.xgrids.remove({value:j});
-                    break;
+            if(point.data !== null){
+                for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
+                    if($scope.optionsSLD.rasterPalette.dataXArray[j] >= point.data){
+                        window.c3chart.xgrids.remove({value:j});
+                        break;
+                    }
                 }
+            }else {
+                $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.nanColor = null;
             }
+        };
+
+        /**
+         * Action to add new value in colorMap
+         */
+        $scope.addColorMapEntry = function() {
+            $scope.optionsSLD.rasterPalette.repartition.push({data:255,color:'#000000'});
         };
 
         /**

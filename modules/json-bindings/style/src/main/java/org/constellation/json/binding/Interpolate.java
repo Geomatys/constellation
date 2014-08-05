@@ -19,6 +19,7 @@
 
 package org.constellation.json.binding;
 
+import org.geotoolkit.filter.DefaultLiteral;
 import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
@@ -55,7 +56,10 @@ public final class Interpolate implements Function {
             for (final org.geotoolkit.style.function.InterpolationPoint point : interpolate.getInterpolationPoints()) {
                 this.points.add(new InterpolationPoint(point));
                 if(nanColor == null && point.getData() instanceof Double && Double.isNaN((double) point.getData())){
-                    nanColor = point.getValue().toString();
+                    if(point.getValue() instanceof DefaultLiteral){
+                        final Object colorHex = ((DefaultLiteral)point.getValue()).getValue();
+                        nanColor = "#"+Integer.toHexString(((Color)colorHex).getRGB()).substring(2);
+                    }
                 }
             }
             this.interval = (double)interpolate.getInterpolationPoints().size();
@@ -91,18 +95,13 @@ public final class Interpolate implements Function {
 	public org.opengis.filter.expression.Function toType() {
 
         //remove nan point if exists because it is added later, and it cause error for max/min values
-        if(nanColor!=null) {
-            InterpolationPoint nanPoint = null;
-            for (final InterpolationPoint ip : points) {
-                if(ip.getData() == null && nanColor.equals(ip.getColor())){
-                    nanPoint = ip;
-                    break;
-                }
-            }
-            if(nanPoint != null){
-                points.remove(nanPoint);
+        final List<InterpolationPoint> nullPoints = new ArrayList<>();
+        for (final InterpolationPoint ip : points) {
+            if(ip.getData() == null){
+                nullPoints.add(ip);
             }
         }
+        points.removeAll(nullPoints);
 
         final org.geotoolkit.style.function.Interpolate inter =  SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(points), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
         

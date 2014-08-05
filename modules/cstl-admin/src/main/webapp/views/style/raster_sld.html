@@ -1,4 +1,4 @@
-<form class="form-horizontal" role="form" ng-init="loadDataProperties();">
+<form class="form-horizontal" role="form">
 	<ul class="nav nav-pills" role="tablist">
 		<li ng-class="{active:optionsSLD.rasterPalette.symbolPills==='color'}">
             <a ng-click="optionsSLD.rasterPalette.symbolPills='color';$broadcast('rzSliderForceRender')"
@@ -185,8 +185,8 @@
                             <table class="sldTable table table-striped">
                                 <tbody>
                                     <tr ng-repeat="point in optionsSLD.rasterPalette.repartition">
-                                        <td style="width:50px;">
-                                            <div ng-style="{'background-color':point.color,'width':'40px','height':'28px'}"></div>
+                                        <td style="width:65px;">
+                                            <input type='text' name="picker" class="picker" spectrum ng-model="point.color"/>
                                         </td>
                                         <td>
                                             <input type="number" class="form-control form-control-fix"
@@ -206,11 +206,11 @@
                                 </tbody>
                             </table>
                         </div>
-                        <!--div class="col-xs-12 div-btn-add">
-                            <button type="button" class="btn-apercu btn btn-default pull-right">
+                        <div class="col-xs-12 div-btn-add">
+                            <button type="button" class="btn-apercu btn btn-default pull-right" ng-click="addColorMapEntry();">
                                 <span translate="sldeditor.edition.rasterPalette.addNewValue">Add new value</span>
                             </button>
-                        </div-->
+                        </div>
                     </div>
 				</accordion-group>
 			</accordion>
