@@ -9,6 +9,11 @@
   <artifactId>cstl-sdi</artifactId>
   <packaging>war</packaging>
 
+  <properties>
+    <jai.version>1.1.4</jai.version>
+    <jai-io.version>1.1</jai-io.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.constellation</groupId>
@@ -28,6 +33,21 @@
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-base</artifactId>
       <version>0.9-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_core</artifactId>
+      <version>${jai.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_codec</artifactId>
+      <version>${jai.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <version>1.1</version>
     </dependency>
   </dependencies>
 

@@ -34,10 +34,6 @@
   </listener>
 
   <listener>
-    <listener-class>org.constellation.map.setup.MapSetup</listener-class>
-  </listener>
-
-  <listener>
     <listener-class>org.constellation.scheduler.CstlSchedulerSetup</listener-class>
   </listener>
 
