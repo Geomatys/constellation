@@ -21,7 +21,7 @@
     <logger name="org.springframework.cache" level="WARN"/>
     
 
-    <root level="${logback.loglevel}">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
