@@ -137,12 +137,12 @@
             </div>
             <div ng-show="wmtsParams">
                 <div class="form-group">
-                    <div class="control-label" for="tileFormat" translate="data.modal.choose.tile.format">Tile format</div>
-                    <input type="text" class="form-control" ng-model="$parent.tileFormat" id="tileFormat"/>
+                    <div class="control-label" for="tileFormat" translate="data.modal.choose.tile.format.label">Tile format</div>
+                    <input type="text" class="form-control" ng-model="$parent.tileFormat" id="tileFormat" placeholder="{{'data.modal.choose.tile.format.placeholder' | translate}}"/>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="crs">CRS</div>
-                    <input type="text" class="form-control" ng-model="$parent.crs" id="crs"/>
+                    <input type="text" class="form-control" ng-model="$parent.crs" id="crs" placeholder="{{'data.modal.choose.tile.crs.placeholder' | translate}}"/>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="scales" translate="data.modal.choose.scales">Scales</div>
@@ -150,11 +150,11 @@
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="upperCornerX" translate="data.modal.choose.uppercornerx">Upper corner X</div>
-                    <input type="text" class="form-control" ng-model="$parent.upperCornerX" id="upperCornerX"/>
+                    <input type="text" class="form-control" ng-model="$parent.upperCornerX" id="upperCornerX"  placeholder="{{'data.modal.choose.uppercornerx.placeholder' | translate}}"/>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="upperCornerY" translate="data.modal.choose.uppercornery">Upper corner Y</div>
-                    <input type="text" class="form-control" ng-model="$parent.upperCornerY" id="upperCornerY"/>
+                    <input type="text" class="form-control" ng-model="$parent.upperCornerY" id="upperCornerY" placeholder="{{'data.modal.choose.uppercornery.placeholder' | translate}}"/>
                 </div>
             </div>
         </div>
