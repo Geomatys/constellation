@@ -18,7 +18,7 @@
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.constellation.gui</groupId>
+      <groupId>org.constellation</groupId>
       <artifactId>cstl-services</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
@@ -50,7 +50,7 @@
             </overlay>
             <overlay>
               <id>cstl-services</id>
-              <groupId>org.constellation.gui</groupId>
+              <groupId>org.constellation</groupId>
               <artifactId>cstl-services</artifactId>
             </overlay>
            
