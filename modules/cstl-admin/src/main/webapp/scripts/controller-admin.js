@@ -431,7 +431,7 @@ cstlAdminApp.controller('DomainAddMembersController', ['$scope', '$modalInstance
 
         $scope.addToDomain = function(i, roles){
             var user = $scope.users[i]
-            DomainResource.addMemberToDomain({userId: user.id, domainId: $scope.domain.id}, [0], function(){
+            DomainResource.addMemberToDomain({userId: user.id, domainId: $scope.domain.id}, [1], function(){
                 $scope.users.splice(i, 1);
                 if($scope.users.length==0){
                     $modalInstance.close('close');
