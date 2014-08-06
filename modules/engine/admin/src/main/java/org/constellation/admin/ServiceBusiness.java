@@ -51,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 @Component
 public class ServiceBusiness {
@@ -381,6 +382,7 @@ public class ServiceBusiness {
             throw new ConfigurationException("Service " + serviceType + ':' + identifier + " not found.");
         } else {
             service.setConfig(getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance()));
+            service.setVersions(StringUtils.join(details.getVersions(), "µ"));
             serviceRepository.update(service);
             if (details != null) {
                 setInstanceDetails(serviceType, identifier, details, details.getLang(), true);

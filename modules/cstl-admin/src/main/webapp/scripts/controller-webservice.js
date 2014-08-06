@@ -524,9 +524,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
             var selVersions = $filter('filter')($scope.versions, {checked: true});
             var strVersions = [];
             for(var i=0; i < selVersions.length; i++) {
-                strVersions.push(selVersions[i].id);
+                $scope.metadata.versions.push(selVersions[i].id);
             }
-            $scope.metadata.versions = strVersions;
         };
 
         // define which version is Selected
