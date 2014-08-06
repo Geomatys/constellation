@@ -763,8 +763,8 @@
                                         <tr ng-click="details($index)" style='cursor:pointer'
                                             ng-repeat="entry in domainroles | filter:filter | orderBy:predicate:reverse">
                                             <td>{{entry.domainRole}}</td>
-                                            <td><input type="checkbox" disabled="true" ng-checked="domain.access.indexOf('READ') != -1"></td>
-                                            <td><input type="checkbox" disabled="true"></td>
+                                            <td><input type="checkbox" disabled="true" ng-checked="entry.access.indexOf('READ') != -1"></td>
+                                            <td><input type="checkbox" disabled="true" ng-checked="entry.access.indexOf('WRITE') != -1"></td>
                                             <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
                                         </tr>
                                     </table>
