@@ -286,7 +286,11 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
         };
 
         $scope.import.finish = function() {
-            $scope.uploaded();
+            if ($scope.import.uploadType != null ) {
+                $scope.uploaded();
+            } else {
+                $growl('error','Error','Select Data Type');
+            }
         };
 
         $scope.addProjection = function (){
