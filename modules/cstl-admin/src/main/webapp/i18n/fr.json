@@ -835,7 +835,11 @@
     "sldeditor.edition.rasterPalette.redChannel":"Canal rouge",
     "sldeditor.edition.rasterPalette.greenChannel":"Canal vert",
     "sldeditor.edition.rasterPalette.blueChannel":"Canal bleu",
+    "sldeditor.edition.rasterPalette.grayscale":"Niveau de gris",
     "sldeditor.edition.histogram.title":"Afficher/Masquer l'histogramme des valeurs",
+    "sldeditor.edition.apply":"Appliquer",
+    "sldeditor.edition.rasterCells.cellSize":"Taille des cellules",
+    "sldeditor.edition.rasterCells.cellType":"Type",
 
     "tooltip.service.create.name":"L'identifiant peut être le même que le nom",
     "tooltip.service.create.tag":"Utiliser la touche Tab ou Entrée pour valider un mot-clé",

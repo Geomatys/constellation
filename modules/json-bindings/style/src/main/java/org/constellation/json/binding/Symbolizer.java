@@ -34,7 +34,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @Type(value=LineSymbolizer.class,    name="line"),
     @Type(value=PolygonSymbolizer.class, name="polygon"),
     @Type(value=TextSymbolizer.class,    name="text"),
-    @Type(value=RasterSymbolizer.class,  name="raster")
+    @Type(value=RasterSymbolizer.class,  name="raster"),
+    @Type(value= CellSymbolizer.class,   name="cell")
 })
 public interface Symbolizer extends StyleElement<org.opengis.style.Symbolizer> {
 }

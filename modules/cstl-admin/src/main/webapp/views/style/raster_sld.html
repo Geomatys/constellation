@@ -1,5 +1,5 @@
-<form class="form-horizontal" role="form">
-	<ul class="nav nav-pills" role="tablist">
+<form class="form-horizontal form-style" role="form">
+	<!--ul class="nav nav-pills" role="tablist">
 		<li ng-class="{active:optionsSLD.rasterPalette.symbolPills==='color'}">
             <a ng-click="optionsSLD.rasterPalette.symbolPills='color';$broadcast('rzSliderForceRender')"
                role="tab">
@@ -18,7 +18,7 @@
                 <span translate="label.contrast">Contrast and relief</span>
 		    </a>
         </li>
-	</ul>
+	</ul-->
 
 	<div class="tab-content">
 		<div class="tab-pane colormodel" ng-class="{active:optionsSLD.rasterPalette.symbolPills==='color'}">
@@ -165,7 +165,7 @@
 									<button type="button"
                                             ng-click="generateRasterPalette();"
                                             class="btn btn-generer btn-default pull-right"
-                                            style="margin-top: 15px;">
+                                            style="margin-top: 2px;">
                                         <span translate="sldeditor.edition.rasterPalette.generate">Generate palette</span>
                                     </button>
 								</div>
@@ -215,47 +215,65 @@
 				</accordion-group>
 			</accordion>
 			<div ng-show="optionsSLD.rasterPalette.colorModel === 'rgb'">
-				<form class="form_classification form-horizontal" role="form">
+				<form class="form_classification form-horizontal form-style" role="form">
 					<div class="form-group bande_rouge">
 						<label class="col-sm-3 control-label" translate="sldeditor.edition.rasterPalette.redChannel">Red channel</label>
 						<div class="col-sm-9">
-							<select class="form-control form-control-fix">
-								<option>Bande 1</option>
-								<option>Bande 2</option>
-								<option>Bande 3</option>
-								<option>Bande 4</option>
-								<option>Bande 5</option>
+							<select class="form-control form-control-fix"
+                                    ng-model="optionsSLD.rasterPalette.rgbChannels[0].name">
+                                <option value=""></option>
+                                <option ng-repeat="dp in $parent.dataProperties.bands" ng-value="dp.name">{{dp.name}}</option>
 							</select>
 						</div>
 					</div>
 					<div class="form-group bande_verte">
 						<label class="col-sm-3 control-label" translate="sldeditor.edition.rasterPalette.greenChannel">Green channel</label>
 						<div class="col-sm-9">
-							<select class="form-control form-control-fix">
-								<option>Bande 1</option>
-								<option>Bande 2</option>
-								<option>Bande 3</option>
-								<option>Bande 4</option>
-								<option>Bande 5</option>
+							<select class="form-control form-control-fix"
+                                    ng-model="optionsSLD.rasterPalette.rgbChannels[1].name">
+                                <option value=""></option>
+                                <option ng-repeat="dp in $parent.dataProperties.bands" ng-value="dp.name">{{dp.name}}</option>
 							</select>
 						</div>
 					</div>
 					<div class="form-group bande_bleue">
 						<label class="col-sm-3 control-label" translate="sldeditor.edition.rasterPalette.blueChannel">Blue channel</label>
 						<div class="col-sm-9">
-							<select class="form-control form-control-fix">
-								<option>Bande 1</option>
-								<option>Bande 2</option>
-								<option>Bande 3</option>
-								<option>Bande 4</option>
-								<option>Bande 5</option>
+							<select class="form-control form-control-fix"
+                                    ng-model="optionsSLD.rasterPalette.rgbChannels[2].name">
+                                <option value=""></option>
+                                <option ng-repeat="dp in $parent.dataProperties.bands" ng-value="dp.name">{{dp.name}}</option>
 							</select>
 						</div>
 					</div>
+                    <div class="col-xs-12 div-btn-add">
+                        <button type="button" class="btn-apercu btn btn-default pull-right" ng-click="applyRGBComposition();">
+                            <span translate="sldeditor.edition.apply">Apply</span>
+                        </button>
+                    </div>
 				</form>
 			</div>
+            <div ng-show="optionsSLD.rasterPalette.colorModel === 'grayscale'">
+                <form class="form_classification form-horizontal form-style" role="form">
+                    <div class="form-group grayscale">
+                        <label class="col-sm-3 control-label" translate="sldeditor.edition.rasterPalette.grayscale">Grayscale</label>
+                        <div class="col-sm-9">
+                            <select class="form-control form-control-fix"
+                                    ng-model="optionsSLD.rasterPalette.greyChannel.name">
+                                <option value=""></option>
+                                <option ng-repeat="dp in $parent.dataProperties.bands" ng-value="dp.name">{{dp.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 div-btn-add">
+                        <button type="button" class="btn-apercu btn btn-default pull-right" ng-click="applyGrayscaleComposition();">
+                            <span translate="sldeditor.edition.apply">Apply</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
 		</div>
-		<div class="tab-pane" ng-class="{active:optionsSLD.rasterPalette.symbolPills==='outline'}">outline</div>
-		<div class="tab-pane" ng-class="{active:optionsSLD.rasterPalette.symbolPills==='contrast'}">contrast</div>
+		<!--div class="tab-pane" ng-class="{active:optionsSLD.rasterPalette.symbolPills==='outline'}">outline</div>
+		<div class="tab-pane" ng-class="{active:optionsSLD.rasterPalette.symbolPills==='contrast'}">contrast</div-->
 	</div>
 </form>

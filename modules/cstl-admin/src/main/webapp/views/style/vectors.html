@@ -308,7 +308,6 @@
                                                     <td>
                                                         <select class="form-control form-control-fix"
                                                                 ng-model="filter.comparator"
-                                                                size="1"
                                                                 ng-change="applyFilter();">
                                                             <option value="=">=</option>
                                                             <option value="!=">!=</option>
@@ -329,8 +328,7 @@
                                                     <td>
                                                         <select class="form-control form-control-fix"
                                                                 ng-model="filter.operator"
-                                                                ng-change="addNewFilter(filter.operator,$index);"
-                                                                size="1">
+                                                                ng-change="addNewFilter(filter.operator,$index);">
                                                             <option value=""></option>
                                                             <option value="AND">AND</option>
                                                             <option value="OR">OR</option>
@@ -538,7 +536,7 @@
                                             <span class="filter-option pull-left">
                                                 <img class="img_palette img_palette_ajust" ng-src="{{optionsSLD.autoUniqueValues.palette.img_palette}}"/>
                                             </span>&nbsp;
-                                            <span class="caret"></span>
+                                            <span class="caret" style="margin-left: -10px;"></span>
                                         </button>
                                         <span class="dropdown-arrow dropdown-arrow-inverse"></span>
                                         <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu"

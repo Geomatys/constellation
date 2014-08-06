@@ -861,7 +861,11 @@
     "sldeditor.edition.rasterPalette.redChannel":"Red channel",
     "sldeditor.edition.rasterPalette.greenChannel":"Green channel",
     "sldeditor.edition.rasterPalette.blueChannel":"Blue channel",
+    "sldeditor.edition.rasterPalette.grayscale":"Grayscale",
     "sldeditor.edition.histogram.title":"Toggle histogram values",
+    "sldeditor.edition.apply":"Apply",
+    "sldeditor.edition.rasterCells.cellSize":"Cell size",
+    "sldeditor.edition.rasterCells.cellType":"Cell type",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",

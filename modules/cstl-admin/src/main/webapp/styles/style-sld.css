@@ -138,6 +138,14 @@ a.choix_type:hover{
 	padding:2px 0 0;
 }
 /*raster*/
+.grayscale{
+    background-color: #e5e5e5;
+    padding: 10px 0;
+}
+.form-horizontal .grayscale{
+    margin-left: 0;
+    margin-right: 0;
+}
 .bande_rouge{
     background-color: rgba(221, 81, 81, 0.5) ;
     padding: 10px 0;
@@ -270,7 +278,19 @@ ul.dropdown-images li a:hover{
 
 .palette-array{
     overflow: auto;
-    max-height: 175px;
+    max-height: 210px;
+}
+
+.active2{
+    background-color: #EBEBEB !important;
+    border-color: #ADADAD !important;
+    box-shadow:0 3px 5px rgba(0, 0, 0, 0.125) inset !important;
+    outline:0 none !important;
+}
+.inactive2{
+    background-color: #FFFFFF !important;
+    border-color:#cccccc !important;
+    box-shadow:none !important;
 }
 
 .form-control-fix{

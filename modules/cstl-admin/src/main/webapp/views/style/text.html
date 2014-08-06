@@ -55,6 +55,7 @@
         <label class="col-sm-4 col-md-3 control-label">Style</label>
         <div class="col-sm-8 btn-group" data-toggle="buttons">
             <label class="btn btn-default"
+                   ng-class="{active2:symbolizer.font.bold, inactive2:!symbolizer.font.bold}"
                    ng-click="symbolizer.font.bold = !symbolizer.font.bold">
                 <input type="checkbox"
                        class="btn btn-default"
@@ -62,8 +63,9 @@
                 <b>B</b>
             </label>
             <label class="btn btn-default"
+                   ng-class="{active2:symbolizer.font.italic, inactive2:!symbolizer.font.italic}"
                    ng-click="symbolizer.font.italic = !symbolizer.font.italic"
-                   style="width: 35px; height: 33px;">
+                   style="width: 35px;">
                 <input type="checkbox"
                        class="btn btn-default"
                        ng-checked="symbolizer.font.italic"/>

@@ -8,7 +8,12 @@
                            style="margin-top: 8px;"
                            translate="sldeditor.name">Style name</label>
                     <div class="col-xs-7 col-sm-7 col-md-8">
-                        <input type="text" class="form-control" ng-model="$parent.newStyle.name"/>
+                        <input ng-if="!isSelectedChooser('edit')"
+                               type="text"
+                               class="form-control form-control-fix"
+                               ng-model="$parent.newStyle.name"/>
+                        <label style="font-size: 12px;font-weight: normal;margin-top: 8px;"
+                               ng-if="isSelectedChooser('edit')">{{$parent.newStyle.name}}</label>
                     </div>
                 </div>
             </div>
@@ -89,7 +94,7 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='description'}">
-                    <form class="form-horizontal" role="form">
+                    <form class="form-horizontal form-style" role="form">
                         <div class="row">
                             <div class="col-xs-12 col-sm-11 col-md-11 col-lg-11" style="margin-top: 20pt;">
                                 <div class="form-group">
@@ -134,7 +139,7 @@
                         <div ng-include="'views/style/raster_sld.html'"></div>
                     </div>
                     <div ng-if="optionsSLD.enableRasterCells && !optionsSLD.enableRasterPalette">
-                        @TODO
+                        <div ng-include="'views/style/raster_cells.html'"></div>
                     </div>
                 </div>
                 <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='filters'}">
@@ -251,7 +256,7 @@
                 <button type="button"
                         class="btn"
                         ng-class="{'btn-info': optionsSLD.enabledRasterChart,'btn-default': !optionsSLD.enabledRasterChart}"
-                        ng-click="optionsSLD.enabledRasterChart= !optionsSLD.enabledRasterChart;"
+                        ng-click="toggleRasterChart();"
                         style="border-bottom-left-radius:0;"
                         title="{{'sldeditor.edition.histogram.title' | translate}}">
                     <i class="glyphicon glyphicon-stats"></i>

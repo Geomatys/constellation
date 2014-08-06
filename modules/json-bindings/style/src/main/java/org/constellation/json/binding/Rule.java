@@ -73,6 +73,8 @@ public final class Rule implements StyleElement<MutableRule> {
                 symbolizers.add(new TextSymbolizer((org.opengis.style.TextSymbolizer) symbolizer));
             } else if (symbolizer instanceof org.opengis.style.RasterSymbolizer) {
                 symbolizers.add(new RasterSymbolizer((org.opengis.style.RasterSymbolizer) symbolizer));
+            } else if (symbolizer instanceof org.geotoolkit.display2d.ext.cellular.CellSymbolizer) {
+                symbolizers.add(new CellSymbolizer((org.geotoolkit.display2d.ext.cellular.CellSymbolizer) symbolizer));
             }
         }
         if (rule.getFilter() != null) {

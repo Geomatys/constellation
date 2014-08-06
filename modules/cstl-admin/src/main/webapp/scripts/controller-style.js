@@ -194,11 +194,51 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "open":false
                     },
                     repartition:undefined,
-                    dataXArray:[]
+                    dataXArray:[],
+                    rgbChannels : [{name:''},{name:''},{name:''}],
+                    greyChannel :{
+                        name: ''
+                    }
                 },
                 enableRasterPalette:false,
                 rasterCells:{
-                    //@TODO add properties
+                    "cellSize":20,
+                    "cellType":'point',
+                    pointSymbol:{
+                        "@symbol": 'point',
+                        "name":'',
+                        "graphic":{
+                            "size":15,
+                            "rotation":0,
+                            "opacity":1,
+                            "mark":{
+                                "geometry":'circle',
+                                "stroke":{
+                                    "color":'#000000',
+                                    "opacity":1
+                                },
+                                "fill":{
+                                    "color":'#808080',
+                                    "opacity":0.7
+                                }
+                            }
+                        }
+                    },
+                    textSymbol:{
+                        "@symbol": 'text',
+                        "name":'',
+                        "label":'',
+                        "font":{
+                            "size":12,
+                            "bold":false,
+                            "italic":false,
+                            "family":['Arial']
+                        },
+                        "fill":{
+                            "color":"#000000",
+                            "opacity":1
+                        }
+                    }
                 },
                 enableRasterCells:false,
                 selectedSymbolizerType:"",
@@ -384,6 +424,17 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         /**
+         * Binding action to show or display the raster's histogram chart
+         */
+        $scope.toggleRasterChart = function(){
+            $scope.optionsSLD.enabledRasterChart= !$scope.optionsSLD.enabledRasterChart;
+            if($scope.optionsSLD.enabledRasterChart){
+                //fix bug for graph resize.
+                setTimeout(function(){window.c3chart.resize();},200);
+            }
+        };
+
+        /**
          * Configure sld editor with given style object to edit them.
          * @param styleObj
          */
@@ -538,7 +589,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             "open":false
                         },
                         repartition:undefined,
-                        dataXArray:[]
+                        dataXArray:[],
+                        rgbChannels : [{name:''},{name:''},{name:''}],
+                        greyChannel :{
+                            name: ''
+                        }
                     };
                     var rule = {
                         "name": 'palette-rule',
@@ -553,14 +608,61 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $scope.editRasterPalette();
                 }else if(mode ==='raster_cellule'){
                     $scope.optionsSLD.rasterCells = {
-                        //@TODO add properties
+                        "cellSize":20,
+                        "cellType":'point',
+                        pointSymbol:{
+                            "@symbol": 'point',
+                            "name":'',
+                            "graphic":{
+                                "size":15,
+                                "rotation":0,
+                                "opacity":1,
+                                "mark":{
+                                    "geometry":'circle',
+                                    "stroke":{
+                                        "color":'#000000',
+                                        "opacity":1
+                                    },
+                                    "fill":{
+                                        "color":'#808080',
+                                        "opacity":0.7
+                                    }
+                                }
+                            }
+                        },
+                        textSymbol:{
+                            "@symbol": 'text',
+                            "name":'',
+                            "label":'',
+                            "font":{
+                                "size":12,
+                                "bold":false,
+                                "italic":false,
+                                "family":['Arial']
+                            },
+                            "fill":{
+                                "color":"#000000",
+                                "opacity":1
+                            }
+                        }
                     };
                     var rule = {
                         "name": 'cell-rule',
                         "title":'',
                         "description":'',
                         "maxScale":500000000,
-                        "symbolizers": [{'@symbol':'raster'}],
+                        "symbolizers": [{'@symbol':'raster'},{
+                            '@symbol':'cell',
+                            "cellSize":20,
+                            rule:{
+                                "name": 'default',
+                                "title":'',
+                                "description":'',
+                                "maxScale":500000000,
+                                "symbolizers": [],
+                                "filter": null
+                            }
+                        }],
                         "filter": null
                     };
                     $scope.newStyle.rules.push(rule);
@@ -621,19 +723,30 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
         /**
          * Edit rule for raster.
-         * and restore $scope.optionsSLD.rasterPalette with the selected rule properties
-         * @TODO the test to identify raster palette and raster cells is not generic
+         * and restore $scope.optionsSLD.rasterPalette with the selected rule properties.
          */
         $scope.editSelectedRasterRule = function(){
-            if($scope.optionsSLD.selectedRule.symbolizers &&
-                $scope.optionsSLD.selectedRule.symbolizers.length>0 &&
-                $scope.optionsSLD.selectedRule.symbolizers[0].colorMap){ //FIXME bug when editing raster and do nothing and then reopen the rule.
-
+            //restore scope for channel selections (rgb / grayscale).
+            var symbolizers=$scope.optionsSLD.selectedRule.symbolizers;
+            if(symbolizers && symbolizers.length>0 && symbolizers[0].channelSelection){
+                if(symbolizers[0].channelSelection.greyChannel){
+                    $scope.optionsSLD.rasterPalette.greyChannel = symbolizers[0].channelSelection.greyChannel;
+                    if(symbolizers[0].colorMap){
+                        $scope.optionsSLD.rasterPalette.colorModel = 'palette';
+                    }else{
+                        $scope.optionsSLD.rasterPalette.colorModel = 'grayscale';
+                    }
+                }else if(symbolizers[0].channelSelection.rgbChannels){
+                    $scope.optionsSLD.rasterPalette.rgbChannels = symbolizers[0].channelSelection.rgbChannels;
+                    $scope.optionsSLD.rasterPalette.colorModel = 'rgb';
+                }
+            }
+            if(! existsCellSymbolizer(symbolizers)){
                 $scope.optionsSLD.enableRasterPalette = true;
                 $scope.optionsSLD.enableRasterCells = false;
 
                 //init sld editor values with selected rule.
-                var channelSelection = $scope.optionsSLD.selectedRule.symbolizers[0].channelSelection;
+                var channelSelection = symbolizers[0].channelSelection;
                 if(channelSelection && channelSelection.greyChannel && $scope.optionsSLD.rasterPalette.band && $scope.dataBands) {
                     var bandIdentified = null;
                     for(var i=0;i<$scope.dataBands.length;i++){
@@ -649,20 +762,23 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
                     $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
                 }
-                var colorMap = $scope.optionsSLD.selectedRule.symbolizers[0].colorMap;
-                $scope.optionsSLD.rasterPalette.palette.method = colorMap.function['@function'];
-                $scope.optionsSLD.rasterPalette.palette.intervalsCount = colorMap.function.interval;
+                var colorMap = symbolizers[0].colorMap;
+                if(colorMap){
+                    $scope.optionsSLD.rasterPalette.palette.method = colorMap.function['@function'];
+                    $scope.optionsSLD.rasterPalette.palette.intervalsCount = colorMap.function.interval;
 
-                if(colorMap.function.nanColor && colorMap.function.nanColor != null){
-                    $scope.optionsSLD.rasterPalette.palette.nan.selected = true;
-                    $scope.optionsSLD.rasterPalette.palette.nan.color = colorMap.function.nanColor;
+                    if(colorMap.function.nanColor && colorMap.function.nanColor != null){
+                        $scope.optionsSLD.rasterPalette.palette.nan.selected = true;
+                        $scope.optionsSLD.rasterPalette.palette.nan.color = colorMap.function.nanColor;
+                    }
+                    $scope.optionsSLD.rasterPalette.repartition = colorMap.function.points;
                 }
-                $scope.optionsSLD.rasterPalette.repartition = colorMap.function.points;
-
                 //Load the selected band on the graph, the repartition of statistics is already present.
                 if($scope.dataBandsRepartition != null && $scope.optionsSLD.rasterPalette.band.selected){
                     var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
-
+                    if(!selectedBand){
+                        selectedBand = 0;
+                    }
                     var repartitionBand = $scope.dataBandsRepartition[selectedBand].repartition;
                     var xArray=[],yArray=[];
                     for(var key in repartitionBand){
@@ -688,8 +804,22 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 //open raster cells panel
                 $scope.optionsSLD.enableRasterPalette = false;
                 $scope.optionsSLD.enableRasterCells = true;
+                if(symbolizers.length>1){
+                    var symb = symbolizers[1];
+                    $scope.optionsSLD.rasterCells.cellSize = symb.cellSize;
+                    if(symb.rule && symb.rule.symbolizers && symb.rule.symbolizers.length>0){
+                        var cellType = symb.rule.symbolizers[0]['@symbol'];
+                        $scope.optionsSLD.rasterCells.cellType = cellType;
+                        if(cellType === 'point'){
+                            $scope.optionsSLD.rasterCells.pointSymbol = symb.rule.symbolizers[0];
+                        }else if(cellType === 'text'){
+                            $scope.optionsSLD.rasterCells.textSymbol = symb.rule.symbolizers[0];
+                        }
+                    }
+                }
             }
         };
+
         /**
          * For Vector : make autoInterval Panel visible.
          */
@@ -1271,7 +1401,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         /**
-         * init the font model in symbolizer text.
+         * init the font model for symbolizer text.
          */
         $scope.initFontFamilies = function(symbolizer) {
             if (symbolizer.font == undefined) {
@@ -1559,19 +1689,75 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if($scope.optionsSLD.rasterPalette.dataXArray && $scope.optionsSLD.rasterPalette.dataXArray.length>0){
                 var gridsArray = [];
                 var paletteRepartition = $scope.optionsSLD.rasterPalette.repartition;
-                for(var i=0;i<paletteRepartition.length;i++){
-                    var threshold = paletteRepartition[i].data;
-                    for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
-                        if($scope.optionsSLD.rasterPalette.dataXArray[j] >= threshold){
-                            gridsArray.push(
-                                {value:j,
-                                    text:threshold});
-                            break;
+                if(paletteRepartition){
+                    for(var i=0;i<paletteRepartition.length;i++){
+                        var threshold = paletteRepartition[i].data;
+                        for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
+                            if($scope.optionsSLD.rasterPalette.dataXArray[j] >= threshold){
+                                gridsArray.push(
+                                    {value:j,
+                                        text:threshold});
+                                break;
+                            }
                         }
                     }
+                    window.c3chart.xgrids(gridsArray);
                 }
-                window.c3chart.xgrids(gridsArray);
             }
+        };
+
+        /**
+         * Apply RGB composition for current style and clean up colormap and rasterPalette.repartition.
+         */
+        $scope.applyRGBComposition = function() {
+            var rgbChannels = $scope.optionsSLD.rasterPalette.rgbChannels;
+            var isValid = true;
+            //@TODO confirm with sld conformance, is it necessary to check channel's band not empty?
+            for(var i=0;i<rgbChannels.length;i++){
+                if(rgbChannels[i].name ===''){
+                    isValid = false;
+                    break;
+                }
+            }
+            if(!isValid){
+                alert('Please select a band for all channels!');
+                return;
+            }else {
+                //Apply rgb channels to selected rule
+                $scope.optionsSLD.selectedRule.symbolizers[0].channelSelection = {
+                    greyChannel :null,
+                    rgbChannels : $scope.optionsSLD.rasterPalette.rgbChannels
+                };
+                //clean colorMap for selected rule
+                $scope.optionsSLD.rasterPalette.repartition = undefined;
+                $scope.optionsSLD.selectedRule.symbolizers[0].colorMap = undefined;
+            }
+        };
+
+        /**
+         * Apply grayscale channel for current style and clean up colormap and rasterPalette.repartition.
+         */
+        $scope.applyGrayscaleComposition = function() {
+            $scope.optionsSLD.selectedRule.symbolizers[0].channelSelection = {
+                greyChannel :$scope.optionsSLD.rasterPalette.greyChannel,
+                rgbChannels : null
+            };
+            //clean colorMap for selected rule
+            $scope.optionsSLD.rasterPalette.repartition = undefined;
+            $scope.optionsSLD.selectedRule.symbolizers[0].colorMap = undefined;
+        };
+
+        /**
+         * Apply and bind cell point symbolizer for current style
+         */
+        $scope.applyCellPointSymbolizer = function(){
+            $scope.optionsSLD.selectedRule.symbolizers[1].rule.symbolizers[0] = $scope.optionsSLD.rasterCells.pointSymbol;
+        };
+        /**
+         * Apply and bind cell text symbolizer for current style
+         */
+        $scope.applyCellTextSymbolizer = function(){
+            $scope.optionsSLD.selectedRule.symbolizers[1].rule.symbolizers[0] = $scope.optionsSLD.rasterCells.textSymbol;
         };
 
         /**
@@ -1589,7 +1775,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     name: $scope.optionsSLD.rasterPalette.band.selected.name
                 },
                 rgbChannels : null
-                // rgbChannels : [{name:'0'},{name,'1'},{name:'2'}]
             }
 
             var colorMap = rule.symbolizers[0].colorMap;
@@ -1889,6 +2074,24 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     }
                 }
             }
+        };
+
+        /**
+         * Returns true if there is a cell symbolizer in given array.
+         * Used to identify cellSymbolizers rule against Palette/colors rule
+         * @param symbolizers
+         * @returns {boolean}
+         */
+        var existsCellSymbolizer = function(symbolizers){
+            if(symbolizers) {
+                for(var i=0;i<symbolizers.length;i++){
+                    var symb = symbolizers[i];
+                    if(symb['@symbol']==='cell'){
+                        return true;
+                    }
+                }
+            }
+            return false;
         };
 
         /**

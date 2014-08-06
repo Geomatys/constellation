@@ -1,0 +1,221 @@
+<form class="form-horizontal form-style" role="form">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11" style="margin-top: 8pt;">
+            <div class="form-group">
+                <label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
+                       translate="sldeditor.edition.rasterCells.cellSize">Cell size</label>
+                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                    <input type="number"
+                           class="form-control form-control-fix"
+                           ng-model="optionsSLD.selectedRule.symbolizers[1].cellSize"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
+                       translate="sldeditor.edition.rasterCells.cellType">Cell type</label>
+                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                    <select class="form-control form-control-fix"
+                            ng-model="optionsSLD.rasterCells.cellType"
+                            style="height: 30px;">
+                        <option value="point">Point</option>
+                        <option value="text">Text</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="margin-top: 0;margin-bottom:10px;"/>
+    <div ng-show="optionsSLD.rasterCells.cellType === 'point'">
+        <form class="form-horizontal form-style" role="form">
+            <div class="form-group">
+                <label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label" translate="sldeditor.edition.icon">Icon</label>
+                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                    <div class="btn-group select select-block">
+                        <button class="btn dropdown-toggle btn-default"
+                                data-toggle="dropdown"
+                                ng-model="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry">
+                            <span class="filter-option pull-left">
+                                <img class="img_icone"
+                                     src="images/icone_{{optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry}}.png"/>
+                            </span>&nbsp;
+                            <span class="caret"></span>
+                        </button>
+                        <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                        <ul class="dropdown-menu dropdown-inverse dropdown-images"
+                            role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;">
+                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'circle'">
+                                <a><img class="img_icone" src="images/icone_circle.png"/></a>
+                            </li>
+                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'triangle'">
+                                <a><img class="img_icone" src="images/icone_triangle.png"/></a>
+                            </li>
+                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'square'">
+                                <a><img class="img_icone" src="images/icone_square.png"/></a>
+                            </li>
+                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'star'">
+                                <a><img class="img_icone" src="images/icone_star.png"/></a>
+                            </li>
+                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'x'">
+                                <a><img class="img_icone" src="images/icone_x.png"/></a>
+                            </li>
+                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'cross'">
+                                <a><img class="img_icone" src="images/icone_cross.png"/></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!--div class="col-xs-4 col-sm-8 col-md-4 col-sm-offset-4 col-md-offset-0">
+                    <button class="btn btn-default btn-block" type="button">Importer</button>
+                </div-->
+            </div>
+            <div class="form-group">
+                <label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label" translate="sldeditor.edition.fill">Fill</label>
+                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                    <input type='text'
+                           name="picker"
+                           class="picker"
+                           spectrum oncolorchanged="affectAlpha(value, optionsSLD.rasterCells.pointSymbol.graphic.mark.fill)"
+                           ng-model="optionsSLD.rasterCells.pointSymbol.graphic.mark.fill.color" />
+
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label" translate="sldeditor.edition.stroke">Stroke</label>
+                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                    <input type='text'
+                           name="picker"
+                           class="picker"
+                           spectrum oncolorchanged="affectAlpha(value, optionsSLD.rasterCells.pointSymbol.graphic.mark.stroke)"
+                           ng-model="optionsSLD.rasterCells.pointSymbol.graphic.mark.stroke.color" />
+
+                </div>
+            </div>
+            <hr style=" margin-bottom: 10px;margin-top: 10px;"/>
+            <div class="form-group">
+                <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.size">Size</label>
+                <div class="col-sm-5 col-md-6">
+                    <input class="slider"
+                           type="range"
+                           ng-model="optionsSLD.rasterCells.pointSymbol.graphic.size" max="100" min="0" step="1"/>
+                </div>
+                <div class="col-sm-3 col-md-2">
+                    <input class="form-control form-control-fix"
+                           style="padding: 6px 4px;"
+                           type="text"
+                           ng-model="optionsSLD.rasterCells.pointSymbol.graphic.size"
+                           min="0"
+                           max="100"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 col-md-3 control-label">Rotation</label>
+                <div class="col-sm-5 col-md-6">
+                    <input class="slider"
+                           ng-model="optionsSLD.rasterCells.pointSymbol.graphic.rotation" type="range" max="360" min="0" step="1"/>
+                </div>
+                <div class="col-sm-3 col-md-2">
+                    <input class="form-control form-control-fix"
+                           style="padding: 6px 4px;"
+                           type="text"
+                           ng-model="optionsSLD.rasterCells.pointSymbol.graphic.rotation"
+                           min="0"
+                           max="360"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.opacity">Opacity</label>
+                <div class="col-sm-5 col-md-6">
+                    <input class="slider"
+                           ng-model="optionsSLD.rasterCells.pointSymbol.graphic.opacity" type="range" max="1" min="0" step="0.01"/>
+                </div>
+                <div class="col-sm-3 col-md-2">
+                    <input class="form-control form-control-fix"
+                           style="padding: 6px 4px;"
+                           type="text"
+                           ng-model="optionsSLD.rasterCells.pointSymbol.graphic.opacity"
+                           min="0"
+                           max="1"
+                           step="0.1"/>
+                </div>
+            </div>
+            <div class="col-xs-12 div-btn-add">
+                <button type="button" class="btn-apercu btn btn-default pull-right" ng-click="applyCellPointSymbolizer();">
+                    <span translate="sldeditor.edition.apply">Apply</span>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div ng-show="optionsSLD.rasterCells.cellType === 'text'">
+        <form class="form-horizontal form-style" role="form">
+            <div class="form-group">
+                <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.label">Label</label>
+                <div class="col-sm-8 col-md-6">
+                    <input type="text" class="form-control form-control-fix"
+                           ng-model="optionsSLD.rasterCells.textSymbol.label"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.font">Font</label>
+                <div class="col-sm-6">
+                    <select class="form-control form-control-fix"
+                            ng-init="$parent.initFontFamilies(optionsSLD.rasterCells.textSymbol)"
+                            ng-model="optionsSLD.rasterCells.textSymbol.font.family[0]">
+                        <option value="Arial" style="font-family: Arial;">Arial</option>
+                        <option value="Calibri" style="font-family: Calibri;">Calibri</option>
+                        <option value="Courier" style="font-family: Courier;">Courier</option>
+                        <option value="Lucida" style="font-family: Lucida;">Lucida</option>
+                        <option value="Times" style="font-family: Times;">Times</option>
+                        <option value="Times New Roman" style="font-family: Times New Roman;">Times New Roman</option>
+                        <option value="Trebuchet" style="font-family: Trebuchet;">Trebuchet</option>
+                        <option value="Verdana" style="font-family: Verdana;">Verdana</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.size">Size</label>
+                <div class="col-sm-4 col-md-3">
+                    <input type="number" class="form-control"
+                           ng-model="optionsSLD.rasterCells.textSymbol.font.size"
+                           min="1"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 col-md-3 control-label">Style</label>
+                <div class="col-sm-8 btn-group" data-toggle="buttons">
+                    <label class="btn btn-default"
+                           ng-class="{active2:optionsSLD.rasterCells.textSymbol.font.bold, inactive2:!optionsSLD.rasterCells.textSymbol.font.bold}"
+                           ng-click="optionsSLD.rasterCells.textSymbol.font.bold = !optionsSLD.rasterCells.textSymbol.font.bold">
+                        <input type="checkbox"
+                               class="btn btn-default"
+                               ng-checked="optionsSLD.rasterCells.textSymbol.font.bold"/>
+                        <b>B</b>
+                    </label>
+                    <label class="btn btn-default"
+                           ng-class="{active2:optionsSLD.rasterCells.textSymbol.font.italic, inactive2:!optionsSLD.rasterCells.textSymbol.font.italic}"
+                           ng-click="optionsSLD.rasterCells.textSymbol.font.italic = !optionsSLD.rasterCells.textSymbol.font.italic"
+                           style="width: 35px;">
+                        <input type="checkbox"
+                               class="btn btn-default"
+                               ng-checked="optionsSLD.rasterCells.textSymbol.font.italic"/>
+                        <i>I</i>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.color">Color</label>
+                <div class="col-sm-3">
+                    <input type='text'
+                           name="picker"
+                           class="picker"
+                           spectrum oncolorchanged="affectAlpha(value, optionsSLD.rasterCells.textSymbol.fill)"
+                           ng-model="optionsSLD.rasterCells.textSymbol.fill.color"/>
+                </div>
+            </div>
+            <div class="col-xs-12 div-btn-add">
+                <button type="button" class="btn-apercu btn btn-default pull-right" ng-click="applyCellTextSymbolizer();">
+                    <span translate="sldeditor.edition.apply">Apply</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</form>
