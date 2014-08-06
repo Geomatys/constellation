@@ -265,7 +265,6 @@ public final class ProviderRest {
                     if (filePath != null && !filePath.isEmpty()) {
                         final URL url = new URL("file:" + filePath);
                         final File folder = new File(filePath);
-
                         final File[] candidates;
                         if(folder.isDirectory()){
                             candidates = folder.listFiles();

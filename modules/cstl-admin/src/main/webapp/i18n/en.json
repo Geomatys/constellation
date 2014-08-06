@@ -866,7 +866,8 @@
     "tooltip.service.source.url":"Fill only the domain name",
     "tooltip.service.source.connexion":"Connection between multiple databases",
     "tooltip.service.source.sensormlfolder":"TODO",
-    "tooltip.data.add.choicedata":"Supported formats: shp (in a zip file.), NetCDF, tif",
+    "tooltip.data.add.choicedata.local":"Supported formats: shp (in a zip file.), NetCDF, tif",
+    "tooltip.data.add.choicedata.server":"Most supported formats: shp, NetCDF, tif",
     "tooltip.sensor.add":"Supported formats: a sensorML file (*.xml) or a zip file.",
     "tooltip.style.create":"You must select a data to associate the style created.",
 
