@@ -7,12 +7,12 @@
 		</div>
 		<div class="modal-body" style="height: 401px; overflow-y: auto;">
 			<div class="container" style="height: 300px;">
-				<form name="form" role="form" novalidate
+				<form name="form" role="form" novalidate autocomplete="off"
 					class="ng-scope ng-invalid ng-invalid-required ng-dirty ng-valid-minlength">
 
 					<div class="form-group col-sm-6">
 						<label translate="settings.form.login">Login</label> <input
-							type="text" class="form-control" name="login"
+							type="text" value="" class="form-control" name="login"
 							placeholder="{{'settings.form.login.placeholder' | translate}}"
 							ng-keyup="checkLogin(user.login)" ng-model="user.login"
 							ng-minlength=3 ng-maxlength=16 required>
@@ -34,7 +34,7 @@
 
 					<div class="form-group  col-sm-6">
 						<label translate="settings.form.password">Password</label> <input
-							type="password" class="form-control" name="password"
+							type="password" class="form-control" name="password" value=""
 							placeholder="{{'settings.form.password.placeholder' | translate}}"
 							ng-model="user.password" ng-minlength=6 ng-maxlength=62 required>
 						<div class="error"
