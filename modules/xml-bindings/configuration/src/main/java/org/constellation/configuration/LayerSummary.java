@@ -47,7 +47,7 @@ public class LayerSummary {
     @XmlElement(name = "Date")
     private Date date;
     @XmlElement(name = "Owner")
-    private Integer owner;
+    private String owner;
     @XmlElement(name = "Provider")
     private String provider;
     @XmlElement(name = "TargetStyle")
@@ -63,7 +63,7 @@ public class LayerSummary {
         this.type = db.getType();
         this.subtype = db.getSubtype();
         this.date = layer.getDate();
-        this.owner = layer.getOwner();
+        this.owner = db.getOwner();
         this.provider = db.getProvider();
         this.targetStyle = convertIntoStylesBrief(layer.getStyles());
     }
@@ -131,11 +131,11 @@ public class LayerSummary {
         this.date = date;
     }
 
-    public Integer getOwner() {
+    public String getOwner() {
         return owner;
     }
 
-    public void setOwner(Integer owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 
