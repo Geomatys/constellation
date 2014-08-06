@@ -41,6 +41,9 @@ public class DomainRoleRest {
         
         private List<Permission> permissions;
         
+        public DomainroleWithPermissions() {
+        }
+        
         public DomainroleWithPermissions(Domainrole domainRole) {
             copyFrom(domainRole);
         }
@@ -58,10 +61,11 @@ public class DomainRoleRest {
     
     public static class DomainroleWithMembers extends Domainrole {
         
-        
-        
         private String memberList;
 
+        public DomainroleWithMembers() {
+        }
+        
         public DomainroleWithMembers(Domainrole domainrole) {
             copyFrom(domainrole);
         }
