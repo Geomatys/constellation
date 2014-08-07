@@ -41,6 +41,11 @@
     <listener-class>org.constellation.admin.SessionListener</listener-class>
   </listener>
   <context-param>
+   <description>Constellation run in a single webapp</description>
+   <param-name>cstl-uberwar</param-name>
+   <param-value>true</param-value>
+  </context-param>
+  <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
     WEB-INF/applicationContext.xml

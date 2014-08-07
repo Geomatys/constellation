@@ -43,7 +43,7 @@ public class ConfigController {
 	 *   <li>-Dcstl.url</li>
 	 *   <li>/constellation</li>
 	 * </ul>
-	 * Current webapp context if running the same webapp (cstl-sdi) 
+	 * Current webapp context if running the same webapp (cstl-uberwar) 
 	 * @param request
 	 * @return
 	 */
@@ -51,12 +51,18 @@ public class ConfigController {
 	public @ResponseBody
 	Map<Object, Object> get(HttpServletRequest request) {
 		Properties properties = new Properties();
-		if(request.getServletContext().getInitParameter("cstl-sdi") != null) {
+		String context;
+		if("true".equals(request.getServletContext().getInitParameter("cstl-uberwar"))) {
 		    //If run in a single war, handle the renaming of this war
-		    properties.put("cstl", request.getContextPath());
+		    context = request.getContextPath();
 		}else {
-		    properties.put("cstl", env.getProperty("cstl.url", "/constellation/"));
+		    context = env.getProperty("cstl.url", "/constellation");
 		}
+		if(!context.endsWith("/")) {
+		    context += "/";
+		}
+		properties.put("cstl", context);
+		
 		return properties;
 	}
 
