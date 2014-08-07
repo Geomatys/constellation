@@ -557,10 +557,11 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             final Distribution distribution = metadata.getDistributionInfo();
             if (distribution != null) {
                 for (Distributor dis :distribution.getDistributors()) {
-                    final ResponsibleParty disRP = dis.getDistributorContact();
+                    final ResponsibleParty disRP = (ResponsibleParty) dis.getDistributorContact();
                     if (disRP != null) {
-                        if (disRP.getOrganisationName() != null) {
-                            distributor = new SimpleLiteral(disRP.getOrganisationName().toString());
+                        InternationalString name = disRP.getOrganisationName();
+                        if (name != null) {
+                            distributor = new SimpleLiteral(name.toString());
                         }
                     }
                 }
