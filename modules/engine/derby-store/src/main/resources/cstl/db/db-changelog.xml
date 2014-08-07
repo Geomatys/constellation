@@ -11,5 +11,6 @@
   <include file="cstl/db/update/patch-v1.2.xml"/>
   <include file="cstl/db/update/patch-v1.3.xml"/>
   <include file="cstl/db/update/patch-v1.4.xml"/>
+  <include file="cstl/db/update/patch-v1.5.xml"/>
   
-  </databaseChangeLog>
+</databaseChangeLog>
