@@ -55,7 +55,7 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
                 $growl('error', 'Error', 'Unable to count data');
             });
 
-            task.list({}, function(taskList) {
+            task.listTasks({}, function(taskList) {
                 $scope.nbprocess = Object.keys(taskList).length;
             }, function() {
                 $scope.nbprocess = 0;

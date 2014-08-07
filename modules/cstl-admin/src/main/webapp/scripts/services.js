@@ -376,7 +376,18 @@ cstlAdminApp.factory('ProcessService', ['$resource', '$cookies',
 cstlAdminApp.factory('TaskService', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/task', {}, {
-            'list':        {method: 'GET',  url: '@cstl/api/1/task/listTasks;jsessionid=', isArray: false}
+            'listTasks':             {method: 'GET',    url: '@cstl/api/1/task/listTasks;jsessionid=',                           isArray: false },
+            'listProcess':           {method: 'GET',    url: '@cstl/api/1/task/listProcesses;jsessionid=',                       isArray: false },
+            'listProcessForFactory': {method: 'GET',    url: '@cstl/api/1/task/process/factory/:authorityCode;jsessionid=',      isArray: false },
+            'listParamsTask':        {method: 'GET',    url: '@cstl/api/1/task/params/list;jsessionid=',                         isArray: true },
+//            Use textService for getProcessDescriptor and get XML response
+//            'getProcessDescriptor':  {method: 'GET',    url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
+            'getParamsTask':         {method: 'GET',    url: '@cstl/api/1/task/params/get/:id;jsessionid=',                      isArray: false },
+            'deleteParamsTask':      {method: 'GET',    url: '@cstl/api/1/task/params/delete/:id;jsessionid=',                      isArray: false },
+            'createTask':            {method: 'POST',   url: '@cstl/api/1/task/:id/:authority/:code/:title/:step;jsessionid=',   isArray: false },
+            'createParamsTask':      {method: 'POST',   url: '@cstl/api/1/task/params/create;jsessionid=',                       isArray: false },
+            'updateTask':            {method: 'PUT',    url: '@cstl/api/1/task/:id/:authority/:code/:title/:step;jsessionid=',   isArray: false },
+            'deleteTask':            {method: 'DELETE', url: '@cstl/api/1/task/:id;jsessionid=',                                 isArray: false }
         });
     }]);
 
@@ -403,7 +414,6 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'Acc
                 	.success(function (data, status, headers, config) {
                 		authService.loginCancelled();
                 	});
-
                 });
             }
         };
@@ -443,6 +453,9 @@ cstlAdminApp.factory('textService', ['$http', '$growl',
             },
             capaWmsExterne : function(url){
                 return $http.get(url +'?REQUEST=GetCapabilities&SERVICE=WMS');
+			},
+            getProcessDescriptor : function(authority, code){
+                return $http.get('@cstl/api/1/task/process/descriptor/'+authority+'/'+code+';jsessionid=');
             },
             createStyleXml : function(provider, styleXml){
                 return $http({

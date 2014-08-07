@@ -883,8 +883,14 @@
 
     "sensor.obervation":"Sensor observation",
 
+    "tasks.information.edit":"Edit task",
+    "tasks.information.delete":"Delete task",
     "tasks.information.title":"Available tasks",
     "tasks.notask":"No current process",
+    "tasks.modal.authority":"Authority",
+    "tasks.modal.process":"Process",
+    "tasks.modal.title":"Add new task",
+    "tasks.modal.name":"Task name *",
 
     "mapcontext.information.title":"Available map context",
 

@@ -159,8 +159,8 @@ cstlAdminApp
                     controller: 'MapcontextController'
                 })
                 .when('/tasks', {
-                    templateUrl: 'views/tasks.html',
-                    controller: 'ProcessController'
+                    templateUrl: 'views/tasks/tasks.html',
+                    controller: 'TasksController'
                 })
 
                 .otherwise({
@@ -181,6 +181,7 @@ cstlAdminApp
         }])
         .run(['$rootScope', '$location', 'AuthenticationSharedService', 'Account',
             function($rootScope, $location, AuthenticationSharedService, Account) {
+
             $rootScope.$on("$routeChangeStart", function(event, next, current) {
                 // Check if the status of the user. Is it authenticated or not?
                 if($rootScope.authenticated)

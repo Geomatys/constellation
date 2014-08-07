@@ -857,8 +857,14 @@
 
     "sensor.obervation":"Observation",
 
+    "tasks.information.edit":"Edit task",
+    "tasks.information.delete":"Delete task",
     "tasks.information.title":"Traitements disponibles",
     "tasks.notask":"Pas de traitement en cours d'execution",
+    "tasks.modal.authority":"Autorité",
+    "tasks.modal.process":"Nom du processus",
+    "tasks.modal.title":"Ajouter un nouveau traitement",
+    "tasks.modal.name":"Nom de la tâche *",
 
     "mapcontext.information.title":"Compositions cartographiques disponibles",
 
