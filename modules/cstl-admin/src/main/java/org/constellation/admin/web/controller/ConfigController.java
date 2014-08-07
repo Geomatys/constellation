@@ -18,28 +18,45 @@
  */
 package org.constellation.admin.web.controller;
 
-import org.constellation.admin.conf.CstlConfig;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.inject.Inject;
-import java.util.Map;
-import java.util.Properties;
 
 @Controller
 @RequestMapping("/conf")
 public class ConfigController {
 	
 	@Inject
-	private CstlConfig cstlConfig;
-
+	private Environment env;
+	/**
+	 * Resolve the Constellation service webapp context.
+	 * It will return:
+	 * <ul>
+	 *   <li>-Dcstl.url</li>
+	 *   <li>/constellation</li>
+	 * </ul>
+	 * Current webapp context if running the same webapp (cstl-sdi) 
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(method=RequestMethod.GET)
 	public @ResponseBody
-	Map<Object, Object> get() {
+	Map<Object, Object> get(HttpServletRequest request) {
 		Properties properties = new Properties();
-		properties.put("cstl", cstlConfig.getUrl());
+		if(request.getServletContext().getInitParameter("cstl-sdi") != null) {
+		    //If run in a single war, handle the renaming of this war
+		    properties.put("cstl", request.getContextPath());
+		}else {
+		    properties.put("cstl", env.getProperty("cstl.url", "/constellation/"));
+		}
 		return properties;
 	}
 

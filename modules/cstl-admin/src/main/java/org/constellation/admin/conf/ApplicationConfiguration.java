@@ -47,13 +47,6 @@ public class ApplicationConfiguration {
     private Environment env;
 
 
-    @Bean
-    public CstlConfig getCstlConfig() {
-        CstlConfig conf = new CstlConfig();
-        conf.setUrl(env.getProperty("cstl.url", "/constellation/"));
-        return conf;
-    }
-
     /**
      * Initializes cstl-admin.
      * <p/>
