@@ -19,10 +19,13 @@
 package org.constellation.rest.api;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -31,14 +34,22 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamException;
+
+import com.google.common.base.Optional;
 import org.constellation.admin.ProcessBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.TaskStatus;
+import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.TaskParameter;
+import org.constellation.engine.register.TaskParameterWithOwnerName;
+import org.constellation.engine.register.repository.TaskParameterRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.scheduler.CstlScheduler;
 import org.constellation.scheduler.Task;
 import org.constellation.scheduler.TaskState;
@@ -71,6 +82,12 @@ public final class TaskRest {
     
     @Inject
     private ProcessBusiness processBusiness;
+
+    @Inject
+    private TaskParameterRepository taskParameterRepository;
+
+    @Inject
+    private UserRepository userRepository;
     
     /**
      * List running tasks.
@@ -317,5 +334,83 @@ public final class TaskRest {
         } else {
             return new AcknowlegementType("Failure", "Could not find chain for given authority/code.");
         }
+    }
+
+    @POST
+    @Path("params/update")
+    @RolesAllowed("cstl-admin")
+    public Response updateParamsTask(final TaskParameter taskParameter) throws ConfigurationException {
+        taskParameterRepository.update(taskParameter);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("params/create")
+    @RolesAllowed("cstl-admin")
+    public Response createParamsTask(final TaskParameter taskParameter, @Context HttpServletRequest req) throws ConfigurationException {
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+
+        if (cstlUser.isPresent()) {
+            taskParameter.setOwner(cstlUser.get().getId());
+
+            taskParameterRepository.create(taskParameter);
+            return Response.ok().build();
+        } else {
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
+        }
+    }
+
+    @GET
+    @Path("params/get/{id}")
+    @RolesAllowed("cstl-admin")
+    public Response getParamsTask(final @PathParam("id") Integer id) {
+        final TaskParameter taskParameter = taskParameterRepository.get(id);
+        if (taskParameter != null) {
+            return Response.ok(taskParameter).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    @GET
+    @Path("params/delete/{id}")
+    @RolesAllowed("cstl-admin")
+    public Response deleteParamsTask(final @PathParam("id") Integer id) {
+        final TaskParameter taskParameter = taskParameterRepository.get(id);
+        if (taskParameter != null) {
+            taskParameterRepository.delete(taskParameter);
+            return Response.ok().build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+
+    @GET
+    @Path("params/list")
+    @RolesAllowed("cstl-admin")
+    public Response listParamsTask() throws ConfigurationException {
+
+        final List<? extends TaskParameter> all = taskParameterRepository.findAll();
+
+        final List<TaskParameterWithOwnerName> ltpwon = new ArrayList<>();
+        for (TaskParameter tp : all){
+            TaskParameterWithOwnerName tpwon = new TaskParameterWithOwnerName();
+
+            tpwon.setId(tp.getId());
+            tpwon.setName(tp.getName());
+            tpwon.setDate(tp.getDate());
+            tpwon.setOwner(tp.getOwner());
+            tpwon.setProcessAuthority(tp.getProcessAuthority());
+            tpwon.setProcessCode(tp.getProcessCode());
+            tpwon.setInputs(tp.getInputs());
+
+            final Optional<CstlUser> byId = userRepository.findById(tp.getOwner());
+            if (byId.isPresent()) {
+                tpwon.setOwnerName(byId.get().getFirstname()+" "+byId.get().getLastname());
+            }
+
+            ltpwon.add(tpwon);
+        }
+
+        return Response.ok(ltpwon).build();
     }
 }
