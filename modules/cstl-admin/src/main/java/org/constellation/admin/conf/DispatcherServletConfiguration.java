@@ -110,12 +110,6 @@ public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
         return messageSource;
     }
 
-    @Bean
-    public MultipartResolver multipartResolver() {
-        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        multipartResolver.setMaxUploadSize(MAX_UPLOAD_SIZE);
-        return multipartResolver;
-    }
 
     @Bean
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {

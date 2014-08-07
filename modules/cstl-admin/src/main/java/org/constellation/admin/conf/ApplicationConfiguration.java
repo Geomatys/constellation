@@ -18,7 +18,6 @@
  */
 package org.constellation.admin.conf;
 
-import org.geotoolkit.util.StringUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +26,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -40,8 +38,7 @@ import java.io.IOException;
         "org.constellation.admin.security"})
 @Import(value = {
        
-        AsyncConfiguration.class,
-        MailConfiguration.class})
+        AsyncConfiguration.class})
 public class ApplicationConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(ApplicationConfiguration.class);
@@ -49,22 +46,7 @@ public class ApplicationConfiguration {
     @Inject
     private Environment env;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new PasswordEncoder() {
-            
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return encode(rawPassword).equals(encodedPassword);
-            }
-            
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return StringUtilities.MD5encode(rawPassword.toString());
-            }
-        };
-    }
-    
+
     @Bean
     public CstlConfig getCstlConfig() {
         CstlConfig conf = new CstlConfig();
