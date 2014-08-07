@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-@Path("/1/domainrole")
+@Path("/1/domainrole/")
 @RolesAllowed("cstl-admin")
 public class DomainRoleRest {
 
@@ -83,7 +83,6 @@ public class DomainRoleRest {
     @Inject
     private DomainroleRepository domainRoleRepository;
 
-    @Path("/")
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response all(@QueryParam("withMembers") boolean withMembers) {
@@ -126,7 +125,7 @@ public class DomainRoleRest {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response get(@PathParam("id") int id) {
         Optional<Pair<Domainrole, List<Permission>>> opt = domainRoleRepository.findOneWithPermission(id);
@@ -139,7 +138,6 @@ public class DomainRoleRest {
         
     }
 
-    @Path("/")
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
@@ -148,7 +146,7 @@ public class DomainRoleRest {
         return Response.ok(saved).build();
     }
 
-    @Path("/{id}")
+    @Path("{id}")
     @PUT
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
@@ -158,7 +156,7 @@ public class DomainRoleRest {
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("{id}")
     public Response delete(@PathParam("id") int id) {
         try {
             if(domainRoleRepository.delete(id) == 0) {

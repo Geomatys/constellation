@@ -41,7 +41,7 @@ import javax.ws.rs.core.Response;
  * @since 0.9
  */
 @Named
-@Path("/1/account")
+@Path("/1/account/")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class CurrentUserRest {
@@ -53,7 +53,6 @@ public class CurrentUserRest {
      * @return a {@link Response} which contains requester user name
      */
     @GET
-    @Path("/")
     public Response current() {
         return userRepository.findOneWithRolesAndDomains(SecurityManagerHolder.getInstance().getCurrentUserLogin())
                 .transform(new Function<DomainUser, Response>() {
@@ -65,7 +64,7 @@ public class CurrentUserRest {
     }
 
     @GET
-    @Path("/access")
+    @Path("access")
     public Response access() {
         final AcknowlegementType response = new AcknowlegementType("Success",
                 "You have access to the configuration service");

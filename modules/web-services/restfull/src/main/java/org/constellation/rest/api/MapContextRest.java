@@ -69,7 +69,7 @@ import java.util.logging.Level;
  *
  * @author Cédric Briançon (Geomatys)
  */
-@Path("/1/context")
+@Path("/1/context/")
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
 public class MapContextRest {
@@ -84,19 +84,18 @@ public class MapContextRest {
     private MapContextRepository contextRepository;
 
     @GET
-    @Path("/list")
+    @Path("list")
     public Response findAll() {
         return Response.ok(contextRepository.findAll()).build();
     }
 
     @GET
-    @Path("/list/layers")
+    @Path("list/layers")
     public Response findAllMapContextLayers() {
         return Response.ok(contextBusiness.findAllMapContextLayers()).build();
     }
 
     @PUT
-    @Path("/")
     @Transactional("txManager")
     public Response create(final Mapcontext mapContext) {
         final Mapcontext mapContextCreated = contextRepository.create(mapContext);
@@ -104,7 +103,6 @@ public class MapContextRest {
     }
 
     @POST
-    @Path("/")
     @Transactional("txManager")
     public Response update(final Mapcontext mapContext) {
         contextRepository.update(mapContext);
@@ -112,7 +110,7 @@ public class MapContextRest {
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("{id}")
     @Transactional("txManager")
     public Response delete(@PathParam("id") final int contextId) {
         contextRepository.delete(contextId);
@@ -120,14 +118,14 @@ public class MapContextRest {
     }
 
     @POST
-    @Path("/layers/{id}")
+    @Path("layers/{id}")
     public Response setMapItems(@PathParam("id") final int contextId, final List<MapcontextStyledLayer> layers) {
         contextBusiness.setMapItems(contextId, layers);
         return Response.status(201).build();
     }
 
     @GET
-    @Path("/{id}/extent")
+    @Path("{id}/extent")
     public Response getContextExtents(@PathParam("id") final int contextId) {
         final ParameterValues values;
         try {
@@ -143,7 +141,7 @@ public class MapContextRest {
     }
 
     @POST
-    @Path("/extent/layers")
+    @Path("extent/layers")
     public Response getContextExtents(final List<MapcontextStyledLayer> layers) {
         final ParameterValues values;
         try {
@@ -159,7 +157,7 @@ public class MapContextRest {
     }
 
     @POST
-    @Path("/external/capabilities/layers/{version}")
+    @Path("external/capabilities/layers/{version}")
     public Response getLayersForWms(@PathParam("version") final String version, final String url) throws IOException, JAXBException {
         final WebMapClient client = (version != null && !version.isEmpty()) ?
                 new WebMapClient(new URL(url), version) : new WebMapClient(new URL(url));
@@ -187,7 +185,7 @@ public class MapContextRest {
     }
 
     @GET
-    @Path("/{id}/export")
+    @Path("{id}/export")
     @Produces("application/xml")
     public Response export(@Context HttpServletRequest hsr, @PathParam("id") final int id) throws JAXBException {
         final Mapcontext ctxt = contextRepository.findById(id);

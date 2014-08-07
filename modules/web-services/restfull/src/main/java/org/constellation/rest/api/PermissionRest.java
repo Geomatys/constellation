@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 
 import java.util.List;
 
-@Path("/1/permission")
+@Path("/1/permission/")
 @RolesAllowed("cstl-admin")
 public class PermissionRest {
     
@@ -21,7 +21,6 @@ public class PermissionRest {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/")
     public List<Permission> all(){
         return domainRoleRepository.allPermission();
     }

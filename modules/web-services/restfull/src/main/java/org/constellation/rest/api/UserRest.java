@@ -49,7 +49,7 @@ import javax.ws.rs.core.Response;
  * @since 0.9
  */
 @Named
-@Path("/1/user")
+@Path("/1/user/")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class UserRest  {
@@ -62,7 +62,6 @@ public class UserRest  {
     private DomainroleRepository domainroleRepository;
     
     @GET
-    @Path("/")
     @RolesAllowed("cstl-admin")
     public Response findAll(@QueryParam("withDomainAndRoles") boolean withDomainAndRole) {
         if(withDomainAndRole) {
@@ -72,21 +71,21 @@ public class UserRest  {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     public Response findOne(@PathParam("id") int id) {
         return Response.ok(userRepository.findOneWithRolesAndDomains(id)).build();
     }
     
     
     @GET
-    @Path("/{id}/domainroles/{domainId}")
+    @Path("{id}/domainroles/{domainId}")
     public Response findDomainRoles(@PathParam("id") int id, @PathParam("domainId") int domainId) {
         return Response.ok(domainroleRepository.findUserDomainroles(id, domainId)).build();
     }
 
 
     @DELETE
-    @Path("/{id}")
+    @Path("{id}")
     @RolesAllowed("cstl-admin")
     public Response delete(@PathParam("id") int id) {
         if(userRepository.isLastAdmin(id))
@@ -96,7 +95,6 @@ public class UserRest  {
     }
 
     @POST
-    @Path("/")
     @Transactional("txManager")
     @RolesAllowed("cstl-admin")
     public Response post(DomainUser userDTO) {
@@ -110,7 +108,6 @@ public class UserRest  {
     
     
     @PUT
-    @Path("/")
     @Transactional("txManager")
     @RolesAllowed("cstl-admin")
     public Response put(DomainUser userDTO) {
@@ -126,7 +123,7 @@ public class UserRest  {
      *         operation state
      */
     @GET
-    @Path("/access")
+    @Path("access")
     public Response access() {
         final AcknowlegementType response = new AcknowlegementType("Success",
                 "You have access to the configuration service");

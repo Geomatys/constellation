@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Path("/1/domain")
+@Path("/1/domain/")
 @RolesAllowed("cstl-admin")
 public class DomainRest {
 
@@ -167,7 +167,6 @@ public class DomainRest {
     private UserRepository userRepository;
 
     @GET
-    @Path("/")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response all(@QueryParam("withMembers") boolean withMembers,
             @DefaultValue("0") @QueryParam("userId") int userId) {
@@ -188,7 +187,7 @@ public class DomainRest {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response get(@PathParam("id") int id) {
         Domain domain = domainRepository.findOne(id);
@@ -199,7 +198,6 @@ public class DomainRest {
     }
 
     @POST
-    @Path("/")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public Response insert(Domain domain) {
@@ -208,7 +206,7 @@ public class DomainRest {
     }
 
     @PUT
-    @Path("/{id}")
+    @Path("{id}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public Response update(@PathParam("id") int id, Domain domain) {
@@ -218,7 +216,7 @@ public class DomainRest {
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("{id}")
     public Response delete(@PathParam("id") int id) {
         try {
             domainRepository.delete(id);
@@ -232,7 +230,7 @@ public class DomainRest {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/members/{id}")
+    @Path("members/{id}")
     public Response members(@PathParam("id") int domainId) {
         Map<CstlUser, List<Domainrole>> findUsersWithDomainRoles = userRepository.findUsersWithDomainRoles(domainId);
         
@@ -247,7 +245,7 @@ public class DomainRest {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/nonmembers/{id}")
+    @Path("nonmembers/{id}")
     public Response notMembers(@PathParam("id") int domainId) {
         return Response.ok(userRepository.findUsersNotInDomain(domainId)).build();
     }
