@@ -77,6 +77,19 @@ public final class StyleUtilities extends Static {
         return FF.literal(label);
     }
 
+    /**
+     * Parse given string as CQL and returns Expression.
+     * @param exp
+     * @return
+     */
+    public static Expression parseExpression(final String exp) {
+        try{
+            return CQL.parseExpression(exp);
+        } catch (CQLException ex) {
+            return Expression.NIL;
+        }
+    }
+
     public static Expression opacity(final double opacity) {
         return (opacity >= 0 && opacity <= 1.0) ? FF.literal(opacity) : Expression.NIL;
     }

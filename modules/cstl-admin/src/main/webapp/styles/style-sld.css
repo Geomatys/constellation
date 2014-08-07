@@ -293,6 +293,18 @@ ul.dropdown-images li a:hover{
     box-shadow:none !important;
 }
 
+.symbolIconItem{
+    font-size: 18px;
+}
+a.symbolIconItem{
+    padding:3px 8px !important;
+}
+.symbolIconItem i{
+    height: 16px;
+    width: 16px;
+    vertical-align:middle;
+}
+
 .form-control-fix{
     padding: 6px;
     font-size: 12px;

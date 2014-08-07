@@ -36,30 +36,45 @@
                                 ng-model="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry">
                             <span class="filter-option pull-left">
                                 <img class="img_icone"
-                                     src="images/icone_{{optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry}}.png"/>
+                                     ng-if="!isTTFValue(optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry)"
+                                     ng-src="images/icone_{{optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry}}.png"/>
+                                <i ng-if="isTTFValue(optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry)"
+                                   class="icon-lg"
+                                   ng-class="resolveClassForCode(optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry)"
+                                   style="font-size:18px;"></i>
                             </span>&nbsp;
                             <span class="caret"></span>
                         </button>
                         <span class="dropdown-arrow dropdown-arrow-inverse"></span>
-                        <ul class="dropdown-menu dropdown-inverse dropdown-images"
-                            role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;">
+                        <ul class="dropdown-menu dropdown-inverse dropdown-images list-inline"
+                            role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;width:190px;">
                             <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'circle'">
-                                <a><img class="img_icone" src="images/icone_circle.png"/></a>
+                                <a class="symbolIconItem"><img class="img_icone" src="images/icone_circle.png"/></a>
                             </li>
                             <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'triangle'">
-                                <a><img class="img_icone" src="images/icone_triangle.png"/></a>
+                                <a class="symbolIconItem"><img class="img_icone" src="images/icone_triangle.png"/></a>
                             </li>
                             <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'square'">
-                                <a><img class="img_icone" src="images/icone_square.png"/></a>
+                                <a class="symbolIconItem"><img class="img_icone" src="images/icone_square.png"/></a>
                             </li>
                             <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'star'">
-                                <a><img class="img_icone" src="images/icone_star.png"/></a>
+                                <a class="symbolIconItem"><img class="img_icone" src="images/icone_star.png"/></a>
                             </li>
                             <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'x'">
-                                <a><img class="img_icone" src="images/icone_x.png"/></a>
+                                <a class="symbolIconItem"><img class="img_icone" src="images/icone_x.png"/></a>
                             </li>
                             <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'cross'">
-                                <a><img class="img_icone" src="images/icone_cross.png"/></a>
+                                <a class="symbolIconItem"><img class="img_icone" src="images/icone_cross.png"/></a>
+                            </li>
+                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'arrow'">
+                                <a class="symbolIconItem"><img class="img_icone" src="images/icone_arrow.png"/></a>
+                            </li>
+                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'hatch'">
+                                <a class="symbolIconItem"><img class="img_icone" src="images/icone_hatch.png"/></a>
+                            </li>
+                            <li ng-repeat="item in fontsCodes"
+                                ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'ttf://FontAwesome'+item">
+                                <a class="symbolIconItem"><i ng-class="fontsMapping[item]"></i></a>
                             </li>
                         </ul>
                     </div>

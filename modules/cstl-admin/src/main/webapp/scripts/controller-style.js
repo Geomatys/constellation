@@ -306,6 +306,32 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.dataBandsRepartition = null;
 
         /**
+         * This is the mapping code->css class for awesome font in symbolizer point selection.
+         */
+        $scope.fontsMapping={
+            '#0xf072':'icon-plane',
+            '#0xf0e7':'icon-bolt',
+            '#0xf06e':'icon-eye-open',
+            '#0xf024':'icon-flag',
+            '#0xf112':'icon-reply',
+            '#0xf0e9':'icon-umbrella',
+            '#0xf041':'icon-map-marker',
+            '#0xf06d':'icon-fire',
+            '#0xf002':'icon-search',
+            '#0xf007':'icon-user',
+            '#0xf071':'icon-warning-sign',
+            '#0xf0ad':'icon-wrench',
+            '#0xf09e':'icon-rss',
+            '#0xf08d':'icon-pushpin',
+            '#0xf06c':'icon-leaf',
+            '#0xf0c2':'icon-cloud'
+        };
+        $scope.fontsCodes = [];
+        for(var code in $scope.fontsMapping){
+            $scope.fontsCodes.push(code);
+        }
+
+        /**
          * Affect alpha from colorpicker into param.opacity
          * @param value
          * @param param
@@ -1410,6 +1436,27 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if (symbolizer.font.family == undefined) {
                 symbolizer.font.family = [];
             }
+        };
+
+        /**
+         * Returns true if the given string value is ttf://fontName#code.
+         * @param value
+         * @returns {*|boolean}
+         */
+        $scope.isTTFValue = function(value) {
+            return (value && value.indexOf('ttf://') != -1);
+        };
+
+        /**
+         * Returns FontAwesome css class for code.
+         * @param value
+         * @returns {*}
+         */
+        $scope.resolveClassForCode = function(value) {
+            if($scope.isTTFValue(value)){
+                return $scope.fontsMapping[value.substring(value.indexOf('#'))];
+            }
+            return '';
         };
 
         $scope.choosePalette = function(index) {

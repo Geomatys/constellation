@@ -23,8 +23,7 @@ import org.opengis.style.GraphicalSymbol;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
-import static org.constellation.json.util.StyleUtilities.literal;
-import static org.constellation.json.util.StyleUtilities.opacity;
+import static org.constellation.json.util.StyleUtilities.*;
 import static org.constellation.json.util.StyleUtilities.singletonType;
 
 /**
@@ -34,9 +33,9 @@ import static org.constellation.json.util.StyleUtilities.singletonType;
  */
 public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
 
-    private double size     = 10.0;
-    private double opacity  = 1.0;
-    private double rotation = 0.0;
+    private String size     = "10.0";
+    private String opacity  = "1.0";
+    private String rotation = "0.0";
     private Mark mark       = new Mark();
 
     public Graphic() {
@@ -44,9 +43,9 @@ public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
 
     public Graphic(final org.opengis.style.Graphic graphic) {
         ensureNonNull("graphic", graphic);
-        this.size     = Double.valueOf(graphic.getSize().toString());
-        this.opacity  = Double.valueOf(graphic.getOpacity().toString());
-        this.rotation = Double.valueOf(graphic.getRotation().toString());
+        this.size     = graphic.getSize().toString();
+        this.opacity  = graphic.getOpacity().toString();
+        this.rotation = graphic.getRotation().toString();
         for (final GraphicalSymbol gs : graphic.graphicalSymbols()) {
             if (gs instanceof org.opengis.style.Mark) {
                 this.mark = new Mark((org.opengis.style.Mark) gs);
@@ -55,27 +54,27 @@ public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
         }
     }
 
-    public double getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(final double size) {
+    public void setSize(final String size) {
         this.size = size;
     }
 
-    public double getOpacity() {
+    public String getOpacity() {
         return opacity;
     }
 
-    public void setOpacity(final double opacity) {
+    public void setOpacity(final String opacity) {
         this.opacity = opacity;
     }
 
-    public double getRotation() {
+    public String getRotation() {
         return rotation;
     }
 
-    public void setRotation(final double rotation) {
+    public void setRotation(final String rotation) {
         this.rotation = rotation;
     }
 
@@ -91,9 +90,9 @@ public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
     public org.opengis.style.Graphic toType() {
         return SF.graphic(
                 singletonType(mark),
-                opacity(opacity),
-                literal(size),
-                literal(rotation),
+                parseExpression(opacity),
+                parseExpression(size),
+                parseExpression(rotation),
                 null,
                 null);
     }
