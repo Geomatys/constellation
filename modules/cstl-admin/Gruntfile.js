@@ -1,344 +1,214 @@
-// Generated on 2014-01-07 using generator-jhipster 0.6.1
-'use strict';
+module.exports = function(grunt) {
+    'use strict';
 
-// # Globbing
-// for performance reasons we're only matching one level down:
-// 'test/spec/{,*/}*.js'
-// use this if you want to recursively match all subfolders:
-// 'test/spec/**/*.js'
+    grunt.initConfig({
 
-var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
+        lib_dir: './grunt/lib',
+        src_dir: './grunt/src',
+        target_dir: grunt.option('target_dir') || './target/cstl-admin',
 
-module.exports = function (grunt) {
-  require('load-grunt-tasks')(grunt);
-  require('time-grunt')(grunt); 
+        // Clean build directory.
+        clean: ['<%= target_dir %>'],
 
-  grunt.initConfig({
-    yeoman: {
-      // configurable paths
-      app: require('./bower.json').appPath || 'app',
-      dist: 'src/main/webapp/dist'
-    },
-    watch: {
-    styles: {
-        files: ['src/main/webapp/styles/{,*/}*.css'],
-        tasks: ['copy:styles', 'autoprefixer']
-      },
-    livereload: {
-        options: {
-          livereload: 35729
+        // Copy assets files.
+        copy: {
+            app: {
+                files: [
+                    {
+                        src: ['*.html'],
+                        cwd: '<%= src_dir %>/',
+                        dest: '<%= target_dir %>/',
+                        expand: true
+                    },
+                    {
+                        src: ['img/**'],
+                        cwd: '<%= src_dir %>/',
+                        dest: '<%= target_dir %>/',
+                        expand: true
+                    },
+                    {
+                        src: ['views/**'],
+                        cwd: '<%= src_dir %>/',
+                        dest: '<%= target_dir %>/',
+                        expand: true
+                    },
+                    {
+                        src: ['i18n/*.json'],
+                        cwd: '<%= src_dir %>/',
+                        dest: '<%= target_dir %>/',
+                        expand: true
+                    }
+                ]
+            },
+            lib: {
+                files: [
+                    {
+                        src: ['<%= lib_dir %>/**/css/*'],
+                        dest: '<%= target_dir %>/css',
+                        expand: true,
+                        flatten: true
+                    },
+                    {
+                        src: ['<%= lib_dir %>/**/fonts/*'],
+                        dest: '<%= target_dir %>/fonts',
+                        expand: true,
+                        flatten: true
+                    },
+                    {
+                        src: ['<%= lib_dir %>/**/img/*'],
+                        dest: '<%= target_dir %>/img',
+                        expand: true,
+                        flatten: true
+                    },
+                    {
+                        src: ['<%= lib_dir %>/**/images/*'],
+                        dest: '<%= target_dir %>/images',
+                        expand: true,
+                        flatten: true
+                    },
+                    {
+                        src: ['<%= lib_dir %>/**/views/*'],
+                        dest: '<%= target_dir %>/views',
+                        expand: true,
+                        flatten: true
+                    }
+                ]
+            }
         },
-        files: [
-          'src/main/webapp/{,*/}*.html',
-          '.tmp/styles/{,*/}*.css',
-          '{.tmp/,}src/main/webapp/scripts/{,*/}*.js',
-          'src/main/webapp/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
-        ]
-      }
-    },
-    autoprefixer: {
-      options: ['last 1 version'],
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '.tmp/styles/',
-          src: '{,*/}*.css',
-          dest: '.tmp/styles/'
-        }]
-      }
-    },
-    connect: {
-      proxies: [
-        {
-          context: '/app',
-          host: 'localhost',
-          port: 8080,
-          https: false,
-          changeOrigin: false
+
+        // Compile less files.
+        less: {
+            app: {
+                options: {
+                    compress: true,
+                    cleancss: true
+                },
+                files: {
+                    '<%= target_dir %>/css/app.css': '<%= src_dir %>/less/app.less'
+                }
+            },
+            lib: {
+                options: {
+                    compress: true,
+                    cleancss: true
+                },
+                files: {
+                    '<%= target_dir %>/css/angular.min.css': '<%= lib_dir %>/angular/less/angular.less',
+                    '<%= target_dir %>/css/bootstrap.min.css': '<%= lib_dir %>/bootstrap/less/bootstrap.less',
+                    '<%= target_dir %>/css/c3.min.css': '<%= lib_dir %>/c3/less/c3.less',
+                    '<%= target_dir %>/css/famfamfam-flags.min.css': '<%= lib_dir %>/famfamfam-flags/less/famfamfam-flags.less',
+                    '<%= target_dir %>/css/font-awesome.min.css': '<%= lib_dir %>/font-awesome/less/font-awesome.less',
+                    '<%= target_dir %>/css/highlight.min.css': '<%= lib_dir %>/highlight/less/highlight.less',
+                    '<%= target_dir %>/css/jquery.min.css': '<%= lib_dir %>/jquery/less/jquery.less',
+                    '<%= target_dir %>/css/openlayers.min.css': '<%= lib_dir %>/openlayers/less/openlayers.less'
+                }
+            }
         },
-        {
-          context: '/metrics',
-          host: 'localhost',
-          port: 8080,
-          https: false,
-          changeOrigin: false
-        }
-      ],
-      options: {
-        port: 9000,
-        // Change this to '0.0.0.0' to access the server from outside.
-        hostname: 'localhost',
-        livereload: 35729
-      },
-      livereload: {
-        options: {
-          open: true,
-          base: [
-            '.tmp',
-            'src/main/webapp'
-          ],
-          middleware: function (connect) {
-            return [
-              proxySnippet,
-              connect.static(require('path').resolve('src/main/webapp'))
-            ];
-          }
-        }
-      },
-      test: {
-        options: {
-         port: 9001,
-          base: [
-            '.tmp',
-            'test',
-            'src/main/webapp'
-          ]
-        }
-      },
-      dist: {
-        options: {
-          base: '<%= yeoman.dist %>'
-        }
-      }
-    },
-    clean: {
-      dist: {
-        files: [{
-          dot: true,
-          src: [
-            '.tmp',
-            '<%= yeoman.dist %>/*',
-            '!<%= yeoman.dist %>/.git*'
-          ]
-        }]
-      },
-      server: '.tmp'
-    },
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc'
-      },
-      all: [
-        'Gruntfile.js',
-        'src/main/webapp/scripts/{,*/}*.js'
-      ]
-    },
-    coffee: {
-      options: {
-        sourceMap: true,
-        sourceRoot: ''
-      },
-      dist: {
-        files: [{
-          expand: true,
-          cwd: 'src/main/webapp/scripts',
-          src: '{,*/}*.coffee',
-          dest: '.tmp/scripts',
-          ext: '.js'
-        }]
-      },
-      test: {
-        files: [{
-          expand: true,
-          cwd: 'test/spec',
-          src: '{,*/}*.coffee',
-          dest: '.tmp/spec',
-          ext: '.js'
-        }]
-      }
-    },
-    // not used since Uglify task does concat,
-    // but still available if needed
-    /*concat: {
-      dist: {}
-    },*/
-    rev: {
-      dist: {
-        files: {
-          src: [
-            '<%= yeoman.dist %>/scripts/{,*/}*.js',
-            '<%= yeoman.dist %>/styles/{,*/}*.css',
-            '<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-            '<%= yeoman.dist %>/fonts/*'
-          ]
-        }
-      }
-    },
-    useminPrepare: {
-      html: 'src/main/webapp/index.html',
-      options: {
-        dest: '<%= yeoman.dist %>'
-      }
-    },
-    usemin: {
-      html: ['<%= yeoman.dist %>/{,*/}*.html'],
-      css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
-      options: {
-        dirs: ['<%= yeoman.dist %>']
-      }
-    },
-    imagemin: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: 'src/main/webapp/images',
-          src: '{,*/}*.{png,jpg,jpeg}',
-          dest: '<%= yeoman.dist %>/images'
-        }]
-      }
-    },
-    svgmin: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: 'src/main/webapp/images',
-          src: '{,*/}*.svg',
-          dest: '<%= yeoman.dist %>/images'
-        }]
-      }
-    },
-    cssmin: {
-      // By default, your `index.html` <!-- Usemin Block --> will take care of
-      // minification. This option is pre-configured if you do not wish to use
-      // Usemin blocks.
-      // dist: {
-      //   files: {
-      //     '<%= yeoman.dist %>/styles/main.css': [
-      //       '.tmp/styles/{,*/}*.css',
-      //       'styles/{,*/}*.css'
-      //     ]
-      //   }
-      // }
-    },
-    htmlmin: {
-      dist: {
-        options: {
-          /*removeCommentsFromCDATA: true,
-          // https://github.com/yeoman/grunt-usemin/issues/44
-          //collapseWhitespace: true,
-          collapseBooleanAttributes: true,
-          removeAttributeQuotes: true,
-          removeRedundantAttributes: true,
-          useShortDoctype: true,
-          removeEmptyAttributes: true,
-          removeOptionalTags: true*/
+
+        // Merge script files.
+        concat: {
+            app: {
+                files: {
+                    '<%= target_dir %>/js/app.js': [
+                        '<%= src_dir %>/js/http-auth-interceptor.js',
+                        '<%= src_dir %>/js/app.js',
+                        '<%= src_dir %>/js/controllers.js',
+                        '<%= src_dir %>/js/controller-data.js',
+                        '<%= src_dir %>/js/controller-data-import.js',
+                        '<%= src_dir %>/js/controller-sensor.js',
+                        '<%= src_dir %>/js/controller-style.js',
+                        '<%= src_dir %>/js/controller-webservice.js',
+                        '<%= src_dir %>/js/controller-tasks.js',
+                        '<%= src_dir %>/js/controller-mapcontext.js',
+                        '<%= src_dir %>/js/controller-admin.js',
+                        '<%= src_dir %>/js/services.js',
+                        '<%= src_dir %>/js/directives.js',
+                        '<%= src_dir %>/js/cstl.data.viewer.js',
+                        '<%= src_dir %>/js/cstl.viewer.wmts.js',
+                        '<%= src_dir %>/js/cstl.netcdf.js'
+                    ]
+                }
+            },
+            app_index: {
+                files: {
+                    '<%= target_dir %>/js/app-index.js': [
+                        '<%= src_dir %>/js/http-auth-interceptor.js',
+                        '<%= src_dir %>/js/index.js',
+                        '<%= src_dir %>/js/index/*.js'
+                    ]
+                }
+            },
+            lib: {
+                files: {
+                    '<%= target_dir %>/js/ace.min.js': '<%= lib_dir %>/ace/js/*.js',
+                    '<%= target_dir %>/js/angular.min.js': '<%= lib_dir %>/angular/js/*.js',
+                    '<%= target_dir %>/js/bootstrap.min.js': '<%= lib_dir %>/bootstrap/js/*.js',
+                    '<%= target_dir %>/js/c3.min.js': '<%= lib_dir %>/c3/js/*.js',
+                    '<%= target_dir %>/js/d3.min.js': '<%= lib_dir %>/d3/js/*.js',
+                    '<%= target_dir %>/js/highlight.min.js': '<%= lib_dir %>/highlight/js/*.js',
+                    '<%= target_dir %>/js/jquery.min.js': '<%= lib_dir %>/jquery/js/*.js',
+                    '<%= target_dir %>/js/openlayers.min.js': '<%= lib_dir %>/openlayers/js/*.js',
+                    '<%= target_dir %>/js/sockjs.min.js': '<%= lib_dir %>/sockjs/js/*.js',
+                    '<%= target_dir %>/js/stomp.min.js': '<%= lib_dir %>/stomp/js/*.js'
+                }
+            }
         },
-        files: [{
-          expand: true,
-          cwd: 'src/main/webapp',
-          src: ['*.html', 'views/*.html'],
-          dest: '<%= yeoman.dist %>'
-        }]
-      }
-    },
-    // Put files not handled in other tasks here
-    copy: {
-      dist: {
-        files: [{
-          expand: true,
-          dot: true,
-          cwd: 'src/main/webapp',
-          dest: '<%= yeoman.dist %>',
-          src: [
-            '*.{ico,png,txt}',
-            '.htaccess',
-            'images/{,*/}*.{gif,webp}',
-            'fonts/*'
-          ]
-        }, {
-          expand: true,
-          cwd: '.tmp/images',
-          dest: '<%= yeoman.dist %>/images',
-          src: [
-            'generated/*'
-          ]
-        }]
-      },
-      styles: {
-        expand: true,
-        cwd: 'src/main/webapp/styles',
-        dest: '.tmp/styles/',
-        src: '{,*/}*.css'
-      }
-    },
-    concurrent: {
-      server: [
-        'copy:styles'
-      ],
-      test: [
-        'copy:styles'
-      ],
-      dist: [
-        'copy:styles',
-        'imagemin',
-        'svgmin',
-        'htmlmin'
-      ]
-    },
-    cdnify: {
-      dist: {
-        html: ['<%= yeoman.dist %>/*.html']
-      }
-    },
-    ngmin: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '.tmp/concat/scripts',
-          src: '*.js',
-          dest: '.tmp/concat/scripts'
-        }]
-      }
-    },
-    uglify: {
-      dist: {
-        files: {
-          '<%= yeoman.dist %>/scripts/scripts.js': [
-            '<%= yeoman.dist %>/scripts/scripts.js'
-          ]
+
+        // Annotate AngularJS application script files for obfuscation.
+        ngAnnotate: {
+            app: {
+                src: ['<%= target_dir %>/js/app.js'],
+                dest: '<%= target_dir %>/js/app.js'
+            },
+            app_index: {
+                src: ['<%= target_dir %>/js/app-index.js'],
+                dest: '<%= target_dir %>/js/app-index.js'
+            }
+        },
+
+        // Obfuscate application script files.
+        uglify: {
+            app: {
+                src: ['<%= target_dir %>/js/app.js'],
+                dest: '<%= target_dir %>/js/app.js'
+            },
+            app_index: {
+                src: ['<%= target_dir %>/js/app-index.js'],
+                dest: '<%= target_dir %>/js/app-index.js'
+            }
         }
-      }
-    }
-  });
 
-  grunt.registerTask('server', function (target) {
-    if (target === 'dist') {
-      return grunt.task.run(['build', 'connect:dist:keepalive']);
-    }
+// TODO → Minify template files for better performances.
+// Previous attempts using following configuration with 'grunt-contrib-htmlmin' have broken some page layouts.
+//
+//        // Minify application templates files.
+//        htmlmin: {
+//            app: {
+//                options: {
+//                    removeComments: true,
+//                    collapseWhitespace: true
+//                },
+//                files: [{
+//                    cwd: '<%= target_dir %>/views/',
+//                    src: '**/*.html',
+//                    dest: '<%= target_dir %>/views/',
+//                    expand: true
+//                }]
+//            }
+//        }
+    });
 
-    grunt.task.run([
-      'clean:server',
-      'concurrent:server',
-      'autoprefixer',
-      'configureProxies',
-      'connect:livereload',
-      'watch'
-    ]);
-  });
+    // Load NPM tasks.
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+//    grunt.loadNpmTasks('grunt-contrib-htmlmin');
+    grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-ng-annotate');
 
-  grunt.registerTask('test', [
-    'clean:server',
-    'concurrent:test',
-    'autoprefixer',
-    'connect:test'
-    ]);
-
-  grunt.registerTask('build', [
-    'clean:dist',
-    'useminPrepare',
-    'concurrent:dist',
-    'autoprefixer',
-    'concat',
-    'copy:dist',
-    'ngmin',
-    'cssmin',
-    'uglify',
-    'rev',
-    'usemin'
-  ]);
-
-  grunt.registerTask('default', [
-    'test',
-    'build'
-  ]);
+    // Register tasks.
+    grunt.registerTask('dev', ['clean', 'copy', 'less', 'concat']);
+    grunt.registerTask('prod', ['clean', 'copy', 'less', 'concat', 'ngAnnotate', 'uglify'/*, 'htmlmin'*/]);
+    grunt.registerTask('update', ['copy:app', 'less:app', 'concat:app', 'concat:app_index']);
 };

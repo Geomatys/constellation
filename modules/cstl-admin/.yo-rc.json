@@ -1,7 +1,0 @@
-{
-  "generator-jhipster": {
-    "packageName": "org.constellation.admin",
-    "packageFolder": "org/constellation/admin",
-    "hibernateCache": "no"
-  }
-}

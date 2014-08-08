@@ -128,10 +128,10 @@ public class WebConfigurer implements ServletContextListener {
 
         staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/");
         staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/index.html");
-        staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/images/*");
+        staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/img/*");
         staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/fonts/*");
-        staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/scripts/*");
-        staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/styles/*");
+        staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/js/*");
+        staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/css/*");
         staticResourcesProductionFilter.addMappingForUrlPatterns(disps, true, "/views/*");
         staticResourcesProductionFilter.setAsyncSupported(true);
     }
@@ -147,10 +147,10 @@ public class WebConfigurer implements ServletContextListener {
                 servletContext.addFilter("cachingHttpHeadersFilter",
                         new CachingHttpHeadersFilter());
 
-        cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/dist/images/*");
+        cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/dist/img/*");
         cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/dist/fonts/*");
-        cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/dist/scripts/*");
-        cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/dist/styles/*");
+        cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/dist/js/*");
+        cachingHttpHeadersFilter.addMappingForUrlPatterns(disps, true, "/dist/css/*");
         cachingHttpHeadersFilter.setAsyncSupported(true);
     }
 

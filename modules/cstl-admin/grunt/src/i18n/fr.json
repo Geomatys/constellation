@@ -134,7 +134,7 @@
     "data.modal.dataName.label": "Ou saisisser un identifiant pour ce jeu de donnée",
     "data.modal.import.server.label": "Saisir le répertoire Serveur à parcourir",
     "data.modal.import.server.label.list": "Lister les fichiers",
-    
+
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",
 
@@ -393,7 +393,7 @@
     "label.outline":"Contour",
     "label.contrast":"Contraste et relief",
     "label.color.model":"Modèle de couleur",
-    
+
 
     "layer.listing.data.add.button.label": "Ajouter une donnée",
     "layer.listing.data.create.button.label": "Créer une donnée",
@@ -857,8 +857,9 @@
 
     "sensor.obervation":"Observation",
 
-    "tasks.information.edit":"Edit task",
-    "tasks.information.delete":"Delete task",
+    "tasks.information.edit":"Editer le traitement",
+    "tasks.information.execute":"Executer le traitement",
+    "tasks.information.delete":"Supprimer le traitement",
     "tasks.information.title":"Traitements disponibles",
     "tasks.notask":"Pas de traitement en cours d'execution",
     "tasks.modal.authority":"Autorité",

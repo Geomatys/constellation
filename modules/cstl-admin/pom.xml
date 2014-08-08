@@ -18,6 +18,9 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <!-- Grunt build profile -->
+        <grunt.build.profile>dev</grunt.build.profile>
+        <skip.npm.install>true</skip.npm.install>
         <!-- Spring profile to use -->
         <spring.profiles.active>dev</spring.profiles.active>
         <!-- i18n resource files reloading -->
@@ -55,6 +58,9 @@
     <profile>
       <id>prod</id>
       <properties>
+        <!-- Grunt build profile -->
+        <grunt.build.profile>prod</grunt.build.profile>
+        <skip.npm.install>false</skip.npm.install>
         <!-- Spring profile to use -->
         <spring.profiles.active>prod</spring.profiles.active>
         <cstl.url>http://demo7.geomatys.com/constellation/</cstl.url>
@@ -65,30 +71,7 @@
         <logback.appender>CONSOLE</logback.appender>
         <!-- production database configuration -->
 
-
-
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.github.trecloux</groupId>
-            <artifactId>yeoman-maven-plugin</artifactId>
-            <version>0.1</version>
-            <configuration>
-              <yeomanProjectDirectory>${project.basedir}</yeomanProjectDirectory>
-            </configuration>
-            <executions>
-              <execution>
-                <id>run-grunt</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 
@@ -102,6 +85,8 @@
     <hibernate.version>4.2.7.Final</hibernate.version>
     <codahale.metrics.version>3.0.1</codahale.metrics.version>
 
+    <!-- Grunt build properties -->
+    <grunt.target.dir>${project.build.directory}/grunt-build</grunt.target.dir>
   </properties>
 
   <repositories>
@@ -414,11 +399,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.4</version>
-      </plugin>
-      <plugin>
         <groupId>org.apache.tomcat.maven</groupId>
         <artifactId>tomcat7-maven-plugin</artifactId>
         <version>2.1</version>
@@ -446,6 +426,95 @@
         <artifactId>sonar-maven-plugin</artifactId>
         <version>2.2</version>
       </plugin>
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+                <!-- Disable maven-source-plugin execution -->
+                <execution>
+                    <id>attach-sources</id>
+                    <phase>none</phase>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+                <warName>cstl-admin</warName>
+                <webResources>
+                    <resource>
+                        <directory>${project.basedir}/src/main/webapp</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                    <!-- Include grunt output directory -->
+                    <resource>
+                        <directory>${grunt.target.dir}</directory>
+                    </resource>
+                </webResources>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>2.5</version>
+            <executions>
+                <!-- Clean installed Node Packaged Modules -->
+                <execution>
+                    <id>node_modules</id>
+                    <phase>initialize</phase>
+                    <goals>
+                        <goal>clean</goal>
+                    </goals>
+                    <configuration>
+                        <skip>${skip.npm.install}</skip>
+                        <filesets>
+                            <fileset>
+                                <directory>node_modules</directory>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <executions>
+                <!-- Install required Node Packaged Modules -->
+                <execution>
+                    <id>npm-install</id>
+                    <phase>prepare-package</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                    <configuration>
+                        <skip>${skip.npm.install}</skip>
+                        <executable>npm</executable>
+                        <arguments>
+                            <argument>install</argument>
+                        </arguments>
+                    </configuration>
+                </execution>
+                <!-- Run grunt build -->
+                <execution>
+                    <id>grunt-build</id>
+                    <phase>prepare-package</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                    <configuration>
+                        <executable>grunt</executable>
+                        <arguments>
+                            <argument>${grunt.build.profile}</argument>
+                            <argument>--target_dir=${grunt.target.dir}</argument>
+                        </arguments>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
   </build>
 </project>
