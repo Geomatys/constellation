@@ -1,0 +1,193 @@
+/*
+ * Constellation - An open source and standard compliant SDI
+ *
+ *    http://www.constellation-sdi.org
+ *
+ *    Copyright 2014 Geomatys.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#header {
+  background-color: @header-bg-color;
+  #gradient > .vertical(@start-color: @header-bg-top-color; @end-color: @header-bg-bottom-color; @end-percent: @header-height);
+  position: relative;
+  min-height: @header-height;
+}
+
+@media (min-width: @screen-sm) and (max-width: @screen-md-max) { // small and medium devices
+  #header {
+    margin-bottom: 40px; // liberate space for languages dropdown
+  }
+}
+
+
+// Brand
+// --------------------
+
+#brand {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+  text-align: center;
+  z-index: 9;
+
+  > img {
+    margin: 6px 0;
+    height: @header-height - 12;
+  }
+}
+
+
+// Navigation
+// --------------------
+
+#navigation {
+  .clearfix();
+
+  > .navbar {
+    margin-bottom: 0;
+  }
+
+  ul.nav {
+    float: right;
+
+    > li > a {
+      color: @header-nav-link-color;
+      background-color: @header-nav-link-bg-color;
+      line-height: 18px;
+      margin: 4px 0;
+      padding: 10px;
+
+      .caret {
+        border-top-color: @header-nav-link-color;
+        border-bottom-color: @header-nav-link-color;
+      }
+
+      > .icon-menu-mapcontext,
+      > .icon-menu-sensor {
+        display: inline-block;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        width: 14px;
+        height: 12px;
+      }
+
+      > .icon-menu-mapcontext{
+        background: url("../img/icon-menu-compo.svg") no-repeat;
+      }
+
+      > .icon-menu-sensor {
+        background: url("../img/icon-menu-sensor.svg") no-repeat;
+      }
+    }
+
+    > li.open > a,
+    > li:hover > a,
+    > li:focus > a,
+    > li > a.menu-selected {
+      color: @header-nav-link-active-color;
+      background-color: @header-nav-link-active-bg-color;
+
+      .caret {
+        border-top-color: @header-nav-link-active-color;
+        border-bottom-color: @header-nav-link-active-color;
+      }
+
+      > .icon-menu-mapcontext{
+        background: url("../img/icon-menu-compo-selected.svg") no-repeat;
+      }
+
+      > .icon-menu-sensor {
+        background: url("../img/icon-menu-sensor-selected.svg") no-repeat;
+      }
+    }
+  }
+
+  .navbar-toggle {
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: @screen-xs-max) { // extra small device
+  #navigation {
+    padding-left: 0;
+
+    .navbar-collapse {
+      text-align: center;
+      width: 100%;
+      border: none;
+      background-color: @header-nav-collapse-bg-color;
+
+      > .nav.nav-pills,
+      > .nav.nav-pills > li {
+        float: none !important;
+      }
+
+      > .nav.nav-pills:first-child {
+        margin-top: 5px;
+      }
+
+      > .nav.nav-pills:last-child {
+        margin-bottom: 5px;
+      }
+    }
+  }
+}
+
+
+// Languages dropdown (only visible on small devices)
+// --------------------
+
+#languages {
+  display: none;
+  position: absolute;
+  top: @header-height;
+  right: 20px;
+
+  > .dropdown-toggle {
+    color: @header-lang-btn-color;
+    background-color: @header-lang-btn-bg-color;
+    border: 0;
+    padding: 10px 15px;
+    border-radius: 0 0 5px 5px;
+    box-shadow: inset 0px 0px 10px #B4B1B1;
+
+    .caret {
+      border-top-color: @header-lang-btn-color;
+      border-bottom-color: @header-lang-btn-color;
+    }
+  }
+
+  > .dropdown-toggle:hover,
+  &.open > .dropdown-toggle {
+    color: @header-lang-btn-active-color;
+    background-color: @header-lang-btn-active-bg-color;
+
+    .caret {
+      border-top-color: @header-lang-btn-active-color;
+      border-bottom-color: @header-lang-btn-active-color;
+    }
+  }
+}
+
+@media (min-width: @screen-sm) and (max-width: @screen-md-max) { // small and medium devices
+  #languages {
+    display: block;
+  }
+}

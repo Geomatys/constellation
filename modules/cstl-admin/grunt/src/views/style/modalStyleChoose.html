@@ -1,0 +1,178 @@
+<div class="modal-dialog modal-dialog-resp-height"
+     ng-class="{'modal-dialog-sld':page.pageSld!=='views/style/chooseType.html', 'modal-dialog-responsive':page.pageSld!=='views/style/chooseType.html'}"
+     ng-init="initScopeStyle()">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="close()">×</button>
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                        <h4 style="font-size:16px;"
+                            translate="edition.style.label.viewer">Style Selection</h4>
+                    </div>
+                    <div class="col-xs-7 col-sm-4 col-md-6 col-lg-6 pull-right buttons-div"
+                         ng-if="serviceName === null">
+                        <button type="button" class="btn btn-add"
+                                ng-class="{'bouton-choix-style-normal': isSelectedChooser('new'), 'bouton-choix-style-selected':isSelectedChooser('existing')}"
+                                ng-click="setStyleChooser('existing');"
+                                style="font-size: 12px;">
+                            <span translate="edition.style.label.choice.existing">Use existing style</span>
+                        </button>
+                        <button type="button" class="btn btn-add "
+                                ng-class="{'bouton-choix-style-selected': isSelectedChooser('new'), 'bouton-choix-style-normal':isSelectedChooser('existing')}"
+                                ng-click="editNewStyle();"
+                                style="font-size: 12px;">
+                            <span translate="edition.style.label.choice.new" >Create new style</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body modal-body-style" style="overflow-y: auto;">
+            <div ng-show="isSelectedChooser('new') || isSelectedChooser('edit') || isSelectedChooser('duplicate')">
+                <div ng-include="page.pageSld"/>
+            </div>
+            <div class="row"  ng-show="isSelectedChooser('existing')">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-left: 0;padding-right: 0;">
+                    <div class="dashboard list-style-modal">
+                        <div class="navbar sort-navbar">
+                            <div class="navbar-inner">
+                                <ul class="nav nav-style">
+                                    <li ng-click="clickFilter('Name');">
+                                        <a>
+                                            <span translate="label.title">Title</span>
+                                            <i class="fa fa-caret-up" ng-if="ordertype === 'Name' && orderreverse"></i>
+                                            <i class="fa fa-caret-down" ng-if="ordertype === 'Name' && !orderreverse"></i>
+                                        </a>
+                                    </li>
+                                    <li class="divider-vertical"></li>
+                                    <li ng-click="clickFilter('Date');">
+                                        <a>
+                                            <span translate="label.date">Date</span>
+                                            <i class="fa fa-caret-up" ng-if="ordertype === 'Date' && orderreverse"></i>
+                                            <i class="fa fa-caret-down" ng-if="ordertype === 'Date' && !orderreverse"></i>
+                                        </a>
+                                    </li>
+                                    <li class="divider-vertical"></li>
+                                    <li ng-click="clickFilter('Owner');">
+                                        <a>
+                                            <span translate="label.owner">Owner</span>
+                                            <i class="fa fa-caret-up" ng-if="ordertype === 'Owner' && orderreverse"></i>
+                                            <i class="fa fa-caret-down" ng-if="ordertype === 'Owner' && !orderreverse"></i>
+                                        </a>
+                                    </li>
+                                    <li class="divider-vertical"></li>
+                                </ul>
+                                <button type="button" ng-click="clickFilter('Name');" class="btn btn-xs btn-style">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                                <div class="pull-right col-xs-7 col-sm-7 col-md-4 col-lg-4">
+                                    <div style="position:relative;">
+                                        <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                                        <input type="text"
+                                               ng-model="wrapScope.filterText"
+                                               class="search-query form-control"
+                                               style="height: 30px;"
+                                               placeholder="..." />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dash-inner">
+                            <div id="list" data-role="list">
+                                <div class="pagination-wrapper pagination-style">
+                                    <strong>
+                                        <span class="nb-results pull-left">{{countdata}}&nbsp;</span>
+                                        <span class="nb-results" translate="label.count.style">available data</span>
+                                    </strong>
+                                    <select class="nb-per-page input-small form-control pull-right"
+                                            style="padding-left: 5px;padding-right: 5px;"
+                                            ng-model="wrapScope.nbbypage">
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                    <div class="pull-right"
+                                         page-switcher="{page:$parent.currentpage,size:$parent.nbbypage,count:$parent.countdata}"
+                                         on-select-page="displayPage(page)"></div>
+                                </div>
+                                <div class="item-list" style="margin-top:40px;">
+                                    <div ng-repeat="style in dataList">
+                                        <div class="btn-group pull-right" style="margin-left: 15px;">
+                                            <button type="button"
+                                                    class="btn btn-default dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    style="margin-right: 2px;margin-top: 1px;padding: 5px;z-index: 1;">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" style="font-size: 12px;text-shadow: none;z-index: 2;">
+                                                <li ng-click="editChooseStyle(style);"><a><span translate="edition.style.label.edit">Edit</span></a></li>
+                                                <li ng-click="duplicateChooseStyle(style);"><a disabled="disabled"><span translate="sldeditor.edition.duplicate">Duplicate</span></a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="item style-{{style.Type | lowercase}}"
+                                             ng-class="{selected:style==selected}"
+                                             ng-click="select(style);displayCurrentStyle('styledMapWithSelectedStyle',null);">
+                                            <div class="top">
+                                                <span class="item-title" style="width: 100%;">{{style.Name}}</span>
+                                                <span class="pull-right text-right item-list-style">{{style.Type}}</span>
+                                            </div>
+                                            <div class="bottom">
+                                                <div class="block">
+                                                    <i class="fa fa-calendar"></i>{{style.Date | date:'yyyy-MM-dd'}}
+                                                </div>
+                                                <div class="block">
+                                                    <i class="fa fa-user"></i>{{style.Owner}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <div id="styledMapWithSelectedStyle" style="height: 500px; width:100%;padding: 0;"/>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" style="margin-top: 0;">
+            <button type="button"
+                    class="btn btn-default"
+                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-click="close()" >
+                <span translate="sldeditor.button.cancel">Cancel</span>
+            </button>
+            <button type="button"
+                    class="btn btn-add"
+                    ng-show="isSelectedChooser('existing')"
+                    ng-disabled="!selected && isSelectedChooser('existing')" ng-click="ok();">
+                <span translate="sldeditor.button.validate">Validate</span>
+            </button>
+            <button type="button"
+                    class="btn btn-add"
+                    ng-show="isSelectedChooser('edit') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-disabled="!selected && isSelectedChooser('existing')"
+                    ng-click="updateStyle();">
+                <span translate="sldeditor.button.validateandsave">Save and validate</span>
+            </button>
+            <button type="button"
+                    class="btn btn-add"
+                    ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-click="createStyle();">
+                <span translate="sldeditor.button.create">Create</span>
+            </button>
+            <button type="button"
+                    class="btn btn-add"
+                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor || optionsSLD.enableRasterPalette || optionsSLD.enableRasterCells"
+                    ng-click="goBack();">
+                <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>
+            </button>
+        </div>
+    </div>
+</div>

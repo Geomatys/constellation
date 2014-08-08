@@ -1,0 +1,119 @@
+<form class="form-horizontal form-style" role="form">
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label" translate="edition.style.label.name">Name</label>
+        <div class="col-sm-5">
+            <input type="text" class="form-control form-control-fix" ng-model="symbolizer.name"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.icon">Icon</label>
+        <div class="col-sm-4 col-md-3">
+            <div class="btn-group select select-block">
+                <button class="btn dropdown-toggle btn-default"
+                        data-toggle="dropdown"
+                        ng-model="symbolizer.graphic.mark.geometry">
+                    <span class="filter-option pull-left">
+                        <img class="img_icone"
+                             src="img/icone_{{symbolizer.graphic.mark.geometry}}.png"/>
+                    </span>&nbsp;
+                    <span class="caret"></span>
+                </button>
+                <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                <ul class="dropdown-menu dropdown-inverse dropdown-images"
+                    role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;">
+                    <li ng-click="symbolizer.graphic.mark.geometry = 'circle'">
+                        <a><img class="img_icone" src="img/icone_circle.png"/></a>
+                    </li>
+                    <li ng-click="symbolizer.graphic.mark.geometry = 'triangle'">
+                        <a><img class="img_icone" src="img/icone_triangle.png"/></a>
+                    </li>
+                    <li ng-click="symbolizer.graphic.mark.geometry = 'square'">
+                        <a><img class="img_icone" src="img/icone_square.png"/></a>
+                    </li>
+                    <li ng-click="symbolizer.graphic.mark.geometry = 'star'">
+                        <a><img class="img_icone" src="img/icone_star.png"/></a>
+                    </li>
+                    <li ng-click="symbolizer.graphic.mark.geometry = 'x'">
+                        <a><img class="img_icone" src="img/icone_x.png"/></a>
+                    </li>
+                    <li ng-click="symbolizer.graphic.mark.geometry = 'cross'">
+                        <a><img class="img_icone" src="img/icone_cross.png"/></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--div class="col-xs-4 col-sm-8 col-md-4 col-sm-offset-4 col-md-offset-0">
+            <button class="btn btn-default btn-block" type="button">Importer</button>
+        </div-->
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.stroke">Stroke</label>
+        <div class="col-sm-3">
+            <input type='text'
+                   name="picker"
+                   class="picker"
+                   spectrum oncolorchanged="affectAlpha(value, symbolizer.graphic.mark.stroke)"
+                   ng-model="symbolizer.graphic.mark.stroke.color" />
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.fill">Fill</label>
+        <div class="col-sm-3">
+            <input type='text'
+                   name="picker"
+                   class="picker"
+                   spectrum oncolorchanged="affectAlpha(value, symbolizer.graphic.mark.fill)"
+                   ng-model="symbolizer.graphic.mark.fill.color" />
+
+        </div>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.size">Size</label>
+        <div class="col-sm-5 col-md-6">
+            <input class="slider"
+                   type="range"
+                   ng-model="symbolizer.graphic.size" max="100" min="0" step="1"/>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <input class="form-control form-control-fix"
+                   style="padding: 6px 4px;"
+                   type="text"
+                   ng-model="symbolizer.graphic.size"
+                   min="0"
+                   max="100"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label">Rotation</label>
+        <div class="col-sm-5 col-md-6">
+            <input class="slider"
+                   ng-model="symbolizer.graphic.rotation" type="range" max="360" min="0" step="1"/>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <input class="form-control form-control-fix"
+                   style="padding: 6px 4px;"
+                   type="text"
+                   ng-model="symbolizer.graphic.rotation"
+                   min="0"
+                   max="360"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.opacity">Opacity</label>
+        <div class="col-sm-5 col-md-6">
+            <input class="slider"
+                   ng-model="symbolizer.graphic.opacity" type="range" max="1" min="0" step="0.01"/>
+        </div>
+        <div class="col-sm-3 col-md-2">
+            <input class="form-control form-control-fix"
+                   style="padding: 6px 4px;"
+                   type="text"
+                   ng-model="symbolizer.graphic.opacity"
+                   min="0"
+                   max="1"
+                   step="0.1"/>
+        </div>
+    </div>
+</form>

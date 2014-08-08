@@ -1,0 +1,304 @@
+
+<div class="logo-wrapper row">
+    <div class="col-sm-12">
+        <h3 class="header-title" translate="page.header.title.create.service.source">Source</h3>
+    </div>
+</div>
+
+<div class="col-sm-12" ng-init="initSource()">
+    
+
+    <div class="frame dashboard" ng-if="type === 'csw'">
+        
+        <div id="description" class="row bg-white">
+            <div class="frame dashboard">
+                <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" translate="service.config.source.choose">Choose source</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row bg-white">
+            <div class="col-sm-offset-3 col-sm-9">
+                <form role="form row">
+                    <div class="form-group col-sm-5">
+                        <label class="control-label new-service-form-label col-sm-2" translate="service.config.source">Source</label>
+                        <select id="sourceType" class="form-control col-sm-5" style="margin-bottom:20px;" ng-model="source['automatic']['@format']">
+                            <!--<option value="mdweb" translate="service.config.source.database">Database</option>-->
+                            <option value="internal" translate="service.config.source.internal">Internal</option>
+                            <option value="filesystem" translate="service.config.source.file">File system</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row bg-white">
+            <div class="form-separator"></div>
+        </div>
+
+        <!-- MDWeb database -->
+        <!--<div class="row bg-white" ng-if="source['automatic']['@format'] === 'mdweb'">-->
+            <!--<div class="col-sm-3">-->
+                <!--<div class="well">-->
+                    <!--<p><b translate="service.config.source.database.title">Database (SGBDR)</b></p>-->
+                    <!--<p translate="service.config.source.database.description">Database which contains metadata records</p>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="col-sm-6">-->
+                <!--<form id="dbSourceForm">-->
+                    <!--<fieldset>-->
+                        <!--<div class="form-group row">-->
+                            <!--<label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.type">Database type</label>-->
+                            <!--<div class="col-sm-11">-->
+                                <!--<select id="selectType" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="db.className">-->
+                                    <!--<option value="org.postgresql.Driver">PostgreSQL</option>-->
+                                    <!--<option value="com.mysql.jdbc.Driver">MySQL</option>-->
+                                <!--</select>-->
+                            <!--</div>-->
+                            <!--<div class="btn-lg tooltipicon">-->
+                                <!--<span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.create.type' | translate }}" ></span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group row">-->
+                            <!--<label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>-->
+                            <!--<div class="col-sm-11">-->
+                                <!--<input type="text" class="form-control" ng-model="db.url">-->
+                             <!--</div>-->
+                             <!--<div class="btn-lg tooltipicon">-->
+                                <!--<span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.source.url' | translate }}" ></span>-->
+                             <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group row">-->
+                            <!--<label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.port">Database port</label>-->
+                            <!--<div class="col-sm-11">-->
+                                <!--<input type="text" class="form-control" ng-model="db.port">-->
+                            <!--</div>-->
+                            <!--<div class="btn-lg tooltipicon">-->
+                                <!--<span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.create.port' | translate }}" ></span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group row">-->
+                            <!--<label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.name">Database name</label>-->
+                            <!--<div class="col-sm-11">-->
+                                <!--<input type="text" class="form-control" ng-model="db.name">-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group row">-->
+                            <!--<label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.username">User name</label>-->
+                            <!--<div class="col-sm-11">-->
+                                <!--<input type="text" class="form-control" ng-model="source.automatic.bdd.user">-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group row">-->
+                            <!--<label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.password">Password</label>-->
+                            <!--<div class="col-sm-11">-->
+                                <!--<input type="password" class="form-control" ng-model="source.automatic.bdd.password">-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group row">-->
+                            <!--<label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.shared">Shared connection</label>-->
+                            <!--<div class="col-sm-11">-->
+                                <!--<div class="checkbox inline" style="margin-top:0;">-->
+                                    <!--<input type="checkbox" ng-model="source.automatic.bdd.sharedConnection" ><span translate="service.config.source.database.shared">Shared connection</span>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="btn-lg tooltipicon">-->
+                                <!--<span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.source.connexion' | translate }}" ></span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</fieldset>-->
+                <!--</form>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <!-- Internal database -->
+        <div class="row bg-white" ng-if="source['automatic']['@format'] === 'internal'">
+            <div class="col-sm-3">
+                <div class="well">
+                    <p><b translate="service.config.source.internal.title">Internal (SGBDR)</b></p>
+                    <p translate="service.config.source.internal.description">Constellation metadata database</p>
+                </div>
+            </div>
+            <div class="col-sm-6">
+            </div>
+        </div>
+
+        <!-- File system -->
+        <div class="row bg-white" ng-if="source['automatic']['@format'] === 'filesystem'">
+            <div class="col-sm-3">
+                <div class="well">
+                    <p><b translate="service.config.source.file.title">File system</b></p>
+                    <p translate="service.config.source.file.description">Sets of metadata records in file system</p>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <form id="fsSourceForm">
+                    <fieldset>
+                        <div class="form-group">
+                            <label class="control-label" translate="service.config.source.file.path">Folder path</label>
+                            <input type="text" class="form-control" ng-model="source.automatic.dataDirectory">
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+        <div ng-if="!source['automatic']['@format']">
+            <div class="row bg-white">
+                <div class="col-sm-12">
+                    <div class="well">
+                        <div class="row" style="padding-bottom: 20px;">
+                            <div class="col-sm-12">
+                                <h4 translate="service.config.source.csw.title">Catalogs service (CSW)</h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!--<div class="col-sm-3">-->
+                                <!--<b><p translate="service.config.source.database">Database</p></b>-->
+                                <!--<p translate="service.config.source.database.description">Database which contains metadata records</p>-->
+                            <!--</div>-->
+                            <div class="col-sm-3 col-sm-offset-1">
+                                <b><p translate="service.config.source.internal">Internal></p></b>
+                                <p translate="service.config.source.internal.description">Constellation metadata database</p>
+                            </div>
+                            <div class="col-sm-3 col-sm-offset-1">
+                                <b><p translate="service.config.source.file">File system</p></b>
+                                <p translate="service.config.source.file.description">Sets of metadata records in file system</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="source['automatic']['@format']">
+
+            <div class="row bg-white">
+                <div class="form-separator"></div>
+            </div>
+
+            <div class="row bg-white">
+                <div class="pull-right" style="margin: 20px 30px;">
+                    <button class="btn btn-add" type="button" ng-click="saveServiceSource()" translate="label.save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="frame dashboard" ng-if="type === 'sos'">
+        
+        <div class="row bg-white">
+            <div class="frame dashboard">
+                <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" translate="service.config.source.choose">Choose source</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MDWeb database -->
+        <div class="row bg-white">
+            <div class="col-sm-3">
+                <div class="well">
+                    <p><b translate="service.config.source.database.title">Database (SGBDR)</b></p>
+                    <!--<p translate="service.config.source.database.description">Database which contains metadata records</p>-->
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <form id="dbSourceSOSForm">
+                    <fieldset>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.type">Database type</label>
+                            <div class="col-sm-11">
+                                <select class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="db.className">
+                                    <option value="org.postgresql.Driver">PostgreSQL</option>
+                                    <option value="com.mysql.jdbc.Driver">MySQL</option>
+                                </select>
+                            </div>
+                            <div class="btn-lg tooltipicon">
+                                <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.create.type' | translate }}" ></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" ng-model="db.url">
+                            </div>
+                            <div class="btn-lg tooltipicon">
+                                <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.source.url' | translate }}" ></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.port">Database port</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" ng-model="db.port">
+                            </div>
+                            <div class="btn-lg tooltipicon">
+                                <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.create.port' | translate }}" ></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.name">Database name</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" ng-model="db.name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.username">User name</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.user">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.password">Password</label>
+                            <div class="col-sm-11">
+                                <input type="password" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.password">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.shared">Shared connection</label>
+                            <div class="col-sm-11">
+                                <div class="checkbox inline" style="margin-top:0;">
+                                    <input type="checkbox" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.sharedConnection">
+                                    <span translate="service.config.source.database.shared">Shared connection</span>
+                                </div>
+                            </div>
+                            <div class="btn-lg tooltipicon">
+                                <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.source.connexion' | translate }}" ></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.file.sml">SensorML folder</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.SMLConfiguration'].dataDirectory">
+                            </div>
+                            <div class="btn-lg tooltipicon">
+                                <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.source.sensormlfolder' | translate }}" ></span>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+
+        <div>
+
+            <div class="row bg-white">
+                <div class="form-separator"></div>
+            </div>
+
+            <div class="row bg-white">
+                <div class="pull-right" style="margin: 20px 30px;">
+                    <button class="btn btn-add" type="button" ng-click="saveServiceSource()" translate="label.save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

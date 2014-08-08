@@ -1,0 +1,115 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Contact pour ce serveur</h3>
+    </div>
+    <div class="panel-body" ng-controller="ContactController">
+
+        <div>
+            <div class="logo-wrapper row" style="margin-top:0px;">
+                <div class="col-sm-12">
+                    <h3 class="header-title" translate="page.header.title.contact">Contact</h3>
+                </div>
+            </div>
+            <div class="col-md-12 contact-form">
+                <form class="form-horizontal" role="form">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="name">Nom</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="text"  id="contact.nom" ng-model="data.contact.name">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="organization">Organization</label>
+                                <div class="col-sm-8">
+                                    <input type="text"  id="contact.organization"
+                                           class="form-control" ng-model="data.contact.organization">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="position">position</label>
+                                <div class="col-sm-8">
+                                    <input type="text"  id="contact.position"
+                                           class="form-control" ng-model="data.contact.position">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="phone">phone</label>
+                                <div class="col-sm-8">
+                                    <input type="tel" id="contact.phone"
+                                           class="form-control" ng-model="data.contact.phone">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="fax">fax</label>
+                                <div class="col-sm-8">
+                                    <input type="tel" id="contact.fax"
+                                           class="form-control" ng-model="data.contact.fax">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="settings.form.email">E-mail</label>
+                                <div class="col-sm-8">
+                                    <input type="email" name="email"
+                                           placeholder="{{'settings.form.email.placeholder' | translate}}"
+                                           class="form-control" ng-model="data.contact.email" ng-minlength=5 ng-maxlength=100
+                                           required>
+                                </div>
+                                <div class="error"
+                                     ng-show="form.email.$dirty && form.email.$invalid">
+                                    <small class="error" ng-show="form.email.$error.required"
+                                           translate="settings.messages.validate.email.required">
+                                        Your e-mail is required. </small> <small class="error"
+                                                                                 ng-show="form.email.$error.email"
+                                                                                 translate="settings.messages.validate.email.invalid">
+                                    Your e-mail is invalid. </small> <small class="error"
+                                                                            ng-show="form.email.$error.minlength"
+                                                                            translate="settings.messages.validate.email.minlength">
+                                    Your e-mail is required to be at least 5 characters </small> <small
+                                        class="error" ng-show="form.email.$error.maxlength"
+                                        translate="settings.messages.validate.email.maxlength">
+                                    Your e-mail cannot be longer than 100 characters </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="address">address</label>
+                                <div class="col-sm-8">
+                                    <input type="text"  id="contact.address"
+                                           class="form-control" ng-model="data.contact.address">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="zip">zip</label>
+                                <div class="col-sm-8">
+                                    <input type="text" id="contact.zip"
+                                           class="form-control" ng-model="data.contact.zip">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="city">city</label>
+                                <div class="col-sm-8">
+                                    <input type="text" id="contact.city"
+                                           class="form-control" ng-model="data.contact.city">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label" translate="country">country</label>
+                                <div class="col-sm-8">
+                                    <input type="text" id="contact.country"
+                                           class="form-control" ng-model="data.contact.country">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-add col-sm-offset-10" ng-click="save()"
+                            translate="save">Save</button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

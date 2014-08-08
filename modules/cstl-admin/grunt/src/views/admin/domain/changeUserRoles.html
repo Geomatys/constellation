@@ -1,0 +1,34 @@
+<div class="modal-dialog modal-dialog-responsive modal-dialog-resp-height" style="max-width:600px;">
+	<div class="modal-content">
+	
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="close()">×</button>
+			<h4 ng-if="domainrole.name!=null" class="modal-title">{{user.name}}</h4>
+			<h4 ng-if="domainrole.name==null" class="modal-title" translate="admin.domain.userroles">User role in domain</h4>
+		</div>
+		<div class="modal-body" style="height: 310px; overflow-y: auto;">
+			<div class="container" style="height: 270px; ">
+				<form name="form" role="form" novalidate
+					class="ng-scope ng-invalid ng-invalid-required ng-dirty ng-valid-minlength">				
+					<div class="form-group">
+						<label class="col-sm-12" translate="admin.group.tab.username" style="font-size:18px;">User name</label>
+						<div class="col-sm-6">
+						<input
+							type="text" class="form-control" name="name"
+							placeholder="{{'admin.group.tab.name' | translate}}"
+							ng-model="domainrole.name" ng-minlength=3 ng-maxlength=100 required>
+						</div>
+					</div>	
+
+					<label class="col-sm-12" translate="admin.group.domainroles" style="font-size:18px;margin-top: 25px;">Domainroles</label>
+					<multi-select ng-model="user.domainRoles" available="allDomainRoles" selected-label="{{'admin.group.multi.current' | translate}}" available-label="{{'admin.group.multi.available' | translate}}" display-attr="name"></multi-select>
+				</form>
+
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" id="cancelButton" class="btn btn-default" translate="settings.form.button.close" ng-click="close()">Close</button>
+			<button type="button" class="btn btn-add" ng-click="save()"><span translate="settings.form.button">Save</span></button>
+		</div>
+	</div>
+</div>

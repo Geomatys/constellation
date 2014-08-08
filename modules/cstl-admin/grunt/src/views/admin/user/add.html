@@ -1,0 +1,154 @@
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="close()">×</button>
+			<h4 class="modal-title" translate="settings.form.modal.title">New
+				User</h4>
+		</div>
+		<div class="modal-body" style="height: 401px; overflow-y: auto;">
+			<div class="container" style="height: 300px;">
+				<form name="form" role="form" novalidate autocomplete="off"
+					class="ng-scope ng-invalid ng-invalid-required ng-dirty ng-valid-minlength">
+
+					<div class="form-group col-sm-6">
+						<label translate="settings.form.login">Login</label> <input
+							type="text" value="" class="form-control" name="login"
+							placeholder="{{'settings.form.login.placeholder' | translate}}"
+							ng-keyup="checkLogin(user.login)" ng-model="user.login"
+							ng-minlength=3 ng-maxlength=16 required>
+						<div class="error"
+							ng-show="loginInUse || (form.login.$dirty && form.login.$invalid)">
+							<small class="error" ng-show="loginInUse"
+								translate="settings.messages.validate.login.inUse"> </small> <small
+								class="error" ng-show="form.login.$error.required"
+								translate="settings.messages.validate.login.required">
+								Your first name is required. </small> <small class="error"
+								ng-show="form.login.$error.minlength"
+								translate="settings.messages.validate.login.minlength">
+								Your first name is required to be at least 1 character </small> <small
+								class="error" ng-show="form.login.$error.maxlength"
+								translate="settings.messages.validate.login.maxlength">
+								Your first name cannot be longer than 16 characters </small>
+						</div>
+					</div>
+
+					<div class="form-group  col-sm-6">
+						<label translate="settings.form.password">Password</label> <input
+							type="password" class="form-control" name="password" value=""
+							placeholder="{{'settings.form.password.placeholder' | translate}}"
+							ng-model="user.password" ng-minlength=6 ng-maxlength=62 required>
+						<div class="error"
+							ng-show="form.password.$dirty && form.password.$invalid">
+							<small class="error" ng-show="form.password.$error.required"
+								translate="settings.messages.validate.password.required">
+								Your first name is required. </small> <small class="error"
+								ng-show="form.password.$error.minlength"
+								translate="settings.messages.validate.password.minlength">
+								Your first name is required to be at least 6 character </small> <small
+								class="error" ng-show="form.password.$error.maxlength"
+								translate="settings.messages.validate.password.maxlength">
+								Your first name cannot be longer than 62 characters </small>
+						</div>
+					</div>
+
+
+					<div class="form-group col-sm-6">
+						<label translate="settings.form.firstname">First Name</label> <input
+							type="text" class="form-control" name="firstname"
+							placeholder="{{'settings.form.firstname.placeholder' | translate}}"
+							ng-model="user.firstname" ng-minlength=1 ng-maxlength=62 required>
+						<div class="error"
+							ng-show="form.firstname.$dirty && form.firstname.$invalid">
+							<small class="error" ng-show="form.firstname.$error.required"
+								translate="settings.messages.validate.firstname.required">
+								Your first name is required. </small> <small class="error"
+								ng-show="form.firstname.$error.minlength"
+								translate="settings.messages.validate.firstname.minlength">
+								Your first name is required to be at least 1 character </small> <small
+								class="error" ng-show="form.firstname.$error.maxlength"
+								translate="settings.messages.validate.firstname.maxlength">
+								Your first name cannot be longer than 50 characters </small>
+						</div>
+					</div>
+
+					<div class="form-group col-sm-6">
+						<label translate="settings.form.lastname">Last Name</label> <input
+							type="text" class="form-control" name="lastname"
+							placeholder="{{'settings.form.lastname.placeholder' | translate}}"
+							ng-model="user.lastname" ng-minlength=1 ng-maxlength=50 required>
+						<div class="error"
+							ng-show="form.lastname.$dirty && form.lastName.$invalid">
+							<small class="error" ng-show="form.lastname.$error.required"
+								translate="settings.messages.validate.firstname.required">
+								Your last name is required. </small> <small class="error"
+								ng-show="form.lastname.$error.minlength"
+								translate="settings.messages.validate.firstname.minlength">
+								Your last name is required to be at least 1 character </small> <small
+								class="error" ng-show="form.lastname.$error.maxlength"
+								translate="settings.messages.validate.firstname.maxlength">
+								Your last name cannot be longer than 50 characters </small>
+						</div>
+					</div>
+					<div class="form-group col-sm-6">
+						<label translate="settings.form.email">E-mail</label> <input
+							type="email" class="form-control" name="email"
+							placeholder="{{'settings.form.email.placeholder' | translate}}"
+							ng-model="user.email" ng-minlength=5 ng-maxlength=100 required>
+						<div class="error"
+							ng-show="form.email.$dirty && form.email.$invalid">
+							<small class="error" ng-show="form.email.$error.required"
+								translate="settings.messages.validate.email.required">
+								Your e-mail is required. </small> <small class="error"
+								ng-show="form.email.$error.email"
+								translate="settings.messages.validate.email.invalid">
+								Your e-mail is invalid. </small> <small class="error"
+								ng-show="form.email.$error.minlength"
+								translate="settings.messages.validate.email.minlength">
+								Your e-mail is required to be at least 5 characters </small> <small
+								class="error" ng-show="form.email.$error.maxlength"
+								translate="settings.messages.validate.email.maxlength">
+								Your e-mail cannot be longer than 100 characters </small>
+						</div>
+					</div>
+
+					<div class="form-group row" style="padding-left:30px; padding-right:15px;">
+						<label class="control-label col-sm-12" style="padding-left:0;" translate="settings.form.roles">Roles</label>
+						<div class="col-sm-12" style="padding-left:0;" >
+                            <div class="row" style="margin-left: 0; margin-right: 0;">
+                                <div class="tag-input-ctn">
+                                    <div data-ng-repeat="role in user.roles" class="input-tag">
+                                        {{ role }}
+                                        <div class="delete-tag" data-ng-click="deleteTag(role)">&times;</div>
+                                    </div>
+                                    <input type="text" data-tag-input="" data-ng-model="tagText"
+                                        data-new-tag="addTag()" data-delete-tag="deleteTag()">
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-left: 0; margin-right: 0;">
+                                <button type="button" class="btn btn-default"
+                                    ng-click="addRole('cstl-admin')">
+                                    <span translate="settings.form.roles.admin">Add admin role</span>
+                                </button>
+                            </div>
+                        </div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" id="cancelButton" class="btn btn-default"
+				ng-click="close()">Close</button>
+			<button type="submit"
+				ng-disabled="loginNotAcceptable || form.$invalid"
+				class="btn btn-add" ng-click="save()">
+				<span translate="settings.form.button">Save</span>
+			</button>
+			<button ng-show="$parent.allowNext" type="button" id="nextButton"
+				class="btn btn-add" ng-click="next();">Next</button>
+			<button ng-show="$parent.allowSubmit" type="button" id="submitButton"
+				class="btn btn-add" ng-click="upload();">Finish</button>
+		</div>
+	</div>
+</div>
+

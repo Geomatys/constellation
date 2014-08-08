@@ -1,0 +1,83 @@
+<div id="platformAdmin">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="menuLeft">
+                    <div class="panel panel-default">
+                        <div class="panel-heading well-header">
+                            <h3 class="panel-title" translate="global.menu.admin.system">System</h3>
+                        </div>
+                        <div class="panel-body" style="padding:0pt;">
+                            <div class="list-group">
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_state'}"
+                                   href="#/admin/system_state" translate="global.menu.admin.system_state">
+                                    Service-Status
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_settings'}"
+                                   href="#/admin/system_settings" translate="global.menu.admin.settings">
+                                    Settings
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_logs'}"
+                                   href="#/admin/system_logs" translate="global.menu.admin.logs">
+                                    Logs
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_contact'}"
+                                   href="#/admin/system_contact" translate="global.menu.admin.contact">
+                                    Contact
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_about'}"
+                                   href="#/admin/system_about" translate="global.menu.admin.about">
+                                    About Constellation
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading well-header">
+                            <h3 class="panel-title" translate="global.menu.admin.processing">Processing</h3>
+                        </div>
+                        <div class="panel-body" style="padding:0pt;">
+                            <div class="list-group">
+                                <a class="list-group-item" ng-class="{active:currentView.name=='tasks_manager'}"
+                                   href="#/admin/tasks_manager" translate="global.menu.admin.tasks">
+                                    Tasks manager
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='planning'}"
+                                   href="#/admin/planning" translate="global.menu.admin.planning">
+                                    Planning
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading well-header">
+                            <h3 class="panel-title" translate="global.menu.admin.security">Security</h3>
+                        </div>
+                        <div class="panel-body" style="padding:0pt;">
+                            <div class="list-group">
+                                <a class="list-group-item" ng-class="{active:currentView.name=='users'}"
+                                   href="#/admin/users" translate="global.menu.admin.users">
+                                    Users Settings
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='groups'}"
+                                   href="#/admin/groups" translate="global.menu.admin.group">
+                                    Groups Settings
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='domains' || currentView.name =='domainmembers'}"
+                                   href="#/admin/domains" translate="global.menu.admin.domains">
+                                    Domains Settings
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="rightPanel">
+                    <ng-include src="currentView.url"></ng-include>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="modal-dialog modal-dialog-resp-height modal-dialog-responsive"
+     ng-class="{'modal-dialog-sld':page.pageSld!=='views/style/chooseType.html', 'modal-dialog-responsive':page.pageSld!=='views/style/chooseType.html'}">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="close()">×</button>
+            <h4 class="modal-title col-xs-7 col-sm-7"
+                translate="edition.style.label.edition">Style Edition</h4>
+        </div>
+        <div class="modal-body" style="overflow-y: auto;">
+            <div ng-include="page.pageSld"/>
+        </div>
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-default"
+                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-click="close()">
+                <span translate="sldeditor.button.cancel">Cancel</span>
+            </button>
+            <button type="button"
+                    class="btn btn-add"
+                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-click="updateStyle();">
+                <span translate="sldeditor.button.validate">Validate</span>
+            </button>
+            <button type="button"
+                    class="btn btn-add"
+                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor || optionsSLD.enableRasterPalette || optionsSLD.enableRasterCells"
+                    ng-click="goBack();">
+                <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>
+            </button>
+        </div>
+    </div>
+</div>

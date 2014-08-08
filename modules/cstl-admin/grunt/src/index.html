@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8"><![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
+<!--[if gt IE 8]><html class="no-js"><![endif]-->
+    <head>
+        <title>CSTL - Administration</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/jquery.min.css">
+        <link rel="stylesheet" href="css/angular.min.css">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/famfamfam-flags.min.css">
+        <link rel="stylesheet" href="css/app.css">
+    </head>
+    <body ng-app="cstlIndexApp">
+        <!--[if lt IE 10]><p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p><![endif]-->
+
+        <div id="header" ng-controller="HeaderController">
+            <a id="brand" href="#">
+                <img src="img/constellation-menu.png"/>
+            </a>
+            <div id="navigation" class="ng-cloak">
+                <div class="navbar navbar-right">
+                    <ul class="nav nav-pills">
+                        <li>
+                            <a href="{{cstlLoginUrl}}" id="authenticateLink">
+                                <span class="glyphicon glyphicon-log-in"></span>&nbsp;
+                                <span translate="global.menu.account.login">Authenticate</span>
+                            </a>
+                        </li>
+                        <li class="dropdown pointer" ng-controller="LanguageController">
+                            <a class="dropdown-toggle" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-flag"></span>&nbsp;
+                                <span class="hidden-tablet" translate="global.menu.language">Language</span>&nbsp;
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu pull-right">
+                                <li active-menu="en">
+                                    <a ng-click="changeLanguage('en')">
+                                        <span class="famfamfam-flag-gb"></span>&nbsp;
+                                        <span translate="global.language.en">English</span>
+                                    </a>
+                                </li>
+                                <li active-menu="fr">
+                                    <a ng-click="changeLanguage('fr')">
+                                        <span class="famfamfam-flag-fr"></span>&nbsp;
+                                        <span translate="global.language.fr">French</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" ng-view></div>
+
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/angular.min.js"></script>
+        <script type="text/javascript" src="js/app-index.js"></script>
+    </body>
+</html>
