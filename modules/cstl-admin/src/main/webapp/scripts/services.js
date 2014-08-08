@@ -383,9 +383,11 @@ cstlAdminApp.factory('TaskService', ['$resource',
 //            Use textService for getProcessDescriptor and get XML response
 //            'getProcessDescriptor':  {method: 'GET',    url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
             'getParamsTask':         {method: 'GET',    url: '@cstl/api/1/task/params/get/:id;jsessionid=',                      isArray: false },
-            'deleteParamsTask':      {method: 'GET',    url: '@cstl/api/1/task/params/delete/:id;jsessionid=',                      isArray: false },
+            'deleteParamsTask':      {method: 'GET',    url: '@cstl/api/1/task/params/delete/:id;jsessionid=',                   isArray: false },
             'createTask':            {method: 'POST',   url: '@cstl/api/1/task/:id/:authority/:code/:title/:step;jsessionid=',   isArray: false },
             'createParamsTask':      {method: 'POST',   url: '@cstl/api/1/task/params/create;jsessionid=',                       isArray: false },
+            'updateParamsTask':      {method: 'POST',   url: '@cstl/api/1/task/params/update;jsessionid=',                       isArray: false },
+            'executeParamsTask':     {method: 'GET',    url: '@cstl/api/1/task/params/execute/:id;jsessionid=',                  isArray: false },
             'updateTask':            {method: 'PUT',    url: '@cstl/api/1/task/:id/:authority/:code/:title/:step;jsessionid=',   isArray: false },
             'deleteTask':            {method: 'DELETE', url: '@cstl/api/1/task/:id;jsessionid=',                                 isArray: false }
         });

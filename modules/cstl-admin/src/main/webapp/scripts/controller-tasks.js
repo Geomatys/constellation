@@ -49,6 +49,14 @@ cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', '$growl', '$
             });
         };
 
+        $scope.executeTask = function(idTask) {
+            TaskService.executeParamsTask({id:idTask}).$promise.then(function(){
+                $growl('success', 'Success', 'The task is currently execute');
+            }).catch(function(){
+                $growl('error', 'Error', "Can't execute this task");
+            });
+        };
+
         $scope.toggleUpDownSelected = function() {
             var $header = $('#ProcessDashboard').find('.selected-item').find('.block-header');
             $header.next().slideToggle(200);
@@ -135,6 +143,33 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                 });
         }
 
+        function restoreInputs(){
+            console.log("restore inputs");
+            if ($scope.task.inputs) {
+                var dom = jQuery(jQuery.parseXML($scope.task.inputs));
+
+                for (var iter in $scope.inputs){
+                    var name = $scope.inputs[iter].name;
+                    dom.find(name).each(function(ind, _el){
+                        switch($scope.inputs[iter].annotation.info){
+                            case "valueClass:java.lang.Double":
+                                $scope.inputs[iter].save[ind] = parseFloat(jQuery(_el)[0].innerHTML);
+                                break;
+                            case "valueClass:java.lang.Integer":
+                                $scope.inputs[iter].save[ind] = parseInt(jQuery(_el)[0].innerHTML);
+                                break;
+                            case "valueClass:java.lang.Boolean":
+                                $scope.inputs[iter].save[ind] = jQuery(_el)[0].innerHTML == "true";
+                                break;
+                            default:
+                                $scope.inputs[iter].save[ind] = jQuery(_el)[0].innerHTML;
+                        }
+
+                    });
+                }
+            }
+        }
+
         // Scope variables
 
         $scope.manageField = [
@@ -170,7 +205,7 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
 
             $scope.task.processAuthority = $scope.processes[$scope.option.authIndex].auth;
             $scope.task.processCode = $scope.processes[$scope.option.authIndex].processes[$scope.option.processIndex];
-            $scope.task.inputs = '<InputParameters xmlns="http://www.geotoolkit.org/parameter">';
+            $scope.task.inputs = '<input xmlns="http://www.geotoolkit.org/parameter">';
 
             for (var i in $scope.inputs){
                 var element = $scope.inputs[i];
@@ -204,15 +239,25 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                         break;
                 }
             }
-            $scope.task.inputs += '</InputParameters>';
+            $scope.task.inputs += '</input>';
 
-            TaskService.createParamsTask($scope.task).$promise
-                .then(function(response) {
-                    $growl('success', 'Success', 'New task is correctly register');
-                    $modalInstance.close();
-                }).catch(function(){
-                    $growl('error', 'Error', 'Error to save the new task');
-                });
+            if ($scope.task.id != 0){
+                TaskService.updateParamsTask($scope.task).$promise
+                    .then(function(response) {
+                        $growl('success', 'Success', 'The task is correctly save');
+                        $modalInstance.close();
+                    }).catch(function(){
+                        $growl('error', 'Error', 'Error to save the task');
+                    });
+            } else {
+                TaskService.createParamsTask($scope.task).$promise
+                    .then(function(response) {
+                        $growl('success', 'Success', 'New task is correctly register');
+                        $modalInstance.close();
+                    }).catch(function(){
+                        $growl('error', 'Error', 'Error to save the new task');
+                    });
+            }
         };
 
         $scope.isValid = function(elementName) {
@@ -287,6 +332,7 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                     }
                 });
                 $scope.inputs = inputs;
+                restoreInputs();
             }
         }, true);
     }]

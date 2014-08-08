@@ -19,10 +19,7 @@
 package org.constellation.rest.api;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -68,6 +65,8 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.SimpleScheduleBuilder;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
 /**
@@ -358,6 +357,58 @@ public final class TaskRest {
         } else {
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
+    }
+
+    @GET
+    @Path("params/execute/{id}")
+    @RolesAllowed("cstl-admin")
+    public AcknowlegementType executeParamsTask(final @PathParam("id") Integer id) throws ConfigurationException {
+        final TaskParameter taskParameter = taskParameterRepository.get(id);
+
+        final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+
+        final ParameterValueGroup params;
+        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
+        try {
+            reader.setInput(taskParameter.getInputs());
+            params = (ParameterValueGroup) reader.read();
+            reader.dispose();
+        } catch (XMLStreamException | IOException ex) {
+            throw new ConfigurationException(ex);
+        }
+
+        //rebuild original values since we have changed the namespace
+        final ParameterDescriptorGroup originalDesc;
+        try {
+            originalDesc = ProcessFinder.getProcessDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode()).getInputDescriptor();
+        } catch (NoSuchIdentifierException ex) {
+            return new AcknowlegementType("Failure", "No process for given id.");
+        }  catch (InvalidParameterValueException ex) {
+            throw new ConfigurationException(ex);
+        }
+        final ParameterValueGroup orig = originalDesc.createValue();
+        orig.values().addAll(params.values());
+
+        final Task task = new Task(UUID.randomUUID().toString());
+
+        final Calendar calendar = Calendar.getInstance();
+
+        task.setTitle(taskParameter.getName()+" "+calendar.get(Calendar.YEAR)+"/"+calendar.get(Calendar.MONTH)+"/"+calendar.get(Calendar.DAY_OF_MONTH)+" "+calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE));
+
+        final TriggerBuilder tb = TriggerBuilder.newTrigger();
+        final Trigger trigger = tb.startNow().build();
+        task.setTrigger((SimpleTrigger)trigger);
+
+        ProcessJobDetail detail = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(), orig);
+        task.setDetail(detail);
+
+        try{
+            CstlScheduler.getInstance().addTask(task);
+        }catch(ConfigurationException ex){
+            return new AcknowlegementType("Failure", "Failed to create task : "+ex.getMessage());
+        }
+
+        return new AcknowlegementType("Success", "The task has been created");
     }
 
     @GET

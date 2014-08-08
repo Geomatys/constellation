@@ -81,7 +81,7 @@
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header block-header-process" ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc" title="{{selected.Name}}">{{selected.name}} - {{selected.id}}</strong><i class="icon-chevron-down pull-right"></i>
+                                <strong class="item-title title-bloc" title="{{selected.Name}}">{{selected.name}}</strong><i class="icon-chevron-down pull-right"></i>
                             </div>
                             <div class="block-content" ng-if="selectedProcessChild != null">
                                     <h6 translate="label.title">Title</h6>
@@ -107,6 +107,14 @@
                                             <button type="button" class="btn btn-process" ng-click="deleteTask(selected.id);"
                                                     data-placement="bottom" title="{{'tasks.information.delete' | translate }}" tooltip>
                                                 <i class="glyphicon glyphicon-trash"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button" class="btn btn-process" ng-click="executeTask(selected.id);"
+                                                    data-placement="bottom" title="{{'tasks.information.execute' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-flash"></i>
                                             </button>
                                         </span>
                                     </div>

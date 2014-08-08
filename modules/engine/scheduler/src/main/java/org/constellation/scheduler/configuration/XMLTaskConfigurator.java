@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class XMLTaskConfigurator implements TaskConfigurator {
         final File configDir = ConfigDirectory.getConfigDirectory();
         final File taskFile = new File(configDir, TASK_FILE);
         if(!taskFile.exists()){
-            return Collections.EMPTY_LIST;
+            return new ArrayList<>();
         }
         
         final XMLTasksReader reader = new XMLTasksReader();

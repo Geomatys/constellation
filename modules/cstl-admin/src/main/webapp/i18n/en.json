@@ -884,6 +884,7 @@
     "sensor.obervation":"Sensor observation",
 
     "tasks.information.edit":"Edit task",
+    "tasks.information.execute":"Execute task",
     "tasks.information.delete":"Delete task",
     "tasks.information.title":"Available tasks",
     "tasks.notask":"No current process",
