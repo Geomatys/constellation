@@ -20,7 +20,7 @@
       <properties>
         <!-- Grunt build profile -->
         <grunt.build.profile>dev</grunt.build.profile>
-        <skip.npm.install>true</skip.npm.install>
+        <skip.npm.install>false</skip.npm.install>
         <!-- Spring profile to use -->
         <spring.profiles.active>dev</spring.profiles.active>
         <!-- i18n resource files reloading -->
