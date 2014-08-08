@@ -1,0 +1,3 @@
+less/variables.less
+--------------------
+[42] @font-family-sans-serif -> Verdana, Arial, Helvetica, sans-serif;
