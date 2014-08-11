@@ -144,7 +144,6 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
             }
 
             function restoreInputs(){
-                console.log("restore inputs");
                 if ($scope.task.inputs) {
                     var dom = jQuery(jQuery.parseXML($scope.task.inputs));
 
