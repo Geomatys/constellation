@@ -100,15 +100,15 @@ cstlAdminApp.controller('ContactController', ['$scope', 'Contact',
 cstlAdminApp.controller('TaskController', ['$scope', 'TaskService','$timeout','StompService',
     function ($scope, TaskService, $timeout, StompService) {
 
-        $scope.tasks = TaskService.list();
+        $scope.tasks = TaskService.listTasks();
 
         var topic = StompService.subscribe('/topic/taskevents', function(data){
-            var event = JSON.parse(data.body)
-            var task = $scope.tasks[event.id]
+            var event = JSON.parse(data.body);
+            var task = $scope.tasks[event.id];
             if(task!=null){
-                task.percent = event.percent
+                task.percent = event.percent;
                 if(task.percent > 99)
-                    delete $scope.tasks[event.id]
+                    delete $scope.tasks[event.id];
                 $scope.$digest();
             }else{
                 //new task
@@ -117,10 +117,10 @@ cstlAdminApp.controller('TaskController', ['$scope', 'TaskService','$timeout','S
                     status: event.status,
                     message: event.message,
                     percent: event.percent
-                }
+                };
                 $scope.$digest();
             }
-        })
+        });
         //connect();
         $scope.$on('$destroy', function () {
             topic.unsubscribe();
@@ -166,7 +166,7 @@ cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', '
             UserResource.delete({id: $scope.list[i].id}, {} , function(resp){
                 $scope.list.splice(i, 1);
             }, function(err){
-                var errorCode = err.data
+                var errorCode = err.data;
                 $translate(['Error',errorCode]).then(function (translations) {
                     $growl('error', translations.Error,  translations[errorCode]);
                 });
@@ -193,14 +193,14 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'G
         $scope.addRole = function(role){
             for(var i=0; i < $scope.user.roles.length; i++)
                 if(role === $scope.user.roles[i])
-                    return
+                    return;
 
             $scope.user.roles[$scope.user.roles.length]=role
         };
         var timeout=null;
         $scope.checkLogin = function(login){
             if(timeout != null){
-                window.clearTimeout(timeout)
+                window.clearTimeout(timeout);
                 timeout = null;
             }
             timeout = setTimeout(function(){
@@ -263,7 +263,7 @@ cstlAdminApp.controller('DomainSwitcherController', ['Account', '$scope', '$cook
       }
       $scope.changeDomain = function(i){
        if($cookies.cstlActiveDomainId != account.domains[i].id){
-         $scope.activeDomain=account.domains[i].name
+         $scope.activeDomain=account.domains[i].name;
          $cookies.cstlActiveDomainId= ""+account.domains[i].id;
          $window.location.href="admin.html";
        }
@@ -300,12 +300,12 @@ cstlAdminApp.controller('DomainController', ['$scope', '$modal', 'DomainResource
                 DomainResource.delete({id: $scope.domains[i].id}, {} , function(resp){
                     $scope.domains.splice(i, 1);
                 }, function(err){
-                    var errorCode = err.data
+                    var errorCode = err.data;
                     $translate(['Error',errorCode]).then(function (translations) {
                         $growl('error', translations.Error,  translations[errorCode]);
                     });
                 });
-            }
+            };
 
             $scope.details = function(i) {
                 $modal.open({
@@ -375,10 +375,10 @@ cstlAdminApp.controller('DomainMembersController', ['$scope', '$routeParams', 'D
     function ($scope, $routeParams, DomainResource, DomainRoleResource, $modal) {
         DomainResource.get({id: $routeParams.domainId}, function(domain){
             $scope.domain = domain
-        })
+        });
         DomainResource.members({id: $routeParams.domainId}, function(members){
             $scope.members = members
-        })
+        });
         
         $scope.changeDomainRoles = function(user) {
             $modal.open({
@@ -394,7 +394,7 @@ cstlAdminApp.controller('DomainMembersController', ['$scope', '$routeParams', 'D
                         $scope.members = members
                     })
                 });
-        }
+        };
 
         $scope.addMembers = function(i) {
             $modal.open({
@@ -409,7 +409,7 @@ cstlAdminApp.controller('DomainMembersController', ['$scope', '$routeParams', 'D
                         $scope.members = members
                     })
                 });
-        }
+        };
         $scope.removeMemberFromDomain = function(i){
             DomainResource.removeMemberFromDomain({domainId: $scope.domain.id, userId: $scope.members[i].id}, function(){
                 $scope.members.splice(i, 1);
@@ -422,15 +422,15 @@ cstlAdminApp.controller('DomainMembersController', ['$scope', '$routeParams', 'D
 
 cstlAdminApp.controller('DomainAddMembersController', ['$scope', '$modalInstance', 'domain', 'users', 'DomainResource',
     function ($scope, $modalInstance, domain, users, DomainResource) {
-        $scope.domain = domain
-        $scope.users = users
+        $scope.domain = domain;
+        $scope.users = users;
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
-        }
+        };
 
         $scope.addToDomain = function(i, roles){
-            var user = $scope.users[i]
+            var user = $scope.users[i];
             DomainResource.addMemberToDomain({userId: user.id, domainId: $scope.domain.id}, [1], function(){
                 $scope.users.splice(i, 1);
                 if($scope.users.length==0){
@@ -454,7 +454,7 @@ cstlAdminApp.controller('DomainChangeUserRolesController', ['$scope', '$modalIns
     
     $scope.close = function() {
       $modalInstance.dismiss('close');
-    }
+    };
 
     $scope.save = function(){
       var roleIds = [];
@@ -504,7 +504,7 @@ cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', '$growl', '
                         $growl('error', translations.Error,  translations[errorCode]);
                     });
                 });
-            }
+            };
 
             $scope.details = function(i) {
                 $modal.open({
