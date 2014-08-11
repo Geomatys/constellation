@@ -135,6 +135,7 @@
     "data.modal.dataName.label": "Or fill an identifier for this dataset",
     "data.modal.import.server.label": "Fill the path of file to import",
     "data.modal.import.server.label.list": "List Files",
+    "data.modal.import.metadata.info":"If there is no existing metadata file, the system will allows to you to creates one later.",
 
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",

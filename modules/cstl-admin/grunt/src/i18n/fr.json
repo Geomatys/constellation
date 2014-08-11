@@ -134,6 +134,7 @@
     "data.modal.dataName.label": "Ou saisisser un identifiant pour ce jeu de donnée",
     "data.modal.import.server.label": "Saisir le répertoire Serveur à parcourir",
     "data.modal.import.server.label.list": "Lister les fichiers",
+    "data.modal.import.metadata.info":"S'il n'y a pas de fichier de métadonnées existantes, le système va vous permettre d'entrer vos métadonnées plus tard.",
 
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",

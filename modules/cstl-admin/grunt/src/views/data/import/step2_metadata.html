@@ -38,8 +38,13 @@
                 </div>
             </div>
         </div>
+        <div class="form-group" style="color:#808080;">
+            <i class="fa fa-info-circle"></i>
+            <span translate="data.modal.import.metadata.info">&nbsp;If there is no existing metadata file, the system will allows to you to creates one later.</span>
+        </div>
         <div class="form-group">
             <label translate="data.modal.dataName.label">Or fill an identifier for this data</label>
+            <br/>
             <div class="col-sm-6" style="padding-left:0;">
                 <input class="form-control col-sm-6" ng-model="import.identifier" type="text" name="identifier" ng-change="verifyAllowNext()" ng-trim="false">
             </div>
