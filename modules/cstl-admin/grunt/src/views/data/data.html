@@ -263,39 +263,46 @@
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
-                                            <a id="exportMD" class="btn btn-info "
-                                               ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/data/export/{{selected.Provider}}/{{selected.Name}};jsessionid={{cstlSessionId}}" data-placement="bottom" title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
-                                                    <i class="fa fa-download-alt"></i>
-                                            </a>
+                                            <button id="showData"
+                                                    class="btn btn-success"
+                                                    type="button"
+                                                    ng-click="showData()"
+                                                    tooltip-html-unsafe="{{'layer.listing.selected.data.button' | translate }}"
+                                                    tooltip-placement="bottom">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
                                         </span>
                                     </div>
-
                                     <div class="col-sm-2">
                                        <span class="tooltipicon">
                                             <button type="button"
                                                     id="seeMetadata"
                                                     class="btn btn-warning"
                                                     ng-click="displayMetadata()"
-                                                    data-placement="bottom" title="{{'layer.listing.selected.metadata.button' | translate }}" tooltip>
+                                                    tooltip-html-unsafe="{{'layer.listing.selected.metadata.button' | translate }}"
+                                                    tooltip-placement="bottom">
                                                 <i class="glyphicon glyphicon-file"></i>
                                             </button>
                                        </span>
                                     </div>
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
-                                            <button id="showData"
-                                                    class="btn btn-success"
-                                                    type="button"
-                                                    ng-click="showData()"
-                                                    data-placement="bottom" title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-map-marker"></i>
-                                            </button>
+                                            <a id="exportMD" class="btn btn-info "
+                                               ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/data/export/{{selected.Provider}}/{{selected.Name}};jsessionid={{cstlSessionId}}"
+                                               tooltip-placement="bottom"
+                                               tooltip-html-unsafe="{{'layer.listing.selected.export.button' | translate }}">
+                                                    <i class="fa fa-download"></i>
+                                            </a>
                                         </span>
                                     </div>
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
-                                            <button id="showDomain" class="btn" type="button" ng-click="showDomains()"
-                                                    data-placement="bottom" title="{{'layer.listing.selected.domain.button' | translate }}" tooltip>
+                                            <button id="showDomain"
+                                                    class="btn"
+                                                    type="button"
+                                                    ng-click="showDomains()"
+                                                    tooltip-placement="bottom"
+                                                    tooltip-html-unsafe="{{'layer.listing.selected.domain.button' | translate }}">
                                                 <i class="fa fa-link"></i>
                                             </button>
                                         </span>
@@ -306,7 +313,8 @@
                                                     id="deleteLayer"
                                                     class="btn btn-danger"
                                                     ng-click="deleteData();"
-                                                    data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                    tooltip-placement="bottom"
+                                                    tooltip-html-unsafe="{{'layer.listing.selected.delete.button' | translate }}">
                                                 <i class="glyphicon glyphicon-trash"></i>
                                             </button>
                                         </span>

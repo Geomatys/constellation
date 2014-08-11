@@ -285,33 +285,30 @@
 
                                             <div class="block-action">
                                                 <div class="row" style="padding-bottom: 5px">
-                                                    <div class="col-sm-2">
-                                                        <span class="tooltipicon">
-                                                            <button type="button" class="btn btn-info"
-                                                                data-placement="bottom" title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
-                                                                <i class="fa fa-download-alt"></i>
-                                                            </button>
-                                                        </span>
-                                                    </div>
-
-                                                    <div class="col-sm-2">
-                                                        <span class="tooltipicon">
-                                                            <button type="button" class="btn btn-warning"
-                                                                data-placement="bottom" title="{{'layer.listing.selected.metadata.button' | translate }}" tooltip>
-                                                                <i class="glyphicon glyphicon-file"></i>
-                                                            </button>
-                                                        </span>
-                                                    </div>
-
-                                                    <div class="col-sm-2">
+                                                    <div class="col-sm-2" ng-if="service.status=='STARTED'">
                                                         <span class="tooltipicon">
                                                             <button id="showData"
                                                                     class="btn btn-success"
                                                                     type="button"
                                                                     ng-click="showLayer()"
-                                                                    ng-if="service.status=='STARTED'"
                                                                     data-placement="bottom" title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
-                                                                <i class="glyphicon glyphicon-map-marker"></i>
+                                                                <i class="fa fa-eye"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button type="button" class="btn btn-info"
+                                                                data-placement="bottom" title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
+                                                                <i class="fa fa-download"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <span class="tooltipicon">
+                                                            <button type="button" class="btn btn-warning"
+                                                                data-placement="bottom" title="{{'layer.listing.selected.metadata.button' | translate }}" tooltip>
+                                                                <i class="glyphicon glyphicon-file"></i>
                                                             </button>
                                                         </span>
                                                     </div>
@@ -436,7 +433,7 @@
                                                                class="btn btn-info btn-csw"
                                                                ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{cstlSessionId}}"
                                                                data-placement="bottom" title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
-                                                                <i class="fa fa-download-alt"></i>
+                                                                <i class="fa fa-download"></i>
                                                             </a>
                                                         </span>
                                                     </div>
