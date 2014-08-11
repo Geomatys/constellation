@@ -39,7 +39,7 @@
                                      ng-if="!isTTFValue(optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry)"
                                      ng-src="img/icone_{{optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry}}.png"/>
                                 <i ng-if="isTTFValue(optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry)"
-                                   class="icon-lg"
+                                   class="fa"
                                    ng-class="resolveClassForCode(optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry)"
                                    style="font-size:18px;"></i>
                             </span>&nbsp;
@@ -74,7 +74,7 @@
                             </li>
                             <li ng-repeat="item in fontsCodes"
                                 ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'ttf://FontAwesome'+item">
-                                <a class="symbolIconItem"><i ng-class="fontsMapping[item]"></i></a>
+                                <a class="symbolIconItem"><i class="fa" ng-class="fontsMapping[item]"></i></a>
                             </li>
                         </ul>
                     </div>

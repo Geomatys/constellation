@@ -311,7 +311,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.fontsMapping={
             '#0xf072':'fa-plane',
             '#0xf0e7':'fa-bolt',
-            '#0xf06e':'fa-eye-open',
+            '#0xf06e':'fa-eye',
             '#0xf024':'fa-flag',
             '#0xf112':'fa-reply',
             '#0xf0e9':'fa-umbrella',
@@ -319,10 +319,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             '#0xf06d':'fa-fire',
             '#0xf002':'fa-search',
             '#0xf007':'fa-user',
-            '#0xf071':'fa-warning-sign',
+            '#0xf071':'fa-warning',
             '#0xf0ad':'fa-wrench',
             '#0xf09e':'fa-rss',
-            '#0xf08d':'fa-pushpin',
+            '#0xf13d':'fa-anchor',
             '#0xf06c':'fa-leaf',
             '#0xf0c2':'fa-cloud'
         };
