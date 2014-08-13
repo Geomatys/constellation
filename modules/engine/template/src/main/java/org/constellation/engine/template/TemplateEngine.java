@@ -19,6 +19,7 @@
 package org.constellation.engine.template;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Properties;
 
 /** Interface for TemplateEngine
@@ -30,4 +31,9 @@ public interface TemplateEngine {
      * apply values from TemplateFile
      */
     public String apply(File templateFile, Properties values);
+
+    /**
+     * apply values from TemplateFile
+     */
+    public String apply(InputStream templateStream, Properties values);
 }

@@ -16,4 +16,14 @@ public class GroovyTemplateEngine implements TemplateEngine {
         def goutput = gstring.createTemplate(templateFile.text).make(gbinding).toString()
 		return goutput
     }
+
+    /**
+     * apply values from TemplateStream
+     */
+    public String apply(InputStream templateStream, Properties param){
+        def gstring = new GStringTemplateEngine()
+        def gbinding = [param: param]
+        def goutput = gstring.createTemplate(templateStream.getText()).make(gbinding).toString()
+        return goutput
+    }
 }
