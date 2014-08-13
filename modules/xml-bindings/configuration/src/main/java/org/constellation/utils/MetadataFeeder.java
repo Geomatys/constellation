@@ -672,16 +672,16 @@ public class MetadataFeeder {
         if (servIdent != null) {
            DefaultCitation cit = (DefaultCitation) servIdent.getCitation();
            if (cit != null) {
-               cit.setOtherCitationDetails(new SimpleInternationalString(serviceInstance));
+               cit.setOtherCitationDetails(Collections.singleton(new SimpleInternationalString(serviceInstance)));
            } else {
                cit = new DefaultCitation();
-               cit.setOtherCitationDetails(new SimpleInternationalString(serviceInstance));
+               cit.setOtherCitationDetails(Collections.singleton(new SimpleInternationalString(serviceInstance)));
                ((AbstractIdentification)servIdent).setCitation(cit);
            }
         } else {
             final DefaultServiceIdentification ident = new DefaultServiceIdentification();
             final DefaultCitation cit = new DefaultCitation();
-            cit.setOtherCitationDetails(new SimpleInternationalString(serviceInstance));
+            cit.setOtherCitationDetails(Collections.singleton(new SimpleInternationalString(serviceInstance)));
             ident.setCitation(cit);
             eater.setIdentificationInfo(Collections.singletonList(ident));
         }
