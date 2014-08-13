@@ -37,6 +37,12 @@ module.exports = function(grunt) {
                         cwd: '<%= src_dir %>/',
                         dest: '<%= target_dir %>/',
                         expand: true
+                    },
+                    {
+                        src: ['metadata/*.json'],
+                        cwd: '<%= src_dir %>/',
+                        dest: '<%= target_dir %>/',
+                        expand: true
                     }
                 ]
             },
