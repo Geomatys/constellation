@@ -18,6 +18,7 @@
  */
 package org.constellation.rest.api;
 
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
@@ -746,7 +747,29 @@ public class DataRest {
             return Response.status(500).build();
         }
     }
-    
+
+
+    @POST
+    @Path("metadata/find")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response findMetadata(final ParameterValues values) {
+        final String search = values.getValues().get("search");
+        List<DataBrief> briefs = new ArrayList<>();
+        final List<org.constellation.engine.register.Data> datas;
+        try {
+            datas = dataBusiness.searchOnMetadata(search);
+            for (org.constellation.engine.register.Data data : datas ) {
+                final QName name = new QName(data.getNamespace(), data.getName());
+                final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
+                briefs.add(db);
+            }
+            return Response.ok(briefs).build();
+        } catch (ParseException | IOException ex) {
+            return Response.ok("Failed to parse query : "+ex.getMessage()).status(500).build();
+        }
+    }
+
     /**
      * Save metadata.
      *

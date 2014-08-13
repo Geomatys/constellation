@@ -80,6 +80,7 @@ public final class ConfigDirectory {
                 DATA_INTEGRATED_DIRECTORY    = prop.getProperty("integrated_directory");
                 UPLOAD_DIRECTORY    = prop.getProperty("upload_directory");
                 METADATA_DIRECTORY= prop.getProperty("metadata_directory");
+                DATA_INDEX_DIRECTORY = prop.getProperty("data_index_directory");
             } catch (IOException ex) {
                 LOGGER.warning("IOException while reading the constellation properties file");
             }
@@ -96,6 +97,7 @@ public final class ConfigDirectory {
     public static String UPLOAD_DIRECTORY = null;
     public static String METADATA_DIRECTORY = null;
     public static String STYLE_DIRECTORY = null;
+    public static String DATA_INDEX_DIRECTORY = null;
     /**
      * Specifies if the process is running on a Glassfish application server.
      */
@@ -191,6 +193,35 @@ public final class ConfigDirectory {
         }
        
         return constellationDataIntegratedDirectory;
+    }
+
+
+    /**
+     * Give a index data directory {@link java.io.File} defined on constellation.properties or
+     * by default on .constellation-data/index/ from user home directory
+     *
+     * @return providers directory as {@link java.io.File}
+     */
+    public static File getDataIndexDirectory() {
+
+        File constellationDataIndexDirectory;
+        File constellationDataDirectory = getDataDirectory();
+
+        if (DATA_INDEX_DIRECTORY != null && !DATA_INDEX_DIRECTORY.isEmpty()) {
+            constellationDataIndexDirectory = new File(DATA_INDEX_DIRECTORY);
+            if (!constellationDataIndexDirectory.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", DATA_INDEX_DIRECTORY);
+            } else if (!constellationDataIndexDirectory.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", DATA_INDEX_DIRECTORY);
+            }
+        } else {
+            constellationDataIndexDirectory = new File(constellationDataDirectory, "index");
+            if (!constellationDataIndexDirectory.exists()) {
+                constellationDataIndexDirectory.mkdir();
+            }
+        }
+
+        return constellationDataIndexDirectory;
     }
     
     /**

@@ -269,7 +269,8 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'generateSML':          {method: 'PUT',     url: '@cstl/api/1/sensor/generate;jsessionid='},
             'linkToDomain':         {method: 'POST',    url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
             'unlinkFromDomain':     {method: 'DELETE',  url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
-            'domains':              {method: 'GET',     url: '@cstl/api/1/dataXdomain/:dataId/user/$userId/domain', isArray: true}
+            'domains':              {method: 'GET',     url: '@cstl/api/1/dataXdomain/:dataId/user/$userId/domain', isArray: true},
+            'findData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/find;jsessionid=', isArray: true}
         });
     }]);
 

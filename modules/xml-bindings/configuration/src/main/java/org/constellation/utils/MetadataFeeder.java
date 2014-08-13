@@ -49,8 +49,15 @@ import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnlineResource;
 import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.content.AttributeGroup;
+import org.opengis.metadata.content.ContentInformation;
+import org.opengis.metadata.content.CoverageDescription;
+import org.opengis.metadata.content.RangeDimension;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Distribution;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.extent.GeographicDescription;
+import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.Keywords;
@@ -287,7 +294,7 @@ public class MetadataFeeder {
 
     public String getTitle() {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
-        if (identification.getCitation() != null) {
+        if (identification != null && identification.getCitation() != null) {
             final Citation citation = identification.getCitation();
             if (citation != null) {
                 final InternationalString is = citation.getTitle();
@@ -385,7 +392,7 @@ public class MetadataFeeder {
         citation.setIdentifiers(Collections.singleton(new DefaultIdentifier(fileIdentifier)));
     }
 
-    private String getAbstract() {
+    public String getAbstract() {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
         final InternationalString internationalizeAbstract = identification.getAbstract();
         if (internationalizeAbstract != null) {
@@ -493,6 +500,19 @@ public class MetadataFeeder {
             return identification.getTopicCategories().iterator().next().identifier();
         }
         return null;
+    }
+
+    public List<String> getAllTopicCategory() {
+        List<String> result = new ArrayList<>();
+        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
+        if (!identification.getTopicCategories().isEmpty()) {
+            final Collection<TopicCategory> topicCategories = identification.getTopicCategories();//.iterator().next().identifier();
+            for (TopicCategory topicCategory : topicCategories){
+                result.add(topicCategory.identifier());
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -887,5 +907,52 @@ public class MetadataFeeder {
         result.setUsername(getIndividualName());
 
         return result;
+    }
+
+
+    public List<String> getAllSequenceIdentifier() {
+        List<String> result = new ArrayList<>();
+        for (ContentInformation contentInformation : eater.getContentInfo()){
+            if (contentInformation != null && contentInformation instanceof  CoverageDescription){
+                for (AttributeGroup attributeGroup : ((CoverageDescription) contentInformation).getAttributeGroups()){
+                    if (attributeGroup != null) {
+                        for (RangeDimension rangeDimension : attributeGroup.getAttributes()) {
+                            if (rangeDimension != null && rangeDimension.getSequenceIdentifier() != null) {
+                                result.add(rangeDimension.getSequenceIdentifier().toString());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public String getProcessingLevel() {
+        final Identification identification = getIdentification(eater);
+        if (identification !=null && identification.getProcessingLevel() != null) {
+            return identification.getProcessingLevel().toString();
+        }
+        return null;
+    }
+
+    public List<String> getAllGeographicIdentifier() {
+        List<String> result = new ArrayList<>();
+        final Identification identification = getIdentification(eater);
+        if (identification != null) {
+            for (Extent extent : identification.getExtents()) {
+                if (extent != null) {
+                    for (GeographicExtent geographicExtent : extent.getGeographicElements()) {
+                        if (geographicExtent != null && geographicExtent instanceof GeographicDescription &&
+                                ((GeographicDescription) geographicExtent).getGeographicIdentifier() != null) {
+                            result.add(((GeographicDescription) geographicExtent).getGeographicIdentifier().toString());
+                        }
+                    }
+                }
+            }
+            return result;
+        } else {
+            return null;
+        }
     }
 }

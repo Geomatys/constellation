@@ -119,11 +119,18 @@
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
-                            <input type="text"
-                                   ng-model="filtertext"
-                                   class="searchbox search-query form-control"
-                                   placeholder="{{'label.search' | translate}}" />
+                            <!--<input type="text"-->
+                                   <!--ng-model="filtertext"-->
+                                   <!--class="searchbox search-query form-control"-->
+                                   <!--placeholder="{{'label.search' | translate}}" />-->
+                            <div class="col-sm-8">
+                                <input type="text" ng-model="searchTerm" class="searchbox search-query form-control"/>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-xs btn-info btn-data" style="padding: 4px; margin-top: 6px;" ng-click="search()">Search</button>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>

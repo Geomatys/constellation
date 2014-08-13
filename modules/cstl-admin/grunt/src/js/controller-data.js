@@ -23,6 +23,22 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.domainId = $cookies.cstlActiveDomainId;
 
+        $scope.search = function(){
+            if ($scope.searchTerm){
+                dataListing.findData({values: {'search': $scope.searchTerm}},function(response) {
+                    console.log(response);
+                    $dashboard($scope, response, true);
+                }, function(response){
+                    console.error(response);
+                });
+            }else{
+                dataListing.listAll({}, function(response) {
+                    $dashboard($scope, response, true);
+                });
+            }
+
+        };
+
         $scope.init = function() {
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
