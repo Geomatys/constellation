@@ -30,6 +30,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
               $scope.advancedSearch = false;
           }  else {
               $scope.advancedSearch = true;
+              $scope.searchTerm ="";
           }
         };
 
@@ -43,7 +44,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
           }
         };
 
-        $scope.alphaPattern = /^([0-9A-Za-z\u00C0-\u017F]+|\s)*$/;
+        $scope.alphaPattern = /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/;
 
         $scope.callSearch = function(){
             if ($scope.searchTerm){
@@ -77,7 +78,6 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     if ($scope.search.area){
                         searchString += " area:"+$scope.search.area;
                     }
-                    console.log('searchString='+searchString);
                     dataListing.findData({values: {'search': searchString}},function(response) {
                         $dashboard($scope, response, true);
                     }, function(response){

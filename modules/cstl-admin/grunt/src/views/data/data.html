@@ -123,7 +123,7 @@
                                 <input type="text" ng-model="searchTerm" ng-show="!advancedSearch" class="searchbox search-query form-control"/>
                             </div>
                             <div class="pull-right">
-                                <button type="button" class="btn btn-xs btn-info btn-data" style="padding: 4px; margin-top: 6px;" ng-show="!advancedSearch" ng-click="search()" translate="label.search">Search</button>
+                                <button type="button" class="btn btn-xs btn-info btn-data" style="padding: 4px; margin-top: 6px;" ng-show="!advancedSearch" ng-click="callSearch()" translate="label.search">Search</button>
                                 <button class="btn btn-xs btn-info btn-data" ng-click="displayAdvancedSearch()">+</button>
                             </div>
                         </div>
@@ -134,8 +134,7 @@
             <div class="dash-inner row" collapse="!advancedSearch">
                 <form name="searchForm">
                     <div class="row" style="padding-right: 15px; padding-left: 15px;">
-                        <div class="form-group col-sm-4" ng-class="{'has-error': searchForm.title.$invalid}">
-                            {{search.title}}
+                        <div class="col-sm-4" ng-class="{'has-error': searchForm.title.$invalid}">
                             <label class="control-label new-service-form-label" translate="data.search.filter.title">Title</label>
                             <input type="text" class="form-control" name="title" ng-model="search.title"  ng-pattern="alphaPattern"  ng-trim="true" ng-change="checkIsValid(searchForm.title.$invalid)">
                         </div>
