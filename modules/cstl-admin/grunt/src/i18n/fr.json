@@ -590,6 +590,7 @@
     "metadata.block.contacts_help":"Information nécessaire pour entrer en conatct avec le responsable ou l'organisation responsable du document.",
     "metadata.block.metadata":"Métadonnée",
     "metadata.block.metadata_help":"Entité maîtresse qui regroupe les métadonnées décrivant une ou plusieurs ressources.",
+    "metadata.field.characterSet":"Jeu de Caractères",
 
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",

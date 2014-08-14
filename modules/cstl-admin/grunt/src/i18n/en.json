@@ -518,6 +518,7 @@
     "metadata.block.contacts_help":"Information required to enable contact with the responsible person and/or organization.",
     "metadata.block.metadata":"Metadata",
     "metadata.block.metadata_help":"Root entity which defines metadata about a resource or resources.",
+    "metadata.field.characterSet":"Character set",
 
 
     "msg.add.data.style.association": "Associate a style to the selected data",
