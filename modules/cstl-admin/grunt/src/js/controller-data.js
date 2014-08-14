@@ -22,21 +22,74 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.domainId = $cookies.cstlActiveDomainId;
+        $scope.advancedSearch = false;
+        $scope.search = {};
 
-        $scope.search = function(){
+        $scope.displayAdvancedSearch = function(){
+          if ($scope.advancedSearch){
+              $scope.advancedSearch = false;
+          }  else {
+              $scope.advancedSearch = true;
+          }
+        };
+
+        $scope.resetSearch = function(){
+            $scope.search = {};
+        };
+
+        $scope.checkIsValid = function(isInvalid){
+          if (isInvalid){
+              $growl('error','Error','Invalid Chars');
+          }
+        };
+
+        $scope.alphaPattern = /^([0-9A-Za-z\u00C0-\u017F]+|\s)*$/;
+
+        $scope.callSearch = function(){
             if ($scope.searchTerm){
                 dataListing.findData({values: {'search': $scope.searchTerm}},function(response) {
-                    console.log(response);
                     $dashboard($scope, response, true);
                 }, function(response){
                     console.error(response);
+                    $growl('error','Error','Search failed:'+ response.data);
                 });
             }else{
-                dataListing.listAll({}, function(response) {
-                    $dashboard($scope, response, true);
-                });
+                if (!$.isEmptyObject($scope.search)){
+                    var searchString = "";
+                    if ($scope.search.title){
+                        searchString += " title:"+$scope.search.title;
+                    }
+                    if ($scope.search.abstract){
+                        searchString += " abstract:"+$scope.search.abstract;
+                    }
+                    if ($scope.search.keywords){
+                        searchString += " keywords:"+$scope.search.keywords;
+                    }
+                    if ($scope.search.topic){
+                        searchString += " topic:"+$scope.search.topic;
+                    }
+                    if ($scope.search.data){
+                        searchString += " data:"+$scope.search.data;
+                    }
+                    if ($scope.search.level){
+                        searchString += " level:"+$scope.search.level;
+                    }
+                    if ($scope.search.area){
+                        searchString += " area:"+$scope.search.area;
+                    }
+                    console.log('searchString='+searchString);
+                    dataListing.findData({values: {'search': searchString}},function(response) {
+                        $dashboard($scope, response, true);
+                    }, function(response){
+                        console.error(response);
+                        $growl('error','Error','Search failed:'+ response.data);
+                    });
+                } else {
+                    dataListing.listAll({}, function(response) {
+                        $dashboard($scope, response, true);
+                    });
+                }
             }
-
         };
 
         $scope.init = function() {

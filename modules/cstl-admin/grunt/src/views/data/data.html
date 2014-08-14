@@ -119,20 +119,60 @@
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
-                            <!--<input type="text"-->
-                                   <!--ng-model="filtertext"-->
-                                   <!--class="searchbox search-query form-control"-->
-                                   <!--placeholder="{{'label.search' | translate}}" />-->
                             <div class="col-sm-8">
-                                <input type="text" ng-model="searchTerm" class="searchbox search-query form-control"/>
+                                <input type="text" ng-model="searchTerm" ng-show="!advancedSearch" class="searchbox search-query form-control"/>
                             </div>
-                            <div class="col-sm-4">
-                                <button type="button" class="btn btn-xs btn-info btn-data" style="padding: 4px; margin-top: 6px;" ng-click="search()">Search</button>
+                            <div class="pull-right">
+                                <button type="button" class="btn btn-xs btn-info btn-data" style="padding: 4px; margin-top: 6px;" ng-show="!advancedSearch" ng-click="search()" translate="label.search">Search</button>
+                                <button class="btn btn-xs btn-info btn-data" ng-click="displayAdvancedSearch()">+</button>
                             </div>
                         </div>
 
                     </div>
                 </div>
+            </div>
+            <div class="dash-inner row" collapse="!advancedSearch">
+                <form name="searchForm">
+                    <div class="row" style="padding-right: 15px; padding-left: 15px;">
+                        <div class="form-group col-sm-4" ng-class="{'has-error': searchForm.title.$invalid}">
+                            {{search.title}}
+                            <label class="control-label new-service-form-label" translate="data.search.filter.title">Title</label>
+                            <input type="text" class="form-control" name="title" ng-model="search.title"  ng-pattern="alphaPattern"  ng-trim="true" ng-change="checkIsValid(searchForm.title.$invalid)">
+                        </div>
+                        <div class="col-sm-4" ng-class="{'has-error': searchForm.abstract.$invalid}">
+                            <label class="control-label new-service-form-label" translate="data.search.filter.abstract">Abstract</label>
+                            <input type="text" class="form-control" name="abstract" ng-model="search.abstract" ng-pattern="alphaPattern" ng-trim="true" ng-change="checkIsValid(searchForm.abstract.$invalid)">
+                        </div>
+                        <div class="col-sm-4" ng-class="{'has-error': searchForm.keywords.$invalid}">
+                            <label class="control-label new-service-form-label" translate="data.search.filter.keywords">Keywords</label>
+                            <input type="text" class="form-control" name="keywords" ng-model="search.keywords" ng-pattern="alphaPattern" ng-trim="true" ng-change="checkIsValid(searchForm.keywords.$invalid)">
+                        </div>
+                    </div>
+                    <div class="form-group row" style="padding-right: 15px; padding-left: 15px;">
+                        <div class="col-sm-4" ng-class="{'has-error': searchForm.topic.$invalid}">
+                            <label class="control-label new-service-form-label" translate="data.search.filter.topic">Topic categories</label>
+                            <input type="text" class="form-control" name="topic" ng-model="search.topic" ng-pattern="alphaPattern" ng-trim="true" ng-change="checkIsValid(searchForm.topic.$invalid)">
+                        </div>
+                        <div class="col-sm-4"  ng-class="{'has-error': searchForm.data.$invalid}">
+                            <label class="control-label new-service-form-label" translate="data.search.filter.data">Variable</label>
+                            <input type="text" class="form-control" name="data" ng-model="search.data" ng-pattern="alphaPattern" ng-trim="true" ng-change="checkIsValid(searchForm.data.$invalid)">
+                        </div>
+                        <div class="col-sm-4" ng-class="{'has-error': searchForm.level.$invalid}">
+                            <label class="control-label new-service-form-label" translate="data.search.filter.level">Processing level</label>
+                            <input type="text" class="form-control" name="level" ng-model="search.level" ng-pattern="alphaPattern" ng-trim="true" ng-change="checkIsValid(searchForm.level.$invalid)">
+                        </div>
+                    </div>
+                    <div class="form-group row" style="padding-right: 15px; padding-left: 15px;">
+                        <div class="col-sm-4" ng-class="{'has-error': searchForm.area.$invalid}">
+                            <label class="control-label new-service-form-label" translate="data.search.filter.area">Area</label>
+                            <input type="text" class="form-control" name="area" ng-model="search.area" ng-pattern="alphaPattern" ng-trim="true" ng-change="checkIsValid(searchForm.area.$invalid)">
+                        </div>
+                        <div class="pull-right"  style="padding-right: 15px; padding-left: 15px;">
+                            <button type="button" class="btn btn-xs btn-info btn-data" style="padding: 4px; margin-top: 6px;" ng-click="callSearch()" translate="label.search">Search</button>
+                            <button type="button" class="btn btn-xs btn-info btn-data" style="padding: 4px; margin-top: 6px;" ng-click="resetSearch()"translate="label.clear">Clear</button>
+                        </div>
+                     </div>
+                </form>
             </div>
             <div class="dash-inner row">
                 <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="small=false">

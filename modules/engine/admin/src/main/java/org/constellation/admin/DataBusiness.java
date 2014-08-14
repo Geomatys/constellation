@@ -208,7 +208,6 @@ public class DataBusiness {
                 "title", "abstract", "keywords", "topic", "data", "level", "area" }, new StandardAnalyzer(Version.LUCENE_46));
         queryParser.setDefaultOperator(QueryParser.Operator.OR);
         final Query q = queryParser.parse(queryString);
-//        final Query q = new QueryParser(Version.LUCENE_46, "keywords", new StandardAnalyzer(Version.LUCENE_46)).parse(queryString);
         indexSearcher.search(q, collector);
         final ScoreDoc[] hits = collector.topDocs().scoreDocs;
         for (ScoreDoc scoreDoc : hits){
