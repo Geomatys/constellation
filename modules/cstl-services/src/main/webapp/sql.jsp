@@ -33,10 +33,9 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
             <button class="btn btn-primary" id="sensored_data">sensored_data</button>
             <button class="btn btn-primary" id="service">service</button>
             <button class="btn btn-primary" id="service_details">service_details</button>
-            <button class="btn btn-primary" id="service_i18n">service_i18n</button>
             <button class="btn btn-primary" id="layer">layer</button>
             <button class="btn btn-primary" id="task">task</button>
-            <button class="btn btn-primary" id="user">user</button>
+            <button class="btn btn-primary" id="cstl_user">cstl_user</button>
             <button class="btn btn-primary" id="mapcontext">mapcontext</button>
             <button class="btn btn-primary" id="mapcontext_styled_layer">mapcontext_styled_layer</button>
             <button class="btn btn-primary" id="chain_process">chain_process</button>
@@ -126,16 +125,12 @@ result :
             $("#query").val('select * from admin.service_details');
             $("#sqlForm").submit();
         });
-        $("#service_i18n").on("click", function(){
-            $("#query").val('select * from admin.service_i18n');
-            $("#sqlForm").submit();
-        });
         $("#style").on("click", function(){
             $("#query").val('select * from admin.style');
             $("#sqlForm").submit();
         });
-        $("#user").on("click", function(){
-            $("#query").val('select * from admin."USER"');
+        $("#cstl_user").on("click", function(){
+            $("#query").val('select * from admin.cstl_user');
             $("#sqlForm").submit();
         });
         $("#styled_data").on("click", function(){
