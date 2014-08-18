@@ -5,96 +5,114 @@
         "content":[
             {
                 "superblock":{
-                    "name":"dataIdentification",
+                    "name":"metadata.block.dataIdentification",
                     "multiplicity":1,
-                    "help":"INSPIRE.dataset_geo.dataIdentification_help",
+                    "help":"metadata.block.dataIdentification_help",
                     "path":null,
                     "content":[{
                         "block":{
-                            "name":"resourceCitation",
+                            "name":"metadata.block.resourceCitation",
                             "multiplicity":1,
-                            "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation_help",
+                            "help":"metadata.block.resourceCitation_help",
                             "path":null,
                             "content":[
                                 {
                                     "field":{
-                                        "name":"title",
+                                        "name":"metadata.field.title",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.title_help",
+                                        "help":"metadata.field.title_help",
                                         "path":"identificationInfo.citation.title",
-                                        "type":"text"
+                                        "type":"text",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"abstract",
+                                        "name":"metadata.field.abstract",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.abstract_help",
+                                        "help":"metadata.field.abstract_help",
                                         "path":"identificationInfo.abstract",
-                                        "type":"textarea"
+                                        "type":"textarea",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"lineageStatement",
+                                        "name":"metadata.field.lineageStatement",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.lineageStatement_help",
+                                        "help":"metadata.field.lineageStatement_help",
                                         "path":"dataQualityInfo.lineage.statement",
-                                        "type":"textarea"
+                                        "type":"textarea",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"date",
+                                        "name":"metadata.field.date",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.date_help",
+                                        "help":"metadata.field.date_help",
                                         "path":"identificationInfo.citation.date.date",
-                                        "type":"Date.text"
+                                        "type":"Date.text",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"dateType",
+                                        "name":"metadata.field.dateType",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.dateType_help",
+                                        "help":"metadata.field.dateType_help",
                                         "path":"identificationInfo.citation.date.dateType",
-                                        "type":"codelist"
+                                        "type":"codelist",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"maintenanceAndUpdateFrequency",
+                                        "name":"metadata.field.maintenanceAndUpdateFrequency",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.maintenanceAndUpdateFrequency_help",
+                                        "help":"metadata.field.maintenanceAndUpdateFrequency_help",
                                         "path":"identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency",
-                                        "type":"codelist"
+                                        "type":"codelist",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"language",
+                                        "name":"metadata.field.language",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.language_help",
+                                        "help":"metadata.field.language_help",
                                         "path":"identificationInfo.language",
-                                        "type":"codelist"
+                                        "type":"codelist",
+                                        "obligation":"M",
+                                        "defaultValue":"LanguageCode.fra"
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"graphicOverViewFileName",
+                                        "name":"metadata.field.graphicOverViewFileName",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.graphicOverViewFileName_help",
+                                        "help":"metadata.field.graphicOverViewFileName_help",
                                         "path":"identificationInfo.graphicOverview.fileName",
-                                        "type":"UPLOADIMAGE.text"
+                                        "type":"UPLOADIMAGE.text",
+                                        "obligation":"O",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"rsIdentifier",
+                                        "name":"metadata.field.rsIdentifier",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataIdentification.resourceCitation.rsIdentifier_help",
+                                        "help":"metadata.field.rsIdentifier_help",
                                         "path":"identificationInfo.citation.identifier.code",
-                                        "type":"text"
+                                        "type":"text",
+                                        "obligation":"M",
+                                        "defaultValue":"identifier"
                                     }
                                 }
                             ]
@@ -102,54 +120,64 @@
                     },
                         {
                             "block":{
-                                "name":"inspire_descriptiveKeyword",
-                                "multiplicity":62,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.inspire_descriptiveKeyword_help",
+                                "name":"metadata.block.inspire_descriptiveKeyword",
+                                "multiplicity":1,
+                                "help":"metadata.block.inspire_descriptiveKeyword_help",
                                 "path":null,
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"keyword",
+                                            "name":"metadata.field.inspire_keyword",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.inspire_descriptiveKeyword.keyword_help",
+                                            "help":"metadata.field.inspire_keyword_help",
                                             "path":"identificationInfo.descriptiveKeywords.keyword",
-                                            "type":"INSPIRE_ISO.codelist"
+                                            "type":"INSPIRE_ISO.codelist",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"thesaurusTitle",
+                                            "name":"metadata.field.inspire_thesaurusTitle",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.inspire_descriptiveKeyword.thesaurusTitle_help",
+                                            "help":"metadata.field.inspire_thesaurusTitle_help",
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.title",
-                                            "type":"readonly"
+                                            "type":"readonly",
+                                            "obligation":"M",
+                                            "defaultValue":"GEMET - INSPIRE themes, version 1.0"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"thesaurusDate",
+                                            "name":"metadata.field.inspire_thesaurusDate",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.inspire_descriptiveKeyword.thesaurusDate_help",
+                                            "help":"metadata.field.inspire_thesaurusDate_help",
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
-                                            "type":"readonly"
+                                            "type":"readonly",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"thesaurusDateType",
+                                            "name":"metadata.field.inspire_thesaurusDateType",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.inspire_descriptiveKeyword.thesaurusDateType_help",
+                                            "help":"metadata.field.inspire_thesaurusDateType_help",
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
-                                            "type":"CODELIST.readonly"
+                                            "type":"CODELIST.readonly",
+                                            "obligation":"M",
+                                            "defaultValue":"CI_DateTypeCode.publication"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"topicCategory",
+                                            "name":"metadata.field.topicCategory",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.inspire_descriptiveKeyword.topicCategory_help",
+                                            "help":"metadata.field.topicCategory_help",
                                             "path":"identificationInfo.topicCategory",
-                                            "type":"ISO_INSPIRE.codelist"
+                                            "type":"ISO_INSPIRE.codelist",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     }
                                 ]
@@ -157,45 +185,53 @@
                         },
                         {
                             "block":{
-                                "name":"descriptiveKeyword",
-                                "multiplicity":1,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.descriptiveKeyword_help",
-                                "path":null,
+                                "name":"metadata.block.descriptiveKeyword",
+                                "multiplicity":62,
+                                "help":"metadata.block.descriptiveKeyword_help",
+                                "path":"identificationInfo.descriptiveKeywords",
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"keyword",
+                                            "name":"metadata.field.keyword",
                                             "multiplicity":62,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.descriptiveKeyword.keyword_help",
+                                            "help":"metadata.field.keyword_help",
                                             "path":"identificationInfo.descriptiveKeywords.keyword",
-                                            "type":"KEYWORD.text"
+                                            "type":"KEYWORD.text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"thesaurusTitle",
+                                            "name":"metadata.field.thesaurusTitle",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.descriptiveKeyword.thesaurusTitle_help",
+                                            "help":"metadata.field.thesaurusTitle_help",
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.title",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"thesaurusDate",
+                                            "name":"metadata.field.thesaurusDate",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.descriptiveKeyword.thesaurusDate_help",
+                                            "help":"metadata.field.thesaurusDate_help",
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
-                                            "type":"DATE.text"
+                                            "type":"DATE.text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"thesaurusDateType",
+                                            "name":"metadata.field.thesaurusDateType",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.descriptiveKeyword.thesaurusDateType_help",
+                                            "help":"metadata.field.thesaurusDateType_help",
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
-                                            "type":"codelist"
+                                            "type":"codelist",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     }
                                 ]
@@ -203,27 +239,31 @@
                         },
                         {
                             "block":{
-                                "name":"spatialRepresentation",
+                                "name":"metadata.block.spatialRepresentation",
                                 "multiplicity":1,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.spatialRepresentation_help",
+                                "help":"metadata.block.spatialRepresentation_help",
                                 "path":null,
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"type",
+                                            "name":"metadata.field.type",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.spatialRepresentation.type_help",
+                                            "help":"metadata.field.type_help",
                                             "path":"identificationInfo.spatialRepresentationType",
-                                            "type":"CODELIST.readonly"
+                                            "type":"CODELIST.readonly",
+                                            "obligation":"M",
+                                            "defaultValue":"MD_SpatialRepresentationTypeCode.vector"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"geometricObjects",
+                                            "name":"metadata.field.geometricObjects",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.spatialRepresentation.geometricObjects_help",
+                                            "help":"metadata.field.geometricObjects_help",
                                             "path":"spatialRepresentationInfo.geometricObjects.geometricObjectType",
-                                            "type":"codelist"
+                                            "type":"codelist",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     }
                                 ]
@@ -231,27 +271,31 @@
                         },
                         {
                             "block":{
-                                "name":"refSystemInfo",
+                                "name":"metadata.block.refSystemInfo",
                                 "multiplicity":1,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.refSystemInfo_help",
+                                "help":"metadata.block.refSystemInfo_help",
                                 "path":null,
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"code",
+                                            "name":"metadata.field.code",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.refSystemInfo.code_help",
+                                            "help":"metadata.field.code_help",
                                             "path":"referenceSystemInfo.referenceSystemIdentifier.code",
-                                            "type":"codelist"
+                                            "type":"codelist",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"scaleDenominator",
+                                            "name":"metadata.field.scaleDenominator",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.refSystemInfo.scaleDenominator_help",
+                                            "help":"metadata.field.scaleDenominator_help",
                                             "path":"identificationInfo.spatialResolution.equivalentScale.denominator",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     }
                                 ]
@@ -259,46 +303,54 @@
                         },
                         {
                             "block":{
-                                "name":"geographicExtension",
+                                "name":"metadata.block.geographicExtension",
                                 "multiplicity":1,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.geographicExtension_help",
-                                "path":"identificationInfo.extent.geographicElement2",
+                                "help":"metadata.block.geographicExtension_help",
+                                "path":"identificationInfo.extent.geographicElement",
                                 "type":"BOUNDINGBOX",
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"westBoundLongitude",
+                                            "name":"metadata.field.westBoundLongitude",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.geographicExtension.westBoundLongitude_help",
-                                            "path":"identificationInfo.extent.geographicElement2:westBoundLongitude",
-                                            "type":"decimal"
+                                            "help":"metadata.field.westBoundLongitude_help",
+                                            "path":"identificationInfo.extent.geographicElement.westBoundLongitude",
+                                            "type":"decimal",
+                                            "obligation":"M",
+                                            "defaultValue":"-180"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"eastBoundLongitude",
+                                            "name":"metadata.field.eastBoundLongitude",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.geographicExtension.eastBoundLongitude_help",
-                                            "path":"identificationInfo.extent.geographicElement2.eastBoundLongitude",
-                                            "type":"decimal"
+                                            "help":"metadata.field.eastBoundLongitude_help",
+                                            "path":"identificationInfo.extent.geographicElement.eastBoundLongitude",
+                                            "type":"decimal",
+                                            "obligation":"M",
+                                            "defaultValue":"180"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"northBoundLatitude",
+                                            "name":"metadata.field.northBoundLatitude",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.geographicExtension.northBoundLatitude_help",
-                                            "path":"identificationInfo.extent.geographicElement2.northBoundLatitude",
-                                            "type":"decimal"
+                                            "help":"metadata.field.northBoundLatitude_help",
+                                            "path":"identificationInfo.extent.geographicElement.northBoundLatitude",
+                                            "type":"decimal",
+                                            "obligation":"M",
+                                            "defaultValue":"90"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"southBoundLatitude",
+                                            "name":"metadata.field.southBoundLatitude",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.geographicExtension.southBoundLatitude_help",
-                                            "path":"identificationInfo.extent.geographicElement2.southBoundLatitude",
-                                            "type":"decimal"
+                                            "help":"metadata.field.southBoundLatitude_help",
+                                            "path":"identificationInfo.extent.geographicElement.southBoundLatitude",
+                                            "type":"decimal",
+                                            "obligation":"M",
+                                            "defaultValue":"-90"
                                         }
                                     }
                                 ]
@@ -306,27 +358,31 @@
                         },
                         {
                             "block":{
-                                "name":"temporalExtension",
-                                "multiplicity":1,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.temporalExtension_help",
+                                "name":"metadata.block.temporalExtension",
+                                "multiplicity":62,
+                                "help":"metadata.block.temporalExtension_help",
                                 "path":"identificationInfo.extent.temporalElement",
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"beginPosition",
+                                            "name":"metadata.field.beginPosition",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.temporalExtension.beginPosition_help",
+                                            "help":"metadata.field.beginPosition_help",
                                             "path":"identificationInfo.extent.temporalElement.extent.beginPosition.value",
-                                            "type":"DATE.text"
+                                            "type":"DATE.text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"endPosition",
+                                            "name":"metadata.field.endPosition",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.temporalExtension.endPosition_help",
+                                            "help":"metadata.field.endPosition_help",
                                             "path":"identificationInfo.extent.temporalElement.extent.endPosition.value",
-                                            "type":"DATE.text"
+                                            "type":"DATE.text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     }
                                 ]
@@ -334,36 +390,20 @@
                         },
                         {
                             "block":{
-                                "name":"distributionInfo",
+                                "name":"metadata.block.distributionInfo",
                                 "multiplicity":1,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.distributionInfo_help",
+                                "help":"metadata.block.distributionInfo_help",
                                 "path":null,
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"format",
+                                            "name":"metadata.field.format",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.distributionInfo.format_help",
+                                            "help":"metadata.field.format_help",
                                             "path":"distributionInfo.distributionFormat.name",
-                                            "type":"codelist"
-                                        }
-                                    },
-                                    {
-                                        "field":{
-                                            "name":"transfertOptionLinkage",
-                                            "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.distributionInfo.transfertOptionLinkageProtocol_help",
-                                            "path":"distributionInfo.transferOptions.onLine.linkage",
-                                            "type":"web"
-                                        }
-                                    },
-                                    {
-                                        "field":{
-                                            "name":"transfertOptionLinkageProtocol",
-                                            "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.temporalExtension.endPosition_help",
-                                            "path":"distributionInfo.transferOptions.onLine.protocol",
-                                            "type":"HIDDEN.readonly"
+                                            "type":"codelist",
+                                            "obligation":"M",
+                                            "defaultValue":"SHP"
                                         }
                                     }
                                 ]
@@ -371,18 +411,31 @@
                         },
                         {
                             "block":{
-                                "name":"distributionInfo2",
+                                "name":"metadata.block.distributionInfo",
                                 "multiplicity":62,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.distributionInfo2_help",
+                                "help":"metadata.block.distributionInfo_help",
                                 "path":"distributionInfo.transferOptions",
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"transfertOptionLinkage2",
+                                            "name":"metadata.field.transfertOptionLinkage",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.distributionInfo.transfertOptionLinkage2_help",
+                                            "help":"metadata.field.transfertOptionLinkage_help",
                                             "path":"distributionInfo.transferOptions.onLine.linkage",
-                                            "type":"web"
+                                            "type":"web",
+                                            "obligation":"O",
+                                            "defaultValue":null
+                                        }
+                                    },
+                                    {
+                                        "field":{
+                                            "name":"metadata.field.transfertOptionLinkageProtocol",
+                                            "multiplicity":1,
+                                            "help":"metadata.field.transfertOptionLinkageProtocol_help",
+                                            "path":"distributionInfo.transferOptions.onLine.protocol",
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     }
                                 ]
@@ -390,45 +443,53 @@
                         },
                         {
                             "block":{
-                                "name":"resourceConstraints",
+                                "name":"metadata.block.resourceConstraints",
                                 "multiplicity":1,
-                                "help":"INSPIRE.dataset_geo.dataIdentification.resourceConstraints_help",
+                                "help":"metadata.block.resourceConstraints_help",
                                 "path":"identificationInfo.resourceConstraints",
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"useLimitation",
+                                            "name":"metadata.field.useLimitation",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.resourceConstraints.useLimitation_help",
+                                            "help":"metadata.field.useLimitation_help",
                                             "path":"identificationInfo.resourceConstraints.useLimitation",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"M",
+                                            "defaultValue":"Pas de limitations"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"accessConstraints",
+                                            "name":"metadata.field.accessConstraints",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.resourceConstraints.accessConstraints_help",
+                                            "help":"metadata.field.accessConstraints_help",
                                             "path":"identificationInfo.resourceConstraints.accessConstraints",
-                                            "type":"CODELIST.readonly"
+                                            "type":"CODELIST.readonly",
+                                            "obligation":"M",
+                                            "defaultValue":"MD_RestrictionCode.otherRestrictions"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"otherConstraints",
+                                            "name":"metadata.field.otherConstraints",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.resourceConstraints.otherConstraints_help",
+                                            "help":"metadata.field.otherConstraints_help",
                                             "path":"identificationInfo.resourceConstraints.otherConstraints",
-                                            "type":"textarea"
+                                            "type":"textarea",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"classification",
+                                            "name":"metadata.field.classification",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.dataIdentification.resourceConstraints.classification_help",
+                                            "help":"metadata.field.classification_help",
                                             "path":"identificationInfo.resourceConstraints.classification",
-                                            "type":"codelist"
+                                            "type":"codelist",
+                                            "obligation":"O",
+                                            "defaultValue":"MD_ClassificationCode.unclassified"
                                         }
                                     }
                                 ]
@@ -439,69 +500,81 @@
             },
             {
                 "superblock":{
-                    "name":"dataQuality",
+                    "name":"metadata.block.dataQuality",
                     "multiplicity":1,
-                    "help":"INSPIRE.dataset_geo.dataQuality_help",
+                    "help":"metadata.block.dataQuality_help",
                     "path":null,
                     "content":[{
                         "block":{
-                            "name":"report",
+                            "name":"metadata.block.report",
                             "multiplicity":1,
-                            "help":"INSPIRE.dataset_geo.dataQuality.report_help",
+                            "help":"metadata.block.report_help",
                             "path":null,
                             "content":[
                                 {
                                     "field":{
-                                        "name":"title",
+                                        "name":"metadata.field.title",
                                         "multiplicity":62,
-                                        "help":"INSPIRE.dataset_geo.dataQuality.report.title_help",
+                                        "help":"metadata.field.title_help",
                                         "path":"dataQualityInfo.report.result.specification.title",
-                                        "type":"codelist"
+                                        "type":"codelist",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"date",
-                                        "multiplicity":62,
-                                        "help":"INSPIRE.dataset_geo.dataQuality.report.date_help",
+                                        "name":"metadata.field.date",
+                                        "multiplicity":1,
+                                        "help":"metadata.field.date_help",
                                         "path":"dataQualityInfo.report.result.specification.date.date",
-                                        "type":"readonly"
+                                        "type":"readonly",
+                                        "obligation":"M",
+                                        "defaultValue":"2010-05-03"
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"dateType",
-                                        "multiplicity":62,
-                                        "help":"INSPIRE.dataset_geo.dataQuality.report.dateType_help",
+                                        "name":"metadata.field.dateType",
+                                        "multiplicity":1,
+                                        "help":"metadata.field.dateType_help",
                                         "path":"dataQualityInfo.report.result.specification.date.dateType",
-                                        "type":"CODELIST.readonly"
+                                        "type":"CODELIST.readonly",
+                                        "obligation":"M",
+                                        "defaultValue":"CI_DateTypeCode.publication"
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"scopeLevel",
+                                        "name":"metadata.field.scopeLevel",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataQuality.report.scopeLevel_help",
+                                        "help":"metadata.field.scopeLevel_help",
                                         "path":"dataQualityInfo.scope.level",
-                                        "type":"CODELIST.readonly"
+                                        "type":"CODELIST.readonly",
+                                        "obligation":"M",
+                                        "defaultValue":"MD_ScopeCode.dataset"
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"resultPass",
+                                        "name":"metadata.field.resultPass",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataQuality.report.resultPass_help",
+                                        "help":"metadata.field.resultPass_help",
                                         "path":"dataQualityInfo.report.result.pass",
-                                        "type":"codelist"
+                                        "type":"codelist",
+                                        "obligation":"M",
+                                        "defaultValue":"null"
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"resultExplanation",
+                                        "name":"metadata.field.resultExplanation",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.dataQuality.report.resultExplanation_help",
+                                        "help":"metadata.field.resultExplanation_help",
                                         "path":"dataQualityInfo.report.result.explanation",
-                                        "type":"textarea"
+                                        "type":"textarea",
+                                        "obligation":"M",
+                                        "defaultValue":"See the referenced specification"
                                     }
                                 }
                             ]
@@ -511,116 +584,138 @@
             },
             {
                 "superblock":{
-                    "name":"contacts",
+                    "name":"metadata.block.contacts",
                     "multiplicity":1,
-                    "help":"INSPIRE.dataset_geo.contacts_help",
+                    "help":"metadata.block.contacts_help",
                     "path":null,
                     "content":[
                         {
                             "block":{
-                                "name":"pointOfContact",
+                                "name":"metadata.block.pointOfContact",
                                 "multiplicity":62,
-                                "help":"INSPIRE.dataset_geo.contacts.pointOfContact_help",
+                                "help":"metadata.block.pointOfContact_help",
                                 "path":"identificationInfo.pointOfContact",
                                 "type":"CONTACT",
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"organisationName",
+                                            "name":"metadata.field.organisationName",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.organisationName_help",
+                                            "help":"metadata.field.organisationName_help",
                                             "path":"identificationInfo.pointOfContact.organisationName",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"role",
+                                            "name":"metadata.field.role",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.role_help",
+                                            "help":"metadata.field.role_help",
                                             "path":"identificationInfo.pointOfContact.role",
-                                            "type":"codelist"
+                                            "type":"codelist",
+                                            "obligation":"M",
+                                            "defaultValue":"CI_RoleCode.pointOfContact"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"individualName",
+                                            "name":"metadata.field.individualName",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.individualName_help",
+                                            "help":"metadata.field.individualName_help",
                                             "path":"identificationInfo.pointOfContact.individualName",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"positionName",
+                                            "name":"metadata.field.positionName",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.positionName_help",
+                                            "help":"metadata.field.positionName_help",
                                             "path":"identificationInfo.pointOfContact.positionName",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"deliveryPoint",
+                                            "name":"metadata.field.deliveryPoint",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.deliveryPoint_help",
+                                            "help":"metadata.field.deliveryPoint_help",
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.deliveryPoint",
-                                            "type":"textarea"
+                                            "type":"textarea",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"city",
+                                            "name":"metadata.field.city",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.city_help",
+                                            "help":"metadata.field.city_help",
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.city",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"postalCode",
+                                            "name":"metadata.field.postalCode",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.postalCode_help",
+                                            "help":"metadata.field.postalCode_help",
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.postalCode",
-                                            "type":"integer"
+                                            "type":"integer",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"country",
+                                            "name":"metadata.field.country",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.country_help",
+                                            "help":"metadata.field.country_help",
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.country",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":"France"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"electronicMailAddress",
+                                            "name":"metadata.field.electronicMailAddress",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.electronicMailAddress_help",
+                                            "help":"metadata.field.electronicMailAddress_help",
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.electronicMailAddress",
-                                            "type":"mail"
+                                            "type":"mail",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"voice",
+                                            "name":"metadata.field.voice",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.voice_help",
+                                            "help":"metadata.field.voice_help",
                                             "path":"identificationInfo.pointOfContact.contactInfo.phone.voice",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"linkage",
+                                            "name":"metadata.field.linkage",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.pointOfContact.linkage_help",
+                                            "help":"metadata.field.linkage_help",
                                             "path":"identificationInfo.pointOfContact.contactInfo.onlineResource.linkage",
-                                            "type":"web"
+                                            "type":"web",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     }
                                 ]
@@ -628,109 +723,131 @@
                         },
                         {
                             "block":{
-                                "name":"metadataContact",
+                                "name":"metadata.block.metadataContact",
                                 "multiplicity":1,
-                                "help":"INSPIRE.dataset_geo.contacts.metadataContact_help",
+                                "help":"metadata.block.metadataContact_help",
                                 "path":"contact",
                                 "type":"CONTACT",
                                 "content":[
                                     {
                                         "field":{
-                                            "name":"organisationName",
+                                            "name":"metadata.field.organisationName",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.organisationName_help",
+                                            "help":"metadata.field.organisationName_help",
                                             "path":"contact.organisationName",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"role",
+                                            "name":"metadata.field.role",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.role_help",
+                                            "help":"metadata.field.role_help",
                                             "path":"contact.role",
-                                            "type":"CODELIST.readonly"
+                                            "type":"CODELIST.readonly",
+                                            "obligation":"M",
+                                            "defaultValue":"CI_RoleCode.pointOfContact"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"individualName",
+                                            "name":"metadata.field.individualName",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.individualName_help",
+                                            "help":"metadata.field.individualName_help",
                                             "path":"contact.individualName",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"positionName",
+                                            "name":"metadata.field.positionName",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.positionName_help",
+                                            "help":"metadata.field.positionName_help",
                                             "path":"contact.positionName",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"deliveryPoint",
+                                            "name":"metadata.field.deliveryPoint",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.deliveryPoint_help",
+                                            "help":"metadata.field.deliveryPoint_help",
                                             "path":"contact.contactInfo.address.deliveryPoint",
-                                            "type":"textarea"
+                                            "type":"textarea",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"city",
+                                            "name":"metadata.field.city",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.city_help",
+                                            "help":"metadata.field.city_help",
                                             "path":"contact.contactInfo.address.city",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"postalCode",
+                                            "name":"metadata.field.postalCode",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.postalCode_help",
+                                            "help":"metadata.field.postalCode_help",
                                             "path":"contact.contactInfo.address.postalCode",
-                                            "type":"integer"
+                                            "type":"integer",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"country",
+                                            "name":"metadata.field.country",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.country_help",
+                                            "help":"metadata.field.country_help",
                                             "path":"contact.contactInfo.address.country",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":"France"
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"electronicMailAddress",
+                                            "name":"metadata.field.electronicMailAddress",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.electronicMailAddress_help",
+                                            "help":"metadata.field.electronicMailAddress_help",
                                             "path":"contact.contactInfo.address.electronicMailAddress",
-                                            "type":"mail"
+                                            "type":"mail",
+                                            "obligation":"M",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"voice",
+                                            "name":"metadata.field.voice",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.voice_help",
+                                            "help":"metadata.field.voice_help",
                                             "path":"contact.contactInfo.phone.voice",
-                                            "type":"text"
+                                            "type":"text",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     },
                                     {
                                         "field":{
-                                            "name":"linkage",
+                                            "name":"metadata.field.linkage",
                                             "multiplicity":1,
-                                            "help":"INSPIRE.dataset_geo.contacts.metadataContact.linkage_help",
+                                            "help":"metadata.field.linkage_help",
                                             "path":"contact.contactInfo.onlineResource.linkage",
-                                            "type":"web"
+                                            "type":"web",
+                                            "obligation":"O",
+                                            "defaultValue":null
                                         }
                                     }
                                 ]
@@ -741,78 +858,103 @@
             },
             {
                 "superblock":{
-                    "name":"metadata",
+                    "name":"metadata.block.metadata",
                     "multiplicity":1,
-                    "help":"INSPIRE.dataset_geo.metadata_help",
+                    "help":"metadata.block.metadata_help",
                     "path":null,
                     "content":[{
                         "block":{
-                            "name":"basic",
+                            "name":"metadata.block.basic",
                             "multiplicity":1,
-                            "help":"INSPIRE.dataset_geo.metadata.basic_help",
+                            "help":"metadata.block.basic_help",
                             "path":null,
                             "content":[
                                 {
                                     "field":{
-                                        "name":"identifier",
+                                        "name":"metadata.field.identifier",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.contacts.metadata.basic.identifier_help",
+                                        "help":"metadata.field.identifier_help",
                                         "path":"fileIdentifier",
-                                        "type":"readonly"
+                                        "type":"readonly",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"dateStamp",
+                                        "name":"metadata.field.dateStamp",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.contacts.metadata.basic.dateStamp_help",
+                                        "help":"metadata.field.dateStamp_help",
                                         "path":"dateStamp",
-                                        "type":"readonly"
+                                        "type":"readonly",
+                                        "obligation":"M",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"metadataStandardName",
+                                        "name":"metadata.field.metadataStandardName",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.contacts.metadata.basic.metadataStandardName_help",
+                                        "help":"metadata.field.metadataStandardName_help",
                                         "path":"metadataStandardName",
-                                        "type":"readonly"
+                                        "type":"readonly",
+                                        "obligation":"M",
+                                        "defaultValue":"x-urn:schema:ISO19115:INSPIRE:dataset:geo-vector"
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"metadataStandardVersion",
+                                        "name":"metadata.field.metadataStandardVersion",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.contacts.metadata.basic.metadataStandardVersion_help",
+                                        "help":"metadata.field.metadataStandardVersion_help",
                                         "path":"metadataStandardVersion",
-                                        "type":"readonly"
+                                        "type":"readonly",
+                                        "obligation":"M",
+                                        "defaultValue":"2011.03"
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"language",
+                                        "name":"metadata.field.characterSet",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.contacts.metadata.basic.language_help",
+                                        "help":"metadata.field.characterSet_help",
+                                        "path":"characterSet",
+                                        "type":"codelist",
+                                        "obligation":"M",
+                                        "defaultValue":"MD_CharacterSetCode.utf8"
+                                    }
+                                },
+                                {
+                                    "field":{
+                                        "name":"metadata.field.metadatalanguage",
+                                        "multiplicity":1,
+                                        "help":"metadata.field.metadatalanguage_help",
                                         "path":"language",
-                                        "type":"codelist"
+                                        "type":"codelist",
+                                        "obligation":"M",
+                                        "defaultValue":"LanguageCode.fra"
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"parentIdentifier",
+                                        "name":"metadata.field.parentIdentifier",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.contacts.metadata.basic.parentIdentifier_help",
+                                        "help":"metadata.field.parentIdentifier_help",
                                         "path":"parentIdentifier",
-                                        "type":"text"
+                                        "type":"text",
+                                        "obligation":"O",
+                                        "defaultValue":null
                                     }
                                 },
                                 {
                                     "field":{
-                                        "name":"hierarchyLevel",
+                                        "name":"metadata.field.hierarchyLevel",
                                         "multiplicity":1,
-                                        "help":"INSPIRE.dataset_geo.contacts.metadata.basic.hierarchyLevel_help",
+                                        "help":"metadata.field.hierarchyLevel_help",
                                         "path":"hierarchyLevel",
-                                        "type":"CODELIST.readonly"
+                                        "type":"CODELIST.readonly",
+                                        "obligation":"M",
+                                        "defaultValue":"MD_ScopeCode.dataset"
                                     }
                                 }
                             ]
