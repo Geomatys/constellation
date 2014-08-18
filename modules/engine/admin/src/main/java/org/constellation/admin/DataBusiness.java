@@ -79,8 +79,19 @@ public class DataBusiness {
     @Inject
     private SensorRepository sensorRepository;
 
-   @Inject
-   private IndexEngine indexEngine;
+    @Inject
+    private IndexEngine indexEngine;
+
+    /**
+     * Return the {@linkplain Provider provider} for the given {@linkplain Data data} identifier.
+     *
+     * @param dataId {@link Data} identifier
+     * @return a {@linkplain Provider provider}
+     */
+    public Provider getProvider(int dataId) {
+        final Data d = dataRepository.findById(dataId);
+        return providerRepository.findOne(d.getProvider());
+    }
 
     public DefaultMetadata loadIsoDataMetadata(String providerId, QName name) {
 

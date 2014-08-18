@@ -48,6 +48,7 @@ import org.constellation.dto.PyramidParams;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
@@ -80,9 +81,11 @@ import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.image.interpolation.InterpolationCase;
@@ -103,7 +106,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
-import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.PropertyType;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
@@ -183,8 +186,8 @@ public class DataRest {
     @Inject
     private UserRepository userRepository;
     
-//    @Inject
-//    private SessionData sessionData;
+    @Inject
+    private DataRepository dataRepository;
 
     @Inject
     private DataBusiness dataBusiness;
@@ -481,7 +484,7 @@ public class DataRest {
 
         final String title = new MetadataFeeder(metadata).getTitle();
         hashMap.put("metatitle",title);
-        hashMap.put("metaIdentifier",metaIdentifier);
+        hashMap.put("metaIdentifier", metaIdentifier);
         return hashMap;
     }
 
@@ -658,7 +661,7 @@ public class DataRest {
                 information = MetadataUtilities.getRasterDataInformation(gridCoverageReader, defaultMetadata, providerDB.getType());
                 break;
             case "vector":
-                final Name nameFeature = ((CoverageStore) dataProvider.getMainStore()).getNames().iterator().next();
+                final Name nameFeature = ((FeatureStore) dataProvider.getMainStore()).getNames().iterator().next();
                 information = new DataInformation(providerId, null, providerDB.getType(), dataProvider.get(nameFeature).getEnvelope().getCoordinateReferenceSystem().getName().toString());
                 information.setFileMetadata(MetadataUtilities.getVectorDataInformation(defaultMetadata));
                 break;
@@ -1809,6 +1812,33 @@ public class DataRest {
         final QName name = new QName(namespace, dataId);
         sensorBusiness.unlinkDataToSensor(name, providerId, sensorId);
         return Response.status(200).build();
+    }
+
+    @GET
+    @Path("{id}/vector/columns")
+    public Response getVectorDataColumns(final @PathParam("id") int id) throws DataStoreException {
+        final Provider provider = dataBusiness.getProvider(id);
+        final DataProvider dataProvider = DataProviders.getInstance().getProvider(provider.getIdentifier());
+        if (!(dataProvider.getMainStore() instanceof FeatureStore)) {
+            return Response.ok("Not a feature requested").build();
+        }
+
+        final List<String> colNames = new ArrayList<>();
+        final String dataName = dataRepository.findById(id).getName();
+        final FeatureStore store = (FeatureStore)dataProvider.getMainStore();
+        final org.opengis.feature.FeatureType ft = store.getFeatureType(dataName);
+        for (final PropertyType prop : ft.getProperties(true)) {
+            colNames.add(prop.getName().toString());
+        }
+
+        final ParameterValues values = new ParameterValues();
+        final HashMap<String,String> mapVals = new HashMap<>();
+        for (final String colName : colNames) {
+            mapVals.put(colName, colName);
+        }
+        values.setValues(mapVals);
+
+        return Response.ok(values).build();
     }
 }
 
