@@ -24,6 +24,7 @@
     "admin.domain.new": "Nouveau domaine",
     "admin.domain.tab.name": "Nom",
     "admin.domain.tab.description": "Description du domaine.",
+    "admin.domain.linked":"Domaines liés",
 
     "city": "Ville",
     "country": "Pays",

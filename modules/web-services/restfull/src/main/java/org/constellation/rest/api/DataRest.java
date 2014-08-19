@@ -591,7 +591,7 @@ public class DataRest {
                 return Response.status(500).entity("failed").build();
             }
         }
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     private static void truncateZipFolder(String filePath) throws IOException {
@@ -723,7 +723,7 @@ public class DataRest {
             }
         }
 
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
@@ -914,7 +914,7 @@ public class DataRest {
             pyramidalThread.start();
 
         }
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     /**
@@ -1570,7 +1570,7 @@ public class DataRest {
     @Path("{providerid}/{dataid}")
     public Response deleteData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
         dataBusiness.deleteData(new QName("", dataid), providerid);
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
@@ -1578,7 +1578,7 @@ public class DataRest {
     public Response visibleData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
 
         dataBusiness.updateDataVisibility(new QName("", dataid), providerid, true);
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
@@ -1591,7 +1591,7 @@ public class DataRest {
             dataName = new QName(dataid);
         }
         dataBusiness.updateDataVisibility(dataName, providerid, false);
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @GET
@@ -1822,7 +1822,7 @@ public class DataRest {
         final String namespace = value.getValue();
         final QName name = new QName(namespace, dataId);
         sensorBusiness.linkDataToSensor(name, providerId, sensorId);
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
@@ -1831,7 +1831,7 @@ public class DataRest {
         final String namespace = value.getValue();
         final QName name = new QName(namespace, dataId);
         sensorBusiness.unlinkDataToSensor(name, providerId, sensorId);
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @GET

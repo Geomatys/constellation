@@ -223,7 +223,7 @@ public final class ProviderRest {
             final CoordinateReferenceSystem coordinateReferenceSystem = CRS.decode(epsgCode.get("codeEpsg"));
             PrjFiles.write(coordinateReferenceSystem, new File(parentPath+File.separator+fileNameWithoutExtention+".prj"));
             provider.reload();
-            return Response.ok().build();
+            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         return Response.status(500).build();
     }
@@ -468,7 +468,7 @@ public final class ProviderRest {
             LOGGER.log(Level.WARNING, null, ex);
             return Response.status(500).build();
         }
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     /**
@@ -600,6 +600,6 @@ public final class ProviderRest {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
         providerBusiness.updateMetadata(providerId, domainId, metadata);
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 }
