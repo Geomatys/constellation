@@ -116,18 +116,27 @@
                             class="btn btn-xs btn-info btn-data">
                         <i class="fa fa-times"></i>
                     </button>
-                    <div class="pull-right">
-                        <div style="position:relative;">
-                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
-                            <div class="col-sm-8">
-                                <input type="text" ng-model="searchTerm" ng-show="!advancedSearch" class="searchbox search-query form-control"/>
-                            </div>
-                            <div class="pull-right">
-                                <button type="button" class="btn btn-xs btn-info btn-data" style="padding: 4px; margin-top: 6px;" ng-show="!advancedSearch" ng-click="callSearch()" translate="label.search">Search</button>
-                                <button class="btn btn-xs btn-info btn-data" ng-click="displayAdvancedSearch()">+</button>
-                            </div>
+                    <div class="pull-right" style="max-width:300px;">
+                        <div class="col-sm-7 input-group" ng-show="!advancedSearch" style="padding-left: 5px;padding-right: 5px;">
+                            <input type="text"
+                                   class="searchbox search-query form-control form-control-fix"
+                                   ng-model="searchTerm"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-info btn-data"
+                                        type="button"
+                                        ng-click="callSearch();"
+                                        title="{{'label.search' | translate}}"
+                                        style="height: 30px;margin: 0;">
+                                    <i class="glyphicon glyphicon-search" style="vertical-align: top;"></i>
+                                </button>
+                            </span>
                         </div>
-
+                        <button class="btn btn-xs btn-info btn-data pull-right"
+                                ng-click="toggleAdvancedSearch()"
+                                tooltip-html-unsafe="{{advancedSearch?'label.search.advanced.hide':'label.search.advanced.show' | translate }}"
+                                tooltip-placement="bottom">
+                            <i class="fa" ng-class="{'fa-plus':!advancedSearch, 'fa-minus':advancedSearch}"></i>
+                        </button>
                     </div>
                 </div>
             </div>

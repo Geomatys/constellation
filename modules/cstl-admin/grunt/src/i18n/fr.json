@@ -403,6 +403,8 @@
     "label.outline":"Contour",
     "label.contrast":"Contraste et relief",
     "label.color.model":"Modèle de couleur",
+    "label.search.advanced.show":"Afficher la recherche avancée",
+    "label.search.advanced.hide":"Cacher la recherche avancée",
 
 
     "layer.listing.data.add.button.label": "Ajouter une donnée",

@@ -25,7 +25,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         $scope.advancedSearch = false;
         $scope.search = {};
 
-        $scope.displayAdvancedSearch = function(){
+        $scope.toggleAdvancedSearch = function(){
           if ($scope.advancedSearch){
               $scope.advancedSearch = false;
           }  else {
@@ -48,12 +48,15 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
 
         $scope.callSearch = function(){
             if ($scope.searchTerm){
-                dataListing.findData({values: {'search': $scope.searchTerm}},function(response) {
-                    $dashboard($scope, response, true);
-                }, function(response){
-                    console.error(response);
-                    $growl('error','Error','Search failed:'+ response.data);
-                });
+                dataListing.findData({values: {'search': $scope.searchTerm}},
+                    function(response) {
+                        $dashboard($scope, response, true);
+                    },
+                    function(response){
+                        console.error(response);
+                        $growl('error','Error','Search failed:'+ response.data);
+                    }
+                );
             }else{
                 if (!$.isEmptyObject($scope.search)){
                     var searchString = "";
@@ -207,8 +210,10 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 templateUrl: 'views/data/modalViewMetadata.html',
                 controller: 'ViewMetadataModalController',
                 resolve: {
-                    'details': function(textService){
-                        return textService.metadata($scope.selected.Provider, $scope.selected.Name);
+                    'selected':function(){return $scope.selected},
+                    'metadataValues':function(textService){
+                        return textService.metadataJson($scope.selected.Provider,
+                            $scope.selected.Name, $scope.selected.Type.toLowerCase(), false);
                     }
                 }
             });
@@ -710,9 +715,188 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
         };
     }]);
 
-cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstance', 'details',
-    function ($scope, $modalInstance, details) {
-        $scope.details = details.data;
+
+cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstance','$http', 'selected', 'metadataValues',
+    function ($scope, $modalInstance, $http, selected, metadataValues) {
+        $scope.metadataValues = metadataValues.data;
+        $scope.selectedData = selected;
+
+        $scope.metadataTemplate = [];
+
+
+        function initCollapseEvents () {
+            if(window.collapseEventsRegistered)return; //to fix a bug with angular
+            $(document).on('click','.expand-all-btn',function(){
+                var labels = $(this).find('.label');
+                var icon = $(this).find('.fa');
+                var blockRows = $('#advancedViewMetadata').find('.block-row');
+                var smallBlocks = blockRows.find(".small-block");
+                if (icon.hasClass('fa-compress')) {
+                    icon.removeClass('fa-compress');
+                    icon.addClass('fa-expand');
+                    blockRows.find('.collapse-block').addClass('hide');
+                    smallBlocks.addClass('closed');
+                    smallBlocks.find('.data-icon').removeClass('fa-angle-up');
+                    smallBlocks.find('.data-icon').addClass('fa-angle-down');
+                } else {
+                    icon.removeClass('fa-expand');
+                    icon.addClass('fa-compress');
+                    blockRows.find('.collapse-block').removeClass('hide');
+                    smallBlocks.removeClass('closed');
+                    smallBlocks.find('.data-icon').removeClass('fa-angle-down');
+                    smallBlocks.find('.data-icon').addClass('fa-angle-up');
+                }
+                labels.toggle();
+            });
+            $(document).on('click','.small-block .heading-block',function(){
+                var blockRow = $(this).parents('.block-row');
+                var parent = $(this).parent('.small-block');
+                parent.toggleClass('closed');
+                blockRow.find('.collapse-block').toggleClass('hide');
+                var icon=parent.find('.data-icon');
+                if(icon.hasClass('fa-angle-up')){
+                    icon.removeClass('fa-angle-up');
+                    icon.addClass('fa-angle-down');
+                }else {
+                    icon.removeClass('fa-angle-down');
+                    icon.addClass('fa-angle-up');
+                }
+            });
+            $(document).on('click','.collapse-row-heading',function(){
+                $(this).parent().toggleClass('open');
+                $(this).next().toggleClass('hide');
+                var icon=$(this).find('.data-icon');
+                if(icon.hasClass('fa-angle-up')){
+                    icon.removeClass('fa-angle-up');
+                    icon.addClass('fa-angle-down');
+                }else {
+                    icon.removeClass('fa-angle-down');
+                    icon.addClass('fa-angle-up');
+                }
+            });
+            window.collapseEventsRegistered = true;
+        }
+
+
+        function existsValueForField(field){
+            if(field.path.indexOf('.') == -1){
+                if(! $scope.metadataValues[field.path]){
+                    return false;
+                }
+            }else {
+                var arr = field.path.split('.');
+                var result = $scope.metadataValues[arr[0]];
+                if(result === undefined){
+                    return false;
+                }
+                if($.isArray(result)){
+                    result = result[0];
+                }
+                if(arr.length>=2){
+                    for (var i=1; i<arr.length; i++){
+                        result = result[arr[i]];
+                        if(result === undefined){
+                            return false;
+                        }
+                        if($.isArray(result)){
+                            result = result[0];
+                        }
+                    }
+                }
+                if(result === undefined){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function cleanEmptyFieldsBlock(jsonObj){
+            var result = [];
+            var cleaned = jsonObj[0];
+            var superBlocks = cleaned.root.content;
+            for(var i=0;i<superBlocks.length;i++){
+                var bcontent = superBlocks[i].superblock.content;
+                for(var j=0;j<bcontent.length;j++){
+                    var block = bcontent[j].block;
+                    var fcontent = block.content;
+                    for(var k=0;k<fcontent.length;k++){
+                        var field = fcontent[k].field;
+                        if(! existsValueForField(field)){
+                            fcontent.splice(k,1);
+                            k--;
+                        }
+                    }
+                    if(fcontent.length===0){
+                        bcontent.splice(j,1);
+                        j--;
+                    }
+                }
+            }
+            result.push(cleaned);
+            return result;
+        }
+
+        function adjust(jsonObj){
+            //clean empty fields
+            cleanEmptyFieldsBlock(jsonObj);
+        }
+
+        $scope.initMetadataViewer = function() {
+            if($scope.selectedData.Type){
+                if($scope.selectedData.Type.toLowerCase() === 'vector'){
+                    $http.get('metadata/profile_inspire_vector.json').then(function(res){
+                        $scope.metadataTemplate.push(res.data);
+                        adjust($scope.metadataTemplate);
+                    });
+                }else if($scope.selectedData.Type.toLowerCase() === 'coverage'){
+                    $http.get('metadata/profile_inspire_raster.json').then(function(res){
+                        $scope.metadataTemplate.push(res.data);
+                        adjust($scope.metadataTemplate);
+                    });
+                }
+
+            }
+            initCollapseEvents();
+        };
+
+        $scope.delete = function(data) {
+            data.content = [];
+        };
+        $scope.add = function(data) {
+            var post = data.content.length + 1;
+            var newName = data.name + '-' + post;
+            data.content.push({"block":{name: newName,content: []}});
+        };
+
+
+        $scope.resolveValue = function(field){
+            var result;
+            if(field.path.indexOf('.') == -1){
+                result = $scope.metadataValues[field.path];
+            }else {
+                var arr = field.path.split('.');
+                result = $scope.metadataValues[arr[0]];
+                if(result === undefined){
+                    return '';
+                }
+                if($.isArray(result)){
+                    result = result[0];
+                }
+                if(arr.length>=2){
+                    for (var i=1; i<arr.length; i++){
+                        result = result[arr[i]];
+                        if(result === undefined){
+                            return '';
+                        }
+                        if($.isArray(result)){
+                            result = result[0];
+                        }
+                    }
+                }
+            }
+            return result;
+        };
+
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };

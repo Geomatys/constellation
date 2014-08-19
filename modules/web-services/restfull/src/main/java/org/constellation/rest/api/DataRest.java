@@ -85,10 +85,10 @@ import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.image.interpolation.InterpolationCase;
+import org.geotoolkit.io.yaml.JSON;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.observation.ObservationStore;
@@ -558,7 +558,13 @@ public class DataRest {
     private String renameDataFile(String dataName, String filePath) throws IOException {
         final File file = new File(filePath);
         final String parent = file.getParentFile().getCanonicalPath();
-        final String fileExt = file.getName().substring(file.getName().lastIndexOf("."), file.getName().length());
+        final String fileName = file.getName();
+        final String fileExt;
+        if(fileName.contains(".")){
+            fileExt = file.getName().substring(file.getName().lastIndexOf("."), file.getName().length());
+        }else {
+            fileExt = "";
+        }
         final java.nio.file.Path newPath = Paths.get(parent + File.separator + dataName + fileExt);
         Files.move(Paths.get(file.getAbsolutePath()), newPath,StandardCopyOption.REPLACE_EXISTING);
         return newPath.toString();
@@ -857,14 +863,14 @@ public class DataRest {
             final QName name = Utils.getQnameFromName(dataName);
             
             // Get previously saved metadata for the current data
-            final DefaultMetadata previous = dataBusiness.loadIsoDataMetadata(providerId, name);
+            final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, name);
             
             // Import changes from DataMetadata into the DefaultMetadata
-            final MetadataFeeder feeder = new MetadataFeeder(previous);
+            final MetadataFeeder feeder = new MetadataFeeder(metadata);
             feeder.feed(overridenValue);
             
             //Save metadata
-            dataBusiness.saveMetadata(providerId,name,previous);
+            dataBusiness.saveMetadata(providerId,name,metadata);
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -1607,6 +1613,20 @@ public class DataRest {
             metadata.prune(); 
         }
         return Response.ok(metadata).build();
+    }
+
+    @GET
+    @Path("metadataJson/iso/{providerId}/{dataId}/{type}/{full}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getIsoMetadataJson(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId,
+            final @PathParam("type") String type, final @PathParam("full") boolean full) {
+        final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+        if (metadata != null) {
+            metadata.prune();
+        }
+        final String str = JSON.format(metadata);
+        return Response.ok(str).build();
     }
 
     @GET

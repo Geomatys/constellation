@@ -32,8 +32,9 @@ import javax.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -123,8 +124,8 @@ public class LuceneIndexEngine implements IndexEngine {
     }
 
 
-    public List<Integer> searchOnMetadata(String queryString) throws ParseException, IOException {
-        List<Integer> result = new ArrayList<>();
+    public Set<Integer> searchOnMetadata(String queryString) throws ParseException, IOException {
+        final Set<Integer> result = new HashSet<>();
         initIndexSearcher();
         TopScoreDocCollector collector = TopScoreDocCollector.create(5, true);
         final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_46, new String[]{

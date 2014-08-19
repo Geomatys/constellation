@@ -479,6 +479,17 @@ cstlAdminApp.factory('textService', ['$http', '$growl',
                 });
                 return promise;
             },
+            metadataJson : function(provider, data, type, full){
+                var promise = $http({
+                    url: '@cstl/api/1/domain/$domainId/data/metadataJson/iso/'+ provider+'/'+ data +'/'+ type +'/'+ full +';jsessionid=',
+                    method: "GET",
+                    headers: {'Accept': 'application/json'}
+                });
+                promise.error(function(errorMsg) {
+                    $growl('warning', 'Warning', 'Error while retrieving json metadata for data '+ data);
+                });
+                return promise;
+            },
             sensorMetadata : function(sensor){
                 var promise = $http({
                     url: '@cstl/api/1/sensor/'+ sensor+';jsessionid=',

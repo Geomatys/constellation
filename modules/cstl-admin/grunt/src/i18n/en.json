@@ -364,6 +364,8 @@
     "label.outline":"Outline",
     "label.contrast":"Contrast and relief",
     "label.color.model":"Color model",
+    "label.search.advanced.show":"Show advanced search",
+    "label.search.advanced.hide":"Hide advanced search",
 
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
