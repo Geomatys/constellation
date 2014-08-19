@@ -52,6 +52,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>style</module>
+    <module>metadata</module>
   </modules>
 
 </project>
