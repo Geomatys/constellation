@@ -707,6 +707,7 @@
     "global.menu.admin.users": "Users Settings",
     "global.menu.language": "Language",
     "global.menu.other":"Other",
+    "global.menu.edit":"Edit profile",
     "global.language.en": "English",
     "global.language.fr": "French",
     "global.language.de": "German",
@@ -787,6 +788,10 @@
     "password.messages.validate.confirmpassword.required": "Your confirm password is required.",
     "password.messages.validate.confirmpassword.minlength": "Your confirm password is required to be at least 5 character",
     "password.messages.validate.confirmpassword.maxlength": "Your confirm password cannot be longer than 20 characters",
+
+    "profile.password.new": "New password",
+    "profile.password.verify": "Checking password",
+    "profile.language.choice": "Language choice",
 
     "sessions.title": "Active sessions for [<b>{{username}}</b>]",
     "sessions.table.ipaddress": "IP address",

@@ -33,7 +33,7 @@
                     <span class="icon-bar"></span>
                 </button>
                 <div class="collapse navbar-right navbar-collapse">
-                    <ul class="nav nav-pills hidden-sm hidden-md">
+                    <ul class="nav nav-pills" ng-hide="authenticated">
                         <li style="margin-left:2px;" class="dropdown pointer" ng-controller="LanguageController">
                             <a class="dropdown-toggle" data-toggle="dropdown">
                                 <span>
@@ -129,13 +129,6 @@
                                 <span translate="global.menu.admin.main">Administration</span>
                             </a>
                         </li>
-                        <li class="hidden-sm hidden-md">
-                            <a href="{{cstlLogoutUrl}}">
-                                <span class="glyphicon glyphicon-log-out"></span>&nbsp;
-                                <span translate="global.menu.admin.logout">Log out </span>&nbsp;
-                                <span>{{cstlSession.firstname}} {{cstlSession.lastname}}</span>
-                            </a>
-                        </li>
                         <li class="dropdown pointer hidden-lg hidden-xs">
                             <a class="dropdown-toggle" data-toggle="dropdown"> <span>
                                         <span class="glyphicon glyphicon-plus"></span> <span
@@ -144,7 +137,7 @@
                                 </span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="hidden-xs hidden-md hidden-lg">
+                                <li>
                                     <a ng-class="navClass('tasks')" href="#/tasks">
                                         <span class="glyphicon glyphicon-cog"></span>
                                         <span translate="global.menu.tasks">Tasks</span>
@@ -156,6 +149,24 @@
                                         <span translate="global.menu.admin.main">Administration</span>
                                     </a>
                                 </li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown pointer" >
+                            <a class="dropdown-toggle" data-toggle="dropdown">
+                                <span>
+                                        <span class="glyphicon glyphicon-user"></span>
+                                        <span class="hidden-tablet" >{{cstlSession.firstname}} {{cstlSession.lastname}}</span>
+                                        <b class="caret"></b>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a ng-class="navClass('profile')" href="#/profile">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                        <span translate="global.menu.edit">Edit profile</span>
+                                    </a>
+                                </li>
                                 <li>
                                     <a href="{{cstlLogoutUrl}}">
                                         <span class="glyphicon glyphicon-log-out"></span>&nbsp;
@@ -164,6 +175,7 @@
                                 </li>
                             </ul>
                         </li>
+
                         <li ng-hide="authenticated">
                             <a href="/cstl-admin/" id="authenticateLink">
                                 <span class="glyphicon glyphicon-log-in"></span> &nbsp;
@@ -172,29 +184,6 @@
                         </li>
                     </ul>
                 </div>
-            </div>
-            <div id="languages" class="dropdown" ng-controller="LanguageController">
-                <a class="btn dropdown-toggle" data-toggle="dropdown">
-                    <span>
-                        <i class="glyphicon glyphicon-flag"></i>&nbsp;
-                        <span translate="global.menu.language">Language</span>
-                        <b class="caret"></b>
-                    </span>
-                </a>
-                <ul class="dropdown-menu pull-right">
-                    <li active-menu="en">
-                        <a ng-click="changeLanguage(&apos;en&apos;)">
-                            <span class="famfamfam-flag-gb"></span>&nbsp;
-                            <span translate="global.language.en">English</span>
-                        </a>
-                    </li>
-                    <li active-menu="fr">
-                        <a ng-click="changeLanguage(&apos;fr&apos;)">
-                            <span class="famfamfam-flag-fr"></span>&nbsp;
-                            <span translate="global.language.fr">French</span>
-                        </a>
-                    </li>
-                </ul>
             </div>
         </div>
 

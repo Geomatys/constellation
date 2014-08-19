@@ -162,6 +162,10 @@ cstlAdminApp
                     templateUrl: 'views/tasks/tasks.html',
                     controller: 'TasksController'
                 })
+                .when('/profile', {
+                    templateUrl: 'views/profile.html',
+                    controller: 'MainController'
+                })
 
                 .otherwise({
                     templateUrl: 'views/main.html',

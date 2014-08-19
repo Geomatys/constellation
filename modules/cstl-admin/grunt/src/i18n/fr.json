@@ -258,6 +258,7 @@
     "global.menu.web-service": "Services web",
     "global.menu.web-service.min": "Services",
     "global.menu.other":"Autres",
+    "global.menu.edit":"Editer le profil",
     "global.title": "JHipster",
 
     "growl.error.data.import.no.geographic": "L'image ne contient pas d'information géographique.",
@@ -672,6 +673,10 @@
     "password.messages.validate.newpassword.minlength": "Votre mot de passe doit comporter au moins 5 caractères",
     "password.messages.validate.newpassword.required": "Votre mot de passe est requis.",
     "password.title": "Changer le mot de passe pour [<b>{{username}}</b>]",
+
+    "profile.password.new": "Nouveau mot de passe",
+    "profile.password.verify": "Vérification du mot de passe",
+    "profile.language.choice": "Choix de la langue",
 
     "server.choose.file": "Choisir un fichier sur le serveur",
     "server.create.button": "Créer",
