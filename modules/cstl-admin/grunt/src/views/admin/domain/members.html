@@ -5,18 +5,15 @@
     <div class="panel-body">
         <div class="logo-wrapper row">
             <div class="col-sm-9">
-                <h3 class="header-title">{{domain.name}}</h3>
+                <a href="#/admin/domains" class="btn btn-default" style="padding: 12px;">
+                    <span class="glyphicon glyphicon-arrow-left" style="margin-right: 5px;"></span>
+                    <span translate="label.return">Back</span>
+                </a>
             </div>
             <!-- Menu to create services -->
             <div class="col-sm-3">
-                <div class="pull-right">
-                    <a href="#/admin/domains" class="btn btn-default" style="padding: 12px;">
-                        <span class="glyphicon glyphicon-arrow-left" style="margin-right: 5px;"></span>
-                        <span translate="label.return">Back</span>
-                    </a>
-                </div>
                 <div ng-click="addMembers()" class="dropdown pull-right">
-                    <a data-toggle="dropdown" class="btn btn-add btn-lg" style="margin-top: 8px; padding: 15px 19px;">
+                    <a data-toggle="dropdown" class="btn btn-add btn-lg" >
                         <span class="fa fa-plus" style="margin-right: 5px;"></span>
                         <span translate="admin.domain.addmembers">Add member</span>
                     </a>
@@ -45,7 +42,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div ng-if="members.length>0" class="row">
                 <table class="table table-condensed table-striped table-bordered table-responsive user-table">
                     <thead>
                     <tr title="click to order">
@@ -53,7 +50,7 @@
                         <td ng-click="predicate = 'firstname'; reverse=!reverse" translate="settings.form.firstname">First name</td>
                         <td ng-click="predicate = 'lastname'; reverse=!reverse" translate="settings.form.lastname">Last name</td>
                         <td ng-click="predicate = 'email'; reverse=!reverse" translate="settings.form.email">E-mail</td>
-                        <td ng-click="predicate = 'email'; reverse=!reverse" translate="settings.form.domainroles">DomainRoles</td>
+                        <td ng-click="predicate = 'email'; reverse=!reverse" translate="settings.form.roles">DomainRoles</td>
                     </tr>
                     </thead>
 
@@ -62,10 +59,17 @@
                         <td>{{user.firstname}}</td>
                         <td>{{user.lastname}}</td>
                         <td>{{user.email}}</td>
-                        <td><span ng-repeat="role in user.domainRoles" ng-click="changeDomainRoles(user)"><span ng-if="$index>0">, </span>{{role.name}}</span></span><td>
-                        <td class="user-delete" ng-click="removeMemberFromDomain($index)"><span class="glyphicon glyphicon-trash"></span></td>
+                        <td><span ng-repeat="role in user.domainRoles" ng-click="changeDomainRoles(user)"><span ng-if="$index>0">, </span>{{role.name}}</span></td>
+                        <td class="user-delete" ng-click="removeMemberFromDomain($index)">
+                            <span class="tooltipicon">
+                                <span class="glyphicon glyphicon-trash" tooltip data-placement="left" title="{{'tooltip.domain.user.remove' | translate }}"></span>
+                            </span>
+                        </td>
                     </tr>
                 </table>
+            </div>
+            <div ng-if="members.length==0" classs="row">
+                <p translate="label.no.user">There are no user</p>
             </div>
         </div>
     </div>

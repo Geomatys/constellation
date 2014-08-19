@@ -1,12 +1,15 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Groups</h3>
+        <h3 class="panel-title" translate="admin.group.title">Groups</h3>
     </div>
     <div class="panel-body" ng-controller="DomainRoleController">
 
         <div class="logo-wrapper row" style="margin-top:0px;">
             <div class="col-sm-9">
-                <h3 class="header-title" translate="admin.group.title">Roles</h3>
+                <div class="col-xs-9 col-md-6  user-count-bloc">
+                    <p translate="admin.group.count" translate-values="{total: '{{ list.length }}'}">There are {{list.length }} users.</p>
+                    {{'admin.group.filter' | translate}} <input type="text" ng-model="filter" class="form-control" maxlength="10" >
+                </div>
             </div>
             <div class="col-sm-3">
                 <div ng-click="add()" class="dropdown pull-right">
@@ -19,12 +22,6 @@
         </div>
 
         <div class="container">
-            <div class="row">
-                <div class="col-sm-6 col-md-5 col-lg-4 user-count-bloc">
-                    <p translate="admin.group.count" translate-values="{total: '{{ list.length }}'}">There are {{list.length }} users.</p>
-                    {{'admin.group.filter' | translate}} <input type="text" ng-model="filter" class="form-control" maxlength="10" >
-                </div>
-            </div>
             <div class="row">
                 <table class="table table-condensed table-striped table-bordered table-responsive user-table">
                     <thead>
@@ -39,7 +36,7 @@
                         <td ng-click="details($index)">{{domainrole.name}}</td>
                         <td ng-click="details($index)"><span>{{domainrole.memberList}}</span>
                         </td>
-                        <td ng-hide="domainrole.system" class="user-delete" ng-click="deleteDomain($index)"><span class="glyphicon glyphicon-trash"></span></td>
+                        <td ng-hide="domainrole.system" class="user-delete" ng-click="deleteDomain($index)"><span class="tooltipicon"><span class="glyphicon glyphicon-trash" tooltip data-placement="left" title="{{'tooltip.group.remove' | translate }}"></span></span></td>
                     </tr>
                 </table>
             </div>

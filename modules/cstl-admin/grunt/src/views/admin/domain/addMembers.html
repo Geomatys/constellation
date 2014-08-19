@@ -5,7 +5,7 @@
 			<h4 class="modal-title">{{domain.name}}</h4>
 		</div>
 		<div class="modal-body" style="height: 510px; overflow-y: auto;">
-			<div class="container" style="height: 470px; ">
+			<div class="container" style="height: 465px; ">
 				<div class="row">
 					<div class="col-sm-7 user-count-bloc" style="padding: 10px 5px;">
 						<p class="col-sm-4" style="margin-top: 8px; margin-bottom: 0;" translate="admin.domain.memberscount" translate-values="{total: '{{ list.length }}'}">{{list.length }} users.</p>
@@ -14,7 +14,7 @@
 						</div>
 					</div>					
 				</div>
-				<div class="row"">
+				<div ng-if="users.length>0" class="row">
 					<table class="table table-condensed table-striped table-bordered table-responsive user-table">
 						<thead>
 							<tr title="click to order">
@@ -29,19 +29,21 @@
 							</tr>
 						</thead>
 
-						<tr ng-click="details($index)" style='cursor:pointer'
+						<tr ng-click="details($index)" style="cursor:pointer;"
 							ng-repeat="user in users | filter:filter | orderBy:predicate:reverse">
 							<td>{{user.login}}</td>
 							<td>{{user.firstname}}</td>
 							<td>{{user.lastname}}</td>
 							<td>{{user.email}}</td>
-							<td class="user-delete" ng-click="addToDomain($index, roles)"><span class="glyphicon glyphicon-user"></span></td>
+							<td class="user-delete" ng-click="addToDomain($index, roles)"><span class="tooltipicon"><span class="glyphicon glyphicon-plus" tooltip data-placement="left" title="{{'tooltip.domain.user.add' | translate }}"></span></span></td>
 						</tr>
 					</table>
 					
 				</div>
 
-
+                <div ng-if="users.length==0" class="row">
+                    <p translate="label.no.user">There are no user</p>
+                </div>
 
 			</div>
 		</div>

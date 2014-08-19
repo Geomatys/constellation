@@ -320,6 +320,7 @@
     "label.no.selected.metadata": "No selected metadata.",
     "label.no.selected.style": "No selected style.",
     "label.no.selected.task": "No selected task.",
+    "label.no.user":"There is no user.",
     "label.north": "North",
     "label.north.first.letter": "N",
     "label.observation": "Observation",
@@ -971,6 +972,12 @@
     "tooltip.data.add.choicedata.server":"Most supported formats: shp, NetCDF, tif",
     "tooltip.sensor.add":"Supported formats: a sensorML file (*.xml) or a zip file.",
     "tooltip.style.create":"You must select a data to associate the style created.",
+    "tooltip.domain.user.add":"Add this user",
+    "tooltip.domain.user.remove":"Remove this user",
+    "tooltip.domain.remove":"Delete this domain",
+    "tooltip.domain.users":"See domain users",
+    "tooltip.user.remove":"Delete this user",
+    "tooltip.group.remove":"Delete this group",
 
     "sensors.information.title":"Available sensors",
 

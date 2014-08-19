@@ -359,6 +359,7 @@
     "label.no.selected.mapcontext": "Aucune composition sélectionnée.",
     "label.no.selected.style": "Aucun style sélectionné.",
     "label.no.selected.task": "Aucun traitement sélectionné.",
+    "label.no.user":"Il n'y a aucun utilisateur.",
     "label.north": "Nord",
     "label.north.first.letter": "N",
     "label.observation": "Observation",
@@ -945,6 +946,12 @@
     "tooltip.data.add.choicedata.server":"Formats couramment supportés : shp, NetCDF, tif",
     "tooltip.sensor.add":"Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
     "tooltip.style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé.",
+    "tooltip.domain.user.add":"Ajouter cet utilisateur",
+    "tooltip.domain.user.remove":"Enlever cet utilisateur",
+    "tooltip.domain.remove":"Supprimer ce domaine",
+    "tooltip.domain.users":"Voir les utilisateurs du domaine",
+    "tooltip.user.remove":"Supprimer cet utilisateur",
+    "tooltip.group.remove":"Supprimer ce groupe",
 
     "sensors.information.title":"Capteurs disponibles",
 

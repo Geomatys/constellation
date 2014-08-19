@@ -1,13 +1,16 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Users</h3>
+        <h3 class="panel-title" translate="users.title">Users</h3>
     </div>
     <div class="panel-body" ng-controller="UserController">
 
 
         <div class="logo-wrapper row" style="margin-top:0px;">
             <div class="col-sm-9">
-                <h3 class="header-title" translate="users.title">Users</h3>
+                <div class="col-xs-9 col-md-6 user-count-bloc">
+                    <p translate="users.count" translate-values="{total: '{{ list.length }}'}">There are {{list.length }} users.</p>
+                    {{'users.filter' | translate}} <input type="text" ng-model="filter" class="form-control" maxlength="10" >
+                </div>
             </div>
             <!-- Menu to create services -->
             <div class="col-sm-3">
@@ -23,12 +26,6 @@
 
         <div class="container">
             <div class="row">
-                <div class="col-sm-6 col-md-5 col-lg-4 user-count-bloc">
-                    <p translate="users.count" translate-values="{total: '{{ list.length }}'}">There are {{list.length }} users.</p>
-                    {{'users.filter' | translate}} <input type="text" ng-model="filter" class="form-control" maxlength="10" >
-                </div>
-            </div>
-            <div class="row">
                 <table class="table table-condensed table-striped table-bordered table-responsive user-table">
                     <thead>
                     <tr title="click to order">
@@ -41,20 +38,22 @@
                         <td ng-click="predicate = 'email'; reverse=!reverse"
                             translate="settings.form.email">E-mail</td>
                         <td ng-click="predicate = 'roles'; reverse=!reverse"
-                            translate="settings.form.roles">Roels</td>
+                            translate="settings.form.roles">Roles</td>
                     </tr>
                     </thead>
 
-                    <tr  style='cursor:pointer'
+                    <tr  style="cursor:pointer;"
                          ng-repeat="user in list | filter:filter | orderBy:predicate:reverse">
                         <td ng-click="details($index)">{{user.login}}</td>
                         <td ng-click="details($index)">{{user.firstname}}</td>
                         <td ng-click="details($index)">{{user.lastname}}</td>
                         <td ng-click="details($index)">{{user.email}}</td>
-                        <td ng-click="details($index)"><span ng-repeat="role in user.roles">{{role}}</span>
+                        <td ng-click="details($index)"><span ng-repeat="role in user.roles">{{role}}</span></td>
+                        <td class="user-delete" ng-click="deleteUser($index)">
+                            <span class="tooltipicon">
+                                <span class="glyphicon glyphicon-trash" tooltip data-placement="left" title="{{'tooltip.user.remove' | translate }}"></span>
+                            </span>
                         </td>
-                        <td class="user-delete" ng-click="deleteUser($index)"><span class="glyphicon glyphicon-trash"></span></td>
-
                     </tr>
                 </table>
             </div>

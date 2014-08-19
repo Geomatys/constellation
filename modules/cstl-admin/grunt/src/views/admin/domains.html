@@ -5,7 +5,12 @@
     <div class="panel-body" ng-controller="DomainController">
         <div class="logo-wrapper row" style="margin-top:0px;">
             <div class="col-sm-9">
-                <h3 class="header-title" translate="admin.domain.title">Domain</h3>
+                <div class="">
+                    <div class="col-xs-9 col-md-6  user-count-bloc">
+                        <p translate="admin.domain.count" translate-values="{NUM: '{{ domains.length }}'}">There are {{domains.length }} domain(s).</p>
+                        {{'admin.group.filter' | translate}} <input type="text" ng-model="filter" class="form-control" maxlength="10">
+                    </div>
+                </div>
             </div>
             <!-- Menu to create services -->
             <div class="col-sm-3">
@@ -19,27 +24,19 @@
 
         <div class="container">
             <div class="row">
-                <div class="col-sm-6 col-md-5 col-lg-4 user-count-bloc">
-                    <p translate="admin.domain.count" translate-values="{NUM: '{{ domains.length }}'}">There are {{domains.length }} domain(s).</p>
-                    {{'admin.group.filter' | translate}} <input type="text" ng-model="filter" class="form-control" maxlength="10">
-                </div>
-            </div>
-            <div class="row">
                 <table class="table table-condensed table-striped table-bordered table-responsive user-table">
                     <thead>
                     <tr title="click to order">
-                        <td></td>
                         <td ng-click="predicate = 'name'; reverse=!reverse" translate="admin.domain.tab.name">Domain name</td>
                         <td translate="description">Description</td>
                     </tr>
 
-                    </tr>
                     </thead>
                     <tr style='cursor: pointer' ng-repeat="domain in domains | filter:filter | orderBy:predicate:reverse">
-                        <td class="user-delete" style="width: 20px; padding-right: 15px;"><a href="#/admin/domainmembers/{{domain.id}}"><span class="glyphicon glyphicon-user"></span></a></td>
                         <td ng-click="details($index)">{{domain.name}}</td>
                         <td ng-click="details($index)"><span>{{domain.description}}</span></td>
-                        <td ng-hide="domain.system" class="user-delete" ng-click="deleteDomain($index)"><span  class="glyphicon glyphicon-trash"></span></td>
+                        <td class="user-delete" style="width: 20px; padding-right: 15px;"><a href="#/admin/domainmembers/{{domain.id}}" style="color:#333;"><span class="tooltipicon"><span class="glyphicon glyphicon-user" tooltip data-placement="left" title="{{'tooltip.domain.users' | translate }}"></span></span></a></td>
+                        <td ng-hide="domain.system" class="user-delete" ng-click="deleteDomain($index)"><span class="tooltipicon"><span  class="glyphicon glyphicon-trash" tooltip data-placement="left" title="{{'tooltip.domain.remove' | translate }}"></span></span></td>
                     </tr>
                 </table>
             </div>
