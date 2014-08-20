@@ -476,32 +476,6 @@
                     </exclusion>
                </exclusions>
             </dependency>
-            <!-- mdweb-metamodel -->
-            <!--<dependency>-->
-                <!--<groupId>org.mdweb.metamodel</groupId>-->
-                <!--<artifactId>mdweb-metamodel-lib-model</artifactId>-->
-                <!--<version>${mdweb-meta.version}</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>org.mdweb.metamodel</groupId>-->
-                <!--<artifactId>mdweb-metamodel-lib-thesaurus</artifactId>-->
-                <!--<version>${mdweb-meta.version}</version>-->
-            <!--</dependency>-->
-	    <!--<dependency>-->
-                <!--<groupId>org.mdweb.metamodel</groupId>-->
-                <!--<artifactId>mdweb-metamodel-lib-sql-data</artifactId>-->
-                <!--<version>${mdweb-meta.version}</version>-->
-            <!--</dependency>-->
-	    <!--<dependency>-->
-                <!--<groupId>org.mdweb.metamodel</groupId>-->
-                <!--<artifactId>mdweb-metamodel-lib-thesaurus-sql-data</artifactId>-->
-                <!--<version>${mdweb-meta.version}</version>-->
-            <!--</dependency>-->
-	    <!--<dependency>-->
-               <!--<groupId>org.mdweb.metamodel</groupId>-->
-               <!--<artifactId>mdweb-metamodel-lib-auth</artifactId>-->
-               <!--<version>${mdweb-meta.version}</version>-->
-            <!--</dependency>-->
 
             <!-- SIS version -->
             <dependency>

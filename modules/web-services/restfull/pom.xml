@@ -32,6 +32,17 @@
 -->
     <developers>
         <developer>
+            <id>msidhoum</id>
+            <name>Mehdi Sidhoum</name>
+            <email>mehdi.sidhoum@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.com</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
             <id>bgarcia</id>
             <name>Benjamin Garcia</name>
             <email>benjamin.garcia@geomatys.com</email>
@@ -116,12 +127,6 @@
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-processing</artifactId>
         </dependency>
-        
-        <!-- Geomatys external project -->
-        <!--<dependency>-->
-            <!--<groupId>org.mdweb.metamodel</groupId>-->
-            <!--<artifactId>mdweb-metamodel-lib-auth</artifactId>-->
-        <!--</dependency>-->
 
         <!-- External dependencies -->
         <dependency>
