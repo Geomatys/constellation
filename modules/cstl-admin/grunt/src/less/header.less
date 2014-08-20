@@ -118,32 +118,6 @@
   }
 }
 
-@media (max-width: @screen-xs-max) { // extra small device
-  #navigation {
-    padding-left: 0;
-
-    .navbar-collapse {
-      text-align: center;
-      width: 100%;
-      border: none;
-      background-color: @header-nav-collapse-bg-color;
-
-      > .nav.nav-pills,
-      > .nav.nav-pills > li {
-        float: none !important;
-      }
-
-      > .nav.nav-pills:first-child {
-        margin-top: 5px;
-      }
-
-      > .nav.nav-pills:last-child {
-        margin-bottom: 5px;
-      }
-    }
-  }
-}
-
 
 // Languages dropdown (only visible on small devices)
 // --------------------
@@ -180,6 +154,31 @@
   }
 }
 
+@media (max-width: @screen-xs-max) { // extra small device
+  #navigation {
+    padding-left: 0;
+
+    .navbar-collapse {
+      text-align: center;
+      width: 100%;
+      border: none;
+      background-color: @header-nav-collapse-bg-color;
+
+      > .nav.nav-pills,
+      > .nav.nav-pills > li {
+        float: none !important;
+      }
+
+      > .nav.nav-pills:first-child {
+        margin-top: 5px;
+      }
+
+      > .nav.nav-pills:last-child {
+        margin-bottom: 5px;
+      }
+    }
+  }
+}
 @media (min-width: @screen-sm) and (max-width: @screen-md-max) { // small and medium devices
   #languages {
     display: block;

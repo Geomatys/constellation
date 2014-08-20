@@ -203,22 +203,7 @@ ul.unstyled {
         margin-left: 0;
         text-align: center;
     }
-@media screen and (min-width:991px){
-.accueil_bloc_images{
-    margin-top: 30px; 
-    margin-left: 15px;
-    text-align: left;
-}
-}
 
-@media screen and (max-width: 991px){
-    .accueil_bloc_text{
-        margin-top: 15px; 
-    }
-    .accueil_text_welcome h2{
-        font-size: 35px;
-    }
-}
 /*
  * Service
  */
@@ -338,18 +323,7 @@ ul.unstyled {
     border: 1px solid #ddd;
     border-bottom-color: transparent;
 }
-@media screen and (max-width: 767px){
-    .accueil_logo img{
-        width:100%;
-        max-width:400px;
-    }
-    .new-service-form-label{
-        margin-top:7px;
-    }
-    .navbar-toggle .icon-bar {
-        background-color: #fff;
-    }
-}
+
 .sos_edit_checkboxlist{
     border:solid 1px #eeeeee; 
     height:315px;
@@ -801,26 +775,6 @@ p.error-select-one{
     line-height: 20px;
     font-weight: normal;
 }
-@media screen and (min-width: 768px) and (max-width: 1199px){
-    .block-association .block-associated .block-associated-title{
-        line-height: 15px;
-    }
-    .block-association .block-associated{
-        line-height: 35px;
-        font-size:40px;
-    }
-}
-@media screen and (min-width: 992px) and (max-width: 1199px){
-    .block-association .block-associated .block-associated-title{
-        width:80px;
-        margin-left: 5px;
-    }
-    .block-association-wms .block-associated .block-associated-title{
-        width:auto;
-        margin-left: 5px;
-    }
-}
-
 
 /*
  * Dashboard item list.
@@ -1185,65 +1139,6 @@ p.error-select-one{
     color:#7dbc6c;
  }
 
- /*Dashboard responsive*/
-@media screen and (min-width: 992px)  and (max-width: 1199px) {
-    .item-title{
-        width: 425px;
-    }
-    .col-xs-6 .item-title{
-        width: 136px;
-    }
-    .col-xs-6 .item-title.data-title{
-        width: 130px;
-    }
-    .item-title.csw-title{
-        width: 455px;
-    }
-    .item-title.title-bloc{
-        width: 310px;
-    }
-    .item-title.title-bloc-service{
-        width: 250px;
-    }
-    .item-title.title-sensorSystem{
-        width: 349px;
-    }
-}
-@media screen and (min-width: 768px)  and (max-width: 991px) {
-    .item-title{
-        width: 300px;
-    }
-    .item-title.csw-title{
-        width: 315px;
-    }
-    .col-xs-6 .item-title{
-        width: 75px;
-    }
-    .item-title.title-bloc{
-        width: 220px;
-    }
-    .item-title.title-bloc-service{
-        width: 180px;
-    }
-    .item-title.title-sensorSystem{
-        width: 215px;
-    }
-    .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
-        font-size: 12px;
-    }
-}
-@media screen and (max-width: 767px) {
-    .item-title{
-        width: 250px;
-    }
-    .item-title.title-sensorSystem{
-        width: 200px;
-    }
-    .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
-        font-size: 12px;
-    }
-}
-
 /*
  * Data Viewer
  */
@@ -1501,11 +1396,7 @@ Users
     padding: 20px;
     margin-bottom:20px;
 }
-@media screen and (max-width: 991px)  {
-    .service-button{
-        margin-bottom: 10px;
-    }
-}
+
 /*process*/
 .process-list .panel-default > .panel-heading{
     background: #ededed url('../img/process.svg') right center no-repeat;
@@ -1587,37 +1478,7 @@ vertical-align: middle;
     padding-top:2px;
     padding-bottom:2px;
 }
-@media screen and (min-width: 768px) and (max-width: 991px) {
-    .modal-dialog-responsive{
-        width:700px;
-    }
-    .buttons-div{
-        padding: 0;
-        width: 394px;
-    }
-}
-@media screen and (min-width: 992px)  and (max-width: 1199px) {
-    .modal-dialog-responsive{
-        width:950px;
-    }
-}
-@media screen and (min-width: 1200px) {
-    .modal-dialog-responsive{
-        width:1024px;
-    }
-}
-@media screen and (max-height:900px){
-    .modal-dialog-resp-height .modal-content{
-        max-height:645px;
-    }
-    .modal-dialog-resp-height .modal-body{
-        max-height:505px;
-    }
-    .list-style-modal{
-        height:500px;
-        overflow-y:auto;
-    }
-}
+
 .ace_editor { height: 200px; }
 
 .searchicon input{
@@ -1648,4 +1509,147 @@ vertical-align: middle;
 h3.popover-title {
     font-size: 14px;
     font-weight: normal;
+}
+
+
+@media screen and (min-width:991px){
+  .accueil_bloc_images{
+    margin-top: 30px;
+    margin-left: 15px;
+    text-align: left;
+  }
+}
+
+@media screen and (max-width: 991px){
+  .accueil_bloc_text{
+    margin-top: 15px;
+  }
+  .accueil_text_welcome h2{
+    font-size: 35px;
+  }
+}
+@media screen and (max-width: 767px){
+  .accueil_logo img{
+    width:100%;
+    max-width:400px;
+  }
+  .new-service-form-label{
+    margin-top:7px;
+  }
+  .navbar-toggle .icon-bar {
+    background-color: #fff;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 1199px){
+  .block-association .block-associated .block-associated-title{
+    line-height: 15px;
+  }
+  .block-association .block-associated{
+    line-height: 35px;
+    font-size:40px;
+  }
+}
+@media screen and (min-width: 992px) and (max-width: 1199px){
+  .block-association .block-associated .block-associated-title{
+    width:80px;
+    margin-left: 5px;
+  }
+  .block-association-wms .block-associated .block-associated-title{
+    width:auto;
+    margin-left: 5px;
+  }
+}
+/*Dashboard responsive*/
+@media screen and (min-width: 992px)  and (max-width: 1199px) {
+  .item-title{
+    width: 425px;
+  }
+  .col-xs-6 .item-title{
+    width: 136px;
+  }
+  .col-xs-6 .item-title.data-title{
+    width: 130px;
+  }
+  .item-title.csw-title{
+    width: 455px;
+  }
+  .item-title.title-bloc{
+    width: 310px;
+  }
+  .item-title.title-bloc-service{
+    width: 250px;
+  }
+  .item-title.title-sensorSystem{
+    width: 349px;
+  }
+}
+@media screen and (min-width: 768px)  and (max-width: 991px) {
+  .item-title{
+    width: 300px;
+  }
+  .item-title.csw-title{
+    width: 315px;
+  }
+  .col-xs-6 .item-title{
+    width: 75px;
+  }
+  .item-title.title-bloc{
+    width: 220px;
+  }
+  .item-title.title-bloc-service{
+    width: 180px;
+  }
+  .item-title.title-sensorSystem{
+    width: 215px;
+  }
+  .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
+    font-size: 12px;
+  }
+}
+@media screen and (max-width: 767px) {
+  .item-title{
+    width: 250px;
+  }
+  .item-title.title-sensorSystem{
+    width: 200px;
+  }
+  .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
+    font-size: 12px;
+  }
+}
+@media screen and (max-width: 991px)  {
+  .service-button{
+    margin-bottom: 10px;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 991px) {
+  .modal-dialog-responsive{
+    width:700px;
+  }
+  .buttons-div{
+    padding: 0;
+    width: 394px;
+  }
+}
+@media screen and (min-width: 992px)  and (max-width: 1199px) {
+  .modal-dialog-responsive{
+    width:950px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .modal-dialog-responsive{
+    width:1024px;
+  }
+}
+@media screen and (max-height:900px){
+  .modal-dialog-resp-height .modal-content{
+    max-height:645px;
+  }
+  .modal-dialog-resp-height .modal-body{
+    max-height:505px;
+  }
+  .list-style-modal{
+    height:500px;
+    overflow-y:auto;
+  }
 }
