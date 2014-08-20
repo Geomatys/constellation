@@ -99,28 +99,23 @@ cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance',
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                url: $cookies.cstlUrl + "api/1/sensor/upload;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
                 async: false,
                 cache: false,
                 contentType: false,
                 processData: false,
-                success: function (path) {
-                    importSensor(path);
+                success: function (data) {
+                    $growl('success','Success','Sensor correctly imported');
+                    $modalInstance.close();
+                },
+                error: function (data){
+                    $growl('error','Error','Unable to import sensor');
+                    $modalInstance.dismiss('close');
                 }
             });
         };
-
-        function importSensor(path) {
-            sensor.add({}, {values: {'path' : path}}, function() {
-                $growl('success','Success','Sensor correctly imported');
-                $modalInstance.close();
-            }, function() {
-                $growl('error','Error','Unable to import sensor');
-                $modalInstance.dismiss('close');
-            });
-        }
     }]);
 
 cstlAdminApp.controller('SensorModalChooseController', ['$scope', '$modalInstance', '$dashboard', 'dataListing', 'sensor', 'selectedData', '$growl',

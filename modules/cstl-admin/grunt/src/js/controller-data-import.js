@@ -655,7 +655,7 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
                 contentType: false,
                 processData: false,
                 success: function (path) {
-                    importAndLinkSensor(path);
+                    importAndLinkSensor(path.dataPath);
                 }
             });
         };

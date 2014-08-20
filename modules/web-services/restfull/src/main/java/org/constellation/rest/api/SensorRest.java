@@ -28,6 +28,7 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SensorBusiness;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.ParameterValues;
@@ -46,17 +47,15 @@ import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
@@ -65,7 +64,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,7 +130,7 @@ public class SensorRest {
     @Path("{sensorid}")
     public Response deleteSensor(@PathParam("sensorid") String sensorid) {
         sensorBusiness.delete(sensorid);
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
     
     @GET
@@ -220,49 +223,107 @@ public class SensorRest {
         }
         sensorBusiness.linkDataToSensor(dataID, providerID, sensor.getIdentifier());
     }
-    
+
+    /**
+     * Receive a {@link org.glassfish.jersey.media.multipart.MultiPart} which contain a file need to be save on server.
+     * Then proceed to import sensor file into database.
+     *
+     * @param fileIs
+     * @param fileDetail
+     * @param request
+     * @return A {@link Response} with 200 code if upload work, 500 if not work.
+     */
+    @POST
+    @Path("upload")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response uploadSensor(@FormDataParam("data") InputStream fileIs,
+                               @FormDataParam("data") FormDataContentDisposition fileDetail,
+                               @Context HttpServletRequest request) {
+        final String sessionId = request.getSession(false).getId();
+        final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
+        final String fileName = fileDetail.getFileName();
+        final File newFileData = new File(uploadDirectory, fileName);
+        try {
+            if (fileIs != null) {
+                if (!uploadDirectory.exists()) {
+                    uploadDirectory.mkdir();
+                }
+                Files.copy(fileIs, newFileData.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                fileIs.close();
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            return Response.status(500).entity("failed").build();
+        }
+
+        //proceed to import sensor
+        final List<Sensor> sensorsImported;
+        try {
+            sensorsImported = proceedToImportSensor(newFileData.getAbsolutePath());
+        }catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Error while reading sensorML file", ex);
+            return Response.status(500).entity("fail to read sensorML file").build();
+        }
+        return Response.ok(sensorsImported).build();
+    }
+
     @PUT
     @Path("add")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response importSensor(final ParameterValues pv) {
-        final List<Sensor> sensorsImported = new ArrayList<>();
         final String path = pv.get("path");
-        final File imported = new File(path);
-        try {
-            if (imported.isDirectory()) {
-                final Map<String, List<String>> parents = new HashMap<>();
-                final List<File> files = getFiles(imported);
-                for (File f : files) {
-                    final AbstractSensorML sml  = unmarshallSensor(f);
-                    final String type           = getSensorMLType(sml);
-                    final String sensorID       = getSmlID(sml);
-                    final List<String> children = getChildrenIdentifiers(sml);
-
-                    final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml));
-                    sensorsImported.add(sensor);
-                    parents.put(sensorID, children);
-                }
-                // update dependencies
-                for (Entry<String, List<String>> entry : parents.entrySet()) {
-                    for (String child : entry.getValue()) {
-                        final Sensor childRecord = sensorBusiness.getSensor(child);//ConfigurationEngine.getSensor(child);
-                        childRecord.setParent(entry.getKey());
-                        sensorBusiness.update(childRecord);
-                    }
-                }
-            } else {
-                final AbstractSensorML sml = unmarshallSensor(imported);
-                final String type          = getSensorMLType(sml);
-                final String sensorID      = getSmlID(sml);
-                final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml));
-                sensorsImported.add(sensor);
-            }
+        final List<Sensor> sensorsImported;
+        try{
+            sensorsImported = proceedToImportSensor(path);
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error while reading sensorML file", ex);
             return Response.status(500).entity("fail to read sensorML file").build();
         }
         return Response.ok(sensorsImported).build();
+    }
+
+    /**
+     * Import sensorML file and Returns a list of sensor described into this sensorML.
+     *
+     * @param path to the file sensorML
+     * @return list of Sensor
+     * @throws JAXBException
+     */
+    private List<Sensor> proceedToImportSensor(final String path) throws JAXBException {
+        final List<Sensor> sensorsImported = new ArrayList<>();
+        final File imported = new File(path);
+        //@FIXME treat zip case
+        if (imported.isDirectory()) {
+            final Map<String, List<String>> parents = new HashMap<>();
+            final List<File> files = getFiles(imported);
+            for (final File f : files) {
+                final AbstractSensorML sml  = unmarshallSensor(f);
+                final String type           = getSensorMLType(sml);
+                final String sensorID       = getSmlID(sml);
+                final List<String> children = getChildrenIdentifiers(sml);
+
+                final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml));
+                sensorsImported.add(sensor);
+                parents.put(sensorID, children);
+            }
+            // update dependencies
+            for (final Entry<String, List<String>> entry : parents.entrySet()) {
+                for (final String child : entry.getValue()) {
+                    final Sensor childRecord = sensorBusiness.getSensor(child);//ConfigurationEngine.getSensor(child);
+                    childRecord.setParent(entry.getKey());
+                    sensorBusiness.update(childRecord);
+                }
+            }
+        } else {
+            final AbstractSensorML sml = unmarshallSensor(imported);
+            final String type          = getSensorMLType(sml);
+            final String sensorID      = getSmlID(sml);
+            final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml));
+            sensorsImported.add(sensor);
+        }
+        return sensorsImported;
     }
     
     @GET
