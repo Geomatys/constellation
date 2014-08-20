@@ -322,7 +322,7 @@ public final class TaskRest {
     @Path("chain")
     public Response createChain(final Chain chain) throws ConfigurationException {
         processBusiness.createChainProcess(chain);
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
     
     @DELETE
@@ -340,7 +340,7 @@ public final class TaskRest {
     @RolesAllowed("cstl-admin")
     public Response updateParamsTask(final TaskParameter taskParameter) throws ConfigurationException {
         taskParameterRepository.update(taskParameter);
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
@@ -353,7 +353,7 @@ public final class TaskRest {
             taskParameter.setOwner(cstlUser.get().getId());
 
             taskParameterRepository.create(taskParameter);
-            return Response.ok().build();
+            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         } else {
             return Response.status(Response.Status.EXPECTATION_FAILED).build();
         }
@@ -429,7 +429,7 @@ public final class TaskRest {
         final TaskParameter taskParameter = taskParameterRepository.get(id);
         if (taskParameter != null) {
             taskParameterRepository.delete(taskParameter);
-            return Response.ok().build();
+            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
     }

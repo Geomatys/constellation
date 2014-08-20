@@ -167,7 +167,7 @@ public class DomainRoleRest {
             LOGGER.warn(e.getMessage());
             return Response.serverError().entity("Domain is in use.").build();
         }
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
 }

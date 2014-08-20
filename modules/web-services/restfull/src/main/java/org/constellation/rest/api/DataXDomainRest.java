@@ -12,6 +12,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +35,14 @@ public class DataXDomainRest {
     @Path("/{dataId}/domain/{domainId}")
     public Response post(@PathParam("dataId") int dataId, @PathParam("domainId") int domainId) {
         business.addDataToDomain(dataId, domainId);
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @DELETE
     @Path("/{dataId}/domain/{domainId}")
     public Response delete(@PathParam("dataId") int dataId, @PathParam("domainId") int domainId) {
         business.removeDataFromDomain(dataId, domainId);
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @GET

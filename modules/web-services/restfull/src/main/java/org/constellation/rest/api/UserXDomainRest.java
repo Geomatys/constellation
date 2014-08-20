@@ -8,6 +8,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Set;
 
@@ -21,21 +22,21 @@ public class UserXDomainRest {
     @Path("/{domainId}/user/{userId}")
     public Response post(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
         domainRepository.addUserToDomain(userId, domainId, roles);
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
     
     @PUT
     @Path("/{domainId}/user/{userId}")
     public Response put(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
         domainRepository.updateUserInDomain(userId, domainId, roles);
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @DELETE
     @Path("/{domainId}/user/{userId}")
     public Response delete(@PathParam("userId") int userId, @PathParam("domainId") int domainId) {
         domainRepository.removeUserFromDomain(userId, domainId);
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
 }

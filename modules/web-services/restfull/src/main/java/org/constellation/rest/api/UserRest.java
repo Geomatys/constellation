@@ -91,7 +91,7 @@ public class UserRest  {
         if(userRepository.isLastAdmin(id))
             return Response.serverError().entity("admin.user.last.admin").build();
         userRepository.desactivate(id);
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST

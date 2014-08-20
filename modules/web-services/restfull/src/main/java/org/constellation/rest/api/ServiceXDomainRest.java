@@ -7,6 +7,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/1/serviceXdomain")
@@ -23,7 +24,7 @@ public class ServiceXDomainRest {
 
         serviceBusiness.addServiceToDomain(serviceId, domainId);
         
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
     
 
@@ -33,7 +34,7 @@ public class ServiceXDomainRest {
         
         serviceBusiness.removeServiceFromDomain(serviceId, domainId);
         
-        return Response.noContent().build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
 }

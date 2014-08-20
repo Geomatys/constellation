@@ -114,14 +114,14 @@ public class MapContextRest {
     @Transactional("txManager")
     public Response delete(@PathParam("id") final int contextId) {
         contextRepository.delete(contextId);
-        return Response.status(204).build();
+        return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
     @Path("layers/{id}")
     public Response setMapItems(@PathParam("id") final int contextId, final List<MapcontextStyledLayer> layers) {
         contextBusiness.setMapItems(contextId, layers);
-        return Response.status(201).build();
+        return Response.status(201).type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @GET
