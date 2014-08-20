@@ -19,6 +19,7 @@
 package org.constellation.json.metadata;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.IOException;
@@ -80,7 +81,7 @@ public class Template {
      * @throws IOException if an error occurred while reading the template.
      */
     public Template(final MetadataStandard standard, final URI template) throws IOException {
-        this(standard, Files.readAllLines(Paths.get(template)));
+        this(standard, Files.readAllLines(Paths.get(template), StandardCharsets.UTF_8));
     }
 
     /**
