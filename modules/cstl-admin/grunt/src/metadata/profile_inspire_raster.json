@@ -25,7 +25,8 @@
                                         "path":"identificationInfo.citation.title",
                                         "type":"text",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -36,7 +37,8 @@
                                         "path":"identificationInfo.abstract",
                                         "type":"textarea",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -47,7 +49,8 @@
                                         "path":"dataQualityInfo.lineage.statement",
                                         "type":"textarea",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -58,7 +61,8 @@
                                         "path":"identificationInfo.citation.date.date",
                                         "type":"Date.text",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -69,7 +73,8 @@
                                         "path":"identificationInfo.citation.date.dateType",
                                         "type":"codelist",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -80,7 +85,8 @@
                                         "path":"identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency",
                                         "type":"codelist",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -91,7 +97,8 @@
                                         "path":"identificationInfo.language",
                                         "type":"codelist",
                                         "obligation":"M",
-                                        "defaultValue":"LanguageCode.fra"
+                                        "defaultValue":"LanguageCode.fra",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -102,7 +109,8 @@
                                         "path":"identificationInfo.graphicOverview.fileName",
                                         "type":"UPLOADIMAGE.text",
                                         "obligation":"O",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -113,7 +121,8 @@
                                         "path":"identificationInfo.citation.identifier.code",
                                         "type":"text",
                                         "obligation":"M",
-                                        "defaultValue":"identifier"
+                                        "defaultValue":"identifier",
+                                        "value":null
                                     }
                                 }
                             ]
@@ -134,7 +143,8 @@
                                             "path":"identificationInfo.descriptiveKeywords.keyword",
                                             "type":"INSPIRE_ISO.codelist",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -145,7 +155,8 @@
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.title",
                                             "type":"readonly",
                                             "obligation":"M",
-                                            "defaultValue":"GEMET - INSPIRE themes, version 1.0"
+                                            "defaultValue":"GEMET - INSPIRE themes, version 1.0",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -156,7 +167,8 @@
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
                                             "type":"readonly",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -167,7 +179,8 @@
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
                                             "type":"CODELIST.readonly",
                                             "obligation":"M",
-                                            "defaultValue":"CI_DateTypeCode.publication"
+                                            "defaultValue":"CI_DateTypeCode.publication",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -178,7 +191,8 @@
                                             "path":"identificationInfo.topicCategory",
                                             "type":"ISO_INSPIRE.codelist",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -199,7 +213,8 @@
                                             "path":"identificationInfo.descriptiveKeywords.keyword",
                                             "type":"KEYWORD.text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -210,7 +225,8 @@
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.title",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -221,7 +237,8 @@
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
                                             "type":"DATE.text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -232,7 +249,8 @@
                                             "path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
                                             "type":"codelist",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -253,7 +271,8 @@
                                             "path":"identificationInfo.spatialRepresentationType",
                                             "type":"CODELIST.readonly",
                                             "obligation":"M",
-                                            "defaultValue":"MD_SpatialRepresentationTypeCode.grid"
+                                            "defaultValue":"MD_SpatialRepresentationTypeCode.grid",
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -274,7 +293,8 @@
                                             "path":"referenceSystemInfo.referenceSystemIdentifier.code",
                                             "type":"codelist",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -285,7 +305,8 @@
                                             "path":"identificationInfo.spatialResolution.distance",
                                             "type":"text",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -307,7 +328,8 @@
                                             "path":"identificationInfo.extent.geographicElement.westBoundLongitude",
                                             "type":"decimal",
                                             "obligation":"M",
-                                            "defaultValue":"-180"
+                                            "defaultValue":"-180",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -318,7 +340,8 @@
                                             "path":"identificationInfo.extent.geographicElement.eastBoundLongitude",
                                             "type":"decimal",
                                             "obligation":"M",
-                                            "defaultValue":"180"
+                                            "defaultValue":"180",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -329,7 +352,8 @@
                                             "path":"identificationInfo.extent.geographicElement.northBoundLatitude",
                                             "type":"decimal",
                                             "obligation":"M",
-                                            "defaultValue":"90"
+                                            "defaultValue":"90",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -340,7 +364,8 @@
                                             "path":"identificationInfo.extent.geographicElement.southBoundLatitude",
                                             "type":"decimal",
                                             "obligation":"M",
-                                            "defaultValue":"-90"
+                                            "defaultValue":"-90",
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -361,7 +386,8 @@
                                             "path":"identificationInfo.extent.temporalElement.extent.beginPosition.value",
                                             "type":"DATE.text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -372,7 +398,8 @@
                                             "path":"identificationInfo.extent.temporalElement.extent.endPosition.value",
                                             "type":"DATE.text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -393,7 +420,8 @@
                                             "path":"distributionInfo.distributionFormat.name",
                                             "type":"codelist",
                                             "obligation":"M",
-                                            "defaultValue":"SHP"
+                                            "defaultValue":"SHP",
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -414,7 +442,8 @@
                                             "path":"distributionInfo.transferOptions.onLine.linkage",
                                             "type":"web",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -425,7 +454,8 @@
                                             "path":"distributionInfo.transferOptions.onLine.protocol",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -446,7 +476,8 @@
                                             "path":"identificationInfo.resourceConstraints.useLimitation",
                                             "type":"text",
                                             "obligation":"M",
-                                            "defaultValue":"Pas de limitations"
+                                            "defaultValue":"Pas de limitations",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -457,7 +488,8 @@
                                             "path":"identificationInfo.resourceConstraints.accessConstraints",
                                             "type":"CODELIST.readonly",
                                             "obligation":"M",
-                                            "defaultValue":"MD_RestrictionCode.otherRestrictions"
+                                            "defaultValue":"MD_RestrictionCode.otherRestrictions",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -468,7 +500,8 @@
                                             "path":"identificationInfo.resourceConstraints.otherConstraints",
                                             "type":"textarea",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -479,7 +512,8 @@
                                             "path":"identificationInfo.resourceConstraints.classification",
                                             "type":"codelist",
                                             "obligation":"O",
-                                            "defaultValue":"MD_ClassificationCode.unclassified"
+                                            "defaultValue":"MD_ClassificationCode.unclassified",
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -509,7 +543,8 @@
                                         "path":"dataQualityInfo.report.result.specification.title",
                                         "type":"codelist",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -520,7 +555,8 @@
                                         "path":"dataQualityInfo.report.result.specification.date.date",
                                         "type":"readonly",
                                         "obligation":"M",
-                                        "defaultValue":"2010-05-03"
+                                        "defaultValue":"2010-05-03",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -531,7 +567,8 @@
                                         "path":"dataQualityInfo.report.result.specification.date.dateType",
                                         "type":"CODELIST.readonly",
                                         "obligation":"M",
-                                        "defaultValue":"CI_DateTypeCode.publication"
+                                        "defaultValue":"CI_DateTypeCode.publication",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -542,7 +579,8 @@
                                         "path":"dataQualityInfo.scope.level",
                                         "type":"CODELIST.readonly",
                                         "obligation":"M",
-                                        "defaultValue":"MD_ScopeCode.dataset"
+                                        "defaultValue":"MD_ScopeCode.dataset",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -553,7 +591,8 @@
                                         "path":"dataQualityInfo.report.result.pass",
                                         "type":"codelist",
                                         "obligation":"M",
-                                        "defaultValue":"null"
+                                        "defaultValue":"null",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -564,7 +603,8 @@
                                         "path":"dataQualityInfo.report.result.explanation",
                                         "type":"textarea",
                                         "obligation":"M",
-                                        "defaultValue":"See the referenced specification"
+                                        "defaultValue":"See the referenced specification",
+                                        "value":null
                                     }
                                 }
                             ]
@@ -595,7 +635,8 @@
                                             "path":"identificationInfo.pointOfContact.organisationName",
                                             "type":"text",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -606,7 +647,8 @@
                                             "path":"identificationInfo.pointOfContact.role",
                                             "type":"codelist",
                                             "obligation":"M",
-                                            "defaultValue":"CI_RoleCode.pointOfContact"
+                                            "defaultValue":"CI_RoleCode.pointOfContact",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -617,7 +659,8 @@
                                             "path":"identificationInfo.pointOfContact.individualName",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -628,7 +671,8 @@
                                             "path":"identificationInfo.pointOfContact.positionName",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -639,7 +683,8 @@
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.deliveryPoint",
                                             "type":"textarea",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -650,7 +695,8 @@
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.city",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -661,7 +707,8 @@
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.postalCode",
                                             "type":"integer",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -672,7 +719,8 @@
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.country",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":"France"
+                                            "defaultValue":"France",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -683,7 +731,8 @@
                                             "path":"identificationInfo.pointOfContact.contactInfo.address.electronicMailAddress",
                                             "type":"mail",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -694,7 +743,8 @@
                                             "path":"identificationInfo.pointOfContact.contactInfo.phone.voice",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -705,7 +755,8 @@
                                             "path":"identificationInfo.pointOfContact.contactInfo.onlineResource.linkage",
                                             "type":"web",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -727,7 +778,8 @@
                                             "path":"contact.organisationName",
                                             "type":"text",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -738,7 +790,8 @@
                                             "path":"contact.role",
                                             "type":"CODELIST.readonly",
                                             "obligation":"M",
-                                            "defaultValue":"CI_RoleCode.pointOfContact"
+                                            "defaultValue":"CI_RoleCode.pointOfContact",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -749,7 +802,8 @@
                                             "path":"contact.individualName",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -760,7 +814,8 @@
                                             "path":"contact.positionName",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -771,7 +826,8 @@
                                             "path":"contact.contactInfo.address.deliveryPoint",
                                             "type":"textarea",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -782,7 +838,8 @@
                                             "path":"contact.contactInfo.address.city",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -793,7 +850,8 @@
                                             "path":"contact.contactInfo.address.postalCode",
                                             "type":"integer",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -804,7 +862,8 @@
                                             "path":"contact.contactInfo.address.country",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":"France"
+                                            "defaultValue":"France",
+                                            "value":null
                                         }
                                     },
                                     {
@@ -815,7 +874,8 @@
                                             "path":"contact.contactInfo.address.electronicMailAddress",
                                             "type":"mail",
                                             "obligation":"M",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -826,7 +886,8 @@
                                             "path":"contact.contactInfo.phone.voice",
                                             "type":"text",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     },
                                     {
@@ -837,7 +898,8 @@
                                             "path":"contact.contactInfo.onlineResource.linkage",
                                             "type":"web",
                                             "obligation":"O",
-                                            "defaultValue":null
+                                            "defaultValue":null,
+                                            "value":null
                                         }
                                     }
                                 ]
@@ -867,7 +929,8 @@
                                         "path":"fileIdentifier",
                                         "type":"readonly",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -878,7 +941,8 @@
                                         "path":"dateStamp",
                                         "type":"readonly",
                                         "obligation":"M",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -889,7 +953,8 @@
                                         "path":"metadataStandardName",
                                         "type":"readonly",
                                         "obligation":"M",
-                                        "defaultValue":"x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster"
+                                        "defaultValue":"x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -900,7 +965,8 @@
                                         "path":"metadataStandardVersion",
                                         "type":"readonly",
                                         "obligation":"M",
-                                        "defaultValue":"2011.03"
+                                        "defaultValue":"2011.03",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -911,7 +977,8 @@
                                         "path":"characterSet",
                                         "type":"codelist",
                                         "obligation":"M",
-                                        "defaultValue":"MD_CharacterSetCode.utf8"
+                                        "defaultValue":"MD_CharacterSetCode.utf8",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -922,7 +989,8 @@
                                         "path":"language",
                                         "type":"codelist",
                                         "obligation":"M",
-                                        "defaultValue":"LanguageCode.fra"
+                                        "defaultValue":"LanguageCode.fra",
+                                        "value":null
                                     }
                                 },
                                 {
@@ -933,7 +1001,8 @@
                                         "path":"parentIdentifier",
                                         "type":"text",
                                         "obligation":"O",
-                                        "defaultValue":null
+                                        "defaultValue":null,
+                                        "value":null
                                     }
                                 },
                                 {
@@ -944,7 +1013,8 @@
                                         "path":"hierarchyLevel",
                                         "type":"CODELIST.readonly",
                                         "obligation":"M",
-                                        "defaultValue":"MD_ScopeCode.dataset"
+                                        "defaultValue":"MD_ScopeCode.dataset",
+                                        "value":null
                                     }
                                 }
                             ]
