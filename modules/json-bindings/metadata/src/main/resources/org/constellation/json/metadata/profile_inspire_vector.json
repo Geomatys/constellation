@@ -121,8 +121,8 @@
 								"defaultValue":"identifier",
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -189,8 +189,8 @@
 								"defaultValue":null,
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -245,8 +245,8 @@
 								"defaultValue":null,
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -277,8 +277,8 @@
 								"defaultValue":null,
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -309,8 +309,8 @@
 								"defaultValue":null,
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -366,8 +366,8 @@
 								"defaultValue":"-90",
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -398,8 +398,8 @@
 								"defaultValue":null,
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -418,8 +418,8 @@
 								"defaultValue":"SHP",
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -450,8 +450,8 @@
 								"defaultValue":null,
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -506,10 +506,10 @@
 								"defaultValue":"MD_ClassificationCode.unclassified",
 								"value":null
 							}
-						}]
-					}
-				}]
-			}
+						}
+					]}
+				}
+			]}
 		},
 		{
 			"superblock":{
@@ -594,10 +594,10 @@
 								"defaultValue":"See the referenced specification",
 								"value":null
 							}
-						}]
-					}
-				}]
-			}
+						}
+					]}
+				}
+			]}
 		},
 		{
 			"superblock":{
@@ -743,8 +743,8 @@
 								"defaultValue":null,
 								"value":null
 							}
-						}]
-					}
+						}
+					]}
 				},
 				{
 					"block":{
@@ -884,10 +884,10 @@
 								"defaultValue":null,
 								"value":null
 							}
-						}]
-					}
-				}]
-			}
+						}
+					]}
+				}
+			]}
 		},
 		{
 			"superblock":{
@@ -996,10 +996,10 @@
 								"defaultValue":"MD_ScopeCode.dataset",
 								"value":null
 							}
-						}]
-					}
-				}]
-			}
-		}]
-	}
+						}
+					]}
+				}
+			]}
+		}
+	]}
 }

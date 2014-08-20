@@ -18,7 +18,13 @@
  */
 package org.constellation.json.metadata;
 
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,53 +38,104 @@ import org.apache.sis.metadata.MetadataStandard;
  *
  * <blockquote><pre>{
  *    "root":{
- *        "content":[
- *            {
- *                "superblock":{
- *                    "path":null,
- *                    "content":[{
- *                        "block":{
- *                            "path":null,
- *                            "content":[
- *                                {
- *                                    "field":{
- *                                        "path":"identificationInfo.citation.title",
- *                                        "defaultValue":null
- *                                    }
- *                                },
- *                                {
- *                                    "field":{
- *                                        // etc...
- *                                    }
- *                                }
- *                            ]
+ *        "content":[{
+ *            "superblock":{
+ *                "path":null,
+ *                "content":[{
+ *                    "block":{
+ *                        "path":null,
+ *                        "content":[{
+ *                            "field":{
+ *                                "path":"identificationInfo.citation.title",
+ *                                "defaultValue":null
+ *                            }
+ *                        },
+ *                        {
+ *                            "field":{
+ *                                // etc...
+ *                            }
  *                        }
- *                    }]
+ *                    ]}
  *                }
- *            }
+ *            ]}
  *        }
  *    }
  *}</pre></blockquote>
  *
- * The file may have more (key:value) pairs - all unknown entries will be copied verbatim.
- * However the current implementation requires the { and } characters to be always like above,
- * ignoring whitespaces. In particular, we are currently not allowing to put content after {
- * or before }, and comma must be always the last character on a line (ignoring whitespaces).
+ * The only keywords handled by this class are {@code "content"}, {@code "path"}, {@code "defaultValue"}
+ * and {@code "value"}. All other entries will be copied verbatim. This allow templates to provide additional
+ * (key:value) pairs without the need to modify the {@code Template} code.
+ *
+ * <p><b>Multi-threading</b><br>
+ * This class is thread safe.</p>
+ *
+ * <p><b>Limitations</b></p>
+ * <ul>
+ *   <li>The current implementation requires that comma are always the last character on a line (ignoring whitespaces).</li>
+ *   <li>The current implementation has only limited tolerance to the location where {, }, [ and ] characters can be placed
+ *       (this is no a full JSON parser). We recommend to stay close to the above formatting.</li>
+ * </ul>
  *
  * @author Martin Desruisseaux (Geomatys)
  */
 public class Template {
     /**
+     * Pre-defined instances. This map shall not be modified after class initialization,
+     * in order to allow concurrent access without synchronization.
+     */
+    private static final Map<String,Template> INSTANCES = new HashMap<>(4);
+    static {
+        final Map<String,String> pool = new LinkedHashMap<>();
+        try {
+            add("profile_inspire_vector", pool);
+            add("profile_inspire_raster", pool);
+        } catch (URISyntaxException | IOException e) {
+            throw new ExceptionInInitializerError(e); // Should never happen.
+        }
+    }
+
+    /**
+     * Creates a pre-defined template from a resource file of the given name.
+     *
+     * @param name The resource file name, without the {@code ".json"} suffix.
+     */
+    private static void add(final String name, final Map<String,String> pool) throws URISyntaxException, IOException {
+        if (INSTANCES.put(name, new Template(Template.class.getResource(name + ".json").toURI(), pool)) != null) {
+            throw new AssertionError(name);
+        }
+    }
+
+    /**
      * The root node of the JSON tree to use as a template.
      */
-    private final TemplateNode root;
+    final TemplateNode root;
+
+    /**
+     * Creates a pre-defined template from a resource file of the given name.
+     *
+     * @param  template Path to a file containing the JSON lines to use as a template.
+     * @param  pool     An initially empty map to be filled by {@link Parser}
+     *                  for sharing same {@code String} instances when possible.
+     */
+    private Template(final URI template, final Map<String,String> pool) throws URISyntaxException, IOException {
+        root = new TemplateNode(new Parser(MetadataStandard.ISO_19115, Files.readAllLines(
+                Paths.get(template), StandardCharsets.UTF_8), pool), true);
+        /*
+         * Do not validate the path (root.validatePath(null)). We will do that in JUnit tests instead,
+         * in order to avoid consuming CPU for a verification of a static resource.
+         */
+    }
 
     /**
      * Creates a new template from the given JSON file.
+     * This constructor is for use of custom templates.
+     * Consider using one of the predefined templates returned by {@link #getInstance(String)} instead.
      *
      * @param  standard The standard used by the metadata objects to write.
      * @param  template Path to a file containing the JSON lines to use as a template.
      * @throws IOException if an error occurred while reading the template.
+     *
+     * @see #getInstance(String)
      */
     public Template(final MetadataStandard standard, final URI template) throws IOException {
         this(standard, Files.readAllLines(Paths.get(template), StandardCharsets.UTF_8));
@@ -86,14 +143,48 @@ public class Template {
 
     /**
      * Creates a new template with the given lines.
+     * This constructor is for use of custom templates.
+     * Consider using one of the predefined templates returned by {@link #getInstance(String)} instead.
      *
      * @param  standard The standard used by the metadata objects to write.
      * @param  template The JSON lines to use as a template.
      * @throws IOException if an error occurred while parsing the JSON template.
+     *
+     * @see #getInstance(String)
      */
     public Template(final MetadataStandard standard, final Iterable<String> template) throws IOException {
-        root = new TemplateNode(new Parser(standard, template), true);
+        root = new TemplateNode(new Parser(standard, template, new HashMap<String,String>()), true);
         root.validatePath(null);
+    }
+
+    /**
+     * Returns the names of available templates.
+     *
+     * @return Available templates.
+     */
+    public static Set<String> getAvailableNames() {
+        return Collections.unmodifiableSet(INSTANCES.keySet());
+    }
+
+    /**
+     * Returns the template of the given name.
+     * Currently recognized names are:
+     *
+     * <ul>
+     *   <li>profile_inspire_vector</li>
+     *   <li>profile_inspire_raster</li>
+     * </ul>
+     *
+     * @param  name Name of the template to get.
+     * @return The template of the given name.
+     * @throws IllegalArgumentException if the given name is not a known template name.
+     */
+    public static Template getInstance(final String name) throws IllegalArgumentException {
+        final Template instance = INSTANCES.get(name);
+        if (instance == null) {
+            throw new IllegalArgumentException("Undefined template: " + name);
+        }
+        return instance;
     }
 
     /**

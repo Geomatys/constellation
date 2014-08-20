@@ -53,7 +53,7 @@ final class TemplateNode {
     /**
      * The value of the {@code path} element found in the node, or {@code null}.
      */
-    private final CharSequence[] path;
+    private final String[] path;
 
     /**
      * The value of the {@code defaultValue} element found in the node, or {@code null}.
@@ -111,10 +111,24 @@ final class TemplateNode {
         }
         this.standard         = parser.standard;
         this.content          = content.toArray();
-        this.path             = (path != null) ? CharSequences.split(path, '.') : null;
+        this.path             = (path != null) ? split(path) : null;
         this.defaultValue     = defaultValue;
         this.valueIndex       = valueIndex;
         this.hasTrailingComma = parser.hasTrailingComma;
+    }
+
+    /**
+     * Split the given path and {@linkplain String#intern() internalize} the components.
+     * We internalize the components because they usually already exists elsewhere in the JVM,
+     * as field names or annotation values.
+     */
+    private static String[] split(final String path) {
+        final CharSequence[] c = CharSequences.split(path, '.');
+        final String[] cs = new String[c.length];
+        for (int i=0; i<c.length; i++) {
+            cs[i] = c[i].toString().intern();
+        }
+        return cs;
     }
 
     /**
@@ -181,7 +195,7 @@ final class TemplateNode {
         }
         Object value;
         do {
-            final String identifier = path[pathOffset].toString();
+            final String identifier = path[pathOffset];
             value = standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
             if (value == null) {
                 return null;

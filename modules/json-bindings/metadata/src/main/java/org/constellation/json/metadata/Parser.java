@@ -84,10 +84,15 @@ final class Parser {
 
     /**
      * Creates a new parser.
+     *
+     * @param  standard The standard used by the metadata objects to write.
+     * @param  template The JSON lines to use as a template.
+     * @param  pool     An initially empty map to be filled by {@code Parser}
+     *                  for sharing same {@code String} instances when possible.
      */
-    Parser(final MetadataStandard standard, final Iterable<String> lines) {
+    Parser(final MetadataStandard standard, final Iterable<String> lines, final Map<String,String> pool) {
         this.standard = standard;
-        this.pool     = new HashMap<>();
+        this.pool     = pool;
         this.lines    = lines.iterator();
     }
 
