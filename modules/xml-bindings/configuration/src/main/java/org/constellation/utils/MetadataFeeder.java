@@ -85,6 +85,7 @@ import java.util.logging.Logger;
  * Class which add some part on a metadata using {@link org.constellation.dto.DataMetadata}.
  *
  * @author bgarcia
+ * @author Cédric Briançon (Geomatys)
  * @version 0.9
  * @since 0.9
  */
@@ -95,7 +96,7 @@ public class MetadataFeeder {
     /**
      * metadata target
      */
-    private final DefaultMetadata eater;
+    protected final DefaultMetadata eater;
 
     /**
      * Constructor
@@ -115,7 +116,7 @@ public class MetadataFeeder {
 
     }
 
-    private void feedServiceContraint(final AccessConstraint constraint) {
+    protected void feedServiceContraint(final AccessConstraint constraint) {
         if (constraint != null) {
             final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
             final DefaultLegalConstraints legalConstraint = new DefaultLegalConstraints();
@@ -131,7 +132,7 @@ public class MetadataFeeder {
         }
     }
 
-    private void feedServiceContact(final Contact contact) {
+    protected void feedServiceContact(final Contact contact) {
         if (contact != null) {
             final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
             final DefaultResponsibleParty ct = new DefaultResponsibleParty(Role.POINT_OF_CONTACT);
@@ -272,7 +273,7 @@ public class MetadataFeeder {
      * @param metadata {@link org.apache.sis.metadata.iso.DefaultMetadata} where we can found Identification
      * @return an {@link org.opengis.metadata.identification.Identification}
      */
-    private Identification getIdentification(DefaultMetadata metadata) {
+    protected Identification getIdentification(DefaultMetadata metadata) {
         if (metadata.getIdentificationInfo() == null || metadata.getIdentificationInfo().isEmpty()) {
             metadata.getIdentificationInfo().add(new DefaultDataIdentification());
         }
@@ -280,7 +281,7 @@ public class MetadataFeeder {
         return metadata.getIdentificationInfo().iterator().next();
     }
 
-     private Identification getServiceIdentification(DefaultMetadata metadata) {
+     protected Identification getServiceIdentification(DefaultMetadata metadata) {
         if (metadata.getIdentificationInfo().isEmpty()) {
             metadata.getIdentificationInfo().add(new DefaultServiceIdentification());
         }
@@ -324,7 +325,7 @@ public class MetadataFeeder {
         }
     }
 
-    private CitationDate getCitationDate() {
+    protected CitationDate getCitationDate() {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
         if (identification.getCitation() != null) {
             final Citation citation = identification.getCitation();
@@ -341,7 +342,7 @@ public class MetadataFeeder {
      * @param date     {@link java.util.Date} need to be inserted
      * @param dateType {@link org.opengis.metadata.citation.DateType} to define the type of the date inserted
      */
-    private void setCitationDate(final Date date, final DateType dateType) {
+    protected void setCitationDate(final Date date, final DateType dateType) {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
         final DefaultCitationDate citDate = new DefaultCitationDate(date, dateType);
         if (identification.getCitation() == null) {
@@ -406,7 +407,7 @@ public class MetadataFeeder {
      *
      * @param _abstract abstract we want add.
      */
-    private void setAbstract(String _abstract) {
+    protected void setAbstract(String _abstract) {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
         final InternationalString internationalizeAbstract;
         if (_abstract != null) {
@@ -456,7 +457,7 @@ public class MetadataFeeder {
         ident.getDescriptiveKeywords().add(keywordsNoType);
     }
 
-    private String getDataLanguage() {
+    protected String getDataLanguage() {
         final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
         if (!identification.getLanguages().isEmpty()) {
             return identification.getLanguages().iterator().next().getLanguage();
@@ -552,7 +553,7 @@ public class MetadataFeeder {
      *
      * @param identifier the fileIdentifier
      */
-    private void setIdentifier(final String identifier) {
+    protected void setIdentifier(final String identifier) {
         eater.setFileIdentifier(identifier);
     }
 
@@ -565,11 +566,11 @@ public class MetadataFeeder {
      *
      * @param dateStamp
      */
-    private void addDateStamp(final Date dateStamp) {
+    protected void addDateStamp(final Date dateStamp) {
         eater.setDateStamp(dateStamp);
     }
 
-    private String getMetadataLocale() {
+    protected String getMetadataLocale() {
         if (!eater.getLocales().isEmpty()) {
             return eater.getLocales().iterator().next().getLanguage();
         }
@@ -581,7 +582,7 @@ public class MetadataFeeder {
      *
      * @param metadataLocale
      */
-    private void setMetadataLocale(final Locale metadataLocale) {
+    protected void setMetadataLocale(final Locale metadataLocale) {
         Collection<Locale> locales = new ArrayList<>(0);
         locales.add(metadataLocale);
         eater.setLocales(locales);
@@ -594,7 +595,7 @@ public class MetadataFeeder {
      * @param organisationName data organisation name
      * @param userRole         user role
      */
-    private void addContact(final String individualName, final String organisationName, final String userRole) {
+    protected void addContact(final String individualName, final String organisationName, final String userRole) {
         DefaultResponsibleParty newContact = new DefaultResponsibleParty();
         newContact.setIndividualName(individualName);
         final InternationalString internationalizeOrganisation = new DefaultInternationalString(organisationName);
@@ -604,7 +605,7 @@ public class MetadataFeeder {
         eater.getContacts().add(newContact);
     }
 
-    private void setContact(final String individualName, final String organisationName, final String userRole) {
+    protected void setContact(final String individualName, final String organisationName, final String userRole) {
         DefaultResponsibleParty newContact = new DefaultResponsibleParty();
         newContact.setIndividualName(individualName);
         final InternationalString internationalizeOrganisation = new DefaultInternationalString(organisationName);
@@ -615,7 +616,7 @@ public class MetadataFeeder {
         eater.getContacts().add(newContact);
     }
 
-    private String getOrganisationName() {
+    protected String getOrganisationName() {
         if (!eater.getContacts().isEmpty()) {
             final InternationalString is = eater.getContacts().iterator().next().getOrganisationName();
             if (is != null) {
@@ -625,14 +626,14 @@ public class MetadataFeeder {
         return null;
     }
 
-    private String getIndividualName() {
+    protected String getIndividualName() {
         if (!eater.getContacts().isEmpty()) {
             return eater.getContacts().iterator().next().getIndividualName();
         }
         return null;
     }
 
-    private String getRole() {
+    protected String getRole() {
         if (!eater.getContacts().isEmpty()) {
             final Role is = eater.getContacts().iterator().next().getRole();
             if (is != null) {
@@ -755,7 +756,7 @@ public class MetadataFeeder {
         }
     }
 
-    private List<OperationMetadata> getOperation(final String serviceType, final String url) {
+    protected List<OperationMetadata> getOperation(final String serviceType, final String url) {
         final List<OperationMetadata> operations = new ArrayList<>();
         OnlineResource resource;
         try {
@@ -812,7 +813,7 @@ public class MetadataFeeder {
         return operations;
     }
 
-    private OperationMetadata buildOperation(final String operationName, final OnlineResource url) {
+    protected OperationMetadata buildOperation(final String operationName, final OnlineResource url) {
         return new DefaultOperationMetadata(operationName, DistributedComputingPlatform.WEB_SERVICES, url);
     }
 
