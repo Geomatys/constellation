@@ -34,7 +34,19 @@ import org.apache.sis.metadata.MetadataStandard;
  */
 final class Parser {
     /**
-     * The metadata standard for the {@link Node} to create.
+     * The {@code null} string.
+     */
+    private static final String NULL = "null";
+
+    /**
+     * The values separator.
+     *
+     * @see #hasTrailingComma
+     */
+    static final char COMMA = ',';
+
+    /**
+     * The metadata standard for the {@link TemplateNode} to create.
      */
     final MetadataStandard standard;
 
@@ -56,17 +68,19 @@ final class Parser {
     /**
      * The line length, excluding the trailing comma (if any) and trailing whitespaces.
      */
-    int length;
+    private int length;
 
     /**
      * The current position in {@link #line}.
      */
-    int position;
+    private int position;
 
     /**
      * {@code true} if the current {@linkplain #line} has a trailing comma, ignoring whitespaces.
+     *
+     * @see #skipComma()
      */
-    boolean hasTrailingComa;
+    boolean hasTrailingComma;
 
     /**
      * Creates a new parser.
@@ -81,7 +95,7 @@ final class Parser {
      * Returns the next line.
      */
     String nextLine() throws EOFException {
-        hasTrailingComa = false;
+        hasTrailingComma = false;
         if (!lines.hasNext()) {
             throw new EOFException("Unexpected end of file.");
         }
@@ -89,8 +103,8 @@ final class Parser {
         length   = CharSequences.skipTrailingWhitespaces(line, 0, line.length());
         position = CharSequences.skipLeadingWhitespaces (line, 0, length);
         if (position < length) {
-            hasTrailingComa = (line.charAt(length - 1) == ',');
-            if (hasTrailingComa) {
+            hasTrailingComma = (line.charAt(length - 1) == COMMA);
+            if (hasTrailingComma) {
                 length = CharSequences.skipTrailingWhitespaces(line, position, length - 1); // Skip trailing comma.
             }
         }
@@ -98,20 +112,15 @@ final class Parser {
     }
 
     /**
-     * Adds the given line to the pool if absent, or returns the existing line otherwise.
+     * Returns {@code true} if the current line is empty or contains only whitespaces, ignoring the trailing comma.
      */
-    private String putIfAbsent(final String newLine) {
-        final String existing = pool.get(newLine);
-        if (existing != null) {
-            return existing;
-        }
-        pool.put(newLine, newLine);
-        return newLine;
+    boolean isEmpty() {
+        return position >= length;
     }
 
     /**
      * Returns {@code true} if the current line starting at the current position contains the given substring.
-     * If there is a match, the {@link #position} is set to the first character after the substring.
+     * If there is a match, then {@link #position} is set to the first character after the substring.
      */
     boolean regionMatches(final String s) {
         if (line.regionMatches(position, s, 0, s.length())) {
@@ -123,6 +132,7 @@ final class Parser {
 
     /**
      * Skips the {@code ':'} separator in the current line, then returns the value.
+     * The position is set after the value, which is usually {@link #length}.
      *
      * @return The value (may be {@code null}).
      * @throws ParseException If the line doesn't have the expected syntax.
@@ -132,16 +142,76 @@ final class Parser {
         if (position < length && line.charAt(position) == ':') {
             position = CharSequences.skipLeadingWhitespaces(line, position+1, length);
             if (position < length) {
-                if (regionMatches("null")) {
+                if (regionMatches(NULL)) {
                     if (position == length) {
                         return null;
                     }
                 } else if (line.charAt(position) == '"' && line.charAt(length-1) == '"') {
-                    return CharSequences.replace(line.substring(position + 1, length - 1), "\\\"", "\"").toString();
+                    final int p = position + 1;
+                    position = length;
+                    return CharSequences.replace(line.substring(p, length - 1), "\\\"", "\"").toString();
                 }
             }
         }
         throw new ParseException("Invalid \"name\":\"value\" pair:\n" + line);
+    }
+
+    /**
+     * Skips the comma, if presents. Leading whitespaces are ignored.
+     *
+     * @return {@code true} if a comma was present.
+     */
+    boolean skipComma() {
+        position = CharSequences.skipLeadingWhitespaces(line, position, length);
+        if (position >= length) {
+            return hasTrailingComma;
+        }
+        if (line.charAt(position) != COMMA) {
+            return false;
+        }
+        position++;
+        return true;
+    }
+
+    /**
+     * Increment or decrement the given level depending on the amount of { or } characters
+     * in the current portion of the current line. The {@linkplain #position} is advanced
+     * until after the } character of level 0, or until the end of line.
+     */
+    int updateLevel(int level) {
+        boolean quote = false;
+scan:   while (position < length) {
+            switch (line.charAt(position++)) {
+                case '"': {
+                    if (position <= 1 || line.charAt(position - 2) != '\\') {
+                        quote = !quote;
+                    }
+                    break;
+                }
+                case '{': {
+                    if (!quote) {
+                        level++;
+                    }
+                    break;
+                }
+                case '}': {
+                    if (!quote && --level == 0) {
+                        break scan;
+                    }
+                    break;
+                }
+            }
+        }
+        return level;
+    }
+
+    /**
+     * Returns the current line (in full, not only the current portion) without the trailing "null".
+     */
+    String currentLineWithoutNull() throws ParseException {
+        if (hasTrailingComma)   throw new ParseException("Value shall be the last entry in a field.");
+        if (getValue() != null) throw new ParseException("Value of \"value\" shall be null.");
+        return putIfAbsent(line.substring(0, length - NULL.length()));
     }
 
     /**
@@ -150,6 +220,20 @@ final class Parser {
      */
     @Override
     public String toString() {
-        return line.substring(position, length);
+        return (line != null) ? line.substring(position, length) : "";
+    }
+
+    /**
+     * Adds the given line to the pool if absent, or returns the existing line otherwise.
+     *
+     * @todo This is a helper method to be removed when we will upgrade to JDK8.
+     */
+    private String putIfAbsent(final String newLine) {
+        final String existing = pool.get(newLine);
+        if (existing != null) {
+            return existing;
+        }
+        pool.put(newLine, newLine);
+        return newLine;
     }
 }

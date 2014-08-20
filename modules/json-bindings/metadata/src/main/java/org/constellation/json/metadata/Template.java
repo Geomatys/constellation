@@ -71,7 +71,7 @@ public class Template {
     /**
      * The root node of the JSON tree to use as a template.
      */
-    private final Node root;
+    private final TemplateNode root;
 
     /**
      * Creates a new template from the given JSON file.
@@ -92,18 +92,20 @@ public class Template {
      * @throws IOException if an error occurred while parsing the JSON template.
      */
     public Template(final MetadataStandard standard, final Iterable<String> template) throws IOException {
-        this.root = new Node(new Parser(standard, template));
+        root = new TemplateNode(new Parser(standard, template), true);
+        root.validatePath(null);
     }
 
     /**
      * Writes the values of the given metadata object using the template given at construction time.
      *
      * @param metadata The metadata object to write.
-     * @param out Where to write the JSO file.
+     * @param out      Where to write the JSO file.
+     * @param prune    {@code true} for omitting empty nodes.
      *
      * @throws IOException if an error occurred while writing to {@code out}.
      */
-    public void write(final Object metadata, final Appendable out) throws IOException {
+    public void write(final Object metadata, final Appendable out, final boolean prune) throws IOException {
         root.write(metadata, out);
     }
 }
