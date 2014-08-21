@@ -174,8 +174,8 @@
 								"path":"characterSet",
 								"type":"codelist",
 								"obligation":"M",
-								"defaultValue":"MD_CharacterSetCode.utf8",
-								"value":"MD_CharacterSetCode.utf16"
+								"defaultValue":"UTF-8",
+								"value":"UTF-16"
 							}
 						},{
 							"field":{

@@ -879,7 +879,7 @@
 								"path":"characterSet",
 								"type":"codelist",
 								"obligation":"M",
-								"defaultValue":"MD_CharacterSetCode.utf8",
+								"defaultValue":"UTF-8",
 								"value":null
 							}
 						},{

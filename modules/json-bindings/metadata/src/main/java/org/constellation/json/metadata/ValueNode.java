@@ -92,7 +92,7 @@ final class ValueNode extends ArrayList<ValueNode> {
                 }
                 out.append("LanguageCode.").append(language);
             } else if (value instanceof Charset) {
-                out.append("MD_CharacterSetCode.").append(LegacyCodes.fromIANA(((Charset) value).name()));
+                out.append(((Charset) value).name());
             } else {
                 out.append(CharSequences.replace(value.toString(), "\"", "\\\"").toString());
             }
