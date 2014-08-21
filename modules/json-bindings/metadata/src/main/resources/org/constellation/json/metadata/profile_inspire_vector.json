@@ -25,8 +25,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.abstract",
 								"multiplicity":1,
@@ -37,8 +36,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.lineageStatement",
 								"multiplicity":1,
@@ -49,8 +47,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.date",
 								"multiplicity":1,
@@ -61,8 +58,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.dateType",
 								"multiplicity":1,
@@ -73,8 +69,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.maintenanceAndUpdateFrequency",
 								"multiplicity":1,
@@ -85,8 +80,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.language",
 								"multiplicity":1,
@@ -97,8 +91,7 @@
 								"defaultValue":"LanguageCode.fra",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.graphicOverViewFileName",
 								"multiplicity":1,
@@ -109,8 +102,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.rsIdentifier",
 								"multiplicity":1,
@@ -123,8 +115,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.inspire_descriptiveKeyword",
 						"multiplicity":1,
@@ -141,8 +132,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.inspire_thesaurusTitle",
 								"multiplicity":1,
@@ -153,8 +143,7 @@
 								"defaultValue":"GEMET - INSPIRE themes, version 1.0",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.inspire_thesaurusDate",
 								"multiplicity":1,
@@ -165,8 +154,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.inspire_thesaurusDateType",
 								"multiplicity":1,
@@ -177,8 +165,7 @@
 								"defaultValue":"CI_DateTypeCode.publication",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.topicCategory",
 								"multiplicity":1,
@@ -191,8 +178,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.descriptiveKeyword",
 						"multiplicity":62,
@@ -209,8 +195,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.thesaurusTitle",
 								"multiplicity":1,
@@ -221,8 +206,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.thesaurusDate",
 								"multiplicity":1,
@@ -233,8 +217,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.thesaurusDateType",
 								"multiplicity":1,
@@ -247,8 +230,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.spatialRepresentation",
 						"multiplicity":1,
@@ -265,8 +247,7 @@
 								"defaultValue":"MD_SpatialRepresentationTypeCode.vector",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.geometricObjects",
 								"multiplicity":1,
@@ -279,8 +260,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.refSystemInfo",
 						"multiplicity":1,
@@ -297,8 +277,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.scaleDenominator",
 								"multiplicity":1,
@@ -311,8 +290,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.geographicExtension",
 						"multiplicity":1,
@@ -330,8 +308,7 @@
 								"defaultValue":"-180",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.eastBoundLongitude",
 								"multiplicity":1,
@@ -342,8 +319,7 @@
 								"defaultValue":"180",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.northBoundLatitude",
 								"multiplicity":1,
@@ -354,8 +330,7 @@
 								"defaultValue":"90",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.southBoundLatitude",
 								"multiplicity":1,
@@ -368,8 +343,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.temporalExtension",
 						"multiplicity":62,
@@ -386,8 +360,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.endPosition",
 								"multiplicity":1,
@@ -400,8 +373,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.distributionInfo",
 						"multiplicity":1,
@@ -420,8 +392,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.distributionInfo",
 						"multiplicity":62,
@@ -438,8 +409,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.transfertOptionLinkageProtocol",
 								"multiplicity":1,
@@ -452,8 +422,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.resourceConstraints",
 						"multiplicity":1,
@@ -470,8 +439,7 @@
 								"defaultValue":"Pas de limitations",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.accessConstraints",
 								"multiplicity":1,
@@ -482,8 +450,7 @@
 								"defaultValue":"MD_RestrictionCode.otherRestrictions",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.otherConstraints",
 								"multiplicity":1,
@@ -494,8 +461,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.classification",
 								"multiplicity":1,
@@ -510,8 +476,7 @@
 					]}
 				}
 			]}
-		},
-		{
+		},{
 			"superblock":{
 				"name":"metadata.block.dataQuality",
 				"multiplicity":1,
@@ -534,8 +499,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.date",
 								"multiplicity":1,
@@ -546,8 +510,7 @@
 								"defaultValue":"2010-05-03",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.dateType",
 								"multiplicity":1,
@@ -558,8 +521,7 @@
 								"defaultValue":"CI_DateTypeCode.publication",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.scopeLevel",
 								"multiplicity":1,
@@ -570,8 +532,7 @@
 								"defaultValue":"MD_ScopeCode.dataset",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.resultPass",
 								"multiplicity":1,
@@ -582,8 +543,7 @@
 								"defaultValue":"null",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.resultExplanation",
 								"multiplicity":1,
@@ -598,8 +558,7 @@
 					]}
 				}
 			]}
-		},
-		{
+		},{
 			"superblock":{
 				"name":"metadata.block.contacts",
 				"multiplicity":1,
@@ -623,8 +582,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.role",
 								"multiplicity":1,
@@ -635,8 +593,7 @@
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.individualName",
 								"multiplicity":1,
@@ -647,8 +604,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.positionName",
 								"multiplicity":1,
@@ -659,8 +615,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.deliveryPoint",
 								"multiplicity":1,
@@ -671,8 +626,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.city",
 								"multiplicity":1,
@@ -683,8 +637,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.postalCode",
 								"multiplicity":1,
@@ -695,8 +648,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.country",
 								"multiplicity":1,
@@ -707,8 +659,7 @@
 								"defaultValue":"France",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.electronicMailAddress",
 								"multiplicity":1,
@@ -719,8 +670,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.voice",
 								"multiplicity":1,
@@ -731,8 +681,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.linkage",
 								"multiplicity":1,
@@ -745,8 +694,7 @@
 							}
 						}
 					]}
-				},
-				{
+				},{
 					"block":{
 						"name":"metadata.block.metadataContact",
 						"multiplicity":1,
@@ -764,8 +712,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.role",
 								"multiplicity":1,
@@ -776,8 +723,7 @@
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.individualName",
 								"multiplicity":1,
@@ -788,8 +734,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.positionName",
 								"multiplicity":1,
@@ -800,8 +745,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.deliveryPoint",
 								"multiplicity":1,
@@ -812,8 +756,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.city",
 								"multiplicity":1,
@@ -824,8 +767,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.postalCode",
 								"multiplicity":1,
@@ -836,8 +778,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.country",
 								"multiplicity":1,
@@ -848,8 +789,7 @@
 								"defaultValue":"France",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.electronicMailAddress",
 								"multiplicity":1,
@@ -860,8 +800,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.voice",
 								"multiplicity":1,
@@ -872,8 +811,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.linkage",
 								"multiplicity":1,
@@ -888,8 +826,7 @@
 					]}
 				}
 			]}
-		},
-		{
+		},{
 			"superblock":{
 				"name":"metadata.block.metadata",
 				"multiplicity":1,
@@ -912,20 +849,18 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.dateStamp",
 								"multiplicity":1,
 								"help":"metadata.field.dateStamp_help",
 								"path":"dateStamp",
-								"type":"readonly",
+								"type":"DATE.readonly",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.metadataStandardName",
 								"multiplicity":1,
@@ -936,8 +871,7 @@
 								"defaultValue":"x-urn:schema:ISO19115:INSPIRE:dataset:geo-vector",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.metadataStandardVersion",
 								"multiplicity":1,
@@ -948,8 +882,7 @@
 								"defaultValue":"2011.03",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.characterSet",
 								"multiplicity":1,
@@ -960,8 +893,7 @@
 								"defaultValue":"MD_CharacterSetCode.utf8",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.metadatalanguage",
 								"multiplicity":1,
@@ -972,8 +904,7 @@
 								"defaultValue":"LanguageCode.fra",
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.parentIdentifier",
 								"multiplicity":1,
@@ -984,8 +915,7 @@
 								"defaultValue":null,
 								"value":null
 							}
-						},
-						{
+						},{
 							"field":{
 								"name":"metadata.field.hierarchyLevel",
 								"multiplicity":1,

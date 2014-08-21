@@ -20,15 +20,14 @@ package org.constellation.json.metadata;
 
 import java.util.Set;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Collections;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import org.apache.sis.metadata.MetadataStandard;
 
 
@@ -49,8 +48,7 @@ import org.apache.sis.metadata.MetadataStandard;
  *                                "path":"identificationInfo.citation.title",
  *                                "defaultValue":null
  *                            }
- *                        },
- *                        {
+ *                        },{
  *                            "field":{
  *                                // etc...
  *                            }
@@ -71,7 +69,8 @@ import org.apache.sis.metadata.MetadataStandard;
  *
  * <p><b>Limitations</b></p>
  * <ul>
- *   <li>The current implementation requires that comma are always the last character on a line (ignoring whitespaces).</li>
+ *   <li>The current implementation requires that comma is the last character on a line (ignoring whitespaces),
+ *       or the character just before an opening {.</li>
  *   <li>The current implementation has only limited tolerance to the location where {, }, [ and ] characters can be placed
  *       (this is no a full JSON parser). We recommend to stay close to the above formatting.</li>
  * </ul>
@@ -89,7 +88,7 @@ public class Template {
         try {
             add("profile_inspire_vector", pool);
             add("profile_inspire_raster", pool);
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new ExceptionInInitializerError(e); // Should never happen.
         }
     }
@@ -99,8 +98,17 @@ public class Template {
      *
      * @param name The resource file name, without the {@code ".json"} suffix.
      */
-    private static void add(final String name, final Map<String,String> pool) throws URISyntaxException, IOException {
-        if (INSTANCES.put(name, new Template(Template.class.getResource(name + ".json").toURI(), pool)) != null) {
+    private static void add(final String name, final Map<String,String> pool) throws IOException {
+        final List<String> lines = new ArrayList<>();
+        try (final BufferedReader in = new BufferedReader(new InputStreamReader(
+                Template.class.getResourceAsStream(name + ".json"), "UTF-8")))
+        {
+            String line;
+            while ((line = in.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+        if (INSTANCES.put(name, new Template(lines, pool)) != null) {
             throw new AssertionError(name);
         }
     }
@@ -113,32 +121,16 @@ public class Template {
     /**
      * Creates a pre-defined template from a resource file of the given name.
      *
-     * @param  template Path to a file containing the JSON lines to use as a template.
+     * @param  template The JSON lines to use as a template.
      * @param  pool     An initially empty map to be filled by {@link Parser}
      *                  for sharing same {@code String} instances when possible.
      */
-    private Template(final URI template, final Map<String,String> pool) throws URISyntaxException, IOException {
-        root = new TemplateNode(new Parser(MetadataStandard.ISO_19115, Files.readAllLines(
-                Paths.get(template), StandardCharsets.UTF_8), pool), true);
+    private Template(final Iterable<String> template, final Map<String,String> pool) throws IOException {
+        root = new TemplateNode(new Parser(MetadataStandard.ISO_19115, template, pool), true);
         /*
          * Do not validate the path (root.validatePath(null)). We will do that in JUnit tests instead,
          * in order to avoid consuming CPU for a verification of a static resource.
          */
-    }
-
-    /**
-     * Creates a new template from the given JSON file.
-     * This constructor is for use of custom templates.
-     * Consider using one of the predefined templates returned by {@link #getInstance(String)} instead.
-     *
-     * @param  standard The standard used by the metadata objects to write.
-     * @param  template Path to a file containing the JSON lines to use as a template.
-     * @throws IOException if an error occurred while reading the template.
-     *
-     * @see #getInstance(String)
-     */
-    public Template(final MetadataStandard standard, final URI template) throws IOException {
-        this(standard, Files.readAllLines(Paths.get(template), StandardCharsets.UTF_8));
     }
 
     /**

@@ -19,7 +19,6 @@
 package org.constellation.json.metadata;
 
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.io.EOFException;
 import org.apache.sis.util.CharSequences;
@@ -37,13 +36,6 @@ final class Parser {
      * The {@code null} string.
      */
     private static final String NULL = "null";
-
-    /**
-     * The values separator.
-     *
-     * @see #hasTrailingComma
-     */
-    static final char COMMA = ',';
 
     /**
      * The metadata standard for the {@link TemplateNode} to create.
@@ -76,11 +68,12 @@ final class Parser {
     private int position;
 
     /**
-     * {@code true} if the current {@linkplain #line} has a trailing comma, ignoring whitespaces.
+     * Non-null if the current {@linkplain #line} has a trailing comma, ignoring whitespaces.
+     * If non-null, the value is either "," or ",{".
      *
      * @see #skipComma()
      */
-    boolean hasTrailingComma;
+    String trailingComma;
 
     /**
      * Creates a new parser.
@@ -100,17 +93,29 @@ final class Parser {
      * Returns the next line.
      */
     String nextLine() throws EOFException {
-        hasTrailingComma = false;
+        trailingComma = null;
         if (!lines.hasNext()) {
             throw new EOFException("Unexpected end of file.");
         }
         line     = putIfAbsent(lines.next());
         length   = CharSequences.skipTrailingWhitespaces(line, 0, line.length());
         position = CharSequences.skipLeadingWhitespaces (line, 0, length);
-        if (position < length) {
-            hasTrailingComma = (line.charAt(length - 1) == COMMA);
-            if (hasTrailingComma) {
-                length = CharSequences.skipTrailingWhitespaces(line, position, length - 1); // Skip trailing comma.
+        final int remaining = length - position;
+        if (remaining >= 1) {
+            switch (line.charAt(length - 1)) {
+                case ',': {
+                    trailingComma = ",";
+                    break;
+                }
+                case '{': {
+                    if (remaining >= 2 && line.charAt(length - 2) == ',') {
+                        trailingComma = ",{";
+                    }
+                    break;
+                }
+            }
+            if (trailingComma != null) {
+                length = CharSequences.skipTrailingWhitespaces(line, position, length - trailingComma.length());
             }
         }
         return line;
@@ -164,18 +169,18 @@ final class Parser {
     /**
      * Skips the comma, if presents. Leading whitespaces are ignored.
      *
-     * @return {@code true} if a comma was present.
+     * @return Non-null if a comma was present.
      */
-    boolean skipComma() {
+    String skipComma() {
         position = CharSequences.skipLeadingWhitespaces(line, position, length);
         if (position >= length) {
-            return hasTrailingComma;
+            return trailingComma;
         }
-        if (line.charAt(position) != COMMA) {
-            return false;
+        if (line.charAt(position) == ',') {
+            position++;
+            return ",";
         }
-        position++;
-        return true;
+        return null;
     }
 
     /**
@@ -184,8 +189,9 @@ final class Parser {
      * until after the } character of level 0, or until the end of line.
      */
     int updateLevel(int level) {
+        final int upper = line.length();
         boolean quote = false;
-scan:   while (position < length) {
+scan:   while (position < upper) {
             switch (line.charAt(position++)) {
                 case '"': {
                     if (position <= 1 || line.charAt(position - 2) != '\\') {
@@ -214,8 +220,8 @@ scan:   while (position < length) {
      * Returns the current line (in full, not only the current portion) without the trailing "null".
      */
     String currentLineWithoutNull() throws ParseException {
-        if (hasTrailingComma)   throw new ParseException("Value shall be the last entry in a field.");
-        if (getValue() != null) throw new ParseException("Value of \"value\" shall be null.");
+        if (trailingComma != null) throw new ParseException("Value shall be the last entry in a field.");
+        if (getValue()    != null) throw new ParseException("Value of \"value\" shall be null.");
         return putIfAbsent(line.substring(0, length - NULL.length()));
     }
 

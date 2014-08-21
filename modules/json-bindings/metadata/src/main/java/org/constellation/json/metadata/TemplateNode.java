@@ -66,9 +66,10 @@ final class TemplateNode {
     private final int valueIndex;
 
     /**
-     * {@code true} if this node has a trailing comma.
+     * Non-null if this node has a trailing comma.
+     * If non-null, the value is either "," or ",{".
      */
-    private final boolean hasTrailingComma;
+    private final String trailingComma;
 
     /**
      * Creates a new node for the given lines.
@@ -96,7 +97,7 @@ final class TemplateNode {
                 content.set(valueIndex, parser.currentLineWithoutNull());
             } else if (parser.regionMatches("\"content\"")) {
                 do content.add(new TemplateNode(parser, false));
-                while (parser.skipComma());
+                while (parser.skipComma() != null);
             }
             /*
              * Increment or decrement the level when we find '{' or '}' character. The loop exits when we reach
@@ -109,12 +110,12 @@ final class TemplateNode {
             }
             nextLine = parser.isEmpty();
         }
-        this.standard         = parser.standard;
-        this.content          = content.toArray();
-        this.path             = (path != null) ? split(path) : null;
-        this.defaultValue     = defaultValue;
-        this.valueIndex       = valueIndex;
-        this.hasTrailingComma = parser.hasTrailingComma;
+        this.standard      = parser.standard;
+        this.content       = content.toArray();
+        this.path          = (path != null) ? split(path) : null;
+        this.defaultValue  = defaultValue;
+        this.valueIndex    = valueIndex;
+        this.trailingComma = parser.trailingComma;
     }
 
     /**
@@ -307,7 +308,7 @@ final class TemplateNode {
         if (root == null) {
             root = new ValueNode(this, null);
         }
-        writeTree(root, out, true);
+        writeTree(root, out, null, true);
     }
 
     /**
@@ -315,7 +316,7 @@ final class TemplateNode {
      * This method handles multi-occurrences of field values only.  Multi-occurrences of metadata
      * shall be handled by the caller.
      */
-    private void writeTree(final ValueNode node, final Appendable out, final boolean isLastNode) throws IOException {
+    private void writeTree(final ValueNode node, final Appendable out, final String separator, final boolean isLastNode) throws IOException {
         assert node.template == this;
         final Object[] values = node.values;
         if (values == null) {
@@ -324,15 +325,15 @@ final class TemplateNode {
              * Note that the caller may invoke this method many time for the same TemplateNode if there
              * is multi-occurrences. The multi-occurrence is not handled by this method.
              */
-            writeTree(node, out, isLastNode, null);
+            writeTree(node, out, separator, isLastNode, null);
         } else {
             /*
-             * The node is "field" and may contain an arbitrary amount of values. Repeate the whole node
+             * The node is "field" and may contain an arbitrary amount of values. Repeats the whole node
              * for each value. Note that multi-occurrences of values (handled here) is not the same than
              * multi-occurrences of metadata (handled by the caller).
              */
             for (int i=0; i < values.length; i++) {
-                writeTree(node, out, isLastNode & ((i+1) == values.length), values[i]);
+                writeTree(node, out, separator, isLastNode & ((i+1) == values.length), values[i]);
             }
         }
     }
@@ -342,35 +343,51 @@ final class TemplateNode {
      *
      * @param  metadata The metadata to write.
      * @param  children The list of children computed by {@link #createValueTree(Object, int)}.
-     * @param  out Where to write the JSON file.
+     * @param  out      Where to write the JSON file.
      * @throws IOException If an error occurred while writing the JSON file.
      */
-    private void writeTree(final ValueNode children, final Appendable out, final boolean isLastNode, final Object value) throws IOException {
+    private void writeTree(final ValueNode children, final Appendable out, final String separator,
+            final boolean isLastNode, final Object value) throws IOException
+    {
+        String childSeparator = null;
         for (int i=0; i<content.length; i++) {
-            final Object e = content[i];
-            if (e instanceof TemplateNode) {
-                final int length = children.size();
-                for (int j=0; j<length; j++) {
+            final Object line = content[i];
+            if (line instanceof TemplateNode) {
+                /*
+                 * If the "line" is actually a "superblock", "block" or "field", we may have many occurrences of
+                 * that node. Formats an occurrence for each value.  Note that if we have more than one occurrence
+                 * but the node was used to be the last array element, we will need to append a separator. This is
+                 * usually "," but can also be ",{" if the node has no opening bracket.
+                 */
+                final int n = children.size();
+                for (int j=0; j<n; j++) {
                     final ValueNode child = children.get(j);
-                    if (child.template == e) {
-                        ((TemplateNode) e).writeTree(child, out, (j+1) == length);
+                    if (child.template == line) {
+                        ((TemplateNode) line).writeTree(child, out, childSeparator, (j+1) == n);
                     }
                 }
+                childSeparator = ((TemplateNode) line).trailingComma; // To be used by the next occurrence of a node.
             } else {
-                final String line = (String) e;
+                /*
+                 * If the line is an ordinary line, write that line with the following special cases:
+                 *
+                 * - Append the value is the line is the one which is expected to contain the value.
+                 * - Append "," or ",{" if there is no separator while we are expecting to write more nodes.
+                 * - Or (opposite of above), remove separator if present while we formatted the last node.
+                 */
                 final boolean isLastLine = (i+1) == content.length;
-                if (isLastLine && isLastNode && hasTrailingComma) {
-                    out.append(line, 0, line.length() - 1);
+                if (isLastLine && isLastNode && trailingComma != null) {
+                    out.append((String) line, 0, ((String) line).length() - trailingComma.length());
                 } else {
-                    out.append(line);
+                    out.append((String) line);
                 }
                 if (i == valueIndex) {
                     if (value != null) out.append('"');
                     out.append(ValueNode.format(value));
                     if (value != null) out.append('"');
                 }
-                if (isLastLine && !isLastNode && !hasTrailingComma) {
-                    out.append(Parser.COMMA);
+                if (isLastLine && !isLastNode && trailingComma == null) {
+                    out.append(separator);
                 }
                 out.append('\n');
             }
@@ -405,7 +422,7 @@ final class TemplateNode {
                 hasChildren = true;
             }
         }
-        if (hasTrailingComma) {
+        if (trailingComma != null) {
             if (hasChildren) {
                 buffer.append('\n').append(CharSequences.spaces(indentation));
             }

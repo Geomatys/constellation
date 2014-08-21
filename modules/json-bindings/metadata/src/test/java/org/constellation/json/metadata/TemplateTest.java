@@ -21,10 +21,8 @@ package org.constellation.json.metadata;
 import java.util.Set;
 import java.util.Locale;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.opengis.metadata.citation.Role;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -92,29 +90,41 @@ public final strictfp class TemplateTest {
     }
 
     /**
+     * Asserts that a JSON output is equals to the expected one.
+     *
+     * @param  expectedFile The filename (without directory) of the test resource containing the expected JSON content.
+     * @param  actual The JSON content produced by {@link Template}.
+     * @throws IOException if an error occurred while reading the expected JSON file.
+     */
+    private static void assertJsonEquals(final String expectedFile, final CharSequence actual) throws IOException {
+        int lineNumber = 0;
+        final CharSequence[] lines = CharSequences.splitOnEOL(actual);
+        try (final BufferedReader in = new BufferedReader(new InputStreamReader(
+                Template.class.getResourceAsStream(expectedFile), "UTF-8")))
+        {
+            String expectedLine;
+            while ((expectedLine = in.readLine()) != null) {
+                final CharSequence actualLine = lines[lineNumber++];
+                if (!expectedLine.equals(actualLine)) {
+                    fail("Comparison failure at line " + lineNumber + ".\n" +
+                         "Expected: " + expectedLine + "\n" +
+                         "Actual:   " + actualLine + '\n');
+                }
+            }
+        }
+
+    }
+
+    /**
      * Test writing of a simple metadata while pruning the empty nodes.
      *
      * @throws IOException if an error occurred while applying the template.
-     * @throws URISyntaxException should never occurs.
      */
     @Test
-    public void testWritePrune() throws IOException, URISyntaxException {
+    public void testWritePrune() throws IOException {
         final DefaultMetadata metadata = createMetadata();
         final StringBuilder buffer = new StringBuilder(5000);
         Template.getInstance("profile_inspire_vector").write(metadata, buffer, true);
-        /*
-         * Compares with expected lines.
-         */
-        final CharSequence[] lines = CharSequences.splitOnEOL(buffer);
-        final URI expected = TemplateTest.class.getResource("vector_test.json").toURI();
-        int lineNumber = 0;
-        for (final String expectedLine : Files.readAllLines(Paths.get(expected), StandardCharsets.UTF_8)) {
-            final CharSequence actualLine = lines[lineNumber++];
-            if (!expectedLine.equals(actualLine)) {
-                fail("Comparison failure at line " + lineNumber + ".\n" +
-                     "Expected: " + expectedLine + "\n" +
-                     "Actual:   " + actualLine + '\n');
-            }
-        }
+        assertJsonEquals("vector_test.json", buffer);
     }
 }
