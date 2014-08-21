@@ -241,7 +241,7 @@ final class TemplateNode {
      * @return The values (often an array of length 1), or {@code null} if none.
      */
     private Object[] getValues(Object metadata, int pathOffset) throws ClassCastException {
-        if (path == null) {
+        if (metadata == null || path == null) {
             return null;
         }
         Object value;
@@ -280,8 +280,9 @@ final class TemplateNode {
      *
      * @param metadata   The root metadata from which to get the values.
      * @param pathOffset Index of the first {@link #path} element to use.
+     * @param prune      {@code true} for omitting empty nodes.
      */
-    private ValueNode createValueTree(final Object metadata, int pathOffset) throws ParseException {
+    private ValueNode createValueTree(final Object metadata, int pathOffset, final boolean prune) throws ParseException {
         ValueNode root = null;
         /*
          * If this node does not declare any path, we can not get a metadata value for this node.
@@ -290,7 +291,7 @@ final class TemplateNode {
         if (path == null) {
             for (final Object line : content) {
                 if (line instanceof TemplateNode) {
-                    root = addTo(root, ((TemplateNode) line).createValueTree(metadata, pathOffset));
+                    root = addTo(root, ((TemplateNode) line).createValueTree(metadata, pathOffset, prune));
                 }
             }
         } else {
@@ -308,8 +309,8 @@ final class TemplateNode {
             }
             if (values != null) {
                 /*
-                 * If this node is a field, store the value. Otherwise delegate to the child nodes
-                 * for creating sub-tree.
+                 * If we have a value and this node is a field, store the value.
+                 * Otherwise delegate to the child nodes for creating sub-tree.
                  */
                 if (valueIndex >= 0) {
                     root = new ValueNode(this, values);
@@ -318,8 +319,24 @@ final class TemplateNode {
                     for (final Object line : content) {
                         if (line instanceof TemplateNode) {
                             for (final Object value : values) {
-                                root = addTo(root, ((TemplateNode) line).createValueTree(value, pathOffset));
+                                root = addTo(root, ((TemplateNode) line).createValueTree(value, pathOffset, prune));
                             }
+                        }
+                    }
+                }
+            } else if (!prune) {
+                /*
+                 * If there is no value, write anyway if the user asked us to not trim empty nodes.
+                 * We will format the default values, which may be {@code null}. Note that in the
+                 * later case we really want an array of values containing the 'null' element.
+                 */
+                if (valueIndex >= 0) {
+                    root = new ValueNode(this, new Object[] {defaultValue});
+                } else {
+                    pathOffset += path.length;
+                    for (final Object line : content) {
+                        if (line instanceof TemplateNode) {
+                            root = addTo(root, ((TemplateNode) line).createValueTree(null, pathOffset, prune));
                         }
                     }
                 }
@@ -350,11 +367,12 @@ final class TemplateNode {
      * Writes the given metadata to the given output using this node as a template.
      *
      * @param  metadata The metadata to write.
-     * @param  out Where to write the JSON file.
+     * @param  out      Where to write the JSON file.
+     * @param  prune    {@code true} for omitting empty nodes.
      * @throws IOException If an error occurred while writing the JSON file.
      */
-    void write(final Object metadata, final Appendable out) throws IOException {
-        ValueNode root = createValueTree(metadata, 0);
+    void write(final Object metadata, final Appendable out, final boolean prune) throws IOException {
+        ValueNode root = createValueTree(metadata, 0, prune);
         if (root == null) {
             root = new ValueNode(this, null);
         }

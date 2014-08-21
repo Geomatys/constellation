@@ -189,6 +189,6 @@ public class Template {
      * @throws IOException if an error occurred while writing to {@code out}.
      */
     public void write(final Object metadata, final Appendable out, final boolean prune) throws IOException {
-        root.write(metadata, out);
+        root.write(metadata, out, prune);
     }
 }

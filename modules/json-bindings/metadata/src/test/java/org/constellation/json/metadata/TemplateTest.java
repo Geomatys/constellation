@@ -122,6 +122,19 @@ public final strictfp class TemplateTest {
         final DefaultMetadata metadata = createMetadata();
         final StringBuilder buffer = new StringBuilder(5000);
         Template.getInstance("profile_inspire_vector").write(metadata, buffer, true);
+        assertJsonEquals("vector_prune.json", buffer);
+    }
+
+    /**
+     * Test writing of a simple metadata without pruning the empty nodes.
+     *
+     * @throws IOException if an error occurred while applying the template.
+     */
+    @Test
+    public void testWriteFull() throws IOException {
+        final DefaultMetadata metadata = createMetadata();
+        final StringBuilder buffer = new StringBuilder(32000);
+        Template.getInstance("profile_inspire_vector").write(metadata, buffer, false);
         assertJsonEquals("vector_test.json", buffer);
     }
 }
