@@ -383,11 +383,12 @@ public class MetadataFeeder {
     }
 
     public void setCitationIdentifier(final String fileIdentifier) {
-        final Identification id = getIdentification(eater);
+        final DefaultDataIdentification id = (DefaultDataIdentification) getIdentification(eater);
         DefaultCitation citation = (DefaultCitation) id.getCitation();
         if (citation == null) {
             citation = new DefaultCitation();
             citation.setIdentifiers(Collections.singleton(new DefaultIdentifier(fileIdentifier)));
+            id.setCitation(citation);
             return;
         }
         citation.setIdentifiers(Collections.singleton(new DefaultIdentifier(fileIdentifier)));
