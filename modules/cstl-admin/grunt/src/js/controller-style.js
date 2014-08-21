@@ -1295,31 +1295,33 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * Proceed to get layer attributes
          */
         $scope.loadDataProperties = function() {
-            provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
-                function(response) {
-                    $scope.dataProperties = response;
-                    $scope.attributesTypeNumber = getOnlyNumbersFields(response.properties);
-                    $scope.attributesExcludeGeometry = getFieldsExcludeGeometry(response.properties);
-                    if($scope.attributesTypeNumber.length>0){
-                        $scope.optionsSLD.autoIntervalValues.attr=$scope.attributesTypeNumber[0].name;
-                    }
-                    if($scope.attributesExcludeGeometry.length>0){
-                        $scope.optionsSLD.autoUniqueValues.attr=$scope.attributesExcludeGeometry[0].name;
-                    }
-                    //for raster only
-                    if($scope.dataType === 'raster'){
-                        $scope.dataBands = response.bands;
-                        if($scope.dataBands && $scope.dataBands.length > 0){
-                            $scope.optionsSLD.rasterPalette.band.selected = $scope.dataBands[0];
-                            $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
-                            $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+            if($scope.providerId && $scope.layerName) {
+                provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
+                    function(response) {
+                        $scope.dataProperties = response;
+                        $scope.attributesTypeNumber = getOnlyNumbersFields(response.properties);
+                        $scope.attributesExcludeGeometry = getFieldsExcludeGeometry(response.properties);
+                        if($scope.attributesTypeNumber.length>0){
+                            $scope.optionsSLD.autoIntervalValues.attr=$scope.attributesTypeNumber[0].name;
                         }
+                        if($scope.attributesExcludeGeometry.length>0){
+                            $scope.optionsSLD.autoUniqueValues.attr=$scope.attributesExcludeGeometry[0].name;
+                        }
+                        //for raster only
+                        if($scope.dataType === 'raster'){
+                            $scope.dataBands = response.bands;
+                            if($scope.dataBands && $scope.dataBands.length > 0){
+                                $scope.optionsSLD.rasterPalette.band.selected = $scope.dataBands[0];
+                                $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
+                                $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+                            }
+                        }
+                    },
+                    function() {
+                        $growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
                     }
-                },
-                function() {
-                    $growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
-                }
-            );
+                );
+            }
         };
         $scope.loadDataProperties();
 
@@ -1375,16 +1377,18 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * Proceed to load all data layers properties bbox and band.
          */
         $scope.initDataLayerProperties = function(callback) {
-            provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
-                function(response) {
-                    $scope.dataBbox = response.boundingBox;
-                    if(typeof callback =='function'){
-                        callback();
+            if($scope.providerId && $scope.layerName) {
+                provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
+                    function(response) {
+                        $scope.dataBbox = response.boundingBox;
+                        if(typeof callback =='function'){
+                            callback();
+                        }
+                    }, function() {
+                        $growl('error', 'Error', 'Unable to get data description');
                     }
-                }, function() {
-                    $growl('error', 'Error', 'Unable to get data description');
-                }
-            );
+                );
+            }
         };
 
         $scope.aceLoaded = function(_editor) {
