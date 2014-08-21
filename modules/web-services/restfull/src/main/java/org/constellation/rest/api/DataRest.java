@@ -26,6 +26,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
@@ -51,6 +52,7 @@ import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.json.metadata.Template;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
@@ -1616,17 +1618,35 @@ public class DataRest {
     }
 
     @GET
-    @Path("metadataJson/iso/{providerId}/{dataId}/{type}/{full}")
+    @Path("metadataJson/iso/{providerId}/{dataId}/{type}/{prune}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getIsoMetadataJson(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId,
-            final @PathParam("type") String type, final @PathParam("full") boolean full) {
+            final @PathParam("type") String type, final @PathParam("prune") boolean prune) {
         final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+        //prune the metadata
         if (metadata != null) {
             metadata.prune();
         }
-        final String str = JSON.format(metadata);
-        return Response.ok(str).build();
+
+        //get template name
+        final String templateName;
+        if("vector".equalsIgnoreCase(type)){
+            //vector
+            templateName="profile_inspire_vector";
+        }else {
+            //raster
+            templateName="profile_inspire_raster";
+        }
+        final Template template = Template.getInstance(templateName);
+        final StringBuilder buffer = new StringBuilder();
+        try{
+            template.write(metadata,buffer,prune);
+        }catch(IOException ex){
+            LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
+            return Response.status(500).entity("failed").build();
+        }
+        return Response.ok(buffer.toString()).build();
     }
 
     @GET

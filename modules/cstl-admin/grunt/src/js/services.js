@@ -479,9 +479,9 @@ cstlAdminApp.factory('textService', ['$http', '$growl',
                 });
                 return promise;
             },
-            metadataJson : function(provider, data, type, full){
+            metadataJson : function(provider, data, type, prune){
                 var promise = $http({
-                    url: '@cstl/api/1/domain/$domainId/data/metadataJson/iso/'+ provider+'/'+ data +'/'+ type +'/'+ full +';jsessionid=',
+                    url: '@cstl/api/1/domain/$domainId/data/metadataJson/iso/'+ provider+'/'+ data +'/'+ type +'/'+ prune +';jsessionid=',
                     method: "GET",
                     headers: {'Accept': 'application/json'}
                 });

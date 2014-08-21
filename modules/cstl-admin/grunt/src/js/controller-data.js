@@ -213,7 +213,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     'selected':function(){return $scope.selected},
                     'metadataValues':function(textService){
                         return textService.metadataJson($scope.selected.Provider,
-                            $scope.selected.Name, $scope.selected.Type.toLowerCase(), false);
+                            $scope.selected.Name, $scope.selected.Type.toLowerCase(), true);
                     }
                 }
             });
@@ -718,11 +718,10 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
 
 cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstance','$http', 'selected', 'metadataValues',
     function ($scope, $modalInstance, $http, selected, metadataValues) {
-        $scope.metadataValues = metadataValues.data;
+        $scope.metadataValues = [];
+        $scope.metadataValues.push(metadataValues.data);
+
         $scope.selectedData = selected;
-
-        $scope.metadataTemplate = [];
-
 
         function initCollapseEvents () {
             if(window.collapseEventsRegistered)return; //to fix a bug with angular
@@ -777,85 +776,14 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
             window.collapseEventsRegistered = true;
         }
 
-
-        function existsValueForField(field){
-            if(field.path.indexOf('.') == -1){
-                if(! $scope.metadataValues[field.path]){
-                    return false;
-                }
-            }else {
-                var arr = field.path.split('.');
-                var result = $scope.metadataValues[arr[0]];
-                if(result === undefined){
-                    return false;
-                }
-                if($.isArray(result)){
-                    result = result[0];
-                }
-                if(arr.length>=2){
-                    for (var i=1; i<arr.length; i++){
-                        result = result[arr[i]];
-                        if(result === undefined){
-                            return false;
-                        }
-                        if($.isArray(result)){
-                            result = result[0];
-                        }
-                    }
-                }
-                if(result === undefined){
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        function cleanEmptyFieldsBlock(jsonObj){
-            var result = [];
-            var cleaned = jsonObj[0];
-            var superBlocks = cleaned.root.content;
-            for(var i=0;i<superBlocks.length;i++){
-                var bcontent = superBlocks[i].superblock.content;
-                for(var j=0;j<bcontent.length;j++){
-                    var block = bcontent[j].block;
-                    var fcontent = block.content;
-                    for(var k=0;k<fcontent.length;k++){
-                        var field = fcontent[k].field;
-                        if(! existsValueForField(field)){
-                            fcontent.splice(k,1);
-                            k--;
-                        }
-                    }
-                    if(fcontent.length===0){
-                        bcontent.splice(j,1);
-                        j--;
-                    }
-                }
-            }
-            result.push(cleaned);
-            return result;
-        }
-
-        function adjust(jsonObj){
-            //clean empty fields
-            cleanEmptyFieldsBlock(jsonObj);
-        }
+        $scope.isDateField = function(type){
+            return (type.toLowerCase().indexOf('date') != -1);
+        };
+        $scope.isCodelistField = function(type){
+            return (type.toLowerCase().indexOf('codelist') != -1);
+        };
 
         $scope.initMetadataViewer = function() {
-            if($scope.selectedData.Type){
-                if($scope.selectedData.Type.toLowerCase() === 'vector'){
-                    $http.get('metadata/profile_inspire_vector.json').then(function(res){
-                        $scope.metadataTemplate.push(res.data);
-                        adjust($scope.metadataTemplate);
-                    });
-                }else if($scope.selectedData.Type.toLowerCase() === 'coverage'){
-                    $http.get('metadata/profile_inspire_raster.json').then(function(res){
-                        $scope.metadataTemplate.push(res.data);
-                        adjust($scope.metadataTemplate);
-                    });
-                }
-
-            }
             initCollapseEvents();
         };
 
@@ -866,35 +794,6 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
             var post = data.content.length + 1;
             var newName = data.name + '-' + post;
             data.content.push({"block":{name: newName,content: []}});
-        };
-
-
-        $scope.resolveValue = function(field){
-            var result;
-            if(field.path.indexOf('.') == -1){
-                result = $scope.metadataValues[field.path];
-            }else {
-                var arr = field.path.split('.');
-                result = $scope.metadataValues[arr[0]];
-                if(result === undefined){
-                    return '';
-                }
-                if($.isArray(result)){
-                    result = result[0];
-                }
-                if(arr.length>=2){
-                    for (var i=1; i<arr.length; i++){
-                        result = result[arr[i]];
-                        if(result === undefined){
-                            return '';
-                        }
-                        if($.isArray(result)){
-                            result = result[0];
-                        }
-                    }
-                }
-            }
-            return result;
         };
 
         $scope.close = function() {
