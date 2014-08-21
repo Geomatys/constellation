@@ -53,8 +53,6 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             $scope.import.allowSubmit = true;
         };
 
-
-
         $scope.importDb = function() {
             var providerId = $scope.import.identifier;
             provider.create({
@@ -106,12 +104,9 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                     $scope.import.metadata = importedMetaData;
 
                     dataListing.findDataType({values: {'filePath':importedData, 'extension': fileExtension, dataType: $scope.import.uploadType}}, function(selectedExtension) {
-
-
                         // Store the providerId for further calls
                         $scope.import.providerId = $scope.import.dataName;
                         $scope.import.uploadType = selectedExtension.dataType;
-
 
                         if ($scope.import.uploadType === "vector") {
 
@@ -161,11 +156,10 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                             function(){
                                                 //error
                                                 $growl('error','Error','Impossible to get all EPSG code');
-                                            });
-
+                                            }
+                                        );
                                     }
                                 );
-
                             }, function(){
                                 $growl('error','Error','Impossible to create dataSet');
                             });
@@ -218,7 +212,6 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                         //provider.delete({id: fileName});
                                     }
                                 );
-
 
                             } , function(){
                                 $growl('error','Error','Impossible to create dataSet');
@@ -368,8 +361,6 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
 
         $scope.columns = [];
 
-
-
         $scope.load = function(){
             $scope.import.allowNext = false;
             var path = $scope.currentPath;
@@ -382,8 +373,6 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
         $scope.open = function(path, depth) {
             $scope.load(path);
         };
-
-
 
         $scope.select = function(item) {
             $scope.currentPath = item.path;
@@ -450,16 +439,13 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
             });
         }
 
-    }]);
+}]);
 
 
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl', 'dataListing',
     function($scope, $cookies, $growl, dataListing) {
 
-
         $scope.columns = [];
-
-
 
         $scope.load = function(){
             $scope.import.allowNext = false;
@@ -473,8 +459,6 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
         $scope.open = function(path, depth) {
             $scope.load(path);
         };
-
-
 
         $scope.select = function(item) {
 
@@ -502,8 +486,6 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
             $scope.import.allowNext = true;
         }
 
-
-
         $scope.verifyAllowNext = function(){
                 if (($scope.import.identifier != null && $scope.import.identifier.length > 0) ) {
                     var letters = /^[A-Za-zàèìòùáéíóúäëïöüñãõåæøâêîôû0-9\-_]+$/;
@@ -519,7 +501,6 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                 } else {
                     $scope.import.allowNext = false;
                 }
-
         };
 
         $scope.import.next = function() {
@@ -545,9 +526,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
 
         $scope.uploadMetadata = function() {
             var $form = $('#uploadMetadataForm');
-
             var formData = new FormData($form[0]);
-
             $.ajax({
                 url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/metadata;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
@@ -564,7 +543,6 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                     $scope.selectType();
                 },
                 error: function(result){
-
                     $growl('error','Error',result.responseJSON.msg);
 //                    $scope.import.currentStep = 'step2Metadata';
 //                    $scope.import.allowNext = false;
@@ -616,7 +594,6 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
                 $scope.nbbypage = 5;
             });
         };
-
 
         $scope.import.finish = function() {
             if ($scope.sensor.mode === 'existing') {

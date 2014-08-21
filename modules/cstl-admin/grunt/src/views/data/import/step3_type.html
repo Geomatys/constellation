@@ -1,30 +1,56 @@
 <div id="part3Type" ng-controller="ModalImportDataStep3TypeController">
-    <!-- Choose data type -->
     <div class="row">
         <div class="col-sm-4">
             <label class="radio">
-                <input type="radio" ng-model="import.uploadType" name="dataType" value="vector" style="margin-top:12px;"> <img src="img/icon/vector.png" class="img-rounded"/><div translate="layer.listing.data.upload.vector.label">Vector data</div>
+                <input type="radio"
+                       ng-model="import.uploadType"
+                       name="dataType"
+                       value="vector"
+                       style="margin-top:12px;"/>
+                <img src="img/icon/vector.png" class="img-rounded"/>
+                <div translate="layer.listing.data.upload.vector.label">Vector data</div>
             </label>
         </div>
         <div class="col-sm-4">
             <label class="radio">
-                <input type="radio" ng-model="import.uploadType" name="dataType" value="raster" style="margin-top:12px;"> <img src="img/icon/raster.png" class="img-rounded"/><div translate="layer.listing.data.upload.raster.label">Raster data</div>
+                <input type="radio"
+                       ng-model="import.uploadType"
+                       name="dataType"
+                       value="raster"
+                       style="margin-top:12px;"/>
+                <img src="img/icon/raster.png" class="img-rounded"/>
+                <div translate="layer.listing.data.upload.raster.label">Raster data</div>
             </label>
         </div>
         <div class="col-sm-4">
             <label class="radio">
-                <input type="radio" ng-model="import.uploadType" name="dataType" value="sensor" style="margin-top:12px;"> <img src="img/icon/sensor.png" class="img-rounded"/><div translate="layer.listing.data.upload.sensor.label">Sensor data</div>
+                <input type="radio"
+                       ng-model="import.uploadType"
+                       name="dataType"
+                       value="sensor"
+                       style="margin-top:12px;"/>
+                <img src="img/icon/sensor.png" class="img-rounded"/>
+                <div translate="layer.listing.data.upload.sensor.label">Sensor data</div>
             </label>
         </div>
     </div>
 
     <div class="col-xs-12" style="margin-top:10px; padding-top:5px; border-top:solid 1px #ddd;">
-        <div class="checkbox inline"><input type="checkbox" ng-model="sensor.checked" ng-change="changeAssociationState()"><span translate="layer.listing.data.upload.associate">Associate with a sensor</span></div>
+        <div class="checkbox inline">
+            <input type="checkbox"
+                   ng-model="sensor.checked"
+                   ng-change="changeAssociationState()"/>
+            <span translate="layer.listing.data.upload.associate">Associate with a sensor</span>
+        </div>
     </div>
 
     <div class="col-xs-12" ng-show="import.enableSelectEPSGCode">
         <label class="col-sm-12"translate="layer.listing.data.upload.selectEPSG">Select EPSG code</label>
-        <input type="text" ng-model="import.epsgSelected" typeahead="epsgCode for epsgCode in epsgList | filter:$viewValue | limitTo:8" class="form-control" placeholder="{{'layer.listing.data.upload.typeEPSG' | translate}}">
+        <input type="text"
+               ng-model="import.epsgSelected"
+               typeahead="epsgCode for epsgCode in epsgList | filter:$viewValue | limitTo:8"
+               class="form-control"
+               placeholder="{{'layer.listing.data.upload.typeEPSG' | translate}}"/>
         <!--<button type="button" id="addProjectionButton" ng-show="import.epsgSelected!=null" class="btn btn-add ng-scope" ng-click="addProjection();" translate="layer.listing.data.upload.createEPSG">Affect projection</button>-->
     </div>
 </div>

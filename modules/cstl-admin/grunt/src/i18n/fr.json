@@ -951,7 +951,7 @@
     "tooltip.service.source.url":"Renseignez uniquement le nom de domaine",
     "tooltip.service.source.connexion":"Connexion entre plusieurs bases",
     "tooltip.service.source.sensormlfolder":"TODO",
-    "tooltip.data.add.choicedata.local":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif",
+    "tooltip.data.add.choicedata.local":"Formats supportés :<br/>Shape (dans un fichier zip)<br/>NetCDF<br/>TIF (GeoTIFF)",
     "tooltip.data.add.choicedata.server":"Formats couramment supportés : shp, NetCDF, tif",
     "tooltip.sensor.add":"Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
     "tooltip.style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé.",
@@ -961,6 +961,7 @@
     "tooltip.domain.users":"Voir les utilisateurs du domaine",
     "tooltip.user.remove":"Supprimer cet utilisateur",
     "tooltip.group.remove":"Supprimer ce groupe",
+    "tooltip.help.title":"A propos",
 
     "sensors.information.title":"Capteurs disponibles",
 
