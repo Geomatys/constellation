@@ -53,7 +53,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.date_help",
 								"path":"identificationInfo.citation.date.date",
-								"type":"Date.text",
+								"type":"DATE.text",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
