@@ -47,38 +47,57 @@ final class TemplateNode {
 
     /**
      * The lines or other nodes contained in this node.
+     * Elements in this array are either {@link String} or other {@code TemplateNode}.
      */
     private final Object[] content;
 
     /**
-     * The value of the {@code path} element found in the node, or {@code null}.
+     * The components of the {@code "path"} value found in the node, or {@code null} if none.
      */
     private final String[] path;
 
     /**
-     * The value of the {@code defaultValue} element found in the node, or {@code null}.
+     * The value of the {@code "defaultValue"} element found in the node, or {@code null}.
      */
     private final Object defaultValue;
 
     /**
      * Index of the line where to format the value, or -1 if none.
+     * The {@code content[valueIndex]} line shall be a {@link String} containing {@code "value:"}.
      */
     private final int valueIndex;
 
     /**
-     * Non-null if this node has a trailing comma.
-     * If non-null, the value is either "," or ",{".
+     * {@code true} if the last line has a trailing comma, ignoring whitespaces.
+     * The comma may be "," alone, or the comma followed by an opening bracket ",{".
      */
-    private final String trailingComma;
+    private final boolean hasTrailingComma;
+
+    /**
+     * The length of the last line of {@link #content} when we want to omit the trailing comma.
+     * This is used when the template contains other nodes after this node, but we do not want
+     * to write those nodes because the remaining nodes are empty and pruned.
+     */
+    private final short lengthWithoutComma;
+
+    /**
+     * The separator between this node and an other occurrence of the same node.
+     * This field is never {@code null}. Its value is the comma ({@code ','}),
+     * sometime followed by an opening bracket if the first line of {@link #content}
+     * does not have an opening bracket.
+     */
+    private final String separator;
 
     /**
      * Creates a new node for the given lines.
      *
-     * @param parser   An iterator over the lines to parse.
-     * @param nextLine {@code true} for invoking {@link Parser#nextLine()} for the first line, or
-     *                 {@code false} for continuing the parsing from the current {@link Parser} content.
+     * @param parser    An iterator over the lines to parse.
+     * @param nextLine  {@code true} for invoking {@link Parser#nextLine()} for the first line, or
+     *                  {@code false} for continuing the parsing from the current {@link Parser} content.
+     * @param separator The separator between this node and an other occurrence of the same node,
+     *                  or {@code null} if unknown.
      */
-    TemplateNode(final Parser parser, boolean nextLine) throws IOException {
+    TemplateNode(final Parser parser, boolean nextLine, String separator) throws IOException {
         final List<Object> content = new ArrayList<>();
         String  path         = null;
         Object  defaultValue = null;
@@ -89,15 +108,20 @@ final class TemplateNode {
                 content.add(parser.nextLine());
             }
             if (parser.regionMatches("\"path\"")) {
-                path = parser.getValue();
+                final Object p = parser.getValue();
+                if (p != null) path = p.toString();
             } else if (parser.regionMatches("\"defaultValue\"")) {
                 defaultValue = parser.getValue();
             } else if (parser.regionMatches("\"value\"")) {
                 valueIndex = content.size() - 1;
                 content.set(valueIndex, parser.currentLineWithoutNull());
             } else if (parser.regionMatches("\"content\"")) {
-                do content.add(new TemplateNode(parser, false));
-                while (parser.skipComma() != null);
+                String childSeparator = null;
+                do {
+                    content.add(new TemplateNode(parser, false, childSeparator));
+                    childSeparator = parser.skipComma();
+                }
+                while (childSeparator != null);
             }
             /*
              * Increment or decrement the level when we find '{' or '}' character. The loop exits when we reach
@@ -110,12 +134,38 @@ final class TemplateNode {
             }
             nextLine = parser.isEmpty();
         }
-        this.standard      = parser.standard;
-        this.content       = content.toArray();
-        this.path          = (path != null) ? split(path) : null;
-        this.defaultValue  = defaultValue;
-        this.valueIndex    = valueIndex;
-        this.trailingComma = parser.trailingComma;
+        /*
+         * If the separator was not declared (which happen only for the first element of a new array),
+         * infers it from whether or not the first non-white line in this node has an opening bracket.
+         */
+        if (separator == null) {
+            separator = ",";
+            for (final Object e : content) {
+                if (e instanceof TemplateNode) {
+                    separator = ",{";
+                    break;
+                }
+                final String line = (String) e;
+                final int i = CharSequences.skipLeadingWhitespaces(line, 0, line.length());
+                if (i < line.length()) {
+                    if (line.charAt(i) != '{') {
+                        separator = ",{";
+                    }
+                    break;
+                }
+            }
+        }
+        /*
+         * Finally store all the information we just computed.
+         */
+        this.standard           = parser.standard;
+        this.content            = content.toArray();
+        this.path               = (path != null) ? split(path) : null;
+        this.defaultValue       = defaultValue;
+        this.valueIndex         = valueIndex;
+        this.hasTrailingComma   = parser.hasTrailingComma();
+        this.lengthWithoutComma = parser.length();
+        this.separator          = separator;
     }
 
     /**
@@ -308,7 +358,7 @@ final class TemplateNode {
         if (root == null) {
             root = new ValueNode(this, null);
         }
-        writeTree(root, out, null, true);
+        writeTree(root, out, true);
     }
 
     /**
@@ -316,7 +366,7 @@ final class TemplateNode {
      * This method handles multi-occurrences of field values only.  Multi-occurrences of metadata
      * shall be handled by the caller.
      */
-    private void writeTree(final ValueNode node, final Appendable out, final String separator, final boolean isLastNode) throws IOException {
+    private void writeTree(final ValueNode node, final Appendable out, final boolean isLastNode) throws IOException {
         assert node.template == this;
         final Object[] values = node.values;
         if (values == null) {
@@ -325,7 +375,7 @@ final class TemplateNode {
              * Note that the caller may invoke this method many time for the same TemplateNode if there
              * is multi-occurrences. The multi-occurrence is not handled by this method.
              */
-            writeTree(node, out, separator, isLastNode, null);
+            writeTree(node, out, isLastNode, null);
         } else {
             /*
              * The node is "field" and may contain an arbitrary amount of values. Repeats the whole node
@@ -333,7 +383,7 @@ final class TemplateNode {
              * multi-occurrences of metadata (handled by the caller).
              */
             for (int i=0; i < values.length; i++) {
-                writeTree(node, out, separator, isLastNode & ((i+1) == values.length), values[i]);
+                writeTree(node, out, isLastNode & ((i+1) == values.length), values[i]);
             }
         }
     }
@@ -346,10 +396,9 @@ final class TemplateNode {
      * @param  out      Where to write the JSON file.
      * @throws IOException If an error occurred while writing the JSON file.
      */
-    private void writeTree(final ValueNode children, final Appendable out, final String separator,
+    private void writeTree(final ValueNode children, final Appendable out,
             final boolean isLastNode, final Object value) throws IOException
     {
-        String childSeparator = null;
         for (int i=0; i<content.length; i++) {
             final Object line = content[i];
             if (line instanceof TemplateNode) {
@@ -363,30 +412,27 @@ final class TemplateNode {
                 for (int j=0; j<n; j++) {
                     final ValueNode child = children.get(j);
                     if (child.template == line) {
-                        ((TemplateNode) line).writeTree(child, out, childSeparator, (j+1) == n);
+                        ((TemplateNode) line).writeTree(child, out, (j+1) == n);
                     }
                 }
-                childSeparator = ((TemplateNode) line).trailingComma; // To be used by the next occurrence of a node.
             } else {
                 /*
                  * If the line is an ordinary line, write that line with the following special cases:
                  *
-                 * - Append the value is the line is the one which is expected to contain the value.
+                 * - Append the value if the line is the one which is expected to contain the value.
                  * - Append "," or ",{" if there is no separator while we are expecting to write more nodes.
                  * - Or (opposite of above), remove separator if present while we formatted the last node.
                  */
                 final boolean isLastLine = (i+1) == content.length;
-                if (isLastLine && isLastNode && trailingComma != null) {
-                    out.append((String) line, 0, ((String) line).length() - trailingComma.length());
+                if (isLastLine && isLastNode) {
+                    out.append((String) line, 0, lengthWithoutComma);
                 } else {
                     out.append((String) line);
                 }
                 if (i == valueIndex) {
-                    if (value != null) out.append('"');
-                    out.append(ValueNode.format(value));
-                    if (value != null) out.append('"');
+                    ValueNode.format(value, out);
                 }
-                if (isLastLine && !isLastNode && trailingComma == null) {
+                if (isLastLine && !isLastNode && !hasTrailingComma) {
                     out.append(separator);
                 }
                 out.append('\n');
@@ -422,7 +468,7 @@ final class TemplateNode {
                 hasChildren = true;
             }
         }
-        if (trailingComma != null) {
+        if (hasTrailingComma) {
             if (hasChildren) {
                 buffer.append('\n').append(CharSequences.spaces(indentation));
             }

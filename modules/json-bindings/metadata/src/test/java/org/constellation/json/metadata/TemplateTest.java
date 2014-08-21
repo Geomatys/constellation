@@ -27,9 +27,8 @@ import java.nio.charset.StandardCharsets;
 import org.opengis.metadata.citation.Role;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
+import org.apache.sis.metadata.iso.citation.DefaultIndividual;
 import org.apache.sis.metadata.iso.citation.DefaultResponsibility;
-import org.apache.sis.metadata.iso.distribution.DefaultDistribution;
-import org.apache.sis.metadata.iso.distribution.DefaultDistributor;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.metadata.iso.identification.AbstractIdentification;
@@ -73,10 +72,9 @@ public final strictfp class TemplateTest {
         identification.setExtents(singleton(new DefaultExtent(null,
                 new DefaultGeographicBoundingBox(-11.4865013, -4.615912, 43.165467, 49.9990223), null, null)));
 
-        final DefaultDistribution distribution = new DefaultDistribution();
-        distribution.setDistributors(asList(
-                new DefaultDistributor(new DefaultResponsibility(Role.AUTHOR, null, null)),
-                new DefaultDistributor(new DefaultResponsibility(Role.COLLABORATOR, null, null))));
+        identification.setPointOfContacts(asList(
+                new DefaultResponsibility(Role.AUTHOR,       null, new DefaultIndividual("An author",      null, null)),
+                new DefaultResponsibility(Role.COLLABORATOR, null, new DefaultIndividual("A collaborator", null, null))));
 
         final DefaultMetadata metadata = new DefaultMetadata();
         metadata.setFileIdentifier("An archive");
@@ -85,7 +83,6 @@ public final strictfp class TemplateTest {
         metadata.setMetadataStandardName("ISO19115");
         metadata.setMetadataStandardVersion("2003/Cor.1:2006");
         metadata.setIdentificationInfo(singleton(identification));
-        metadata.setDistributionInfo(distribution);
         return metadata;
     }
 

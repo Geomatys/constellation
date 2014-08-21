@@ -19,7 +19,11 @@
 package org.constellation.json.metadata;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.ArrayList;
+import java.util.MissingResourceException;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import org.opengis.util.Enumerated;
 import org.apache.sis.measure.Angle;
 import org.apache.sis.util.iso.Types;
@@ -61,18 +65,41 @@ final class ValueNode extends ArrayList<ValueNode> {
      *
      * @param value The value to format.
      */
-    static String format(final Object value) {
+    static void format(final Object value, final Appendable out) throws IOException {
+        final String p;
         if (value == null) {
-            return null;
-        } else if (value instanceof Enumerated) {
-            return Types.getStandardName(value.getClass()) + '.' + Types.getCodeName((Enumerated) value);
+            p = null;
+        } else if (value instanceof Number) {
+            p = value.toString();
         } else if (value instanceof Date) {
-            return Long.toString(((Date) value).getTime());
+            p = Long.toString(((Date) value).getTime());
         } else if (value instanceof Angle) {
-            return Double.toString(((Angle) value).degrees());
+            p = Double.toString(((Angle) value).degrees());
         } else {
-            return CharSequences.replace(value.toString(), "\"", "\\\"").toString();
+            /*
+             * Above were unquoted cases. Below are texts to quote.
+             */
+            out.append('"');
+            if (value instanceof Enumerated) {
+                out.append(Types.getStandardName(value.getClass())).append('.')
+                   .append(Types.getCodeName((Enumerated) value));
+            } else if (value instanceof Locale) {
+                String language;
+                try {
+                    language = ((Locale) value).getISO3Language();
+                } catch (MissingResourceException e) {
+                    language = ((Locale) value).getLanguage();
+                }
+                out.append("LanguageCode.").append(language);
+            } else if (value instanceof Charset) {
+                out.append("MD_CharacterSetCode.").append(LegacyCodes.fromIANA(((Charset) value).name()));
+            } else {
+                out.append(CharSequences.replace(value.toString(), "\"", "\\\"").toString());
+            }
+            out.append('"');
+            return;
         }
+        out.append(p);
     }
 
     /**

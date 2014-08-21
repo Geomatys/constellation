@@ -21,6 +21,7 @@ package org.constellation.json.metadata;
 import java.util.Map;
 import java.util.Iterator;
 import java.io.EOFException;
+import org.apache.sis.util.Numbers;
 import org.apache.sis.util.CharSequences;
 import org.apache.sis.metadata.MetadataStandard;
 
@@ -73,7 +74,7 @@ final class Parser {
      *
      * @see #skipComma()
      */
-    String trailingComma;
+    private String trailingComma;
 
     /**
      * Creates a new parser.
@@ -122,6 +123,16 @@ final class Parser {
     }
 
     /**
+     * Returns the line length, excluding the trailing comma (if any) and trailing whitespaces.
+     */
+    short length() throws ParseException {
+        if ((length & ~Short.MAX_VALUE) == 0) {
+            return (short) length;
+        }
+        throw new ParseException("Line too long.");
+    }
+
+    /**
      * Returns {@code true} if the current line is empty or contains only whitespaces, ignoring the trailing comma.
      */
     boolean isEmpty() {
@@ -144,10 +155,11 @@ final class Parser {
      * Skips the {@code ':'} separator in the current line, then returns the value.
      * The position is set after the value, which is usually {@link #length}.
      *
-     * @return The value (may be {@code null}).
+     * @return The value (may be {@code null}, a {@link String} or a {@link Number}).
      * @throws ParseException If the line doesn't have the expected syntax.
      */
-    String getValue() throws ParseException {
+    Object getValue() throws ParseException {
+        Exception cause = null;
         position = CharSequences.skipLeadingWhitespaces(line, position, length);
         if (position < length && line.charAt(position) == ':') {
             position = CharSequences.skipLeadingWhitespaces(line, position+1, length);
@@ -160,10 +172,24 @@ final class Parser {
                     final int p = position + 1;
                     position = length;
                     return CharSequences.replace(line.substring(p, length - 1), "\\\"", "\"").toString();
+                } else try {
+                    final Number value = Numbers.narrowestNumber(line.substring(position, length));
+                    position = length;
+                    return value;
+                } catch (NumberFormatException e) {
+                    cause = e;
                 }
             }
         }
-        throw new ParseException("Invalid \"name\":\"value\" pair:\n" + line);
+        throw new ParseException("Invalid \"name\":\"value\" pair:\n" + line, cause);
+    }
+
+    /**
+     * Returns {@code true} if the current line has a trailing comma, ignoring whitespaces.
+     * The comma may be "," alone, or the comma followed by an opening bracket ",{".
+     */
+    boolean hasTrailingComma() {
+        return trailingComma != null;
     }
 
     /**

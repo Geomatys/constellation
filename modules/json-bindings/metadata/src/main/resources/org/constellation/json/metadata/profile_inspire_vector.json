@@ -305,7 +305,7 @@
 								"path":"identificationInfo.extent.geographicElement.westBoundLongitude",
 								"type":"decimal",
 								"obligation":"M",
-								"defaultValue":"-180",
+								"defaultValue":-180,
 								"value":null
 							}
 						},{
@@ -316,7 +316,7 @@
 								"path":"identificationInfo.extent.geographicElement.eastBoundLongitude",
 								"type":"decimal",
 								"obligation":"M",
-								"defaultValue":"180",
+								"defaultValue":180,
 								"value":null
 							}
 						},{
@@ -327,7 +327,7 @@
 								"path":"identificationInfo.extent.geographicElement.northBoundLatitude",
 								"type":"decimal",
 								"obligation":"M",
-								"defaultValue":"90",
+								"defaultValue":90,
 								"value":null
 							}
 						},{
@@ -338,7 +338,7 @@
 								"path":"identificationInfo.extent.geographicElement.southBoundLatitude",
 								"type":"decimal",
 								"obligation":"M",
-								"defaultValue":"-90",
+								"defaultValue":-90,
 								"value":null
 							}
 						}
@@ -507,7 +507,7 @@
 								"path":"dataQualityInfo.report.result.specification.date.date",
 								"type":"readonly",
 								"obligation":"M",
-								"defaultValue":"2010-05-03",
+								"defaultValue":1272844800000,
 								"value":null
 							}
 						},{
@@ -540,7 +540,7 @@
 								"path":"dataQualityInfo.report.result.pass",
 								"type":"codelist",
 								"obligation":"M",
-								"defaultValue":"null",
+								"defaultValue":"nilReason:unknown",
 								"value":null
 							}
 						},{
