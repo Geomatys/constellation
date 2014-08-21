@@ -258,7 +258,8 @@
     "global.menu.web-service": "Services web",
     "global.menu.web-service.min": "Services",
     "global.menu.other":"Autres",
-    "global.menu.edit":"Editer le profil",
+    "global.menu.edit":"Mon compte",
+    "global.menu.domain.choice":"Choix du domaine",
     "global.title": "JHipster",
 
     "growl.error.data.import.no.geographic": "L'image ne contient pas d'information géographique.",

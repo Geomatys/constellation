@@ -203,6 +203,32 @@ ul.unstyled {
         margin-left: 0;
         text-align: center;
     }
+.main-block-stat{
+  margin-top:40px;
+}
+.main-block-domain-choice{
+  background-color: #eaeaea;
+  color:#5e5e5e;
+  border: 2px solid #dadada;
+  li+li{
+    margin-left:10px;
+  }
+  a{
+    color:#5e5e5e;
+  }
+  .activDomain a{
+    color:white;
+    background-color:#2e8bbf;
+  }
+}
+.nav-domain>li>a:hover, .nav-domain>li>a:focus{
+  background-color:#e3e3e3;
+  color:#5e5e5e;
+}
+.nav-domain>li.activDomain>a:hover, .nav-domain>li.activDomain>a:focus{
+  color:white;
+  background-color:#2e8bbf;
+}
 
 /*
  * Service
@@ -1515,23 +1541,10 @@ h3.popover-title {
   max-width:300px;
 }
 
-@media screen and (min-width:991px){
-  .accueil_bloc_images{
-    margin-top: 30px;
-    margin-left: 15px;
-    text-align: left;
-  }
-}
+/* -------------- Responsive -------------- */
 
-@media screen and (max-width: 991px){
-  .accueil_bloc_text{
-    margin-top: 15px;
-  }
-  .accueil_text_welcome h2{
-    font-size: 35px;
-  }
-}
-@media screen and (max-width: 767px){
+@media screen and (max-width: @screen-xs-max){
+  /* accueil */
   .accueil_logo img{
     width:100%;
     max-width:400px;
@@ -1542,32 +1555,69 @@ h3.popover-title {
   .navbar-toggle .icon-bar {
     background-color: #fff;
   }
+  /* dashboard */
+  .item-title{
+    width: 250px;
+  }
+  .item-title.title-sensorSystem{
+    width: 200px;
+  }
+  .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
+    font-size: 12px;
+  }
+  /* service */
+  .service-button{
+    margin-bottom: 10px;
+  }
+  .dashboard .searchbox {
+    width: 130px;
+  }
 }
-@media screen and (min-width: 768px) and (max-width: 1199px){
+
+@media screen and (min-width: @screen-sm)and (max-width: @screen-sm-max){
+  /* accueil */
+  .accueil_bloc_text{
+    margin-top: 15px;
+  }
+  .accueil_text_welcome h2{
+    font-size: 35px;
+  }
+  /* service */
+  .service-button{
+    margin-bottom: 10px;
+  }
+  .dashboard .searchbox {
+    width: 130px;
+  }
+}
+
+@media screen and (min-width: @screen-md)and (max-width: @screen-md-max) {
+  /* accueil */
+  .accueil_bloc_images{
+    margin-top: 30px;
+    margin-left: 15px;
+    text-align: left;
+  }
+  /*Dashboard - left block */
   .block-association .block-associated .block-associated-title{
     line-height: 15px;
+    width:80px;
+    margin-left: 5px;
+    width:80px;
+    margin-left: 5px;
   }
   .block-association .block-associated{
     line-height: 35px;
     font-size:40px;
   }
-}
-@media screen and (min-width: 992px) and (max-width: 1199px){
-  .block-association .block-associated .block-associated-title{
-    width:80px;
-    margin-left: 5px;
-  }
   .block-association-wms .block-associated .block-associated-title{
-    width:auto;
-    margin-left: 5px;
+     width:auto;
+     margin-left: 5px;
+   }
+  /*Dashboard responsive*/
+  .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
+    font-size: 12px;
   }
-  .dashboard .searchbox {
-    height: 30px;
-    width: 170px;
-  }
-}
-/*Dashboard responsive*/
-@media screen and (min-width: 992px)  and (max-width: 1199px) {
   .item-title{
     width: 425px;
   }
@@ -1589,8 +1639,38 @@ h3.popover-title {
   .item-title.title-sensorSystem{
     width: 349px;
   }
+  /* modale */
+  .buttons-div{
+    padding: 0;
+    width: 394px;
+  }
+  .modal-dialog-responsive{
+    width:950px;
+  }
+
+  .dashboard .searchbox {
+    height: 30px;
+    width: 170px;
+  }
 }
-@media screen and (min-width: 768px)  and (max-width: 991px) {
+
+
+@media screen and (min-width: @screen-lg){
+  /* accueil */
+  .accueil_bloc_images{
+    margin-top: 30px;
+    margin-left: 15px;
+    text-align: left;
+  }
+  /*Dashboard - left block */
+  .block-association .block-associated .block-associated-title{
+    line-height: 15px;
+  }
+  .block-association .block-associated{
+    line-height: 35px;
+    font-size:40px;
+  }
+  /*Dashboard responsive*/
   .item-title{
     width: 300px;
   }
@@ -1612,48 +1692,17 @@ h3.popover-title {
   .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
     font-size: 12px;
   }
-}
-@media screen and (max-width: 767px) {
-  .item-title{
-    width: 250px;
-  }
-  .item-title.title-sensorSystem{
-    width: 200px;
-  }
-  .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
-    font-size: 12px;
-  }
-  .dashboard .searchbox {
-    width: 130px;
-  }
-}
-@media screen and (max-width: 991px)  {
-  .service-button{
-    margin-bottom: 10px;
-  }
-}
-@media screen and (min-width: 768px) and (max-width: 991px) {
+  /* modale */
   .modal-dialog-responsive{
-    width:700px;
+    width:1024px;
   }
   .buttons-div{
     padding: 0;
     width: 394px;
   }
-  .dashboard .searchbox {
-    width: 130px;
-  }
 }
-@media screen and (min-width: 992px)  and (max-width: 1199px) {
-  .modal-dialog-responsive{
-    width:950px;
-  }
-}
-@media screen and (min-width: 1200px) {
-  .modal-dialog-responsive{
-    width:1024px;
-  }
-}
+
+/* media cas particulier*/
 @media screen and (max-height:900px){
   .modal-dialog-resp-height .modal-content{
     max-height:645px;

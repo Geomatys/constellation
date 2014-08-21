@@ -21,10 +21,35 @@
     <body ng-app="cstlAdminApp">
         <!--[if lt IE 10]><p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p><![endif]-->
 
-        <div id="header" ng-controller="HeaderController">
+        <div id="header" ng-controller="HeaderController" ng-init="showDomain=false">
             <a id="brand" href="#">
                 <img src="img/constellation-menu.png"/>
             </a>
+            <ul class="nav navbar-right nav-pills ng-cloak nav-user pull-right">
+                <li class="dropdown pointer" >
+                    <a class="dropdown-toggle" data-toggle="dropdown">
+                                <span>
+                                        <span class="glyphicon glyphicon-user"></span>
+                                        <span class="hidden-tablet" >{{cstlSession.firstname}} {{cstlSession.lastname}}</span>
+                                </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a ng-class="navClass('profile')" href="#/profile">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span translate="global.menu.edit">Edit profile</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{cstlLogoutUrl}}">
+                                <span class="glyphicon glyphicon-log-out"></span>&nbsp;
+                                <span translate="global.menu.admin.logout">Log out</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
             <div id="navigation" class="ng-cloak">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -59,22 +84,6 @@
                         </li>
                     </ul>
                     <ul class="nav nav-pills" ng-controller="navCtrl">
-                        <li ng-show="hasMultipleDomains()" class="dropdown pointer" ng-controller="DomainSwitcherController">
-                            <a class="dropdown-toggle" data-toggle="dropdown">
-                                <span>
-                                    <span class="glyphicon glyphicon-flag"></span>
-                                    <span class="hidden-tablet">{{activeDomain}}</span>
-                                    <b class="caret"></b>
-                                </span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li ng-repeat="domain in domains" active-menu="{{domain.name}}">
-                                    <a ng-click="changeDomain($index)">
-                                        <span>{{domain.name}}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
                         <li class="hidden-sm hidden-md">
                             <a ng-class="navClass('webservice')" href="#/webservice">
                                 <span class="glyphicon glyphicon-cloud"></span>
@@ -111,14 +120,14 @@
                                 <span translate="global.menu.mapcontext">Map context</span>
                             </a>
                         </li>
-                        <li class="hidden-xs hidden-md hidden-lg">
-                            <a ng-class="navClass('mapcontext')" href="#/mapcontext">
-                                <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
-                                <span translate="global.menu.mapcontext-min">Map context</span>
+                        <li ng-if="!hasRole('cstl-admin')" class="hidden-sm">
+                            <a ng-class="navClass('tasks')" href="#/tasks">
+                                <span class="glyphicon glyphicon-cog"></span>
+                                <span translate="global.menu.tasks">Tasks</span>
                             </a>
                         </li>
-                        <li>
-                            <a class="hidden-sm" ng-class="navClass('tasks')" href="#/tasks">
+                        <li ng-if="hasRole('cstl-admin')" class="hidden-sm hidden-md">
+                            <a ng-class="navClass('tasks')" href="#/tasks">
                                 <span class="glyphicon glyphicon-cog"></span>
                                 <span translate="global.menu.tasks">Tasks</span>
                             </a>
@@ -129,11 +138,44 @@
                                 <span translate="global.menu.admin.main">Administration</span>
                             </a>
                         </li>
-                        <li class="dropdown pointer hidden-lg hidden-xs">
-                            <a class="dropdown-toggle" data-toggle="dropdown"> <span>
-                                        <span class="glyphicon glyphicon-plus"></span> <span
-                                    class="hidden-tablet" translate="global.menu.other">Other</span>
-                                        <b class="caret"></b>
+
+                        <li class="dropdown pointer hidden-lg hidden-md hidden-xs">
+                            <a class="dropdown-toggle" data-toggle="dropdown">
+                                <span>
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    <span class="hidden-tablet" translate="global.menu.other">Other</span>
+                                    <b class="caret"></b>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu menu-other">
+                                <li>
+                                    <a ng-class="navClass('mapcontext')" href="#/mapcontext">
+                                        <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext" style="width:12px; height:12px; color:transparent;">aa</span>
+                                        <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
+                                        <span translate="global.menu.mapcontext">Map context</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a ng-class="navClass('tasks')" href="#/tasks">
+                                        <span class="glyphicon glyphicon-cog"></span>
+                                        <span translate="global.menu.tasks">Tasks</span>
+                                    </a>
+                                </li>
+                                <li ng-if="hasRole('cstl-admin')">
+                                    <a ng-class="navClass('admin')" href="#/admin">
+                                        <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
+                                        <span translate="global.menu.admin.main">Administration</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li ng-if="hasRole('cstl-admin')" class="dropdown pointer hidden-lg hidden-sm hidden-xs">
+                            <a class="dropdown-toggle" data-toggle="dropdown">
+                                <span>
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    <span class="hidden-tablet" translate="global.menu.other">Other</span>
+                                    <b class="caret"></b>
                                 </span>
                             </a>
                             <ul class="dropdown-menu">
@@ -152,29 +194,6 @@
                             </ul>
                         </li>
 
-                        <li class="dropdown pointer" >
-                            <a class="dropdown-toggle" data-toggle="dropdown">
-                                <span>
-                                        <span class="glyphicon glyphicon-user"></span>
-                                        <span class="hidden-tablet" >{{cstlSession.firstname}} {{cstlSession.lastname}}</span>
-                                        <b class="caret"></b>
-                                </span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a ng-class="navClass('profile')" href="#/profile">
-                                        <span class="glyphicon glyphicon-pencil"></span>
-                                        <span translate="global.menu.edit">Edit profile</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{cstlLogoutUrl}}">
-                                        <span class="glyphicon glyphicon-log-out"></span>&nbsp;
-                                        <span translate="global.menu.admin.logout">Log out</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
 
                         <li ng-hide="authenticated">
                             <a href="/cstl-admin/" id="authenticateLink">
@@ -186,7 +205,6 @@
                 </div>
             </div>
         </div>
-
         <div class="container" ng-view></div>
 
         <script type="text/ng-template" id="views/modalLoader.html">

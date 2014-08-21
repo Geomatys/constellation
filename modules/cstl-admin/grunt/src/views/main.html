@@ -53,44 +53,27 @@
         </div>
     </div>
 
-
-
-
-
-    <!-- Formulaire d'authentification
-    <div class="col-sm-6" ng-hide="authenticated" >
-        <div class="well" style="padding-bottom: 0px; padding-top: 0px; margin-top: 170px;">
+    <div class="col-sm-6" ng-if="authenticated" ng-show="hasMultipleDomains()">
+        <div class="well main-block-domain-choice" style="padding-bottom: 0px; padding-top: 0px; margin-top: 40px;">
             <div class="row" style="padding: 0px 27px 27px 27px;">
                 <div class="col-sm-12">
                     <div class="row">
-                        <h1 style="font-size:20px; color:#5e5e5e; margin-bottom:20px;" translate="login.title">Authentication</h1>
-                        <form class="form" role="form" action="j_spring_security_check" method="post">
-                            <div class="form-group">
-                                <label for="username" translate="login.form.username">Login</label>
-                                <input type="text" class="form-control" name="j_username"
-                            id="username"
-                            placeholder="login"
-                            ng-model="username">
-                            </div>
-                            <div class="form-group">
-                                <label for="password" translate="login.form.password">Password</label>
-                                <input type="password" class="form-control" name="j_password"
-                            id="password"
-                            placeholder="password"
-                            >
-                            </div>
-                            <button type="submit" class="btn btn-primary">Login</button>
-                        </form>
-                     </div>
+                        <h1 style="font-size:20px; margin-bottom:20px;" translate="global.menu.domain.choice">Domain choice</h1>
+                        <ul class="nav nav-pills nav-domain ng-cloak" ng-controller="DomainSwitcherController">
+                            <li class="dropdown pointer tab-domain" ng-class="{'activDomain':'{{domain.name}}'==='{{activeDomain}}'}" ng-repeat="domain in domains" active-menu="{{domain.name}}">
+                                <a ng-click="changeDomain($index)">
+                                    <span>{{domain.name}}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    -->
-
 
     <div class="col-sm-6" ng-if="authenticated">
-        <div class="well" style="padding-bottom: 0px; padding-top: 0px; margin-top: 40px;" ng-init="countStats()">
+        <div class="well" ng-class="{'main-block-stat':!hasMultipleDomains()}" style="padding-bottom: 0px; padding-top: 0px;" ng-init="countStats()">
             <div class="row" style="padding: 0px 27px 27px 27px;">
                 <div class="col-sm-12">
                     <div class="row">

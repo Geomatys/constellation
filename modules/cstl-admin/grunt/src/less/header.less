@@ -62,7 +62,7 @@
       color: @header-nav-link-color;
       background-color: @header-nav-link-bg-color;
       line-height: 18px;
-      margin: 4px 0;
+      margin: 4px 5px;
       padding: 10px;
 
       .caret {
@@ -112,6 +112,14 @@
     }
   }
 
+  .menu-other .icon-menu-mapcontext{
+    background: url("../img/icon-menu-compo-collapse.svg") no-repeat;
+  }
+
+  .menu-other a:hover > .icon-menu-mapcontext{
+    background: url("../img/icon-menu-compo-collapse-selected.svg") no-repeat;
+  }
+
   .navbar-toggle {
     margin-top: 6px;
     margin-bottom: 6px;
@@ -154,7 +162,30 @@
   }
 }
 
-@media (max-width: @screen-xs-max) { // extra small device
+// user menu
+// --------------------
+.nav-user{
+  > li {
+    > a {
+      background-image: linear-gradient(to bottom,#2e8bbf 0,#297dab 46px);
+      color: #e3e3e3;
+      padding-top: 14px;
+      padding-bottom: 15px;
+      border-radius: 0;
+    }
+    > a:hover, a:focus, a:active {
+      background-image: linear-gradient(to bottom,#246f98 0,#297dab 46px);
+    }
+  }
+  > .open {
+    > a, a:hover, a:focus, a:active  {
+      background-image: linear-gradient(to bottom,#246f98 0,#297dab 46px);
+    }
+  }
+}
+
+
+@media screen and (max-width: @screen-xs-max){ // extra small device
   #navigation {
     padding-left: 0;
 
@@ -179,8 +210,19 @@
     }
   }
 }
-@media (min-width: @screen-sm) and (max-width: @screen-md-max) { // small and medium devices
-  #languages {
-    display: block;
+
+@media screen and (min-width: @screen-sm)and (max-width: @screen-sm-max){
+  #navigation {
+    ul.nav>li>a {
+      margin: 4px 5px;
+    }
+  }
+}
+
+@media screen and (min-width: @screen-md)and (max-width: @screen-md-max){
+  #navigation {
+    ul.nav>li>a {
+      margin: 4px 2px;
+    }
   }
 }
