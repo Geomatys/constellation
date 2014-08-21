@@ -101,6 +101,11 @@
             <artifactId>cstl-store-data-observationstore</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.json-bindings</groupId>
+            <artifactId>cstl-json-metadata</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Geomatys external project -->
         <dependency>
