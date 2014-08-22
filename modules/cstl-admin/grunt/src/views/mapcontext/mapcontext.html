@@ -65,8 +65,8 @@
                             <div ng-repeat="context in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                 <div class="item mapcontext" ng-class="{'selected':context==selected}" ng-click="select(context);selectContextChild(null);">
                                     <div class="top">
-                                        <span class="item-title" title="{{context.name}}">{{context.name}}</span>
-                                        <span class="pull-right text-right item-list-style" translate="label.mapcontext.system">mapcontext dashboard</span>
+                                        <span class="item-title" title="{{context.name}}">{{truncate(small,context.name)}}</span>
+                                        <span class="pull-right text-right item-list-style hidden-xs hidden-sm" ng-if="!small" translate="label.mapcontext.system">mapcontext dashboard</span>
                                     </div>
                                     <div class="bottom">
                                         <div class="block">
@@ -88,8 +88,8 @@
                                 <div ng-if="context==selected" ng-repeat="layer in context.layers" style="padding-left:0;">
                                     <div class="item child compo layer" ng-class="{'selected':layer==selectedLayer, mapcontext: layer.externalLayer, coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase()}" ng-click="selectContextChild(layer);">
                                         <div class="top">
-                                            <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
-                                            <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector': (layer.Type) ? layer.Type : 'WMS'}}</span>
+                                            <span class="item-title" title="{{layer.Name}}">{{truncate(small,layer.Name)}}</span>
+                                            <span ng-if="!small" class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector': (layer.Type) ? layer.Type : 'WMS'}}</span>
                                             <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selectedLayer"
                                                  src="img/vector-multipoint-mapcontext.svg"
                                                  class="pull-right"
@@ -157,7 +157,7 @@
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header block-header-mapcontext" ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc" title="{{selected.name}}">{{selected.name}}</strong><i class="fa fa-chevron-down pull-right"></i>
+                                <strong class="item-title title-bloc" title="{{selected.name}}">{{truncateTitleBlock(selected.name)}}</strong><i class="fa fa-chevron-down pull-right"></i>
                             </div>
                             <div class="block-content">
                                 <div class="row description-block">
@@ -188,7 +188,7 @@
                                         <span class="tooltipicon">
                                             <button class="btn btn-mapcontext" type="button" ng-click="editMapContext()"
                                                     data-placement="bottom" title="{{'layer.listing.selected.edit.button' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-edit"></i>
+                                                <i class="glyphicon glyphicon-pencil"></i>
                                             </button>
                                         </span>
                                     </div>

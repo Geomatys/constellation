@@ -68,7 +68,7 @@
                             <div ng-if="service.type.toLowerCase() !== 'sos'">
                                 <div class="item {{data.Type.toLowerCase()}}" ng-repeat="data in dataList" ng-class="{selected:isInSelected(data)}" ng-click="dataInArray(data)">
                                     <div class="top">
-                                        <span class="item-title title-modal">{{data.Name}}</span>
+                                        <span class="item-title title-modal">{{truncate(data.Name)}}</span>
                                         <span class="pull-right text-right item-list-style"  style="font-size:14px;">{{data.Type}}</span>
                                         <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && !isInSelected(data)" src="img/vector-multipoint.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                         <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && !isInSelected(data)" src="img/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >

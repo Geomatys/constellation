@@ -46,7 +46,7 @@
                             <div ng-repeat="registry in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                 <div class="item registry" ng-class="{selected:registry==selected}" ng-click="select(registry);selectProcessChild(null);">
                                     <div class="top">
-                                        <span class="item-title" title="{{registry.name}}">{{registry.name}} </span>
+                                        <span class="item-title" title="{{registry.name}}">{{truncate(small,registry.name)}} </span>
                                     </div>
                                     <div class="bottom">
                                         <div class="block">
@@ -64,7 +64,7 @@
 
                                 <div class="item process-child" style="margin-top:0;" ng-if="registry==selected" ng-repeat="process in registry.processes" ng-class="{'selected':process===selectedProcessChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectProcessChild(process)">
                                     <div class="top">
-                                        <span class="item-title" title="{{process.id}}">{{process.id}}</span>
+                                        <span class="item-title" title="{{process.id}}">{{truncate(small,process.id)}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -81,7 +81,7 @@
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header block-header-process" ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc" title="{{selected.Name}}">{{selected.name}}</strong><i class="fa fa-chevron-down pull-right"></i>
+                                <strong class="item-title title-bloc" title="{{selected.Name}}">{{truncateTitleBlock(selected.name)}}</strong><i class="fa fa-chevron-down pull-right"></i>
                             </div>
                             <div class="block-content" ng-if="selectedProcessChild != null">
                                 <h6 translate="label.title">Title</h6>
@@ -98,7 +98,7 @@
                                         <span class="tooltipicon">
                                             <button class="btn btn-process" type="button" ng-click="showAddTaskPopup(selected.id)"
                                                     data-placement="bottom" title="{{'tasks.information.edit' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-wrench"></i>
+                                                <i class="glyphicon glyphicon-pencil"></i>
                                             </button>
                                         </span>
                                     </div>

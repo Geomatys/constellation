@@ -58,7 +58,7 @@
                             <div ng-repeat="sosdata in dataList">
                                 <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                     <div class="top">
-                                        <span class="item-title">{{sosdata.id}}</span>
+                                        <span class="item-title">{{truncate(sosdata.id)}}</span>
                                         <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor.system">sensor system</span>
                                         <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor">sensor</span>
                                     </div>
@@ -80,7 +80,7 @@
 
                                 <div class="item child sensor-sos" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild}" ng-click="selectSensorsChild(soschild)">
                                     <div class="top">
-                                        <span class="item-title">{{soschild.id}}</span>
+                                        <span class="item-title">{{truncate(soschild.id)}}</span>
                                         <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">sensor</span>
                                     </div>
                                     <div class="bottom">

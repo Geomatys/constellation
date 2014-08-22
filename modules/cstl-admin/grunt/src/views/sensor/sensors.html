@@ -68,8 +68,8 @@
                             <div ng-repeat="sosdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                 <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                     <div class="top">
-                                        <span class="item-title" ng-class="{'title-sensorSystem':sosdata.type==='System'}" title="{{sosdata.id}}">{{sosdata.id}}</span>
-                                        <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style" style="width:172px;" translate="label.sensor.system">sensor system</span>
+                                        <span class="item-title" ng-class="{'title-sensorSystem':sosdata.type==='System'}" title="{{sosdata.id}}">{{truncate(small,sosdata.id)}}</span>
+                                        <span ng-if="sosdata.type==='System'&& !small" class="pull-right text-right item-list-style" style="width:172px;" translate="label.sensor.system">sensor system</span>
                                         <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style"  translate="label.sensor">sensor</span>
                                     </div>
                                     <div class="bottom">
@@ -90,7 +90,7 @@
 
                                 <div class="item sensor-sos" style="margin-top:0;" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectSensorsChild(soschild)">
                                     <div class="top">
-                                        <span class="item-title">{{soschild.id}}</span>
+                                        <span class="item-title" title="{{soschild.id}}">{{truncate(small,soschild.id)}}</span>
                                         <span class="pull-right text-right item-list-style" translate="label.sensor">sensor</span>
                                     </div>
                                     <div class="bottom">
@@ -114,7 +114,7 @@
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header block-header-sos" ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc" title="{{selected.id}}">{{selected.id}}</strong><i class="fa fa-chevron-down pull-right"></i>
+                                <strong class="item-title title-bloc" title="{{selected.id}}">{{truncateTitleBlock(selected.id)}}</strong><i class="fa fa-chevron-down pull-right"></i>
                             </div>
 
                             <div class="block-content">
@@ -130,7 +130,7 @@
 
                             <div class="block-content" ng-if="selectedSensorsChild != null">
                                     <h6 translate="label.title">Title</h6>
-                                    <span>{{selectedSensorsChild.id}}</span>
+                                    <span>{{truncateTitleBlock(selectedSensorsChild.id)}}</span>
 
                                     <div class="separator"></div>
                                     <h6 translate="label.type">Type</h6>

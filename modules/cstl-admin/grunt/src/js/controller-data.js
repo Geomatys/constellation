@@ -319,6 +319,42 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 }
             });
         };
+
+        $scope.truncate = function(small, text){
+            if (window.innerWidth >= 1200){
+                if(small==true && text.length > 20){
+                    return text.substr(0,20)+"...";
+                } else if(small==false && text.length > 65){
+                    return text.substr(0,65)+"...";
+                } else return text;
+            } else if (window.innerWidth < 1200 && window.innerWidth >= 992){
+                if(small==true && text.length > 12){
+                    return text.substr(0,12)+"...";
+                } else if(small==false && text.length > 50){
+                    return text.substr(0,50)+"...";
+                } else return text;
+            } else if (window.innerWidth < 992) {
+                if(text.length > 30){
+                    return text.substr(0,30)+"...";
+                } else return text;
+            }
+        };
+        $scope.truncateTitleBlock = function(text){
+            if (window.innerWidth >= 1200){
+                if(text.length > 40){
+                    return text.substr(0,40)+"...";
+                } else return text;
+            } else if (window.innerWidth < 1200 && window.innerWidth >= 992){
+                if(text.length > 30){
+                    return text.substr(0,30)+"...";
+                } else return text;
+            } else if (window.innerWidth < 992) {
+                if(text.length > 20){
+                    return text.substr(0,20)+"...";
+                } else return text;
+            }
+        };
+
     }]);
 
 
@@ -712,6 +748,12 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                     }
                 }
             }
+        };
+
+        $scope.truncate = function(text){
+            if(text.length > 40){
+                return text.substr(0,40)+"...";
+            } else return text;
         };
     }]);
 

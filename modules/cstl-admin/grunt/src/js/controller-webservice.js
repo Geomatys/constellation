@@ -832,4 +832,39 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
             StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
         };
+
+        $scope.truncate = function(small, text){
+            if (window.innerWidth >= 1200){
+                if(small==true && text.length > 22){
+                    return text.substr(0,22)+"...";
+                } else if(small==false && text.length > 65){
+                    return text.substr(0,65)+"...";
+                } else return text;
+            } else if (window.innerWidth < 1200 && window.innerWidth >= 992){
+                if(small==true && text.length > 15){
+                    return text.substr(0,15)+"...";
+                } else if(small==false && text.length > 55){
+                    return text.substr(0,55)+"...";
+                } else return text;
+            } else if (window.innerWidth < 992) {
+                if(text.length > 35){
+                    return text.substr(0,35)+"...";
+                } else return text;
+            }
+        };
+        $scope.truncateTitleBlock = function(text){
+            if (window.innerWidth >= 1200){
+                if(text.length > 30){
+                    return text.substr(0,30)+"...";
+                } else return text;
+            } else if (window.innerWidth < 1200 && window.innerWidth >= 992){
+                if(text.length > 25){
+                    return text.substr(0,25)+"...";
+                } else return text;
+            } else if (window.innerWidth < 992) {
+                if(text.length > 17){
+                    return text.substr(0,17)+"...";
+                } else return text;
+            }
+        };
     }]);

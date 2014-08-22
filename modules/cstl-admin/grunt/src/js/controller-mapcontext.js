@@ -120,6 +120,41 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
             });
             return lays;
         };
+
+        $scope.truncate = function(small, text){
+            if (window.innerWidth >= 1200){
+                if(small==true && text.length > 30){
+                    return text.substr(0,30)+"...";
+                } else if(small==false && text.length > 40){
+                    return text.substr(0,40)+"...";
+                } else return text;
+            } else if (window.innerWidth < 1200 && window.innerWidth >= 992){
+                if(small==true && text.length > 22){
+                    return text.substr(0,22)+"...";
+                } else if(small==false && text.length > 29){
+                    return text.substr(0,29)+"...";
+                } else return text;
+            } else if (window.innerWidth < 992) {
+                if(text.length > 40){
+                    return text.substr(0,40)+"...";
+                } else return text;
+            }
+        };
+        $scope.truncateTitleBlock = function(text){
+            if (window.innerWidth >= 1200){
+                if(text.length > 40){
+                    return text.substr(0,40)+"...";
+                } else return text;
+            } else if (window.innerWidth < 1200 && window.innerWidth >= 992){
+                if(text.length > 30){
+                    return text.substr(0,30)+"...";
+                } else return text;
+            } else if (window.innerWidth < 992) {
+                if(text.length > 20){
+                    return text.substr(0,20)+"...";
+                } else return text;
+            }
+        };
     }]);
 
 cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies', '$modal',
@@ -595,5 +630,13 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                 });
             }
         }
+
+        $scope.truncate = function(test,text){
+            if(test!='chooseLayer' && text.length > 30){
+                return text.substr(0,30)+"...";
+            } else if (test==='chooseLayer' && text.length > 60){
+                return text.substr(0,60)+"...";
+            } else return text;
+        };
     }]);
                                      

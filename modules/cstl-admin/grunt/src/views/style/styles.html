@@ -117,7 +117,7 @@
                                  ng-class="{selected:style==selected, 'col-xs-6':small==true}"
                                  ng-click="select(style)">
                                 <div class="top">
-                                    <span class="item-title" title="{{style.Name}}">{{style.Name}}</span>
+                                    <span class="item-title" title="{{style.Name}}">{{truncate(small,style.Name)}}</span>
                                     <span class="pull-right text-right item-list-style"> {{style.Type}}</span>
                                     <img ng-if="style.Type=='VECTOR' && style.subtype=='point'"
                                          src="img/vector-point.svg"
@@ -152,7 +152,7 @@
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header block-header-style" ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc" title="{{selected.Name}}">{{selected.Name}}</strong>
+                                <strong class="item-title title-bloc" title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
                                 <i class="fa fa-chevron-down pull-right"></i>
                             </div>
                             <div class="block-content" ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">

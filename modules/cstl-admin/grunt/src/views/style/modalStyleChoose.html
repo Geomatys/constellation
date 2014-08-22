@@ -118,7 +118,7 @@
                                              ng-class="{selected:style==selected}"
                                              ng-click="select(style);displayCurrentStyle('styledMapWithSelectedStyle',null);">
                                             <div class="top">
-                                                <span class="item-title" style="width: 100%;">{{style.Name}}</span>
+                                                <span class="item-title" style="width: 100%;">{{truncate(style.Name)}}</span>
                                                 <span class="pull-right text-right item-list-style">{{style.Type}}</span>
                                             </div>
                                             <div class="bottom">

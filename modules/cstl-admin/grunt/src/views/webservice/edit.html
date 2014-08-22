@@ -113,7 +113,7 @@
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
                                                 <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer)">
                                                     <div class="top">
-                                                        <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
+                                                        <span class="item-title" title="{{layer.Name}}">{{truncate(small,layer.Name)}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                         <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected"
                                                              src="img/vector-multipoint.svg"
@@ -162,7 +162,7 @@
                                                 <div ng-repeat="cswdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                                     <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null)">
                                                         <div class="top">
-                                                            <span class="item-title csw-title" title="{{cswdata.title ? cswdata.title : cswdata.identifier}}">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
+                                                            <span class="item-title csw-title" title="{{cswdata.title ? cswdata.title : cswdata.identifier}}">{{cswdata.title ? truncate(small,cswdata.title) : truncate(small,cswdata.identifier)}}</span>
                                                             <span class="pull-right text-right item-list-style">METADATA</span>
                                                         </div>
                                                         <div class="bottom">
@@ -181,7 +181,7 @@
                                                     <div class="item" style="margin-top:0;" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
                                                          ng-click="selectMetadataChild(relatedData)" ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}">
                                                         <div class="top">
-                                                            <span class="item-title csw-title" title="{{relatedData.Name}}">{{relatedData.Name}}</span>
+                                                            <span class="item-title csw-title" title="{{relatedData.Name}}">{{truncate(small,relatedData.Name)}}</span>
                                                             <span class="pull-right text-right item-list-style" style="font-size:14px;">{{relatedData.Type}}</span>
                                                         </div>
                                                         <div class="bottom">
@@ -199,7 +199,7 @@
                                                 <div ng-repeat="sosdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                                     <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                                         <div class="top">
-                                                            <span class="item-title" title="{{sosdata.id}}">{{sosdata.id}}</span>
+                                                            <span class="item-title" title="{{sosdata.id}}">{{truncate(small,sosdata.id)}}</span>
                                                             <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style" translate="label.sensor.system">sensor system</span>
                                                             <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style" translate="label.sensor">sensor</span>
                                                         </div>
@@ -221,7 +221,7 @@
 
                                                     <div class="item sensor-sos" style="margin-top:0;" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectSensorsChild(soschild)">
                                                         <div class="top">
-                                                            <span class="item-title" title="{{soschild.id}}">{{soschild.id}}</span>
+                                                            <span class="item-title" title="{{soschild.id}}">{{truncate(small,soschild.id)}}</span>
                                                             <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">sensor</span>
                                                         </div>
                                                         <div class="bottom">
@@ -268,7 +268,7 @@
                                         <div ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'sos'">
 
                                             <div class="block-header" ng-click="toggleUpDownSelected()">
-                                                <strong class="item-title title-bloc-service" title="{{selected.Name}}">{{selected.Name}}</strong><i class="fa fa-chevron-down pull-right"></i>
+                                                <strong class="item-title title-bloc-service" title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong><i class="fa fa-chevron-down pull-right"></i>
                                             </div>
 
                                             <div class="block-content" ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
@@ -352,7 +352,7 @@
                                                                     class="btn btn-small">
                                                                 <i class="glyphicon glyphicon-trash"></i>
                                                             </button>
-                                                            {{style.Name}}
+                                                            {{truncateTitleBlock(style.Name)}}
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-xs-12">
@@ -390,7 +390,7 @@
 
                                         <div ng-if="service.type.toLowerCase() === 'csw'">
                                             <div class="block-header block-header-md" ng-click="toggleUpDownSelected()">
-                                                <strong class="item-title title-bloc-service" title="{{selected.title ? selected.title : selected.identifier}}">{{selected.title ? selected.title : selected.identifier}}</strong><i class="fa fa-chevron-up pull-right"></i>
+                                                <strong class="item-title title-bloc-service" title="{{selected.title ? selected.title : selected.identifier}}">{{selected.title ? truncateTitleBlock(selected.title) : truncateTitleBlock(selected.identifier)}}</strong><i class="fa fa-chevron-up pull-right"></i>
                                             </div>
 
                                             <div>
@@ -409,7 +409,7 @@
                                                 </div>
                                                 <div class="block-content" ng-class="{'block-vector':selectedMetadataChild.Type=='VECTOR','block-raster':selectedMetadataChild.Type=='COVERAGE'}" ng-if="selectedMetadataChild != null">
                                                     <h6 translate="label.title">Title</h6>
-                                                    <span>{{selectedMetadataChild.Name}}</span>
+                                                    <span>{{truncateTitleBlock(selectedMetadataChild.Name)}}</span>
 
                                                     <div class="row description-block">
                                                         <div class="col-sm-3 col-md-2"><img src="img/block-content-owner.svg" alt="" /></div>
@@ -455,7 +455,7 @@
 
                                         <div ng-if="service.type.toLowerCase() === 'sos'">
                                             <div class="block-header block-header-sos" ng-click="toggleUpDownSelected()">
-                                                <strong>{{selected.id}}</strong>
+                                                <strong>{{truncateTitleBlock(selected.id)}}</strong>
                                                 <i class="fa fa-chevron-up pull-right"></i>
                                             </div>
 

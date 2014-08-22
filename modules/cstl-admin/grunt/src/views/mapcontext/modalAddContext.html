@@ -114,7 +114,7 @@
                                                         <div class="col-xs-9 no-padding">
                                                             <div class="item layer compo" ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
                                                                 <div class="top">
-                                                                    <span class="item-title" title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}</span>
+                                                                    <span class="item-title" title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? truncate(mode.display,layerToAdd.layer.Name) : truncate(mode.display,layerToAdd.layer.externalLayer)}}</span>
                                                                     <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':(layerToAdd.layer.Type) ? layerToAdd.layer.Type : 'WMS'}}</span>
                                                                     <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd!=selected.item"
                                                                          src="img/vector-multipoint-mapcontext.svg"
@@ -224,7 +224,7 @@
                                              ng-class="{selected: styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage'), 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector', 'style-compo-layer':styleItem.Type == null || styleItem.Type == undefined}"
                                              ng-click="selectStyle(styleItem)">
                                             <div class="top">
-                                                <span class="item-title" title="{{styleItem.Name}}">{{styleItem.Name}}</span>
+                                                <span class="item-title" title="{{styleItem.Name}}">{{truncate(mode.display,styleItem.Name)}}</span>
                                                 <span class="pull-right text-right item-list-style">{{(styleItem.Type) ? styleItem.Type : 'WMS'}}</span>
                                             </div>
                                             <div class="bottom" ng-show="styleItem.Date">
@@ -278,7 +278,7 @@
                                         <div class="item-list">
                                             <div class="item" ng-repeat="layer in serviceLayers.layers" ng-class="{selected:layer==selected.layer,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer, serviceLayers)">
                                                 <div class="top">
-                                                    <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
+                                                    <span class="item-title" title="{{layer.Name}}">{{truncate(mode.display,layer.Name)}}</span>
                                                     <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                     <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected.layer"
                                                          src="img/vector-multipoint.svg"
