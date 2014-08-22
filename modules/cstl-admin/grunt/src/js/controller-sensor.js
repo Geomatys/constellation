@@ -87,37 +87,41 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
         };
 
         $scope.truncate = function(small, text){
-            if (window.innerWidth >= 1200){
-                if(small==true && text.length > 30){
-                    return text.substr(0,30)+"...";
-                } else if(small==false && text.length > 60){
-                    return text.substr(0,60)+"...";
-                } else return text;
-            } else if (window.innerWidth < 1200 && window.innerWidth >= 992){
-                if(small==true && text.length > 22){
-                    return text.substr(0,22)+"...";
-                } else if(small==false && text.length > 42){
-                    return text.substr(0,42)+"...";
-                } else return text;
-            } else if (window.innerWidth < 992) {
-                if(text.length > 22){
-                    return text.substr(0,22)+"...";
-                } else return text;
+            if(text != null) {
+                if (window.innerWidth >= 1200) {
+                    if (small == true && text.length > 30) {
+                        return text.substr(0, 30) + "...";
+                    } else if (small == false && text.length > 60) {
+                        return text.substr(0, 60) + "...";
+                    } else return text;
+                } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
+                    if (small == true && text.length > 22) {
+                        return text.substr(0, 22) + "...";
+                    } else if (small == false && text.length > 42) {
+                        return text.substr(0, 42) + "...";
+                    } else return text;
+                } else if (window.innerWidth < 992) {
+                    if (text.length > 22) {
+                        return text.substr(0, 22) + "...";
+                    } else return text;
+                }
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if (window.innerWidth >= 1200){
-                if(text.length > 40){
-                    return text.substr(0,40)+"...";
-                } else return text;
-            } else if (window.innerWidth < 1200 && window.innerWidth >= 992){
-                if(text.length > 30){
-                    return text.substr(0,30)+"...";
-                } else return text;
-            } else if (window.innerWidth < 992) {
-                if(text.length > 20){
-                    return text.substr(0,20)+"...";
-                } else return text;
+            if(text != null) {
+                if (window.innerWidth >= 1200) {
+                    if (text.length > 40) {
+                        return text.substr(0, 40) + "...";
+                    } else return text;
+                } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
+                    if (text.length > 30) {
+                        return text.substr(0, 30) + "...";
+                    } else return text;
+                } else if (window.innerWidth < 992) {
+                    if (text.length > 20) {
+                        return text.substr(0, 20) + "...";
+                    } else return text;
+                }
             }
         };
     }]);
@@ -185,9 +189,11 @@ cstlAdminApp.controller('SensorModalChooseController', ['$scope', '$modalInstanc
         };
 
         $scope.truncate = function(text){
-            if(text.length > 30){
-                return text.substr(0,30)+"...";
-            } else return text;
+            if(text != null) {
+                if (text.length > 30) {
+                    return text.substr(0, 30) + "...";
+                } else return text;
+            }
         };
     }]);
 
