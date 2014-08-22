@@ -525,10 +525,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         }
 
                         final String defaut = !valuesList.isEmpty() ? valuesList.getFirst() : null;
-                        final boolean multipleValues = (valuesList.size() > 1);
-
                         dim = createDimension(queryVersion, values.toString(), axisName.getCode(), unit,
-                                unitSymbol, defaut, multipleValues, null, null);
+                                unitSymbol, defaut, null, null, null);
 
                         dimensions.add(dim);
                     }
@@ -807,7 +805,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
 
             final String sortedValues = sortValues(values.toString().split(","));
-            final boolean multipleValues = (refs.size() > 1);
             final String unitSymbol = ddef.getCrs().getCoordinateSystem().getAxis(0).getUnit().toString();
             final String unit = unitSymbol;
             final String axisName = ddef.getCrs().getCoordinateSystem().getAxis(0).getName().getCode();
@@ -815,9 +812,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
             final AbstractDimension dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
                 new org.geotoolkit.wms.xml.v111.Dimension(sortedValues, axisName, unit,
-                    unitSymbol, defaut, multipleValues, null, null) :
+                    unitSymbol, defaut, null, null, null) :
                 new org.geotoolkit.wms.xml.v130.Dimension(sortedValues, axisName, unit,
-                    unitSymbol, defaut, multipleValues, null, null);
+                    unitSymbol, defaut, null, null, null);
 
             dimensions.add(dim);
         }
