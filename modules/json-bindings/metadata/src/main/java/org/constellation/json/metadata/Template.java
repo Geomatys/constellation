@@ -127,13 +127,13 @@ public class Template {
      * Creates a pre-defined template from a resource file of the given name.
      *
      * @param  template    The JSON lines to use as a template.
-     * @param  sharedLines An initially empty map to be filled by {@link Parser}
+     * @param  sharedLines An initially empty map to be filled by {@link LineReader}
      *                     for sharing same {@code String} instances when possible.
      */
     private Template(final Iterable<String> template, final Map<String,String> sharedLines,
             final Map<String,String[]> sharedPaths) throws IOException
     {
-        root = new TemplateNode(new Parser(MetadataStandard.ISO_19115, template, sharedLines, sharedPaths), true, null);
+        root = new TemplateNode(new LineReader(MetadataStandard.ISO_19115, template, sharedLines, sharedPaths), true, null);
         /*
          * Do not validate the path (root.validatePath(null)). We will do that in JUnit tests instead,
          * in order to avoid consuming CPU for a verification of a static resource.
@@ -152,7 +152,7 @@ public class Template {
      * @see #getInstance(String)
      */
     public Template(final MetadataStandard standard, final Iterable<String> template) throws IOException {
-        root = new TemplateNode(new Parser(standard, template, new HashMap<String,String>(),
+        root = new TemplateNode(new LineReader(standard, template, new HashMap<String,String>(),
                 new HashMap<String,String[]>()), true, null);
         root.validatePath(null);
     }

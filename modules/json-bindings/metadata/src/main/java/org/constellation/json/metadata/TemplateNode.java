@@ -97,12 +97,12 @@ final class TemplateNode {
      * Creates a new node for the given lines.
      *
      * @param parser    An iterator over the lines to parse.
-     * @param nextLine  {@code true} for invoking {@link Parser#nextLine()} for the first line, or
-     *                  {@code false} for continuing the parsing from the current {@link Parser} content.
+     * @param nextLine  {@code true} for invoking {@link LineReader#nextLine()} for the first line, or
+     *                  {@code false} for continuing the parsing from the current {@link LineReader} content.
      * @param separator The separator between this node and an other occurrence of the same node,
      *                  or {@code null} if unknown.
      */
-    TemplateNode(final Parser parser, boolean nextLine, String separator) throws IOException {
+    TemplateNode(final LineReader parser, boolean nextLine, String separator) throws IOException {
         final List<Object> content = new ArrayList<>();
         String  path         = null;
         Object  defaultValue = null;

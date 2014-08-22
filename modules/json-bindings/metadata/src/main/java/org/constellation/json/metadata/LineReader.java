@@ -33,7 +33,7 @@ import org.apache.sis.metadata.MetadataStandard;
  *
  * @author Martin Desruisseaux (Geomatys)
  */
-final class Parser {
+final class LineReader {
     /**
      * The {@code null} string.
      */
@@ -89,10 +89,10 @@ final class Parser {
      *
      * @param  standard    The standard used by the metadata objects to write.
      * @param  template    The JSON lines to use as a template.
-     * @param  sharedLines An initially empty map to be filled by {@code Parser}
+     * @param  sharedLines An initially empty map to be filled by {@code LineReader}
      *                     for sharing same {@code String} instances when possible.
      */
-    Parser(final MetadataStandard standard, final Iterable<String> lines,
+    LineReader(final MetadataStandard standard, final Iterable<String> lines,
             final Map<String,String> sharedLines, final Map<String,String[]> sharedPaths)
     {
         this.standard    = standard;
