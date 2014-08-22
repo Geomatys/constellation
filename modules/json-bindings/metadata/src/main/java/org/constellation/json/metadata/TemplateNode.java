@@ -68,6 +68,11 @@ final class TemplateNode {
     private final int valueIndex;
 
     /**
+     * Maximum number of occurrences allowed for this node.
+     */
+    private final int multiplicity;
+
+    /**
      * {@code true} if the last line has a trailing comma, ignoring whitespaces.
      * The comma may be "," alone, or the comma followed by an opening bracket ",{".
      */
@@ -101,8 +106,9 @@ final class TemplateNode {
         final List<Object> content = new ArrayList<>();
         String  path         = null;
         Object  defaultValue = null;
-        int     valueIndex   =   -1;
-        int     level        =    0;
+        int     valueIndex   = -1;
+        int     multiplicity = Integer.MAX_VALUE;
+        int     level        = 0;
         while (true) {
             if (nextLine) {
                 content.add(parser.nextLine());
@@ -114,7 +120,13 @@ final class TemplateNode {
                 defaultValue = parser.getValue();
             } else if (parser.regionMatches("\"value\"")) {
                 valueIndex = content.size() - 1;
-                content.set(valueIndex, parser.currentLineWithoutNull());
+                content.set(valueIndex, parser.fullLineWithoutNull());
+            } else if (parser.regionMatches("multiplicity")) {
+                final Object n = parser.getValue();
+                if (!(n instanceof Number)) {
+                    throw new ParseException("Invalid multiplicity: " + n);
+                }
+                multiplicity = ((Number) n).intValue();
             } else if (parser.regionMatches("\"content\"")) {
                 String childSeparator = null;
                 do {
@@ -160,26 +172,13 @@ final class TemplateNode {
          */
         this.standard           = parser.standard;
         this.content            = content.toArray();
-        this.path               = (path != null) ? split(path) : null;
+        this.path               = (path != null) ? parser.sharedPath(path) : null;
         this.defaultValue       = defaultValue;
         this.valueIndex         = valueIndex;
+        this.multiplicity       = multiplicity;
         this.hasTrailingComma   = parser.hasTrailingComma();
         this.lengthWithoutComma = parser.length();
         this.separator          = separator;
-    }
-
-    /**
-     * Split the given path and {@linkplain String#intern() internalize} the components.
-     * We internalize the components because they usually already exists elsewhere in the JVM,
-     * as field names or annotation values.
-     */
-    private static String[] split(final String path) {
-        final CharSequence[] c = CharSequences.split(path, '.');
-        final String[] cs = new String[c.length];
-        for (int i=0; i<c.length; i++) {
-            cs[i] = c[i].toString().intern();
-        }
-        return cs;
     }
 
     /**

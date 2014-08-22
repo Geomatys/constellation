@@ -82,35 +82,40 @@ public class Template {
      * Pre-defined instances. This map shall not be modified after class initialization,
      * in order to allow concurrent access without synchronization.
      */
-    private static final Map<String,Template> INSTANCES = new HashMap<>(4);
+    private static final Map<String,Template> INSTANCES;
     static {
-        final Map<String,String> pool = new LinkedHashMap<>();
         try {
-            add("profile_inspire_vector", pool);
-            add("profile_inspire_raster", pool);
+            INSTANCES = load("profile_inspire_vector", "profile_inspire_raster");
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e); // Should never happen.
         }
     }
 
     /**
-     * Creates a pre-defined template from a resource file of the given name.
+     * Creates a pre-defined template from resource files of the given names.
      *
-     * @param name The resource file name, without the {@code ".json"} suffix.
+     * @param names The resource file names, without the {@code ".json"} suffix.
      */
-    private static void add(final String name, final Map<String,String> pool) throws IOException {
-        final List<String> lines = new ArrayList<>();
-        try (final BufferedReader in = new BufferedReader(new InputStreamReader(
-                Template.class.getResourceAsStream(name + ".json"), "UTF-8")))
-        {
-            String line;
-            while ((line = in.readLine()) != null) {
-                lines.add(line);
+    private static Map<String,Template> load(final String... names) throws IOException {
+        final List<String>         lines       = new ArrayList<>();
+        final Map<String,String>   sharedLines = new HashMap<>();
+        final Map<String,String[]> sharedPaths = new HashMap<>();
+        final Map<String,Template> templates   = new LinkedHashMap<>(4);
+        for (final String name : names) {
+            try (final BufferedReader in = new BufferedReader(new InputStreamReader(
+                    Template.class.getResourceAsStream(name + ".json"), "UTF-8")))
+            {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    lines.add(line);
+                }
             }
+            if (templates.put(name, new Template(lines, sharedLines, sharedPaths)) != null) {
+                throw new AssertionError(name);
+            }
+            lines.clear();
         }
-        if (INSTANCES.put(name, new Template(lines, pool)) != null) {
-            throw new AssertionError(name);
-        }
+        return templates;
     }
 
     /**
@@ -121,12 +126,14 @@ public class Template {
     /**
      * Creates a pre-defined template from a resource file of the given name.
      *
-     * @param  template The JSON lines to use as a template.
-     * @param  pool     An initially empty map to be filled by {@link Parser}
-     *                  for sharing same {@code String} instances when possible.
+     * @param  template    The JSON lines to use as a template.
+     * @param  sharedLines An initially empty map to be filled by {@link Parser}
+     *                     for sharing same {@code String} instances when possible.
      */
-    private Template(final Iterable<String> template, final Map<String,String> pool) throws IOException {
-        root = new TemplateNode(new Parser(MetadataStandard.ISO_19115, template, pool), true, null);
+    private Template(final Iterable<String> template, final Map<String,String> sharedLines,
+            final Map<String,String[]> sharedPaths) throws IOException
+    {
+        root = new TemplateNode(new Parser(MetadataStandard.ISO_19115, template, sharedLines, sharedPaths), true, null);
         /*
          * Do not validate the path (root.validatePath(null)). We will do that in JUnit tests instead,
          * in order to avoid consuming CPU for a verification of a static resource.
@@ -145,7 +152,8 @@ public class Template {
      * @see #getInstance(String)
      */
     public Template(final MetadataStandard standard, final Iterable<String> template) throws IOException {
-        root = new TemplateNode(new Parser(standard, template, new HashMap<String,String>()), true, null);
+        root = new TemplateNode(new Parser(standard, template, new HashMap<String,String>(),
+                new HashMap<String,String[]>()), true, null);
         root.validatePath(null);
     }
 

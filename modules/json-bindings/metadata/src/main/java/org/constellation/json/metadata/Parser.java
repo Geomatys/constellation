@@ -21,6 +21,7 @@ package org.constellation.json.metadata;
 import java.util.Map;
 import java.util.Iterator;
 import java.io.EOFException;
+import java.util.ConcurrentModificationException;
 import org.apache.sis.util.Numbers;
 import org.apache.sis.util.CharSequences;
 import org.apache.sis.metadata.MetadataStandard;
@@ -44,9 +45,16 @@ final class Parser {
     final MetadataStandard standard;
 
     /**
-     * Pool of string, for replacing duplicated instances (which are numerous) by a single instance.
+     * Pool of strings, for replacing duplicated instances (which are numerous) by shared instances.
      */
-    private final Map<String,String> pool;
+    private final Map<String,String> sharedLines;
+
+    /**
+     * For sharing same {@code String[]} instances when possible. This sharing is helpful for a
+     * {@link ValueKey} optimization, since it will allow to compare paths by reference before
+     * to perform full {@code Arrays.equals(…)} checks.
+     */
+    private final Map<String,String[]> sharedPaths;
 
     /**
      * An iterator over the lines to read.
@@ -79,15 +87,18 @@ final class Parser {
     /**
      * Creates a new parser.
      *
-     * @param  standard The standard used by the metadata objects to write.
-     * @param  template The JSON lines to use as a template.
-     * @param  pool     An initially empty map to be filled by {@code Parser}
-     *                  for sharing same {@code String} instances when possible.
+     * @param  standard    The standard used by the metadata objects to write.
+     * @param  template    The JSON lines to use as a template.
+     * @param  sharedLines An initially empty map to be filled by {@code Parser}
+     *                     for sharing same {@code String} instances when possible.
      */
-    Parser(final MetadataStandard standard, final Iterable<String> lines, final Map<String,String> pool) {
-        this.standard = standard;
-        this.pool     = pool;
-        this.lines    = lines.iterator();
+    Parser(final MetadataStandard standard, final Iterable<String> lines,
+            final Map<String,String> sharedLines, final Map<String,String[]> sharedPaths)
+    {
+        this.standard    = standard;
+        this.sharedLines = sharedLines;
+        this.sharedPaths = sharedPaths;
+        this.lines       = lines.iterator();
     }
 
     /**
@@ -98,7 +109,7 @@ final class Parser {
         if (!lines.hasNext()) {
             throw new EOFException("Unexpected end of file.");
         }
-        line     = putIfAbsent(lines.next());
+        line     = sharedLine(lines.next());
         length   = CharSequences.skipTrailingWhitespaces(line, 0, line.length());
         position = CharSequences.skipLeadingWhitespaces (line, 0, length);
         final int remaining = length - position;
@@ -243,17 +254,7 @@ scan:   while (position < upper) {
     }
 
     /**
-     * Returns the current line (in full, not only the current portion) without the trailing "null".
-     */
-    String currentLineWithoutNull() throws ParseException {
-        if (trailingComma != null) throw new ParseException("Value shall be the last entry in a field.");
-        if (getValue()    != null) throw new ParseException("Value of \"value\" shall be null.");
-        return putIfAbsent(line.substring(0, length - NULL.length()));
-    }
-
-    /**
      * Returns the currently selected part of current line.
-     * For debugging purpose only.
      */
     @Override
     public String toString() {
@@ -261,16 +262,47 @@ scan:   while (position < upper) {
     }
 
     /**
+     * Returns the current line (in full, not only the current portion) without the trailing "null".
+     */
+    String fullLineWithoutNull() throws ParseException {
+        if (trailingComma != null) throw new ParseException("Value shall be the last entry in a field.");
+        if (getValue()    != null) throw new ParseException("Value of \"value\" shall be null.");
+        return sharedLine(line.substring(0, length - NULL.length()));
+    }
+
+    /**
      * Adds the given line to the pool if absent, or returns the existing line otherwise.
      *
-     * @todo This is a helper method to be removed when we will upgrade to JDK8.
+     * @todo Use Map.putIfAbsent when we will be allowed to compile for JDK8.
      */
-    private String putIfAbsent(final String newLine) {
-        final String existing = pool.get(newLine);
+    private String sharedLine(final String newLine) {
+        final String existing = sharedLines.get(newLine);
         if (existing != null) {
             return existing;
         }
-        pool.put(newLine, newLine);
+        if (sharedLines.put(newLine, newLine) != null) {
+            throw new ConcurrentModificationException();
+        }
         return newLine;
+    }
+
+    /**
+     * Split the given path and {@linkplain String#intern() internalize} the components.
+     * We internalize the components because they usually already exists elsewhere in the JVM,
+     * as field names or annotation values.
+     */
+    String[] sharedPath(final String path) {
+        String[] ci = sharedPaths.get(path);
+        if (ci == null) {
+            final CharSequence[] c = CharSequences.split(path, '.');
+            ci = new String[c.length];
+            for (int i=0; i<c.length; i++) {
+                ci[i] = c[i].toString().intern();
+            }
+            if (sharedPaths.put(path, ci) != null) {
+                throw new ConcurrentModificationException();
+            }
+        }
+        return ci;
     }
 }
