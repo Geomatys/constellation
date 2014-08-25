@@ -9,3 +9,4 @@ target/
 .settings/
 modules/cstl-sdi/overlays
 node_modules/
+node/
