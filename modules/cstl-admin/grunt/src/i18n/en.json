@@ -366,6 +366,7 @@
     "label.color.model":"Color model",
     "label.search.advanced.show":"Show advanced search",
     "label.search.advanced.hide":"Hide advanced search",
+    "label.create.account":"Create account",
 
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
@@ -683,6 +684,7 @@
     "global.menu.viewer": "Map Viewer",
     "global.menu.tasks":"Process",
     "global.menu.account.login": "Authenticate",
+    "global.menu.account.registation":"Register",
     "global.menu.admin.about":"About Constellation",
     "global.menu.admin.contact": "Contact",
     "global.menu.admin.domains":"Domains Settings",
@@ -791,6 +793,7 @@
     "password.messages.validate.confirmpassword.maxlength": "Your confirm password cannot be longer than 20 characters",
 
     "profile.password.new": "New password",
+    "profile.password.first": "Password",
     "profile.password.verify": "Checking password",
     "profile.language.choice": "Language choice",
 
@@ -876,6 +879,7 @@
     "page.header.title.tasks":"Tasks Dashboard",
     "page.header.title.task":"Current tasks",
     "page.header.title.mapcontext":"Map Context Dashboard",
+    "page.header.title.registration":"Create account",
 
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
 

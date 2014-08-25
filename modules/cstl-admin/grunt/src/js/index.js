@@ -33,7 +33,12 @@ var cstlIndexApp = angular.module('cstlIndexApp',
 cstlIndexApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider',
         function ($routeProvider, $httpProvider, $translateProvider) {
-            $routeProvider.otherwise({
+            $routeProvider
+                .when('/registration', {
+                    templateUrl: 'views/registration.html',
+                    controller: 'MainController'
+                })
+                .otherwise({
                 templateUrl: 'views/main.html',
                 controller: 'MainController'
             });

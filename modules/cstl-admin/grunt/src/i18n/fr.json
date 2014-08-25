@@ -224,6 +224,7 @@
     "global.language.en": "Anglais",
     "global.language.fr": "Français",
     "global.menu.account.login": "S'authentifier",
+    "global.menu.account.registation":"S'inscrire",
     "global.menu.admin.about":"A propos de Constellation",
     "global.menu.admin.contact": "Contact",
     "global.menu.admin.domains":"Gestion des domaines",
@@ -408,6 +409,7 @@
     "label.color.model":"Modèle de couleur",
     "label.search.advanced.show":"Afficher la recherche avancée",
     "label.search.advanced.hide":"Cacher la recherche avancée",
+    "label.create.account":"Créer le compte",
 
 
     "layer.listing.data.add.button.label": "Ajouter une donnée",
@@ -676,7 +678,8 @@
     "password.title": "Changer le mot de passe pour [<b>{{username}}</b>]",
 
     "profile.password.new": "Nouveau mot de passe",
-    "profile.password.verify": "Vérification du mot de passe",
+    "profile.password.first": "Mot de passe",
+    "profile.password.verify": "Confirmer le mot de passe",
     "profile.language.choice": "Choix de la langue",
 
     "server.choose.file": "Choisir un fichier sur le serveur",
@@ -854,6 +857,7 @@
     "page.header.title.sensors":"Gestion des capteurs",
     "page.header.title.tasks":"Gestion des traitements",
     "page.header.title.mapcontext":"Gestion des compositions cartographiques",
+    "page.header.title.registration":"Créer un compte",
 
     "style.information.title":"Styles disponibles",
 
