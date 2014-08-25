@@ -126,8 +126,8 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     
     @Override
     public void createOrUpdateServiceDetails(ServiceDetails serviceDetails) {
-        final ServiceDetails ServiceDetails = getServiceDetails(serviceDetails.getId(), serviceDetails.getLang());
-        if (ServiceDetails!=null){
+        final ServiceDetails old = getServiceDetails(serviceDetails.getId(), serviceDetails.getLang());
+        if (old!=null){
             dsl.update(SERVICE_DETAILS).set(SERVICE_DETAILS.CONTENT, serviceDetails.getContent())
                     .set(SERVICE_DETAILS.DEFAULT_LANG, serviceDetails.isDefaultLang())
                     .where(SERVICE_DETAILS.ID.eq(serviceDetails.getId()))

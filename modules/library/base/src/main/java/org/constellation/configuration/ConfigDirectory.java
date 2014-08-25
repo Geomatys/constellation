@@ -636,18 +636,26 @@ public final class ConfigDirectory {
     }
 
     public static File setupTestEnvironement(final String directoryName) {
-        final File configDir = new File(directoryName);
+        final File configDir     = new File(directoryName);
+        final File configDataDir = new File(directoryName + "-data");
         if (configDir.exists()) {
             FileUtilities.deleteDirectory(configDir);
         }
+        if (configDataDir.exists()) {
+            FileUtilities.deleteDirectory(configDataDir);
+        }
         configDir.mkdir();
+        configDataDir.mkdir();
         setConfigDirectory(configDir);
+        setDataDirectory(configDataDir);
 
         return configDir;
     }
 
     public static void shutdownTestEnvironement(final String directoryName) {
         FileUtilities.deleteDirectory(new File(directoryName));
+        FileUtilities.deleteDirectory(new File(directoryName+ "-data"));
         setConfigDirectory(null);
+        setDataDirectory(null);
     }
 }

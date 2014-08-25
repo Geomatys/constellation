@@ -61,7 +61,7 @@ import static org.junit.Assume.assumeNoException;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-public class WPSRequestTest  extends AbstractGrizzlyServer implements ApplicationContextAware {
+public class WPSRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
     

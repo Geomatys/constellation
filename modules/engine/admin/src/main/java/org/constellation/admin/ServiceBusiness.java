@@ -366,7 +366,7 @@ public class ServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
-    public void configure(final String serviceType, final String identifier, final Details details, Object configuration)
+    public void configure(final String serviceType, final String identifier, Details details, Object configuration)
             throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -382,11 +382,13 @@ public class ServiceBusiness {
             throw new ConfigurationException("Service " + serviceType + ':' + identifier + " not found.");
         } else {
             service.setConfig(getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance()));
-            service.setVersions(StringUtils.join(details.getVersions(), "µ"));
-            serviceRepository.update(service);
             if (details != null) {
                 setInstanceDetails(serviceType, identifier, details, details.getLang(), true);
+            } else {
+                details = getInstanceDetails(service.getId(), "eng");
             }
+            service.setVersions(StringUtils.join(details.getVersions(), "µ"));
+            serviceRepository.update(service);
         }
     }
 
