@@ -272,7 +272,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.code_help",
 								"path":"referenceSystemInfo.referenceSystemIdentifier.code",
-								"type":"codelist",
+								"type":"ReferenceSystemIdentifier.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
