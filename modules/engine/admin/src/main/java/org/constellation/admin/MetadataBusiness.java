@@ -96,4 +96,22 @@ public class MetadataBusiness {
         
         return results;
     }
+
+    /**
+     * Returns all metadata stored in database.
+     *
+     * @TODO we need to get dataset's metadata and provider's metadata will be removed.
+     *
+     * @param includeService given flag to include service's metadata
+     * @return List of all metadata as string xml stored in database.
+     */
+    public List<String> getAllMetadata(final boolean includeService) {
+        final List<String> results = new ArrayList<>();
+        final List<String> allIdentifiers = getInternalMetadataIds(includeService);
+        for(final String identifier : allIdentifiers){
+            final String metadataStr = searchMetadata(identifier, includeService);
+            results.add(metadataStr);
+        }
+        return results;
+    }
 }
