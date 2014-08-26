@@ -28,12 +28,33 @@ function findWebappContext(){
 
 /* App Module */
 
-var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies',
-    'pascalprecht.translate', 'uiModal', 'hljs', 'base64','ui.ace','ui.bootstrap.buttons',
-    'ui.bootstrap.tpls-accordion', 'ui.bootstrap.transition','ui.bootstrap.collapse','ui.bootstrap.accordion',
-    'ui.bootstrap.tpls-popover','ui.bootstrap.position','ui.bootstrap.bindHtml','ui.bootstrap.tooltip','ui.bootstrap.popover',
-    'ui.bootstrap.tpls-typeahead','ui.bootstrap.typeahead',
-    'rzModule']);
+var cstlAdminApp = angular.module('cstlAdminApp', [
+    // Angular official modules.
+    'ngCookies',
+    'ngResource',
+    'ngRoute',
+    // Libraries modules.
+    'base64',
+    'hljs',
+    'pascalprecht.translate',
+    'rzModule',
+    'ui.ace',
+    'ui.bootstrap.modal',
+    'ui.bootstrap.buttons',
+    'ui.bootstrap.tpls-accordion',
+    'ui.bootstrap.transition',
+    'ui.bootstrap.collapse',
+    'ui.bootstrap.accordion',
+    'ui.bootstrap.tpls-popover',
+    'ui.bootstrap.position',
+    'ui.bootstrap.bindHtml',
+    'ui.bootstrap.tooltip',
+    'ui.bootstrap.popover',
+    'ui.bootstrap.tpls-typeahead',
+    'ui.bootstrap.typeahead',
+    // Constellation modules.
+    'cstl-directives',
+    'http-auth-interceptor']);
 
 
 

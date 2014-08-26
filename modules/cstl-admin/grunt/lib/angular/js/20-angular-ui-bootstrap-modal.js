@@ -1,4 +1,4 @@
-angular.module('uiModal', ['template/modal/backdrop.html', 'template/modal/window.html'])
+angular.module('ui.bootstrap.modal', ['template/modal/backdrop.html', 'template/modal/window.html'])
 
 /**
  * A helper, internal data structure that acts as a map but also allows getting / removing
