@@ -64,7 +64,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.dateType_help",
 								"path":"identificationInfo.citation.date.dateType",
-								"type":"codelist",
+								"type":"DATE.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -75,7 +75,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.maintenanceAndUpdateFrequency_help",
 								"path":"identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency",
-								"type":"codelist",
+								"type":"MaintenanceFrequency.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -86,7 +86,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.language_help",
 								"path":"identificationInfo.language",
-								"type":"codelist",
+								"type":"Language.codelist",
 								"obligation":"M",
 								"defaultValue":"LanguageCode.fra",
 								"value":null
@@ -149,9 +149,9 @@
 								"multiplicity":1,
 								"help":"metadata.field.inspire_thesaurusDate_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
-								"type":"readonly",
+								"type":"DATE.readonly",
 								"obligation":"M",
-								"defaultValue":null,
+								"defaultValue":1212271200000,
 								"value":null
 							}
 						},{
@@ -223,7 +223,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.thesaurusDateType_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
-								"type":"codelist",
+								"type":"DATE.codelist",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -505,7 +505,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.date_help",
 								"path":"dataQualityInfo.report.result.specification.date.date",
-								"type":"readonly",
+								"type":"DATE.readonly",
 								"obligation":"M",
 								"defaultValue":1272844800000,
 								"value":null
@@ -899,7 +899,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.metadatalanguage_help",
 								"path":"language",
-								"type":"codelist",
+								"type":"Language.codelist",
 								"obligation":"M",
 								"defaultValue":"LanguageCode.fra",
 								"value":null
