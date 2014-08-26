@@ -130,7 +130,7 @@
 								"type":"INSPIRE_ISO.codelist",
 								"obligation":"M",
 								"defaultValue":null,
-								"value":null
+								"value":"keywword 1"
 							}
 						},{
 							"field":{
@@ -193,7 +193,92 @@
 								"type":"KEYWORD.text",
 								"obligation":"O",
 								"defaultValue":null,
+								"value":"keywword 1"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 2"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 3"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.thesaurusTitle",
+								"multiplicity":1,
+								"help":"metadata.field.thesaurusTitle_help",
+								"path":"identificationInfo.descriptiveKeywords.thesaurusName.title",
+								"type":"text",
+								"obligation":"O",
+								"defaultValue":null,
 								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.thesaurusDate",
+								"multiplicity":1,
+								"help":"metadata.field.thesaurusDate_help",
+								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
+								"type":"DATE.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.thesaurusDateType",
+								"multiplicity":1,
+								"help":"metadata.field.thesaurusDateType_help",
+								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
+								"type":"DATE.codelist",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						}
+					]}
+				},{
+					"block":{
+						"name":"metadata.block.descriptiveKeyword",
+						"multiplicity":62,
+						"help":"metadata.block.descriptiveKeyword_help",
+						"path":"identificationInfo.descriptiveKeywords",
+						"content":[{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 4"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 5"
 							}
 						},{
 							"field":{

@@ -32,6 +32,7 @@ import org.apache.sis.metadata.iso.citation.DefaultResponsibility;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.metadata.iso.identification.AbstractIdentification;
+import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.util.CharSequences;
 import org.junit.Test;
 
@@ -70,11 +71,16 @@ public final strictfp class TemplateTest {
         final AbstractIdentification identification = new AbstractIdentification();
         identification.setCitation(new DefaultCitation("Data \"title\""));
         identification.setExtents(singleton(new DefaultExtent(null,
-                new DefaultGeographicBoundingBox(-11.4865013, -4.615912, 43.165467, 49.9990223), null, null)));
-
+                new DefaultGeographicBoundingBox(-11.4865013, -4.615912, 43.165467, 49.9990223), null, null)
+        ));
+        identification.setDescriptiveKeywords(asList(
+                new DefaultKeywords("keywword 1", "keywword 2", "keywword 3"),
+                new DefaultKeywords("keywword 4", "keywword 5")
+        ));
         identification.setPointOfContacts(asList(
                 new DefaultResponsibility(Role.AUTHOR,       null, new DefaultIndividual("An author",      null, null)),
-                new DefaultResponsibility(Role.COLLABORATOR, null, new DefaultIndividual("A collaborator", null, null))));
+                new DefaultResponsibility(Role.COLLABORATOR, null, new DefaultIndividual("A collaborator", null, null))
+        ));
 
         final DefaultMetadata metadata = new DefaultMetadata();
         metadata.setFileIdentifier("An archive");
@@ -120,7 +126,7 @@ public final strictfp class TemplateTest {
     @Test
     public void testWritePrune() throws IOException {
         final DefaultMetadata metadata = createMetadata();
-        final StringBuilder buffer = new StringBuilder(5000);
+        final StringBuilder buffer = new StringBuilder(10000);
         Template.getInstance("profile_inspire_vector").write(metadata, buffer, true);
         assertJsonEquals("vector_prune.json", buffer);
     }
@@ -133,7 +139,7 @@ public final strictfp class TemplateTest {
     @Test
     public void testWriteFull() throws IOException {
         final DefaultMetadata metadata = createMetadata();
-        final StringBuilder buffer = new StringBuilder(32000);
+        final StringBuilder buffer = new StringBuilder(40000);
         Template.getInstance("profile_inspire_vector").write(metadata, buffer, false);
         assertJsonEquals("vector_test.json", buffer);
     }

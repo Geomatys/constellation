@@ -19,6 +19,7 @@
 package org.constellation.json.metadata;
 
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.io.IOException;
@@ -241,6 +242,22 @@ final class TemplateNode {
     }
 
     /**
+     * Given a newly computed set of values, returns the values accepted by the current node.
+     *
+     * <p>The current version only ensures that the number of elements is not greater than {@link #maxOccurs}.
+     * However if we want to apply a more sophisticated filter in a future version, it could be applied here.</p>
+     *
+     * @param  values The values fetched from the metadata object.
+     * @return The values to write for the current {@code TemplateNode}.
+     */
+    private Object[] filterNewValues(Object[] values) {
+        if (values != null && values.length > maxOccurs) {
+            values = Arrays.copyOfRange(values, 0, maxOccurs);
+        }
+        return values;
+    }
+
+    /**
      * Fetches all occurrences of metadata values at the path given by {@link #path}.
      * This method search only the metadata values for this {@code TemplateNode} - it
      * does not perform any search for children {@code TemplateNode}s.
@@ -279,7 +296,7 @@ final class TemplateNode {
                         }
                         values = ArraysExt.concatenate(arrays);
                     }
-                    return values;
+                    return filterNewValues(values);
                 }
             }
             /*
@@ -289,7 +306,7 @@ final class TemplateNode {
              */
             metadata = value;
         } while (++pathOffset < path.length);
-        return new Object[] {value};
+        return filterNewValues(new Object[] {value});
     }
 
     /**

@@ -29,6 +29,96 @@
 					]}
 				},{
 					"block":{
+						"name":"metadata.block.inspire_descriptiveKeyword",
+						"multiplicity":1,
+						"help":"metadata.block.inspire_descriptiveKeyword_help",
+						"path":null,
+						"content":[{
+							"field":{
+								"name":"metadata.field.inspire_keyword",
+								"multiplicity":1,
+								"help":"metadata.field.inspire_keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"INSPIRE_ISO.codelist",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":"keywword 1"
+							}
+						}
+					]}
+				},{
+					"block":{
+						"name":"metadata.block.descriptiveKeyword",
+						"multiplicity":62,
+						"help":"metadata.block.descriptiveKeyword_help",
+						"path":"identificationInfo.descriptiveKeywords",
+						"content":[{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 1"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 2"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 3"
+							}
+						}
+					]}
+				},{
+					"block":{
+						"name":"metadata.block.descriptiveKeyword",
+						"multiplicity":62,
+						"help":"metadata.block.descriptiveKeyword_help",
+						"path":"identificationInfo.descriptiveKeywords",
+						"content":[{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 4"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.keyword",
+								"multiplicity":62,
+								"help":"metadata.field.keyword_help",
+								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"type":"KEYWORD.text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"keywword 5"
+							}
+						}
+					]}
+				},{
+					"block":{
 						"name":"metadata.block.geographicExtension",
 						"multiplicity":1,
 						"help":"metadata.block.geographicExtension_help",
