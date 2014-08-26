@@ -397,14 +397,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
     function ($scope, $routeParams,dataListing, $location, $translate, $uploadFiles, $modal,textService) {
         $scope.provider = $routeParams.id;
         $scope.missing = $routeParams.missing === 'true';
-        $scope.type = $routeParams.type;
+        $scope.type = $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
         $scope.typeLabelKey = "metadata.edition.dataset."+$scope.type;
-
-        $scope.tabiso = $scope.missing;
-        $scope.tabcrs = false;
-        $scope.tabdesc = $scope.type==='vector' && !$scope.missing;
-        $scope.tabimageinfo = $scope.type==='raster' && !$scope.missing;
-        $scope.tabsensorinfo = $scope.type==='observation' && !$scope.missing;
 
         /**
          * Get all codelists for metadata editor

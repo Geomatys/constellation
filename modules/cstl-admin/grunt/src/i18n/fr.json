@@ -102,7 +102,7 @@
     "create.description.version.title": "Version",
 
     "data.information.page.title": "Information sur la donnée",
-    "data.information.tab.missing.title": "Saisie de la métadonnée",
+    "data.information.tab.metadata.title": "Saisie de la métadonnée",
     "data.information.tab.title": "Information sur l'image",
     "data.information.title": "Données disponibles",
     "data.search.filter.title":"Titre",

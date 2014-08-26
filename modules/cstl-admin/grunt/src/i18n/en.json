@@ -102,7 +102,7 @@
     "create.description.version.title":"Version",
 
     "data.information.page.title":"Information about data",
-    "data.information.tab.missing.title":"Edit Metadata",
+    "data.information.tab.metadata.title":"Edit Metadata",
     "data.information.tab.title":"Picture information",
     "data.information.title":"Available data",
     "data.search.filter.title":"Title",
