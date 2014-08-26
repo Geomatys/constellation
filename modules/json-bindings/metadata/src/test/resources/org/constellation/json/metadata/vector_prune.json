@@ -106,7 +106,16 @@
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":"CI_RoleCode.author"
 							}
-						},{
+						}
+					]}
+				},{
+					"block":{
+						"name":"metadata.block.pointOfContact",
+						"multiplicity":62,
+						"help":"metadata.block.pointOfContact_help",
+						"path":"identificationInfo.pointOfContact",
+						"type":"CONTACT",
+						"content":[{
 							"field":{
 								"name":"metadata.field.role",
 								"multiplicity":1,
@@ -183,7 +192,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.metadatalanguage_help",
 								"path":"language",
-								"type":"codelist",
+								"type":"Language.codelist",
 								"obligation":"M",
 								"defaultValue":"LanguageCode.fra",
 								"value":"LanguageCode.eng"

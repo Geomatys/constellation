@@ -48,11 +48,13 @@ final class TemplateNode {
     /**
      * The lines or other nodes contained in this node.
      * Elements in this array are either {@link String} or other {@code TemplateNode}.
+     * <strong>Do not modify the content of this array.</strong>
      */
     private final Object[] content;
 
     /**
      * The components of the {@code "path"} value found in the node, or {@code null} if none.
+     * <strong>Do not modify the content of this array.</strong>
      */
     private final String[] path;
 
@@ -69,8 +71,9 @@ final class TemplateNode {
 
     /**
      * Maximum number of occurrences allowed for this node.
+     * Must not be negative or zero.
      */
-    private final int multiplicity;
+    private final int maxOccurs;
 
     /**
      * {@code true} if the last line has a trailing comma, ignoring whitespaces.
@@ -107,7 +110,7 @@ final class TemplateNode {
         String  path         = null;
         Object  defaultValue = null;
         int     valueIndex   = -1;
-        int     multiplicity = Integer.MAX_VALUE;
+        int     maxOccurs    = Integer.MAX_VALUE;
         int     level        = 0;
         while (true) {
             if (nextLine) {
@@ -121,12 +124,11 @@ final class TemplateNode {
             } else if (parser.regionMatches("\"value\"")) {
                 valueIndex = content.size() - 1;
                 content.set(valueIndex, parser.fullLineWithoutNull());
-            } else if (parser.regionMatches("multiplicity")) {
+            } else if (parser.regionMatches("\"multiplicity\"")) {
                 final Object n = parser.getValue();
-                if (!(n instanceof Number)) {
+                if (!(n instanceof Number) || (maxOccurs = ((Number) n).intValue()) < 1) {
                     throw new ParseException("Invalid multiplicity: " + n);
                 }
-                multiplicity = ((Number) n).intValue();
             } else if (parser.regionMatches("\"content\"")) {
                 String childSeparator = null;
                 do {
@@ -175,7 +177,7 @@ final class TemplateNode {
         this.path               = (path != null) ? parser.sharedPath(path) : null;
         this.defaultValue       = defaultValue;
         this.valueIndex         = valueIndex;
-        this.multiplicity       = multiplicity;
+        this.maxOccurs          = maxOccurs;
         this.hasTrailingComma   = parser.hasTrailingComma();
         this.lengthWithoutComma = parser.length();
         this.separator          = separator;
@@ -183,9 +185,10 @@ final class TemplateNode {
 
     /**
      * Validate the {@link #path} of this node and all child nodes.
-     * This method shall be invoked only on the root node after we finished to build the whole tree.
+     * This method shall be invoked on the root node after we finished to build the whole tree.
+     * This method invokes itself recursively for validating children too.
      */
-    void validatePath(CharSequence[] prefix) throws ParseException {
+    final void validatePath(CharSequence[] prefix) throws ParseException {
         if (path != null) {
             if (prefix != null) {
                 for (int i=0; i<prefix.length; i++) {
@@ -208,7 +211,7 @@ final class TemplateNode {
     /**
      * Returns the depth of {@link #path}.
      */
-    int getPathDepth() {
+    final int getPathDepth() {
         return (path != null) ? path.length : 0;
     }
 
@@ -231,6 +234,13 @@ final class TemplateNode {
     }
 
     /**
+     * Returns {@code true} if this node contains a "value" property.
+     */
+    private boolean isField() {
+        return valueIndex >= 0;
+    }
+
+    /**
      * Fetches all occurrences of metadata values at the path given by {@link #path}.
      * This method search only the metadata values for this {@code TemplateNode} - it
      * does not perform any search for children {@code TemplateNode}s.
@@ -238,6 +248,7 @@ final class TemplateNode {
      * @param  metadata   The metadata from where to get the values.
      * @param  pathOffset Index of the first {@link #path} element to use.
      * @return The values (often an array of length 1), or {@code null} if none.
+     * @throws ClassCastException if {@code metadata} is not an instance of the expected standard.
      */
     private Object[] getValues(Object metadata, int pathOffset) throws ClassCastException {
         if (metadata == null || path == null) {
@@ -245,6 +256,7 @@ final class TemplateNode {
         }
         Object value;
         do {
+            // Fetch the value from the metadata object.
             final String identifier = path[pathOffset];
             value = standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
             if (value == null) {
@@ -256,7 +268,8 @@ final class TemplateNode {
              * Instead, we rely on the method contract.
              */
             if (value instanceof Collection<?>) {
-                final Class<?> type = standard.asTypeMap(metadata.getClass(), KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.PROPERTY_TYPE).get(identifier);
+                final Class<?> type = standard.asTypeMap(metadata.getClass(),
+                        KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.PROPERTY_TYPE).get(identifier);
                 if (Collection.class.isAssignableFrom(type)) {
                     Object[] values = ((Collection<?>) value).toArray();
                     if (++pathOffset < path.length) {
@@ -269,6 +282,11 @@ final class TemplateNode {
                     return values;
                 }
             }
+            /*
+             * The value is not a collection. Continue the loop for each components in the path. For example
+             * if the path is "identificationInfo.extent.geographicElement.southBoundLatitude", then the loop
+             * would be executed for "identificationInfo", then "extent", etc. if all components were singleton.
+             */
             metadata = value;
         } while (++pathOffset < path.length);
         return new Object[] {value};
@@ -277,20 +295,23 @@ final class TemplateNode {
     /**
      * Builds a tree of values for this node and all children nodes.
      *
-     * @param metadata   The root metadata from which to get the values.
-     * @param pathOffset Index of the first {@link #path} element to use.
-     * @param prune      {@code true} for omitting empty nodes.
+     * @param  metadata   The metadata from which to get the values.
+     * @param  pathOffset Index of the first {@link #path} element to use.
+     * @param  prune      {@code true} for omitting empty nodes.
+     * @return The roots of tree nodes creates by this method (not necessarily the root of the whole tree to be
+     *         written), or {@code null} if none. The array may contain null elements, which shall be ignored.
      */
-    private ValueNode createValueTree(final Object metadata, int pathOffset, final boolean prune) throws ParseException {
-        ValueNode root = null;
-        /*
-         * If this node does not declare any path, we can not get a metadata value for this node.
-         * However maybe some chidren may have a path allowing them to fetch metadata values.
-         */
+    private ValueNode[] createValueTree(final Object metadata, int pathOffset, final boolean prune) throws ParseException {
+        ValueNode node;
         if (path == null) {
+            /*
+             * If this node does not declare any path, we can not get a metadata value for this node.
+             * However maybe some chidren may have a path allowing them to fetch metadata values.
+             */
+            node = null;
             for (final Object line : content) {
                 if (line instanceof TemplateNode) {
-                    root = addTo(root, ((TemplateNode) line).createValueTree(metadata, pathOffset, prune));
+                    node = addTo(node, ((TemplateNode) line).createValueTree(metadata, pathOffset, prune));
                 }
             }
         } else {
@@ -309,55 +330,76 @@ final class TemplateNode {
             if (values != null) {
                 /*
                  * If we have a value and this node is a field, store the value.
-                 * Otherwise delegate to the child nodes for creating sub-tree.
+                 * Otherwise delegate to the child nodes for creating sub-trees.
                  */
-                if (valueIndex >= 0) {
-                    root = new ValueNode(this, values);
+                if (isField()) {
+                    node = new ValueNode(this, values);
                 } else {
+                    /*
+                     * If we have at least one value and this node may contains children,
+                     * we have to invoke recursively this method for the children. Note
+                     * that this may result in the creation of more than one "root" node.
+                     * This block is the reason why 'createValueTree' needs to return an array.
+                     */
                     pathOffset += path.length;
-                    for (final Object line : content) {
-                        if (line instanceof TemplateNode) {
-                            for (final Object value : values) {
-                                root = addTo(root, ((TemplateNode) line).createValueTree(value, pathOffset, prune));
+                    final ValueNode[] nodes = new ValueNode[values.length];
+                    for (int i=0; i<values.length; i++) {
+                        node = null;
+                        for (final Object line : content) {
+                            if (line instanceof TemplateNode) {
+                                node = addTo(node, ((TemplateNode) line).createValueTree(values[i], pathOffset, prune));
                             }
                         }
+                        nodes[i] = node;
                     }
+                    return nodes;
                 }
-            } else if (!prune) {
+            } else if (prune) {
                 /*
-                 * If there is no value, write anyway if the user asked us to not trim empty nodes.
+                 * If there is no value and the user asked us to prune empty nodes,
+                 * returns 'null' immediately (avoid the creation of an array).
+                 */
+                return null;
+            } else {
+                /*
+                 * If there is no value, write anyway if the user asked us to not prune empty nodes.
                  * We will format the default values, which may be {@code null}. Note that in the
                  * later case we really want an array of values containing the 'null' element.
                  */
-                if (valueIndex >= 0) {
-                    root = new ValueNode(this, new Object[] {defaultValue});
+                if (isField()) {
+                    node = new ValueNode(this, new Object[] {defaultValue});
                 } else {
+                    node = null;
                     pathOffset += path.length;
                     for (final Object line : content) {
                         if (line instanceof TemplateNode) {
-                            root = addTo(root, ((TemplateNode) line).createValueTree(null, pathOffset, prune));
+                            node = addTo(node, ((TemplateNode) line).createValueTree(null, pathOffset, prune));
                         }
                     }
                 }
             }
         }
-        return root;
+        return new ValueNode[] {node};
     }
 
     /**
-     * If the given child is non-null, adds it to the given parent.
+     * Adds the non-null children to the given parent.
      * The parent will be created when first needed.
      *
-     * @param  parent The parent, or {@code null} if not yet created.
-     * @param  child  The child to add to the parent, or {@code null}.
+     * @param  parent   The parent, or {@code null} if not yet created.
+     * @param  children The children to add to the parent, or {@code null}.
      * @return The parent, newly created if the given {@code parent} was null.
      */
-    private ValueNode addTo(ValueNode parent, final ValueNode child) {
-        if (child != null) {
-            if (parent == null) {
-                parent = new ValueNode(this, null);
+    private ValueNode addTo(ValueNode parent, final ValueNode[] children) {
+        if (children != null) {
+            for (final ValueNode child : children) {
+                if (child != null) {
+                    if (parent == null) {
+                        parent = new ValueNode(this, null);
+                    }
+                    parent.add(child);
+                }
             }
-            parent.add(child);
         }
         return parent;
     }
@@ -368,14 +410,15 @@ final class TemplateNode {
      * @param  metadata The metadata to write.
      * @param  out      Where to write the JSON file.
      * @param  prune    {@code true} for omitting empty nodes.
+     * @param  maxDepth The maximal length of {@link #path}.
      * @throws IOException If an error occurred while writing the JSON file.
      */
-    void write(final Object metadata, final Appendable out, final boolean prune) throws IOException {
-        ValueNode root = createValueTree(metadata, 0, prune);
-        if (root == null) {
-            root = new ValueNode(this, null);
+    final void write(final Object metadata, final Appendable out, final boolean prune) throws IOException {
+        for (final ValueNode root : createValueTree(metadata, 0, prune)) {
+            if (root != null) {
+                writeTree(root, out, true);
+            }
         }
-        writeTree(root, out, true);
     }
 
     /**
@@ -497,8 +540,8 @@ final class TemplateNode {
      * Partial implementation of {@link #toString(StringBuilder, int, int)} to be shared by {@link ValueNode}.
      * This method does not add the EOL character - it is caller responsibility to append it.
      */
-    void toString(final StringBuilder buffer, final int indentation, final int pathOffset, final String label, final Object[] values) {
-        buffer.append(CharSequences.spaces(indentation)).append(valueIndex < 0 ? "Node" : "Field").append('[');
+    final void toString(final StringBuilder buffer, final int indentation, final int pathOffset, final String label, final Object[] values) {
+        buffer.append(CharSequences.spaces(indentation)).append(isField() ? "Field" :  "Node").append('[');
         if (path != null) {
             appendPath(pathOffset, buffer.append("path:\""));
             buffer.append('"');

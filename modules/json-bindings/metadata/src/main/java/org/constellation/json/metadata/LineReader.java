@@ -51,8 +51,8 @@ final class LineReader {
 
     /**
      * For sharing same {@code String[]} instances when possible. This sharing is helpful for a
-     * {@link ValueKey} optimization, since it will allow to compare paths by reference before
-     * to perform full {@code Arrays.equals(…)} checks.
+     * {@link NumerotedPath} optimization, since it will allow to compare paths by reference
+     * before to perform full {@code Arrays.equals(…)} checks.
      */
     private final Map<String,String[]> sharedPaths;
 

@@ -1,0 +1,225 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ * Copyright 2014 Geomatys.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.constellation.json.metadata;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.Arrays;
+import org.apache.sis.util.ArraysExt;
+import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.metadata.KeyNamePolicy;
+import org.apache.sis.metadata.TypeValuePolicy;
+import org.apache.sis.metadata.ValueExistencePolicy;
+
+
+/**
+ * Writes a JSON file using a template.
+ *
+ * @author Martin Desruisseaux (Geomatys)
+ */
+final class TemplateApplicator {
+    /**
+     * Value stored in the {@link #remainingValues} map after we used all metadata values for a given path.
+     * Also used as a sentinel value in {@code Object[]} arrays for meaning that an element has been used.
+     *
+     * <p>{@code EMPTY} shall be a new instance, not an {@code Object[0]} instance shared with other classes,
+     * because of its use as a sentinel value.</p>
+     */
+    private static final Object[] EMPTY = new Object[0];
+
+    /**
+     * Where to write the JSON file.
+     */
+    private final Appendable out;
+
+    /**
+     * {@code true} for omitting empty nodes.
+     */
+    final boolean prune;
+
+    /**
+     * If a metadata values has been requested, the remaining values after we processed the values for
+     * the current {@code TemplateNode}. This is used for avoiding to write the same values many time
+     * if the same path appears more than once.
+     */
+    private final Map<NumerotedPath,Object[]> remainingValues;
+
+    /**
+     * The node currently in process of being written.
+     */
+    TemplateNode currentNode;
+
+    /**
+     * The index of each elements in the path, to be copied in {@link NumerotedPath#indices} when needed.
+     * Those indices will be incremented as we iterate in the metadata tree.
+     */
+    private final int[] indices;
+
+    /**
+     * Creates a new writer.
+     *
+     * @param out      Where to write the JSON file.
+     * @param prune    {@code true} for omitting empty nodes.
+     * @param maxDepth The maximal length of {@link TemplateNode#path}.
+     */
+    TemplateApplicator(final Appendable out, final boolean prune, final int maxDepth) {
+        this.out   = out;
+        this.prune = prune;
+        remainingValues = new HashMap<>();
+        indices = new int[maxDepth];
+    }
+
+    /**
+     * Given a newly computed set of values for the given path, separates the value to use for the current
+     * {@code TemplateNode}. Remaining values (which are often an empty array) will be stored in the
+     * {@link #remainingValues} map.
+     *
+     * @param  path   The key to use for storing the remaining values in the map, or {@code null} if none.
+     * @param  values The values fetched from the metadata object.
+     * @return The values to write for the current {@code TemplateNode}.
+     */
+    private Object[] filterNewValues(final NumerotedPath path, Object[] values) {
+        if (path != null && values != null) {
+            final Object[] remaining;
+            final int maxOccurs = currentNode.maxOccurs;
+            if (values.length <= maxOccurs) {
+                remaining = EMPTY; // This is the most common case.
+            } else {
+                /*
+                 * Current TemplateNode does not use all values. Separates used values from remaining.
+                 * Instead than creating a new array for the remaining values, we will rather set the
+                 * used values to a sentinel value (EMPTY). Since there is usually only one used value
+                 * (because 'maxOccurs' is typically either 1 or infinity), this approach is efficient
+                 * in most cases.
+                 */
+                remaining = values;
+                values = Arrays.copyOfRange(values, 0, maxOccurs);
+                Arrays.fill(remaining, 0, maxOccurs, EMPTY);
+            }
+            if (remainingValues.put(path, remaining) != null) {
+                throw new ConcurrentModificationException();
+            }
+        }
+        return values;
+    }
+
+    /**
+     * Given a path which is used for the second time or more, returns as many values as we can use
+     * and removes the used values from the {@link #remainingValues} map.
+     *
+     * @param  path      The key which has been used for storing {@code remaining} in the {@link #remainingValues} map.
+     * @param  remaining The value of {@code remainingValues.get(path)}.
+     * @return The values to write for the current {@code TemplateNode}.
+     */
+    private Object[] filterExistingValues(final NumerotedPath path, final Object[] remaining) {
+        assert remainingValues.get(path) == remaining;
+        for (int i=0; i<remaining.length; i++) {
+            if (remaining[i] != EMPTY) {
+                /*
+                 * Found the first element that we can use. This is usually 'remaining[1]' (because
+                 * 'maxOccurs' is typically either 1 or infinity), so this loop is usually fast.
+                 */
+                final int maxOccurs = currentNode.maxOccurs;
+                final int upper = Math.min(remaining.length - i, maxOccurs);
+                final Object[] values = Arrays.copyOfRange(remaining, i, upper);
+                if (upper != maxOccurs) {
+                    Arrays.fill(remaining, i, upper, EMPTY);
+                } else {
+                    if (remainingValues.put(path, EMPTY) != remaining) {
+                        throw new ConcurrentModificationException();
+                    }
+                }
+                return values;
+            }
+        }
+        return null; // Really 'null', not 'EMPTY'.
+    }
+
+    /**
+     * Fetches all occurrences of metadata values at the path given by {@link TemplateNode#path}.
+     * This method search only the metadata values for the current {@code TemplateNode} - it does
+     * not perform any search for children {@code TemplateNode}s.
+     *
+     * <p>The {@link #currentNode} field <strong>must</strong> be set before to invoke this method.</p>
+     *
+     * @param  metadata   The metadata from where to get the values.
+     * @param  pathOffset Index of the first {@link TemplateNode#path} element to use.
+     * @return The values (often an array of length 1), or {@code null} if none.
+     * @throws ClassCastException if {@code metadata} is not an instance of the expected standard.
+     */
+    final Object[] getValues(Object metadata, int pathOffset) throws ClassCastException {
+        final String[] path = currentNode.path;
+        if (metadata == null || path == null) {
+            return null;
+        }
+        final MetadataStandard standard = currentNode.standard;
+        Object value;
+        NumerotedPath key = null;
+        do {
+            /*
+             * Verify the value has already been fetched from previous execution of this method.
+             * In such case, we will uses those values and return immediately.
+             */
+            if (currentNode.isField()) {
+                key = new NumerotedPath(path, indices, pathOffset);
+                final Object[] values = remainingValues.get(key);
+                if (values != null) {
+                    return filterExistingValues(key, values);
+                }
+            }
+            // Fetch the value from the metadata object.
+            final String identifier = path[pathOffset];
+            value = standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
+            if (value == null) {
+                return null;
+            }
+            /*
+             * Verify if the value is a collection. We do not rely on (value instanceof Collection)
+             * only because it may not be reliable if the value implements more than one interface.
+             * Instead, we rely on the method contract.
+             */
+            if (value instanceof Collection<?>) {
+                final Class<?> type = standard.asTypeMap(metadata.getClass(),
+                        KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.PROPERTY_TYPE).get(identifier);
+                if (Collection.class.isAssignableFrom(type)) {
+                    Object[] values = ((Collection<?>) value).toArray();
+                    if (++pathOffset < path.length) {
+                        final Object[][] arrays = new Object[values.length][];
+                        for (int i=0; i<values.length; i++) {
+                            indices[pathOffset - 1] = i;
+                            arrays[i] = getValues(values[i], pathOffset);
+                        }
+                        values = ArraysExt.concatenate(arrays);
+                    }
+                    return filterNewValues(key, values);
+                }
+            }
+            /*
+             * The value is not a collection. Continue the loop for each components in the path. For example
+             * if the path is "identificationInfo.extent.geographicElement.southBoundLatitude", then the loop
+             * would be executed for "identificationInfo", then "extent", etc. if all components were singleton.
+             */
+            metadata = value;
+            indices[pathOffset] = 0;
+        } while (++pathOffset < path.length);
+        return filterNewValues(key, new Object[] {value});
+    }
+}

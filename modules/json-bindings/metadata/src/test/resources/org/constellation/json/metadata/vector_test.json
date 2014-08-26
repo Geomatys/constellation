@@ -64,7 +64,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.dateType_help",
 								"path":"identificationInfo.citation.date.dateType",
-								"type":"codelist",
+								"type":"DATE.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -75,7 +75,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.maintenanceAndUpdateFrequency_help",
 								"path":"identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency",
-								"type":"codelist",
+								"type":"MaintenanceFrequency.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -86,7 +86,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.language_help",
 								"path":"identificationInfo.language",
-								"type":"codelist",
+								"type":"Language.codelist",
 								"obligation":"M",
 								"defaultValue":"LanguageCode.fra",
 								"value":"LanguageCode.fra"
@@ -149,10 +149,10 @@
 								"multiplicity":1,
 								"help":"metadata.field.inspire_thesaurusDate_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
-								"type":"readonly",
+								"type":"DATE.readonly",
 								"obligation":"M",
-								"defaultValue":null,
-								"value":null
+								"defaultValue":1212271200000,
+								"value":1212271200000
 							}
 						},{
 							"field":{
@@ -223,7 +223,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.thesaurusDateType_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
-								"type":"codelist",
+								"type":"DATE.codelist",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -272,7 +272,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.code_help",
 								"path":"referenceSystemInfo.referenceSystemIdentifier.code",
-								"type":"codelist",
+								"type":"ReferenceSystemIdentifier.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -505,7 +505,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.date_help",
 								"path":"dataQualityInfo.report.result.specification.date.date",
-								"type":"readonly",
+								"type":"DATE.readonly",
 								"obligation":"M",
 								"defaultValue":1272844800000,
 								"value":1272844800000
@@ -584,17 +584,6 @@
 							}
 						},{
 							"field":{
-								"name":"metadata.field.organisationName",
-								"multiplicity":1,
-								"help":"metadata.field.organisationName_help",
-								"path":"identificationInfo.pointOfContact.organisationName",
-								"type":"text",
-								"obligation":"M",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
 								"name":"metadata.field.role",
 								"multiplicity":1,
 								"help":"metadata.field.role_help",
@@ -603,6 +592,125 @@
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":"CI_RoleCode.author"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.individualName",
+								"multiplicity":1,
+								"help":"metadata.field.individualName_help",
+								"path":"identificationInfo.pointOfContact.individualName",
+								"type":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.positionName",
+								"multiplicity":1,
+								"help":"metadata.field.positionName_help",
+								"path":"identificationInfo.pointOfContact.positionName",
+								"type":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.deliveryPoint",
+								"multiplicity":1,
+								"help":"metadata.field.deliveryPoint_help",
+								"path":"identificationInfo.pointOfContact.contactInfo.address.deliveryPoint",
+								"type":"textarea",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.city",
+								"multiplicity":1,
+								"help":"metadata.field.city_help",
+								"path":"identificationInfo.pointOfContact.contactInfo.address.city",
+								"type":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.postalCode",
+								"multiplicity":1,
+								"help":"metadata.field.postalCode_help",
+								"path":"identificationInfo.pointOfContact.contactInfo.address.postalCode",
+								"type":"integer",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.country",
+								"multiplicity":1,
+								"help":"metadata.field.country_help",
+								"path":"identificationInfo.pointOfContact.contactInfo.address.country",
+								"type":"text",
+								"obligation":"O",
+								"defaultValue":"France",
+								"value":"France"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.electronicMailAddress",
+								"multiplicity":1,
+								"help":"metadata.field.electronicMailAddress_help",
+								"path":"identificationInfo.pointOfContact.contactInfo.address.electronicMailAddress",
+								"type":"mail",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.voice",
+								"multiplicity":1,
+								"help":"metadata.field.voice_help",
+								"path":"identificationInfo.pointOfContact.contactInfo.phone.voice",
+								"type":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.linkage",
+								"multiplicity":1,
+								"help":"metadata.field.linkage_help",
+								"path":"identificationInfo.pointOfContact.contactInfo.onlineResource.linkage",
+								"type":"web",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						}
+					]}
+				},{
+					"block":{
+						"name":"metadata.block.pointOfContact",
+						"multiplicity":62,
+						"help":"metadata.block.pointOfContact_help",
+						"path":"identificationInfo.pointOfContact",
+						"type":"CONTACT",
+						"content":[{
+							"field":{
+								"name":"metadata.field.organisationName",
+								"multiplicity":1,
+								"help":"metadata.field.organisationName_help",
+								"path":"identificationInfo.pointOfContact.organisationName",
+								"type":"text",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":null
 							}
 						},{
 							"field":{
@@ -628,44 +736,11 @@
 							}
 						},{
 							"field":{
-								"name":"metadata.field.individualName",
-								"multiplicity":1,
-								"help":"metadata.field.individualName_help",
-								"path":"identificationInfo.pointOfContact.individualName",
-								"type":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
 								"name":"metadata.field.positionName",
 								"multiplicity":1,
 								"help":"metadata.field.positionName_help",
 								"path":"identificationInfo.pointOfContact.positionName",
 								"type":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.positionName",
-								"multiplicity":1,
-								"help":"metadata.field.positionName_help",
-								"path":"identificationInfo.pointOfContact.positionName",
-								"type":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.deliveryPoint",
-								"multiplicity":1,
-								"help":"metadata.field.deliveryPoint_help",
-								"path":"identificationInfo.pointOfContact.contactInfo.address.deliveryPoint",
-								"type":"textarea",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -694,17 +769,6 @@
 							}
 						},{
 							"field":{
-								"name":"metadata.field.city",
-								"multiplicity":1,
-								"help":"metadata.field.city_help",
-								"path":"identificationInfo.pointOfContact.contactInfo.address.city",
-								"type":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
 								"name":"metadata.field.postalCode",
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
@@ -713,28 +777,6 @@
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.postalCode",
-								"multiplicity":1,
-								"help":"metadata.field.postalCode_help",
-								"path":"identificationInfo.pointOfContact.contactInfo.address.postalCode",
-								"type":"integer",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.country",
-								"multiplicity":1,
-								"help":"metadata.field.country_help",
-								"path":"identificationInfo.pointOfContact.contactInfo.address.country",
-								"type":"text",
-								"obligation":"O",
-								"defaultValue":"France",
-								"value":"France"
 							}
 						},{
 							"field":{
@@ -760,44 +802,11 @@
 							}
 						},{
 							"field":{
-								"name":"metadata.field.electronicMailAddress",
-								"multiplicity":1,
-								"help":"metadata.field.electronicMailAddress_help",
-								"path":"identificationInfo.pointOfContact.contactInfo.address.electronicMailAddress",
-								"type":"mail",
-								"obligation":"M",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
 								"name":"metadata.field.voice",
 								"multiplicity":1,
 								"help":"metadata.field.voice_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.phone.voice",
 								"type":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.voice",
-								"multiplicity":1,
-								"help":"metadata.field.voice_help",
-								"path":"identificationInfo.pointOfContact.contactInfo.phone.voice",
-								"type":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.linkage",
-								"multiplicity":1,
-								"help":"metadata.field.linkage_help",
-								"path":"identificationInfo.pointOfContact.contactInfo.onlineResource.linkage",
-								"type":"web",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -1020,7 +1029,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.metadatalanguage_help",
 								"path":"language",
-								"type":"codelist",
+								"type":"Language.codelist",
 								"obligation":"M",
 								"defaultValue":"LanguageCode.fra",
 								"value":"LanguageCode.eng"
