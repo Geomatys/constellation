@@ -23,6 +23,7 @@ import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -90,7 +91,6 @@ import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.image.interpolation.InterpolationCase;
-import org.geotoolkit.io.yaml.JSON;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.observation.ObservationStore;
@@ -113,13 +113,13 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
-import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
 
 import javax.inject.Inject;
@@ -156,18 +156,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -202,55 +192,67 @@ public class DataRest {
 
 
     /**
-     * Give metadata CodeList (example {@link org.opengis.metadata.citation.Role} codes
+     * Give metadata CodeLists (example {@link org.opengis.metadata.citation.Role} codes
      *
-     * @param pLocale locale to found right translation
      * @return a {@link javax.ws.rs.core.Response} which contain codelists
      */
     @GET
-    @Path("metadataCodeLists/{locale}")
+    @Path("metadataCodeLists")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getMetadataCodeLists(@PathParam("locale") final String pLocale) {
+    public Response getMetadataCodeLists() {
+        final MetadataLists mdList = new MetadataLists();
 
-        final Locale userLocale = new Locale(pLocale);
-        MetadataLists mdList = new MetadataLists();
-
-        HashMap<String, String> roles = new HashMap<>(0);
-        for (Role role : Role.values()) {
-            InternationalString is = Types.getCodeTitle(role);
-            roles.put(role.name(), is.toString(userLocale));
+        //for role codes
+        final List<String> roleCodes = new LinkedList<>();
+        for (final Role role : Role.values()) {
+            final String standardName = Types.getStandardName(role.getClass());
+            final String code = role.identifier()!=null?role.identifier():role.name();
+            final String codeListName = standardName+"."+code;
+            roleCodes.add(codeListName);
         }
-        mdList.setRoles(roles);
+        Collections.sort(roleCodes);
+        mdList.setRoleCodes(roleCodes);
 
-
-        Comparator<String> comparator = new Comparator<String>() {
-            @Override
-            public int compare(final String first, final String second) {
-                return first.compareTo(second);
-            }
-        };
-        TreeMap<String, String> locales = new TreeMap<>(comparator);
-        for (Locale locale : Locale.getAvailableLocales()) {
-            locales.put(locale.toString(), locale.getDisplayName(userLocale));
+        //for locale codes
+        final List<String> localeCodes = new LinkedList<>();
+        for (final Locale locale : Locales.ALL.getAvailableLanguages()) {
+            localeCodes.add("LanguageCode."+locale.getISO3Language());
         }
-        mdList.setLocales(locales);
+        Collections.sort(localeCodes);
+        mdList.setLocaleCodes(localeCodes);
 
-        HashMap<String, String> topics = new HashMap<>(0);
-        for (TopicCategory topicCategory : TopicCategory.values()) {
-            InternationalString is = Types.getCodeTitle(topicCategory);
-            topics.put(topicCategory.name(), is.toString(userLocale));
+        final List<String> topicCategoryCodes = new LinkedList<>();
+        for (final TopicCategory tc : TopicCategory.values()) {
+            final String standardName = Types.getStandardName(tc.getClass());
+            final String code = tc.identifier()!=null? tc.identifier(): tc.name();
+            final String codeListName = standardName+"."+code;
+            topicCategoryCodes.add(codeListName);
         }
-        mdList.setCategories(topics);
+        Collections.sort(topicCategoryCodes);
+        mdList.setTopicCategoryCodes(topicCategoryCodes);
 
-        HashMap<String, String> dateTypes = new HashMap<>(0);
-        for (DateType dateType : DateType.values()) {
-            InternationalString is = Types.getCodeTitle(dateType);
-            dateTypes.put(dateType.name(), is.toString(userLocale));
+        final List<String> dateTypeCodes = new LinkedList<>();
+        for (final DateType dateType : DateType.values()) {
+            final String standardName = Types.getStandardName(dateType.getClass());
+            final String code = dateType.identifier()!=null? dateType.identifier(): dateType.name();
+            final String codeListName = standardName+"."+code;
+            dateTypeCodes.add(codeListName);
         }
-        mdList.setDateTypes(dateTypes);
+        Collections.sort(dateTypeCodes);
+        mdList.setDateTypeCodes(dateTypeCodes);
 
-        return Response.status(200).entity(mdList).build();
+        final List<String> maintenanceFrequencyCodes = new LinkedList<>();
+        for (final MaintenanceFrequency cl : MaintenanceFrequency.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            maintenanceFrequencyCodes.add(codeListName);
+        }
+        Collections.sort(maintenanceFrequencyCodes);
+        mdList.setMaintenanceFrequencyCodes(maintenanceFrequencyCodes);
+
+        return Response.ok().entity(mdList).build();
     }
 
 
@@ -653,6 +655,9 @@ public class DataRest {
         final Provider providerDB = providerBusiness.getProvider(providerId, domainId);
         final List<org.constellation.engine.register.Data> datasFromProviderId = providerBusiness.getDatasFromProviderId(providerDB.getId());
         final String metadata;
+        if(datasFromProviderId.size()==0){
+            return Response.status(500).entity("The dataset have no data").build();
+        }
         if (datasFromProviderId.size()>1){
             metadata = providerDB.getMetadataIso();
         }else{
@@ -729,16 +734,17 @@ public class DataRest {
     }
 
     @POST
-    @Path("metadata/data")
+    @Path("metadata/dataset")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDataMetadata(final ParameterValues values) {
+    public Response getDatasetMetadata(final ParameterValues values) {
         final String providerId = values.getValues().get("providerId");
         final String dataName   = values.getValues().get("dataName");
+        final String dataType   = values.getValues().get("type");
         final DefaultMetadata metadata;
         if (dataName != null) {
-            final QName name = Util.parseQName(dataName);
-            metadata = dataBusiness.loadIsoDataMetadata(providerId, name);
+            final QName qname = Util.parseQName(dataName);
+            metadata = dataBusiness.loadIsoDataMetadata(providerId, qname);
         } else {
             final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
             // multiple ?
@@ -750,10 +756,31 @@ public class DataRest {
             }
         }
         if (metadata != null) {
-            final MetadataFeeder feeder = new MetadataFeeder(metadata);
-            final DataMetadata information = feeder.extractDataMetadata();
-                    
-            return Response.status(200).entity(information).build();
+            //get template name
+            final String templateName;
+            if("vector".equalsIgnoreCase(dataType)){
+                //vector
+                templateName="profile_inspire_vector";
+            }else {
+                //@TODO make template for sensorML
+                //raster
+                templateName="profile_inspire_raster";
+            }
+            final Template template = Template.getInstance(templateName);
+            final StringBuilder buffer = new StringBuilder();
+            try{
+                template.write(metadata,buffer,false);
+            }catch(IOException ex){
+                LOGGER.log(Level.WARNING, "error while generating metadata json.", ex);
+                return Response.status(500).entity("failed").build();
+            }
+            return Response.ok(buffer.toString()).build();
+
+
+//            final MetadataFeeder feeder = new MetadataFeeder(metadata);
+//            final DataMetadata information = feeder.extractDataMetadata();
+//
+//            return Response.status(200).entity(information).build();
         } else {
             return Response.status(500).build();
         }
@@ -1628,6 +1655,13 @@ public class DataRest {
         if (metadata != null) {
             metadata.prune();
         }
+
+        //for debugging purposes
+        /*try{
+            System.out.println(XML.marshal(metadata));
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+        }*/
 
         //get template name
         final String templateName;

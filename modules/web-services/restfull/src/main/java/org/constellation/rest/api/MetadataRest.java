@@ -50,6 +50,8 @@ public class MetadataRest {
     @GET
     @Path("all/{includeService}")
     public Response getAllMetadata(final @PathParam("includeService") boolean includeService) throws Exception {
+        //@TODO we need to return a minimized object instead of the entire metadata
+        //@see what is needed by the dashboard page.
         return ok(metadataBusiness.getAllMetadata(includeService));
     }
 

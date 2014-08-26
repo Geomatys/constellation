@@ -392,11 +392,13 @@ cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalIn
 	
 }]);
 
-cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate', '$uploadFiles', '$modal',
-    function ($scope, $routeParams, dataListing, $location, $translate, $uploadFiles, $modal) {
+cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
+    'dataListing','$location', '$translate', '$uploadFiles', '$modal','textService',
+    function ($scope, $routeParams,dataListing, $location, $translate, $uploadFiles, $modal,textService) {
         $scope.provider = $routeParams.id;
         $scope.missing = $routeParams.missing === 'true';
         $scope.type = $routeParams.type;
+        $scope.typeLabelKey = "metadata.edition.dataset."+$scope.type;
 
         $scope.tabiso = $scope.missing;
         $scope.tabcrs = false;
@@ -404,156 +406,189 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.tabimageinfo = $scope.type==='raster' && !$scope.missing;
         $scope.tabsensorinfo = $scope.type==='observation' && !$scope.missing;
 
-        $scope.metadata = {};
-        $scope.metadata.keywords = [];
-
-        dataListing.getDataMetadata({}, {values: {'providerId': $scope.provider}}, function(response) {
-            if (response) {
-                $scope.metadata.title = response.title;
-                $scope.metadata.anAbstract = response.anAbstract;
-                $scope.metadata.keywords = response.keywords;
-                $scope.metadata.username = response.username;
-                $scope.metadata.organisationName = response.organisationName;
-                $scope.metadata.role = response.role;
-                $scope.metadata.localeData = response.localeMetadata;
-                $scope.metadata.topicCategory = response.topicCategory;
-                $scope.metadata.date = response.date;
-                $scope.metadata.dateType = response.dateType;
-            }
+        /**
+         * Get all codelists for metadata editor
+         */
+        $scope.codeLists = {};
+        dataListing.codeLists({},{},function(response){
+            $scope.codeLists = response;
         });
 
-        $scope.selectTab = function(item) {
-            if (item === 'tabiso') {
-                $scope.tabiso = true;
-                $scope.tabcrs = false;
-                $scope.tabdesc = false;
-                $scope.tabimageinfo = false;
-                $scope.tabsensorinfo = false;
-            } else if (item === 'tabcrs') {
-                $scope.tabiso = false;
-                $scope.tabcrs = true;
-                $scope.tabdesc = false;
-                $scope.tabimageinfo = false;
-                $scope.tabsensorinfo = false;
-            } else if (item === 'tabdesc') {
-                $scope.tabiso = false;
-                $scope.tabcrs = false;
-                $scope.tabdesc = true;
-                $scope.tabimageinfo = false;
-                $scope.tabsensorinfo = false;
-            } else if (item === 'tabimageinfo') {
-                $scope.tabiso = false;
-                $scope.tabcrs = false;
-                $scope.tabdesc = false;
-                $scope.tabimageinfo = true;
-                $scope.tabsensorinfo = false;
-            } else {
-                $scope.tabiso = false;
-                $scope.tabcrs = false;
-                $scope.tabdesc = false;
-                $scope.tabimageinfo = false;
-                $scope.tabsensorinfo = true;
+        $scope.predefinedValues = {};
+        $scope.predefinedValues.inspireThemes = [
+            "Addresses","Hydrography","Administrative units","Land cover",
+            "Agricultural and aquaculture facilities","Land use",
+            "Area management/restriction/regulation zones and reporting units",
+            "Meteorological geographical features","Atmospheric conditions",
+            "Mineral resources","Bio-geographical regions","Natural risk zones",
+            "Buildings","Oceanographic geographical features","Cadastral parcels",
+            "Orthoimagery","Coordinate reference systems","Population distribution — demography",
+            "Elevation","Production and industrial facilities","Energy resources",
+            "Protected sites","Environmental monitoring facilities","Sea regions",
+            "Geographical grid systems","Soil","Geographical names","Species distribution",
+            "Geology","Statistical units","Habitats and biotopes",
+            "Transport networks","Human health and safety","Utility and governmental services"];
+        $scope.predefinedValues.inspireThemes = $scope.predefinedValues.inspireThemes.sort();
+        $scope.predefinedValues.referenceSystemIdentifier = [
+            'WGS84 - EPSG:4326',
+            'Fort Desaix / UTM 20 N - EPSG:2973',
+            'UTM 20 N - EPSG:32620',
+            'CGS 1967 / UTM 21 N - EPSG:3312',
+            'UTM 22 N - EPSG:2971',
+            'RGFG95 / UTM 22 N - EPSG:2972',
+            'UTM 30 N - EPSG:32630',
+            'UTM 31 N - EPSG:32631',
+            'UTM 32 N - EPSG:32632',
+            'RGF93 / Lambert-93 - EPSG:2154',
+            'Lambert I - EPSG:27571',
+            'Lambert II - EPSG:27572',
+            'Lambert III - EPSG:27573',
+            'Lambert IV - EPSG:27574',
+            'CC42 - EPSG:3942',
+            'WGS84 / UTM 20 N - EPSG:4559'];
+        $scope.predefinedValues.referenceSystemIdentifier = $scope.predefinedValues.referenceSystemIdentifier.sort();
+
+        /**
+         * Get metadata values
+         * @type {Array}
+         */
+        $scope.metadataValues = [];
+        dataListing.getDatasetMetadata({}, {values: {'providerId': $scope.provider, 'type':$scope.type.toLowerCase(),'prune':false}},
+            function(response) {
+                if (response && response.root) {
+                    $scope.metadataValues.push({"root":response.root});
+                    $scope.codeLists =dataListing.codeLists({});
+                }
+            }
+        );
+
+        function initCollapseEvents () {
+            if(window.collapseEditionEventsRegistered)return; //to fix a bug with angular
+            $(document).on('click','.small-block .heading-block',function(){
+                var blockRow = $(this).parents('.block-row');
+                var parent = $(this).parent('.small-block');
+                parent.toggleClass('closed');
+                blockRow.find('.collapse-block').toggleClass('hide');
+                var icon=parent.find('.data-icon');
+                if(icon.hasClass('fa-angle-up')){
+                    icon.removeClass('fa-angle-up');
+                    icon.addClass('fa-angle-down');
+                }else {
+                    icon.removeClass('fa-angle-down');
+                    icon.addClass('fa-angle-up');
+                }
+            });
+            $(document).on('click','.collapse-row-heading',function(){
+                $(this).parent().toggleClass('open');
+                $(this).next().toggleClass('hide');
+                var icon=$(this).find('.data-icon');
+                if(icon.hasClass('fa-angle-up')){
+                    icon.removeClass('fa-angle-up');
+                    icon.addClass('fa-angle-down');
+                }else {
+                    icon.removeClass('fa-angle-down');
+                    icon.addClass('fa-angle-up');
+                }
+            });
+            window.collapseEditionEventsRegistered = true;
+        }
+
+        $scope.getMetadataTitle = function() {
+            if($scope.metadataValues && $scope.metadataValues.length>0){
+                return $scope.metadataValues[0].root.content[0].superblock.content[0].block.content[0].field.value;
             }
         };
 
-        $scope.addTag = function() {
-            if (!$scope.tagText || $scope.tagText == '' || $scope.tagText.length == 0) {
-                return;
-            }
-
-            $scope.metadata.keywords.push($scope.tagText);
-            $scope.tagText = '';
+        $scope.initMetadataEditorEvents = function() {
+            initCollapseEvents();
         };
 
-        $scope.deleteTag = function(key) {
-            if ($scope.metadata.keywords.length > 0 &&
-                $scope.tagText.length == 0 &&
-                key === undefined) {
-                $scope.metadata.keywords.pop();
-            } else if (key != undefined) {
-                $scope.metadata.keywords.splice(key, 1);
-            }
+        $scope.delete = function(data) {
+            data.content = [];
+        };
+        $scope.add = function(data) {
+            var post = data.content.length + 1;
+            var newName = data.name + '-' + post;
+            data.content.push({"block":{name: newName,content: []}});
         };
 
+        /**
+         * Save the metadata in server.
+         */
         $scope.save = function() {
-            $scope.metadata.dataName = $scope.provider;
-            $scope.metadata.type = $scope.type;
-
-            dataListing.mergeMetadata({}, $scope.metadata,
+            //$scope.metadata.dataName = $scope.provider;
+            //$scope.metadata.type = $scope.type;
+            if($scope.metadataValues && $scope.metadataValues.length>0){
+                console.debug($scope.metadataValues[0]);
+                $location.path('/data'); //redirect to data dashboard page
+            }
+            //@TODO save metadata
+            /*dataListing.mergeMetadata({}, $scope.metadata,
                 function() {
                     $location.path('/data');
                 }
-            );
+            );*/
         };
 
+        /**
+         * Returns the current lang used.
+         * For datepicker as locale.
+         */
         $scope.getCurrentLang = function() {
             return $translate.use();
         };
 
-        $scope.createMetadataTree = function(parentDivId, isCoverageMetadata){
-            var upFile = $uploadFiles.files.file;
-            var upMdFile;
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
-            if (upFile) {
-                upFile = upFile.substring(upFile.lastIndexOf("/")+1);
-                upMdFile = $uploadFiles.files.mdFile;
-                if (upMdFile != null) {
-                    upMdFile = upMdFile.substring(upMdFile.lastIndexOf("/")+1);
-                }
+        /**
+         * Function to set values for ISO INSPIRE selectOneMenu
+         * the INSPIRE predefinedValues are defined in sql.
+         * the corresponding code is the topicCategory codes
+         * @param value
+         * @param parentBlock
+         */
+        $scope.updateIsoInspireSelectOneMenu = function(value,parentBlock) {
+            console.debug(value);
+            console.debug(parentBlock);
+
+            if(value != null) {
+                var INSPIRE_ISO_MAP = {};
+                INSPIRE_ISO_MAP['Elevation'] = 'MD_TopicCategoryCode.elevation';
+                INSPIRE_ISO_MAP['Geology'] = 'MD_TopicCategoryCode.geoscientificInformation';
+                INSPIRE_ISO_MAP['Habitats and biotopes'] = 'MD_TopicCategoryCode.biota';
+                INSPIRE_ISO_MAP['Environmental monitoring facilities'] = 'MD_TopicCategoryCode.structure';
+                INSPIRE_ISO_MAP['Land cover'] = 'MD_TopicCategoryCode.imageryBaseMapsEarthCover';
+                INSPIRE_ISO_MAP['Species distribution'] = 'MD_TopicCategoryCode.biota';
+                INSPIRE_ISO_MAP['Land use'] = 'MD_TopicCategoryCode.planningCadastre';
+                INSPIRE_ISO_MAP['Area management/restriction/regulation zones and reporting units'] = 'MD_TopicCategoryCode.planningCadastre';
+                INSPIRE_ISO_MAP['Natural risk zones'] = 'MD_TopicCategoryCode.planningCadastre';
+                INSPIRE_ISO_MAP['Buildings'] = 'MD_TopicCategoryCode.structure';
+                INSPIRE_ISO_MAP['Oceanographic geographical features'] = 'MD_TopicCategoryCode.oceans';
+                INSPIRE_ISO_MAP['Bio-geographical regions'] = 'MD_TopicCategoryCode.biota';
+                INSPIRE_ISO_MAP['Sea regions'] = 'MD_TopicCategoryCode.oceans';
+                INSPIRE_ISO_MAP['Statistical units'] = 'MD_TopicCategoryCode.boundaries';
+                INSPIRE_ISO_MAP['Addresses'] = 'MD_TopicCategoryCode.location';
+                INSPIRE_ISO_MAP['Geographical names'] = 'MD_TopicCategoryCode.location';
+                INSPIRE_ISO_MAP['Hydrography'] = 'MD_TopicCategoryCode.inlandWaters';
+                INSPIRE_ISO_MAP['Cadastral parcels'] = 'MD_TopicCategoryCode.planningCadastre';
+                INSPIRE_ISO_MAP['Transport networks'] = 'MD_TopicCategoryCode.transportation';
+                INSPIRE_ISO_MAP['Protected sites'] = 'MD_TopicCategoryCode.environment';
+                INSPIRE_ISO_MAP['Administrative units'] = 'MD_TopicCategoryCode.boundaries';
+                INSPIRE_ISO_MAP['Orthoimagery'] = 'MD_TopicCategoryCode.imageryBaseMapsEarthCover';
+                INSPIRE_ISO_MAP['Meteorological geographical features'] = 'MD_TopicCategoryCode.climatologyMeteorologyAtmosphere';
+                INSPIRE_ISO_MAP['Atmospheric conditions'] = 'MD_TopicCategoryCode.climatologyMeteorologyAtmosphere';
+                INSPIRE_ISO_MAP['Agricultural and aquaculture facilities'] = 'MD_TopicCategoryCode.farming';
+                INSPIRE_ISO_MAP['Production and industrial facilities'] = 'MD_TopicCategoryCode.structure';
+                INSPIRE_ISO_MAP['Population distribution — demography'] = 'MD_TopicCategoryCode.society';
+                INSPIRE_ISO_MAP['Mineral resources'] = 'MD_TopicCategoryCode.economy';
+                INSPIRE_ISO_MAP['Human health and safety'] = 'MD_TopicCategoryCode.health';
+                INSPIRE_ISO_MAP['Utility and governmental services'] = 'MD_TopicCategoryCode.utilitiesCommunication';
+                INSPIRE_ISO_MAP['Soil'] = 'MD_TopicCategoryCode.geoscientificInformation';
+                INSPIRE_ISO_MAP['Energy resources'] = 'MD_TopicCategoryCode.economy';
+                var valueToSet=INSPIRE_ISO_MAP[value];
+                parentBlock.content[4].field.value=valueToSet;
             }
-
-            dataListing.loadData({}, {values: {'filePath': upFile, 'metadataFilePath': upMdFile, dataType: $scope.type, providerId: $uploadFiles.files.providerId}}, function(response) {
-                if (isCoverageMetadata) {
-                    for (var key in response.coveragesMetadata) {
-                        var metadataList = response.coveragesMetadata[key].coverageMetadataTree;
-                        generateMetadataTags(metadataList, parentDivId);
-                    }
-                } else {
-                    var metadataList = response.fileMetadata;
-                    generateMetadataTags(metadataList, parentDivId);
-                }
-
-                $("#"+ parentDivId +" .collapse").collapse('show');
-                modalLoader.close();
-            });
-
-            function generateMetadataTags(metadataList, parentDivId) {
-                if (metadataList == null) {
-                    return;
-                }
-                for(var i=0; i<metadataList.length; i++){
-                    var key = metadataList[i];
-                    var name = key.name;
-                    var nameWithoutWhiteSpace = key.nameNoWhiteSpace;
-                    var value = key.value;
-                    var childrenExist = key.childrenExist;
-                    var parentNode = key.parentName;
-                    var depthSpan = key.depthSpan;
-
-                    if(childrenExist){
-                        //root node
-                        if(parentNode === null || parentNode == ''){
-                            var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='col-sm-"+depthSpan+"'>"+name+"</a>" +
-                                "<div class='collapse col-sm-"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class='table table-striped'></table></div>";
-                            jQuery("#"+ parentDivId).append(htmlElement);
-                        }else{
-                            var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='col-sm-"+depthSpan+"'>"+name+"</a>" +
-                                "<div class='collapse col-sm-"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class='table table-striped'></table></div>";
-                            jQuery("#"+parentNode+"Div").append(htmlElement);
-                        }
-                    }else{
-                        var htmlElement = "<tr><td>"+name+"</td><td>"+value+"</td></tr>";
-                        jQuery("#"+parentNode).append(htmlElement);
-                    }
-                }
-            };
         };
 
-        $scope.codeLists = dataListing.codeLists({lang: $scope.getCurrentLang()});
-    }]);
+}]);
 
 cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', 'sensor', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl', '$modal',
     function ($scope, dataListing, webService, sos, sensor, $dashboard, $modalInstance, service, exclude, $growl, $modal) {
@@ -642,7 +677,6 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             return false;
         }
 
-
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
@@ -671,8 +705,6 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
 
                 if ($scope.wmtsParams === false) {
                     // just add the data if we are not in the case of the wmts service
-
-
                     if (service.type.toLowerCase() !== 'wmts') {
                         for(var i=0; i<$scope.selected.length; i++) {
                             if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
@@ -694,7 +726,6 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                                     $modalInstance.dismiss('close');
                                 });
                             } else {
-
                                 webService.addLayer({type: service.type, id: service.identifier},
                                     {layerAlias: $scope.selected[i].Name, layerId: $scope.selected[i].Name, serviceType: service.type, serviceId: service.identifier, providerId: $scope.selected[i].Provider, layerNamespace: $scope.selected[i].Namespace},
                                     function (response) {
@@ -729,7 +760,6 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 } else {
                     // Finish the WMTS publish process
                     // Pyramid the data to get the new provider to add
-
                     for(var i=0; i<$scope.selected.length; i++) {
                         dataListing.pyramidData({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name},
                             {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY},

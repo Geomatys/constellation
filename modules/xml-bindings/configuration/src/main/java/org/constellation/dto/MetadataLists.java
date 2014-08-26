@@ -19,63 +19,65 @@
 package org.constellation.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.io.Serializable;
+import java.util.List;
 
 /**
- * @author bgarcia
+ * This class represents a pojo that store all necessary codelist for UI part.
+ * this pojo is sent by REST api.
+ *
+ * @author Mehdi Sidhoum (Geomatys).
+ * @since 0.9
  */
 @XmlRootElement
-public class MetadataLists {
+public class MetadataLists implements Serializable {
 
-    private HashMap<String, String> roles;
-    private TreeMap<String, String> locales;
-    private HashMap<String, String> categories;
-    private HashMap<String, String> dateTypes;
+    private List<String> roleCodes;
+    private List<String> localeCodes;
+    private List<String> topicCategoryCodes;
+    private List<String> dateTypeCodes;
+    private List<String> maintenanceFrequencyCodes;
 
     public MetadataLists() {
-        roles = new HashMap<>(0);
-        locales = new TreeMap<>();
-        categories = new HashMap<>(0);
-        dateTypes = new HashMap<>(0);
     }
 
-    public HashMap<String, String> getRoles() {
-        return roles;
+    public List<String> getRoleCodes() {
+        return roleCodes;
     }
 
-    public void setRoles(final HashMap<String, String> roles) {
-        this.roles = roles;
+    public void setRoleCodes(List<String> roleCodes) {
+        this.roleCodes = roleCodes;
     }
 
-    public TreeMap<String, String> getLocales() {
-        return locales;
+    public List<String> getLocaleCodes() {
+        return localeCodes;
     }
 
-    public void setLocales(final TreeMap<String, String> locales) {
-        this.locales = locales;
+    public void setLocaleCodes(List<String> localeCodes) {
+        this.localeCodes = localeCodes;
     }
 
-    public HashMap<String, String> getCategories() {
-        return categories;
+    public List<String> getTopicCategoryCodes() {
+        return topicCategoryCodes;
     }
 
-    public void setCategories(final HashMap<String, String> categories) {
-        this.categories = categories;
+    public void setTopicCategoryCodes(List<String> topicCategoryCodes) {
+        this.topicCategoryCodes = topicCategoryCodes;
     }
 
-    public HashMap<String, String> getDateTypes() {
-        return dateTypes;
+    public List<String> getDateTypeCodes() {
+        return dateTypeCodes;
     }
 
-    public void setDateTypes(final HashMap<String, String> dateTypes) {
-        this.dateTypes = dateTypes;
+    public void setDateTypeCodes(List<String> dateTypeCodes) {
+        this.dateTypeCodes = dateTypeCodes;
     }
 
-	@Override
-	public String toString() {
-		return "MetadataLists [roles=" + roles + ", locales=" + locales
-				+ ", categories=" + categories + ", dateTypes=" + dateTypes
-				+ "]";
-	}
+    public List<String> getMaintenanceFrequencyCodes() {
+        return maintenanceFrequencyCodes;
+    }
+
+    public void setMaintenanceFrequencyCodes(List<String> maintenanceFrequencyCodes) {
+        this.maintenanceFrequencyCodes = maintenanceFrequencyCodes;
+    }
 }

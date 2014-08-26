@@ -261,8 +261,8 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'mergeMetadata':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/merge;jsessionid='},
             'metadata':             {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/metadata/iso/:providerId/:dataId;jsessionid='},
             'dataForMetadata':      {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/associated;jsessionid='},
-            'getDataMetadata':      {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/data;jsessionid='},
-            'codeLists':            {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/metadataCodeLists/:lang;jsessionid='},
+            'getDatasetMetadata':   {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/dataset;jsessionid='},
+            'codeLists':            {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/metadataCodeLists;jsessionid='},
             'findDataType':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/findDataType;jsessionid='},
             'linkToSensor':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/link/sensor/:providerId/:dataId/:sensorId;jsessionid='},
             'unlinkSensor':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/unlink/sensor/:providerId/:dataId/:sensorId;jsessionid='},
@@ -271,6 +271,13 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'unlinkFromDomain':     {method: 'DELETE',  url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
             'domains':              {method: 'GET',     url: '@cstl/api/1/dataXdomain/:dataId/user/$userId/domain', isArray: true},
             'findData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/find;jsessionid=', isArray: true}
+        });
+    }]);
+
+cstlAdminApp.factory('metadataListing', ['$resource',
+    function ($resource) {
+        return $resource('@cstl/api/1/domain/$domainId/metadata/all/:includeService;jsessionid=', {}, {
+            'listAll':              {method: 'GET',    isArray: true }
         });
     }]);
 
