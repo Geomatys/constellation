@@ -105,13 +105,13 @@
                                     <div class="dash-inner row dashboard" ng-init="small=false">
                                         <div data-role="list">
                                             <div class="item-list">
-                                                <div ng-repeat="layerToAdd in layers.toAdd" ng-click="selectItem(layerToAdd)">
+                                                <div ng-repeat="layerToAdd in layers.toAdd">
                                                     <div class="row">
                                                         <div class="col-xs-1" style="padding-top:35px;">
                                                             <!-- Visibility -->
                                                             <input type="checkbox" ng-model="layerToAdd.visible" ng-change="changeVisibility(layerToAdd)">
                                                         </div>
-                                                        <div class="col-xs-9 no-padding">
+                                                        <div class="col-xs-9 no-padding" ng-click="selectItem(layerToAdd)">
                                                             <div class="item layer compo" ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
                                                                 <div class="top">
                                                                     <span class="item-title" title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? truncate(mode.display,layerToAdd.layer.Name) : truncate(mode.display,layerToAdd.layer.externalLayer)}}</span>
