@@ -462,7 +462,7 @@
             <executions>
                 <!-- Download and install nodejs and npm (locally) -->
                 <execution>
-                    <id>install node and npm</id>
+                    <id>install-node-and-npm</id>
                     <goals>
                         <goal>install-node-and-npm</goal>
                     </goals>
@@ -473,7 +473,7 @@
                 </execution>
                 <!-- Install required Node Packaged Modules -->
                 <execution>
-                    <id>npm install</id>
+                    <id>npm-install</id>
                     <goals>
                         <goal>npm</goal>
                     </goals>
@@ -483,7 +483,7 @@
                 </execution>
                 <!-- Run grunt build -->
                 <execution>
-                    <id>grunt build</id>
+                    <id>grunt-build</id>
                     <goals>
                         <goal>grunt</goal>
                     </goals>

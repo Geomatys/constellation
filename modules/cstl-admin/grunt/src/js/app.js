@@ -17,14 +17,6 @@
 
 var cstlSession = {};
 
-function findWebappContext(){
-    var path = window.location.pathname;
-    if(path == '/')
-        return "/";
-
-    return path.substring(0, path.indexOf("/", 1));
-}
-
 
 /* App Module */
 
@@ -54,6 +46,7 @@ var cstlAdminApp = angular.module('cstlAdminApp', [
     'ui.bootstrap.typeahead',
     // Constellation modules.
     'cstl-directives',
+    'cstl-services',
     'http-auth-interceptor']);
 
 
@@ -195,7 +188,7 @@ cstlAdminApp
 
             // Initialize angular-translate
             $translateProvider.useStaticFilesLoader({
-                prefix: findWebappContext() + '/i18n/',
+                prefix: 'i18n/',
                 suffix: '.json'
             });
 

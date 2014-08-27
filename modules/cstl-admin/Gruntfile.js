@@ -10,6 +10,21 @@ module.exports = function(grunt) {
         // Clean build directory.
         clean: ['<%= target_dir %>'],
 
+// TODO → Enabled JavaScript code style validation.
+// Previous attempts using following configuration reveal more than 500 errors.
+//
+//        // Validate JavaScript code style.
+//        jshint: {
+//            app: {
+//                options: {
+//                    'curly': true,
+//                    'eqnull': true,
+//                    'eqeqeq': true
+//                },
+//                src: ['<%= src_dir %>/js/**/*.js']
+//            }
+//        },
+
         // Copy assets files.
         copy: {
             app: {
@@ -119,6 +134,7 @@ module.exports = function(grunt) {
                         '<%= src_dir %>/js/http-auth-interceptor.js',
                         '<%= src_dir %>/js/app.js',
                         '<%= src_dir %>/js/app-directives.js',
+                        '<%= src_dir %>/js/app-services.js',
                         '<%= src_dir %>/js/controllers.js',
                         '<%= src_dir %>/js/controller-data.js',
                         '<%= src_dir %>/js/controller-data-import.js',
@@ -141,6 +157,7 @@ module.exports = function(grunt) {
                         '<%= src_dir %>/js/http-auth-interceptor.js',
                         '<%= src_dir %>/js/index.js',
                         '<%= src_dir %>/js/app-directives.js',
+                        '<%= src_dir %>/js/app-services.js',
                         '<%= src_dir %>/js/index/*.js'
                     ]
                 }
@@ -210,12 +227,13 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
 //    grunt.loadNpmTasks('grunt-contrib-htmlmin');
+//    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-ng-annotate');
 
     // Register tasks.
-    grunt.registerTask('dev', ['clean', 'copy', 'less', 'concat']);
-    grunt.registerTask('prod', ['clean', 'copy', 'less', 'concat', 'ngAnnotate', 'uglify'/*, 'htmlmin'*/]);
-    grunt.registerTask('update', ['copy:app', 'less:app', 'concat:app', 'concat:app_index']);
+    grunt.registerTask('dev', [/*'jshint',*/ 'clean', 'copy', 'less', 'concat']);
+    grunt.registerTask('prod', [/*'jshint',*/ 'clean', 'copy', 'less', 'concat', 'ngAnnotate', 'uglify'/*, 'htmlmin'*/]);
+    grunt.registerTask('update', [/*'jshint',*/ 'copy:app', 'less:app', 'concat:app', 'concat:app_index']);
 };
