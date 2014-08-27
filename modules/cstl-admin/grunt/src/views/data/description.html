@@ -238,7 +238,7 @@
                                         <select ng-if="jsonObjectField.field.type === 'CharacterSet.codelist'"
                                                 class="form-control form-control-fix"
                                                 ng-model="jsonObjectField.field.value"
-                                                ng-options="(code | translate) for code in codeLists.characterSetCodes | orderBy: 'toString() | translate'"
+                                                ng-options="code for code in codeLists.characterSetCodes | orderBy: 'toString()'"
                                                 style="width:auto;min-width:165pt;height:30px;">
                                             <option value="">-----</option>
                                         </select>
