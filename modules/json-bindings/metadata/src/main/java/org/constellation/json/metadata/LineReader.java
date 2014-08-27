@@ -46,6 +46,7 @@ final class LineReader {
 
     /**
      * Pool of strings, for replacing duplicated instances (which are numerous) by shared instances.
+     * May be {@code null} if we do not need to share the line instances.
      */
     private final Map<String,String> sharedLines;
 
@@ -59,7 +60,7 @@ final class LineReader {
     /**
      * An iterator over the lines to read.
      */
-    private final Iterator<String> lines;
+    private final Iterator<? extends CharSequence> lines;
 
     /**
      * The line currently being parsed.
@@ -92,7 +93,7 @@ final class LineReader {
      * @param  sharedLines An initially empty map to be filled by {@code LineReader}
      *                     for sharing same {@code String} instances when possible.
      */
-    LineReader(final MetadataStandard standard, final Iterable<String> lines,
+    LineReader(final MetadataStandard standard, final Iterable<? extends CharSequence> lines,
             final Map<String,String> sharedLines, final Map<String,String[]> sharedPaths)
     {
         this.standard    = standard;
@@ -109,7 +110,7 @@ final class LineReader {
         if (!lines.hasNext()) {
             throw new EOFException("Unexpected end of file.");
         }
-        line     = sharedLine(lines.next());
+        line     = sharedLine(lines.next().toString());
         length   = CharSequences.skipTrailingWhitespaces(line, 0, line.length());
         position = CharSequences.skipLeadingWhitespaces (line, 0, length);
         final int remaining = length - position;
@@ -276,12 +277,14 @@ scan:   while (position < upper) {
      * @todo Use Map.putIfAbsent when we will be allowed to compile for JDK8.
      */
     private String sharedLine(final String newLine) {
-        final String existing = sharedLines.get(newLine);
-        if (existing != null) {
-            return existing;
-        }
-        if (sharedLines.put(newLine, newLine) != null) {
-            throw new ConcurrentModificationException();
+        if (sharedLines != null) {
+            final String existing = sharedLines.get(newLine);
+            if (existing != null) {
+                return existing;
+            }
+            if (sharedLines.put(newLine, newLine) != null) {
+                throw new ConcurrentModificationException();
+            }
         }
         return newLine;
     }
@@ -294,7 +297,7 @@ scan:   while (position < upper) {
     String[] sharedPath(final String path) {
         String[] ci = sharedPaths.get(path);
         if (ci == null) {
-            final CharSequence[] c = CharSequences.split(path, '.');
+            final CharSequence[] c = CharSequences.split(path, Keywords.PATH_SEPARATOR);
             ci = new String[c.length];
             for (int i=0; i<c.length; i++) {
                 ci[i] = c[i].toString().intern();

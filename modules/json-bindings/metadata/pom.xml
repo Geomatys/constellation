@@ -30,5 +30,10 @@
             <artifactId>sis-metadata</artifactId>
             <version>${sis.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-metadata</artifactId>
+            <version>${geotoolkit.version}</version>
+        </dependency>
     </dependencies>
 </project>

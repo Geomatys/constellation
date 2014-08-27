@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.MetadataStandard;
 
 
@@ -198,5 +199,25 @@ public class Template {
      */
     public void write(final Object metadata, final Appendable out, final boolean prune) throws IOException {
         root.write(metadata, out, prune);
+    }
+
+    /**
+     * Parses the given JSON lines and write the metadata values in the given metadata object.
+     *
+     * <p>The {@code skipNulls} argument controls whether {@code null} values in the JSON file shall be skipped
+     * instead than stored in the metadata object. If {@code false}, null values in the JSON file will overwrite
+     * (erase) metadata properties that may have existed before the operation.
+     * This is sometime the desired effect when updating an existing {@code DefaultMetadata} instance.
+     * However when writing to an initially empty metadata object, a value of {@code true} will reduce
+     * the need to call {@link org.apache.sis.metadata.iso.DefaultMetadata#prune()} after parsing.</p>
+     *
+     * @param  json        Lines of the JSON file to parse.
+     * @param  destination Where to store the metadata values.
+     * @param  skipNulls   {@code true} for skipping {@code null} values instead than storing null in the metadata object.
+     * @throws IOException if an error occurred while parsing.
+     */
+    public void read(final Iterable<? extends CharSequence> json, final AbstractMetadata destination, final boolean skipNulls) throws IOException {
+        final FormReader r = new FormReader(new LineReader(root.standard, json, null, null), skipNulls);
+        r.read(null, destination);
     }
 }

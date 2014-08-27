@@ -21,13 +21,19 @@ package org.constellation.json.metadata;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.MissingResourceException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.opengis.util.Enumerated;
 import org.apache.sis.measure.Angle;
 import org.apache.sis.util.iso.Types;
+import org.apache.sis.util.ArraysExt;
 import org.apache.sis.util.CharSequences;
+import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.metadata.KeyNamePolicy;
+import org.apache.sis.metadata.TypeValuePolicy;
+import org.apache.sis.metadata.ValueExistencePolicy;
 
 
 /**
@@ -58,6 +64,62 @@ final class ValueNode extends ArrayList<ValueNode> {
     ValueNode(final TemplateNode template, final Object[] values) {
         this.template = template;
         this.values   = values;
+    }
+
+    /**
+     * Fetches all occurrences of metadata values at the given path.
+     *
+     * @param  metadata   The metadata from where to get the values.
+     * @param  pathOffset Index of the first {@code path} element to use.
+     * @param  upper      Index after the last {@code path} element to use.
+     * @return The values (often an array of length 1), or {@code null} if none.
+     * @throws ClassCastException if {@code metadata} is not an instance of the expected standard.
+     */
+    static Object[] getValues(final MetadataStandard standard, Object metadata,
+            final CharSequence[] path, int pathOffset, final int upper) throws ClassCastException, ParseException
+    {
+        if (pathOffset >= upper) {
+            throw new ParseException("Path is empty.");
+        }
+        if (metadata == null || path == null) {
+            return null;
+        }
+        Object value;
+        do {
+            // Fetch the value from the metadata object.
+            final CharSequence identifier = path[pathOffset];
+            value = standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
+            if (value == null) {
+                return null;
+            }
+            /*
+             * Verify if the value is a collection. We do not rely on (value instanceof Collection)
+             * only because it may not be reliable if the value implements more than one interface.
+             * Instead, we rely on the method contract.
+             */
+            if (value instanceof Collection<?>) {
+                final Class<?> type = standard.asTypeMap(metadata.getClass(),
+                        KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.PROPERTY_TYPE).get(identifier);
+                if (Collection.class.isAssignableFrom(type)) {
+                    Object[] values = ((Collection<?>) value).toArray();
+                    if (++pathOffset < upper) {
+                        final Object[][] arrays = new Object[values.length][];
+                        for (int i=0; i<values.length; i++) {
+                            arrays[i] = getValues(standard, values[i], path, pathOffset, upper);
+                        }
+                        values = ArraysExt.concatenate(arrays);
+                    }
+                    return values;
+                }
+            }
+            /*
+             * The value is not a collection. Continue the loop for each components in the path. For example
+             * if the path is "identificationInfo.extent.geographicElement.southBoundLatitude", then the loop
+             * would be executed for "identificationInfo", then "extent", etc. if all components were singleton.
+             */
+            metadata = value;
+        } while (++pathOffset < upper);
+        return new Object[] {value};
     }
 
     /**

@@ -21,13 +21,8 @@ package org.constellation.json.metadata;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.io.IOException;
-import org.apache.sis.metadata.KeyNamePolicy;
-import org.apache.sis.metadata.TypeValuePolicy;
-import org.apache.sis.metadata.ValueExistencePolicy;
 import org.apache.sis.metadata.MetadataStandard;
-import org.apache.sis.util.ArraysExt;
 import org.apache.sis.util.CharSequences;
 
 
@@ -44,7 +39,7 @@ final class TemplateNode {
     /**
      * The metadata standard for this node.
      */
-    private final MetadataStandard standard;
+    final MetadataStandard standard;
 
     /**
      * The lines or other nodes contained in this node.
@@ -101,12 +96,12 @@ final class TemplateNode {
      * Creates a new node for the given lines.
      *
      * @param parser    An iterator over the lines to parse.
-     * @param nextLine  {@code true} for invoking {@link LineReader#nextLine()} for the first line, or
+     * @param isNextLineRequested {@code true} for invoking {@link LineReader#nextLine()} for the first line, or
      *                  {@code false} for continuing the parsing from the current {@link LineReader} content.
      * @param separator The separator between this node and an other occurrence of the same node,
      *                  or {@code null} if unknown.
      */
-    TemplateNode(final LineReader parser, boolean nextLine, String separator) throws IOException {
+    TemplateNode(final LineReader parser, boolean isNextLineRequested, String separator) throws IOException {
         final List<Object> content = new ArrayList<>();
         String  path         = null;
         Object  defaultValue = null;
@@ -114,40 +109,39 @@ final class TemplateNode {
         int     maxOccurs    = Integer.MAX_VALUE;
         int     level        = 0;
         while (true) {
-            if (nextLine) {
+            if (isNextLineRequested) {
                 content.add(parser.nextLine());
             }
-            if (parser.regionMatches("\"path\"")) {
+            if (parser.regionMatches(Keywords.PATH)) {
                 final Object p = parser.getValue();
                 if (p != null) path = p.toString();
-            } else if (parser.regionMatches("\"defaultValue\"")) {
+            } else if (parser.regionMatches(Keywords.DEFAULT_VALUE)) {
                 defaultValue = parser.getValue();
-            } else if (parser.regionMatches("\"value\"")) {
+            } else if (parser.regionMatches(Keywords.VALUE)) {
                 valueIndex = content.size() - 1;
                 content.set(valueIndex, parser.fullLineWithoutNull());
-            } else if (parser.regionMatches("\"multiplicity\"")) {
+            } else if (parser.regionMatches(Keywords.MAX_OCCURRENCES)) {
                 final Object n = parser.getValue();
                 if (!(n instanceof Number) || (maxOccurs = ((Number) n).intValue()) < 1) {
                     throw new ParseException("Invalid multiplicity: " + n);
                 }
-            } else if (parser.regionMatches("\"content\"")) {
+            } else if (parser.regionMatches(Keywords.CONTENT)) {
                 String childSeparator = null;
                 do {
                     content.add(new TemplateNode(parser, false, childSeparator));
                     childSeparator = parser.skipComma();
-                }
-                while (childSeparator != null);
+                } while (childSeparator != null);
             }
             /*
              * Increment or decrement the level when we find '{' or '}' character. The loop exits when we reach
-             * back the level 0, except if the line was not part of this node (nextLine == false), because the
-             * opening bracket may be on the next line. Remaining lines are ignored.
+             * back the level 0, except if the line was not part of this node (isNextLineRequested == false),
+             * because the opening bracket may be on the next line. Remaining lines are ignored.
              */
             level = parser.updateLevel(level);
-            if (level == 0 && nextLine) {
+            if (level == 0 && isNextLineRequested) {
                 break;
             }
-            nextLine = parser.isEmpty();
+            isNextLineRequested = parser.isEmpty();
         }
         /*
          * If the separator was not declared (which happen only for the first element of a new array),
@@ -228,7 +222,7 @@ final class TemplateNode {
                 if (i == pathOffset) {
                     appendTo.append(')');
                 }
-                appendTo.append('.');
+                appendTo.append(Keywords.PATH_SEPARATOR);
             }
             appendTo.append(path[i]);
         }
@@ -242,71 +236,24 @@ final class TemplateNode {
     }
 
     /**
-     * Given a newly computed set of values, returns the values accepted by the current node.
+     * Fetches all occurrences of metadata values at the path given by {@link #path}, then filter the elements.
+     * This method search only the metadata values for this {@code TemplateNode} - it does not perform any search
+     * for children {@code TemplateNode}s.
      *
      * <p>The current version only ensures that the number of elements is not greater than {@link #maxOccurs}.
      * However if we want to apply a more sophisticated filter in a future version, it could be applied here.</p>
-     *
-     * @param  values The values fetched from the metadata object.
-     * @return The values to write for the current {@code TemplateNode}.
-     */
-    private Object[] filterNewValues(Object[] values) {
-        if (values != null && values.length > maxOccurs) {
-            values = Arrays.copyOfRange(values, 0, maxOccurs);
-        }
-        return values;
-    }
-
-    /**
-     * Fetches all occurrences of metadata values at the path given by {@link #path}.
-     * This method search only the metadata values for this {@code TemplateNode} - it
-     * does not perform any search for children {@code TemplateNode}s.
      *
      * @param  metadata   The metadata from where to get the values.
      * @param  pathOffset Index of the first {@link #path} element to use.
      * @return The values (often an array of length 1), or {@code null} if none.
      * @throws ClassCastException if {@code metadata} is not an instance of the expected standard.
      */
-    private Object[] getValues(Object metadata, int pathOffset) throws ClassCastException {
-        if (metadata == null || path == null) {
-            return null;
+    private Object[] getValues(Object metadata, int pathOffset) throws ClassCastException, ParseException {
+        Object[] values = ValueNode.getValues(standard, metadata, path, pathOffset, path.length);
+        if (values != null && values.length > maxOccurs) {
+            values = Arrays.copyOfRange(values, 0, maxOccurs);
         }
-        Object value;
-        do {
-            // Fetch the value from the metadata object.
-            final String identifier = path[pathOffset];
-            value = standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
-            if (value == null) {
-                return null;
-            }
-            /*
-             * Verify if the value is a collection. We do not rely on (value instanceof Collection)
-             * only because it may not be reliable if the value implements more than one interface.
-             * Instead, we rely on the method contract.
-             */
-            if (value instanceof Collection<?>) {
-                final Class<?> type = standard.asTypeMap(metadata.getClass(),
-                        KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.PROPERTY_TYPE).get(identifier);
-                if (Collection.class.isAssignableFrom(type)) {
-                    Object[] values = ((Collection<?>) value).toArray();
-                    if (++pathOffset < path.length) {
-                        final Object[][] arrays = new Object[values.length][];
-                        for (int i=0; i<values.length; i++) {
-                            arrays[i] = getValues(values[i], pathOffset);
-                        }
-                        values = ArraysExt.concatenate(arrays);
-                    }
-                    return filterNewValues(values);
-                }
-            }
-            /*
-             * The value is not a collection. Continue the loop for each components in the path. For example
-             * if the path is "identificationInfo.extent.geographicElement.southBoundLatitude", then the loop
-             * would be executed for "identificationInfo", then "extent", etc. if all components were singleton.
-             */
-            metadata = value;
-        } while (++pathOffset < path.length);
-        return filterNewValues(new Object[] {value});
+        return values;
     }
 
     /**

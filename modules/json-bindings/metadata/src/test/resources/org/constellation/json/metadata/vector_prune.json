@@ -191,7 +191,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.role_help",
 								"path":"identificationInfo.pointOfContact.role",
-								"type":"codelist",
+								"type":"Role.codelist",
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":"CI_RoleCode.author"
@@ -211,7 +211,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.role_help",
 								"path":"identificationInfo.pointOfContact.role",
-								"type":"codelist",
+								"type":"Role.codelist",
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":"CI_RoleCode.collaborator"
@@ -271,7 +271,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.characterSet_help",
 								"path":"characterSet",
-								"type":"codelist",
+								"type":"CharacterSet.codelist",
 								"obligation":"M",
 								"defaultValue":"UTF-8",
 								"value":"UTF-16"

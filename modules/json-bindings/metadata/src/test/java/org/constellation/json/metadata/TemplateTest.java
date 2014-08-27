@@ -19,7 +19,9 @@
 package org.constellation.json.metadata;
 
 import java.util.Set;
+import java.util.List;
 import java.util.Locale;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -93,6 +95,27 @@ public final strictfp class TemplateTest {
     }
 
     /**
+     * Returns a reader for the test resource of the given name.
+     */
+    private static BufferedReader open(final String file) throws IOException {
+        return new BufferedReader(new InputStreamReader(Template.class.getResourceAsStream(file), "UTF-8"));
+    }
+
+    /**
+     * Returns all lines read from the test resource of the given name.
+     */
+    private static List<String> readAllLines(final String file) throws IOException {
+        final List<String> lines = new ArrayList<>();
+        try (final BufferedReader in = open(file)) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                assertTrue(lines.add(line));
+            }
+        }
+        return lines;
+    }
+
+    /**
      * Asserts that a JSON output is equals to the expected one.
      *
      * @param  expectedFile The filename (without directory) of the test resource containing the expected JSON content.
@@ -102,9 +125,7 @@ public final strictfp class TemplateTest {
     private static void assertJsonEquals(final String expectedFile, final CharSequence actual) throws IOException {
         int lineNumber = 0;
         final CharSequence[] lines = CharSequences.splitOnEOL(actual);
-        try (final BufferedReader in = new BufferedReader(new InputStreamReader(
-                Template.class.getResourceAsStream(expectedFile), "UTF-8")))
-        {
+        try (final BufferedReader in = open(expectedFile)) {
             String expectedLine;
             while ((expectedLine = in.readLine()) != null) {
                 final CharSequence actualLine = lines[lineNumber++];
@@ -115,7 +136,6 @@ public final strictfp class TemplateTest {
                 }
             }
         }
-
     }
 
     /**
@@ -142,5 +162,19 @@ public final strictfp class TemplateTest {
         final StringBuilder buffer = new StringBuilder(40000);
         Template.getInstance("profile_inspire_vector").write(metadata, buffer, false);
         assertJsonEquals("vector_test.json", buffer);
+    }
+
+    /**
+     * Tests {@link Template#read(Iterable, Object)} when storing in an initially empty {@link DefaultMetadata}.
+     *
+     * @throws IOException if an error occurred while reading the test JSON file.
+     */
+    @Test
+    public void testRead() throws IOException {
+        final DefaultMetadata expected = createMetadata();
+        final DefaultMetadata metadata = new DefaultMetadata();
+        Template.getInstance("profile_inspire_vector").read(readAllLines("vector_prune.json"), metadata, true);
+        metadata.prune();
+// TODO assertEquals(expected, metadata);
     }
 }
