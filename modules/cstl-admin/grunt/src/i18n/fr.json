@@ -541,7 +541,8 @@
     "metadata.field.graphicOverViewFileName":"Aperçu de la ressource",
     "metadata.field.rsIdentifier":"Identifiant unique de la donnée",
     "metadata.block.inspire_descriptiveKeyword":"Thèmes INSPIRE et ISO",
-
+    "metadata.field.report.specification.title":"Spécification employée pour l'évaluation de la conformité",
+    "metadata.field.report.specification.date":"Date de référence de la spécification",
     "metadata.field.inspire_keyword":"Thème(s) INSPIRE",
     "metadata.field.inspire_thesaurusTitle":"Thésaurus",
     "metadata.field.inspire_thesaurusDate":"Date de référence du thésaurus",
@@ -1046,6 +1047,16 @@
     "CI_RoleCode.processor":"Exécutant secondaire",
     "CI_RoleCode.publisher":"Editeur",
     "CI_RoleCode.author":"Auteur",
+    "CI_RoleCode.coAuthor":"Co-Auteur",
+    "CI_RoleCode.collaborator":"Collaborateur",
+    "CI_RoleCode.contributor":"Intervenant",
+    "CI_RoleCode.editor":"Éditeur",
+    "CI_RoleCode.funder":"Bailleur de fonds",
+    "CI_RoleCode.mediator":"Médiateur",
+    "CI_RoleCode.null":"Non défini",
+    "CI_RoleCode.rightsHolder":"Titulaire",
+    "CI_RoleCode.sponsor":"Sponsor",
+    "CI_RoleCode.stakeholder":"Partie prenante",
 
     "DQ_EvaluationMethodTypeCode.directInternal":"Evaluation directe interne",
     "DQ_EvaluationMethodTypeCode.directExternal":"Evaluation directe externe",
@@ -1111,6 +1122,10 @@
     "MD_ClassificationCode.confidential":"Confidentiel",
     "MD_ClassificationCode.secret":"Secret",
     "MD_ClassificationCode.topSecret":"Top secret",
+    "MD_ClassificationCode.forOfficialUseOnly":"Pour un usage officiel",
+    "MD_ClassificationCode.limitedDistribution":"Distribution limitée",
+    "MD_ClassificationCode.protected":"Protégé",
+    "MD_ClassificationCode.sensitiveButUnclassified":"Sensible mais non classés",
 
     "MD_CoverageContentTypeCode.image":"Image de la valeur",
     "MD_CoverageContentTypeCode.thematicClassification":"Classification thématique",
@@ -1382,6 +1397,9 @@
     "theme.inspire.Species distribution":"Répartition des espèces",
     "theme.inspire.Statistical units":"Unités statistiques",
     "theme.inspire.Transport networks":"Réseaux de transport",
-    "theme.inspire.Utility and governmental services":"Services d'utilité publique et services publics"
+    "theme.inspire.Utility and governmental services":"Services d'utilité publique et services publics",
+    "boolean.true":"Vrai",
+    "boolean.false":"Faux",
+    "boolean.nilReason:unknown":"Non évalué"
 
 }

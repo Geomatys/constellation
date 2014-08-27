@@ -465,7 +465,8 @@
     "metadata.field.graphicOverViewFileName":"Graphic overview file name",
     "metadata.field.rsIdentifier":"Identifier code for data",
     "metadata.block.inspire_descriptiveKeyword":"INSPIRE and ISO themes",
-
+    "metadata.field.report.specification.title":"Specification used for assessing conformity",
+    "metadata.field.report.specification.date":"Reference date of the specification",
     "metadata.field.inspire_keyword":"INSPIRE theme",
     "metadata.field.inspire_thesaurusTitle":"Thesaurus",
     "metadata.field.inspire_thesaurusDate":"Date",
@@ -1084,6 +1085,16 @@
     "CI_RoleCode.processor":"Processor",
     "CI_RoleCode.publisher":"Publisher",
     "CI_RoleCode.author":"Author",
+    "CI_RoleCode.coAuthor":"CoAuthor",
+    "CI_RoleCode.collaborator":"Collaborator",
+    "CI_RoleCode.contributor":"Contributor",
+    "CI_RoleCode.editor":"Editor",
+    "CI_RoleCode.funder":"Funder",
+    "CI_RoleCode.mediator":"Mediator",
+    "CI_RoleCode.null":"Undefined",
+    "CI_RoleCode.rightsHolder":"Right holder",
+    "CI_RoleCode.sponsor":"Sponsor",
+    "CI_RoleCode.stakeholder":"Stake holder",
 
     "DQ_EvaluationMethodTypeCode.directInternal":"Direct internal",
     "DQ_EvaluationMethodTypeCode.directExternal":"Direct external",
@@ -1149,6 +1160,10 @@
     "MD_ClassificationCode.confidential":"Confidential",
     "MD_ClassificationCode.secret":"Secret",
     "MD_ClassificationCode.topSecret":"Top Secret",
+    "MD_ClassificationCode.forOfficialUseOnly":"For official use only",
+    "MD_ClassificationCode.limitedDistribution":"Limited distribution",
+    "MD_ClassificationCode.protected":"protected",
+    "MD_ClassificationCode.sensitiveButUnclassified":"Sensitive but unclassified",
 
     "MD_CoverageContentTypeCode.image":"Image",
     "MD_CoverageContentTypeCode.thematicClassification":"Thematic Classification",
@@ -1420,6 +1435,9 @@
     "theme.inspire.Species distribution":"Species distribution",
     "theme.inspire.Statistical units":"Statistical units",
     "theme.inspire.Transport networks":"Transport networks",
-    "theme.inspire.Utility and governmental services":"Utility and governmental services"
+    "theme.inspire.Utility and governmental services":"Utility and governmental services",
+    "boolean.true":"True",
+    "boolean.false":"False",
+    "boolean.nilReason:unknown":"Not evaluated"
 
 }
