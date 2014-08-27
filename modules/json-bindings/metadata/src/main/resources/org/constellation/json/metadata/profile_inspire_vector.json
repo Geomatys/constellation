@@ -253,7 +253,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.geometricObjects_help",
 								"path":"spatialRepresentationInfo.geometricObjects.geometricObjectType",
-								"type":"codelist",
+								"type":"GeometricObjects.codelist",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -385,7 +385,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.format_help",
 								"path":"distributionInfo.distributionFormat.name",
-								"type":"codelist",
+								"type":"DistributionFormat.codelist",
 								"obligation":"M",
 								"defaultValue":"SHP",
 								"value":null
@@ -467,7 +467,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.classification_help",
 								"path":"identificationInfo.resourceConstraints.classification",
-								"type":"codelist",
+								"type":"Classification.codelist",
 								"obligation":"O",
 								"defaultValue":"MD_ClassificationCode.unclassified",
 								"value":null
@@ -490,20 +490,20 @@
 						"path":null,
 						"content":[{
 							"field":{
-								"name":"metadata.field.title",
+								"name":"metadata.field.report.specification.title",
 								"multiplicity":62,
-								"help":"metadata.field.title_help",
+								"help":"metadata.field.report.specification.title_help",
 								"path":"dataQualityInfo.report.result.specification.title",
-								"type":"codelist",
+								"type":"Specification.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
 							}
 						},{
 							"field":{
-								"name":"metadata.field.date",
+								"name":"metadata.field.report.specification.date",
 								"multiplicity":1,
-								"help":"metadata.field.date_help",
+								"help":"metadata.field.report.specification.date_help",
 								"path":"dataQualityInfo.report.result.specification.date.date",
 								"type":"DATE.readonly",
 								"obligation":"M",
@@ -538,7 +538,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.resultPass_help",
 								"path":"dataQualityInfo.report.result.pass",
-								"type":"codelist",
+								"type":"ResultPass.codelist",
 								"obligation":"M",
 								"defaultValue":"nilReason:unknown",
 								"value":null
@@ -588,7 +588,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.role_help",
 								"path":"identificationInfo.pointOfContact.role",
-								"type":"codelist",
+								"type":"Role.codelist",
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":null
@@ -888,7 +888,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.characterSet_help",
 								"path":"characterSet",
-								"type":"codelist",
+								"type":"CharacterSet.codelist",
 								"obligation":"M",
 								"defaultValue":"UTF-8",
 								"value":null
