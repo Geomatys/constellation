@@ -112,8 +112,11 @@ import org.opengis.feature.PropertyType;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.constraint.Classification;
+import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
+import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -222,6 +225,7 @@ public class DataRest {
         Collections.sort(localeCodes);
         mdList.setLocaleCodes(localeCodes);
 
+        //for topic category codes
         final List<String> topicCategoryCodes = new LinkedList<>();
         for (final TopicCategory tc : TopicCategory.values()) {
             final String standardName = Types.getStandardName(tc.getClass());
@@ -232,6 +236,7 @@ public class DataRest {
         Collections.sort(topicCategoryCodes);
         mdList.setTopicCategoryCodes(topicCategoryCodes);
 
+        //for date type codes
         final List<String> dateTypeCodes = new LinkedList<>();
         for (final DateType dateType : DateType.values()) {
             final String standardName = Types.getStandardName(dateType.getClass());
@@ -242,6 +247,7 @@ public class DataRest {
         Collections.sort(dateTypeCodes);
         mdList.setDateTypeCodes(dateTypeCodes);
 
+        //for maintenanceFrequency codes
         final List<String> maintenanceFrequencyCodes = new LinkedList<>();
         for (final MaintenanceFrequency cl : MaintenanceFrequency.values()) {
             final String standardName = Types.getStandardName(cl.getClass());
@@ -251,6 +257,39 @@ public class DataRest {
         }
         Collections.sort(maintenanceFrequencyCodes);
         mdList.setMaintenanceFrequencyCodes(maintenanceFrequencyCodes);
+
+        //for GeometricObjectType codes
+        final List<String> geometricObjectTypeCodes = new LinkedList<>();
+        for (final GeometricObjectType got : GeometricObjectType.values()) {
+            final String standardName = Types.getStandardName(got.getClass());
+            final String code = got.identifier()!=null? got.identifier(): got.name();
+            final String codeListName = standardName+"."+code;
+            geometricObjectTypeCodes.add(codeListName);
+        }
+        Collections.sort(geometricObjectTypeCodes);
+        mdList.setGeometricObjectTypeCodes(geometricObjectTypeCodes);
+
+        //for Classification codes
+        final List<String> classificationCodes = new LinkedList<>();
+        for (final Classification cl : Classification.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            classificationCodes.add(codeListName);
+        }
+        Collections.sort(classificationCodes);
+        mdList.setClassificationCodes(classificationCodes);
+
+        // for characterSet codes
+        final List<String> characterSetCodes = new LinkedList<>();
+        for (final CharacterSet c : CharacterSet.values()) {
+            final String standardName = Types.getStandardName(c.getClass());
+            final String code = c.identifier()!=null? c.identifier(): c.name();
+            final String codeListName = standardName+"."+code;
+            characterSetCodes.add(codeListName);
+        }
+        Collections.sort(characterSetCodes);
+        mdList.setCharacterSetCodes(characterSetCodes);
 
         return Response.ok().entity(mdList).build();
     }
@@ -782,6 +821,7 @@ public class DataRest {
 //
 //            return Response.status(200).entity(information).build();
         } else {
+            LOGGER.warning("Metadata is null for providerId:"+providerId);
             return Response.status(500).build();
         }
     }

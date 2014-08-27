@@ -37,6 +37,9 @@ public class MetadataLists implements Serializable {
     private List<String> topicCategoryCodes;
     private List<String> dateTypeCodes;
     private List<String> maintenanceFrequencyCodes;
+    private List<String> geometricObjectTypeCodes;
+    private List<String> classificationCodes;
+    private List<String> characterSetCodes;
 
     public MetadataLists() {
     }
@@ -79,5 +82,29 @@ public class MetadataLists implements Serializable {
 
     public void setMaintenanceFrequencyCodes(List<String> maintenanceFrequencyCodes) {
         this.maintenanceFrequencyCodes = maintenanceFrequencyCodes;
+    }
+
+    public List<String> getGeometricObjectTypeCodes() {
+        return geometricObjectTypeCodes;
+    }
+
+    public void setGeometricObjectTypeCodes(List<String> geometricObjectTypeCodes) {
+        this.geometricObjectTypeCodes = geometricObjectTypeCodes;
+    }
+
+    public List<String> getClassificationCodes() {
+        return classificationCodes;
+    }
+
+    public void setClassificationCodes(List<String> classificationCodes) {
+        this.classificationCodes = classificationCodes;
+    }
+
+    public List<String> getCharacterSetCodes() {
+        return characterSetCodes;
+    }
+
+    public void setCharacterSetCodes(List<String> characterSetCodes) {
+        this.characterSetCodes = characterSetCodes;
     }
 }

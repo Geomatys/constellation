@@ -422,7 +422,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             "Geographical grid systems","Soil","Geographical names","Species distribution",
             "Geology","Statistical units","Habitats and biotopes",
             "Transport networks","Human health and safety","Utility and governmental services"];
-        $scope.predefinedValues.inspireThemes = $scope.predefinedValues.inspireThemes.sort();
+        //$scope.predefinedValues.inspireThemes = $scope.predefinedValues.inspireThemes.sort();
         $scope.predefinedValues.referenceSystemIdentifier = [
             'WGS84 - EPSG:4326',
             'Fort Desaix / UTM 20 N - EPSG:2973',
@@ -440,7 +440,45 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             'Lambert IV - EPSG:27574',
             'CC42 - EPSG:3942',
             'WGS84 / UTM 20 N - EPSG:4559'];
-        $scope.predefinedValues.referenceSystemIdentifier = $scope.predefinedValues.referenceSystemIdentifier.sort();
+        //$scope.predefinedValues.referenceSystemIdentifier = $scope.predefinedValues.referenceSystemIdentifier.sort();
+        $scope.predefinedValues.distributionFormat = ['SHP','TAB','MIF/MID','KML','GML','GeoTIFF','ECW','Autre'];
+        $scope.predefinedValues.specifications=[
+            'No INSPIRE Data Specification',
+            'INSPIRE Data Specification on Administrative Units',
+            'INSPIRE Data Specification on Cadastral Parcels',
+            'INSPIRE Data Specification on Geographical Names',
+            'INSPIRE Data Specification on Hydrography',
+            'INSPIRE Data Specification on Protected Sites',
+            'INSPIRE Data Specification on Transport Networks',
+            'INSPIRE Data Specifications on Addresses',
+            'INSPIRE Specification on Coordinate Reference Systems',
+            'INSPIRE Specification on Geographical Grid Systems',
+            'Data Specification on Agricultural and Aquaculture Facilities',
+            'Data Specification on Area management / restriction / regulation zones and reporting units',
+            'Data Specification on Atmospheric Conditions- Meteorological geographical features',
+            'Data Specification on Bio-geographical regions',
+            'Data Specification on Buildings',
+            'Data Specification on Elevation',
+            'Data Specification on Energy Resources',
+            'Data Specification on Environmental monitoring Facilities',
+            'Data Specification on Geology',
+            'Data Specification on Habitats and biotopes',
+            'Data Specification on Human health and safety',
+            'Data Specification on Land cover',
+            'Data Specification on Land use',
+            'Data Specification on Mineral Resources',
+            'Data Specification on Natural risk zones',
+            'Data Specification on Oceanographic geographical features',
+            'Data Specification on Orthoimagery',
+            'Data Specification on Population distribution - demography',
+            'Data Specification on Production and Industrial Facilities',
+            'Data Specification on Sea regions',
+            'Data Specification on Soil',
+            'Data Specification on Species distribution',
+            'Data Specification on Statistical units',
+            'Data Specification on Utility and Government Services',
+            'RÈGLEMENT (UE) N°1089/2010'];
+        $scope.predefinedValues.resultPass=['nilReason:unknown','false','true'];
 
         /**
          * Get metadata values
@@ -451,7 +489,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             function(response) {
                 if (response && response.root) {
                     $scope.metadataValues.push({"root":response.root});
-                    $scope.codeLists =dataListing.codeLists({});
+                    //$scope.codeLists =dataListing.codeLists({});
                 }
             }
         );
@@ -540,9 +578,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
          * @param parentBlock
          */
         $scope.updateIsoInspireSelectOneMenu = function(value,parentBlock) {
-            console.debug(value);
-            console.debug(parentBlock);
-
             if(value != null) {
                 var INSPIRE_ISO_MAP = {};
                 INSPIRE_ISO_MAP['Elevation'] = 'MD_TopicCategoryCode.elevation';

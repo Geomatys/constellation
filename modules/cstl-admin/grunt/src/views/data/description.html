@@ -178,6 +178,13 @@
                                                 style="width:auto;min-width:165pt;height:30px;">
                                             <option value="">-----</option>
                                         </select>
+                                        <select ng-if="jsonObjectField.field.type === 'GeometricObjects.codelist'"
+                                                class="form-control form-control-fix"
+                                                ng-model="jsonObjectField.field.value"
+                                                ng-options="(code | translate) for code in codeLists.geometricObjectTypeCodes | orderBy: 'toString() | translate'"
+                                                style="width:auto;min-width:165pt;height:30px;">
+                                            <option value="">-----</option>
+                                        </select>
                                         <select ng-if="jsonObjectField.field.type === 'ReferenceSystemIdentifier.codelist'"
                                                 class="form-control form-control-fix"
                                                 ng-model="jsonObjectField.field.value"
@@ -185,11 +192,56 @@
                                                 style="width:auto;min-width:165pt;height:30px;">
                                             <option value="">-----</option>
                                         </select>
-                                        <input ng-if="jsonObjectField.field.type === 'KEYWORD.text'"
-                                               type="text"
-                                               class="form-control form-control-fix"
-                                               placeholder="{{jsonObjectField.field.name | translate}}"
-                                               ng-model="jsonObjectField.field.value"/>
+                                        <div ng-if="jsonObjectField.field.type === 'KEYWORD.text'"
+                                             class="col-xs-5 col-sm-5 col-md-5 col-lg-5"
+                                             style="padding-left:0;">
+                                            <input type="text"
+                                                   class="form-control form-control-fix"
+                                                   placeholder="{{jsonObjectField.field.name | translate}}"
+                                                   ng-model="jsonObjectField.field.value"/>
+                                        </div>
+                                        <select ng-if="jsonObjectField.field.type === 'DistributionFormat.codelist'"
+                                                class="form-control form-control-fix"
+                                                ng-model="jsonObjectField.field.value"
+                                                ng-options="format for format in predefinedValues.distributionFormat | orderBy: 'toString()'"
+                                                style="width:auto;min-width:165pt;height:30px;">
+                                            <option value="">-----</option>
+                                        </select>
+                                        <select ng-if="jsonObjectField.field.type === 'Classification.codelist'"
+                                                class="form-control form-control-fix"
+                                                ng-model="jsonObjectField.field.value"
+                                                ng-options="(code | translate) for code in codeLists.classificationCodes | orderBy: 'toString() | translate'"
+                                                style="width:auto;min-width:165pt;height:30px;">
+                                            <option value="">-----</option>
+                                        </select>
+                                        <select ng-if="jsonObjectField.field.type === 'Specification.codelist'"
+                                                class="form-control form-control-fix"
+                                                ng-model="jsonObjectField.field.value"
+                                                ng-options="spec for spec in predefinedValues.specifications | orderBy: 'toString()'"
+                                                style="width:auto;min-width:165pt;height:30px;">
+                                            <option value="">-----</option>
+                                        </select>
+                                        <select ng-if="jsonObjectField.field.type === 'ResultPass.codelist'"
+                                                class="form-control form-control-fix"
+                                                ng-model="jsonObjectField.field.value"
+                                                ng-options="('boolean.'+pass | translate) for pass in predefinedValues.resultPass | orderBy: '\'boolean.\'+toString() | translate'"
+                                                style="width:auto;min-width:165pt;height:30px;">
+                                            <option value="">-----</option>
+                                        </select>
+                                        <select ng-if="jsonObjectField.field.type === 'Role.codelist'"
+                                                class="form-control form-control-fix"
+                                                ng-model="jsonObjectField.field.value"
+                                                ng-options="(code | translate) for code in codeLists.roleCodes | orderBy: 'toString() | translate'"
+                                                style="width:auto;min-width:165pt;height:30px;">
+                                            <option value="">-----</option>
+                                        </select>
+                                        <select ng-if="jsonObjectField.field.type === 'CharacterSet.codelist'"
+                                                class="form-control form-control-fix"
+                                                ng-model="jsonObjectField.field.value"
+                                                ng-options="(code | translate) for code in codeLists.characterSetCodes | orderBy: 'toString() | translate'"
+                                                style="width:auto;min-width:165pt;height:30px;">
+                                            <option value="">-----</option>
+                                        </select>
                                         <input ng-if="jsonObjectField.field.type === 'decimal'"
                                                type="text"
                                                class="form-control form-control-fix"
