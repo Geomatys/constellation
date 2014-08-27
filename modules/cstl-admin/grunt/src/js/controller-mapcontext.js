@@ -230,7 +230,11 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         };
 
         $scope.selectItem = function(item) {
-            $scope.selected.item = item;
+            if ($scope.selected.item) {
+                $scope.selected.item = null;
+            } else {
+                $scope.selected.item = item;
+            }
         };
 
         $scope.selectExtLayer = function(extLayer) {
