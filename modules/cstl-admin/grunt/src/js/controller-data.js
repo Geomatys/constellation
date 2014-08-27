@@ -16,8 +16,8 @@
 'use strict';
 
 cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'DomainResource', 'provider',
-    'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, DomainResource,  provider, style, textService, $modal, $growl,
+    'style', 'textService', '$modal', 'Growl', 'StyleSharedService', '$cookies',
+    function ($scope, $location, $dashboard, webService, dataListing, DomainResource,  provider, style, textService, $modal, Growl,
               StyleSharedService, $cookies) {
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
@@ -40,7 +40,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
 
         $scope.checkIsValid = function(isInvalid){
           if (isInvalid){
-              $growl('error','Error','Invalid Chars');
+              Growl('error','Error','Invalid Chars');
           }
         };
 
@@ -54,7 +54,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     },
                     function(response){
                         console.error(response);
-                        $growl('error','Error','Search failed:'+ response.data);
+                        Growl('error','Error','Search failed:'+ response.data);
                     }
                 );
             }else{
@@ -85,7 +85,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                         $dashboard($scope, response, true);
                     }, function(response){
                         console.error(response);
-                        $growl('error','Error','Search failed:'+ response.data);
+                        Growl('error','Error','Search failed:'+ response.data);
                     });
                 } else {
                     dataListing.listAll({}, function(response) {
@@ -185,7 +185,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 }
 
                 dataListing.hideData({providerid: providerId, dataid: layerName}, {value : $scope.selected.Namespace},
-                    function() { $growl('success','Success','Data '+ layerName +' successfully deleted');
+                    function() { Growl('success','Success','Data '+ layerName +' successfully deleted');
                         dataListing.listDataForProv({providerId: providerId}, function(response) {
                             if (response.length == 0) {
                                 provider.delete({id: providerId}, function() {
@@ -200,7 +200,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                             }
                         });
                     },
-                    function() { $growl('error','Error','Data '+ layerName +' deletion failed'); }
+                    function() { Growl('error','Error','Data '+ layerName +' deletion failed'); }
                 );
             }
         };
@@ -265,7 +265,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
                     }, function () {
-                        $growl('error', 'Error', 'Unable to save metadata');
+                        Growl('error', 'Error', 'Unable to save metadata');
                     });
                 }
             });
@@ -284,7 +284,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
                     }, function () {
-                        $growl('error', 'Error', 'Unable to save metadata');
+                        Growl('error', 'Error', 'Unable to save metadata');
                     });
                 }
             });
@@ -303,7 +303,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
                     }, function () {
-                        $growl('error', 'Error', 'Unable to save metadata');
+                        Growl('error', 'Error', 'Unable to save metadata');
                     });
                 }
             });
@@ -362,8 +362,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
     }]);
 
 
-cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalInstance', '$growl', 'dataListing', 'domains', 'dataId',
-  function($scope, $modalInstance, $growl, dataListing, domains, dataId){
+cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalInstance', 'Growl', 'dataListing', 'domains', 'dataId',
+  function($scope, $modalInstance, Growl, dataListing, domains, dataId){
 	$scope.domains = domains;
     $scope.close = function() {
       $modalInstance.dismiss('close');
@@ -376,7 +376,7 @@ cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalIn
             $scope.domains[i].linked = !$scope.domains[i].linked;
             $scope.domains[i].linked = false;
           }, function(response){
-            $growl('error','error', response.data.message );
+            Growl('error','error', response.data.message );
             dataListing.domains({dataId:dataId}, function(domains){
                $scope.domains = domains;          
              })
@@ -619,8 +619,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
 
 }]);
 
-cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', 'sensor', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl', '$modal',
-    function ($scope, dataListing, webService, sos, sensor, $dashboard, $modalInstance, service, exclude, $growl, $modal) {
+cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', 'sensor', '$dashboard', '$modalInstance', 'service', 'exclude', 'Growl', '$modal',
+    function ($scope, dataListing, webService, sos, sensor, $dashboard, $modalInstance, service, exclude, Growl, $modal) {
         $scope.service = service;
 
         $scope.getDefaultFilter = function() {
@@ -715,7 +715,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 $scope.selected = $scope.listSelect;
             }
             if ($scope.selected == null) {
-                $growl('warning', 'Warning', 'No data selected');
+                Growl('warning', 'Warning', 'No data selected');
                 $modalInstance.dismiss('close');
                 return;
             }
@@ -723,10 +723,10 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 if ($scope.service.type.toLowerCase() === 'sos') {
                     var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
                     sos.importSensor({id: service.identifier}, {values: {"sensorId": sensorId}}, function () {
-                        $growl('success', 'Success', 'Sensor ' + sensorId + ' imported in service ' + service.name);
+                        Growl('success', 'Success', 'Sensor ' + sensorId + ' imported in service ' + service.name);
                         $modalInstance.close();
                     }, function () {
-                        $growl('error', 'Error', 'Unable to import sensor ' + sensorId + ' in service ' + service.name);
+                        Growl('error', 'Error', 'Unable to import sensor ' + sensorId + ' in service ' + service.name);
                         $modalInstance.dismiss('close');
                     });
                     return;
@@ -742,28 +742,28 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                                     webService.addLayer({type: service.type, id: service.identifier},
                                         {layerAlias: tiledProvider.dataId, layerId: tiledProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: tiledProvider.providerId},
                                         function () {
-                                            $growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
+                                            Growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
                                             $modalInstance.close();
                                         },
                                         function () {
-                                            $growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
+                                            Growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
                                             $modalInstance.dismiss('close');
                                         }
                                     );
                                 }, function () {
-                                    $growl('error', 'Error', 'Failed to generate conform pyramid for ' + $scope.selected[i].Name);
+                                    Growl('error', 'Error', 'Failed to generate conform pyramid for ' + $scope.selected[i].Name);
                                     $modalInstance.dismiss('close');
                                 });
                             } else {
                                 webService.addLayer({type: service.type, id: service.identifier},
                                     {layerAlias: $scope.selected[i].Name, layerId: $scope.selected[i].Name, serviceType: service.type, serviceId: service.identifier, providerId: $scope.selected[i].Provider, layerNamespace: $scope.selected[i].Namespace},
                                     function (response) {
-                                        $growl('success', 'Success', response.message);
+                                        Growl('success', 'Success', response.message);
                                         modalLoader.close();
                                         $modalInstance.close();
                                     },
                                     function (response) {
-                                        $growl('error', 'Error', response.message);
+                                        Growl('error', 'Error', response.message);
                                         $modalInstance.dismiss('close');
                                     }
                                 );
@@ -781,7 +781,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                         dataListing.pyramidScales({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, function (response) {
                             $scope.scales = response.Entry[0].split(',');
                         }, function () {
-                            $growl('error', 'Error', 'Unable to pyramid data ' + $scope.selected[i].Name);
+                            Growl('error', 'Error', 'Unable to pyramid data ' + $scope.selected[i].Name);
                         });
 
                         $scope.wmtsParams = true;
@@ -797,16 +797,16 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                                 webService.addLayer({type: service.type, id: service.identifier},
                                     {layerAlias: respProvider.dataId, layerId: respProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: respProvider.providerId},
                                     function () {
-                                        $growl('success', 'Success', 'Layer ' + respProvider.dataId + ' successfully added to service ' + service.name);
+                                        Growl('success', 'Success', 'Layer ' + respProvider.dataId + ' successfully added to service ' + service.name);
                                         $modalInstance.close();
                                     },
                                     function () {
-                                        $growl('error', 'Error', 'Layer ' + respProvider.dataId + ' failed to be added to service ' + service.name);
+                                        Growl('error', 'Error', 'Layer ' + respProvider.dataId + ' failed to be added to service ' + service.name);
                                         $modalInstance.dismiss('close');
                                     }
                                 );
                             }, function () {
-                                $growl('error', 'Error', 'Pyramid process failed for ' + $scope.selected[i].Name);
+                                Growl('error', 'Error', 'Pyramid process failed for ' + $scope.selected[i].Name);
                             });
                     }
                 }

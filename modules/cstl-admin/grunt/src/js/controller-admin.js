@@ -16,8 +16,8 @@
 'use strict';
 
 cstlAdminApp.controller('AdminController', ['$scope', '$location', '$dashboard', 'webService',
-    'dataListing', 'provider', 'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, provider, style, textService, $modal, $growl, StyleSharedService, $cookies) {
+    'dataListing', 'provider', 'style', 'textService', '$modal', 'Growl', 'StyleSharedService', '$cookies',
+    function ($scope, $location, $dashboard, webService, dataListing, provider, style, textService, $modal, Growl, StyleSharedService, $cookies) {
 
         $scope.viewUrls = {
             'system_state':         {name:'system_state',       url:'views/admin/system_state.html'},
@@ -129,8 +129,8 @@ cstlAdminApp.controller('TaskController', ['$scope', 'TaskService','$timeout','S
     }
 ]);
 
-cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', '$growl', '$translate',
-    function ($scope, UserResource, $modal, $growl, $translate) {
+cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', 'Growl', '$translate',
+    function ($scope, UserResource, $modal, Growl, $translate) {
         $scope.list = UserResource.query({"withDomainAndRoles": true});
         $scope.details = function(i) {
             $modal.open({
@@ -168,15 +168,15 @@ cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', '
             }, function(err){
                 var errorCode = err.data;
                 $translate(['Error',errorCode]).then(function (translations) {
-                    $growl('error', translations.Error,  translations[errorCode]);
+                    Growl('error', translations.Error,  translations[errorCode]);
                 });
             });
         };
     }
 ]);
 
-cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'GeneralService', 'user', 'isUpdate', 'UserResource', '$growl', '$translate',
-    function ($scope, $modalInstance, GeneralService, user, isUpdate, UserResource, $growl, $translate) {
+cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'GeneralService', 'user', 'isUpdate', 'UserResource', 'Growl', '$translate',
+    function ($scope, $modalInstance, GeneralService, user, isUpdate, UserResource, Growl, $translate) {
         $scope.user = user;
 
         $scope.close = function() {
@@ -222,14 +222,14 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'G
                     $modalInstance.close(updated);
                 }, function(){
                     $translate(['Error','admin.user.save.error']).then(function (translations) {
-                        $growl('error', translations.Error,  translations['admin.user.save.error']);
+                        Growl('error', translations.Error,  translations['admin.user.save.error']);
                     })});
             else
                 userResource.$save(function(saved){
                     $modalInstance.close(saved);
                 }, function(){
                     $translate(['Error','admin.user.save.error']).then(function (translations) {
-                        $growl('error', translations.Error,  translations['admin.user.save.error']);
+                        Growl('error', translations.Error,  translations['admin.user.save.error']);
                     });
                 });
         }
@@ -302,7 +302,7 @@ cstlAdminApp.controller('DomainController', ['$scope', '$modal', 'DomainResource
                 }, function(err){
                     var errorCode = err.data;
                     $translate(['Error',errorCode]).then(function (translations) {
-                        $growl('error', translations.Error,  translations[errorCode]);
+                        Growl('error', translations.Error,  translations[errorCode]);
                     });
                 });
             };
@@ -355,14 +355,14 @@ cstlAdminApp.controller('DomainDetailsController', ['$scope', '$modalInstance', 
                     $modalInstance.close(updated);
                 }, function(){
                     $translate(['Error','admin.domain.save.error']).then(function (translations) {
-                        $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                        Growl('error', translations.Error,  translations['admin.domain.save.error']);
                     })});
             else
                 domainResource.$save(function(saved){
                     $modalInstance.close(saved);
                 }, function(){
                     $translate(['Error','admin.domain.save.error']).then(function (translations) {
-                        $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                        Growl('error', translations.Error,  translations['admin.domain.save.error']);
                     });
                 });
         }
@@ -468,8 +468,8 @@ cstlAdminApp.controller('DomainChangeUserRolesController', ['$scope', '$modalIns
     };
 }]);
 
-cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', '$growl', '$translate', 'DomainRoleResource', 'PermissionService',
-    function ($scope, $modal, $growl, $translate, DomainRoleResource, PermissionService) {
+cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', 'Growl', '$translate', 'DomainRoleResource', 'PermissionService',
+    function ($scope, $modal, Growl, $translate, DomainRoleResource, PermissionService) {
 
         $scope.domainroles = DomainRoleResource.query({withMembers:true});
 
@@ -501,7 +501,7 @@ cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', '$growl', '
                 }, function(err){
                     var errorCode = err.data
                     $translate(['Error',errorCode]).then(function (translations) {
-                        $growl('error', translations.Error,  translations[errorCode]);
+                        Growl('error', translations.Error,  translations[errorCode]);
                     });
                 });
             };
@@ -544,7 +544,7 @@ cstlAdminApp.controller('DomainRoleDetailsController', ['$scope', '$translate', 
                 $modalInstance.close(saved);
               }, function(){
                 $translate(['Error','admin.domain.save.error']).then(function (translations) {
-                  $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                  Growl('error', translations.Error,  translations['admin.domain.save.error']);
                 });
               });
             } else {
@@ -552,7 +552,7 @@ cstlAdminApp.controller('DomainRoleDetailsController', ['$scope', '$translate', 
                 $modalInstance.close(updated);
               }, function(){
                 $translate(['Error','admin.domain.save.error']).then(function (translations) {
-                  $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                  Growl('error', translations.Error,  translations['admin.domain.save.error']);
                 })});
             }
         }

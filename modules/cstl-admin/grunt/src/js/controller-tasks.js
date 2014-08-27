@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', '$growl', '$modal', 'TaskService',
-        function ($scope, $dashboard, $growl, $modal, TaskService){
+cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', 'Growl', '$modal', 'TaskService',
+        function ($scope, $dashboard, Growl, $modal, TaskService){
             var lastOpened = null;
 
             $scope.nbbypage = 5; // Default value at 5
@@ -32,7 +32,7 @@ cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', '$growl', '$
                         $dashboard($scope, response, false);
                     }).catch(function(){
                         // On error
-                        $growl('error', 'Error', 'Unable to get tasks list');
+                        Growl('error', 'Error', 'Unable to get tasks list');
                     })['finally'](function(){
                     // On all case
                     modalLoader.close()
@@ -51,9 +51,9 @@ cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', '$growl', '$
 
             $scope.executeTask = function(idTask) {
                 TaskService.executeParamsTask({id:idTask}).$promise.then(function(){
-                    $growl('success', 'Success', 'The task is currently execute');
+                    Growl('success', 'Success', 'The task is currently execute');
                 }).catch(function(){
-                    $growl('error', 'Error', "Can't execute this task");
+                    Growl('error', 'Error', "Can't execute this task");
                 });
             };
 
@@ -131,8 +131,8 @@ cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', '$growl', '$
 );
 
 // The controller for the add task modal
-cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '$growl', 'textService', 'TaskService', 'processes', 'task',
-        function($scope, $modalInstance, $growl, textService, TaskService, processes, task){
+cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', 'Growl', 'textService', 'TaskService', 'processes', 'task',
+        function($scope, $modalInstance, Growl, textService, TaskService, processes, task){
 
             // Private function
             function parseProcessDefaultName(processName) {
@@ -177,7 +177,7 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                     .success(function(data){ // On success
                         $scope.describeProcess = data;
                     }).error(function(data){ // On error
-                        $growl('error', 'Error', 'Unable to get the describe process');
+                        Growl('error', 'Error', 'Unable to get the describe process');
                     });
             }
 
@@ -236,7 +236,7 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
             $scope.validate = function() {
 
                 if (!$scope.isValid("formModalAddTask")) {
-                    $growl('error', 'Error', 'Form is invalid');
+                    Growl('error', 'Error', 'Form is invalid');
                     return false;
                 }
 
@@ -248,7 +248,7 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                     var element = $scope.inputs[i];
 
                     if (!$scope.isValid(element.name)) {
-                        $growl('error', 'Error', 'Form is invalid');
+                        Growl('error', 'Error', 'Form is invalid');
                         return false;
                     }
 
@@ -281,18 +281,18 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                 if ($scope.task.id != 0){
                     TaskService.updateParamsTask($scope.task).$promise
                         .then(function(response) {
-                            $growl('success', 'Success', 'The task is correctly save');
+                            Growl('success', 'Success', 'The task is correctly save');
                             $modalInstance.close();
                         }).catch(function(){
-                            $growl('error', 'Error', 'Error to save the task');
+                            Growl('error', 'Error', 'Error to save the task');
                         });
                 } else {
                     TaskService.createParamsTask($scope.task).$promise
                         .then(function(response) {
-                            $growl('success', 'Success', 'New task is correctly register');
+                            Growl('success', 'Success', 'New task is correctly register');
                             $modalInstance.close();
                         }).catch(function(){
-                            $growl('error', 'Error', 'Error to save the new task');
+                            Growl('error', 'Error', 'Error to save the new task');
                         });
                 }
             };

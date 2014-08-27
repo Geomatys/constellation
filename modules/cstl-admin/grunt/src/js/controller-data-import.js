@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance', 'dataListing', 'provider', 'firstStep', '$uploadFiles', '$growl',
-    function($scope, $modalInstance, dataListing, provider, firstStep, $uploadFiles, $growl) {
+cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance', 'dataListing', 'provider', 'firstStep', '$uploadFiles', 'Growl',
+    function($scope, $modalInstance, dataListing, provider, firstStep, $uploadFiles, Growl) {
         $scope.import = {
             currentStep: firstStep,
             dataPath: null,
@@ -72,7 +72,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                     dataListing.setUpMetadata({values: {'providerId': providerId, 'mdPath': $scope.import.metadata}});
                 }
 
-                $growl('success','Success','Postgis database successfully added');
+                Growl('success','Success','Postgis database successfully added');
                 $modalInstance.close({type: "vector", file: $scope.import.identifier, missing: $scope.import.metadata == null});
             });
         };
@@ -133,7 +133,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                         //update data & metadata files reminder for further use
                                         $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData, providerId: $scope.import.providerId};
 
-                                        $growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
+                                        Growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
                                         if ($scope.sensor.checked) {
                                             $scope.showAssociate();
                                         } else {
@@ -142,7 +142,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
                                     }, function() {
                                         //failure
-                                        $growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
+                                        Growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
                                         $scope.import.allowSubmit = false;
                                         //TODO div select EPSG
                                         $scope.import.enableSelectEPSGCode = true;
@@ -155,13 +155,13 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                             },
                                             function(){
                                                 //error
-                                                $growl('error','Error','Impossible to get all EPSG code');
+                                                Growl('error','Error','Impossible to get all EPSG code');
                                             }
                                         );
                                     }
                                 );
                             }, function(){
-                                $growl('error','Error','Impossible to create dataSet');
+                                Growl('error','Error','Impossible to create dataSet');
                             });
                         } else if ($scope.import.uploadType === "raster") {
                             provider.create({
@@ -183,7 +183,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                         $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData, providerId: $scope.import.providerId};
 
                                         if (!fileExtension || fileExtension !== "nc") {
-                                            $growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
+                                            Growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
                                             $modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
                                         } else {
                                             $scope.showAssociate();
@@ -192,7 +192,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
                                     }, function() {
                                         //failure
-                                        $growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
+                                        Growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
                                         $scope.import.allowSubmit = false;
                                         //TODO div select EPSG
                                         $scope.import.enableSelectEPSGCode = true;
@@ -205,7 +205,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                             },
                                             function(){
                                                 //error
-                                                $growl('error','Error','Impossible to get all EPSG code');
+                                                Growl('error','Error','Impossible to get all EPSG code');
                                             });
 
 
@@ -214,7 +214,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                 );
 
                             } , function(){
-                                $growl('error','Error','Impossible to create dataSet');
+                                Growl('error','Error','Impossible to create dataSet');
                             });
                         } else if ($scope.import.uploadType === "observation" && fileExtension === "xml") {
                             provider.create({
@@ -230,13 +230,13 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
                                 }
 
-                                $growl('success','Success','Observation data '+ fileName +' successfully added');
+                                Growl('success','Success','Observation data '+ fileName +' successfully added');
 
                                 $scope.showAssociate();
                                 //$modalInstance.close({type: "observation", file: fileName, missing: $scope.metadata == null});
 
                             }, function(){
-                                $growl('error','Error','Impossible to create dataSet');
+                                Growl('error','Error','Impossible to create dataSet');
                             });
 
                         } else if ($scope.import.uploadType === "observation") {
@@ -253,27 +253,27 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
                                 }
 
-                                $growl('success','Success','Observation data '+ fileName +' successfully added');
+                                Growl('success','Success','Observation data '+ fileName +' successfully added');
 
                                 $scope.showAssociate();
 //                                if (!fileExtension || fileExtension !== "nc") {
-//                                    $growl('success','Success','Observation data '+ fileName +' successfully added');
+//                                    Growl('success','Success','Observation data '+ fileName +' successfully added');
 //                                    $modalInstance.close({type: "observation", file: fileName, missing: $scope.metadata == null});
 //                                } else {
 //                                    displayNetCDF(fileName);
 //                                }
                             }, function(){
-                                $growl('error','Error','Impossible to create dataSet');
+                                Growl('error','Error','Impossible to create dataSet');
                             });
                         } else {
-                            $growl('warning','Warning','Not implemented choice');
+                            Growl('warning','Warning','Not implemented choice');
                             $modalInstance.close();
                         }
                     });
                 });
 
             } else {
-                $growl('error','Error','Data import failed');
+                Growl('error','Error','Data import failed');
                 $modalInstance.close();
             }
         };
@@ -282,7 +282,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             if ($scope.import.uploadType != null ) {
                 $scope.uploaded();
             } else {
-                $growl('error','Error','Select Data Type');
+                Growl('error','Error','Select Data Type');
             }
         };
 
@@ -297,15 +297,15 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                 },
                 function(){
                     // error
-                    $growl('error','Error','Impossible to set projection for data '+ $scope.import.fileName );
+                    Growl('error','Error','Impossible to set projection for data '+ $scope.import.fileName );
                 }
             );
 
         };
     }]);
 
-cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataListing', '$cookies', '$growl',
-    function($scope, dataListing, $cookies, $growl) {
+cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataListing', '$cookies', 'Growl',
+    function($scope, dataListing, $cookies, Growl) {
         $scope.loader = {
             upload: false
         };
@@ -335,7 +335,7 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
                     });
                 },
                 error: function(){
-                    $growl('error', 'Error', 'error while uploading data');
+                    Growl('error', 'Error', 'error while uploading data');
                 }
             });
         };
@@ -406,8 +406,8 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
         };
     }]);
 
-cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','provider', '$growl',
-    function($scope, provider, $growl) {
+cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','provider', 'Growl',
+    function($scope, provider, Growl) {
         $scope.import.allowNext = false;
         $scope.import.testConnected = false;
 
@@ -430,20 +430,20 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
                     database: $scope.import.db.name
                 }
             }, function(response) {
-                $growl('success', 'Success', 'Connected to database');
+                Growl('success', 'Success', 'Connected to database');
                 $scope.import.testConnected = true;
                 $scope.import.allowNext = true;
 
             },function(response){
-                $growl('error','Error','Unable to connect database. Verify parrameters');
+                Growl('error','Error','Unable to connect database. Verify parrameters');
             });
         }
 
 }]);
 
 
-cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl', 'dataListing',
-    function($scope, $cookies, $growl, dataListing) {
+cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','Growl', 'dataListing',
+    function($scope, $cookies, Growl, dataListing) {
 
         $scope.columns = [];
 
@@ -492,7 +492,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                     var id = $scope.import.identifier;
                     if(!id.match(letters)) {
                         $scope.import.allowNext = false;
-                        $growl('error','Error','fill identifier without special chars like space');
+                        Growl('error','Error','fill identifier without special chars like space');
                     }else {
                         $scope.import.allowNext = true;
                     }
@@ -543,7 +543,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                     $scope.selectType();
                 },
                 error: function(result){
-                    $growl('error','Error',result.responseJSON.msg);
+                    Growl('error','Error',result.responseJSON.msg);
 //                    $scope.import.currentStep = 'step2Metadata';
 //                    $scope.import.allowNext = false;
 //                    $scope.import.allowSubmit = false;
@@ -576,8 +576,8 @@ cstlAdminApp.controller('ModalImportDataStep3TypeController', ['$scope',
         };
     }]);
 
-cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sensor', 'dataListing', '$dashboard', '$growl', '$cookies',
-    function($scope, sensor, dataListing, $dashboard, $growl, $cookies) {
+cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sensor', 'dataListing', '$dashboard', 'Growl', '$cookies',
+    function($scope, sensor, dataListing, $dashboard, Growl, $cookies) {
         $scope.selectedSensorsChild = null;
 
         $scope.selectSensorsChild = function(item) {
@@ -639,7 +639,7 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
 
         function importAndLinkSensor(path) {
             sensor.add({}, {values: {'path' : path}}, function(sensors) {
-                $growl('success','Success','Sensor correctly imported');
+                Growl('success','Success','Sensor correctly imported');
 
                 for (var s=0; s<sensors.length; s++) {
                     var sensorId = sensors[s].identifier;
@@ -650,13 +650,13 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
                     });
                 }
             }, function() {
-                $growl('error','Error','Unable to import sensor');
+                Growl('error','Error','Unable to import sensor');
             });
         }
     }]);
 
-cstlAdminApp.controller('ModalImportDataStep4SNetcdfController', ['$scope', 'dataListing', '$growl', '$cookies',
-    function($scope, dataListing, $growl, $cookies) {
+cstlAdminApp.controller('ModalImportDataStep4SNetcdfController', ['$scope', 'dataListing', 'Growl', '$cookies',
+    function($scope, dataListing, Growl, $cookies) {
         function displayNetCDF(providerId) {
             $scope.import.currentStep = 'step4Netcdf';
             $scope.import.allowNext = false;

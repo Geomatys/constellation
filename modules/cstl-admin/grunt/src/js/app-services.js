@@ -66,9 +66,10 @@ angular.module('cstl-services', [])
              *  - inject.expr.user.id
              *
              * @param url {String} the url template to compile
+             * @param fillSessionId {Boolean} indicates if should fill the jsessionid
              * @returns {String} the complied url
              */
-            compileUrl: function(url) {
+            compileUrl: function(url, fillSessionId) {
                 // Acquire cookie values.
                 var cstlUrl   = $cookies[CstlConfig['cookie.cstl.url']],
                     domainId  = $cookies[CstlConfig['cookie.domain.id']],
@@ -94,7 +95,7 @@ angular.module('cstl-services', [])
                 if (angular.isDefined(sessionId)) {
                     if (url.indexOf(';jsessionid=') !== -1) {
                         url = url.replace(';jsessionid=', ';jsessionid=' + sessionId);
-                    } else {
+                    } else if (fillSessionId !== false) {
                         var reqIndex = url.indexOf('?');
                         if (reqIndex !== -1) {
                             url = url.replace('?', ';jsessionid=' + sessionId + '?');
@@ -192,7 +193,7 @@ angular.module('cstl-services', [])
     //  Growl Service
     // -------------------------------------------------------------------------
 
-    .factory('$growl', function() {
+    .factory('Growl', function() {
         /**
          * Displays a notification with the specified title and text.
          *
@@ -218,7 +219,7 @@ angular.module('cstl-services', [])
     // -------------------------------------------------------------------------
     
     .factory('StompService', function(CstlUtils) {
-        return new Stomper(CstlUtils.compileUrl('@cstl/spring/ws/adminmessages'));
+        return new Stomper(CstlUtils.compileUrl('@cstl/spring/ws/adminmessages', false));
 
         function Topic(stompClient, path) {
             var self = this;

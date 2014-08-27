@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', '$growl','$translate',
-    function ($scope, webService, provider, csw, sos, $modal, textService, $growl, $translate) {
+cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', 'Growl','$translate',
+    function ($scope, webService, provider, csw, sos, $modal, textService, Growl, $translate) {
 
 
         $scope.typeFilter = {type: '!WEBDAV'};
@@ -85,8 +85,8 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
 
         $scope.reload = function(service){
             webService.restart({type: service.type, id: service.identifier}, {value: true},
-                function() { $growl('success','Success','Service '+ service.name +' successfully reloaded'); },
-                function() { $growl('error','Error','Service '+ service.name +' reload failed'); }
+                function() { Growl('success','Success','Service '+ service.name +' successfully reloaded'); },
+                function() { Growl('error','Error','Service '+ service.name +' reload failed'); }
             );
         };
         $scope.startOrStop = function(service){
@@ -94,16 +94,16 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
                 webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.services = webService.listAll({lang: $scope.getCurrentLang()});
-                        $growl('success','Success','Service '+ service.name +' successfully stopped');
+                        Growl('success','Success','Service '+ service.name +' successfully stopped');
                     }
-                }, function() { $growl('error','Error','Service '+ service.name +' stop failed'); });
+                }, function() { Growl('error','Error','Service '+ service.name +' stop failed'); });
             }else{
                 webService.start({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.services = webService.listAll({lang: $scope.getCurrentLang()});
-                        $growl('success','Success','Service '+ service.name +' successfully started');
+                        Growl('success','Success','Service '+ service.name +' successfully started');
                     }
-                }, function() { $growl('error','Error','Service '+ service.name +' start failed'); });
+                }, function() { Growl('error','Error','Service '+ service.name +' start failed'); });
             }
         };
 
@@ -114,17 +114,17 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
                     provider.delete({id: service.identifier +"-om2"});
                 }
                 webService.delete({type: service.type, id: service.identifier}, {} ,
-                    function() { $growl('success','Success','Service '+ service.name +' successfully deleted');
+                    function() { Growl('success','Success','Service '+ service.name +' successfully deleted');
                         $scope.services = webService.listAll({lang: $scope.getCurrentLang()}); },
-                    function() { $growl('error','Error','Service '+ service.name +' deletion failed'); }
+                    function() { Growl('error','Error','Service '+ service.name +' deletion failed'); }
                 );
             }
         };
 
         $scope.refreshIndex = function(service) {
             csw.refresh({id: service.identifier}, {},
-                function() { $growl('success','Success','Search index for the service '+ service.name +' successfully refreshed'); },
-                function() { $growl('error','Error','Search index for the service '+ service.name +' failed to be updated'); }
+                function() { Growl('success','Success','Search index for the service '+ service.name +' successfully refreshed'); },
+                function() { Growl('error','Error','Search index for the service '+ service.name +' failed to be updated'); }
             );
         };
 
@@ -158,8 +158,8 @@ cstlAdminApp.controller('WebServiceVersionsController', ['$scope', 'webService',
         };
     }]);
 
-cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', '$growl', '$translate',
-    function ($scope, $routeParams, webService, $filter, $location, $growl, $translate) {
+cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', 'Growl', '$translate',
+    function ($scope, $routeParams, webService, $filter, $location, Growl, $translate) {
         $scope.type = $routeParams.type;
         $scope.tonext = true;
         $scope.serviceInfo = true;
@@ -274,7 +274,7 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
             webService.create({type: $scope.type}, $scope.metadata,
                 function() {
-                    $growl('success', 'Success', 'Service ' + $scope.metadata.name + ' successfully created');
+                    Growl('success', 'Success', 'Service ' + $scope.metadata.name + ' successfully created');
                     if ($scope.type == 'csw' || $scope.type == 'sos') {
                         $location.path('/webservice/'+ $scope.type +'/'+ $scope.metadata.identifier +'/source');
                     } else {
@@ -282,13 +282,13 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
                     }
                 },
 
-                function() { $growl('error','Error','Service '+ $scope.metadata.name +' creation failed'); }
+                function() { Growl('error','Error','Service '+ $scope.metadata.name +' creation failed'); }
             );
         };
     }]);
 
-cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', 'provider', 'sos', '$growl', '$location',
-    function ($scope, $routeParams , webService, provider, sos, $growl, $location) {
+cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', 'provider', 'sos', 'Growl', '$location',
+    function ($scope, $routeParams , webService, provider, sos, Growl, $location) {
         $scope.type = $routeParams.type;
         $scope.id = $routeParams.id;
 //        $scope.db = {
@@ -333,14 +333,14 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
             }
 
             webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
-                $growl('success','Success','Service '+ $scope.id +' successfully updated');
+                Growl('success','Success','Service '+ $scope.id +' successfully updated');
                 if ($scope.type.toLowerCase() === 'sos') {
                     createOmProvider();
                     buildOmDatasource();
                 }
                 $location.path('/webservice');
             }, function() {
-                $growl('error','Error','Service configuration update error');
+                Growl('error','Error','Service configuration update error');
             });
         };
 
@@ -359,20 +359,20 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
                     sgbdtype: 'postgres'
                 }
             }, function() {}, function() {
-                $growl('error','Error','Unable to create OM2 provider');
+                Growl('error','Error','Unable to create OM2 provider');
             });
         }
         function buildOmDatasource() {
             sos.build({
                 id: $scope.id
             }, function() {}, function() {
-                $growl('error','Error','Unable to build OM2 datasource');
+                Growl('error','Error','Unable to build OM2 datasource');
             });
         }
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', '$growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies','$translate',
-    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, $growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate) {
+cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', 'Growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies','$translate',
+    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate) {
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -402,7 +402,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                         $scope.domains[i].linked = !$scope.domains[i].linked;
                         $scope.domains[i].linked = false;
                     }, function (response) {
-                        $growl('error', 'error', response.data.message);
+                        Growl('error', 'error', response.data.message);
                         webService.domains({id: service.id}, function (domains) {
                             $scope.domains = domains;
                         })
@@ -463,7 +463,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
 
                         dataListing.dataForMetadata({}, mdIds,
                             function(response) { $scope.relatedDatas = response; },
-                            function() { $growl('error','Error','Unable to get related data for metadata'); }
+                            function() { Growl('error','Error','Unable to get related data for metadata'); }
                         );
                     });
                 });
@@ -472,7 +472,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                     $dashboard($scope, sensors.children, false);
                     $scope.layers = sensors.children;
 
-                }, function() { $growl('error','Error','Unable to list sensors'); });
+                }, function() { Growl('error','Error','Unable to list sensors'); });
             } else {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
                 $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
@@ -565,13 +565,13 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
             webService.updateMd({type: $scope.service.type, id: $scope.service.identifier},$scope.metadata,
                 function(response) {
                     if (response.status==="Success") {
-                        $growl('success','Success','Service description successfully updated');
+                        Growl('success','Success','Service description successfully updated');
                     }else{
-                        $growl('error','Error','Service description update failed due to :'+response.status);
+                        Growl('error','Error','Service description update failed due to :'+response.status);
                     }
                 },
                 function() {
-                    $growl('error','Error','Service description update failed');
+                    Growl('error','Error','Service description update failed');
                 }
             )
         };
@@ -623,8 +623,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
 
         $scope.reload = function(service){
             webService.restart({type: service.type, id: service.identifier}, {value: true},
-                function() { $growl('success','Success','Service '+ service.name +' successfully reloaded'); },
-                function() { $growl('error','Error','Service '+ service.name +' reload failed'); }
+                function() { Growl('success','Success','Service '+ service.name +' successfully reloaded'); },
+                function() { Growl('error','Error','Service '+ service.name +' reload failed'); }
             );
         };
 
@@ -634,16 +634,16 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                 webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.service.status = "NOT_STARTED";
-                        $growl('success','Success','Service '+ service.name +' successfully stopped');
+                        Growl('success','Success','Service '+ service.name +' successfully stopped');
                     }
-                }, function() { $growl('error','Error','Service '+ service.name +' stop failed'); });
+                }, function() { Growl('error','Error','Service '+ service.name +' stop failed'); });
             }else{
                 webService.start({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.service.status = "STARTED";
-                        $growl('success','Success','Service '+ service.name +' successfully started');
+                        Growl('success','Success','Service '+ service.name +' successfully started');
                     }
-                }, function() { $growl('error','Error','Service '+ service.name +' start failed'); });
+                }, function() { Growl('error','Error','Service '+ service.name +' start failed'); });
             }
         };
 
@@ -675,10 +675,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                 if ($scope.service.type.toLowerCase() === 'sos') {
                     var idToDel = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
                     sos.removeSensor({id: $scope.service.identifier, sensor: idToDel}, function() {
-                        $growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed from service ' + $scope.service.name);
+                        Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed from service ' + $scope.service.name);
                         $scope.initScope();
                     },function () {
-                        $growl('error', 'Error', 'Unable to remove sensor ' + idToDel + ' from service ' + $scope.service.name);
+                        Growl('error', 'Error', 'Unable to remove sensor ' + idToDel + ' from service ' + $scope.service.name);
                     });
                 } else {
                     webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name}, {value: $scope.selected.Namespace},
@@ -687,13 +687,13 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                                 $scope.deleteTiledData($scope.service, $scope.selected.Name, $scope.selected.Provider);
                             }
 
-                            $growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully deleted from service ' + $scope.service.name);
+                            Growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully deleted from service ' + $scope.service.name);
                             $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
                                 $scope.fullList = response;
                             });
                         },
                         function () {
-                            $growl('error', 'Error', 'Layer ' + $scope.selected.Name + ' failed to be deleted from service ' + $scope.service.name);
+                            Growl('error', 'Error', 'Layer ' + $scope.selected.Name + ' failed to be deleted from service ' + $scope.service.name);
                         }
                     );
                 }
@@ -703,7 +703,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         $scope.deleteTiledData = function(service, layerName, providerId) {
             dataListing.deletePyramidFolder({providerId: providerId}, function() {
                 provider.delete({id: providerId}, function() {}, function() {
-                    $growl('error','Error','Unable to delete data for layer '+ layerName);
+                    Growl('error','Error','Unable to delete data for layer '+ layerName);
                 });
             });
         };
@@ -712,14 +712,14 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
             if ($scope.selected != null && confirm("Are you sure?")) {
                 csw.delete({id: $scope.service.identifier, metaId: $scope.selected.identifier}, {},
                     function() {
-                        $growl('success','Success','Metadata deleted');
+                        Growl('success','Success','Metadata deleted');
                         csw.count({id: $routeParams.id}, {}, function(max) {
                             csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
                                 $dashboard($scope, response.BriefNode, false);
                                 $scope.filtertype = "";
                             });
                         });
-                    }, function() { $growl('error','Error','Failed to delete metadata'); }
+                    }, function() { Growl('error','Error','Failed to delete metadata'); }
                 );
             }
         };

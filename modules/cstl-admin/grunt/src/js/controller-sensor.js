@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'sensor', '$modal', '$growl',
-    function ($scope, $dashboard, webService, sensor, $modal, $growl){
+cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'sensor', '$modal', 'Growl',
+    function ($scope, $dashboard, webService, sensor, $modal, Growl){
         $scope.init = function() {
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
@@ -65,10 +65,10 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
             if (confirm("Are you sure?")) {
                 var idToDel = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
                 sensor.delete({sensor: idToDel}, function () {
-                    $growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed');
+                    Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed');
                     $scope.init();
                 }, function () {
-                    $growl('error', 'Error', 'Unable to remove sensor ' + idToDel);
+                    Growl('error', 'Error', 'Unable to remove sensor ' + idToDel);
                 });
             }
         };
@@ -126,8 +126,8 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
         };
     }]);
 
-cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance', 'sensor', '$growl', '$cookies',
-    function ($scope, $modalInstance, sensor, $growl, $cookies) {
+cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance', 'sensor', 'Growl', '$cookies',
+    function ($scope, $modalInstance, sensor, Growl, $cookies) {
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
@@ -146,19 +146,19 @@ cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance',
                 contentType: false,
                 processData: false,
                 success: function (data) {
-                    $growl('success','Success','Sensor correctly imported');
+                    Growl('success','Success','Sensor correctly imported');
                     $modalInstance.close();
                 },
                 error: function (data){
-                    $growl('error','Error','Unable to import sensor');
+                    Growl('error','Error','Unable to import sensor');
                     $modalInstance.dismiss('close');
                 }
             });
         };
     }]);
 
-cstlAdminApp.controller('SensorModalChooseController', ['$scope', '$modalInstance', '$dashboard', 'dataListing', 'sensor', 'selectedData', '$growl',
-    function ($scope, $modalInstance, $dashboard, dataListing, sensor, selectedData, $growl){
+cstlAdminApp.controller('SensorModalChooseController', ['$scope', '$modalInstance', '$dashboard', 'dataListing', 'sensor', 'selectedData', 'Growl',
+    function ($scope, $modalInstance, $dashboard, dataListing, sensor, selectedData, Growl){
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
@@ -197,8 +197,8 @@ cstlAdminApp.controller('SensorModalChooseController', ['$scope', '$modalInstanc
         };
     }]);
 
-cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$modal', '$cookies', 'sos', 'service', 'sensorId', '$growl', '$http',
-    function ($scope, $modalInstance, $modal, $cookies, sos, service, sensorId, $growl, $http) {
+cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$modal', '$cookies', 'sos', 'service', 'sensorId', 'Growl', '$http',
+    function ($scope, $modalInstance, $modal, $cookies, sos, service, sensorId, Growl, $http) {
         $scope.service = service;
         $scope.sensorId = sensorId;
         $scope.measures = undefined;
@@ -229,7 +229,7 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
                     }
                     $scope.measures[i] = {id: newMeasureId, checked:check};
                 }
-            }, function() { $growl('error','Error','Unable to list measures for sensor '+ sensorId); });
+            }, function() { Growl('error','Error','Unable to list measures for sensor '+ sensorId); });
         };
 
         $scope.initMap = function() {

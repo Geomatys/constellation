@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl', '$modal', '$cookies', 'mapcontext',
-    function ($scope, $dashboard, $growl, $modal, $cookies, mapcontext){
+cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'Growl', '$modal', '$cookies', 'mapcontext',
+    function ($scope, $dashboard, Growl, $modal, $cookies, mapcontext){
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.domainId = $cookies.cstlActiveDomainId;
         $scope.cstlSessionId = $cookies.cstlSessionId;
@@ -71,10 +71,10 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
             if (confirm("Are you sure?")) {
                 var ctxtName = $scope.selected.name;
                 mapcontext.delete({id: $scope.selected.id}, function () {
-                    $growl('success', 'Success', 'Map context ' + ctxtName + ' successfully removed');
+                    Growl('success', 'Success', 'Map context ' + ctxtName + ' successfully removed');
                     $scope.init();
                 }, function () {
-                    $growl('error', 'Error', 'Unable to remove map context ' + ctxtName);
+                    Growl('error', 'Error', 'Unable to remove map context ' + ctxtName);
                 });
             }
         };
@@ -161,8 +161,8 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         };
     }]);
 
-cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies', '$modal',
-    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies, $modal) {
+cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', 'Growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies', '$modal',
+    function ($scope, $modalInstance, mapcontext, webService, style, Growl, $translate, ctxtToEdit, layersForCtxt, $cookies, $modal) {
         // item to save in the end
         $scope.ctxt = {};
         // defines if we are in adding or edition mode
@@ -272,7 +272,7 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             if ($scope.mode.display==='general') {
                 if ($scope.ctxt.name == undefined || $scope.ctxt.name == null || $scope.ctxt.name === '') {
                     $scope.mode.errorNoGivenName = true;
-                    $growl('error', 'Error', 'Name should be filled');
+                    Growl('error', 'Error', 'Name should be filled');
                     return;
                 }
 
@@ -291,14 +291,14 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                     mapcontext.add({}, $scope.ctxt, function (ctxtCreated) {
                         handleLayersForContext(ctxtCreated);
                     }, function () {
-                        $growl('error', 'Error', 'Unable to create map context');
+                        Growl('error', 'Error', 'Unable to create map context');
                         $modalInstance.dismiss('close');
                     });
                 } else {
                     mapcontext.update({}, $scope.ctxt, function (ctxtUpdated) {
                         handleLayersForContext(ctxtUpdated);
                     }, function () {
-                        $growl('error', 'Error', 'Unable to update map context');
+                        Growl('error', 'Error', 'Unable to update map context');
                         $modalInstance.dismiss('close');
                     });
                 }
@@ -407,10 +407,10 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             fillLayersToSend(ctxt);
 
             mapcontext.setLayers({id: ctxt.id}, $scope.layers.toSend, function () {
-                $growl('success', 'Success', 'Map context created');
+                Growl('success', 'Success', 'Map context created');
                 $modalInstance.close();
             }, function () {
-                $growl('error', 'Error', 'Unable to add layers to map context');
+                Growl('error', 'Error', 'Unable to add layers to map context');
                 $modalInstance.dismiss('close');
             });
         }
@@ -633,7 +633,7 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                         $scope.mode.dispWmsLayers = true;
                     }, function() {
                         modalLoader.close();
-                        $growl('error', 'Error', 'Unable to find layers for this url');
+                        Growl('error', 'Error', 'Unable to find layers for this url');
                     });
                 });
             }

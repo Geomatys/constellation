@@ -18,8 +18,8 @@
 /**
  * Controller for dashboard of styles.
  */
-cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl', 'StyleSharedService', '$modal',
-    function($scope, $dashboard, style, $growl, StyleSharedService, $modal) {
+cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', 'Growl', 'StyleSharedService', '$modal',
+    function($scope, $dashboard, style, Growl, StyleSharedService, $modal) {
         $scope.init = function() {
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
@@ -49,13 +49,13 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
                 var providerId = $scope.selected.Provider;
                 style.delete({provider: providerId, name: styleName}, {},
                         function() {
-                            $growl('success', 'Success', 'Style ' + styleName + ' successfully deleted');
+                            Growl('success', 'Success', 'Style ' + styleName + ' successfully deleted');
                             style.listAll({provider: 'sld'}, function(response) {
                                 $scope.fullList = response.styles;
                             });
                         },
                         function() {
-                            $growl('error', 'Error', 'Style ' + styleName + ' deletion failed');
+                            Growl('error', 'Error', 'Style ' + styleName + ' deletion failed');
                         });
             }
         };
@@ -130,8 +130,8 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
 /**
  * Controller for modal popup SLD-Editor used in dashboards styles, services and data layers.
  */
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', '$cookies', 'dataListing', 'provider', '$growl', 'textService', 'newStyle', 'selectedLayer','selectedStyle', 'serviceName', 'exclude','$timeout',
-    function($scope, $dashboard, $modalInstance, style, $cookies, dataListing, provider, $growl, textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', '$cookies', 'dataListing', 'provider', 'Growl', 'textService', 'newStyle', 'selectedLayer','selectedStyle', 'serviceName', 'exclude','$timeout',
+    function($scope, $dashboard, $modalInstance, style, $cookies, dataListing, provider, Growl, textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout) {
         $scope.xmlStyle = '<xml></xml>';
         $scope.exclude = exclude;
 
@@ -1357,7 +1357,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         }
                     },
                     function() {
-                        $growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
+                        Growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
                     }
                 );
             }
@@ -1424,7 +1424,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             callback();
                         }
                     }, function() {
-                        $growl('error', 'Error', 'Unable to get data description');
+                        Growl('error', 'Error', 'Unable to get data description');
                     }
                 );
             }
@@ -1444,10 +1444,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             alert("ace=" + $scope.aceEditor.getValue());
             textService.createStyleXml('sld', $scope.aceEditor.getValue());
 //                , function() {
-//                $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+//                Growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
 //                $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
 //            }, function() {
-//                $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
+//                Growl('error','Error','Unable to create style '+ $scope.newStyle.name);
 //                $modalInstance.close();
 //            });
         };
@@ -1730,7 +1730,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                 }
                             },
                             function() {
-                                $growl('error', 'Error', 'Unable to get palette for '+$scope.layerName);
+                                Growl('error', 'Error', 'Unable to get palette for '+$scope.layerName);
                             }
                         );
 
@@ -1998,10 +1998,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          */
         $scope.updateStyle = function() {
             style.updatejson({provider: 'sld', name: $scope.selectedStyle.Name}, $scope.newStyle, function() {
-                $growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully updated');
+                Growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully updated');
                 $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
             }, function() {
-                $growl('error', 'Error', 'Unable to update style ' + $scope.newStyle.name);
+                Growl('error', 'Error', 'Unable to update style ' + $scope.newStyle.name);
                 $modalInstance.close();
             });
         };
@@ -2015,10 +2015,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             } else {
                 //write style in server side.
                 style.createjson({provider: 'sld'}, $scope.newStyle, function(response) {
-                    $growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully created');
+                    Growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully created');
                     $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
                 }, function() {
-                    $growl('error', 'Error', 'Unable to create style ' + $scope.newStyle.name);
+                    Growl('error', 'Error', 'Unable to create style ' + $scope.newStyle.name);
                     $modalInstance.close();
                 });
             }
@@ -2285,7 +2285,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         }
                     },
                     function(){
-                        $growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
+                        Growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
                     }
                 );
             }

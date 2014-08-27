@@ -297,8 +297,8 @@ cstlAdminApp.factory('TaskService', ['$resource',
         });
     }]);
 
-cstlAdminApp.factory('textService', ['$http', '$growl',
-    function ($http, $growl){
+cstlAdminApp.factory('textService', ['$http', 'Growl',
+    function ($http, Growl){
         return {
             logs : function(type, id){
                 return $http.get('@cstl/api/1/log/'+type+'/'+id+';jsessionid=');
@@ -329,7 +329,7 @@ cstlAdminApp.factory('textService', ['$http', '$growl',
                     headers: {'Accept': 'application/xml'}
                 });
                 promise.error(function(errorMsg) {
-                    $growl('warning', 'Warning', 'No metadata found for data '+ data);
+                    Growl('warning', 'Warning', 'No metadata found for data '+ data);
                 });
                 return promise;
             },
@@ -340,7 +340,7 @@ cstlAdminApp.factory('textService', ['$http', '$growl',
                     headers: {'Accept': 'application/json'}
                 });
                 promise.error(function(errorMsg) {
-                    $growl('warning', 'Warning', 'Error while retrieving json metadata for data '+ data);
+                    Growl('warning', 'Warning', 'Error while retrieving json metadata for data '+ data);
                 });
                 return promise;
             },
@@ -351,15 +351,15 @@ cstlAdminApp.factory('textService', ['$http', '$growl',
                     headers: {'Accept': 'application/xml'}
                 });
                 promise.error(function(errorMsg) {
-                    $growl('warning', 'Warning', 'No sensorML found for sensor '+ sensor);
+                    Growl('warning', 'Warning', 'No sensorML found for sensor '+ sensor);
                 });
                 return promise;
             }
         };
     }]);
 
-cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$growl',
-    function ($modal, style, webService, $growl) {
+cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', 'Growl',
+    function ($modal, style, webService, Growl) {
         return {
             showStyleList : function($scope) {
                 var modal = $modal.open({
@@ -388,8 +388,8 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                                 {values: {layerId: $scope.selected.Name, spId: 'sld', styleName: item.Name}},
                                 function() {
                                     $scope.selected.TargetStyle.push(item);
-                                    $growl('success','Success','Style updated for layer '+ $scope.selected.Name);
-                                }, function() { $growl('error','Error','Unable to update style for layer '+ $scope.selected.Name); }
+                                    Growl('success','Success','Style updated for layer '+ $scope.selected.Name);
+                                }, function() { Growl('error','Error','Unable to update style for layer '+ $scope.selected.Name); }
                             );
                         } else {
                             style.link({
@@ -421,7 +421,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                                     break;
                                 }
                             }
-                        }, function() { $growl('error','Error','Unable to update style for layer '+ $scope.selected.Name); }
+                        }, function() { Growl('error','Error','Unable to update style for layer '+ $scope.selected.Name); }
                     );
                 } else {
                     var res = style.unlink({provider: providerName, name: styleName},

@@ -27,8 +27,8 @@ cstlAdminApp.controller('HeaderController', ['$scope','$http',
 	      });
 }]);
 
-cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource', 'GeneralService', 'TaskService',
-    function ($scope, $location, webService, dataListing, Process, $growl, UserResource, GeneralService, task) {
+cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','Growl', 'UserResource', 'GeneralService', 'TaskService',
+    function ($scope, $location, webService, dataListing, Process, Growl, UserResource, GeneralService, task) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
                 var count = 0;
@@ -40,7 +40,7 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
                 $scope.nbservices = count;
             }, function() {
                 $scope.nbservices = 0;
-                $growl('error', 'Error', 'Unable to count services');
+                Growl('error', 'Error', 'Unable to count services');
             });
 
 
@@ -48,21 +48,21 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
                 $scope.nbdata = response.length;
             }, function() {
                 $scope.nbdata = 0;
-                $growl('error', 'Error', 'Unable to count data');
+                Growl('error', 'Error', 'Unable to count data');
             });
 
             task.listTasks({}, function(taskList) {
                 $scope.nbprocess = Object.keys(taskList).length;
             }, function() {
                 $scope.nbprocess = 0;
-                $growl('error', 'Error', 'Unable to count process');
+                Growl('error', 'Error', 'Unable to count process');
             });
 
             GeneralService.counts().success(function(response) {
                 $scope.nbusers = response.nbuser;
             }).error(function() {
                 $scope.nbusers = 1;
-                $growl('error', 'Error', 'Unable to count users');
+                Growl('error', 'Error', 'Unable to count users');
             });
         };
     }]);
