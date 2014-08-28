@@ -4,20 +4,8 @@
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title" translate="service.edit.dashboard.action.add.data">Add data</h4>
         </div>
-        <div class="modal-body" style="height: 575px;overflow-y: auto;">
-            <div ng-show="service.type.toLowerCase() === 'wms'">
-                <div class="form-group">
-                    <span class="control-label" for="conformPyramid" translate="data.modal.choose.pyramid.conform">Generate a pyramid on data</span>
-                    <input type="checkbox" class="inline" ng-model="$parent.conformPyramid" id="conformPyramid"/>
-                </div>
-            </div>
+        <div class="modal-body modal-body-list-data" style="height: 575px;overflow-y: auto;">
             <div class="dashboard" ng-hide="wmtsParams">
-                <div class="navbar title">
-                    <div class="navbar-inner">
-                        <div class="brand" translate="service.edit.dashboard.data.title">Data List</div>
-
-                    </div>
-                </div>
                 <div class="navbar sort-navbar">
                     <div class="navbar-inner">
                         <ul class="nav nav-style">
@@ -50,19 +38,34 @@
                 <div class="dash-inner row dashboard" ng-init="init()">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-data">
-                            <strong><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
 
-                            <input type="checkbox" ng-model="dataSelect.all" id="selectAll" ng-change="selectAllData()"/>
-                            <span translate="label.select.all">Select all</span>
+                            <strong class="col-xs-9">
+                                <span class="nb-results pull-left">{{countdata}}&nbsp;</span>
+                                <span class="nb-results" translate="label.count.data">available data</span>
+                            </strong>
 
-                            <select class="nb-per-page input-small form-control pull-right" ng-model="$parent.nbbypage">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                            <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
+                            <div class="pull-right col-xs-3" style="padding-right:0;">
+                                <input type="checkbox" ng-model="dataSelect.all" id="selectAll" ng-change="selectAllData()"/>
+                                <span translate="label.select.all">Select all</span>
+                            </div>
+
+                            <div class="row" style="margin-left: 0; margin-right: 0;">
+                                <div class="col-sm-9" style="padding-left:15px; margin-top: 5px;"
+                                     page-switcher="{page:currentpage,size:nbbypage,count:countdata}"
+                                     on-select-page="displayPage(page)"></div>
+                                <select class="nb-per-page input-small form-control pull-right col-xs-2 "
+                                        style="padding-left: 5px;padding-right: 5px; margin-right: 15px; margin-top: 5px;"
+                                        ng-model="$parent.nbbypage">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+
+
+
                         </div>
                         <div class="item-list">
                             <div ng-if="service.type.toLowerCase() !== 'sos'">
@@ -157,8 +160,14 @@
                     <input type="text" class="form-control" ng-model="$parent.upperCornerY" id="upperCornerY" placeholder="{{'data.modal.choose.uppercornery.placeholder' | translate}}"/>
                 </div>
             </div>
+
+        </div><div ng-show="service.type.toLowerCase() === 'wms'">
+        <div class="form-group" style="padding: 10px 0 10px 10px; margin-bottom: 0; background-color: #E9E9E9;">
+            <span class="control-label" for="conformPyramid" translate="data.modal.choose.pyramid.conform">Generate a pyramid on data</span>
+            <input type="checkbox" class="inline" ng-model="$parent.conformPyramid" id="conformPyramid"/>
         </div>
-        <div class="modal-footer">
+    </div>
+        <div class="modal-footer modal-footer-list-data">
             <button type="button" class="btn btn-default" ng-click="close()" translate="label.close">Close</button>
             <button type="button" class="btn btn-add" ng-click="choose()" translate="data.modal.choose">Choose</button>
         </div>

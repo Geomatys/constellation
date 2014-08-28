@@ -144,6 +144,10 @@
     "data.modal.import.server.label.list": "Lister les fichiers",
     "data.modal.import.metadata.info":"S'il n'y a pas de fichier de métadonnées existantes, le système va vous permettre d'entrer vos métadonnées plus tard.",
 
+    "data.dashboard.tab.data":"Données",
+    "data.dashboard.tab.metadata":"Métadonnées",
+    "data.dashboard.metadata.title":"Métadonnées disponibles",
+
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",
 
@@ -247,7 +251,7 @@
     "global.menu.admin.system_state":"État des services",
     "global.menu.admin.tasks":"Gestionnaire des tâches",
     "global.menu.admin.users": "Gestion des utilisateurs",
-    "global.menu.data": "Données",
+    "global.menu.data": "Méta/Données",
     "global.menu.sensor": "Capteurs",
     "global.menu.home": "Accueil",
     "global.menu.language": "Langue",
@@ -409,8 +413,9 @@
     "label.color.model":"Modèle de couleur",
     "label.search.advanced.show":"Afficher la recherche avancée",
     "label.search.advanced.hide":"Cacher la recherche avancée",
+    "label.search.refresh":"Réinitialiser les filtres",
     "label.create.account":"Créer le compte",
-
+    "label.display":"Affichage :",
 
     "layer.listing.data.add.button.label": "Ajouter une donnée",
     "layer.listing.data.create.button.label": "Créer une donnée",
@@ -852,7 +857,7 @@
     "webservicepage.title": "Services disponibles",
 
     "page.header.title.webservices":"Gestion des services",
-    "page.header.title.data":"Gestion des données",
+    "page.header.title.data":"Gestion des données et des métadonnées",
     "page.header.title.style":"Gestion des styles",
     "page.header.title.contact": "Contact",
     "page.header.title.create.service":"Nouveau service",
