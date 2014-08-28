@@ -372,6 +372,7 @@
     "label.search.refresh":"Refresh filters",
     "label.create.account":"Create account",
     "label.display":"Display :",
+    "label.service.url": "Service URL",
 
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
@@ -650,6 +651,7 @@
     "service.edit.dashboard.date.from":"From",
     "service.edit.dashboard.button.graph.hide":"Hide graph",
     "service.edit.dashboard.button.graph.show":"Show graph",
+    "service.id.label":"Service identifier",
     "service.menu.delete.label": "Delete service",
     "service.menu.edit.label": "Edit",
     "service.menu.getcapabilities.label": "GetCapabilities",

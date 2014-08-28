@@ -239,21 +239,24 @@ h3.service-name{
 .service-item .well.started {
     border-left: #62c462 20px solid;
     min-height: 180px;
-    padding-top:15px;
+    padding-top:10px;
     padding-right: 10px;
 }
 .service-item .well.stopped {
     border-left: #ee5f5b 20px solid;
     min-height: 180px;
-    padding-top:15px;
+    padding-top:10px;
     padding-right: 10px;
 }
 .service-item .well.not-started {
     border-left: #777777 20px solid;
     min-height: 180px;
-    padding-top:15px;
+    padding-top:10px;
     padding-right: 10px;
 }
+.service-published-data-nb{
+   color:#777777;
+ }
 .service-item .btn.dropdown-toggle {
 
 }
@@ -456,6 +459,17 @@ p.error-select-one{
 }
 .form_service_md .control-group{
     margin-bottom: 10px;
+}
+
+/*service description*/
+.service-description {
+  overflow: hidden;
+  height: 34px;
+  text-overflow:ellipsis;
+  display: block; /* Fallback for non-webkit */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /*service type image*/
@@ -1647,10 +1661,6 @@ h3.popover-title {
   .accueil_text_welcome h2{
     font-size: 35px;
   }
-  /* service */
-  .service-button{
-    margin-bottom: 10px;
-  }
   .dashboard .searchbox {
     width: 130px;
   }
@@ -1720,6 +1730,11 @@ h3.popover-title {
     height: 30px;
     width: 170px;
   }
+  /*service edit*/
+  .service-link{
+    width:500px;
+  }
+
 }
 
 
@@ -1767,6 +1782,10 @@ h3.popover-title {
   .buttons-div{
     padding: 0;
     width: 394px;
+  }
+  /*service edit*/
+  .service-link{
+    width:500px;
   }
 }
 

@@ -47,12 +47,18 @@
 
             <div class="row bg-white dash-inner" style="padding: 20px 15px;" id="list-services">
                 <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter">
-                    <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info service-name">{{service.identifier}} : {{service.name}} </h3></a>
-                    <div class="well" ng-class="{'started':service.status=='STARTED','stopped':service.status=='ERROR','not-started':service.status=='STOPPED', 'serviceTypeCSW':service.type=='csw', 'serviceTypeWMS':service.type=='wms', 'serviceTypeWMTS':service.type=='wmts', 'serviceTypeSOS':service.type=='sos', 'serviceTypeWPS':service.type=='wps', 'serviceTypeWFS':service.type=='wfs', 'serviceTypeWCS':service.type=='wcs'}" data-state="wms-test">
+                    <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info service-name">{{service.name}} </h3></a>
+                    <div class="well" style="padding-bottom: 0;" ng-class="{'started':service.status=='STARTED','stopped':service.status=='ERROR','not-started':service.status=='STOPPED', 'serviceTypeCSW':service.type=='csw', 'serviceTypeWMS':service.type=='wms', 'serviceTypeWMTS':service.type=='wmts', 'serviceTypeSOS':service.type=='sos', 'serviceTypeWPS':service.type=='wps', 'serviceTypeWFS':service.type=='wfs', 'serviceTypeWCS':service.type=='wcs'}" data-state="wms-test">
                         <div class="row service-button">
-                            <div class="col-sm-7 col-sm-offset-5 col-md-5 col-md-offset-7 col-lg-4 col-lg-offset-8">
-                                <div class="dropdown pull-left">
-                                    <a data-toggle="dropdown" class="btn btn-default dropdown-toggle">
+                            <div class="pull-right col-xs-12">
+                                <a style="margin-left: 5px;" class="btn btn-sm btn-default pull-right" ng-class="{'started':service.status=='STARTED','stopped':service.status!='STARTED'}" ng-click="startOrStop(service)">
+                                    <i class="fa" ng-class="{'fa-play':service.status!='STARTED','fa-stop':service.status=='STARTED'}"></i>
+                                </a>
+                                <a style="margin-left: 5px;" class="btn btn-default pull-right btn-sm btn-add" ng-click="reload(service)">
+                                    <i class="fa fa-refresh"></i>
+                                </a>
+                                <div style="margin-left: 15px;" class="dropdown pull-right">
+                                    <a data-toggle="dropdown" class="btn btn-sm btn-default dropdown-toggle">
                                         <i class="fa fa-wrench"></i>
                                         <span class="caret"></span>
                                     </a>
@@ -64,22 +70,25 @@
                                         <li ng-if="service.type.toLowerCase() === 'csw'"><a ng-click="refreshIndex(service)" translate="service.menu.refresh.label">Refresh</a></li>
                                     </ul>
                                 </div>
-                                <a style="margin-left: 5px;" class="btn btn-default btn-add" ng-click="reload(service)">
-                                    <i class="fa fa-refresh"></i>
-                                </a>
-                                <a class="btn btn-default" ng-class="{'started':service.status=='STARTED','stopped':service.status!='STARTED'}" ng-click="startOrStop(service)">
-                                    <i class="fa" ng-class="{'fa-play':service.status!='STARTED','fa-stop':service.status=='STARTED'}"></i>
-                                </a>
+                                <div class="pull-right service-published-data-nb" style="padding-top:2px;">
+                                    <p tooltip-html-unsafe="{{'service.data.label' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()!=='sos'" ><span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{getLayersCount(service)}}</p>
+                                    <p tooltip-html-unsafe="{{'service.data.label.sos' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()==='sos'" ><span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{getLayersCount(service)}}</p>
+                                </div>
                             </div>
+
                         </div>
-                        <div class="row">
-                            <div class="col-sm-8">
-                                <p><strong><span translate="service.abstract.label">Service description</span></strong></p>
-                                <p ng-if="service._abstract != null && service._abstract !==''">{{service._abstract}}</p>
-                                <p ng-if="service._abstract == null || service._abstract ===''"> - </p>
+                        <div class="row" style="height: 120px;">
+                            <div class="col-sm-12">
+                                <p style="margin-bottom: 5px;"><strong><span translate="service.id.label">Service identifiant</span></strong></p>
+                                <p style="margin-bottom: 15px;">{{service.identifier}}</p>
+                                <p style="margin-bottom: 5px;"><strong><span translate="service.abstract.label">Service description</span></strong></p>
+                                <p class="service-description" ng-if="service._abstract != null && service._abstract !==''" title="{{service._abstract}}" >{{service._abstract}}</p>
+                                <p class="service-description" ng-if="service._abstract == null || service._abstract ===''"> - </p>
+                                <!--
                                 <p><strong><span ng-if="service.type.toLocaleLowerCase()!=='sos'" translate="service.data.label">Published data on service</span></strong></p>
                                 <p><strong><span ng-if="service.type.toLocaleLowerCase()==='sos'" translate="service.data.label.sos">Available sensors on service</span></strong></p>
                                 <p>{{getLayersCount(service)}}</p>
+                                -->
                             </div>
                         </div>
                     </div>
