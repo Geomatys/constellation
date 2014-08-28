@@ -197,7 +197,7 @@
             <gmd:distributionFormat>
                 <gmd:MD_Format>
                     <gmd:name>
-                        <gco:CharacterString>${param.distributionFormat}</gco:CharacterString>
+                        <gco:CharacterString>${param.distributionFormat != null ? param.distributionFormat : ""}</gco:CharacterString>
                     </gmd:name>
                     <gmd:version></gmd:version>
                 </gmd:MD_Format>
