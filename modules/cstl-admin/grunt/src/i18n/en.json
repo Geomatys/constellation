@@ -544,6 +544,13 @@
     "metadata.edition.dataset.vector":"Vector dataset INSPIRE",
     "metadata.edition.dataset.raster":"Raster dataset INSPIRE",
     "metadata.edition.heading.save":"Save modifications",
+    "metadata.edition.heading.requiredFields":"(*) Required field",
+    "metadata.edition.heading.scrolltotop":"Scroll to top",
+    "metadata.edition.validation.required":"This field is required",
+    "metadata.edition.validation.url":"Invalid URL format",
+    "metadata.edition.validation.email":"Invalid E-mail format",
+    "metadata.edition.validation.integer":"Invalid integer value",
+    "metadata.edition.validation.decimal":"Invalid decimal value",
 
 
     "msg.add.data.style.association": "Associate a style to the selected data",

@@ -619,6 +619,13 @@
     "metadata.edition.dataset.vector":"Données vecteur INSPIRE",
     "metadata.edition.dataset.raster":"Données raster INSPIRE",
     "metadata.edition.heading.save":"Enregistrer les modifications",
+    "metadata.edition.heading.requiredFields":"(*) Champ obligatoire",
+    "metadata.edition.heading.scrolltotop":"Retour en haut de page",
+    "metadata.edition.validation.required":"Ce champ est obligatoire",
+    "metadata.edition.validation.url":"Format URL invalide ",
+    "metadata.edition.validation.email":"Format E-mail invalide",
+    "metadata.edition.validation.integer":"Nombre entier invalide",
+    "metadata.edition.validation.decimal":"Nombre décimal invalide",
 
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",
