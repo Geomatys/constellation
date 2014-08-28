@@ -24,7 +24,7 @@
             </ul>
             <div style="margin-top:20px;">
                 <div class="tab-pane active">
-                    <form class="form-horizontal" role="form">
+                    <form class="form-horizontal" name="metadataform" role="form">
                         <div class="row alert alert-csw" style="margin: 0;">
                             <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                                 <h4 style="font-weight:bold">
@@ -51,27 +51,27 @@
                         <div class="row" style="margin: 0;">
                             <div id="editorMetadata" ng-init="initMetadataEditorEvents()">
                                 <script type="text/ng-template"  id="node_edition_renderer.html">
-                                    <div ng-if="jsonObjectRoot.root && jsonObjectSuperBlock == null && jsonObjectBlock == null && jsonObjectField == null">
-                                        <div ng-repeat="jsonObjectSuperBlock in jsonObjectRoot.root.content"
+                                    <div ng-if="rootObj.root && superblockObj == null && blockObj == null && fieldObj == null">
+                                        <div ng-repeat="superblockObj in rootObj.root.children"
                                              class="block-row"
                                              ng-include="'node_edition_renderer.html'">
                                         </div>
                                     </div>
-                                    <div ng-if="jsonObjectSuperBlock.superblock && jsonObjectBlock == null && jsonObjectField == null">
+                                    <div ng-if="superblockObj.superblock && blockObj == null && fieldObj == null">
                                         <div class="row-fluid">
                                             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 small-block">
                                                 <h3 class="heading-block clickable">
-                                                    {{jsonObjectSuperBlock.superblock.name | translate}}
+                                                    {{superblockObj.superblock.name | translate}}
                                                     <i class="data-icon fa fa-angle-up"></i>
                                                 </h3>
-                                                <p>{{jsonObjectSuperBlock.superblock.help | translate}}</p>
+                                                <p>{{superblockObj.superblock.help | translate}}</p>
                                             </div>
                                             <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
                                                 <div class="collapse-block">
                                                     <div>
                                                         <div>
                                                             <div class="collapse-row-wrapper open"
-                                                                 ng-repeat="jsonObjectBlock in jsonObjectSuperBlock.superblock.content"
+                                                                 ng-repeat="blockObj in superblockObj.superblock.children"
                                                                  ng-include="'node_edition_renderer.html'">
                                                             </div>
                                                         </div>
@@ -80,12 +80,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div ng-if="jsonObjectBlock.block && jsonObjectField == null">
+                                    <div ng-if="blockObj.block && fieldObj == null">
                                         <div class="collapse-row-heading">
                                             <span class="data-icon fa fa-angle-up"></span>
-                                            <span class="text">{{jsonObjectBlock.block.name | translate}}</span>
-                                            <!--button ng-click="add(jsonObjectBlock.block)">Add node</button>
-                                            <button ng-click="delete(jsonObjectBlock.block)" ng-show="jsonObjectBlock.block.content.length > 0">Delete nodes</button-->
+                                            <span class="text">{{blockObj.block.name | translate}}</span>
+                                            <!--button ng-click="add(blockObj.block)">Add node</button>
+                                            <button ng-click="delete(blockObj.block)" ng-show="blockObj.block.children.length > 0">Delete nodes</button-->
                                         </div>
                                         <div class="collapse-row-inner">
                                             <div class="table-mimic">
@@ -93,9 +93,9 @@
                                                     <div class="table-cell">
                                                         <div class="fieldset">
                                                             <ul class="metadata-list"
-                                                                ng-repeat="jsonObjectChild in jsonObjectBlock.block.content">
-                                                                <ng-include ng-if="jsonObjectChild.block" src="'node_edition_renderer.html'" onLoad="jsonObjectBlock=jsonObjectChild"></ng-include>
-                                                                <ng-include ng-if="jsonObjectChild.field" src="'node_edition_renderer.html'" onLoad="jsonObjectField=jsonObjectChild"></ng-include>
+                                                                ng-repeat="jsonObjectChild in blockObj.block.children">
+                                                                <ng-include ng-if="jsonObjectChild.block" src="'node_edition_renderer.html'" onLoad="blockObj=jsonObjectChild"></ng-include>
+                                                                <ng-include ng-if="jsonObjectChild.field" src="'node_edition_renderer.html'" onLoad="fieldObj=jsonObjectChild"></ng-include>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -103,181 +103,235 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <li ng-if="jsonObjectField.field">
-                                        <!--span style="color:green">{{jsonObjectField.field.type}}</span-->
-                                        <label ng-if="jsonObjectField.field.type.indexOf('readonly') === -1"
-                                               class="label-data">{{jsonObjectField.field.name | translate}}
-                                            <span ng-if="jsonObjectField.field.obligation === 'M'" style="color:#db4747;">(*)</span>
+                                    <li ng-if="fieldObj.field">
+                                        <!--span style="color:green">{{fieldObj.field.render}}</span-->
+                                        <label ng-if="fieldObj.field.render.indexOf('readonly') === -1"
+                                               class="label-data">{{fieldObj.field.name | translate}}
+                                            <span ng-if="fieldObj.field.obligation === 'M'" style="color:#db4747;">(*)</span>
                                         </label>
-                                        <span ng-if="jsonObjectField.field.type.indexOf('readonly') !== -1"
-                                              class="label-data-readonly">{{jsonObjectField.field.name | translate}}</span>
-                                        <input ng-if="jsonObjectField.field.type === 'text'"
+                                        <span ng-if="fieldObj.field.render.indexOf('readonly') !== -1"
+                                              class="label-data-readonly">{{fieldObj.field.name | translate}}</span>
+                                        <input ng-if="fieldObj.field.render === 'text'"
                                                type="text"
                                                class="form-control form-control-fix"
-                                               placeholder="{{jsonObjectField.field.name | translate}}"
-                                               ng-model="jsonObjectField.field.value"/>
-                                        <textarea ng-if="jsonObjectField.field.type === 'textarea'"
+                                               placeholder="{{fieldObj.field.name | translate}}"
+                                               ng-model="fieldObj.field.value"
+                                               ng-required="fieldObj.field.obligation === 'M'"
+                                               ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                               dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
+                                        <textarea ng-if="fieldObj.field.render === 'textarea'"
                                                   class="form-control form-control-fix"
-                                                  ng-model="jsonObjectField.field.value"
+                                                  ng-model="fieldObj.field.value"
+                                                  ng-required="fieldObj.field.obligation === 'M'"
+                                                  ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                  dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"
                                                   rows="6"
                                                   cols="33"></textarea>
-                                        <div ng-if="jsonObjectField.field.type === 'DATE.text'"
+                                        <div ng-if="fieldObj.field.render === 'DATE.text'"
                                              class="col-xs-5 col-sm-5 col-md-5 col-lg-5 input-group date"
                                              style="padding-left:0;"
                                              datepicker="{language:getCurrentLang(),format:'yyyy-mm-dd '}">
                                             <input type="text"
                                                    class="form-control form-control-fix"
-                                                   ng-model="jsonObjectField.field.value"/>
+                                                   ng-model="fieldObj.field.value"
+                                                   ng-required="fieldObj.field.obligation === 'M'"
+                                                   ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                   dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
                                             <span class="input-group-addon">
                                                 <i class="glyphicon glyphicon-th"></i>
                                             </span>
                                         </div>
-                                        <input ng-if="jsonObjectField.field.type === 'codelist'"
-                                               type="text"
-                                               class="form-control form-control-fix"
-                                               placeholder="{{jsonObjectField.field.name | translate}}"
-                                               ng-model="jsonObjectField.field.value"/>
-                                        <select ng-if="jsonObjectField.field.type === 'DATE.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'DATE.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="(code | translate) for code in codeLists.dateTypeCodes | orderBy: 'toString() | translate'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'MaintenanceFrequency.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'MaintenanceFrequency.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="(code | translate) for code in codeLists.maintenanceFrequencyCodes | orderBy: 'toString() | translate'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'Language.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'Language.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="(code | translate) for code in codeLists.localeCodes | orderBy: 'toString() | translate'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <input ng-if="jsonObjectField.field.type === 'UPLOADIMAGE.text'"
+                                        <input ng-if="fieldObj.field.render === 'UPLOADIMAGE.text'"
                                                type="text"
                                                class="form-control form-control-fix"
-                                               placeholder="{{jsonObjectField.field.name | translate}}"
-                                               ng-model="jsonObjectField.field.value"/>
-                                        <select ng-if="jsonObjectField.field.type === 'INSPIRE_ISO.codelist'"
+                                               placeholder="{{fieldObj.field.name | translate}}"
+                                               ng-model="fieldObj.field.value"/>
+                                        <select ng-if="fieldObj.field.render === 'INSPIRE_ISO.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="('theme.inspire.'+theme | translate) for theme in predefinedValues.inspireThemes | orderBy: '\'theme.inspire.\'+toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;"
-                                                ng-change="updateIsoInspireSelectOneMenu(jsonObjectField.field.value,jsonObjectBlock.block)">
+                                                ng-change="updateIsoInspireSelectOneMenu(fieldObj.field.value,blockObj.block)"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'ISO_INSPIRE.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'ISO_INSPIRE.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="(code | translate) for code in codeLists.topicCategoryCodes | orderBy: 'toString() | translate'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'GeometricObjects.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'GeometricObjects.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="(code | translate) for code in codeLists.geometricObjectTypeCodes | orderBy: 'toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'ReferenceSystemIdentifier.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'ReferenceSystemIdentifier.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="code for code in predefinedValues.referenceSystemIdentifier | orderBy: 'toString()'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <div ng-if="jsonObjectField.field.type === 'KEYWORD.text'"
+                                        <div ng-if="fieldObj.field.render === 'KEYWORD.text'"
                                              class="col-xs-5 col-sm-5 col-md-5 col-lg-5"
                                              style="padding-left:0;">
                                             <input type="text"
                                                    class="form-control form-control-fix"
-                                                   placeholder="{{jsonObjectField.field.name | translate}}"
-                                                   ng-model="jsonObjectField.field.value"/>
+                                                   placeholder="{{fieldObj.field.name | translate}}"
+                                                   ng-model="fieldObj.field.value"/>
                                         </div>
-                                        <select ng-if="jsonObjectField.field.type === 'DistributionFormat.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'DistributionFormat.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="format for format in predefinedValues.distributionFormat | orderBy: 'toString()'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'Classification.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'Classification.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="(code | translate) for code in codeLists.classificationCodes | orderBy: 'toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'Specification.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'Specification.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="spec for spec in predefinedValues.specifications | orderBy: 'toString()'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'ResultPass.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'ResultPass.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="('boolean.'+pass | translate) for pass in predefinedValues.resultPass | orderBy: '\'boolean.\'+toString() | translate'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'Role.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'Role.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="(code | translate) for code in codeLists.roleCodes | orderBy: 'toString() | translate'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <select ng-if="jsonObjectField.field.type === 'CharacterSet.codelist'"
+                                        <select ng-if="fieldObj.field.render === 'CharacterSet.codelist'"
                                                 class="form-control form-control-fix"
-                                                ng-model="jsonObjectField.field.value"
+                                                ng-model="fieldObj.field.value"
                                                 ng-options="code for code in codeLists.characterSetCodes | orderBy: 'toString()'"
-                                                style="width:auto;min-width:165pt;height:30px;">
+                                                style="width:auto;min-width:165pt;height:30px;"
+                                                ng-required="fieldObj.field.obligation === 'M'"
+                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
-                                        <input ng-if="jsonObjectField.field.type === 'decimal'"
-                                               type="text"
+                                        <input ng-if="fieldObj.field.render === 'decimal'"
+                                               type="number"
                                                class="form-control form-control-fix"
-                                               placeholder="{{jsonObjectField.field.name | translate}}"
-                                               ng-model="jsonObjectField.field.value"/>
-                                        <input ng-if="jsonObjectField.field.type === 'integer'"
-                                               type="text"
+                                               placeholder="{{fieldObj.field.name | translate}}"
+                                               ng-model="fieldObj.field.value"
+                                               ng-required="fieldObj.field.obligation === 'M'"
+                                               ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                               dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
+                                        <input ng-if="fieldObj.field.render === 'integer'"
+                                               type="number"
                                                class="form-control form-control-fix"
-                                               placeholder="{{jsonObjectField.field.name | translate}}"
-                                               ng-model="jsonObjectField.field.value"/>
-                                        <input ng-if="jsonObjectField.field.type === 'web'"
-                                               type="text"
+                                               placeholder="{{fieldObj.field.name | translate}}"
+                                               ng-model="fieldObj.field.value"/>
+                                        <input ng-if="fieldObj.field.render === 'web'"
+                                               type="url"
                                                class="form-control form-control-fix"
-                                               placeholder="{{jsonObjectField.field.name | translate}}"
-                                               ng-model="jsonObjectField.field.value"/>
-                                        <input ng-if="jsonObjectField.field.type === 'mail'"
-                                               type="text"
+                                               placeholder="{{fieldObj.field.name | translate}}"
+                                               ng-model="fieldObj.field.value"/>
+                                        <input ng-if="fieldObj.field.render === 'mail'"
+                                               type="email"
                                                class="form-control form-control-fix"
-                                               placeholder="{{jsonObjectField.field.name | translate}}"
-                                               ng-model="jsonObjectField.field.value"/>
-                                        <span ng-if="jsonObjectField.field.type === 'readonly'"
+                                               placeholder="{{fieldObj.field.name | translate}}"
+                                               ng-model="fieldObj.field.value"
+                                               ng-required="fieldObj.field.obligation === 'M'"
+                                               ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                               dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
+                                        <span ng-if="fieldObj.field.render === 'readonly'"
                                               class="data"
-                                              style="word-wrap: break-word;">{{jsonObjectField.field.value}}</span>
-                                        <span ng-if="jsonObjectField.field.type === 'DATE.readonly'"
+                                              style="word-wrap: break-word;">{{fieldObj.field.value}}</span>
+                                        <span ng-if="fieldObj.field.render === 'DATE.readonly'"
                                               class="data"
-                                              style="word-wrap: break-word;">{{jsonObjectField.field.value | date:'yyyy-MM-dd HH:mm:ss'}}</span>
-                                        <span ng-if="jsonObjectField.field.type === 'CODELIST.readonly'"
+                                              style="word-wrap: break-word;">{{fieldObj.field.value | date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                                        <span ng-if="fieldObj.field.render === 'CODELIST.readonly'"
                                               class="data"
-                                              style="word-wrap: break-word;">{{jsonObjectField.field.value | translate}}</span>
+                                              style="word-wrap: break-word;">{{fieldObj.field.value | translate}}</span>
+                                        <div ng-if="isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])"
+                                             class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-error">
+                                            <i class="fa fa-caret-up"></i>
+                                            <span translate="metadata.edition.validation.required">This field is required</span>
+                                        </div>
                                     </li>
                                 </script>
-                                <div ng-repeat="jsonObjectRoot in metadataValues" ng-include="'node_edition_renderer.html'"></div>
-                                <!--div ng-repeat="jsonObject in metadataValues">
-                                    <ng-include src="'node_edition_renderer.html'" onLoad="toto='billing'"></ng-include>
-                                </div-->
+                                <div ng-repeat="rootObj in metadataValues" ng-include="'node_edition_renderer.html'"></div>
                             </div>
+                        </div>
+                        <div class="row buttons-block">
+                            <span style="color:#db4747;" translate="metadata.edition.heading.requiredFields">(*) Required field</span>
+                            <button type="button"
+                                    class="btn btn-csw pull-right"
+                                    onclick="jQuery('html, body').animate({scrollTop: '0px'}, 1000);">
+                                <i class="fa fa-chevron-up"></i>
+                                <span translate="metadata.edition.heading.scrolltotop">Scroll to top</span>
+                            </button>
                         </div>
                     </form>
                 </div>

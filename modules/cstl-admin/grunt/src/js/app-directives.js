@@ -290,6 +290,21 @@ angular.module('cstl-directives', [])
     })
 
     // -------------------------------------------------------------------------
+    //  Directive to set input name dynamically
+    // -------------------------------------------------------------------------
+
+    .directive('dynamicName', function($compile, $parse) {
+        return {
+            restrict:"A",
+            require: ['ngModel', '^form'],
+            link:function(scope,element,attrs,ctrls){
+                ctrls[0].$name = scope.$eval(attrs.dynamicName) || attrs.dynamicName;
+                ctrls[1].$addControl(ctrls[0]);
+            }
+        };
+    })
+
+    // -------------------------------------------------------------------------
     //  Multi Select
     // -------------------------------------------------------------------------
 

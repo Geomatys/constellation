@@ -522,6 +522,16 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             }
         );
 
+        $scope.isInValidRequiredField = function(input){
+            if(input){
+                /*if(input.$invalid && input.$dirty){
+                    console.debug(input.$error);
+                }*/
+                return input.$invalid && input.$dirty;
+            }
+            return false;
+        };
+
         function initCollapseEvents () {
             if(window.collapseEditionEventsRegistered)return; //to fix a bug with angular
             $(document).on('click','.small-block .heading-block',function(){
@@ -555,7 +565,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
 
         $scope.getMetadataTitle = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
-                return $scope.metadataValues[0].root.content[0].superblock.content[0].block.content[0].field.value;
+                return $scope.metadataValues[0].root.children[0].superblock.children[0].block.children[0].field.value;
             }
         };
 
@@ -564,12 +574,12 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
         };
 
         $scope.delete = function(data) {
-            data.content = [];
+            data.children = [];
         };
         $scope.add = function(data) {
-            var post = data.content.length + 1;
+            var post = data.children.length + 1;
             var newName = data.name + '-' + post;
-            data.content.push({"block":{name: newName,content: []}});
+            data.children.push({"block":{name: newName,children: []}});
         };
 
         /**
@@ -641,7 +651,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
                 INSPIRE_ISO_MAP['Soil'] = 'MD_TopicCategoryCode.geoscientificInformation';
                 INSPIRE_ISO_MAP['Energy resources'] = 'MD_TopicCategoryCode.economy';
                 var valueToSet=INSPIRE_ISO_MAP[value];
-                parentBlock.content[4].field.value=valueToSet;
+                parentBlock.children[4].field.value=valueToSet;
             }
         };
 
@@ -911,11 +921,11 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
             window.collapseEventsRegistered = true;
         }
 
-        $scope.isDateField = function(type){
-            return (type.toLowerCase().indexOf('date') != -1);
+        $scope.isDateField = function(render){
+            return (render.toLowerCase().indexOf('date') != -1);
         };
-        $scope.isCodelistField = function(type){
-            return (type.toLowerCase().indexOf('codelist') != -1);
+        $scope.isCodelistField = function(render){
+            return (render.toLowerCase().indexOf('codelist') != -1);
         };
 
         $scope.initMetadataViewer = function() {
@@ -923,12 +933,12 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
         };
 
         $scope.delete = function(data) {
-            data.content = [];
+            data.children = [];
         };
         $scope.add = function(data) {
-            var post = data.content.length + 1;
+            var post = data.children.length + 1;
             var newName = data.name + '-' + post;
-            data.content.push({"block":{name: newName,content: []}});
+            data.children.push({"block":{name: newName,children: []}});
         };
 
         $scope.close = function() {

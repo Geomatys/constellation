@@ -6,7 +6,7 @@
     </h3>
     <script type="text/ng-template"  id="node_renderer.html">
         <div ng-if="jsonObject.root">
-            <div ng-repeat="jsonObject in jsonObject.root.content"
+            <div ng-repeat="jsonObject in jsonObject.root.children"
                  class="block-row"
                  ng-include="'node_renderer.html'">
             </div>
@@ -25,7 +25,7 @@
                         <div>
                             <div>
                                 <div class="collapse-row-wrapper open"
-                                     ng-repeat="jsonObject in jsonObject.superblock.content"
+                                     ng-repeat="jsonObject in jsonObject.superblock.children"
                                      ng-include="'node_renderer.html'">
                                 </div>
                             </div>
@@ -39,7 +39,7 @@
                 <span class="data-icon fa fa-angle-up"></span>
                 <span class="text">{{jsonObject.block.name | translate}}</span>
                 <!--button ng-click="add(jsonObject.block)">Add node</button>
-                <button ng-click="delete(jsonObject.block)" ng-show="jsonObject.block.content.length > 0">Delete nodes</button-->
+                <button ng-click="delete(jsonObject.block)" ng-show="jsonObject.block.children.length > 0">Delete nodes</button-->
             </div>
             <div class="collapse-row-inner">
                 <div class="table-mimic">
@@ -47,7 +47,7 @@
                         <div class="table-cell">
                             <div class="fieldset">
                                 <ul class="metadata-list"
-                                    ng-repeat="jsonObject in jsonObject.block.content"
+                                    ng-repeat="jsonObject in jsonObject.block.children"
                                     ng-include="'node_renderer.html'">
                                 </ul>
                             </div>
@@ -58,13 +58,13 @@
         </div>
         <li ng-if="jsonObject.field">
             <span class="label-data">{{jsonObject.field.name | translate}}</span>
-            <span ng-if="!isDateField(jsonObject.field.type) && !isCodelistField(jsonObject.field.type)"
+            <span ng-if="!isDateField(jsonObject.field.render) && !isCodelistField(jsonObject.field.render)"
                   class="data"
                   style="word-wrap: break-word;">{{jsonObject.field.value}}</span>
-            <span ng-if="isDateField(jsonObject.field.type)"
+            <span ng-if="isDateField(jsonObject.field.render)"
                   class="data"
                   style="word-wrap: break-word;">{{jsonObject.field.value | date:'yyyy-MM-dd HH:mm:ss'}}</span>
-            <span ng-if="isCodelistField(jsonObject.field.type)"
+            <span ng-if="isCodelistField(jsonObject.field.render)"
                   class="data"
                   style="word-wrap: break-word;">{{jsonObject.field.value | translate}}</span>
         </li>
