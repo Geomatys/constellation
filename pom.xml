@@ -997,14 +997,6 @@
             </snapshots>
         </repository>
         <repository>
-            <id>apache.snapshots</id>
-            <name>Apache Snapshot Repository</name>
-            <url>http://repository.apache.org/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
             <id>etrema</id>
             <url>http://milton.io/maven/</url>
             <snapshots>
@@ -1017,6 +1009,13 @@
         </repository>
     </repositories>
     <pluginRepositories>
+        <pluginRepository>
+            <id>geotoolkit</id>
+            <url>http://maven.geotoolkit.org/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
         <pluginRepository>
             <id>maven.nexus</id>
             <name>Maven Geomatys Snapshot</name>
