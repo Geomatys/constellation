@@ -2,25 +2,25 @@
 	"root":{
 		"name":"MD_Metadata",
 		"multiplicity":1,
-		"content":[{
+		"children":[{
 			"superblock":{
 				"name":"metadata.block.dataIdentification",
 				"multiplicity":1,
 				"help":"metadata.block.dataIdentification_help",
 				"path":null,
-				"content":[{
+				"children":[{
 					"block":{
 						"name":"metadata.block.resourceCitation",
 						"multiplicity":1,
 						"help":"metadata.block.resourceCitation_help",
 						"path":null,
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.title",
 								"multiplicity":1,
 								"help":"metadata.field.title_help",
 								"path":"identificationInfo.citation.title",
-								"type":"text",
+								"render":"text",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -31,7 +31,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.abstract_help",
 								"path":"identificationInfo.abstract",
-								"type":"textarea",
+								"render":"textarea",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -42,7 +42,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.lineageStatement_help",
 								"path":"dataQualityInfo.lineage.statement",
-								"type":"textarea",
+								"render":"textarea",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -53,7 +53,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.date_help",
 								"path":"identificationInfo.citation.date.date",
-								"type":"DATE.text",
+								"render":"DATE.text",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -64,7 +64,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.dateType_help",
 								"path":"identificationInfo.citation.date.dateType",
-								"type":"DATE.codelist",
+								"render":"DATE.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -75,7 +75,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.maintenanceAndUpdateFrequency_help",
 								"path":"identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency",
-								"type":"MaintenanceFrequency.codelist",
+								"render":"MaintenanceFrequency.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -86,7 +86,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.language_help",
 								"path":"identificationInfo.language",
-								"type":"Language.codelist",
+								"render":"Language.codelist",
 								"obligation":"M",
 								"defaultValue":"LanguageCode.fra",
 								"value":null
@@ -97,7 +97,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.graphicOverViewFileName_help",
 								"path":"identificationInfo.graphicOverview.fileName",
-								"type":"UPLOADIMAGE.text",
+								"render":"UPLOADIMAGE.text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -108,7 +108,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.rsIdentifier_help",
 								"path":"identificationInfo.citation.identifier.code",
-								"type":"text",
+								"render":"text",
 								"obligation":"M",
 								"defaultValue":"identifier",
 								"value":null
@@ -121,13 +121,13 @@
 						"multiplicity":1,
 						"help":"metadata.block.inspire_descriptiveKeyword_help",
 						"path":null,
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.inspire_keyword",
 								"multiplicity":1,
 								"help":"metadata.field.inspire_keyword_help",
 								"path":"identificationInfo.descriptiveKeywords.keyword",
-								"type":"INSPIRE_ISO.codelist",
+								"render":"INSPIRE_ISO.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -138,7 +138,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.inspire_thesaurusTitle_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.title",
-								"type":"readonly",
+								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":"GEMET - INSPIRE themes, version 1.0",
 								"value":null
@@ -149,7 +149,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.inspire_thesaurusDate_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
-								"type":"DATE.readonly",
+								"render":"DATE.readonly",
 								"obligation":"M",
 								"defaultValue":1212271200000,
 								"value":null
@@ -160,7 +160,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.inspire_thesaurusDateType_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
-								"type":"CODELIST.readonly",
+								"render":"CODELIST.readonly",
 								"obligation":"M",
 								"defaultValue":"CI_DateTypeCode.publication",
 								"value":null
@@ -171,7 +171,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.topicCategory_help",
 								"path":"identificationInfo.topicCategory",
-								"type":"ISO_INSPIRE.codelist",
+								"render":"ISO_INSPIRE.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -184,13 +184,13 @@
 						"multiplicity":62,
 						"help":"metadata.block.descriptiveKeyword_help",
 						"path":"identificationInfo.descriptiveKeywords",
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.keyword",
 								"multiplicity":62,
 								"help":"metadata.field.keyword_help",
 								"path":"identificationInfo.descriptiveKeywords.keyword",
-								"type":"KEYWORD.text",
+								"render":"KEYWORD.text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -201,7 +201,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.thesaurusTitle_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.title",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -212,7 +212,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.thesaurusDate_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.date",
-								"type":"DATE.text",
+								"render":"DATE.text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -223,7 +223,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.thesaurusDateType_help",
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
-								"type":"DATE.codelist",
+								"render":"DATE.codelist",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -236,13 +236,13 @@
 						"multiplicity":1,
 						"help":"metadata.block.spatialRepresentation_help",
 						"path":null,
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.type",
 								"multiplicity":1,
 								"help":"metadata.field.type_help",
 								"path":"identificationInfo.spatialRepresentationType",
-								"type":"CODELIST.readonly",
+								"render":"CODELIST.readonly",
 								"obligation":"M",
 								"defaultValue":"MD_SpatialRepresentationTypeCode.vector",
 								"value":null
@@ -253,7 +253,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.geometricObjects_help",
 								"path":"spatialRepresentationInfo.geometricObjects.geometricObjectType",
-								"type":"GeometricObjects.codelist",
+								"render":"GeometricObjects.codelist",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -266,13 +266,13 @@
 						"multiplicity":1,
 						"help":"metadata.block.refSystemInfo_help",
 						"path":null,
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.code",
 								"multiplicity":1,
 								"help":"metadata.field.code_help",
 								"path":"referenceSystemInfo.referenceSystemIdentifier.code",
-								"type":"ReferenceSystemIdentifier.codelist",
+								"render":"ReferenceSystemIdentifier.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -283,7 +283,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.scaleDenominator_help",
 								"path":"identificationInfo.spatialResolution.equivalentScale.denominator",
-								"type":"text",
+								"render":"text",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -296,14 +296,14 @@
 						"multiplicity":1,
 						"help":"metadata.block.geographicExtension_help",
 						"path":"identificationInfo.extent.geographicElement",
-						"type":"BOUNDINGBOX",
-						"content":[{
+						"render":"BOUNDINGBOX",
+						"children":[{
 							"field":{
 								"name":"metadata.field.westBoundLongitude",
 								"multiplicity":1,
 								"help":"metadata.field.westBoundLongitude_help",
 								"path":"identificationInfo.extent.geographicElement.westBoundLongitude",
-								"type":"decimal",
+								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":-180,
 								"value":null
@@ -314,7 +314,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.eastBoundLongitude_help",
 								"path":"identificationInfo.extent.geographicElement.eastBoundLongitude",
-								"type":"decimal",
+								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":180,
 								"value":null
@@ -325,7 +325,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.northBoundLatitude_help",
 								"path":"identificationInfo.extent.geographicElement.northBoundLatitude",
-								"type":"decimal",
+								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":90,
 								"value":null
@@ -336,7 +336,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.southBoundLatitude_help",
 								"path":"identificationInfo.extent.geographicElement.southBoundLatitude",
-								"type":"decimal",
+								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":-90,
 								"value":null
@@ -349,13 +349,13 @@
 						"multiplicity":62,
 						"help":"metadata.block.temporalExtension_help",
 						"path":"identificationInfo.extent.temporalElement",
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.beginPosition",
 								"multiplicity":1,
 								"help":"metadata.field.beginPosition_help",
 								"path":"identificationInfo.extent.temporalElement.extent.beginPosition.value",
-								"type":"DATE.text",
+								"render":"DATE.text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -366,7 +366,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.endPosition_help",
 								"path":"identificationInfo.extent.temporalElement.extent.endPosition.value",
-								"type":"DATE.text",
+								"render":"DATE.text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -379,13 +379,13 @@
 						"multiplicity":1,
 						"help":"metadata.block.distributionInfo_help",
 						"path":null,
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.format",
 								"multiplicity":1,
 								"help":"metadata.field.format_help",
 								"path":"distributionInfo.distributionFormat.name",
-								"type":"DistributionFormat.codelist",
+								"render":"DistributionFormat.codelist",
 								"obligation":"M",
 								"defaultValue":"SHP",
 								"value":null
@@ -398,13 +398,13 @@
 						"multiplicity":62,
 						"help":"metadata.block.distributionInfo_help",
 						"path":"distributionInfo.transferOptions",
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.transfertOptionLinkage",
 								"multiplicity":1,
 								"help":"metadata.field.transfertOptionLinkage_help",
 								"path":"distributionInfo.transferOptions.onLine.linkage",
-								"type":"web",
+								"render":"web",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -415,7 +415,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.transfertOptionLinkageProtocol_help",
 								"path":"distributionInfo.transferOptions.onLine.protocol",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -428,13 +428,13 @@
 						"multiplicity":1,
 						"help":"metadata.block.resourceConstraints_help",
 						"path":"identificationInfo.resourceConstraints",
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.useLimitation",
 								"multiplicity":1,
 								"help":"metadata.field.useLimitation_help",
 								"path":"identificationInfo.resourceConstraints.useLimitation",
-								"type":"text",
+								"render":"text",
 								"obligation":"M",
 								"defaultValue":"Pas de limitations",
 								"value":null
@@ -445,7 +445,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.accessConstraints_help",
 								"path":"identificationInfo.resourceConstraints.accessConstraints",
-								"type":"CODELIST.readonly",
+								"render":"CODELIST.readonly",
 								"obligation":"M",
 								"defaultValue":"MD_RestrictionCode.otherRestrictions",
 								"value":null
@@ -456,7 +456,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.otherConstraints_help",
 								"path":"identificationInfo.resourceConstraints.otherConstraints",
-								"type":"textarea",
+								"render":"textarea",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -467,7 +467,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.classification_help",
 								"path":"identificationInfo.resourceConstraints.classification",
-								"type":"Classification.codelist",
+								"render":"Classification.codelist",
 								"obligation":"O",
 								"defaultValue":"MD_ClassificationCode.unclassified",
 								"value":null
@@ -482,19 +482,19 @@
 				"multiplicity":1,
 				"help":"metadata.block.dataQuality_help",
 				"path":null,
-				"content":[{
+				"children":[{
 					"block":{
 						"name":"metadata.block.report",
 						"multiplicity":1,
 						"help":"metadata.block.report_help",
 						"path":null,
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.report.specification.title",
 								"multiplicity":62,
 								"help":"metadata.field.report.specification.title_help",
 								"path":"dataQualityInfo.report.result.specification.title",
-								"type":"Specification.codelist",
+								"render":"Specification.codelist",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -505,7 +505,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.report.specification.date_help",
 								"path":"dataQualityInfo.report.result.specification.date.date",
-								"type":"DATE.readonly",
+								"render":"DATE.readonly",
 								"obligation":"M",
 								"defaultValue":1272844800000,
 								"value":null
@@ -516,7 +516,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.dateType_help",
 								"path":"dataQualityInfo.report.result.specification.date.dateType",
-								"type":"CODELIST.readonly",
+								"render":"CODELIST.readonly",
 								"obligation":"M",
 								"defaultValue":"CI_DateTypeCode.publication",
 								"value":null
@@ -527,7 +527,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.scopeLevel_help",
 								"path":"dataQualityInfo.scope.level",
-								"type":"CODELIST.readonly",
+								"render":"CODELIST.readonly",
 								"obligation":"M",
 								"defaultValue":"MD_ScopeCode.dataset",
 								"value":null
@@ -538,7 +538,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.resultPass_help",
 								"path":"dataQualityInfo.report.result.pass",
-								"type":"ResultPass.codelist",
+								"render":"ResultPass.codelist",
 								"obligation":"M",
 								"defaultValue":"nilReason:unknown",
 								"value":null
@@ -549,7 +549,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.resultExplanation_help",
 								"path":"dataQualityInfo.report.result.explanation",
-								"type":"textarea",
+								"render":"textarea",
 								"obligation":"M",
 								"defaultValue":"See the referenced specification",
 								"value":null
@@ -564,20 +564,20 @@
 				"multiplicity":1,
 				"help":"metadata.block.contacts_help",
 				"path":null,
-				"content":[{
+				"children":[{
 					"block":{
 						"name":"metadata.block.pointOfContact",
 						"multiplicity":62,
 						"help":"metadata.block.pointOfContact_help",
 						"path":"identificationInfo.pointOfContact",
-						"type":"CONTACT",
-						"content":[{
+						"render":"CONTACT",
+						"children":[{
 							"field":{
 								"name":"metadata.field.organisationName",
 								"multiplicity":1,
 								"help":"metadata.field.organisationName_help",
 								"path":"identificationInfo.pointOfContact.organisationName",
-								"type":"text",
+								"render":"text",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -588,7 +588,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.role_help",
 								"path":"identificationInfo.pointOfContact.role",
-								"type":"Role.codelist",
+								"render":"Role.codelist",
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":null
@@ -599,7 +599,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.individualName_help",
 								"path":"identificationInfo.pointOfContact.individualName",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -610,7 +610,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.positionName_help",
 								"path":"identificationInfo.pointOfContact.positionName",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -621,7 +621,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.deliveryPoint_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.address.deliveryPoint",
-								"type":"textarea",
+								"render":"textarea",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -632,7 +632,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.city_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.address.city",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -643,7 +643,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.address.postalCode",
-								"type":"integer",
+								"render":"integer",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -654,7 +654,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.country_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.address.country",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":"France",
 								"value":null
@@ -665,7 +665,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.electronicMailAddress_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.address.electronicMailAddress",
-								"type":"mail",
+								"render":"mail",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -676,7 +676,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.voice_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.phone.voice",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -687,7 +687,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.linkage_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.onlineResource.linkage",
-								"type":"web",
+								"render":"web",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -700,14 +700,14 @@
 						"multiplicity":1,
 						"help":"metadata.block.metadataContact_help",
 						"path":"contact",
-						"type":"CONTACT",
-						"content":[{
+						"render":"CONTACT",
+						"children":[{
 							"field":{
 								"name":"metadata.field.organisationName",
 								"multiplicity":1,
 								"help":"metadata.field.organisationName_help",
 								"path":"contact.organisationName",
-								"type":"text",
+								"render":"text",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -718,7 +718,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.role_help",
 								"path":"contact.role",
-								"type":"CODELIST.readonly",
+								"render":"CODELIST.readonly",
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":null
@@ -729,7 +729,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.individualName_help",
 								"path":"contact.individualName",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -740,7 +740,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.positionName_help",
 								"path":"contact.positionName",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -751,7 +751,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.deliveryPoint_help",
 								"path":"contact.contactInfo.address.deliveryPoint",
-								"type":"textarea",
+								"render":"textarea",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -762,7 +762,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.city_help",
 								"path":"contact.contactInfo.address.city",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -773,7 +773,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
 								"path":"contact.contactInfo.address.postalCode",
-								"type":"integer",
+								"render":"integer",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -784,7 +784,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.country_help",
 								"path":"contact.contactInfo.address.country",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":"France",
 								"value":null
@@ -795,7 +795,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.electronicMailAddress_help",
 								"path":"contact.contactInfo.address.electronicMailAddress",
-								"type":"mail",
+								"render":"mail",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -806,7 +806,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.voice_help",
 								"path":"contact.contactInfo.phone.voice",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -817,7 +817,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.linkage_help",
 								"path":"contact.contactInfo.onlineResource.linkage",
-								"type":"web",
+								"render":"web",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -832,19 +832,19 @@
 				"multiplicity":1,
 				"help":"metadata.block.metadata_help",
 				"path":null,
-				"content":[{
+				"children":[{
 					"block":{
 						"name":"metadata.block.basic",
 						"multiplicity":1,
 						"help":"metadata.block.basic_help",
 						"path":null,
-						"content":[{
+						"children":[{
 							"field":{
 								"name":"metadata.field.identifier",
 								"multiplicity":1,
 								"help":"metadata.field.identifier_help",
 								"path":"fileIdentifier",
-								"type":"readonly",
+								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -855,7 +855,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.dateStamp_help",
 								"path":"dateStamp",
-								"type":"DATE.readonly",
+								"render":"DATE.readonly",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -866,7 +866,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.metadataStandardName_help",
 								"path":"metadataStandardName",
-								"type":"readonly",
+								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":"x-urn:schema:ISO19115:INSPIRE:dataset:geo-vector",
 								"value":null
@@ -877,7 +877,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.metadataStandardVersion_help",
 								"path":"metadataStandardVersion",
-								"type":"readonly",
+								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":"2011.03",
 								"value":null
@@ -888,7 +888,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.characterSet_help",
 								"path":"characterSet",
-								"type":"CharacterSet.codelist",
+								"render":"CharacterSet.codelist",
 								"obligation":"M",
 								"defaultValue":"UTF-8",
 								"value":null
@@ -899,7 +899,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.metadatalanguage_help",
 								"path":"language",
-								"type":"Language.codelist",
+								"render":"Language.codelist",
 								"obligation":"M",
 								"defaultValue":"LanguageCode.fra",
 								"value":null
@@ -910,7 +910,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.parentIdentifier_help",
 								"path":"parentIdentifier",
-								"type":"text",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -921,7 +921,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.hierarchyLevel_help",
 								"path":"hierarchyLevel",
-								"type":"CODELIST.readonly",
+								"render":"CODELIST.readonly",
 								"obligation":"M",
 								"defaultValue":"MD_ScopeCode.dataset",
 								"value":null
