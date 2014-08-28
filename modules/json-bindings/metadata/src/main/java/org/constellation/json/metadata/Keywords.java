@@ -56,7 +56,7 @@ final class Keywords {
     /**
      * The keyword for the value attribute in JSON file, including quotes.
      */
-    static final String CONTENT = "\"children\"";
+    static final String CHILDREN = "\"children\"";
 
     /**
      * Do not allow (for now) instantiation of this class.

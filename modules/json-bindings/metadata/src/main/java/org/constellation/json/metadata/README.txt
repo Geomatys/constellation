@@ -6,7 +6,7 @@ when the template have two or more nodes with the same path. For example we may 
         "block":{
             "multiplicity":1,
             "path":null
-            "content":[{
+            "children":[{
                 "field":{
                     "multiplicity":1,
                     "path":"identificationInfo.descriptiveKeywords.keyword"
@@ -24,7 +24,7 @@ when the template have two or more nodes with the same path. For example we may 
         "block":{
             "multiplicity":60,
             "path":"identificationInfo.descriptiveKeywords",
-            "content":[{
+            "children":[{
                 "field":{
                     "multiplicity":60,
                     "path":"identificationInfo.descriptiveKeywords.keyword"

@@ -38,13 +38,13 @@ import org.apache.sis.metadata.MetadataStandard;
  *
  * <blockquote><pre>{
  *    "root":{
- *        "content":[{
+ *        "children":[{
  *            "superblock":{
  *                "path":null,
- *                "content":[{
+ *                "children":[{
  *                    "block":{
  *                        "path":null,
- *                        "content":[{
+ *                        "children":[{
  *                            "field":{
  *                                "path":"identificationInfo.citation.title",
  *                                "defaultValue":null
@@ -61,7 +61,7 @@ import org.apache.sis.metadata.MetadataStandard;
  *    }
  *}</pre></blockquote>
  *
- * The only keywords handled by this class are {@code "content"}, {@code "path"}, {@code "defaultValue"}
+ * The only keywords handled by this class are {@code "children"}, {@code "path"}, {@code "defaultValue"}
  * and {@code "value"}. All other entries will be copied verbatim. This allow templates to provide additional
  * (key:value) pairs without the need to modify the {@code Template} code.
  *

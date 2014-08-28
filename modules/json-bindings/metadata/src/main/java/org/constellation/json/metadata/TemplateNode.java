@@ -125,7 +125,7 @@ final class TemplateNode {
                 if (!(n instanceof Number) || (maxOccurs = ((Number) n).intValue()) < 1) {
                     throw new ParseException("Invalid multiplicity: " + n);
                 }
-            } else if (parser.regionMatches(Keywords.CONTENT)) {
+            } else if (parser.regionMatches(Keywords.CHILDREN)) {
                 String childSeparator = null;
                 do {
                     content.add(new TemplateNode(parser, false, childSeparator));

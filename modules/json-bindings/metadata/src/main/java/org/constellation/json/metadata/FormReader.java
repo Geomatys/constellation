@@ -137,7 +137,7 @@ final class FormReader {
                 } catch (IllegalArgumentException | ClassCastException | FactoryException e) {
                     throw new ParseException("Can not store value at path \"" + toString(path) + "\".", e);
                 }
-            } else if (parser.regionMatches(Keywords.CONTENT)) {
+            } else if (parser.regionMatches(Keywords.CHILDREN)) {
                 /*
                  * Found a block with children. If there is a path, get the corresponding metadata.
                  * Child values will be relative to that child metadata.
