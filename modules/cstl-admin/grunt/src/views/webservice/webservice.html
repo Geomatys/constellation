@@ -47,7 +47,7 @@
 
             <div class="row bg-white dash-inner" style="padding: 20px 15px;" id="list-services">
                 <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter">
-                    <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info">{{service.identifier}} : {{service.name}} </h3></a>
+                    <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info service-name">{{service.identifier}} : {{service.name}} </h3></a>
                     <div class="well" ng-class="{'started':service.status=='STARTED','stopped':service.status=='ERROR','not-started':service.status=='STOPPED', 'serviceTypeCSW':service.type=='csw', 'serviceTypeWMS':service.type=='wms', 'serviceTypeWMTS':service.type=='wmts', 'serviceTypeSOS':service.type=='sos', 'serviceTypeWPS':service.type=='wps', 'serviceTypeWFS':service.type=='wfs', 'serviceTypeWCS':service.type=='wcs'}" data-state="wms-test">
                         <div class="row service-button">
                             <div class="col-sm-7 col-sm-offset-5 col-md-5 col-md-offset-7 col-lg-4 col-lg-offset-8">
@@ -89,3 +89,4 @@
         </div>
     </div>
 </div>
+<div scroll-to="" id="backtotop" class="backtotop" ng-hide="hideScrollServices"><span class="glyphicon glyphicon-chevron-up"></span></div>

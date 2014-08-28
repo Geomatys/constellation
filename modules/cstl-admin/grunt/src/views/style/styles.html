@@ -74,7 +74,11 @@
                         </li>
                         <li class="divider-vertical"></li>
                     </ul>
-                    <button type="button" ng-click="ordertype='Name';orderreverse=false" class="btn btn-xs btn-info btn-style">
+                    <button type="button"
+                            ng-click="ordertype='Name';orderreverse=false"
+                            tooltip-html-unsafe="{{'label.search.refresh' | translate }}"
+                            tooltip-placement="bottom"
+                            class="btn btn-xs btn-info btn-style">
                         <i class="fa fa-times"></i>
                     </button>
                     <div class="pull-right">
@@ -89,27 +93,39 @@
                 <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="small=false">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-style">
-                            <strong>
+                            <strong class="col-lg-6 col-xs-8 col-md-6">
                                 <span class="nb-results pull-left">{{countdata}}&nbsp;</span>
                                 <span class="nb-results" translate="label.count.style">available styles</span>
                             </strong>
-                            <button type="button"
-                                    ng-click="small=!small"
-                                    class="hidden-sm hidden-xs pull-right btn btn-xs btn-info btn-style"
-                                    ng-class="{'btn-small-selected':small==true}"
-                                    style="margin-left: 10px; margin-top: 5px;">
-                                <span translate="label.reduced.display">Reduced display</span>
-                            </button>
-
-                            <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                            <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}"
-                                 on-select-page="displayPage(page)"/>
+                            <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
+                                <button type="button" ng-click="small=true"
+                                        class="pull-right btn btn-xs btn-info btn-style"
+                                        ng-class="{'btn-small-selected':small==true}"
+                                        style="border-radius:0 3px 3px 0; margin-top: 5px; width:32px; height:34px;">
+                                    <img src="img/btn-display-reduced.svg" alt="" />
+                                </button>
+                                <button type="button" ng-click="small=false"
+                                        class="pull-right btn btn-xs btn-info btn-style"
+                                        ng-class="{'btn-small-selected':small==false}"
+                                        style="margin-left: 10px; border-radius:3px 0 0 3px; margin-top: 5px; width:32px; height:34px;">
+                                    <img src="img/btn-display-normal.svg" alt="" />
+                                </button>
+                                <p class="pull-right" style="margin-top:12px;" translate="label.display">Display :</p>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-9" style="padding-left:15px; margin-top: 5px;"
+                                     page-switcher="{page:currentpage,size:nbbypage,count:countdata}"
+                                     on-select-page="displayPage(page)"></div>
+                                <select class="nb-per-page input-small form-control pull-right col-xs-2 "
+                                        style="padding-left: 5px;padding-right: 5px; margin-right: 15px; margin-top: 5px;"
+                                        ng-model="nbbypage">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="item-list">
                             <div class="item style-{{style.Type | lowercase}}"
@@ -192,3 +208,5 @@
         </div>
     </div>
 </div>
+
+<div scroll-to="" id="backtotop" class="backtotop" ng-hide="hideScroll"><span class="glyphicon glyphicon-chevron-up"></span></div>

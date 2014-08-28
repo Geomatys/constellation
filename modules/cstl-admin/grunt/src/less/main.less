@@ -233,6 +233,9 @@ ul.unstyled {
 /*
  * Service
  */
+h3.service-name{
+  font-size:21px;
+}
 .service-item .well.started {
     border-left: #62c462 20px solid;
     min-height: 180px;
@@ -349,6 +352,22 @@ ul.unstyled {
     border: 1px solid #ddd;
     border-bottom-color: transparent;
 }
+
+.nav-tabs>li.tab-data>a:hover, .nav-tabs>li.tab-data>a:focus, .nav-tabs>li.tab-data.active>a {
+  background-color: #8ac1d4;
+  color:#ffffff;
+  border: solid 1px #77b7cd;
+}
+.nav-tabs>li.tab-metadata>a:hover, .nav-tabs>li.tab-metadata>a:focus, .nav-tabs>li.tab-metadata.active>a {
+  background-color: #e8bd94;
+  border: solid 1px #e3b07f;
+  color:#ffffff;
+}
+.nav-tabs>li.tab-data>a, .nav-tabs>li.tab-metadata>a {
+  background-color: transparent;
+}
+
+
 
 .sos_edit_checkboxlist{
     border:solid 1px #eeeeee; 
@@ -518,11 +537,16 @@ p.error-select-one{
     background-color: #545454;
     border: solid 1px #474747;
 }
+.btn-small-true{
+  background: transparent url('../img/loader.gif') center center no-repeat;
+}
+.btn-small-false{
+  background: transparent url('../img/loader.gif') center center no-repeat;
+}
 /*
  * Dashboard pagination.
  */
 .dashboard .pagination-wrapper {
-    height: 30px;
     margin-bottom: 10px;
 }
 .dashboard .pagination-wrapper .nb-results {
@@ -1009,6 +1033,39 @@ p.error-select-one{
 .modal .dashboard .searchbox {
     width: 150px;
 }
+.dashboard .advanced-search-data{
+  background-color: #e8f3f7;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+  padding-top: 15px;
+}
+.dashboard .advanced-search-metadata{
+  background-color: #faf1e8;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+  padding-top: 15px;
+}
+.dashboard .advanced-open{
+  margin-bottom:0;
+}
+.backtotop{
+  display: inline;
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  text-decoration: none;
+  font-size: 18px;
+  padding: 20px 23px;
+  color: #fff;
+  background-color: #297dab;
+  border: 2px solid #246f98;
+  border-radius: 10px;
+  cursor:pointer;
+}
+.backtotop:hover{
+  background-color: #246f98;
+  border: 2px solid #246f98;
+}
 /*dashboard style*/
 .btn-style{
     background-color: #9e96c2;
@@ -1369,6 +1426,12 @@ a.btn-push-right {
     background-color: #3399CC;
     color: white;
 }
+.modal-body.modal-body-list-data{
+  padding:0;
+}
+.modal-footer.modal-footer-list-data{
+  margin-top:0;
+}
 
 .row .form-separator {
     border-top: 1px solid #eeeeee;
@@ -1591,6 +1654,9 @@ h3.popover-title {
   .dashboard .searchbox {
     width: 130px;
   }
+  .quick-search-panel{
+    max-width:215px;
+  }
 }
 
 @media screen and (min-width: @screen-md)and (max-width: @screen-md-max) {
@@ -1710,10 +1776,29 @@ h3.popover-title {
     max-height:645px;
   }
   .modal-dialog-resp-height .modal-body{
-    max-height:505px;
+    max-height:494px;
   }
   .list-style-modal{
     height:500px;
     overflow-y:auto;
+  }
+  .modal-footer{
+    padding: 10px 20px 10px;
+  }
+}
+
+@media screen and (max-height:680px){
+  .modal-dialog-resp-height .modal-body{
+    max-height:445px;
+  }
+  .modal-dialog-resp-height  .modal-header{
+    min-height: 40px;
+    padding: 7px 15px;
+  }
+  .modal-dialog.modal-dialog-resp-height{
+    padding-top:8px;
+  }
+  .modal-footer{
+    padding: 10px 20px 10px;
   }
 }

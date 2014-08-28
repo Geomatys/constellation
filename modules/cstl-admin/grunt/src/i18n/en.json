@@ -144,6 +144,10 @@
     "data.modal.import.server.label.list": "List Files",
     "data.modal.import.metadata.info":"If there is no existing metadata file, the system will allows to you to creates one later.",
 
+    "data.dashboard.tab.data":"Data",
+    "data.dashboard.tab.metadata":"Metadata",
+    "data.dashboard.metadata.title":"Available metadata",
+
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",
 
@@ -365,7 +369,9 @@
     "label.color.model":"Color model",
     "label.search.advanced.show":"Show advanced search",
     "label.search.advanced.hide":"Hide advanced search",
+    "label.search.refresh":"Refresh filters",
     "label.create.account":"Create account",
+    "label.display":"Display :",
 
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
@@ -681,7 +687,7 @@
     "global.menu.domains": "Domains",
     "global.menu.web-service": "Web Services",
     "global.menu.web-service.min": "Services",
-    "global.menu.data": "Data",
+    "global.menu.data": "Meta/Data",
     "global.menu.sensor": "Sensors",
     "global.menu.style": "Styles",
     "global.menu.mapcontext": "Map Context",
@@ -873,7 +879,7 @@
     "main.menu.stat.subtitle": "Show statistics",
 
     "page.header.title.webservices":"Services Dashboard",
-    "page.header.title.data":"Data Dashboard",
+    "page.header.title.data":"Data and Metadata Dashboard",
     "page.header.title.style":"Styles Dashboard",
     "page.header.title.contact": "Contact",
     "page.header.title.create.service":"New service",
