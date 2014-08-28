@@ -15,15 +15,17 @@
  */
 'use strict';
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'DomainResource', 'provider',
+
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'DomainResource', 'provider', '$window',
     'style', 'textService', '$modal', 'Growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, DomainResource,  provider, style, textService, $modal, Growl,
+    function ($scope, $location, $dashboard, webService, dataListing, DomainResource,  provider, $window, style, textService, $modal, Growl,
               StyleSharedService, $cookies) {
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.domainId = $cookies.cstlActiveDomainId;
         $scope.advancedSearch = false;
         $scope.search = {};
+        $scope.hideScroll = true;
 
         $scope.toggleAdvancedSearch = function(){
           if ($scope.advancedSearch){
@@ -106,6 +108,15 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 modalLoader.close();
             }, function() {
                 modalLoader.close();
+            });
+
+            angular.element($window).bind("scroll", function() {
+                if (this.pageYOffset < 220) {
+                    $scope.hideScroll = true;
+                } else {
+                    $scope.hideScroll = false;
+                }
+                $scope.$apply();
             });
         };
 
@@ -250,6 +261,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             $header.next().slideToggle(200);
             $header.find('i').toggleClass('fa-chevron-down fa-chevron-up');
         };
+        $scope.toggleUpDownSelectedMD = function() {
+            var $header = $('#metadataDashboard').find('.selected-item').find('.block-header');
+            $header.next().slideToggle(200);
+            $header.find('i').toggleClass('fa-chevron-down fa-chevron-up');
+        };
 
         // Data loading
         $scope.showLocalFilePopup = function() {
@@ -318,6 +334,18 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     'dataId': function(){return $scope.selected.Id}
                 }
             });
+        };
+
+        $scope.tabdata = true;
+        $scope.tabmetadata = false;
+        $scope.selectTab = function(item) {
+            if (item === 'tabdata') {
+                $scope.tabdata = true;
+                $scope.tabmetadata = false;
+            } else if (item === 'tabmetadata') {
+                $scope.tabdata = false;
+                $scope.tabmetadata = true;
+            }
         };
 
         $scope.truncate = function(small, text){

@@ -15,12 +15,12 @@
  */
 'use strict';
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', 'Growl','$translate',
-    function ($scope, webService, provider, csw, sos, $modal, textService, Growl, $translate) {
-
+cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', 'Growl','$translate', '$window',
+    function ($scope, webService, provider, csw, sos, $modal, textService, Growl, $translate, $window) {
 
         $scope.typeFilter = {type: '!WEBDAV'};
-
+        $scope.hideScroll = true;
+        $scope.hideScrollServices = true;
 
         var modalLoader = $modal.open({
           templateUrl: 'views/modalLoader.html',
@@ -31,6 +31,14 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
             return $translate.use();
         };
 
+        angular.element($window).bind("scroll", function() {
+            if (this.pageYOffset < 220) {
+                $scope.hideScrollServices = true;
+            } else {
+                $scope.hideScrollServices = false;
+            }
+            $scope.$apply();
+        });
         webService.listAll({lang: $scope.getCurrentLang()}, function(response){
             $scope.services = response;
             modalLoader.close();
@@ -371,8 +379,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         }
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', 'Growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies','$translate',
-    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate) {
+cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', 'Growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies','$translate','$window',
+    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate, $window) {
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -381,6 +389,17 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         $scope.urlBoxSize = Math.min($scope.url.length,100);
         $scope.domainId = $cookies.cstlActiveDomainId;
         $scope.writeOperationAvailable = $scope.type == 'csw' || $scope.type == 'sos' || $scope.type == 'wfs';
+        $scope.hideScroll = true;
+
+
+        angular.element($window).bind("scroll", function() {
+                if (this.pageYOffset < 220) {
+                    $scope.hideScroll = true;
+                } else {
+                    $scope.hideScroll = false;
+                }
+                $scope.$apply();
+        });
 
         $scope.getCurrentLang = function() {
             return $translate.use();

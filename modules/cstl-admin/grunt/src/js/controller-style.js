@@ -18,8 +18,10 @@
 /**
  * Controller for dashboard of styles.
  */
-cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', 'Growl', 'StyleSharedService', '$modal',
-    function($scope, $dashboard, style, Growl, StyleSharedService, $modal) {
+cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', 'Growl', 'StyleSharedService', '$modal','$window',
+    function($scope, $dashboard, style, Growl, StyleSharedService, $modal, $window) {
+        $scope.hideScroll = true;
+
         $scope.init = function() {
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
@@ -37,6 +39,14 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', 'G
                         modalLoader.close();
                     }
                 );
+            });
+            angular.element($window).bind("scroll", function() {
+                if (this.pageYOffset < 220) {
+                    $scope.hideScroll = true;
+                } else {
+                    $scope.hideScroll = false;
+                }
+                $scope.$apply();
             });
         };
 

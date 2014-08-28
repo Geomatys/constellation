@@ -15,8 +15,10 @@
  */
 'use strict';
 
-cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'sensor', '$modal', 'Growl',
-    function ($scope, $dashboard, webService, sensor, $modal, Growl){
+cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'sensor', '$modal', 'Growl','$window',
+    function ($scope, $dashboard, webService, sensor, $modal, Growl, $window){
+        $scope.hideScroll = true;
+
         $scope.init = function() {
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
@@ -27,6 +29,14 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
                 modalLoader.close();
             }, function() {
                 modalLoader.close();
+            });
+            angular.element($window).bind("scroll", function() {
+                if (this.pageYOffset < 220) {
+                    $scope.hideScroll = true;
+                } else {
+                    $scope.hideScroll = false;
+                }
+                $scope.$apply();
             });
         };
 

@@ -15,11 +15,12 @@
  */
 'use strict';
 
-cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', 'Growl', '$modal', 'TaskService',
-        function ($scope, $dashboard, Growl, $modal, TaskService){
+cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', 'Growl', '$modal', 'TaskService','$window',
+        function ($scope, $dashboard, Growl, $modal, TaskService, $window){
             var lastOpened = null;
 
             $scope.nbbypage = 5; // Default value at 5
+            $scope.hideScroll = true;
 
             $scope.init = function() {
                 var modalLoader = $modal.open({
@@ -36,6 +37,15 @@ cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', 'Growl', '$m
                     })['finally'](function(){
                     // On all case
                     modalLoader.close()
+                });
+
+                angular.element($window).bind("scroll", function() {
+                    if (this.pageYOffset < 220) {
+                        $scope.hideScroll = true;
+                    } else {
+                        $scope.hideScroll = false;
+                    }
+                    $scope.$apply();
                 });
             };
 

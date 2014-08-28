@@ -15,11 +15,12 @@
  */
 'use strict';
 
-cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'Growl', '$modal', '$cookies', 'mapcontext',
-    function ($scope, $dashboard, Growl, $modal, $cookies, mapcontext){
+cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'Growl', '$modal', '$cookies', 'mapcontext','$window',
+    function ($scope, $dashboard, Growl, $modal, $cookies, mapcontext, $window){
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.domainId = $cookies.cstlActiveDomainId;
         $scope.cstlSessionId = $cookies.cstlSessionId;
+        $scope.hideScroll = true;
 
         $scope.init = function() {
             var modalLoader = $modal.open({
@@ -32,6 +33,14 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'Growl'
                 modalLoader.close();
             }, function() {
                 modalLoader.close();
+            });
+            angular.element($window).bind("scroll", function() {
+                if (this.pageYOffset < 220) {
+                    $scope.hideScroll = true;
+                } else {
+                    $scope.hideScroll = false;
+                }
+                $scope.$apply();
             });
         };
 
