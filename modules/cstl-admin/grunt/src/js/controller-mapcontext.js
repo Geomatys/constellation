@@ -239,7 +239,7 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         };
 
         $scope.selectItem = function(item) {
-            if ($scope.selected.item) {
+            if ($scope.selected.item === item) {
                 $scope.selected.item = null;
             } else {
                 $scope.selected.item = item;
