@@ -40,8 +40,11 @@ public class CreateProviderDescriptor extends AbstractCstlProcessDescriptor {
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new provider in constellation.");
 
 
+    /**
+     * {@link org.constellation.provider.ProviderFactoryType}
+     */
     public static final String PROVIDER_TYPE_NAME = "provider_type";
-    private static final String PROVIDER_TYPE_REMARKS = "The type of he provider like 'data-store', 'coverage-store', ... .";
+    private static final String PROVIDER_TYPE_REMARKS = "Provider factory name like 'feature-store', 'coverage-store', ... .";
     public static final ParameterDescriptor<String> PROVIDER_TYPE =
             new DefaultParameterDescriptor<String>(PROVIDER_TYPE_NAME, PROVIDER_TYPE_REMARKS, String.class, null, true);
 
@@ -71,6 +74,8 @@ public class CreateProviderDescriptor extends AbstractCstlProcessDescriptor {
     public CreateProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
+
+    public static final CreateProviderDescriptor INSTANCE = new CreateProviderDescriptor();
 
     @Override
     public AbstractCstlProcess buildProcess(ParameterValueGroup input) {

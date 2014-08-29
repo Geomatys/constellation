@@ -81,6 +81,7 @@ public class PyramidCoverageDescriptor extends AbstractProcessDescriptor {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
+    public static final PyramidCoverageDescriptor INSTANCE = new PyramidCoverageDescriptor();
     
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {

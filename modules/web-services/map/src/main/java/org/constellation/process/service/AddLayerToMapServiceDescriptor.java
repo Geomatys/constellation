@@ -160,6 +160,8 @@ public class AddLayerToMapServiceDescriptor extends AbstractCstlProcessDescripto
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
+    public static final AddLayerToMapServiceDescriptor INSTANCE = new AddLayerToMapServiceDescriptor();
+
     /**
      * {@inheritDoc}
      */

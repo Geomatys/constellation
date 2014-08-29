@@ -25,22 +25,22 @@ import java.net.URI;
 import java.net.URL;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.coverage.PyramidCoverageHelper;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.COVERAGE_BASE_NAME;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.IMAGE_FILE_PATH;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.PROVIDER_OUT_ID;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.PROVIDER_SOURCE;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.PYRAMID_FOLDER;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.feature.type.DefaultName;
+
+import static org.constellation.coverage.process.PyramidCoverageDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.coverage.mathcalc.MathCalcDescriptor;
+import org.opengis.coverage.Coverage;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
@@ -48,11 +48,32 @@ import org.opengis.util.FactoryException;
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 public class PyramidCoverageProcess extends AbstractCstlProcess {
 
     public PyramidCoverageProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
+    }
+
+    /**
+     * Quick constructor to create process
+     * @param pyramidFolder
+     * @param providerID
+     * @param imageFilePath
+     * @param coverageBaseName
+     */
+    public PyramidCoverageProcess (final File pyramidFolder, final String providerID, final String imageFilePath, final String coverageBaseName) {
+        this(PyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, coverageBaseName));
+    }
+
+    private static ParameterValueGroup toParameters(final File pyramidFolder, final String providerID, final String imageFilePath, final String coverageBaseName){
+        final ParameterValueGroup params = PyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
+        getOrCreate(PROVIDER_OUT_ID, params).setValue(providerID);
+        getOrCreate(IMAGE_FILE_PATH, params).setValue(imageFilePath);
+        getOrCreate(COVERAGE_BASE_NAME, params).setValue(coverageBaseName);
+        getOrCreate(PYRAMID_FOLDER, params).setValue(pyramidFolder);
+        return params;
     }
 
     @Override

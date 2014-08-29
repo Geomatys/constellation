@@ -24,6 +24,7 @@ import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.configuration.Layer;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.process.AbstractCstlProcess;
+import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.constellation.util.DataReference;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.ogc.xml.v110.FilterType;
@@ -41,15 +42,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_ALIAS;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_CUSTOM_GFI;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_DIMENSION;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_FILTER;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_REF;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_STYLE;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.OUT_LAYER;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.SERVICE_INSTANCE;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.SERVICE_TYPE;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 
@@ -68,6 +61,34 @@ public class AddLayerToMapService extends AbstractCstlProcess {
         super(desc, input);
     }
 
+    public AddLayerToMapService (final String serviceType, final String serviceInstance,
+                                 final DataReference layerRef, final String layerAlias,
+                                 final DataReference layerStyleRef, final Filter layerFilter,
+                                 final String layerDimension, final GetFeatureInfoCfg[] customGFI) {
+        this(INSTANCE, toParameters(serviceType, serviceInstance, layerRef, layerAlias, layerStyleRef, layerFilter, layerDimension, customGFI));
+    }
+
+    public AddLayerToMapService (final String serviceType, final String serviceInstance,
+                                 final DataReference layerRef, final DataReference layerStyleRef) {
+        this(INSTANCE, toParameters(serviceType, serviceInstance, layerRef, null, layerStyleRef, null, null, null));
+    }
+
+    private static ParameterValueGroup toParameters(final String serviceType, final String serviceInstance,
+                                                    final DataReference layerRef, final String layerAlias,
+                                                    final DataReference layerStyleRef, final Filter layerFilter,
+                                                    final String layerDimension, final GetFeatureInfoCfg[] customGFI){
+        final ParameterValueGroup params = INSTANCE.getInputDescriptor().createValue();
+        getOrCreate(LAYER_REF, params).setValue(layerRef);
+        getOrCreate(LAYER_ALIAS, params).setValue(layerAlias);
+        getOrCreate(LAYER_STYLE, params).setValue(layerStyleRef);
+        getOrCreate(LAYER_FILTER, params).setValue(layerFilter);
+        getOrCreate(LAYER_DIMENSION, params).setValue(layerDimension);
+        getOrCreate(LAYER_CUSTOM_GFI, params).setValue(customGFI);
+        getOrCreate(SERVICE_TYPE, params).setValue(serviceType);
+        getOrCreate(SERVICE_INSTANCE, params).setValue(serviceInstance);
+        return params;
+    }
+
     @Override
     protected void execute() throws ProcessException {
 
@@ -83,7 +104,7 @@ public class AddLayerToMapService extends AbstractCstlProcess {
         //check layer reference
         final String dataType = layerRef.getDataType();
         if (dataType.equals(DataReference.PROVIDER_STYLE_TYPE) || dataType.equals(DataReference.SERVICE_TYPE)) {
-            throw new ProcessException("Layer Refrence must be a from a layer provider.", this, null);
+            throw new ProcessException("Layer Reference must be a from a layer provider.", this, null);
         }
 
         //check style from a style provider
@@ -148,7 +169,7 @@ public class AddLayerToMapService extends AbstractCstlProcess {
         try {
             layerBusiness.add(layerName.getLocalPart(), layerName.getNamespaceURI(), providerID, layerAlias, serviceInstance, serviceType, newLayer);
         } catch (ConfigurationException ex) {
-            throw new ProcessException("Erro while saving layer", this, ex);
+            throw new ProcessException("Error while saving layer", this, ex);
         }
 
         //output

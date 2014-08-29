@@ -35,7 +35,10 @@ import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import org.constellation.provider.StyleProviders;
+
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
+
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -50,13 +53,31 @@ public final class CreateProvider extends AbstractCstlProcess {
         super(desc, parameter);
     }
 
+    /**
+     * Quick process constructor
+     * @param providerType
+     * @param source
+     * @param domainId
+     */
+    public CreateProvider (final String providerType, ParameterValueGroup source, final Integer domainId) {
+        this(CreateProviderDescriptor.INSTANCE, toParameters(providerType, source, domainId));
+    }
+
+    private static ParameterValueGroup toParameters(final String providerType, ParameterValueGroup source, final Integer domainId){
+        final ParameterValueGroup params = CreateProviderDescriptor.INSTANCE.getInputDescriptor().createValue();
+        getOrCreate(CreateProviderDescriptor.PROVIDER_TYPE, params).setValue(providerType);
+        getOrCreate(CreateProviderDescriptor.SOURCE, params).setValue(source);
+        getOrCreate(CreateProviderDescriptor.DOMAIN_ID, params).setValue(domainId);
+        return params;
+    }
+
     @Override
     protected void execute() throws ProcessException {
         final String providerType        = value(PROVIDER_TYPE, inputParameters);
         final ParameterValueGroup source = value(SOURCE, inputParameters);
         final Integer domainId           = value(DOMAIN_ID, inputParameters);
 
-        //initialize list of avaible Povider services
+        //initialize list of available Provider services
         final Map<String, ProviderFactory> services = new HashMap<>();
         final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getFactories();
         for (DataProviderFactory service: availableLayerServices) {

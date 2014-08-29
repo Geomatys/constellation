@@ -21,6 +21,7 @@ import static org.constellation.process.service.AddDataToMapContextDescriptor.DA
 import static org.constellation.process.service.AddDataToMapContextDescriptor.DATA_PROVIDER_ID;
 import static org.constellation.process.service.AddDataToMapContextDescriptor.INSTANCE;
 import static org.constellation.process.service.AddDataToMapContextDescriptor.LAYER_STYLE;
+
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragesgroup.xml.DataReference;
@@ -41,6 +42,30 @@ public class AddDataToMapContext extends AbstractCstlProcess {
     
     public AddDataToMapContext(final ParameterValueGroup input) {
         super(INSTANCE,input);
+    }
+
+    /**
+     * Quick constructor
+     * @param providerID
+     * @param groupName
+     * @param layerName
+     * @param layerProvider
+     * @param layerStyle
+     */
+    public AddDataToMapContext (final String providerID, final String groupName, final String layerName,
+                                final String layerProvider, final StyleReference layerStyle) {
+        this(toParameters(providerID, groupName, layerName, layerProvider, layerStyle));
+    }
+
+    private static ParameterValueGroup toParameters(final String providerID, final String groupName, final String layerName,
+                                                    final String layerProvider, final StyleReference layerStyle){
+        final ParameterValueGroup params = INSTANCE.getInputDescriptor().createValue();
+        getOrCreate(CONTEXT_PROVIDER_ID, params).setValue(providerID);
+        getOrCreate(CONTEXT_NAME, params).setValue(groupName);
+        getOrCreate(DATA_NAME, params).setValue(layerName);
+        getOrCreate(DATA_PROVIDER_ID, params).setValue(layerProvider);
+        getOrCreate(LAYER_STYLE, params).setValue(layerStyle);
+        return params;
     }
 
     @Override

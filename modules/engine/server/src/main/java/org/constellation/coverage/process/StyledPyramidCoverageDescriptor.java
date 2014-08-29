@@ -93,7 +93,9 @@ public class StyledPyramidCoverageDescriptor  extends AbstractCstlProcessDescrip
     public StyledPyramidCoverageDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
+    public static final StyledPyramidCoverageDescriptor INSTANCE = new StyledPyramidCoverageDescriptor();
+
     @Override
     public AbstractCstlProcess buildProcess(ParameterValueGroup input) {
         return new StyledPyramidCoverageProcess(this, input);

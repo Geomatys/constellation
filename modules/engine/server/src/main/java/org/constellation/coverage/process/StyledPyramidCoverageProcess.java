@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.ArraysExt;
 import org.constellation.configuration.TargetNotFoundException;
@@ -60,6 +59,8 @@ import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.parameter.Parameters;
+
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -84,6 +85,33 @@ public class StyledPyramidCoverageProcess extends AbstractCstlProcess {
     
     public StyledPyramidCoverageProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
+    }
+
+    /**
+     * Quick constructor to create process
+     *
+     * @param pyramidFolder
+     * @param providerID
+     * @param imageFilePath
+     * @param coverageBaseName
+     * @param styleRef
+     * @param domainId
+     */
+    public StyledPyramidCoverageProcess (final File pyramidFolder, final String providerID, final String imageFilePath,
+                                         final String coverageBaseName, final StyleReference styleRef, final Integer domainId) {
+        this(StyledPyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, coverageBaseName, styleRef, domainId));
+    }
+
+    private static ParameterValueGroup toParameters(final File pyramidFolder, final String providerID, final String imageFilePath,
+                                                    final String coverageBaseName, final StyleReference styleRef, final Integer domainId){
+        final ParameterValueGroup params = StyledPyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
+        getOrCreate(StyledPyramidCoverageDescriptor.PROVIDER_OUT_ID, params).setValue(providerID);
+        getOrCreate(StyledPyramidCoverageDescriptor.IMAGE_FILE_PATH, params).setValue(imageFilePath);
+        getOrCreate(StyledPyramidCoverageDescriptor.COVERAGE_BASE_NAME, params).setValue(coverageBaseName);
+        getOrCreate(StyledPyramidCoverageDescriptor.PYRAMID_FOLDER, params).setValue(pyramidFolder);
+        getOrCreate(StyledPyramidCoverageDescriptor.STYLE, params).setValue(styleRef);
+        getOrCreate(StyledPyramidCoverageDescriptor.DOMAIN_ID, params).setValue(domainId);
+        return params;
     }
 
     @Override
