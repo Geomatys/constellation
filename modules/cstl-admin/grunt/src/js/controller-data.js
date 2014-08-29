@@ -522,14 +522,60 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             }
         );
 
-        $scope.isInValidRequiredField = function(input){
+        $scope.isValidField = function(input){
             if(input){
-                /*if(input.$invalid && input.$dirty){
-                    console.debug(input.$error);
-                }*/
-                return input.$invalid && input.$dirty;
+                return (input.$valid || input.$pristine);
             }
-            return false;
+            return true;
+        };
+
+        $scope.isValidRequired = function(input){
+            if(input){
+                return ! input.$error.required;
+            }
+            return true;
+        };
+
+        $scope.isValidEmail = function(input){
+            if(input){
+                return ! input.$error.email;
+            }
+            return true;
+        };
+
+        $scope.isValidUrl = function(input){
+            if(input){
+                return ! input.$error.url;
+            }
+            return true;
+        };
+
+        $scope.isValidNumber = function(input){
+            if(input){
+                return ! input.$error.number;
+            }
+            return true;
+        };
+
+        $scope.checkValidation = function(form) {
+            if(form.$error.required){
+                for(var i=0;i<form.$error.required.length;i++){
+                    form.$error.required[i].$pristine = false;
+                }
+            }
+            if(form.$invalid){
+                alert('Echec de la validation du formulaire ! ');
+                var firstInvalid = $('.highlight-invalid').get(0);
+                if(firstInvalid){
+                    $('html, body').animate(
+                        {scrollTop: $(firstInvalid).offset().top-200}, 1000);
+                    $(firstInvalid).focus();
+                }
+            }else {
+                alert('Bravo, la formulaire est validée avec succès !');
+            }
+
+
         };
 
         function initCollapseEvents () {

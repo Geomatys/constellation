@@ -46,6 +46,15 @@
                                         <span translate="metadata.edition.heading.save">Save modifications</span>
                                     </button>
                                 </div>
+                                <div class="pull-right" style="margin-top: 10pt;">
+                                    <button type="button"
+                                            class="btn btn-link"
+                                            style="font-size: 12px;"
+                                            ng-click="checkValidation(metadataform)">
+                                        <i class="fa fa-check-square-o"></i>
+                                        <span translate="metadata.edition.heading.check.validation">Check validation</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="row" style="margin: 0;">
@@ -68,13 +77,9 @@
                                             </div>
                                             <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
                                                 <div class="collapse-block">
-                                                    <div>
-                                                        <div>
-                                                            <div class="collapse-row-wrapper open"
-                                                                 ng-repeat="blockObj in superblockObj.superblock.children"
-                                                                 ng-include="'node_edition_renderer.html'">
-                                                            </div>
-                                                        </div>
+                                                    <div class="collapse-row-wrapper open"
+                                                         ng-repeat="blockObj in superblockObj.superblock.children"
+                                                         ng-include="'node_edition_renderer.html'">
                                                     </div>
                                                 </div>
                                             </div>
@@ -117,14 +122,14 @@
                                                placeholder="{{fieldObj.field.name | translate}}"
                                                ng-model="fieldObj.field.value"
                                                ng-required="fieldObj.field.obligation === 'M'"
-                                               ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                               dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
+                                               ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                               dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
                                         <textarea ng-if="fieldObj.field.render === 'textarea'"
                                                   class="form-control form-control-fix"
                                                   ng-model="fieldObj.field.value"
                                                   ng-required="fieldObj.field.obligation === 'M'"
-                                                  ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                  dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"
+                                                  ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                  dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"
                                                   rows="6"
                                                   cols="33"></textarea>
                                         <div ng-if="fieldObj.field.render === 'DATE.text'"
@@ -135,8 +140,8 @@
                                                    class="form-control form-control-fix"
                                                    ng-model="fieldObj.field.value"
                                                    ng-required="fieldObj.field.obligation === 'M'"
-                                                   ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                   dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
+                                                   ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                   dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
                                             <span class="input-group-addon">
                                                 <i class="glyphicon glyphicon-th"></i>
                                             </span>
@@ -147,8 +152,8 @@
                                                 ng-options="(code | translate) for code in codeLists.dateTypeCodes | orderBy: 'toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <select ng-if="fieldObj.field.render === 'MaintenanceFrequency.codelist'"
@@ -157,8 +162,8 @@
                                                 ng-options="(code | translate) for code in codeLists.maintenanceFrequencyCodes | orderBy: 'toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <select ng-if="fieldObj.field.render === 'Language.codelist'"
@@ -167,8 +172,8 @@
                                                 ng-options="(code | translate) for code in codeLists.localeCodes | orderBy: 'toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <input ng-if="fieldObj.field.render === 'UPLOADIMAGE.text'"
@@ -183,8 +188,8 @@
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-change="updateIsoInspireSelectOneMenu(fieldObj.field.value,blockObj.block)"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <select ng-if="fieldObj.field.render === 'ISO_INSPIRE.codelist'"
@@ -193,8 +198,8 @@
                                                 ng-options="(code | translate) for code in codeLists.topicCategoryCodes | orderBy: 'toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <select ng-if="fieldObj.field.render === 'GeometricObjects.codelist'"
@@ -210,8 +215,8 @@
                                                 ng-options="code for code in predefinedValues.referenceSystemIdentifier | orderBy: 'toString()'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <div ng-if="fieldObj.field.render === 'KEYWORD.text'"
@@ -228,8 +233,8 @@
                                                 ng-options="format for format in predefinedValues.distributionFormat | orderBy: 'toString()'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <select ng-if="fieldObj.field.render === 'Classification.codelist'"
@@ -245,8 +250,8 @@
                                                 ng-options="spec for spec in predefinedValues.specifications | orderBy: 'toString()'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <select ng-if="fieldObj.field.render === 'ResultPass.codelist'"
@@ -255,8 +260,8 @@
                                                 ng-options="('boolean.'+pass | translate) for pass in predefinedValues.resultPass | orderBy: '\'boolean.\'+toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <select ng-if="fieldObj.field.render === 'Role.codelist'"
@@ -265,8 +270,8 @@
                                                 ng-options="(code | translate) for code in codeLists.roleCodes | orderBy: 'toString() | translate'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <select ng-if="fieldObj.field.render === 'CharacterSet.codelist'"
@@ -275,8 +280,8 @@
                                                 ng-options="code for code in codeLists.characterSetCodes | orderBy: 'toString()'"
                                                 style="width:auto;min-width:165pt;height:30px;"
                                                 ng-required="fieldObj.field.obligation === 'M'"
-                                                ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                                dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
+                                                ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                                dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index">
                                             <option value="">-----</option>
                                         </select>
                                         <input ng-if="fieldObj.field.render === 'decimal'"
@@ -285,26 +290,32 @@
                                                placeholder="{{fieldObj.field.name | translate}}"
                                                ng-model="fieldObj.field.value"
                                                ng-required="fieldObj.field.obligation === 'M'"
-                                               ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                               dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
+                                               ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                               dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
                                         <input ng-if="fieldObj.field.render === 'integer'"
                                                type="number"
                                                class="form-control form-control-fix"
                                                placeholder="{{fieldObj.field.name | translate}}"
-                                               ng-model="fieldObj.field.value"/>
+                                               ng-model="fieldObj.field.value"
+                                               ng-required="fieldObj.field.obligation === 'M'"
+                                               ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                               dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
                                         <input ng-if="fieldObj.field.render === 'web'"
                                                type="url"
                                                class="form-control form-control-fix"
                                                placeholder="{{fieldObj.field.name | translate}}"
-                                               ng-model="fieldObj.field.value"/>
+                                               ng-model="fieldObj.field.value"
+                                               ng-required="fieldObj.field.obligation === 'M'"
+                                               ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                               dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
                                         <input ng-if="fieldObj.field.render === 'mail'"
                                                type="email"
                                                class="form-control form-control-fix"
                                                placeholder="{{fieldObj.field.name | translate}}"
                                                ng-model="fieldObj.field.value"
                                                ng-required="fieldObj.field.obligation === 'M'"
-                                               ng-class="{'highlight-invalid':isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
-                                               dynamic-name="'required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
+                                               ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])}"
+                                               dynamic-name="blockObj.block.name+'_'+fieldObj.field.name+'_'+$index"/>
                                         <span ng-if="fieldObj.field.render === 'readonly'"
                                               class="data"
                                               style="word-wrap: break-word;">{{fieldObj.field.value}}</span>
@@ -314,10 +325,17 @@
                                         <span ng-if="fieldObj.field.render === 'CODELIST.readonly'"
                                               class="data"
                                               style="word-wrap: break-word;">{{fieldObj.field.value | translate}}</span>
-                                        <div ng-if="isInValidRequiredField(metadataform['required_'+blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])"
+                                        <div ng-if="!isValidField(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])"
                                              class="col-xs-12 col-sm-12 col-md-12 col-lg-12 control-error">
                                             <i class="fa fa-caret-up"></i>
-                                            <span translate="metadata.edition.validation.required">This field is required</span>
+                                            <span ng-if="!isValidRequired(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])"
+                                                  translate="metadata.edition.validation.required">This field is required</span>
+                                            <span ng-if="!isValidUrl(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])"
+                                                  translate="metadata.edition.validation.url">Invalid URL format</span>
+                                            <span ng-if="!isValidEmail(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])"
+                                                  translate="metadata.edition.validation.email">Invalid E-mail format</span>
+                                            <span ng-if="!isValidNumber(metadataform[blockObj.block.name+'_'+fieldObj.field.name+'_'+$index])"
+                                                  translate="metadata.edition.validation.number">Invalid number value</span>
                                         </div>
                                     </li>
                                 </script>
