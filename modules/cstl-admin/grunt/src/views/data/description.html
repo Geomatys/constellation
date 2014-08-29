@@ -25,7 +25,7 @@
             <div style="margin-top:20px;">
                 <div class="tab-pane active">
                     <form class="form-horizontal" name="metadataform" role="form">
-                        <div class="row alert alert-csw" style="margin: 0;">
+                        <div class="row alert alert-info" style="margin: 0;">
                             <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                                 <h4 style="font-weight:bold">
                                     <span translate="metadata.edition.heading.title">Metadata title :</span>
@@ -36,17 +36,17 @@
                                     <span style="font-size:13px;color:#999999;margin-left:10pt;">{{typeLabelKey | translate}}</span>
                                 </h5>
                             </div>
-                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                                <div class="pull-right">
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="text-align: right;">
+                                <div class="col-md-12">
                                     <button type="button"
-                                            class="btn btn-csw"
+                                            class="btn btn-info"
                                             style="padding:8pt;"
                                             ng-click="save()">
                                         <i class="fa fa-save"></i>
                                         <span translate="metadata.edition.heading.save">Save modifications</span>
                                     </button>
                                 </div>
-                                <div class="pull-right" style="margin-top: 10pt;">
+                                <div class="col-md-12" style="margin-top: 10pt;">
                                     <button type="button"
                                             class="btn btn-link"
                                             style="font-size: 12px;"
@@ -345,7 +345,7 @@
                         <div class="row buttons-block">
                             <span style="color:#db4747;" translate="metadata.edition.heading.requiredFields">(*) Required field</span>
                             <button type="button"
-                                    class="btn btn-csw pull-right"
+                                    class="btn btn-info pull-right"
                                     onclick="jQuery('html, body').animate({scrollTop: '0px'}, 1000);">
                                 <i class="fa fa-chevron-up"></i>
                                 <span translate="metadata.edition.heading.scrolltotop">Scroll to top</span>
