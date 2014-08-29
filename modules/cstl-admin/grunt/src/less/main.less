@@ -1874,8 +1874,38 @@ h3.popover-title {
   }
   .main-block-left{
     padding: 20px 25px;
+    .accueil_bloc_text{
+      font-size:14px;
+      &.accueil_bloc_text-data{
+        margin-top:20px;
+      }
+      &.accueil_bloc_text-service{
+        margin-top:20px;
+      }
+      &.accueil_bloc_text-sensor{
+        margin-top:7px;
+      }
+    }
   }
   .accueil_bloc_images {
     margin-top: 20px;
+  }
+}
+@media screen and (max-height:680px) and (min-width: @screen-md)and (max-width: @screen-md-max) {
+  .main-block-left{
+    .accueil_bloc_text{
+      &.accueil_bloc_text-data{
+        margin-top:15px;
+      }
+      &.accueil_bloc_text-service{
+        margin-top: 5px;
+      }
+      &.accueil_bloc_text-sensor{
+        margin-top:0;
+      }
+    }
+    .accueil_bloc_images.image-sensor{
+      margin-top:30px;
+    }
   }
 }
