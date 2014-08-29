@@ -16,10 +16,11 @@
 'use strict';
 
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'DomainResource', 'provider', '$window',
-    'style', 'textService', '$modal', 'Growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, DomainResource,  provider, $window, style, textService, $modal, Growl,
-              StyleSharedService, $cookies) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService',
+    'dataListing', 'DomainResource', 'provider', '$window', 'style', 'textService', '$modal',
+    'Growl', 'StyleSharedService', '$cookies',
+    function ($scope, $location, $dashboard, webService, dataListing, DomainResource,
+              provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookies) {
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.domainId = $cookies.cstlActiveDomainId;
@@ -390,7 +391,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
     }]);
 
 
-cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalInstance', 'Growl', 'dataListing', 'domains', 'dataId',
+cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalInstance', 'Growl',
+    'dataListing', 'domains', 'dataId',
   function($scope, $modalInstance, Growl, dataListing, domains, dataId){
 	$scope.domains = domains;
     $scope.close = function() {
@@ -557,25 +559,32 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             return true;
         };
 
+        /**
+         * Proceed to check validation form
+         * @param form
+         */
         $scope.checkValidation = function(form) {
             if(form.$error.required){
                 for(var i=0;i<form.$error.required.length;i++){
                     form.$error.required[i].$pristine = false;
                 }
             }
-            if(form.$invalid){
-                alert('Echec de la validation du formulaire ! ');
-                var firstInvalid = $('.highlight-invalid').get(0);
-                if(firstInvalid){
-                    $('html, body').animate(
-                        {scrollTop: $(firstInvalid).offset().top-200}, 1000);
-                    $(firstInvalid).focus();
+            $scope.showValidationPopup(form);
+        };
+
+        $scope.showValidationPopup = function(form) {
+            var validationPopup = $('#validationPopup');
+            validationPopup.modal("show");
+            validationPopup.on('hidden.bs.modal', function(e){
+                if(form && form.$invalid){
+                    var firstInvalid = $('.highlight-invalid').get(0);
+                    if(firstInvalid){
+                        $('html, body').animate(
+                            {scrollTop: $(firstInvalid).offset().top-200}, 1000);
+                        $(firstInvalid).focus();
+                    }
                 }
-            }else {
-                alert('Bravo, la formulaire est validée avec succès !');
-            }
-
-
+            });
         };
 
         function initCollapseEvents () {
@@ -611,6 +620,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
 
         $scope.getMetadataTitle = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
+                //@FIXME get field with jsonPath
                 return $scope.metadataValues[0].root.children[0].superblock.children[0].block.children[0].field.value;
             }
         };
@@ -703,8 +713,10 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
 
 }]);
 
-cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', 'sensor', '$dashboard', '$modalInstance', 'service', 'exclude', 'Growl', '$modal',
-    function ($scope, dataListing, webService, sos, sensor, $dashboard, $modalInstance, service, exclude, Growl, $modal) {
+cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos',
+    'sensor', '$dashboard', '$modalInstance', 'service', 'exclude', 'Growl', '$modal',
+    function ($scope, dataListing, webService, sos, sensor, $dashboard, $modalInstance,
+              service, exclude, Growl, $modal) {
         $scope.service = service;
 
         $scope.getDefaultFilter = function() {
@@ -907,7 +919,8 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
     }]);
 
 
-cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstance','$http', 'selected', 'metadataValues',
+cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstance','$http',
+    'selected', 'metadataValues',
     function ($scope, $modalInstance, $http, selected, metadataValues) {
         $scope.metadataValues = [];
         $scope.metadataValues.push(metadataValues.data);
