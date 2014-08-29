@@ -623,10 +623,10 @@
     "metadata.edition.heading.requiredFields":"(*) Champ obligatoire",
     "metadata.edition.heading.scrolltotop":"Retour en haut de page",
     "metadata.edition.validation.required":"Ce champ est obligatoire",
-    "metadata.edition.validation.url":"Format URL invalide ",
-    "metadata.edition.validation.email":"Format E-mail invalide",
-    "metadata.edition.validation.integer":"Nombre entier invalide",
-    "metadata.edition.validation.decimal":"Nombre décimal invalide",
+    "metadata.edition.validation.url":"Format URL non valide ",
+    "metadata.edition.validation.email":"Format E-mail non valide",
+    "metadata.edition.validation.number":"Nombre non valide",
+    "metadata.edition.heading.check.validation":"Vérifier la validation",
 
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",

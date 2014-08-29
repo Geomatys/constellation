@@ -550,8 +550,8 @@
     "metadata.edition.validation.required":"This field is required",
     "metadata.edition.validation.url":"Invalid URL format",
     "metadata.edition.validation.email":"Invalid E-mail format",
-    "metadata.edition.validation.integer":"Invalid integer value",
-    "metadata.edition.validation.decimal":"Invalid decimal value",
+    "metadata.edition.validation.number":"Invalid number value",
+    "metadata.edition.heading.check.validation":"Check validation",
 
 
     "msg.add.data.style.association": "Associate a style to the selected data",
