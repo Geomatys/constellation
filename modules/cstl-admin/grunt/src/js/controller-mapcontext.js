@@ -197,7 +197,6 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         $scope.mode = {
             selTab: 'tabInfo',
             display: 'general',
-            source: 'interne',
             dispWmsLayers: false,
             errorNoGivenName: false
         };

@@ -1,8 +1,9 @@
-<div class="modal-dialog modal-dialog-resp-height modal-dialog-sld">
+<div class="modal-dialog modal-dialog-resp-height" ng-class="{'modal-dialog-sld':mode.display!=='addChooseSource'}">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title" translate="mapcontext.modal.title">Add/Edit map context</h4>
+            <h4 class="modal-title" ng-if="mode.display!=='addChooseSource'" translate="mapcontext.modal.title">Add/Edit map context</h4>
+            <h4 class="modal-title" ng-if="mode.display==='addChooseSource'" translate="mapcontext.modal.select.source">Select your layer source</h4>
         </div>
         <div class="modal-body modal-body-style" style="overflow-y: auto;">
             <div ng-if="mode.display==='general' || mode.display==='addChooseStyle'">
@@ -12,16 +13,20 @@
                     <div class="row" ng-if="mode.display==='general'">
                         <ul class="nav nav-tabs">
                             <li id="infoTab" ng-class="{active:mode.selTab==='tabInfo'}">
-                                <a ng-click="mode.selTab='tabInfo'" data-toggle="tab"><span translate="mapcontext.modal.tab.info">Information</span></a>
+                                <a ng-click="mode.selTab='tabInfo'" data-toggle="tab" style="padding-bottom: 5px; padding-top: 5px; margin-top: 6px;">
+                                    <span translate="mapcontext.modal.tab.info">Information</span>
+                                </a>
                             </li>
-                            <li id="descriptionTab" ng-class="{active:mode.selTab==='tabLayers'}">
-                                <a ng-click="mode.selTab='tabLayers'" data-toggle="tab"><span translate="mapcontext.modal.tab.layers">Layers</span></a>
+                            <li id="descriptionTab" ng-class="{active:mode.selTab==='tabLayers'}" >
+                                <a ng-click="mode.selTab='tabLayers'" data-toggle="tab" style="padding-bottom: 5px; padding-top: 5px; margin-top: 6px;">
+                                    <span translate="mapcontext.modal.tab.layers">Layers</span>
+                                </a>
                             </li>
                         </ul>
 
                         <div class="tab-content">
                             <!-- Tab map context information -->
-                            <div class="tab-pane block-border" ng-class="{active:mode.selTab==='tabInfo'}">
+                            <div class="tab-pane block-border" ng-class="{active:mode.selTab==='tabInfo'}" style="padding-top: 13px;">
                                 <form class="form-horizontal form-style" role="form">
                                     <div class="form-group" ng-class="{'has-error':mode.errorNoGivenName}">
                                         <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.name">Name</label>
@@ -50,7 +55,7 @@
                                                     <input type="text" class="form-control" ng-model="ctxt.north" placeholder="{{'label.north.first.letter' | translate}}"/>
                                                 </div>
                                                 <div class="col-sm-offset-1 col-sm-2">
-                                                    <button class="btn btn-add" type="button" ng-click="applyExtent()" title="{{'mapcontext.modal.apply.extent' | translate}}">
+                                                    <button class="btn btn-add" title="{{'sldeditor.edition.filter.getScale' | translate}}" type="button" ng-click="applyExtent()" title="{{'mapcontext.modal.apply.extent' | translate}}">
                                                         <i class="glyphicon glyphicon-arrow-left"></i>
                                                     </button>
                                                 </div>
@@ -88,12 +93,12 @@
                             </div>
 
                             <!-- Tab layers list -->
-                            <div class="tab-pane block-border" ng-class="{active:mode.selTab==='tabLayers'}">
+                            <div class="tab-pane block-border" ng-class="{active:mode.selTab==='tabLayers'}" style="padding-top: 7px;">
                                 <div class="row dash-inner" ng-class="{'border-bottom':layers.toAdd.length > 0}">
-                                    <div class="col-sm-6">
-                                        <h3 translate="layer.listing.title">Layers list</h3>
+                                    <div class="col-sm-6" style="margin-top: 8px;">
+                                        <p style="font-weight: bold; font-size: 13px;" translate="layer.listing.title">Layers list</p>
                                     </div>
-                                    <div class="col-sm-offset-1 col-sm-5">
+                                    <div class="col-sm-6" style="margin-bottom: 7px;">
                                         <button type="button" class="btn btn-add form-control" ng-click="goToAddLayerToContext()">
                                             <span class="fa fa-plus" style="margin-right:5px;"></span>
                                             <span translate="mapcontext.modal.add.layer">Add layer</span>
@@ -250,15 +255,32 @@
 
             <!-- Add mode, choose kind of source -->
             <div ng-if="mode.display==='addChooseSource'">
-                <div class="well title-form-blue">
-                    <span translate="mapcontext.modal.select.source">Select your layer source</span>
-                </div>
-                <div style="margin-left: 30px;">
-                    <div style="margin-bottom: 5px;">
-                        <input type="radio" ng-model="mode.source" value="interne" style="margin-right: 5px;"><span translate="mapcontext.modal.label.internal">Internal</span>
+                <div style="margin-left:0; margin-right:0; height: 150px; padding-top: 22px;">
+                    <div class="col-sm-4 col-sm-offset-2" style="text-align:center;">
+                        <label class="radio data-type-choose" ng-class="{'type-selected':mode.source==='interne'}">
+                            <div class="col-sm-12" style="margin-top: 5px; padding-left:5px;">
+                                <img ng-if="mode.source!=='interne'" src="img/icon/internal.svg" />
+                                <img ng-if="mode.source==='interne'" src="img/icon/internal-selected.svg" />
+                            </div>
+                            <input type="radio"
+                                   ng-model="mode.source"
+                                   value="interne"
+                                   style="margin-left:0; display: none;"/>
+                            <div translate="mapcontext.modal.label.internal" style="margin-top:10px;">Vector data</div>
+                        </label>
                     </div>
-                    <div>
-                        <input type="radio" ng-model="mode.source" value="externe" style="margin-right: 5px;"><span translate="mapcontext.modal.label.external">External</span>
+                    <div class="col-sm-4" style="text-align:center;">
+                        <label class="radio data-type-choose" ng-class="{'type-selected':mode.source==='externe'}">
+                            <div class="col-sm-12" style="margin-top: 5px;">
+                                <img ng-if="mode.source!=='externe'" src="img/icon/external.svg" />
+                                <img ng-if="mode.source==='externe'" src="img/icon/external-selected.svg" />
+                            </div>
+                            <input type="radio"
+                                   ng-model="mode.source"
+                                   value="externe"
+                                   style="margin-left:0; display: none;"/>
+                            <div translate="mapcontext.modal.label.external" style="margin-top:10px;">Raster data</div>
+                        </label>
                     </div>
                 </div>
             </div>
