@@ -111,7 +111,7 @@ public class Template {
                     lines.add(line);
                 }
             }
-            if (templates.put(name, new Template(lines, sharedLines, sharedPaths)) != null) {
+            if (templates.put(name, new Template(lines, sharedLines, sharedPaths, 6)) != null) {
                 throw new AssertionError(name);
             }
             lines.clear();
@@ -125,6 +125,11 @@ public class Template {
     final TemplateNode root;
 
     /**
+     * The maximal length of {@link TemplateNode#path} arrays.
+     */
+    final int depth;
+
+    /**
      * Creates a pre-defined template from a resource file of the given name.
      *
      * @param  template    The JSON lines to use as a template.
@@ -132,9 +137,10 @@ public class Template {
      *                     for sharing same {@code String} instances when possible.
      */
     private Template(final Iterable<String> template, final Map<String,String> sharedLines,
-            final Map<String,String[]> sharedPaths) throws IOException
+            final Map<String,String[]> sharedPaths, final int depth) throws IOException
     {
         root = new TemplateNode(new LineReader(MetadataStandard.ISO_19115, template, sharedLines, sharedPaths), true, null);
+        this.depth = depth;
         /*
          * Do not validate the path (root.validatePath(null)). We will do that in JUnit tests instead,
          * in order to avoid consuming CPU for a verification of a static resource.
@@ -155,7 +161,7 @@ public class Template {
     public Template(final MetadataStandard standard, final Iterable<String> template) throws IOException {
         root = new TemplateNode(new LineReader(standard, template, new HashMap<String,String>(),
                 new HashMap<String,String[]>()), true, null);
-        root.validatePath(null);
+        depth = root.validatePath(null);
     }
 
     /**
@@ -198,7 +204,7 @@ public class Template {
      * @throws IOException if an error occurred while writing to {@code out}.
      */
     public void write(final Object metadata, final Appendable out, final boolean prune) throws IOException {
-        root.write(metadata, out, prune);
+        root.write(metadata, out, prune, depth);
     }
 
     /**

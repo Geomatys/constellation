@@ -263,6 +263,13 @@ scan:   while (position < upper) {
     }
 
     /**
+     * Returns the current line (in full, not only the current portion) except for the value.
+     */
+    String fullLineWithoutValue() {
+        return sharedLine(line.substring(0, line.indexOf(':') + 1));
+    }
+
+    /**
      * Returns the current line (in full, not only the current portion) without the trailing "null".
      */
     String fullLineWithoutNull() throws ParseException {

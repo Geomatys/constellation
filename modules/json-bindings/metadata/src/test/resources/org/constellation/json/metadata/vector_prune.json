@@ -19,7 +19,7 @@
 								"name":"metadata.field.title",
 								"multiplicity":1,
 								"help":"metadata.field.title_help",
-								"path":"identificationInfo.citation.title",
+								"path":"identificationInfo[1].citation.title",
 								"render":"text",
 								"obligation":"M",
 								"defaultValue":null,
@@ -38,11 +38,11 @@
 								"name":"metadata.field.inspire_keyword",
 								"multiplicity":1,
 								"help":"metadata.field.inspire_keyword_help",
-								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"path":"identificationInfo[1].descriptiveKeywords[1].keyword[1]",
 								"render":"INSPIRE_ISO.codelist",
 								"obligation":"M",
 								"defaultValue":null,
-								"value":"keywword 1"
+								"value":"keyword 1"
 							}
 						}
 					]}
@@ -51,39 +51,39 @@
 						"name":"metadata.block.descriptiveKeyword",
 						"multiplicity":62,
 						"help":"metadata.block.descriptiveKeyword_help",
-						"path":"identificationInfo.descriptiveKeywords",
+						"path":"identificationInfo[1].descriptiveKeywords[1]",
 						"children":[{
 							"field":{
 								"name":"metadata.field.keyword",
 								"multiplicity":62,
 								"help":"metadata.field.keyword_help",
-								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"path":"identificationInfo[1].descriptiveKeywords[1].keyword[1]",
 								"render":"KEYWORD.text",
 								"obligation":"O",
 								"defaultValue":null,
-								"value":"keywword 1"
+								"value":"keyword 1"
 							}
 						},{
 							"field":{
 								"name":"metadata.field.keyword",
 								"multiplicity":62,
 								"help":"metadata.field.keyword_help",
-								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"path":"identificationInfo[1].descriptiveKeywords[1].keyword[2]",
 								"render":"KEYWORD.text",
 								"obligation":"O",
 								"defaultValue":null,
-								"value":"keywword 2"
+								"value":"keyword 2"
 							}
 						},{
 							"field":{
 								"name":"metadata.field.keyword",
 								"multiplicity":62,
 								"help":"metadata.field.keyword_help",
-								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"path":"identificationInfo[1].descriptiveKeywords[1].keyword[3]",
 								"render":"KEYWORD.text",
 								"obligation":"O",
 								"defaultValue":null,
-								"value":"keywword 3"
+								"value":"keyword 3"
 							}
 						}
 					]}
@@ -92,28 +92,28 @@
 						"name":"metadata.block.descriptiveKeyword",
 						"multiplicity":62,
 						"help":"metadata.block.descriptiveKeyword_help",
-						"path":"identificationInfo.descriptiveKeywords",
+						"path":"identificationInfo[1].descriptiveKeywords[2]",
 						"children":[{
 							"field":{
 								"name":"metadata.field.keyword",
 								"multiplicity":62,
 								"help":"metadata.field.keyword_help",
-								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"path":"identificationInfo[1].descriptiveKeywords[2].keyword[1]",
 								"render":"KEYWORD.text",
 								"obligation":"O",
 								"defaultValue":null,
-								"value":"keywword 4"
+								"value":"keyword 4"
 							}
 						},{
 							"field":{
 								"name":"metadata.field.keyword",
 								"multiplicity":62,
 								"help":"metadata.field.keyword_help",
-								"path":"identificationInfo.descriptiveKeywords.keyword",
+								"path":"identificationInfo[1].descriptiveKeywords[2].keyword[2]",
 								"render":"KEYWORD.text",
 								"obligation":"O",
 								"defaultValue":null,
-								"value":"keywword 5"
+								"value":"keyword 5"
 							}
 						}
 					]}
@@ -122,14 +122,14 @@
 						"name":"metadata.block.geographicExtension",
 						"multiplicity":1,
 						"help":"metadata.block.geographicExtension_help",
-						"path":"identificationInfo.extent.geographicElement",
+						"path":"identificationInfo[1].extent[1].geographicElement[1]",
 						"render":"BOUNDINGBOX",
 						"children":[{
 							"field":{
 								"name":"metadata.field.westBoundLongitude",
 								"multiplicity":1,
 								"help":"metadata.field.westBoundLongitude_help",
-								"path":"identificationInfo.extent.geographicElement.westBoundLongitude",
+								"path":"identificationInfo[1].extent[1].geographicElement[1].westBoundLongitude",
 								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":-180,
@@ -140,7 +140,7 @@
 								"name":"metadata.field.eastBoundLongitude",
 								"multiplicity":1,
 								"help":"metadata.field.eastBoundLongitude_help",
-								"path":"identificationInfo.extent.geographicElement.eastBoundLongitude",
+								"path":"identificationInfo[1].extent[1].geographicElement[1].eastBoundLongitude",
 								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":180,
@@ -151,7 +151,7 @@
 								"name":"metadata.field.northBoundLatitude",
 								"multiplicity":1,
 								"help":"metadata.field.northBoundLatitude_help",
-								"path":"identificationInfo.extent.geographicElement.northBoundLatitude",
+								"path":"identificationInfo[1].extent[1].geographicElement[1].northBoundLatitude",
 								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":90,
@@ -162,7 +162,7 @@
 								"name":"metadata.field.southBoundLatitude",
 								"multiplicity":1,
 								"help":"metadata.field.southBoundLatitude_help",
-								"path":"identificationInfo.extent.geographicElement.southBoundLatitude",
+								"path":"identificationInfo[1].extent[1].geographicElement[1].southBoundLatitude",
 								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":-90,
@@ -183,14 +183,14 @@
 						"name":"metadata.block.pointOfContact",
 						"multiplicity":62,
 						"help":"metadata.block.pointOfContact_help",
-						"path":"identificationInfo.pointOfContact",
+						"path":"identificationInfo[1].pointOfContact[1]",
 						"render":"CONTACT",
 						"children":[{
 							"field":{
 								"name":"metadata.field.role",
 								"multiplicity":1,
 								"help":"metadata.field.role_help",
-								"path":"identificationInfo.pointOfContact.role",
+								"path":"identificationInfo[1].pointOfContact[1].role",
 								"render":"Role.codelist",
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",
@@ -203,14 +203,14 @@
 						"name":"metadata.block.pointOfContact",
 						"multiplicity":62,
 						"help":"metadata.block.pointOfContact_help",
-						"path":"identificationInfo.pointOfContact",
+						"path":"identificationInfo[1].pointOfContact[2]",
 						"render":"CONTACT",
 						"children":[{
 							"field":{
 								"name":"metadata.field.role",
 								"multiplicity":1,
 								"help":"metadata.field.role_help",
-								"path":"identificationInfo.pointOfContact.role",
+								"path":"identificationInfo[1].pointOfContact[2].role",
 								"render":"Role.codelist",
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",

@@ -20,20 +20,15 @@ package org.constellation.json.metadata;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.MissingResourceException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.opengis.util.Enumerated;
 import org.apache.sis.measure.Angle;
 import org.apache.sis.util.iso.Types;
-import org.apache.sis.util.ArraysExt;
 import org.apache.sis.util.CharSequences;
-import org.apache.sis.metadata.MetadataStandard;
-import org.apache.sis.metadata.KeyNamePolicy;
-import org.apache.sis.metadata.TypeValuePolicy;
-import org.apache.sis.metadata.ValueExistencePolicy;
 
 
 /**
@@ -51,75 +46,47 @@ final class ValueNode extends ArrayList<ValueNode> {
     final TemplateNode template;
 
     /**
-     * The values associated to this node, or {@code null}.
+     * The indices of each path element.
      */
-    final Object[] values;
+    final int[] indices;
+
+    /**
+     * The value associated to this node, or {@code null}.
+     */
+    final Object value;
 
     /**
      * Creates a new node for the given metadata.
      *
      * @param template The template to apply.
-     * @param values   The values associated to this node, or {@code null}.
+     * @param indices  The indices of each path element.
+     * @param value    The value associated to this node, or {@code null}.
      */
-    ValueNode(final TemplateNode template, final Object[] values) {
+    ValueNode(final TemplateNode template, final int[] indices, final Object value) {
         this.template = template;
-        this.values   = values;
+        this.value    = value;
+        this.indices  = (indices != null) ? Arrays.copyOfRange(indices, 0, template.path.length) : null;
     }
 
     /**
-     * Fetches all occurrences of metadata values at the given path.
-     *
-     * @param  metadata   The metadata from where to get the values.
-     * @param  pathOffset Index of the first {@code path} element to use.
-     * @param  upper      Index after the last {@code path} element to use.
-     * @return The values (often an array of length 1), or {@code null} if none.
-     * @throws ClassCastException if {@code metadata} is not an instance of the expected standard.
+     * Formats the path.
      */
-    static Object[] getValues(final MetadataStandard standard, Object metadata,
-            final CharSequence[] path, int pathOffset, final int upper) throws ClassCastException, ParseException
-    {
-        if (pathOffset >= upper) {
-            throw new ParseException("Path is empty.");
-        }
-        if (metadata == null || path == null) {
-            return null;
-        }
-        Object value;
-        do {
-            // Fetch the value from the metadata object.
-            final CharSequence identifier = path[pathOffset];
-            value = standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
-            if (value == null) {
-                return null;
+    final void formatPath(final Appendable out) throws IOException {
+        out.append('"');
+        final String[] path = template.path;
+        for (int i=0; i<path.length; i++) {
+            if (i != 0) {
+                out.append('.');
             }
-            /*
-             * Verify if the value is a collection. We do not rely on (value instanceof Collection)
-             * only because it may not be reliable if the value implements more than one interface.
-             * Instead, we rely on the method contract.
-             */
-            if (value instanceof Collection<?>) {
-                final Class<?> type = standard.asTypeMap(metadata.getClass(),
-                        KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.PROPERTY_TYPE).get(identifier);
-                if (Collection.class.isAssignableFrom(type)) {
-                    Object[] values = ((Collection<?>) value).toArray();
-                    if (++pathOffset < upper) {
-                        final Object[][] arrays = new Object[values.length][];
-                        for (int i=0; i<values.length; i++) {
-                            arrays[i] = getValues(standard, values[i], path, pathOffset, upper);
-                        }
-                        values = ArraysExt.concatenate(arrays);
-                    }
-                    return values;
+            out.append(path[i]);
+            if (indices != null) {
+                final int index = indices[i];
+                if (index != 0) {
+                    out.append('[').append(Integer.toString(index)).append(']');
                 }
             }
-            /*
-             * The value is not a collection. Continue the loop for each components in the path. For example
-             * if the path is "identificationInfo.extent.geographicElement.southBoundLatitude", then the loop
-             * would be executed for "identificationInfo", then "extent", etc. if all components were singleton.
-             */
-            metadata = value;
-        } while (++pathOffset < upper);
-        return new Object[] {value};
+        }
+        out.append('"');
     }
 
     /**
@@ -127,7 +94,7 @@ final class ValueNode extends ArrayList<ValueNode> {
      *
      * @param value The value to format.
      */
-    static void format(final Object value, final Appendable out) throws IOException {
+    static void formatValue(final Object value, final Appendable out) throws IOException {
         final String p;
         if (value == null) {
             p = null;
@@ -178,7 +145,7 @@ final class ValueNode extends ArrayList<ValueNode> {
      * Implementation of {@link #toString()} to be invoked recursively by children.
      */
     private void toString(final StringBuilder buffer, int indentation, int pathOffset) {
-        template.toString(buffer, indentation, pathOffset, "values", values);
+        template.toString(buffer, indentation, pathOffset, "value", value);
         buffer.append('\n');
         indentation += 4;
         pathOffset += template.getPathDepth();

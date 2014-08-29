@@ -31,9 +31,7 @@ import org.apache.sis.metadata.ValueExistencePolicy;
 
 
 /**
- * Writes a JSON file using a template.
- *
- * @author Martin Desruisseaux (Geomatys)
+ * Note: elements already present in TemplateApplication.java have been removed from this file.
  */
 final class TemplateApplicator {
     /**
@@ -51,41 +49,11 @@ final class TemplateApplicator {
     private final Appendable out;
 
     /**
-     * {@code true} for omitting empty nodes.
-     */
-    final boolean prune;
-
-    /**
      * If a metadata values has been requested, the remaining values after we processed the values for
      * the current {@code TemplateNode}. This is used for avoiding to write the same values many time
      * if the same path appears more than once.
      */
     private final Map<NumerotedPath,Object[]> remainingValues;
-
-    /**
-     * The node currently in process of being written.
-     */
-    TemplateNode currentNode;
-
-    /**
-     * The index of each elements in the path, to be copied in {@link NumerotedPath#indices} when needed.
-     * Those indices will be incremented as we iterate in the metadata tree.
-     */
-    private final int[] indices;
-
-    /**
-     * Creates a new writer.
-     *
-     * @param out      Where to write the JSON file.
-     * @param prune    {@code true} for omitting empty nodes.
-     * @param maxDepth The maximal length of {@link TemplateNode#path}.
-     */
-    TemplateApplicator(final Appendable out, final boolean prune, final int maxDepth) {
-        this.out   = out;
-        this.prune = prune;
-        remainingValues = new HashMap<>();
-        indices = new int[maxDepth];
-    }
 
     /**
      * Given a newly computed set of values for the given path, separates the value to use for the current
@@ -196,21 +164,17 @@ final class TemplateApplicator {
              * only because it may not be reliable if the value implements more than one interface.
              * Instead, we rely on the method contract.
              */
-            if (value instanceof Collection<?>) {
-                final Class<?> type = standard.asTypeMap(metadata.getClass(),
-                        KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.PROPERTY_TYPE).get(identifier);
-                if (Collection.class.isAssignableFrom(type)) {
-                    Object[] values = ((Collection<?>) value).toArray();
-                    if (++pathOffset < path.length) {
-                        final Object[][] arrays = new Object[values.length][];
-                        for (int i=0; i<values.length; i++) {
-                            indices[pathOffset - 1] = i;
-                            arrays[i] = getValues(values[i], pathOffset);
-                        }
-                        values = ArraysExt.concatenate(arrays);
+            if (value instanceof Collection<?> && isCollection(standard, metadata, identifier)) {
+                Object[] values = ((Collection<?>) value).toArray();
+                if (++pathOffset < path.length) {
+                    final Object[][] arrays = new Object[values.length][];
+                    for (int i=0; i<values.length; i++) {
+                        indices[pathOffset - 1] = i;
+                        arrays[i] = getValues(values[i], pathOffset);
                     }
-                    return filterNewValues(key, values);
+                    values = ArraysExt.concatenate(arrays);
                 }
+                return filterNewValues(key, values);
             }
             /*
              * The value is not a collection. Continue the loop for each components in the path. For example
