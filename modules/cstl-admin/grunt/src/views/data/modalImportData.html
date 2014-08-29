@@ -26,7 +26,7 @@
                     class="modal-title"
                     translate="data.modal.netcdf">NetCDF File</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" ng-class="{'modal-body-list-data':import.currentStep === 'step3Type'}">
                 <div ng-if="import.currentStep === 'step1DataLocal'">
                     <div ng-include="'views/data/import/step1_data_local.html'"></div>
                 </div>
@@ -49,7 +49,7 @@
                     <div ng-include="'views/data/import/step4_netcdf.html'"></div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" ng-class="{'modal-footer-list-data':import.currentStep === 'step3Type'}">
                 <button id="cancelButton"
                         type="button"
                         class="btn btn-default"

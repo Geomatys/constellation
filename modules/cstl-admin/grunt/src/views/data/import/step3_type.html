@@ -1,42 +1,48 @@
 <div id="part3Type" ng-controller="ModalImportDataStep3TypeController">
-    <div class="row">
-        <div class="col-sm-4">
-            <label class="radio">
+    <div class="row" style="margin-left:0; margin-right:0; height: 150px; padding-top: 18px;">
+        <div class="col-sm-4" style="text-align:center;">
+            <label class="radio data-type-choose" ng-class="{'type-selected':import.uploadType==='vector'}">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                    <img src="img/icon/vector.svg" />
+                </div>
                 <input type="radio"
                        ng-model="import.uploadType"
                        name="dataType"
                        value="vector"
-                       style="margin-top:12px;"/>
-                <img src="img/icon/vector.png" class="img-rounded"/>
-                <div translate="layer.listing.data.upload.vector.label">Vector data</div>
+                       style="margin-left:0; display: none;"/>
+                <div translate="layer.listing.data.upload.vector.label" style="margin-top:10px;">Vector data</div>
             </label>
         </div>
-        <div class="col-sm-4">
-            <label class="radio">
+        <div class="col-sm-4" style="text-align:center;">
+            <label class="radio data-type-choose" ng-class="{'type-selected':import.uploadType==='raster'}">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                    <img src="img/icon/raster.svg" />
+                </div>
                 <input type="radio"
                        ng-model="import.uploadType"
                        name="dataType"
                        value="raster"
-                       style="margin-top:12px;"/>
-                <img src="img/icon/raster.png" class="img-rounded"/>
-                <div translate="layer.listing.data.upload.raster.label">Raster data</div>
+                       style="margin-left:0; display: none;"/>
+                <div translate="layer.listing.data.upload.raster.label" style="margin-top:10px;">Raster data</div>
             </label>
         </div>
-        <div class="col-sm-4">
-            <label class="radio">
+        <div class="col-sm-4" style="text-align:center;">
+            <label class="radio data-type-choose" ng-class="{'type-selected':import.uploadType==='sensor'}">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                    <img src="img/icon/sensor.svg" />
+                </div>
                 <input type="radio"
                        ng-model="import.uploadType"
                        name="dataType"
                        value="sensor"
-                       style="margin-top:12px;"/>
-                <img src="img/icon/sensor.png" class="img-rounded"/>
-                <div translate="layer.listing.data.upload.sensor.label">Sensor data</div>
+                       style="margin-left:0; display: none;"/>
+                <div translate="layer.listing.data.upload.sensor.label" style="margin-top:10px;">Sensor data</div>
             </label>
         </div>
     </div>
 
-    <div class="col-xs-12" style="margin-top:10px; padding-top:5px; border-top:solid 1px #ddd;">
-        <div class="checkbox inline">
+    <div class="col-xs-12" style="margin-top:10px; border-top:solid 1px #ddd; padding-left:0; padding-right:0;">
+        <div class="form-group" style="padding: 10px 0 12px 17px; margin-bottom: 0; background-color: #E9E9E9;">
             <input type="checkbox"
                    ng-model="sensor.checked"
                    ng-change="changeAssociationState()"/>
