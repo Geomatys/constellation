@@ -18,6 +18,45 @@
  */
 package org.constellation.rest.api;
 
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.CRC32;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -27,9 +66,9 @@ import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.admin.DataBusiness;
+import org.constellation.admin.DatasetBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SensorBusiness;
 import org.constellation.admin.exception.ConstellationException;
@@ -49,6 +88,7 @@ import org.constellation.dto.ProviderData;
 import org.constellation.dto.PyramidParams;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.UserRepository;
@@ -125,47 +165,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.CRC32;
-
 /**
  * Manage data sending
  *
@@ -187,6 +186,9 @@ public class DataRest {
 
     @Inject
     private DataBusiness dataBusiness;
+    
+    @Inject
+    private DatasetBusiness datasetBusiness;
 
     @Inject
     private ProviderBusiness providerBusiness;
@@ -698,13 +700,15 @@ public class DataRest {
         }
 
         final Provider providerDB = providerBusiness.getProvider(providerId, domainId);
+        // for now assume that providerID == datasetID
+        final Dataset datasetDB   = datasetBusiness.getDataset(providerId, domainId);
         final List<org.constellation.engine.register.Data> datasFromProviderId = providerBusiness.getDatasFromProviderId(providerDB.getId());
         final String metadata;
-        if(datasFromProviderId.size()==0){
+        if(datasFromProviderId.isEmpty()){
             return Response.status(500).entity("The dataset have no data").build();
         }
         if (datasFromProviderId.size()>1){
-            metadata = providerDB.getMetadataIso();
+            metadata = datasetDB.getMetadataIso();
         }else{
             metadata = datasFromProviderId.get(0).getIsoMetadata();
         }
@@ -1743,8 +1747,9 @@ public class DataRest {
 
 
         DefaultMetadata metadata = null;
-        final Provider providerFromDB = providerBusiness.getProvider(providerId);
-        final String metadataFromDB = providerFromDB.getMetadataIso();
+        // for now assume that providerID == datasetID
+        final Dataset datasetFromDB = datasetBusiness.getDataset(providerId);
+        final String metadataFromDB = datasetFromDB.getMetadataIso();
         final InputStream is = new ByteArrayInputStream(metadataFromDB.getBytes());
         final MarshallerPool pool = CSWMarshallerPool.getInstance();
         try {

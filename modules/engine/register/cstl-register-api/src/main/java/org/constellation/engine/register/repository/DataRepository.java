@@ -47,6 +47,7 @@ public interface DataRepository {
 
     List<Data> findByProviderId(Integer id);
 
+    List<Data> findByDatasetId(Integer id);
     
     DataWithI18N getDescription(Data data);
 

@@ -1,7 +1,5 @@
 package org.constellation.admin;
 
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.xml.MarshallerPool;
 import org.constellation.api.ProviderType;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.engine.register.Data;
@@ -10,7 +8,6 @@ import org.constellation.engine.register.Style;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.utils.ISOMarshallerPool;
 import org.opengis.parameter.GeneralParameterValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,12 +15,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Optional;
 
 import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,35 +104,5 @@ public class ProviderBusiness {
         provider.setImpl(serviceName);
         return providerRepository.insert(provider);
 
-    }
-
-    public DefaultMetadata getMetadata(String providerId, int domainId) throws JAXBException {
-        final Provider provider = getProvider(providerId, domainId);
-        final MarshallerPool pool = ISOMarshallerPool.getInstance();
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final DefaultMetadata metadata = (DefaultMetadata) unmarshaller.unmarshal(new ByteArrayInputStream(provider.getMetadataIso()
-                .getBytes()));
-        pool.recycle(unmarshaller);
-        metadata.prune();
-        return metadata;
-    }
-
-    public void updateMetadata(String providerIdentifier, Integer domainId, DefaultMetadata metadata) throws JAXBException {
-        final MarshallerPool pool = ISOMarshallerPool.getInstance();
-        final Marshaller marshaller = pool.acquireMarshaller();
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        marshaller.marshal(metadata, outputStream);
-        final String metadataString = outputStream.toString();
-        final Provider provider = providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
-        provider.setMetadataIso(metadataString);
-        provider.setMetadataId(metadata.getFileIdentifier());
-        providerRepository.update(provider);
-    }
-
-    public void updateMetadata(String providerIdentifier, Integer domainId, String metaId, String metadataXml) throws JAXBException {
-        final Provider provider = providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
-        provider.setMetadataIso(metadataXml);
-        provider.setMetadataId(metaId);
-        providerRepository.update(provider);
     }
 }

@@ -1,41 +1,6 @@
 package org.constellation.admin;
 
 import com.google.common.base.Optional;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.ServiceDef;
-import org.constellation.admin.exception.ConstellationException;
-import org.constellation.configuration.CstlConfigurationRuntimeException;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.ServiceProtocol;
-import org.constellation.configuration.StyleBrief;
-import org.constellation.dto.CoverageMetadataBean;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.Style;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.engine.register.repository.LayerRepository;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.engine.register.repository.SensorRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.engine.register.repository.StyleRepository;
-import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.admin.index.IndexEngine;
-import org.constellation.utils.ISOMarshallerPool;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +11,42 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef;
+import org.constellation.admin.exception.ConstellationException;
+import org.constellation.admin.index.IndexEngine;
+import org.constellation.configuration.CstlConfigurationRuntimeException;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.ServiceProtocol;
+import org.constellation.configuration.StyleBrief;
+import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.Style;
+import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.DatasetRepository;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.engine.register.repository.ProviderRepository;
+import org.constellation.engine.register.repository.SensorRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.engine.register.repository.StyleRepository;
+import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.utils.ISOMarshallerPool;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DataBusiness {
@@ -75,6 +76,9 @@ public class DataBusiness {
 
     @Inject
     private ProviderRepository providerRepository;
+    
+    @Inject
+    private DatasetRepository datasetRepository;
 
     @Inject
     private SensorRepository sensorRepository;
@@ -202,11 +206,11 @@ public class DataBusiness {
 
     private  List<Data> findByMetadataId(String metadataId) {
         List<Data> dataResult   = new ArrayList<>();
-        final Provider provider = providerRepository.findByMetadataId(metadataId);
+        final Dataset dataset   = datasetRepository.findByMetadataId(metadataId);
         final Data data         = dataRepository.findByMetadataId(metadataId);
         final Service service   = serviceRepository.findByMetadataId(metadataId);
-        if (provider != null){
-            dataResult = dataRepository.findByProviderId(provider.getId());
+        if (dataset != null){
+            dataResult = dataRepository.findByDatasetId(dataset.getId());
         } else if (service!= null) {
             dataResult = serviceRepository.findDataByServiceId(service.getId());
         } else if (data != null) {

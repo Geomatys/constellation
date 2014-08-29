@@ -30,8 +30,6 @@ public interface ProviderRepository {
 
     public Provider findOne(Integer id);
 
-    public Provider findByMetadataId(String metadataId);
-
     public List<Provider> findByImpl(String serviceName);
 
     public List<String> getProviderIds();

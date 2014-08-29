@@ -95,8 +95,6 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
         newRecord.setConfig(provider.getConfig());
         newRecord.setIdentifier(provider.getIdentifier());
         newRecord.setImpl(provider.getImpl());
-        newRecord.setMetadataIso(provider.getMetadataIso());
-        newRecord.setMetadataId(provider.getMetadataId());
         newRecord.setOwner(provider.getOwner());
         newRecord.setType(provider.getType());
         newRecord.setParent(provider.getParent());
@@ -112,11 +110,6 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     @Override
     public int deleteByIdentifier(String providerID) {
         return dsl.delete(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerID)).execute();
-    }
-
-    @Override
-    public Provider findByMetadataId(String metadataId) {
-        return dsl.select().from(PROVIDER).where(PROVIDER.METADATA_ID.eq(metadataId)).fetchOneInto(Provider.class);
     }
 
     @Override
@@ -137,8 +130,6 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
         UpdateConditionStep<ProviderRecord> set = dsl.update(PROVIDER)
                 .set(PROVIDER.CONFIG, provider.getConfig())
                 .set(PROVIDER.IDENTIFIER, provider.getIdentifier())
-                .set(PROVIDER.METADATA_ISO, provider.getMetadataIso())
-                .set(PROVIDER.METADATA_ID, provider.getMetadataId())
                 .set(PROVIDER.IMPL, provider.getImpl())
                 .set(PROVIDER.OWNER, provider.getOwner())
                 .set(PROVIDER.PARENT, provider.getParent())

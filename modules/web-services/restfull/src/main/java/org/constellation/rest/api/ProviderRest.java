@@ -19,10 +19,37 @@
 
 package org.constellation.rest.api;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.referencing.crs.DefaultGeographicCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.DatasetBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -49,7 +76,6 @@ import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.FileFeatureStoreFactory;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.io.ContentFormatException;
 import org.geotoolkit.io.wkt.PrjFiles;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessException;
@@ -58,41 +84,12 @@ import org.geotoolkit.storage.DataFileStore;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
-
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * RestFull API for provider management/operations.
@@ -114,6 +111,9 @@ public final class ProviderRest {
     
     @Inject
     private ProviderBusiness providerBusiness;
+    
+    @Inject
+    private DatasetBusiness datasetBusiness;
 
     @POST
     @Path("/{id}/test")
@@ -585,21 +585,35 @@ public final class ProviderRest {
         }
     }
 
+    /**
+     *  
+     * Is this method still used ??
+     * 
+     * No longer metadata for provider but for dataset
+     */
     @GET
     @Path("metadata/{providerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
-        DefaultMetadata metadata = providerBusiness.getMetadata(providerId,domainId);
+        // for now assume that providerID == datasetID
+        DefaultMetadata metadata = datasetBusiness.getMetadata(providerId,domainId);
         return Response.ok(metadata).build();
     }
 
+    /**
+     *  
+     * Is this method still used ??
+     * 
+     * No longer metadata for provider but for dataset
+     */
     @POST
     @Path("metadata/{providerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
-        providerBusiness.updateMetadata(providerId, domainId, metadata);
+        // for now assume that providerID == datasetID
+        datasetBusiness.updateMetadata(providerId, domainId, metadata);
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 }

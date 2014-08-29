@@ -19,17 +19,16 @@
 
 package org.constellation.admin;
 
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
-import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.DatasetRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
+import org.springframework.stereotype.Component;
 
 /**
  *
@@ -42,15 +41,15 @@ public class MetadataBusiness {
     private DataRepository dataRepository;
     
     @Inject
-    private ProviderRepository providerRepository;
+    private DatasetRepository datasetRepository;
     
     @Inject
     private ServiceRepository serviceRepository;
  
     public String searchMetadata(final String metadataId, final boolean includeService)  {
-        final Provider provider = providerRepository.findByMetadataId(metadataId);
-        if (provider != null) {
-            return provider.getMetadataIso();
+        final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
+        if (dataset != null) {
+            return dataset.getMetadataIso();
         }
         
         final Data data = dataRepository.findByMetadataId(metadataId);
@@ -73,8 +72,8 @@ public class MetadataBusiness {
     
     public List<String> getInternalMetadataIds(final boolean includeService) {
         final List<String> results = new ArrayList<>();
-        final List<Provider> providers = providerRepository.findAll();
-        for (Provider record : providers) {
+        final List<Dataset> datasets = datasetRepository.findAll();
+        for (Dataset record : datasets) {
             if (record.getMetadataIso() != null) {
                 results.add(record.getMetadataId());
             }

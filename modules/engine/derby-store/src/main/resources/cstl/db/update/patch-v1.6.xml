@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.6" author="GLegal">
+        
+        <createTable schemaName="admin" tableName="dataset">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="DATASET_PK" />
+            </column>
+            <column name="identifier" type="VARCHAR(100)" >
+                <constraints nullable="false" />
+            </column>
+            <column name="provider_id" type="INTEGER" >
+                <constraints nullable="false" />
+            </column>
+            <column name="metadata_id" type="VARCHAR(100)" >
+                <constraints nullable="true" />
+            </column>
+            <column name="metadata_iso" type="CLOB(2147483647)" >
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint
+            baseTableSchemaName="admin" referencedTableSchemaName="admin"
+            constraintName="dataset_provider_id_fk"
+            baseTableName="dataset" baseColumnNames="provider_id"
+            referencedTableName="provider" referencedColumnNames="id"
+            onDelete="NO ACTION" />
+        
+        <addColumn schemaName="admin" tableName="data">
+            <column name="dataset_id" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <addForeignKeyConstraint
+            baseTableSchemaName="admin" referencedTableSchemaName="admin"
+            constraintName="data_dataset_id_fk"
+            baseTableName="data" baseColumnNames="dataset_id"
+            referencedTableName="dataset" referencedColumnNames="id"
+             onDelete="NO ACTION" />
+        
+        <dropColumn columnName="metadata_iso"
+            schemaName="admin"
+            tableName="provider"/>
+        
+        <dropColumn columnName="metadata_id"
+            schemaName="admin"
+            tableName="provider"/>
+    </changeSet>
+</databaseChangeLog>

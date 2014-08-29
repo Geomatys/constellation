@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -35,14 +36,16 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.admin.DatasetBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.api.ProviderType;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
+import org.constellation.engine.register.Provider;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.DataProviderFactory;
@@ -62,7 +65,10 @@ import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -95,6 +101,9 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
 
     @Inject
     private ProviderBusiness providerBusiness;
+    
+    @Inject
+    private DatasetBusiness datasetBusiness;
     
     private static ConstellationClient client;
     
@@ -206,8 +215,14 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         DefaultMetadata meta = (DefaultMetadata) u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
         CSWMarshallerPool.getInstance().recycle(u);
 
-        providerBusiness.createProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
-        providerBusiness.updateMetadata(identifier,null,meta);
+        Marshaller m = CSWMarshallerPool.getInstance().acquireMarshaller();
+        m.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
+        final StringWriter sw = new StringWriter();
+        m.marshal(meta, sw);
+        CSWMarshallerPool.getInstance().recycle(m);
+        
+        final Provider prov = providerBusiness.createProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
+        datasetBusiness.createDataset(identifier, prov.getId(), meta.getFileIdentifier(), sw.toString());
     }
 
     /**
