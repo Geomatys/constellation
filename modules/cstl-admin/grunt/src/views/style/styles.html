@@ -3,21 +3,13 @@
         <h3 class="header-title" translate="page.header.title.style">Style Dashboard</h3>
     </div>
     <div class="col-sm-3">
-        <div class="dropdown pull-right">
-            <a data-toggle="dropdown"
-               class="btn btn-lg dropdown-toggle btn-add"
+        <div class="pull-right">
+            <a class="btn btn-lg dropdown-toggle btn-add"
+               ng-click="showStyleCreate()"
                style="margin-top:8px;padding:15px 19px;">
                 <span class="fa fa-plus" style="margin-right:5px;"></span>
                 <span translate="label.add.style">Add new style</span>
-                <span class="caret"></span>
             </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a id="newstylechoice"
-                       ng-click="showStyleCreate()"
-                       translate="label.create.new.style">Create new style</a>
-                </li>
-            </ul>
         </div>
     </div>
 </div>
