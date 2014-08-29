@@ -1,4 +1,4 @@
-<div class="row" style="margin-bottom: 20px; margin-top: 50px;">
+<div class="row accueil-header-logo">
     <div class="col-sm-6 col-md-5 col-md-offset-1 accueil_logo" style="text-align:center;">
         <img src="img/constellation.svg"/>
     </div>
@@ -12,8 +12,8 @@
 <div class="row">
     <!-- Service block -->
     <div class="col-sm-6"  >
-        <div class="well accueil-well">
-            <div class="row" style="padding: 37px 27px;">
+        <div class="well accueil-well main-block-left">
+            <div class="row">
                 <div class="col-sm-12">
                     <p class="accueil_bloc_text" translate="homepage.text.intro">
                         <b>Constellation-SDI</b> is the perfect solution to easily set up your Spatial Data Infrastructure.
@@ -38,7 +38,7 @@
                             </p>
                         </div>
                     </div>
-                    <div class="row accueil_bloc_images" style="margin-top: 45px;">
+                    <div class="row accueil_bloc_images" >
                         <div class="col-xs-12 col-md-3">
                             <img src="img/sensor-accueil.svg">
                         </div>
@@ -53,12 +53,12 @@
         </div>
     </div>
 
-    <div class="col-sm-6" ng-if="authenticated" ng-show="hasMultipleDomains()">
-        <div class="well main-block-domain-choice" style="padding-bottom: 0px; padding-top: 0px; margin-top: 40px;">
-            <div class="row" style="padding: 0px 27px 27px 27px;">
+    <div class="col-sm-6 " ng-if="authenticated" ng-show="hasMultipleDomains()">
+        <div class="well main-block-right main-block-domain-choice" style="margin-top: 40px;">
+            <div class="row">
                 <div class="col-sm-12">
                     <div class="row">
-                        <h1 style="font-size:20px; margin-bottom:20px;" translate="global.menu.domain.choice">Domain choice</h1>
+                        <h1 translate="global.menu.domain.choice">Domain choice</h1>
                         <ul class="nav nav-pills nav-domain ng-cloak" ng-controller="DomainSwitcherController">
                             <li class="dropdown pointer tab-domain" ng-class="{'activDomain':'{{domain.name}}'==='{{activeDomain}}'}" ng-repeat="domain in domains" active-menu="{{domain.name}}">
                                 <a ng-click="changeDomain($index)">
@@ -73,36 +73,36 @@
     </div>
 
     <div class="col-sm-6" ng-if="authenticated">
-        <div class="well" ng-class="{'main-block-stat':!hasMultipleDomains()}" style="padding-bottom: 0px; padding-top: 0px;" ng-init="countStats()">
-            <div class="row" style="padding: 0px 27px 27px 27px;">
+        <div class="well main-block-right" ng-class="{'main-block-stat':!hasMultipleDomains()}" ng-init="countStats()">
+            <div class="row">
                 <div class="col-sm-12">
                     <div class="row">
-                        <h1 style="font-size:20px; color:#5e5e5e; margin-bottom:20px;" translate="homepage.statistics.title">Statistics</h1>
+                        <h1 translate="homepage.statistics.title">Statistics</h1>
                         <div class="row">
                             <div class="col-xs-6">
-                                <div style="background-color:#eaeaea; padding:10px; border-radius:5px; text-align:center; background-image:url('img/index-img-services.svg'); background-repeat:no-repeat; background-position:3% 80%;">
-                                    <p class="col-xs-12" translate="homepage.statistics.services"><strong>Active Services</strong></p>
+                                <div class="accueil-stat-blocs" style="background-image:url('img/index-img-services.svg'); background-repeat:no-repeat; background-position:3% 80%;">
+                                    <p class="col-xs-12 label-stat" translate="homepage.statistics.services"><strong>Active Services</strong></p>
                                     <p class="col-xs-12" style="font-size:30px; font-weight:bold;">{{nbservices}}</p>
                                 </div>
                             </div>
                             <div class="col-xs-6" >
-                                <div style="background-color:#eaeaea; padding:10px; border-radius:5px; text-align:center; background-image:url('img/index-img-data.svg'); background-repeat:no-repeat; background-position:5% 80%;">
-                                    <p class="col-xs-12" translate="homepage.statistics.data"><strong>Integrated Data</strong></p>
+                                <div class="accueil-stat-blocs" style="background-image:url('img/index-img-data.svg'); background-repeat:no-repeat; background-position:5% 80%;">
+                                    <p class="col-xs-12 label-stat" translate="homepage.statistics.data"><strong>Integrated Data</strong></p>
                                     <p class="col-xs-12" style="font-size:30px; font-weight:bold;">{{nbdata}}</p>
                                 </div>
                             </div>
 
                         </div>
-                        <div class="row" style="margin-top:20px;">
+                        <div class="row blocs-bottom">
                             <div class="col-xs-6" >
-                                <div style="background-color:#eaeaea; padding:10px; border-radius:5px; text-align:center; background-image:url('img/index-img-user.svg'); background-repeat:no-repeat; background-position:3% 100%;">
-                                    <p class="col-xs-12" translate="homepage.statistics.users"><strong>Created Users</strong></p>
+                                <div class="accueil-stat-blocs" style="background-image:url('img/index-img-user.svg'); background-repeat:no-repeat; background-position:3% 100%;">
+                                    <p class="col-xs-12 label-stat" translate="homepage.statistics.users"><strong>Created Users</strong></p>
                                     <p class="col-xs-12" style="font-size:30px; font-weight:bold;">{{nbusers}}</p>
                                 </div>
                             </div>
                             <div class="col-xs-6" >
-                                <div style="background-color:#eaeaea; padding:10px; border-radius:5px; text-align:center; background-image:url('img/index-img-process.svg'); background-repeat:no-repeat; background-position:3% 90%;">
-                                    <p class="col-xs-12" translate="homepage.statistics.process"><strong>Process</strong></p>
+                                <div class="accueil-stat-blocs" style="background-image:url('img/index-img-process.svg'); background-repeat:no-repeat; background-position:3% 90%;">
+                                    <p class="col-xs-12 label-stat" translate="homepage.statistics.process"><strong>Process</strong></p>
                                     <p class="col-xs-12" style="font-size:30px; font-weight:bold;">{{nbprocess}}</p>
                                 </div>
                             </div>
