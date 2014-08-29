@@ -627,7 +627,8 @@
     "metadata.edition.validation.email":"Format E-mail non valide",
     "metadata.edition.validation.number":"Nombre non valide",
     "metadata.edition.heading.check.validation":"Vérifier la validation",
-
+    "metadata.edition.heading.check.validation.passed":"Bravo !! les champs de votre formulaire sont bien remplis.",
+    "metadata.edition.heading.check.validation.notpassed":"Echec de la validation, merci de vérifier les valeurs des champs.",
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",
     "metrics.jvm.gc.marksweepcount": "Total de \"Mark Sweep\"",

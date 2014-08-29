@@ -552,7 +552,8 @@
     "metadata.edition.validation.email":"Invalid E-mail format",
     "metadata.edition.validation.number":"Invalid number value",
     "metadata.edition.heading.check.validation":"Check validation",
-
+    "metadata.edition.heading.check.validation.passed":"Well done ! your current form is valid.",
+    "metadata.edition.heading.check.validation.notpassed":"Failed to validate your current form, please check your values.",
 
     "msg.add.data.style.association": "Associate a style to the selected data",
     "msg.add.data.mapcontext.association": "Associate a mapcontext to the selected data.",
