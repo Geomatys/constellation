@@ -74,19 +74,7 @@ final class ValueNode extends ArrayList<ValueNode> {
      */
     final void formatPath(final Appendable out, int pathOffset) throws IOException {
         out.append('"');
-        final String[] path = template.path;
-        for (int i=0; i<path.length; i++) {
-            if (i != 0) {
-                out.append('.');
-            }
-            out.append(path[i]);
-            if (indices != null) {
-                final int index = indices[i];
-                if (index != 0) {
-                    out.append('[').append(Integer.toString(index)).append(']');
-                }
-            }
-        }
+        NumerotedPath.formatPath(out, template.path, pathOffset, indices);
         out.append('"');
     }
 

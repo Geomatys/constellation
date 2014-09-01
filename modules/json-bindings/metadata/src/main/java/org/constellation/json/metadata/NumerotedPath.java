@@ -34,13 +34,12 @@ import java.io.IOException;
  */
 final class NumerotedPath {
     /**
-     * The template from which to get the path.
+     * The path elements.
      */
-    final TemplateNode template;
+    final String[] path;
 
     /**
-     * The index of each elements in the path. The length of this array is smaller than
-     * or equals to {@code path.length}.
+     * The index of each elements in the path.
      */
     final int[] indices;
 
@@ -50,9 +49,9 @@ final class NumerotedPath {
      * @param path    The template containing the path.
      * @param indices The index of each elements in the path. This array will be partially copied.
      */
-    NumerotedPath(final TemplateNode template, final int[] indices) {
-        this.template = template;
-        this.indices  = (indices != null) ? Arrays.copyOfRange(indices, 0, template.path.length) : null;
+    NumerotedPath(final String[] path, final int[] indices) {
+        this.path     = path;
+        this.indices  = (indices != null) ? Arrays.copyOfRange(indices, 0, path.length) : null;
     }
 
     /**
@@ -60,7 +59,7 @@ final class NumerotedPath {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(template.path) ^ Arrays.hashCode(indices);
+        return Arrays.hashCode(path) ^ Arrays.hashCode(indices);
     }
 
     /**
@@ -69,8 +68,8 @@ final class NumerotedPath {
     @Override
     public boolean equals(final Object other) {
         return (other instanceof NumerotedPath) &&
-               Arrays.equals(template.path, ((NumerotedPath) other).template.path) &&
-               Arrays.equals(indices,       ((NumerotedPath) other).indices);
+               Arrays.equals(path,    ((NumerotedPath) other).path) &&
+               Arrays.equals(indices, ((NumerotedPath) other).indices);
     }
 
     /**
@@ -80,7 +79,7 @@ final class NumerotedPath {
     public String toString() {
         final StringBuilder buffer = new StringBuilder();
         try {
-            formatPath(buffer, template.path, 0, indices);
+            formatPath(buffer, path, 0, indices);
         } catch (IOException e) {
             throw new AssertionError(e); // Should never happen, since we are writting to a StringBuilder.
         }
@@ -90,10 +89,10 @@ final class NumerotedPath {
     /**
      * Formats the given path, without quotes.
      */
-    static void formatPath(final Appendable out, final String[] path, int pathOffset, final int[] indices) throws IOException {
+    static void formatPath(final Appendable out, final CharSequence[] path, int pathOffset, final int[] indices) throws IOException {
         while (pathOffset < path.length) {
             if (pathOffset != 0) {
-                out.append('.');
+                out.append(Keywords.PATH_SEPARATOR);
             }
             out.append(path[pathOffset]);
             if (indices != null) {

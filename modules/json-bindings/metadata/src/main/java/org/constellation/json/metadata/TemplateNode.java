@@ -206,7 +206,25 @@ final class TemplateNode {
     }
 
     /**
-     * Validate the {@link #path} of this node and all child nodes.
+     * Returns {@code true} if the given path starts with the given prefix.
+     * A null {@code prefix} is considered synonymous to an empty prefix.
+     */
+    static boolean startsWith(final CharSequence[] path, final CharSequence[] prefix) {
+        if (prefix != null) {
+            if (prefix.length > path.length) {
+                return false;
+            }
+            for (int i=0; i<prefix.length; i++) {
+                if (!path[i].equals(prefix[i])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Validates the {@link #path} of this node and all child nodes.
      * This method shall be invoked on the root node after we finished to build the whole tree.
      * This method invokes itself recursively for validating children too.
      *
@@ -215,14 +233,10 @@ final class TemplateNode {
     final int validatePath(CharSequence[] prefix) throws ParseException {
         int depth = 0;
         if (path != null) {
-            if (prefix != null) {
-                for (int i=0; i<prefix.length; i++) {
-                    if (i >= path.length - 1 || !path[i].equals(prefix[i])) {
-                        final StringBuilder buffer = new StringBuilder("Path ");
-                        appendPath(0, buffer);
-                        throw new ParseException(buffer.append(" is inconsistent with parent.").toString());
-                    }
-                }
+            if (!startsWith(path, prefix)) {
+                final StringBuilder buffer = new StringBuilder("Path ");
+                appendPath(0, buffer);
+                throw new ParseException(buffer.append(" is inconsistent with parent.").toString());
             }
             prefix = path;
             depth = prefix.length;

@@ -68,6 +68,12 @@ final class FormReader {
     private boolean isNextLineRequested;
 
     /**
+     * Indices of path elements. The 0 value means that the corresponding path element does
+     * not specify any index.
+     */
+    private final int[] indices;
+
+    /**
      * {@code true} for skipping {@code null} values instead than storing null in the metadata object.
      * See the {@code skipNulls} argument of {@link Template#read(Iterable, AbstractMetadata, boolean)}
      * for more information.
@@ -77,8 +83,9 @@ final class FormReader {
     /**
      * Creates a new form reader.
      */
-    FormReader(final LineReader parser, final boolean skipNulls) {
+    FormReader(final LineReader parser, final int maxDepth, final boolean skipNulls) {
         this.parser    = parser;
+        this.indices   = new int[maxDepth];
         this.skipNulls = skipNulls;
         isNextLineRequested = true;
     }
@@ -86,12 +93,13 @@ final class FormReader {
     /**
      * Parses the given JSON lines and write the metadata values in the given metadata object.
      *
+     * <p>This method invokes itself recursively.</p>
+     *
      * @param  parent The parent path, or {@code null} if none.
      * @param  destination Where to store the metadata values.
      * @throws IOException if an error occurred while parsing.
      */
     final void read(final CharSequence[] parent, final AbstractMetadata destination) throws IOException {
-        boolean multiOccurs = false;
         CharSequence[] path = null;
         int pathOffset      = 0;
         int level           = 0;
@@ -109,27 +117,19 @@ final class FormReader {
                  * fail to detect that multi-occurrence.
                  */
                 final Object p = parser.getValue();
-                final CharSequence[] oldPath = path;
                 if (p != null) {
                     path = CharSequences.split(p.toString(), Keywords.PATH_SEPARATOR);
-                    if (parent != null) {
-                        pathOffset = parent.length;
-                        for (int i=0; i<pathOffset; i++) {
-                            if (i >= path.length || !parent[i].equals(path[i])) {
-                                throw new ParseException("Path \"" + toString(path) + "\" is inconsistent with parent.");
-                            }
-                        }
+                    parsePathIndices(path);
+                    if (!TemplateNode.startsWith(path, parent)) {
+                        throw new ParseException(formatPath("Path \"", path, "\" is inconsistent with parent."));
                     }
                 } else {
                     path = null;
                     pathOffset = 0;
                 }
-                multiOccurs = Arrays.equals(oldPath, path);
             } else if (parser.regionMatches(Keywords.VALUE)) {
                 /*
-                 * For a value to store in the metadata structure. If this is the first time that we
-                 * have a value for the current path, clears all previous value.  If this is not the
-                 * first time (multi-occurrence), append the new value to previous one.
+                 * Found a value to store in the metadata structure.
                  */
                 final Object value = parser.getValue();
                 if (path == null) {
@@ -137,9 +137,9 @@ final class FormReader {
                 }
                 if (value != null || !skipNulls) try {
                     put(getOrCreateSingleton(destination, path, pathOffset, path.length - 1),
-                            path[path.length - 1].toString(), value, multiOccurs);
+                            path[path.length - 1].toString(), value);
                 } catch (IllegalArgumentException | ClassCastException | FactoryException e) {
-                    throw new ParseException("Can not store value at path \"" + toString(path) + "\".", e);
+                    throw new ParseException(formatPath("Can not store value at path \"", path, "\"."), e);
                 }
             } else if (parser.regionMatches(Keywords.CHILDREN)) {
                 /*
@@ -151,7 +151,7 @@ final class FormReader {
                     try {
                         child = getOrCreateSingleton(destination, path, pathOffset, path.length);
                     } catch (IllegalArgumentException | ClassCastException | FactoryException e) {
-                        throw new ParseException("Can not store value at path \"" + toString(path) + "\".", e);
+                        throw new ParseException(formatPath("Can not store value at path \"", path, "\"."), e);
                     }
                 }
                 do {
@@ -169,6 +169,34 @@ final class FormReader {
                 break;
             }
             isNextLineRequested = parser.isEmpty();
+        }
+    }
+
+    /**
+     * Parses the indices in the given path. The index values are stored in the {@link #indices} array
+     * and the path elements are stored in-place in the given {@code path} array.
+     */
+    private void parsePathIndices(final CharSequence[] path) throws ParseException {
+        NumberFormatException cause = null;
+        for (int i=0; i<path.length; i++) {
+            String p = path[i].toString();
+            final int lower = p.lastIndexOf('[');
+            int index = 0;
+            if (lower >= 0) {
+                final int upper = p.lastIndexOf(']');
+                boolean failed = (upper <= lower);
+                if (!failed) try {
+                    index = Integer.parseInt(p.substring(lower + 1, upper));
+                } catch (NumberFormatException e) {
+                    cause = e;
+                    failed = true;
+                }
+                if (failed) {
+                    throw new ParseException(formatPath("Illegal path syntax: \"", path, "\"."), cause);
+                }
+                path[i] = p.substring(0, lower); // Set only in case of success.
+            }
+            indices[i] = index;
         }
     }
 
@@ -271,11 +299,8 @@ final class FormReader {
     /**
      * Puts the given value for the given property in the given metadata object.
      */
-    private static void put(final AbstractMetadata metadata, final String identifier, Object value, final boolean multiOccurs) {
+    private static void put(final AbstractMetadata metadata, final String identifier, Object value) {
         final Map<String,Object> values = metadata.asMap();
-        if (!multiOccurs) {
-            // TODO
-        }
         if (value instanceof CharSequence && ((CharSequence) value).length() == 0) {
             value = null;
         } else if (value != null) {
@@ -318,9 +343,15 @@ final class FormReader {
     }
 
     /**
-     * Formats the given path.
+     * Formats an error message with the given path.
      */
-    private static String toString(final CharSequence[] path) {
-        return CharSequences.toString(Arrays.asList(path), String.valueOf(Keywords.PATH_SEPARATOR));
+    private String formatPath(final String before, final CharSequence[] path, final String after) {
+        final StringBuilder buffer = new StringBuilder(before);
+        try {
+            NumerotedPath.formatPath(buffer, path, 0, indices);
+        } catch (IOException e) {
+            throw new AssertionError(e); // Should never happen, since we are writting to a StringBuilder.
+        }
+        return buffer.append(after).toString();
     }
 }

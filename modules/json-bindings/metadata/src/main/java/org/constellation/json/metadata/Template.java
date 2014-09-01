@@ -223,7 +223,7 @@ public class Template {
      * @throws IOException if an error occurred while parsing.
      */
     public void read(final Iterable<? extends CharSequence> json, final AbstractMetadata destination, final boolean skipNulls) throws IOException {
-        final FormReader r = new FormReader(new LineReader(root.standard, json, null, null), skipNulls);
+        final FormReader r = new FormReader(new LineReader(root.standard, json, null, null), depth, skipNulls);
         r.read(null, destination);
     }
 }
