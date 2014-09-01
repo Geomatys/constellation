@@ -367,7 +367,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                             // For portraying
                             return null;
                         },
-                        newStyle: function() { return null }
+                        newStyle: function() { return null },
+                        stylechooser: function(){return null;}
                     }
                 });
 
@@ -442,7 +443,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                         selectedLayer: function() {  return null },
                         selectedStyle: function() { return null },
                         serviceName: function() {  return null },
-                        exclude: function() {  return null }
+                        exclude: function() {  return null },
+                        stylechooser: function(){return null;}
                     }
                 });
                 modal.result.then(function(item) {
@@ -463,7 +465,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                         selectedLayer: function() {  return null },
                         selectedStyle: function() { return scope.selected },
                         serviceName: function() {  return null },
-                        exclude: function() {  return null }
+                        exclude: function() {  return null },
+                        stylechooser: function(){return null;}
                     }
                 });
                 modal.result.then(function(item) {
