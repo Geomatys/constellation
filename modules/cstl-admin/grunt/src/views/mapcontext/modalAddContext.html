@@ -169,9 +169,6 @@
                                                                     <div class="block" ng-hide="layerToAdd.layer.externalLayer">
                                                                         <i class="fa fa-user"></i>{{layerToAdd.layer.Owner}}
                                                                     </div>
-                                                                    <div class="block">
-                                                                        <i class="glyphicon glyphicon-pencil"></i>{{(layerToAdd.layer.styleName) ? layerToAdd.layer.styleName : (layerToAdd.layer.externalStyle) ? layerToAdd.layer.externalStyle.split(',')[0] : ''}}
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -199,10 +196,9 @@
                                                             <span translate="sldeditor.edition.opacity">Opacity</span>
                                                         </div>
                                                         <div class="col-xs-6 no-padding">
-                                                            <rzslider rz-slider-floor="0" rz-slider-ceil="100"
-                                                                      rz-slider-model="layerToAdd.layer.opacity" rz-slider-step="1" ng-click="updateOpacity(layerToAdd)">
-                                                            </rzslider>
+                                                            <input class="slider-mapcontext-layer" type="range" ng-model="layerToAdd.layer.opacity" ng-click="updateOpacity(layerToAdd)"/>
                                                         </div>
+
                                                         <div class="col-xs-1" style="margin-left:17px;">
                                                             <!-- Edition -->
                                                             <div class="btn btn-sm" ng-click="goToStyleMapItem(layerToAdd)">
