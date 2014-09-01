@@ -554,6 +554,8 @@
     "metadata.edition.heading.check.validation":"Check validation",
     "metadata.edition.heading.check.validation.passed":"Well done ! your current form is valid.",
     "metadata.edition.heading.check.validation.notpassed":"Failed to validate your current form, please check your values.",
+    "metadata.edition.occurence.field.add":"Add field occurence",
+    "metadata.edition.occurence.field.remove":"Remove field occurence",
 
     "msg.add.data.style.association": "Associate a style to the selected data",
     "msg.add.data.mapcontext.association": "Associate a mapcontext to the selected data.",
