@@ -128,6 +128,18 @@
                                 <p class="help-block">{{element.annotation.documentation}}</p>
                             </div>
 
+                            <!--org.constellation.util.StyleReference-->
+                            <div ng-switch-when="valueClass:org.constellation.util.StyleReference">
+                                <label for="{{element.name}}">{{element.name}} {{element.mandatory?'*':''}}</label>
+                                <div ng-show="element.maxOccurs==1">
+                                    <select id="{{element.name}}" ng-required="element.mandatory" class="form-control"
+                                            ng-model="element.save[0]" ng-options="style.ref as style.name for style in styles">
+                                    </select>
+                                </div>
+
+                                <p class="help-block">{{element.annotation.documentation}}</p>
+                            </div>
+
                             <!-- We can't edit this type -->
                             <div ng-switch-default>
                                 <label for="{{element.name}}">{{element.name}} {{element.mandatory?'*':''}}</label>

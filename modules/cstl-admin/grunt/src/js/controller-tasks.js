@@ -141,8 +141,8 @@ cstlAdminApp.controller('TasksController', ['$scope', 'Dashboard', 'Growl', '$mo
 );
 
 // The controller for the add task modal
-cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', 'Growl', 'textService', 'TaskService', 'processes', 'task',
-        function($scope, $modalInstance, Growl, textService, TaskService, processes, task){
+cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', 'Growl', 'textService', 'TaskService', 'processes', 'task', 'style',
+        function($scope, $modalInstance, Growl, textService, TaskService, processes, task, style){
 
             // Private function
             function parseProcessDefaultName(processName) {
@@ -200,16 +200,16 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                         dom.find(name).each(function(ind, _el){
                             switch($scope.inputs[iter].annotation.info){
                                 case "valueClass:java.lang.Double":
-                                    $scope.inputs[iter].save[ind] = parseFloat(jQuery(_el)[0].innerHTML);
+                                    $scope.inputs[iter].save[ind] = parseFloat(jQuery(_el)[0].textContent);
                                     break;
                                 case "valueClass:java.lang.Integer":
-                                    $scope.inputs[iter].save[ind] = parseInt(jQuery(_el)[0].innerHTML);
+                                    $scope.inputs[iter].save[ind] = parseInt(jQuery(_el)[0].textContent);
                                     break;
                                 case "valueClass:java.lang.Boolean":
-                                    $scope.inputs[iter].save[ind] = jQuery(_el)[0].innerHTML == "true";
+                                    $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent == "true";
                                     break;
                                 default:
-                                    $scope.inputs[iter].save[ind] = jQuery(_el)[0].innerHTML;
+                                    $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent;
                             }
 
                         });
@@ -225,7 +225,8 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                 "valueClass:java.lang.Integer",
                 "valueClass:java.lang.Double",
                 "valueClass:java.net.URL",
-                "valueClass:java.io.File"
+                "valueClass:java.io.File",
+                "valueClass:org.constellation.util.StyleReference"
             ];
             $scope.canManage = false;
 
@@ -237,11 +238,23 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
             $scope.describeProcess = undefined;
             $scope.inputs = [];
             $scope.task = task;
+            $scope.styles = [];
 
             $scope.processes = createProcesses(processes['Entry']);
 
             // scope functions
             $scope.close = $scope.cancel = $modalInstance.close;
+
+            $scope.listAvailableStyles = function() {
+                style.listAll({provider: 'sld'}, function (response) {
+                    $scope.styles = [];
+                    $.each(response.styles, function(i,style) {
+                        var styleName = style['Name'];
+                        var styleRef = '${providerStyleType|sld|'+styleName+'}';
+                        $scope.styles.push({name:styleName, ref:styleRef});
+                    });
+                });
+            };
 
             $scope.validate = function() {
 
@@ -337,8 +350,12 @@ cstlAdminApp.controller('ModalAddTaskController', ['$scope', '$modalInstance', '
                     var getAnnotationFor = function(_el) {
                         var element = jQuery(_el);
                         var annotation = {};
-                        annotation.info = element.find("appinfo").get(0).innerHTML;
-                        annotation.documentation = element.find("documentation").get(0).innerHTML;
+                        annotation.info = element.find("appinfo").get(0).textContent;
+                        annotation.documentation = element.find("documentation").get(0).textContent;
+
+                        if ("valueClass:org.constellation.util.StyleReference" === annotation.info) {
+                            $scope.listAvailableStyles();
+                        }
 
                         return annotation;
                     };
