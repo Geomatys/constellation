@@ -443,10 +443,12 @@
     "mapcontext.modal.label.keywords": "Keywords",
     "mapcontext.modal.label.name": "Name",
     "mapcontext.modal.select.source": "Select your layer source",
+    "mapcontext.modal.select.layer" : "Select layer to add",
     "mapcontext.modal.tab.info": "Information",
     "mapcontext.modal.tab.layers": "Layers",
     "mapcontext.modal.title": "Add/Edit map context",
     "mapcontext.modal.validate": "Validate",
+    "mapcontext.modal.validate.layer":"Add this layer",
 
     "menu.administration.label": "Administration",
     "menu.data.label": "Data",

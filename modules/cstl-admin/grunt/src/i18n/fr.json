@@ -496,10 +496,12 @@
     "mapcontext.modal.label.keywords": "Mots clés",
     "mapcontext.modal.label.name": "Nom",
     "mapcontext.modal.select.source": "Sélectionner la source de votre couche",
+    "mapcontext.modal.select.layer" : "Sélectionner la couche à ajouter",
     "mapcontext.modal.tab.info": "Informations",
     "mapcontext.modal.tab.layers": "Couches",
     "mapcontext.modal.title": "Ajouter/Editer un contexte cartographique",
     "mapcontext.modal.validate": "Valider",
+    "mapcontext.modal.validate.layer":"Ajouter cette couche",
 
     "md.iso.abstract": "Résumé",
     "md.iso.data.date": "Date des données",
