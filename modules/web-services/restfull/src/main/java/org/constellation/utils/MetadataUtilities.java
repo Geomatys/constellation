@@ -19,8 +19,6 @@
 
 package org.constellation.utils;
 
-import com.google.common.io.Files;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
@@ -42,18 +40,13 @@ import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.observation.ObservationStore;
-import org.geotoolkit.observation.file.FileObservationStore;
-import org.geotoolkit.observation.xml.XmlObservationStore;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -76,11 +69,9 @@ import org.w3c.dom.Node;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -281,7 +272,7 @@ public final class MetadataUtilities {
     public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException {
 
     	final DataStore dataStore = dataProvider.getMainStore();
-    	final CoverageStore coverageStore =(CoverageStore)dataStore;
+    	final CoverageStore coverageStore = (CoverageStore) dataStore;
     	final CoverageReference coverageReference = coverageStore.getCoverageReference(dataName);
         if (coverageReference != null) {
             final GridCoverageReader coverageReader = coverageReference.acquireReader();
@@ -293,6 +284,13 @@ public final class MetadataUtilities {
         }
         return null;
     }
+    
+    public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider) throws DataStoreException {
+
+    	final DataStore dataStore = dataProvider.getMainStore();
+    	final CoverageStore coverageStore = (CoverageStore) dataStore;
+        return (DefaultMetadata) coverageStore.getMetadata();
+    }
 
     /**
      * @param dataProvider
@@ -303,7 +301,7 @@ public final class MetadataUtilities {
     public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException, TransformException {
     	
     	final DataStore dataStore = dataProvider.getMainStore();
-    	final FeatureStore featureStore =(FeatureStore)dataStore;
+    	final FeatureStore featureStore = (FeatureStore) dataStore;
 
 
         final DefaultMetadata md = new DefaultMetadata();
@@ -319,6 +317,35 @@ public final class MetadataUtilities {
         final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(
                 env.getMinimum(0), env.getMaximum(0), env.getMinimum(1), env.getMaximum(1)
         );
+        final DefaultExtent extent = new DefaultExtent("", bbox, null, null);
+        ident.getExtents().add(extent);
+        return md;
+    }
+    
+    public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider) throws DataStoreException, TransformException {
+    	
+    	final DataStore dataStore = dataProvider.getMainStore();
+    	final FeatureStore featureStore = (FeatureStore) dataStore;
+
+
+        final DefaultMetadata md = new DefaultMetadata();
+        final DefaultDataIdentification ident = new DefaultDataIdentification();
+        md.getIdentificationInfo().add(ident);
+        DefaultGeographicBoundingBox bbox = null;
+        for (Name dataName : featureStore.getNames()) {
+            Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
+            if (env == null) {
+                return md;
+            }
+
+            env = CRS.transform(env, CommonCRS.WGS84.normalizedGeographic());
+            final DefaultGeographicBoundingBox databbox = new DefaultGeographicBoundingBox(env.getMinimum(0), env.getMaximum(0), env.getMinimum(1), env.getMaximum(1));
+            if (bbox == null) {
+                bbox = databbox;
+            } else {
+                bbox.add(databbox);
+            }
+        }
         final DefaultExtent extent = new DefaultExtent("", bbox, null, null);
         ident.getExtents().add(extent);
         return md;

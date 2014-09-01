@@ -14,6 +14,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.utils.ISOMarshallerPool;
@@ -42,33 +44,51 @@ public class DatasetBusiness {
         return datasetRepository.insert(ds);
     }
     
-    public DefaultMetadata getMetadata(String providerId, int domainId) throws JAXBException {
+    public DefaultMetadata getMetadata(String providerId, int domainId) throws ConfigurationException {
         final Dataset dataset = getDataset(providerId, domainId);
         final MarshallerPool pool = ISOMarshallerPool.getInstance();
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final DefaultMetadata metadata = (DefaultMetadata) unmarshaller.unmarshal(new ByteArrayInputStream(dataset.getMetadataIso()
-                .getBytes()));
-        pool.recycle(unmarshaller);
-        metadata.prune();
-        return metadata;
+        try {
+            final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+            final DefaultMetadata metadata = (DefaultMetadata) unmarshaller.unmarshal(new ByteArrayInputStream(dataset.getMetadataIso()
+                    .getBytes()));
+            pool.recycle(unmarshaller);
+            metadata.prune();
+            return metadata;
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to unmarshall the dataset metadata", ex);
+        }
     }
 
-    public void updateMetadata(String providerIdentifier, Integer domainId, DefaultMetadata metadata) throws JAXBException {
-        final MarshallerPool pool = ISOMarshallerPool.getInstance();
-        final Marshaller marshaller = pool.acquireMarshaller();
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        marshaller.marshal(metadata, outputStream);
-        final String metadataString = outputStream.toString();
-        final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
-        dataset.setMetadataIso(metadataString);
-        dataset.setMetadataId(metadata.getFileIdentifier());
-        datasetRepository.update(dataset);
+    public void updateMetadata(String datasetIdentifier, Integer domainId, DefaultMetadata metadata) throws ConfigurationException {
+        String metadataString = null;
+        try {
+            final MarshallerPool pool = ISOMarshallerPool.getInstance();
+            final Marshaller marshaller = pool.acquireMarshaller();
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            marshaller.marshal(metadata, outputStream);
+            metadataString = outputStream.toString();
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
+        }
+        
+        final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
+        if (dataset != null) {
+            dataset.setMetadataIso(metadataString);
+            dataset.setMetadataId(metadata.getFileIdentifier());
+            datasetRepository.update(dataset);
+        } else {
+            throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
+        }
     }
 
-    public void updateMetadata(String providerIdentifier, Integer domainId, String metaId, String metadataXml) throws JAXBException {
-        final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
-        dataset.setMetadataIso(metadataXml);
-        dataset.setMetadataId(metaId);
-        datasetRepository.update(dataset);
+    public void updateMetadata(String datasetIdentifier, Integer domainId, String metaId, String metadataXml) throws ConfigurationException {
+        final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
+        if (dataset != null) {
+            dataset.setMetadataIso(metadataXml);
+            dataset.setMetadataId(metaId);
+            datasetRepository.update(dataset);
+        } else {
+            throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
+        }
     }
 }

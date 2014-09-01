@@ -35,8 +35,8 @@
             <artifactId>geotk-spatial-lucene</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>commons</artifactId>
+            <groupId>org.constellation.library</groupId>
+            <artifactId>cstl-lib-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

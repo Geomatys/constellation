@@ -134,7 +134,6 @@
     <module>template</module>
     <module>derby-store</module>
     <module>indexing</module>
-    <module>commons</module>
   </modules>
 
 </project>

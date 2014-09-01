@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,7 +44,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
@@ -53,7 +51,6 @@ import org.constellation.admin.DatasetBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.dto.SimpleValue;
@@ -78,7 +75,6 @@ import org.geotoolkit.data.FileFeatureStoreFactory;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.io.wkt.PrjFiles;
 import org.geotoolkit.parameter.ParametersExt;
-import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.storage.DataFileStore;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -89,7 +85,6 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.FactoryException;
-import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * RestFull API for provider management/operations.
@@ -181,15 +176,18 @@ public final class ProviderRest {
 
         sources = fillProviderParameter(type, subType, inParams, sources);
 
-
-            try {
-                DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
-                int count = domainRepository.addProviderDataToDomain(id, domainId );
-                LOGGER.info("Added " + count + " data to domain " + domainId);
-            } catch (ConfigurationException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
-                return Response.status(500).build();
-            }
+        try {
+            DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
+            final int count = domainRepository.addProviderDataToDomain(id, domainId );
+            final int provId = providerBusiness.getProvider(id).getId();
+            // for now we assume provider == dataset
+            datasetBusiness.createDataset(id, provId, null, null);
+            
+            LOGGER.info("Added " + count + " data to domain " + domainId);
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            return Response.status(500).build();
+        }
 
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -595,7 +593,7 @@ public final class ProviderRest {
     @Path("metadata/{providerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+    public Response getMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId) throws ConfigurationException {
         // for now assume that providerID == datasetID
         DefaultMetadata metadata = datasetBusiness.getMetadata(providerId,domainId);
         return Response.ok(metadata).build();
@@ -611,7 +609,7 @@ public final class ProviderRest {
     @Path("metadata/{providerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+    public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws ConfigurationException {
         // for now assume that providerID == datasetID
         datasetBusiness.updateMetadata(providerId, domainId, metadata);
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();

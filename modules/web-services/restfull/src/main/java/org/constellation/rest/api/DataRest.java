@@ -73,6 +73,7 @@ import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SensorBusiness;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StringList;
 import org.constellation.coverage.PyramidCoverageHelper;
@@ -401,6 +402,8 @@ public class DataRest {
      *
      * @param fileIs
      * @param fileDetail
+     * @param fileMetaIs
+     * @param fileMetaDetail
      * @param request
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
@@ -445,6 +448,8 @@ public class DataRest {
      *
      * @param mdFileIs
      * @param fileMetaDetail
+     * @param identifier
+     * @param serverMetadataPath
      * @param request
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
@@ -513,12 +518,12 @@ public class DataRest {
             pool.recycle(unmarsh);
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
-            throw new ConstellationException(new Exception("metadata file is incorrect"));
+            throw new ConstellationException("metadata file is incorrect");
 
         }
 
         if (!(obj instanceof DefaultMetadata)) {
-            throw new ConstellationException(new Exception("metadata file is incorrect"));
+            throw new ConstellationException("metadata file is incorrect");
         }
 
 
@@ -678,8 +683,14 @@ public class DataRest {
      * Load data from file selected 
      
      *
+     * @param domainId
      * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
      * @return a {@link javax.ws.rs.core.Response} with a {@link org.constellation.dto.DataInformation}
+     * 
+     * @throws javax.xml.bind.JAXBException
+     * @throws org.apache.sis.storage.DataStoreException
+     * @throws org.opengis.util.NoSuchIdentifierException
+     * @throws org.geotoolkit.process.ProcessException
      */
     @POST
     @Path("load")
@@ -749,8 +760,6 @@ public class DataRest {
     public Response saveUploadedMetadata(final ParameterValues values) {
         final String providerId         = values.getValues().get("providerId");
         final String mdPath             = values.getValues().get("mdPath");
-        final String dataName             = values.getValues().get("dataName");
-        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
 
         if (mdPath != null && mdPath.length()>0) {
             final Object obj;
@@ -770,11 +779,12 @@ public class DataRest {
 
             final DefaultMetadata metadata = (DefaultMetadata) obj;
 
-            for (Name data : dataProvider.getKeys()) {
-                //Save metadata
-                final QName name = Utils.getQnameFromName(data);
-                dataBusiness.saveMetadata(providerId, name, metadata);
-
+            // for now we assume datasetID == providerID
+            try {
+                datasetBusiness.updateMetadata(providerId, -1, metadata);
+            } catch (ConfigurationException ex) {
+                LOGGER.warning("Error while saving dataset metadata");
+                throw new ConstellationException(ex);
             }
         }
 
@@ -785,24 +795,11 @@ public class DataRest {
     @Path("metadata/dataset")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDatasetMetadata(final ParameterValues values) {
-        final String providerId = values.getValues().get("providerId");
-        final String dataName   = values.getValues().get("dataName");
-        final String dataType   = values.getValues().get("type");
-        final DefaultMetadata metadata;
-        if (dataName != null) {
-            final QName qname = Util.parseQName(dataName);
-            metadata = dataBusiness.loadIsoDataMetadata(providerId, qname);
-        } else {
-            final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
-            // multiple ?
-            if (!dataProvider.getKeys().isEmpty()) {
-                final QName name = Utils.getQnameFromName(dataProvider.getKeys().iterator().next());
-                metadata =  dataBusiness.loadIsoDataMetadata(providerId, name);
-            } else {
-                metadata = null;
-            }
-        }
+    public Response getDatasetMetadata(final ParameterValues values) throws ConfigurationException {
+        final String providerId         = values.getValues().get("providerId");
+        final String dataType           = values.getValues().get("type");
+        final DefaultMetadata metadata  =  datasetBusiness.getMetadata(providerId, -1);
+            
         if (metadata != null) {
             //get template name
             final String templateName;
@@ -825,8 +822,8 @@ public class DataRest {
             return Response.ok(buffer.toString()).build();
 
         } else {
-            LOGGER.warning("Metadata is null for providerId:"+providerId);
-            return Response.status(500).build();
+            LOGGER.log(Level.WARNING, "Metadata is null for providerId:{0}", providerId);
+            return Response.status(500).entity("failed").build();
         }
     }
 
@@ -856,7 +853,8 @@ public class DataRest {
      * Save metadata.
      *
      * @param values
-     * @return {@link javax.ws.rs.core.Response} with code 200.
+     * @return {@link javax.ws.rs.core.Response}
+     * @throws org.opengis.referencing.operation.TransformException with code 200.
      */
     @POST
     @Path("metadata")
@@ -867,60 +865,66 @@ public class DataRest {
         final String dataType           = values.getValues().get("dataType");
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
         
-        for (Name dataName : dataProvider.getKeys()) {
-            
-            DefaultMetadata extractedMetadata = null;
-            switch (dataType) {
-                case "raster":
-                    try {
-                        extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider, dataName);
-                    } catch (DataStoreException e) {
-                        LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
-                        extractedMetadata = new DefaultMetadata();
-                    }
-                    break;
-                case "vector":
-                    try {                
-                        extractedMetadata = MetadataUtilities.getVectorMetadata(dataProvider, dataName);
-                    } catch (DataStoreException e) {
-                        LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
-                        extractedMetadata = new DefaultMetadata();
-                    }
-                    break;
-                default:
-                    extractedMetadata = new DefaultMetadata();
-            }
-            //Update metadata
-            final Properties prop = ConfigurationBusiness.getMetadataTemplateProperties();
-            final String metadataID = CstlMetadatas.getMetadataIdForData(providerId, dataName);
-            prop.put("fileId", metadataID);
-            prop.put("dataTitle", dataName);
-            prop.put("dataAbstract", "");
-            final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
-            
-            DefaultMetadata mergedMetadata;
-            if (extractedMetadata != null) {
-                mergedMetadata = new DefaultMetadata();
+        DefaultMetadata extractedMetadata = null;
+        switch (dataType) {
+            case "raster":
                 try {
-                    mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, extractedMetadata);
-                } catch (NoSuchIdentifierException | ProcessException ex) {
-                    LOGGER.log(Level.WARNING, "error while merging metadata", ex);
+                    extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider);
+                } catch (DataStoreException e) {
+                    LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
+                    extractedMetadata = new DefaultMetadata();
                 }
-            } else {
-                mergedMetadata = templateMetadata;
-            }
-            mergedMetadata.prune();
-            
-            //Save metadata
-            final QName name = Utils.getQnameFromName(dataName);
-            dataBusiness.saveMetadata(providerId,name,mergedMetadata);
+                break;
+            case "vector":
+                try {                
+                    extractedMetadata = MetadataUtilities.getVectorMetadata(dataProvider);
+                } catch (DataStoreException e) {
+                    LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
+                    extractedMetadata = new DefaultMetadata();
+                }
+                break;
+            default:
+                extractedMetadata = new DefaultMetadata();
         }
+        //Update metadata
+        final Properties prop = ConfigurationBusiness.getMetadataTemplateProperties();
+        final String metadataID = CstlMetadatas.getMetadataIdForDataset(providerId);
+        prop.put("fileId", metadataID);
+        prop.put("dataTitle", metadataID);
+        prop.put("dataAbstract", "");
+        final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
+
+        DefaultMetadata mergedMetadata;
+        if (extractedMetadata != null) {
+            mergedMetadata = new DefaultMetadata();
+            try {
+                mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, extractedMetadata);
+            } catch (NoSuchIdentifierException | ProcessException ex) {
+                LOGGER.log(Level.WARNING, "error while merging metadata", ex);
+            }
+        } else {
+            mergedMetadata = templateMetadata;
+        }
+        mergedMetadata.prune();
+
+        try {
+            //Save metadata
+            datasetBusiness.updateMetadata(providerId, -1, mergedMetadata);
+        } catch (ConfigurationException ex) {
+            LOGGER.warning("Error while saving dataset metadata");
+            throw new ConstellationException(ex);
+        }
+        
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     /**
      * Save metadata with merge from ISO19115 form
      *
+     * @param providerId
+     * @param type
+     * @param metadataValues
+     * @return 
      */
     @POST
     @Path("metadata/merge/{providerId}/{type}")
@@ -929,23 +933,20 @@ public class DataRest {
     public Response mergeMetadata(@PathParam("providerId") final String providerId,
                                   @PathParam("type") final String type,
                                   final RootObj metadataValues) {
-        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
+        // for now assume that providerID == datasetID
+        try {
 
-        for (final Name dataName : dataProvider.getKeys()) {
-            final QName name = Utils.getQnameFromName(dataName);
-            
-            // Get previously saved metadata for the current data
-            final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, name);
-
+            // Get previously saved metadata for the current data    
+            final DefaultMetadata metadata = datasetBusiness.getMetadata(providerId, -1);
 
             //get template name
             final String templateName;
-            if("vector".equalsIgnoreCase(type)){
+            if ("vector".equalsIgnoreCase(type)) {
                 //vector
-                templateName="profile_inspire_vector";
-            }else {
+                templateName = "profile_inspire_vector";
+            } else {
                 //raster
-                templateName="profile_inspire_raster";
+                templateName = "profile_inspire_raster";
             }
             final Template template = Template.getInstance(templateName);
 
@@ -958,7 +959,10 @@ public class DataRest {
 //            }
             
             //Save metadata
-            dataBusiness.saveMetadata(providerId,name,metadata);
+            datasetBusiness.updateMetadata(providerId, -1, metadata);
+        } catch (ConfigurationException ex) {
+            LOGGER.warning("Error while saving dataset metadata");
+            throw new ConstellationException(ex);
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -1710,34 +1714,35 @@ public class DataRest {
     public Response getIsoMetadataJson(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId,
             final @PathParam("type") String type, final @PathParam("prune") boolean prune) {
         final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
-        //prune the metadata
-        if (metadata != null) {
-            metadata.prune();
-        }
-
-        //for debugging purposes
-        /*try{
-            System.out.println(XML.marshal(metadata));
-        }catch(Exception ex){
-            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-        }*/
-
-        //get template name
-        final String templateName;
-        if("vector".equalsIgnoreCase(type)){
-            //vector
-            templateName="profile_inspire_vector";
-        }else {
-            //raster
-            templateName="profile_inspire_raster";
-        }
-        final Template template = Template.getInstance(templateName);
+        
         final StringBuilder buffer = new StringBuilder();
-        try{
-            template.write(metadata,buffer,prune);
-        }catch(IOException ex){
-            LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
-            return Response.status(500).entity("failed").build();
+        if (metadata != null) {
+            //prune the metadata
+            metadata.prune();
+            
+            //for debugging purposes
+            /*try{
+                System.out.println(XML.marshal(metadata));
+            }catch(Exception ex){
+                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            }*/
+
+            //get template name
+            final String templateName;
+            if("vector".equalsIgnoreCase(type)){
+                //vector
+                templateName="profile_inspire_vector";
+            }else {
+                //raster
+                templateName="profile_inspire_raster";
+            }
+            final Template template = Template.getInstance(templateName);
+            try{
+                template.write(metadata,buffer,prune);
+            }catch(IOException ex){
+                LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
+                return Response.status(500).entity("failed").build();
+            }
         }
         return Response.ok(buffer.toString()).build();
     }
@@ -1759,11 +1764,11 @@ public class DataRest {
         // for now assume that providerID == datasetID
         final Dataset datasetFromDB = datasetBusiness.getDataset(providerId);
         final String metadataFromDB = datasetFromDB.getMetadataIso();
-        final InputStream is = new ByteArrayInputStream(metadataFromDB.getBytes());
         final MarshallerPool pool = CSWMarshallerPool.getInstance();
         try {
             final Unmarshaller m = pool.acquireUnmarshaller();
             if (metadataFromDB != null) {
+                final InputStream is = new ByteArrayInputStream(metadataFromDB.getBytes());
                 metadata = (DefaultMetadata) m.unmarshal(is);
             }
             pool.recycle(m);

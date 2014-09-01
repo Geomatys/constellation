@@ -54,7 +54,7 @@ public interface DataRepository {
 
     Data findByNameAndNamespaceAndProviderId(String localPart, String namespaceURI, Integer providerId);
 
-	void update(Data data);
+    void update(Data data);
 
     Map<Domain, Boolean> getLinkedDomains(int dataId);
 

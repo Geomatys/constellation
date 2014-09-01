@@ -19,9 +19,8 @@
 package org.constellation.engine.register.jooq.repository;
 
 import java.util.List;
-import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
-import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import static org.constellation.engine.register.jooq.Tables.DATASET;
 import org.constellation.engine.register.jooq.tables.records.DatasetRecord;
 import org.constellation.engine.register.repository.DatasetRepository;
@@ -77,9 +76,27 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
     
     @Override
+    public List<Dataset> findByProviderIdentifier(String identifier) {
+        return dsl.select(DATASET.fields()).from(DATASET).join(PROVIDER).onKey().where(PROVIDER.IDENTIFIER.eq(identifier)).fetchInto(Dataset.class);
+    }
+    
+    @Override
     public Dataset findByIdentifierAndDomainId(String datasetIdentifier, Integer domainId) {
         // @FIXME binding domainId
         return dsl.select().from(DATASET).where(DATASET.IDENTIFIER.eq(datasetIdentifier)).fetchOneInto(Dataset.class);
 
+    }
+
+    @Override
+    public void removeForProvider(String providerIdentifier) {
+        final List<Dataset> sets = findByProviderIdentifier(providerIdentifier);
+        for (Dataset d : sets) {
+            remove(d.getId());
+        }
+    }
+
+    @Override
+    public void remove(int id) {
+        dsl.delete(DATASET).where(DATASET.ID.eq(id)).execute();
     }
 }

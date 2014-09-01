@@ -16,33 +16,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.constellation.engine.register.repository;
-
-import java.util.List;
-import org.constellation.engine.register.Dataset;
+package org.constellation.admin.exception;
 
 /**
  *
- * @author Guilhem Legal
+ * @author christophe Mourrette
  */
-public interface DatasetRepository {
+public class ConstellationException extends RuntimeException {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    public ConstellationException(Exception e) {
+        super(e);
+    }
     
-    List<Dataset> findAll();
-    
-    Dataset insert(Dataset dataset);
-    
-    int update(Dataset dataset);
-            
-    Dataset findByMetadataId(String metadataId);
-    
-    Dataset findByIdentifierAndDomainId(String datasetIdentifier, Integer domainId);
-    
-    Dataset findByIdentifier(String datasetIdentifier);
-    
-    List<Dataset> findByProviderIdentifier(String identifier);
-    
-    void removeForProvider(String providerIdentifier);
-    
-    void remove(int id);
+    public ConstellationException(String msg) {
+        super(msg);
+    }
+
 }

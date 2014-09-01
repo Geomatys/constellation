@@ -1,23 +1,22 @@
 package org.constellation.admin;
 
-import org.constellation.api.ProviderType;
+import com.google.common.base.Optional;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
 import org.constellation.admin.util.IOUtilities;
+import org.constellation.api.ProviderType;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Style;
-import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.opengis.parameter.GeneralParameterValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Optional;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ProviderBusiness {
@@ -27,6 +26,9 @@ public class ProviderBusiness {
 
     @Inject
     private ProviderRepository providerRepository;
+    
+    @Inject
+    private DatasetRepository datasetRepository;
 
     @Autowired
     private org.constellation.security.SecurityManager securityManager;
@@ -57,12 +59,14 @@ public class ProviderBusiness {
     }
 
     public void removeProvider(final String identifier) {
+        datasetRepository.removeForProvider(identifier);
         providerRepository.deleteByIdentifier(identifier);
     }
 
     public void removeAll() {
         final List<Provider> providers = providerRepository.findAll();
         for (Provider p : providers) {
+            datasetRepository.removeForProvider(p.getIdentifier());
             providerRepository.delete(p.getId());
         }
     }

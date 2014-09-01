@@ -93,6 +93,11 @@ public class CstlMetadatas {
         return  providerId + '_' + dataName.getLocalPart(); // TODO namespace?
     }
     
+    public static String getMetadataIdForDataset(final String providerId){
+        ArgumentChecks.ensureNonNull("providerId", providerId);
+        return  providerId; 
+    }
+    
 //    public static String getMetadataIdForLayer(final String dataName){
 //        ArgumentChecks.ensureNonNull("dataName", dataName);
 //        return DATA.getPrefix()+ '_' + dataName;
