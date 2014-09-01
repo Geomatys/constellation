@@ -24,6 +24,7 @@ import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
+import org.geotoolkit.process.ProcessDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -69,6 +70,7 @@ public class AddMetadataDescriptor extends AbstractProcessDescriptor {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
+    public static final ProcessDescriptor INSTANCE = new AddMetadataDescriptor();
     
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {

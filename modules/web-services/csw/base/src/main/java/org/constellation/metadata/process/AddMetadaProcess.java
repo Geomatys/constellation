@@ -18,30 +18,44 @@
  */
 package org.constellation.metadata.process;
 
-import java.io.File;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.metadata.configuration.CSWConfigurer;
-import static org.constellation.metadata.process.AddMetadataDescriptor.METADATA_FILE;
-import static org.constellation.metadata.process.AddMetadataDescriptor.METADATA_ID;
-import static org.constellation.metadata.process.AddMetadataDescriptor.SERVICE_IDENTIFIER;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.ServiceConfigurer;
-import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
+import java.io.File;
+
+import static org.constellation.metadata.process.AddMetadataDescriptor.*;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import static org.geotoolkit.parameter.Parameters.value;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 public class AddMetadaProcess extends AbstractCstlProcess {
 
     public AddMetadaProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
-    
+
+    public AddMetadaProcess(String serviceID, String metadataID, File metadataFile) {
+        this(INSTANCE, toParameter(serviceID, metadataID, metadataFile));
+    }
+
+    private static ParameterValueGroup toParameter(String serviceID, String metadataID, File metadataFile) {
+        ParameterValueGroup params = INSTANCE.getInputDescriptor().createValue();
+        getOrCreate(METADATA_FILE, params).setValue(metadataFile);
+        getOrCreate(METADATA_ID, params).setValue(metadataID);
+        getOrCreate(SERVICE_IDENTIFIER, params).setValue(serviceID);
+        return params;
+    }
+
     @Override
     protected void execute() throws ProcessException {
         final String serviceID  = value(SERVICE_IDENTIFIER, inputParameters);
