@@ -131,7 +131,6 @@ module.exports = function(grunt) {
             app: {
                 files: {
                     '<%= target_dir %>/js/app.js': [
-                        '<%= src_dir %>/js/http-auth-interceptor.js',
                         '<%= src_dir %>/js/app.js',
                         '<%= src_dir %>/js/directives.js',
                         '<%= src_dir %>/js/restapi.js',
@@ -154,7 +153,6 @@ module.exports = function(grunt) {
             app_index: {
                 files: {
                     '<%= target_dir %>/js/app-index.js': [
-                        '<%= src_dir %>/js/http-auth-interceptor.js',
                         '<%= src_dir %>/js/app-index.js',
                         '<%= src_dir %>/js/directives.js',
                         '<%= src_dir %>/js/restapi.js',

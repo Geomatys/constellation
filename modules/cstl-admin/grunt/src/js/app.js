@@ -47,8 +47,7 @@ var cstlAdminApp = angular.module('cstlAdminApp', [
     // Constellation modules.
     'cstl-directives',
     'cstl-restapi',
-    'cstl-services',
-    'http-auth-interceptor']);
+    'cstl-services']);
 
 
 
@@ -211,8 +210,8 @@ cstlAdminApp
             });
 
             // Call when the 401 response is returned by the client
-            $rootScope.$on('event:auth-loginRequired', function(rejection) {
-              window.location.href="index.html";
+            $rootScope.$on('event:auth-loginRequired', function() {
+                window.location.href="index.html";
             });
 
            $rootScope.hasRole = function(){return false}

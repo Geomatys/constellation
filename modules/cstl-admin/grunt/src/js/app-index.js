@@ -27,8 +27,7 @@ angular.module('CstlIndex', [
     'pascalprecht.translate',
     // Constellation modules.
     'cstl-directives',
-    'cstl-services',
-    'http-auth-interceptor'])
+    'cstl-services'])
     
     .config(function($routeProvider, $httpProvider, $translateProvider) {
         

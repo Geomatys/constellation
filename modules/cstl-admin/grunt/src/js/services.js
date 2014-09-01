@@ -121,7 +121,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     //  Authentication HTTP Interceptor
     // -------------------------------------------------------------------------
 
-    .factory('AuthInterceptor', function($rootScope, $cookies, CstlConfig, CstlUtils) {
+    .factory('AuthInterceptor', function($rootScope, $q, $cookies, $cookieStore, CstlConfig, CstlUtils) {
         return {
             'request': function(config) {
                 // Intercept request to Constellation REST API.
@@ -130,7 +130,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     // Broadcast 'event:auth-loginRequired' event and cancel request
                     // if no authentication.
                     if (!isUserLogged()) {
-                        $rootScope.$broadcast('event:auth-loginRequired', null);
+                        $rootScope.$broadcast('event:auth-loginRequired');
                         return; // auth required cancel request
                     }
 
@@ -138,6 +138,16 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     config.url = CstlUtils.compileUrl(config.url);
                 }
                 return config;
+            },
+            'responseError': function(response) {
+                if (response.status === 401) {
+                    // Remove constellation session id cookie.
+                    $cookieStore.remove($cookies[CstlConfig['cookie.session.id']]);
+
+                    // Broadcast 'event:auth-loginRequired' event.
+                    $rootScope.$broadcast('event:auth-loginRequired');
+                }
+                return $q.reject(response);
             }
         };
 
@@ -165,7 +175,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     //  Authentication Service
     // -------------------------------------------------------------------------
 
-    .factory('AuthService', function ($rootScope, $http, $cookieStore, Account, CstlUtils, authService) {
+    .factory('AuthService', function ($rootScope, $http, $cookieStore, Account) {
         return {
             authenticate: function() {
                 Account.get(function(account) {
@@ -187,7 +197,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 $http.get('@cstl/spring/session/logout;jsessionid=').then(function() {
                     $cookieStore.remove('cstlSessionId');
                     $http.get('/app/logout').success(function() {
-                        authService.loginCancelled();
+                        $rootScope.$broadcast('event:auth-loginCancelled');
                     });
                 });
             }
