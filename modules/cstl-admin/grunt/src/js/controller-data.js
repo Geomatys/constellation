@@ -240,6 +240,12 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
         };
 
+        $scope.editLinkedStyle = function(styleProvider, styleName, selectedData) {
+            style.get({provider: styleProvider, name: styleName}, function(response) {
+                StyleSharedService.editLinkedStyle($scope, response,selectedData);
+            });
+        };
+
         $scope.showSensorsList = function() {
             $modal.open({
                 templateUrl: 'views/sensor/modalSensorChoose.html',

@@ -483,6 +483,21 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', 'Gr
                         });
                     }
                 });
+            },
+
+            editLinkedStyle : function(scope, response, selectedData) {
+                var modal = $modal.open({
+                    templateUrl: 'views/style/modalStyleEdit.html',
+                    controller: 'StyleModalController',
+                    resolve: {
+                        newStyle: function() { return response},
+                        selectedLayer: function() {  return selectedData },
+                        selectedStyle: function() { return null },
+                        serviceName: function() {  return null },
+                        exclude: function() {  return null },
+                        stylechooser: function(){return 'edit';}
+                    }
+                });
             }
         };
 

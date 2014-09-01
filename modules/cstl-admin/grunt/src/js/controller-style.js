@@ -140,8 +140,11 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', 'G
 /**
  * Controller for modal popup SLD-Editor used in dashboards styles, services and data layers.
  */
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', '$cookies', 'dataListing', 'provider', 'Growl', 'textService', 'newStyle', 'selectedLayer','selectedStyle', 'serviceName', 'exclude','$timeout',
-    function($scope, $dashboard, $modalInstance, style, $cookies, dataListing, provider, Growl, textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance',
+    'style', '$cookies', 'dataListing', 'provider', 'Growl', 'textService', 'newStyle',
+    'selectedLayer','selectedStyle', 'serviceName', 'exclude','$timeout','stylechooser',
+    function($scope, $dashboard, $modalInstance, style, $cookies, dataListing, provider, Growl,
+             textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout,stylechooser) {
         $scope.xmlStyle = '<xml></xml>';
         $scope.exclude = exclude;
 
@@ -167,9 +170,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
         /**
          * stylechooser is used as a flag to switch between tabs
-         * to display existing styles dashbord or new style creation panel.
+         * to display existing styles dashbord or new style creation panel or edit state.
          */
-        $scope.stylechooser = 'existing';
+        $scope.stylechooser = stylechooser || 'existing';
         /**
          * the path of page to include in sld editor vectors or raster or chooseType wich is default.
          */
@@ -2007,7 +2010,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * Proceed to update an existing style.
          */
         $scope.updateStyle = function() {
-            style.updatejson({provider: 'sld', name: $scope.selectedStyle.Name}, $scope.newStyle, function() {
+            style.updatejson({provider: 'sld', name: $scope.newStyle.name}, $scope.newStyle, function() {
                 Growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully updated');
                 $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
             }, function() {
@@ -2109,10 +2112,16 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             DataViewer.layers = [layerData, layerBackground];
                         }
                         DataViewer.initMap(mapId);
-
                         if ($scope.dataBbox) {
                             var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
                             DataViewer.map.zoomToExtent(extent, true);
+                        }else {
+                            $scope.initDataLayerProperties(function(){
+                                if ($scope.dataBbox) {
+                                    var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
+                                    DataViewer.map.zoomToExtent(extent, true);
+                                }
+                            });
                         }
                         DataViewer.map.events.register("moveend", DataViewer.map, function(){
                             setCurrentScale();
