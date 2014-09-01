@@ -26,6 +26,7 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
     <div class="row">
         <div class="col-md-12">
             <button class="btn btn-primary" id="provider">provider</button>
+            <button class="btn btn-primary" id="dataset">dataset</button>
             <button class="btn btn-primary" id="data">data</button>
             <button class="btn btn-primary" id="style">style</button>
             <button class="btn btn-primary" id="styled_data">styled_data</button>
@@ -107,6 +108,10 @@ result :
         });
         $("#provider").on("click", function(){
             $("#query").val('select * from admin.provider');
+            $("#sqlForm").submit();
+        });
+        $("#dataset").on("click", function(){
+            $("#query").val('select * from admin.dataset');
             $("#sqlForm").submit();
         });
         $("#data").on("click", function(){
