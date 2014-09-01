@@ -458,7 +458,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             "Geographical grid systems","Soil","Geographical names","Species distribution",
             "Geology","Statistical units","Habitats and biotopes",
             "Transport networks","Human health and safety","Utility and governmental services"];
-        //$scope.predefinedValues.inspireThemes = $scope.predefinedValues.inspireThemes.sort();
         $scope.predefinedValues.referenceSystemIdentifier = [
             'WGS84 - EPSG:4326',
             'Fort Desaix / UTM 20 N - EPSG:2973',
@@ -476,7 +475,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             'Lambert IV - EPSG:27574',
             'CC42 - EPSG:3942',
             'WGS84 / UTM 20 N - EPSG:4559'];
-        //$scope.predefinedValues.referenceSystemIdentifier = $scope.predefinedValues.referenceSystemIdentifier.sort();
         $scope.predefinedValues.distributionFormat = ['SHP','TAB','MIF/MID','KML','GML','GeoTIFF','ECW','Autre'];
         $scope.predefinedValues.specifications=[
             'No INSPIRE Data Specification',
@@ -583,6 +581,11 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             $scope.showValidationPopup(form);
         };
 
+        /**
+         * Display validation modal popup that show the form state
+         * and when popup is closed then animate scroll to next invalid input.
+         * @param form
+         */
         $scope.showValidationPopup = function(form) {
             var validationPopup = $('#validationPopup');
             validationPopup.modal("show");
@@ -597,6 +600,58 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
                 }
             });
         };
+
+        /**
+         * Add new occurrence of field. the field must have multiplicity gt 1
+         * @param blockObj
+         * @param fieldObj
+         */
+        $scope.addFieldOccurrence = function(blockObj,fieldObj) {
+            var newField = {"field":{}};
+            // Shallow copy
+            newField.field = jQuery.extend({}, fieldObj.field);
+            newField.field.value=fieldObj.field.defaultValue;
+            if(newField.field.path.indexOf('+')==-1){
+                newField.field.path = newField.field.path+'+';
+            }
+            // Deep copy
+            //var newField = jQuery.extend(true, {}, field);
+            var indexOfField = blockObj.block.children.indexOf(fieldObj);
+            blockObj.block.children.splice(indexOfField+1,0,newField);
+        };
+
+        /**
+         * Remove occurrence of given field for given block.
+         * @param blockObj
+         * @param fieldObj
+         */
+        $scope.removeFieldOccurrence = function(blockObj,fieldObj) {
+            var indexToRemove = blockObj.block.children.indexOf(fieldObj);
+            blockObj.block.children.splice(indexToRemove,1);
+        };
+
+        /**
+         * Returns true if the given field is an occurrence that can be removed from the form.
+         * @param fieldObj
+         * @returns {boolean}
+         */
+        $scope.isFieldOccurrence = function(fieldObj){
+            var strPath = fieldObj.field.path;
+            if(endsWith(strPath,'+')){
+                return true;
+            }
+            if(strPath.indexOf('[')!=-1){
+                var number = strPath.substring(strPath.lastIndexOf('[')+1,strPath.length-1);
+                if(number>1){
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        function endsWith(str,suffix) {
+            return str.indexOf(suffix, str.length - suffix.length) !== -1;
+        }
 
         function initCollapseEvents () {
             if(window.collapseEditionEventsRegistered)return; //to fix a bug with angular
