@@ -89,8 +89,7 @@
                                         <button type="button"
                                                 ng-click="ordertype= (service && service.type && service.type.toLowerCase()==='sos') ? 'id' : (service && service.type && service.type.toLowerCase==='csw') ? 'title' : 'Name';orderreverse=false"
                                                 ng-class="{'btn-csw':type==='csw','btn-sos':type==='sos'}"
-                                                tooltip-html-unsafe="{{'label.search.refresh' | translate }}"
-                                                tooltip-placement="bottom"
+                                                title="{{'label.search.refresh' | translate }}"
                                                 class="btn  btn-data btn-xs btn-info"><i class="fa fa-times"></i></button>
                                         <div class="pull-right">
                                             <div style="position:relative;">

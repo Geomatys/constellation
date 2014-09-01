@@ -94,7 +94,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : !published}" ng-click="published=false">
+                                        <a ng-class="{filter_active : published==='false'}" ng-click="published=false">
                                             <span translate="label.no">No</span>
                                         </a>
                                     </li>
@@ -117,7 +117,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : !observation}" ng-click="observation=false">
+                                        <a ng-class="{filter_active : observation==='false'}" ng-click="observation=false">
                                             <span translate="label.no">No</span>
                                         </a>
                                     </li>
@@ -127,8 +127,7 @@
                         </ul>
                         <button type="button"
                                 ng-click="ordertype='Name';orderreverse=false; published=null; observation=null"
-                                tooltip-html-unsafe="{{'label.search.refresh' | translate }}"
-                                tooltip-placement="bottom"
+                                title="{{'label.search.refresh' | translate }}"
                                 class="btn btn-xs btn-info btn-data">
                             <i class="fa fa-times"></i>
                         </button>
@@ -618,7 +617,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a ng-class="{filter_active : !published}" ng-click="published=false">
+                                            <a ng-class="{filter_active : published==='false'}" ng-click="published=false">
                                                 <span translate="label.no">No</span>
                                             </a>
                                         </li>
@@ -641,7 +640,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a ng-class="{filter_active : !observation}" ng-click="observation=false">
+                                            <a ng-class="{filter_active : observation==='false'}" ng-click="observation=false">
                                                 <span translate="label.no">No</span>
                                             </a>
                                         </li>
@@ -649,10 +648,9 @@
                                 </li>
                                 <li class="divider-vertical"></li>
                             </ul>
-                            <button type="button"
+                            <button type="button" tooltip
                                     ng-click="ordertype='Name';orderreverse=false; published=null; observation=null"
-                                    tooltip-html-unsafe="{{'label.search.refresh' | translate }}"
-                                    tooltip-placement="bottom"
+                                    title="{{'label.search.refresh' | translate }}"
                                     class="btn btn-xs btn-info btn-csw btn-data">
                                 <i class="fa fa-times"></i>
                             </button>
