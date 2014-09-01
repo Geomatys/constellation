@@ -68,4 +68,4 @@ angular.module('CstlIndex', [
         };
     })
 
-    .controller('RegisterController', function() {});
+    .controller('RegisterController', function() { /* TODO */ });

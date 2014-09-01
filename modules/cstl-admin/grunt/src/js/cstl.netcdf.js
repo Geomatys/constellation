@@ -1,4 +1,4 @@
-Netcdf = {
+window.Netcdf = {
     $caller : null,
 
     index: 0,
