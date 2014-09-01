@@ -19,6 +19,7 @@
 package org.constellation.json.metadata;
 
 import java.util.Arrays;
+import java.io.IOException;
 
 
 /**
@@ -26,34 +27,32 @@ import java.util.Arrays;
  * This is used as keys for storing metadata values in a map.
  *
  * <p><b>Implementation note:</b>
- * We store the full path, not only the last UML identifier, because the same metadata object could be reached
+ * We need the full path, not only the last UML identifier, because the same metadata object could be reached
  * by different paths (e.g. {@code "contact.party"} and {@code "identificationInfo.pointOfContact.party"}).</p>
  *
  * @author Martin Desruisseaux (Geomatys)
  */
 final class NumerotedPath {
     /**
-     * The path where to fetch the value. Array content must not be changed,
-     * since this is the same reference than {@link TemplateNode#path}.
+     * The template from which to get the path.
      */
-    private final String[] path;
+    final TemplateNode template;
 
     /**
      * The index of each elements in the path. The length of this array is smaller than
      * or equals to {@code path.length}.
      */
-    private final int[] indices;
+    final int[] indices;
 
     /**
-     * Creates a new key for the given path and indices.
+     * Creates a new key for the given node and indices.
      *
-     * @param path    The path, stored by reference (the array is not and should not be cloned).
+     * @param path    The template containing the path.
      * @param indices The index of each elements in the path. This array will be partially copied.
-     * @param depth   Number of valid elements in the path.
      */
-    NumerotedPath(final String[] path, final int[] indices, final int depth) {
-        this.path    = path; // No copy.
-        this.indices = Arrays.copyOfRange(indices, 0, depth);
+    NumerotedPath(final TemplateNode template, final int[] indices) {
+        this.template = template;
+        this.indices  = (indices != null) ? Arrays.copyOfRange(indices, 0, template.path.length) : null;
     }
 
     /**
@@ -61,7 +60,7 @@ final class NumerotedPath {
      */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(path) ^ Arrays.hashCode(indices);
+        return Arrays.hashCode(template.path) ^ Arrays.hashCode(indices);
     }
 
     /**
@@ -70,8 +69,8 @@ final class NumerotedPath {
     @Override
     public boolean equals(final Object other) {
         return (other instanceof NumerotedPath) &&
-               Arrays.equals(path,    ((NumerotedPath) other).path) &&
-               Arrays.equals(indices, ((NumerotedPath) other).indices);
+               Arrays.equals(template.path, ((NumerotedPath) other).template.path) &&
+               Arrays.equals(indices,       ((NumerotedPath) other).indices);
     }
 
     /**
@@ -80,15 +79,30 @@ final class NumerotedPath {
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder();
-        for (int i=0; i<path.length; i++) {
-            if (i != 0) {
-                buffer.append('.');
-            }
-            buffer.append(path[i]);
-            if (i < indices.length) {
-                buffer.append('[').append(indices[i]).append(']');
-            }
+        try {
+            formatPath(buffer, template.path, 0, indices);
+        } catch (IOException e) {
+            throw new AssertionError(e); // Should never happen, since we are writting to a StringBuilder.
         }
         return buffer.toString();
+    }
+
+    /**
+     * Formats the given path, without quotes.
+     */
+    static void formatPath(final Appendable out, final String[] path, int pathOffset, final int[] indices) throws IOException {
+        while (pathOffset < path.length) {
+            if (pathOffset != 0) {
+                out.append('.');
+            }
+            out.append(path[pathOffset]);
+            if (indices != null) {
+                final int index = indices[pathOffset];
+                if (index != 0) {
+                    out.append('[').append(Integer.toString(index)).append(']');
+                }
+            }
+            pathOffset++;
+        }
     }
 }

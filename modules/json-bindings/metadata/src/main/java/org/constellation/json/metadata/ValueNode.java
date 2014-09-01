@@ -69,9 +69,10 @@ final class ValueNode extends ArrayList<ValueNode> {
     }
 
     /**
-     * Formats the path.
+     * Formats the path. Callers must ensure that {@link TemplateNode#path} is non-null
+     * before to invoke this method.
      */
-    final void formatPath(final Appendable out) throws IOException {
+    final void formatPath(final Appendable out, int pathOffset) throws IOException {
         out.append('"');
         final String[] path = template.path;
         for (int i=0; i<path.length; i++) {
@@ -90,11 +91,9 @@ final class ValueNode extends ArrayList<ValueNode> {
     }
 
     /**
-     * Formats a single value.
-     *
-     * @param value The value to format.
+     * Formats the value.
      */
-    static void formatValue(final Object value, final Appendable out) throws IOException {
+    final void formatValue(final Appendable out) throws IOException {
         final String p;
         if (value == null) {
             p = null;
@@ -145,10 +144,26 @@ final class ValueNode extends ArrayList<ValueNode> {
      * Implementation of {@link #toString()} to be invoked recursively by children.
      */
     private void toString(final StringBuilder buffer, int indentation, int pathOffset) {
-        template.toString(buffer, indentation, pathOffset, "value", value);
-        buffer.append('\n');
+        boolean hasValue = template.isField();
+        buffer.append(CharSequences.spaces(indentation)).append(hasValue ? "Field" : "Node").append('[');
+        hasValue &= (value != null);
+        if (template.path != null) {
+            buffer.append("path:");
+            try {
+                formatPath(buffer, pathOffset);
+            } catch (IOException e) {
+                throw new AssertionError(e); // Should never happen, since we are writting to a StringBuilder.
+            }
+            if (hasValue) {
+                buffer.append(", ");
+            }
+            pathOffset += template.path.length; // For the iteration over children.
+        }
+        if (hasValue) {
+            buffer.append("value:\"").append(value).append('"');
+        }
+        buffer.append("]\n");
         indentation += 4;
-        pathOffset += template.getPathDepth();
         for (final ValueNode child : this) {
             child.toString(buffer, indentation, pathOffset);
         }

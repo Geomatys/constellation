@@ -218,9 +218,9 @@ final class TemplateNode {
             if (prefix != null) {
                 for (int i=0; i<prefix.length; i++) {
                     if (i >= path.length - 1 || !path[i].equals(prefix[i])) {
-                        final StringBuilder buffer = new StringBuilder("Path \"");
+                        final StringBuilder buffer = new StringBuilder("Path ");
                         appendPath(0, buffer);
-                        throw new ParseException(buffer.append("\" is inconsistent with parent.").toString());
+                        throw new ParseException(buffer.append(" is inconsistent with parent.").toString());
                     }
                 }
             }
@@ -239,16 +239,11 @@ final class TemplateNode {
     }
 
     /**
-     * Returns the depth of {@link #path}.
-     */
-    final int getPathDepth() {
-        return (path != null) ? path.length : 0;
-    }
-
-    /**
-     * Appends the path for this node in the given buffer.
+     * Appends the path (including quotes) for this node in the given buffer.
+     * Callers must ensure that {@link #path} is non-null before to invoke this method.
      */
     final void appendPath(final int pathOffset, final StringBuilder appendTo) {
+        appendTo.append('"');
         if (pathOffset != 0) {
             appendTo.append('(');
         }
@@ -261,6 +256,7 @@ final class TemplateNode {
             }
             appendTo.append(path[i]);
         }
+        appendTo.append('"');
     }
 
     /**
@@ -282,7 +278,7 @@ final class TemplateNode {
     final void write(final Object metadata, final Appendable out, final boolean prune, final int maxDepth) throws IOException {
         final TemplateApplicator f = new TemplateApplicator(prune, maxDepth);
         for (final ValueNode root : f.createValueTree(this, metadata)) {
-            writeTree(root, out, true, null);
+            writeTree(root, out, true);
         }
     }
 
@@ -294,9 +290,7 @@ final class TemplateNode {
      * @param  out      Where to write the JSON file.
      * @throws IOException If an error occurred while writing the JSON file.
      */
-    private void writeTree(final ValueNode node, final Appendable out,
-            final boolean isLastNode, final Object value) throws IOException
-    {
+    private void writeTree(final ValueNode node, final Appendable out, final boolean isLastNode) throws IOException {
         for (int i=0; i<content.length; i++) {
             final Object line = content[i];
             if (line instanceof TemplateNode) {
@@ -310,7 +304,7 @@ final class TemplateNode {
                 for (int j=0; j<n; j++) {
                     final ValueNode child = node.get(j);
                     if (child.template == line) {
-                        child.template.writeTree(child, out, (j+1) == n, child.value);
+                        child.template.writeTree(child, out, (j+1) == n);
                     }
                 }
             } else {
@@ -327,12 +321,12 @@ final class TemplateNode {
                 } else {
                     out.append((String) line);
                 }
-                if (i == pathIndex) {
-                    node.formatPath(out);
+                if (i == pathIndex) { // Implies non-null path.
+                    node.formatPath(out, 0);
                     out.append(',');
                 }
                 if (i == valueIndex) {
-                    ValueNode.formatValue(value, out);
+                    node.formatValue(out);
                 }
                 if (isLastLine && !isLastNode && !hasTrailingComma) {
                     out.append(separator);
@@ -357,11 +351,19 @@ final class TemplateNode {
 
     /**
      * Implementation of {@link #toString()} to be invoked recursively by children.
-     * This method does not add the EOL character - it is caller responsibility to append it.
+     * This method does not add the final EOL character - it is caller responsibility to append it.
      */
     private void toString(final StringBuilder buffer, final int indentation, int pathOffset) {
-        toString(buffer, indentation, pathOffset, "defaultValue", defaultValue);
-        pathOffset += getPathDepth();
+        buffer.append(CharSequences.spaces(indentation)).append(isField() ? "Field" : "Node").append('[');
+        if (path != null) {
+            appendPath(pathOffset, buffer.append("path:"));
+            pathOffset += path.length; // For the iteration over children.
+        }
+        if (defaultValue != null) {
+            if (path != null) buffer.append(", ");
+            buffer.append("defaultValue:\"").append(defaultValue).append('"');
+        }
+        buffer.append(']');
         if (children != null) {
             for (final TemplateNode template : children) {
                 template.toString(buffer.append('\n'), indentation + 4, pathOffset);
@@ -373,24 +375,5 @@ final class TemplateNode {
             }
             buffer.append(',');
         }
-    }
-
-    /**
-     * Partial implementation of {@link #toString(StringBuilder, int, int)} to be shared by {@link ValueNode}.
-     * This method does not add the EOL character - it is caller responsibility to append it.
-     */
-    final void toString(final StringBuilder buffer, final int indentation, final int pathOffset, final String label, final Object value) {
-        buffer.append(CharSequences.spaces(indentation)).append(isField() ? "Field" :  "Node").append('[');
-        if (path != null) {
-            appendPath(pathOffset, buffer.append("path:\""));
-            buffer.append('"');
-        }
-        if (value != null) {
-            if (path != null) {
-                buffer.append(", ");
-            }
-            buffer.append(label).append(":\"").append(value).append('"');
-        }
-        buffer.append(']');
     }
 }

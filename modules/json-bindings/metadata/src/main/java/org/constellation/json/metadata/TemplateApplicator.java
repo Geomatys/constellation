@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.TypeValuePolicy;
@@ -75,10 +76,19 @@ final class TemplateApplicator {
 
     /**
      * Builds a tree of values for the given node and all its children nodes.
+     * The given {@code metadata} argument shall be one of the following:
+     *
+     * <ul>
+     *   <li>The metadata instance.</li>
+     *   <li>If the metadata instance is unknown, then the base {@link Class} of expected metadata instances.
+     *       There is not risk of confusion between {@code Class} instances and metadata instances because
+     *       {@code Class} can not implement a GeoAPI interface.</li>
+     *   <li>If even the base {@code Class} is unknown, then {@code null}.</li>
+     * </ul>
      *
      * <p>This method invokes itself recursively.</p>
      *
-     * @param  metadata   The metadata from which to get the values, or {@code null}.
+     * @param  metadata   The metadata from which to get the values, or the expected base {@code Class}, or {@code null}.
      * @param  pathOffset Index of the first {@link #path} element to use.
      * @return The roots of tree nodes created by this method (not necessarily the root of the whole tree to be
      *         written), or {@code null} if none. The array may contain null elements, which shall be ignored.
@@ -100,14 +110,17 @@ final class TemplateApplicator {
          * metadata objects, in which case we will need to invoke this method recursively for them.
          */
         nodes.clear();
-        try {
-            getValues(template, metadata, pathOffset);
-        } catch (ClassCastException e) {
-            final StringBuilder buffer = new StringBuilder("Illegal path: \"");
-            template.appendPath(pathOffset, buffer);
-            throw new ParseException(buffer.append("\".").toString(), e);
+        final boolean isMetadataInstance = (metadata != null) && !(metadata instanceof Class<?>);
+        if (isMetadataInstance) {
+            try {
+                getValues(template, metadata, pathOffset);
+            } catch (ClassCastException e) {
+                final StringBuilder buffer = new StringBuilder("Illegal path: ");
+                template.appendPath(pathOffset, buffer);
+                throw new ParseException(buffer.append('.').toString(), e);
+            }
+            filterNewValues(template);
         }
-        filterNewValues(template);
         /*
          * If there is no value and the user asked us to prune empty nodes,
          * returns 'null' immediately (avoid the creation of an array).
@@ -124,10 +137,11 @@ final class TemplateApplicator {
              */
             final int pathEnd = template.path.length;
             Arrays.fill(indices, pathOffset, pathEnd, 0); // Initialize to "not a collection".
+            Class<?> type = null;
             if (metadata != null) {
-                Class<?> type = metadata.getClass();
-                while (pathOffset < pathEnd) {
-                    final String   identifier   = template.path[pathOffset];
+                type = isMetadataInstance ? metadata.getClass() : (Class<?>) metadata; // See method javadoc.
+                do {
+                    final String identifier = template.path[pathOffset];
                     final Class<?> propertyType;
                     try {
                         propertyType = getType(template, type, TypeValuePolicy.PROPERTY_TYPE, identifier);
@@ -144,14 +158,11 @@ final class TemplateApplicator {
                     }
                     if (Collection.class.isAssignableFrom(propertyType)) {
                         indices[pathOffset] = 1;
-                        if (++pathOffset != pathEnd) { // Avoid computing the next 'type' if we are reaching the end of loop.
-                            type = getType(template, type, TypeValuePolicy.ELEMENT_TYPE, identifier);
-                        }
+                        type = getType(template, type, TypeValuePolicy.ELEMENT_TYPE, identifier);
                     } else {
-                        ++pathOffset;
                         type = propertyType; // Should be equivalent to a call to 'getType(…)', but much cheaper.
                     }
-                }
+                } while (++pathOffset < pathEnd);
             }
             if (template.isField()) {
                 nodes.add(new ValueNode(template, indices, template.defaultValue));
@@ -159,7 +170,7 @@ final class TemplateApplicator {
             } else {
                 ValueNode node = null;
                 for (final TemplateNode child : template.children) {
-                    node = addTo(template, node, createValueTree(child, null, pathEnd));
+                    node = addTo(template, node, createValueTree(child, type, pathEnd));
                 }
                 return new ValueNode[] {node}; // Unlikely to be null, but still allowed.
             }
@@ -193,16 +204,13 @@ final class TemplateApplicator {
      *
      * <p>This method invokes itself recursively.</p>
      *
-     * @param  metadata   The metadata from where to get the values, or {@code null}.
+     * @param  metadata   The metadata from where to get the values.
      * @param  pathOffset Index of the first {@code path} element to use.
      * @throws ClassCastException if {@code metadata} is not an instance of the expected standard.
      */
-    private void getValues(final TemplateNode template, Object metadata, int pathOffset)
-            throws ClassCastException
-    {
-        if (metadata == null || template.path == null) {
-            return;
-        }
+    private void getValues(final TemplateNode template, Object metadata, int pathOffset) throws ClassCastException {
+        Objects.requireNonNull(template.path);
+        Objects.requireNonNull(metadata);
         Object value;
         do {
             final String identifier = template.path[pathOffset];
@@ -223,7 +231,7 @@ final class TemplateApplicator {
                     value = values[i];
                     if (isField) {
                         nodes.add(new ValueNode(template, indices, value));
-                    } else {
+                    } else if (value != null) {
                         getValues(template, value, pathOffset);
                     }
                 }
