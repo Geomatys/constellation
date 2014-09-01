@@ -130,7 +130,6 @@ import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;

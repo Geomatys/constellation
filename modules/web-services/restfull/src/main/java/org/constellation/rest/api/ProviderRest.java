@@ -54,6 +54,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.provider.CoverageData;
@@ -109,6 +110,7 @@ public final class ProviderRest {
     
     @Inject
     private DatasetBusiness datasetBusiness;
+    
 
     @POST
     @Path("/{id}/test")
@@ -124,8 +126,9 @@ public final class ProviderRest {
             sources.parameter("id").setValue(providerIdentifier);
             sources.parameter("providerType").setValue(type);
             sources = fillProviderParameter(type, subType, inParams, sources);
-            Set<Name> names = DataProviders.getInstance().testProvider(providerIdentifier, providerService, sources);
-            if (names==null || names.size()==0){
+            final Set<Name> names = DataProviders.getInstance().testProvider(providerIdentifier, providerService, sources);
+            if (names.isEmpty()){
+                LOGGER.warning("non data found for provider: " + providerIdentifier);
                 return Response.status(500).build();
             }
 
@@ -181,8 +184,11 @@ public final class ProviderRest {
             final int count = domainRepository.addProviderDataToDomain(id, domainId );
             final int provId = providerBusiness.getProvider(id).getId();
             // for now we assume provider == dataset
-            datasetBusiness.createDataset(id, provId, null, null);
+            final Dataset dataset = datasetBusiness.createDataset(id, provId, null, null);
             
+            // link to dataset
+            datasetBusiness.linkDataTodataset(dataset, providerBusiness.getDatasFromProviderId(provId));
+                    
             LOGGER.info("Added " + count + " data to domain " + domainId);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, null, ex);
@@ -455,6 +461,7 @@ public final class ProviderRest {
 
     /**
      * Delete a provider with the given id.
+     * @param id
      */
     @DELETE
     @Path("{id}")

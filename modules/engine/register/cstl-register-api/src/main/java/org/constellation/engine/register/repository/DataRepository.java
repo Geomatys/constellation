@@ -58,5 +58,5 @@ public interface DataRepository {
 
     Map<Domain, Boolean> getLinkedDomains(int dataId);
 
-
+    
 }

@@ -8,6 +8,7 @@ package org.constellation.admin;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -16,7 +17,9 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.stereotype.Component;
@@ -30,6 +33,9 @@ public class DatasetBusiness {
     
     @Inject
     private DatasetRepository datasetRepository;
+    
+    @Inject
+    private DataRepository dataRepository;
     
     public Dataset getDataset(String datasetIdentifier, int domainId) {
         return datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
@@ -89,6 +95,13 @@ public class DatasetBusiness {
             datasetRepository.update(dataset);
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
+        }
+    }
+    
+    public void linkDataTodataset(final Dataset ds, final List<Data> datas) {
+        for (Data data : datas) {
+            data.setDatasetId(ds.getId());
+            dataRepository.update(data);
         }
     }
 }

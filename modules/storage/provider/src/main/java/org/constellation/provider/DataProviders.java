@@ -29,7 +29,6 @@ import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.referencing.CRS;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -137,7 +136,7 @@ public final class DataProviders extends Providers implements PropertyChangeList
         getProviders();
         final DataProvider provider = factory.createProvider(id, params);
         //test to read data
-        Set<Name> names = null;
+        Set<Name> names = new HashSet<>();
         if (provider.getMainStore() instanceof FeatureStore) {
             names = ((FeatureStore) provider.getMainStore()).getNames();
         } else if (provider.getMainStore() instanceof CoverageStore) {
@@ -151,16 +150,15 @@ public final class DataProviders extends Providers implements PropertyChangeList
         getProviders();
         final DataProvider provider = getProvider(id);
         //test getting CRS from data
-        Set<Name> names = null;
         if (provider.getMainStore() instanceof FeatureStore) {
-            names =  ((FeatureStore) provider.getMainStore()).getNames();
+            final Set<Name> names =  ((FeatureStore) provider.getMainStore()).getNames();
             for (Name name : names){
                 final Envelope envelope = ((FeatureStore) provider.getMainStore()).getEnvelope(QueryBuilder.all(name));
                 final CoordinateReferenceSystem coordinateReferenceSystem = envelope.getCoordinateReferenceSystem();
                 nameCoordinateReferenceSystemHashMap.put(name,coordinateReferenceSystem);
             }
         } else if (provider.getMainStore() instanceof CoverageStore) {
-            names = ((CoverageStore) provider.getMainStore()).getNames();
+            final Set<Name> names = ((CoverageStore) provider.getMainStore()).getNames();
             for (Name name : names){
                 final CoverageReference coverageReference = ((CoverageStore) provider.getMainStore()).getCoverageReference(name);
                 final GridCoverageReader coverageReader = coverageReference.acquireReader();
