@@ -79,7 +79,6 @@ import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
-import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.ImportedData;
 import org.constellation.dto.MetadataLists;
@@ -94,6 +93,7 @@ import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.json.metadata.Template;
+import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
@@ -153,7 +153,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.constraint.Classification;
-import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.spatial.GeometricObjectType;
@@ -825,11 +824,6 @@ public class DataRest {
             }
             return Response.ok(buffer.toString()).build();
 
-
-//            final MetadataFeeder feeder = new MetadataFeeder(metadata);
-//            final DataMetadata information = feeder.extractDataMetadata();
-//
-//            return Response.status(200).entity(information).build();
         } else {
             LOGGER.warning("Metadata is null for providerId:"+providerId);
             return Response.status(500).build();
@@ -927,26 +921,41 @@ public class DataRest {
     /**
      * Save metadata with merge from ISO19115 form
      *
-     * @param overridenValue {@link org.constellation.dto.DataMetadata} which contains new information for metadata.
-     * @return {@link javax.ws.rs.core.Response} with code 200.
      */
     @POST
-    @Path("metadata/merge")
+    @Path("metadata/merge/{providerId}/{type}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response mergeMetadata(final DataMetadata overridenValue) {
-        final String providerId = overridenValue.getDataName();
+    public Response mergeMetadata(@PathParam("providerId") final String providerId,
+                                  @PathParam("type") final String type,
+                                  final RootObj metadataValues) {
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
 
-        for (Name dataName : dataProvider.getKeys()) {
+        for (final Name dataName : dataProvider.getKeys()) {
             final QName name = Utils.getQnameFromName(dataName);
             
             // Get previously saved metadata for the current data
             final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, name);
-            
-            // Import changes from DataMetadata into the DefaultMetadata
-            final MetadataFeeder feeder = new MetadataFeeder(metadata);
-            feeder.feed(overridenValue);
+
+
+            //get template name
+            final String templateName;
+            if("vector".equalsIgnoreCase(type)){
+                //vector
+                templateName="profile_inspire_vector";
+            }else {
+                //raster
+                templateName="profile_inspire_raster";
+            }
+            final Template template = Template.getInstance(templateName);
+
+//            try{
+//                final CharSequence[] lines = CharSequences.splitOnEOL(metadataValues);
+//                template.read(Arrays.asList(lines),metadata,false);
+//            }catch(IOException ex){
+//                LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
+//                return Response.status(500).entity("failed").build();
+//            }
             
             //Save metadata
             dataBusiness.saveMetadata(providerId,name,metadata);

@@ -515,12 +515,17 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
          * @type {Array}
          */
         $scope.metadataValues = [];
-        dataListing.getDatasetMetadata({}, {values: {'providerId': $scope.provider, 'type':$scope.type.toLowerCase(),'prune':false}},
+        dataListing.getDatasetMetadata({}, {values: {'providerId': $scope.provider,
+                                                     'type':$scope.type.toLowerCase(),
+                                                     'prune':false}},
             function(response) {
                 if (response && response.root) {
                     $scope.metadataValues.push({"root":response.root});
-                    //$scope.codeLists =dataListing.codeLists({});
                 }
+            },
+            function(response) {
+                console.error(response);
+                Growl('error','Error','The server returned an error!');
             }
         );
 
@@ -642,18 +647,20 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
          * Save the metadata in server.
          */
         $scope.save = function() {
-            //$scope.metadata.dataName = $scope.provider;
-            //$scope.metadata.type = $scope.type;
-            if($scope.metadataValues && $scope.metadataValues.length>0){
-                console.debug($scope.metadataValues[0]);
-                $location.path('/data'); //redirect to data dashboard page
-            }
             //@TODO save metadata
-            /*dataListing.mergeMetadata({}, $scope.metadata,
-                function() {
-                    $location.path('/data');
-                }
-            );*/
+            if($scope.metadataValues && $scope.metadataValues.length>0){
+                dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.type.toLowerCase()},
+                    $scope.metadataValues[0],
+                    function(response) {
+                        console.debug(response);
+                        $location.path('/data'); //redirect to data dashboard page
+                    },
+                    function(response) {
+                        console.error(response);
+                        Growl('error','Error','The server returned an error!');
+                    }
+                );
+            }
         };
 
         /**
