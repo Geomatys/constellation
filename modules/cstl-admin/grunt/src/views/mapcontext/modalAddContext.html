@@ -112,11 +112,14 @@
                                             <div class="item-list">
                                                 <div ng-repeat="layerToAdd in layers.toAdd">
                                                     <div class="row">
-                                                        <div class="col-xs-1" style="padding-top:35px;">
+                                                        <div class="col-xs-2" style="padding-top:30px;" ng-model="layerToAdd.visible">
                                                             <!-- Visibility -->
-                                                            <input type="checkbox" ng-model="layerToAdd.visible" ng-change="changeVisibility(layerToAdd)">
+                                                            <button ng-click="changeVisibility(layerToAdd)" class="btn btn-sm" ng-class="{'btn-visibility-layer-true':layerToAdd.visible===true, 'btn-visibility-layer-false':layerToAdd.visible===false}">
+                                                                <span ng-if="layerToAdd.visible===false" class="fa fa-eye-slash"></span>
+                                                                <span ng-if="layerToAdd.visible===true" class="fa fa-eye"></span>
+                                                            </button>
                                                         </div>
-                                                        <div class="col-xs-9 no-padding" ng-click="selectItem(layerToAdd)">
+                                                        <div class="col-xs-8 no-padding" ng-click="selectItem(layerToAdd)">
                                                             <div class="item layer compo" ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
                                                                 <div class="top">
                                                                     <span class="item-title" title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? truncate(mode.display,layerToAdd.layer.Name) : truncate(mode.display,layerToAdd.layer.externalLayer)}}</span>
@@ -191,7 +194,7 @@
                                                             </a>
                                                         </div>
                                                     </div>
-                                                    <div ng-if="selected.item === layerToAdd" class="row child">
+                                                    <div ng-if="selected.item === layerToAdd" class="row col-xs-10 child mapcontext-layer-opacity">
                                                         <div class="col-xs-3 no-padding">
                                                             <span translate="sldeditor.edition.opacity">Opacity</span>
                                                         </div>
@@ -199,11 +202,12 @@
                                                             <input class="slider-mapcontext-layer" type="range" ng-model="layerToAdd.layer.opacity" ng-click="updateOpacity(layerToAdd)"/>
                                                         </div>
 
-                                                        <div class="col-xs-1" style="margin-left:17px;">
-                                                            <!-- Edition -->
-                                                            <div class="btn btn-sm" ng-click="goToStyleMapItem(layerToAdd)">
-                                                                <span class="glyphicon glyphicon-pencil"></span>
-                                                            </div>
+
+                                                    </div>
+                                                    <div ng-if="selected.item === layerToAdd" class="col-xs-1" style="margin-left: 3px; margin-right:17px;">
+                                                        <!-- Edition -->
+                                                        <div class="btn btn-sm" ng-click="goToStyleMapItem(layerToAdd)">
+                                                            <span class="glyphicon glyphicon-pencil"></span>
                                                         </div>
                                                     </div>
                                                 </div>

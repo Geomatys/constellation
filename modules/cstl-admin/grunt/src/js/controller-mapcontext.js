@@ -475,18 +475,18 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         $scope.viewLayerInfo = function(item) {
             var serviceIdentifier = (item.service) ? item.service.name : (item.layer.serviceIdentifier) ? item.layer.serviceIdentifier : item.layer.externalServiceUrl;
             var serviceVersions = (item.service) ? item.service.versions : (item.layer.serviceVersions) ? (item.layer.serviceVersions) : item.layer.externalServiceVersion;
-            var str = '<div><b>Name</b></div>' +
-                '<div>'+ item.layer.Name +'</div>' +
+            var str = '<div style="word-wrap: break-word;"> </div><div><b>Name</b></div>' +
+                '<div style="word-wrap: break-word;">'+ item.layer.Name +'</div>' +
                 '<div><b>Alias</b></div>' +
-                '<div>'+ item.layer.Alias +'</div>';
+                '<div style="word-wrap: break-word;">'+ item.layer.Alias +'</div>';
             if (item.layer.Type) {
                 str += '<div><b>Type</b></div>' +
-                    '<div>'+ item.layer.Type +'</div>';
+                    '<div style="word-wrap: break-word;">'+ item.layer.Type +'</div>';
             }
             str += '<div><b>Service</b></div>' +
-                '<div>'+ serviceIdentifier +'</div>' +
+                '<div style="word-wrap: break-word;">'+ serviceIdentifier +'</div>' +
                 '<div><b>Service version(s)</b></div>' +
-                '<div>'+ serviceVersions +'</div>';
+                '<div>'+ serviceVersions +'</div></div>';
             return str;
         };
 
@@ -536,6 +536,7 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         };
 
         $scope.changeVisibility = function(item) {
+            item.visible=!(item.visible);
             for (var i=0; i<DataViewer.layers.length; i++) {
                 var l = DataViewer.layers[i];
                 if (l.name === item.layer.Name) {
