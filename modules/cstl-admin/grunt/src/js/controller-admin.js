@@ -15,9 +15,9 @@
  */
 'use strict';
 
-cstlAdminApp.controller('AdminController', ['$scope', '$location', '$dashboard', 'webService',
+cstlAdminApp.controller('AdminController', ['$scope', '$location', 'Dashboard', 'webService',
     'dataListing', 'provider', 'style', 'textService', '$modal', 'Growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, provider, style, textService, $modal, Growl, StyleSharedService, $cookies) {
+    function ($scope, $location, Dashboard, webService, dataListing, provider, style, textService, $modal, Growl, StyleSharedService, $cookies) {
 
         $scope.viewUrls = {
             'system_state':         {name:'system_state',       url:'views/admin/system_state.html'},

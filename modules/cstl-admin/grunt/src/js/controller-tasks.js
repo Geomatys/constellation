@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', 'Growl', '$modal', 'TaskService','$window',
-        function ($scope, $dashboard, Growl, $modal, TaskService, $window){
+cstlAdminApp.controller('TasksController', ['$scope', 'Dashboard', 'Growl', '$modal', 'TaskService','$window',
+        function ($scope, Dashboard, Growl, $modal, TaskService, $window){
             var lastOpened = null;
 
             $scope.nbbypage = 5; // Default value at 5
@@ -30,7 +30,7 @@ cstlAdminApp.controller('TasksController', ['$scope', '$dashboard', 'Growl', '$m
                 TaskService.listParamsTask({}).$promise
                     .then(function(response){
                         // On success
-                        $dashboard($scope, response, false);
+                        Dashboard($scope, response, false);
                     }).catch(function(){
                         // On error
                         Growl('error', 'Error', 'Unable to get tasks list');

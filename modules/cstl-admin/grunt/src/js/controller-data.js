@@ -16,10 +16,10 @@
 'use strict';
 
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService',
+cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', 'webService',
     'dataListing', 'DomainResource', 'provider', '$window', 'style', 'textService', '$modal',
     'Growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, DomainResource,
+    function ($scope, $location, Dashboard, webService, dataListing, DomainResource,
               provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookies) {
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
@@ -53,7 +53,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             if ($scope.searchTerm){
                 dataListing.findData({values: {'search': $scope.searchTerm}},
                     function(response) {
-                        $dashboard($scope, response, true);
+                        Dashboard($scope, response, true);
                     },
                     function(response){
                         console.error(response);
@@ -85,14 +85,14 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                         searchString += " area:"+$scope.search.area;
                     }
                     dataListing.findData({values: {'search': searchString}},function(response) {
-                        $dashboard($scope, response, true);
+                        Dashboard($scope, response, true);
                     }, function(response){
                         console.error(response);
                         Growl('error','Error','Search failed:'+ response.data);
                     });
                 } else {
                     dataListing.listAll({}, function(response) {
-                        $dashboard($scope, response, true);
+                        Dashboard($scope, response, true);
                     });
                 }
             }
@@ -104,7 +104,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 controller: 'ModalInstanceCtrl'
             });
             dataListing.listAll({}, function(response) {
-                $dashboard($scope, response, true);
+                Dashboard($scope, response, true);
                 $scope.filtertype = "";
                 modalLoader.close();
             }, function() {
@@ -429,8 +429,8 @@ cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalIn
 }]);
 
 cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
-    'dataListing','$location', '$translate', '$uploadFiles', '$modal','textService',
-    function ($scope, $routeParams,dataListing, $location, $translate, $uploadFiles, $modal,textService) {
+    'dataListing','$location', '$translate', 'UploadFiles', '$modal','textService',
+    function ($scope, $routeParams,dataListing, $location, $translate, UploadFiles, $modal,textService) {
         $scope.provider = $routeParams.id;
         $scope.missing = $routeParams.missing === 'true';
         $scope.type = $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
@@ -727,8 +727,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
 }]);
 
 cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos',
-    'sensor', '$dashboard', '$modalInstance', 'service', 'exclude', 'Growl', '$modal',
-    function ($scope, dataListing, webService, sos, sensor, $dashboard, $modalInstance,
+    'sensor', 'Dashboard', '$modalInstance', 'service', 'exclude', 'Growl', '$modal',
+    function ($scope, dataListing, webService, sos, sensor, Dashboard, $modalInstance,
               service, exclude, Growl, $modal) {
         $scope.service = service;
 
@@ -756,11 +756,11 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
         $scope.init = function() {
             if (service.type.toLowerCase() === 'sos') {
                 sensor.list({}, function(response) {
-                    $dashboard($scope, response.children, false);
+                    Dashboard($scope, response.children, false);
                 });
             } else {
                 dataListing.listAll({}, function (response) {
-                    $dashboard($scope, response, true);
+                    Dashboard($scope, response, true);
                     $scope.filtertype = $scope.getDefaultFilter();
                 });
             }

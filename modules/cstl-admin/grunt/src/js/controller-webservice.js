@@ -379,8 +379,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         }
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', 'Growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies','$translate','$window',
-    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate, $window) {
+cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', 'Dashboard', 'Growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies','$translate','$window',
+    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, Dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate, $window) {
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -472,7 +472,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
             if ($scope.type === 'csw') {
                 csw.count({id: $routeParams.id}, {}, function(max) {
                     csw.getRecords({id: $routeParams.id, count: max.value, startIndex: 0}, {}, function(response) {
-                        $dashboard($scope, response.BriefNode, false);
+                        Dashboard($scope, response.BriefNode, false);
                         $scope.filtertype = "";
 
                         var mdIds = [];
@@ -488,14 +488,14 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                 });
             } else if ($scope.type === 'sos') {
                 sos.sensorsTree({id: $routeParams.id}, function(sensors) {
-                    $dashboard($scope, sensors.children, false);
+                    Dashboard($scope, sensors.children, false);
                     $scope.layers = sensors.children;
 
                 }, function() { Growl('error','Error','Unable to list sensors'); });
             } else {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
                 $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
-                    $dashboard($scope, response, true);
+                    Dashboard($scope, response, true);
                     $scope.filtertype = "";
                 });
             }
@@ -734,7 +734,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                         Growl('success','Success','Metadata deleted');
                         csw.count({id: $routeParams.id}, {}, function(max) {
                             csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
-                                $dashboard($scope, response.BriefNode, false);
+                                Dashboard($scope, response.BriefNode, false);
                                 $scope.filtertype = "";
                             });
                         });

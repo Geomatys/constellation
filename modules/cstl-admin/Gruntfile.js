@@ -133,8 +133,9 @@ module.exports = function(grunt) {
                     '<%= target_dir %>/js/app.js': [
                         '<%= src_dir %>/js/http-auth-interceptor.js',
                         '<%= src_dir %>/js/app.js',
-                        '<%= src_dir %>/js/app-directives.js',
-                        '<%= src_dir %>/js/app-services.js',
+                        '<%= src_dir %>/js/directives.js',
+                        '<%= src_dir %>/js/restapi.js',
+                        '<%= src_dir %>/js/services.js',
                         '<%= src_dir %>/js/controllers.js',
                         '<%= src_dir %>/js/controller-data.js',
                         '<%= src_dir %>/js/controller-data-import.js',
@@ -144,7 +145,6 @@ module.exports = function(grunt) {
                         '<%= src_dir %>/js/controller-tasks.js',
                         '<%= src_dir %>/js/controller-mapcontext.js',
                         '<%= src_dir %>/js/controller-admin.js',
-                        '<%= src_dir %>/js/services.js',
                         '<%= src_dir %>/js/cstl.data.viewer.js',
                         '<%= src_dir %>/js/cstl.viewer.wmts.js',
                         '<%= src_dir %>/js/cstl.netcdf.js'
@@ -155,10 +155,10 @@ module.exports = function(grunt) {
                 files: {
                     '<%= target_dir %>/js/app-index.js': [
                         '<%= src_dir %>/js/http-auth-interceptor.js',
-                        '<%= src_dir %>/js/index.js',
-                        '<%= src_dir %>/js/app-directives.js',
-                        '<%= src_dir %>/js/app-services.js',
-                        '<%= src_dir %>/js/index/*.js'
+                        '<%= src_dir %>/js/app-index.js',
+                        '<%= src_dir %>/js/directives.js',
+                        '<%= src_dir %>/js/restapi.js',
+                        '<%= src_dir %>/js/services.js'
                     ]
                 }
             },

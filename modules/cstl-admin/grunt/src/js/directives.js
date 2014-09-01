@@ -18,7 +18,11 @@
  * limitations under the License.
  */
 
-angular.module('cstl-directives', [])
+/**
+ * @require angular.js
+ * @require angular-translate.js
+ */
+angular.module('cstl-directives', ['pascalprecht.translate'])
 
     // -------------------------------------------------------------------------
     //  Page Switcher
@@ -200,7 +204,7 @@ angular.module('cstl-directives', [])
     //  Active Menu
     // -------------------------------------------------------------------------
 
-    .directive('activeMenu', ['$rootScope', '$translate', function($rootScope, $translate) {
+    .directive('activeMenu', function($rootScope, $translate) {
         return {
             restrict: 'A',
             link: function(scope, element, attrs) {
@@ -217,13 +221,13 @@ angular.module('cstl-directives', [])
                 }
             }
         };
-    }])
+    })
 
     // -------------------------------------------------------------------------
     //  Active Link
     // -------------------------------------------------------------------------
 
-    .directive('activeLink', ['$rootScope', '$location', function($rootScope, $location) {
+    .directive('activeLink', function($rootScope, $location) {
         return {
             restrict: 'A',
             link: function(scope, element, attrs) {
@@ -240,7 +244,7 @@ angular.module('cstl-directives', [])
                 }
             }
         };
-    }])
+    })
 
     // -------------------------------------------------------------------------
     //  Spectrum
@@ -293,7 +297,7 @@ angular.module('cstl-directives', [])
     //  Directive to set input name dynamically
     // -------------------------------------------------------------------------
 
-    .directive('dynamicName', function($compile, $parse) {
+    .directive('dynamicName', function() {
         return {
             restrict:"A",
             require: ['ngModel', '^form'],
@@ -308,7 +312,7 @@ angular.module('cstl-directives', [])
     //  Multi Select
     // -------------------------------------------------------------------------
 
-    .directive('multiSelect', ['$q', function($q) {
+    .directive('multiSelect', function($q) {
         return {
             restrict: 'E',
             require: 'ngModel',
@@ -405,14 +409,13 @@ angular.module('cstl-directives', [])
                 });
             }
         };
-    }])
-
+    })
 
     // -------------------------------------------------------------------------
     //  Back to top button
     // -------------------------------------------------------------------------
 
-    .directive("scrollTo", ["$window", function($window){
+    .directive("scrollTo", function($window){
         return {
             restrict : "AC",
             compile : function(){
@@ -445,4 +448,4 @@ angular.module('cstl-directives', [])
                 };
             }
         };
-    }]);
+    });

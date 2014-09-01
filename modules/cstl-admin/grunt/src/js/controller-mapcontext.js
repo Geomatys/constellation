@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'Growl', '$modal', '$cookies', 'mapcontext','$window',
-    function ($scope, $dashboard, Growl, $modal, $cookies, mapcontext, $window){
+cstlAdminApp.controller('MapcontextController', ['$scope', 'Dashboard', 'Growl', '$modal', '$cookies', 'mapcontext','$window',
+    function ($scope, Dashboard, Growl, $modal, $cookies, mapcontext, $window){
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.domainId = $cookies.cstlActiveDomainId;
         $scope.cstlSessionId = $cookies.cstlSessionId;
@@ -28,7 +28,7 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'Growl'
                 controller: 'ModalInstanceCtrl'
             });
             mapcontext.listLayers({}, function(response) {
-                $dashboard($scope, response, true);
+                Dashboard($scope, response, true);
                 $scope.ordertype='name';
                 modalLoader.close();
             }, function() {

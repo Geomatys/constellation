@@ -46,6 +46,7 @@ var cstlAdminApp = angular.module('cstlAdminApp', [
     'ui.bootstrap.typeahead',
     // Constellation modules.
     'cstl-directives',
+    'cstl-restapi',
     'cstl-services',
     'http-auth-interceptor']);
 
@@ -197,14 +198,14 @@ cstlAdminApp
             // remember language
             $translateProvider.useCookieStorage();
         }])
-        .run(['$rootScope', '$location', 'AuthenticationSharedService', 'Account',
-            function($rootScope, $location, AuthenticationSharedService, Account) {
+        .run(['$rootScope', '$location', 'AuthService', 'Account',
+            function($rootScope, $location, AuthService, Account) {
 
             $rootScope.$on("$routeChangeStart", function(event, next, current) {
                 // Check if the status of the user. Is it authenticated or not?
                 if($rootScope.authenticated)
                     return;
-                AuthenticationSharedService.authenticate({}, function() {
+                AuthService.authenticate({}, function() {
                     $rootScope.authenticated = true;
                 });
             });

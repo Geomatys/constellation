@@ -18,8 +18,8 @@
 /**
  * Controller for dashboard of styles.
  */
-cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', 'Growl', 'StyleSharedService', '$modal','$window',
-    function($scope, $dashboard, style, Growl, StyleSharedService, $modal, $window) {
+cstlAdminApp.controller('StylesController', ['$scope', 'Dashboard', 'style', 'Growl', 'StyleSharedService', '$modal','$window',
+    function($scope, Dashboard, style, Growl, StyleSharedService, $modal, $window) {
         $scope.hideScroll = true;
 
         $scope.init = function() {
@@ -30,7 +30,7 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', 'G
             modalLoader.opened.then(function() {
                 style.listAll({provider: 'sld'},
                     function(response) {
-                        $dashboard($scope, response.styles, true);
+                        Dashboard($scope, response.styles, true);
                         $scope.filtertype = "";
                         $scope.ordertype = "Name";
                         modalLoader.close();
@@ -140,10 +140,10 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', 'G
 /**
  * Controller for modal popup SLD-Editor used in dashboards styles, services and data layers.
  */
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance',
+cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalInstance',
     'style', '$cookies', 'dataListing', 'provider', 'Growl', 'textService', 'newStyle',
     'selectedLayer','selectedStyle', 'serviceName', 'exclude','$timeout','stylechooser',
-    function($scope, $dashboard, $modalInstance, style, $cookies, dataListing, provider, Growl,
+    function($scope, Dashboard, $modalInstance, style, $cookies, dataListing, provider, Growl,
              textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout,stylechooser) {
         $scope.xmlStyle = '<xml></xml>';
         $scope.exclude = exclude;
@@ -2209,7 +2209,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          */
         $scope.initScopeStyle = function() {
             style.listAll({provider: 'sld'}, function(response) {
-                $dashboard($scope, response.styles, true);
+                Dashboard($scope, response.styles, true);
             });
         };
 

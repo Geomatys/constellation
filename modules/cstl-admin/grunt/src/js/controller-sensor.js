@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'sensor', '$modal', 'Growl','$window',
-    function ($scope, $dashboard, webService, sensor, $modal, Growl, $window){
+cstlAdminApp.controller('SensorsController', ['$scope', 'Dashboard', 'webService', 'sensor', '$modal', 'Growl','$window',
+    function ($scope, Dashboard, webService, sensor, $modal, Growl, $window){
         $scope.hideScroll = true;
 
         $scope.init = function() {
@@ -25,7 +25,7 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
                 controller: 'ModalInstanceCtrl'
             });
             sensor.list({}, function(response) {
-                $dashboard($scope, response.children, false);
+                Dashboard($scope, response.children, false);
                 modalLoader.close();
             }, function() {
                 modalLoader.close();
@@ -55,7 +55,7 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
 
             modal.result.then(function() {
                 sensor.list({}, function(sensors) {
-                    $dashboard($scope, sensors.children, false);
+                    Dashboard($scope, sensors.children, false);
                     $scope.init();
                 });
             });
@@ -167,14 +167,14 @@ cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance',
         };
     }]);
 
-cstlAdminApp.controller('SensorModalChooseController', ['$scope', '$modalInstance', '$dashboard', 'dataListing', 'sensor', 'selectedData', 'Growl',
-    function ($scope, $modalInstance, $dashboard, dataListing, sensor, selectedData, Growl){
+cstlAdminApp.controller('SensorModalChooseController', ['$scope', '$modalInstance', 'Dashboard', 'dataListing', 'sensor', 'selectedData', 'Growl',
+    function ($scope, $modalInstance, Dashboard, dataListing, sensor, selectedData, Growl){
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
 
         sensor.list({}, function(response) {
-            $dashboard($scope, response.children, false);
+            Dashboard($scope, response.children, false);
             $scope.nbbypage = 5;
         });
 

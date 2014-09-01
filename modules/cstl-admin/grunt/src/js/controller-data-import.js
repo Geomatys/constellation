@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance', 'dataListing', 'provider', 'firstStep', '$uploadFiles', 'Growl',
-    function($scope, $modalInstance, dataListing, provider, firstStep, $uploadFiles, Growl) {
+cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance', 'dataListing', 'provider', 'firstStep', 'UploadFiles', 'Growl',
+    function($scope, $modalInstance, dataListing, provider, firstStep, UploadFiles, Growl) {
         $scope.import = {
             currentStep: firstStep,
             dataPath: null,
@@ -86,7 +86,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                 }
 
                 // Stores uploaded files in session for further use
-                var upFiles = $uploadFiles.files;
+                var upFiles = UploadFiles.files;
                 upFiles.file = $scope.import.dataName;
                 upFiles.mdFile = upMdFile;
 
@@ -131,7 +131,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                             dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData, dataName: $scope.import.dataName}});
                                         }
                                         //update data & metadata files reminder for further use
-                                        $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData, providerId: $scope.import.providerId};
+                                        UploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData, providerId: $scope.import.providerId};
 
                                         Growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
                                         if ($scope.sensor.checked) {
@@ -180,7 +180,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                             dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
                                         }
                                         //update data & metadata files reminder for further use
-                                        $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData, providerId: $scope.import.providerId};
+                                        UploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData, providerId: $scope.import.providerId};
 
                                         if (!fileExtension || fileExtension !== "nc") {
                                             Growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
@@ -292,7 +292,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             provider.createPRJ({ id: $scope.import.fileName },{codeEpsg: codeEpsg},
                 function(){
                     //success
-                    $uploadFiles.files = {file: $scope.import.providerId, mdFile: $scope.import.metadata, providerId: $scope.import.providerId};
+                    UploadFiles.files = {file: $scope.import.providerId, mdFile: $scope.import.metadata, providerId: $scope.import.providerId};
                     $modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
                 },
                 function(){
@@ -576,8 +576,8 @@ cstlAdminApp.controller('ModalImportDataStep3TypeController', ['$scope',
         };
     }]);
 
-cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sensor', 'dataListing', '$dashboard', 'Growl', '$cookies',
-    function($scope, sensor, dataListing, $dashboard, Growl, $cookies) {
+cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sensor', 'dataListing', 'Dashboard', 'Growl', '$cookies',
+    function($scope, sensor, dataListing, Dashboard, Growl, $cookies) {
         $scope.selectedSensorsChild = null;
 
         $scope.selectSensorsChild = function(item) {
@@ -590,7 +590,7 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
 
         $scope.initDashboardSensor = function() {
             sensor.list({}, function(response) {
-                $dashboard($scope, response.children, false);
+                Dashboard($scope, response.children, false);
                 $scope.nbbypage = 5;
             });
         };

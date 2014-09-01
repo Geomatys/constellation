@@ -83,11 +83,11 @@ cstlAdminApp.controller('MenuController', ['$scope',
 
 }]);
 
-cstlAdminApp.controller('LoginController', ['$scope', '$location', 'AuthenticationSharedService',
-    function ($scope, $location, AuthenticationSharedService) {
+cstlAdminApp.controller('LoginController', ['$scope', '$location', 'AuthService',
+    function ($scope, $location, AuthService) {
         $scope.rememberMe = true;
         $scope.login = function () {
-            AuthenticationSharedService.login({
+            AuthService.login({
                 username: $scope.username,
                 password: $scope.password,
                 rememberMe: $scope.rememberMe,
@@ -98,9 +98,9 @@ cstlAdminApp.controller('LoginController', ['$scope', '$location', 'Authenticati
         };
     }]);
 
-cstlAdminApp.controller('LogoutController', ['$location', 'AuthenticationSharedService',
-    function ($location, AuthenticationSharedService) {
-        AuthenticationSharedService.logout({
+cstlAdminApp.controller('LogoutController', ['$location', 'AuthService',
+    function ($location, AuthService) {
+        AuthService.logout({
             success: function () {
                 $location.path('');
             }
