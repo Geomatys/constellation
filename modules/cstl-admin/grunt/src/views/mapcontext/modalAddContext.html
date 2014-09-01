@@ -1,10 +1,11 @@
-<div class="modal-dialog modal-dialog-resp-height" ng-class="{'modal-dialog-sld':mode.display==='general' || mode.display==='addChooseStyle' || (mode.display==='chooseLayer' && mode.source==='interne') || (mode.display==='chooseLayer' && mode.source==='externe' && mode.dispWmsLayers==='true')}">
+<div class="modal-dialog modal-dialog-resp-height" ng-class="{'modal-dialog-sld':mode.display==='general' || mode.display==='addChooseStyle' || (mode.display==='chooseLayer' && mode.source==='interne') || (mode.display==='chooseLayer' && mode.source==='externe' && mode.dispWmsLayers===true)}">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title" ng-if="mode.display!=='addChooseSource'&& mode.display!=='chooseLayer'" translate="mapcontext.modal.title">Add/Edit map context</h4>
+            <h4 class="modal-title" ng-if="mode.display!=='addChooseSource'&& mode.display!=='chooseLayer' && mode.display!=='addChooseStyle'" translate="mapcontext.modal.title">Add/Edit map context</h4>
             <h4 class="modal-title" ng-if="mode.display==='addChooseSource'" translate="mapcontext.modal.select.source">Select your layer source</h4>
             <h4 class="modal-title" ng-if="mode.display==='chooseLayer'" translate="mapcontext.modal.select.layer">Select layer to add</h4>
+            <h4 class="modal-title" ng-if="mode.display==='addChooseStyle'" translate="mapcontext.modal.select.style">Select style to associate</h4>
         </div>
         <div class="modal-body modal-body-style" style="overflow-y: auto;">
             <div ng-if="mode.display==='general' || mode.display==='addChooseStyle'">
@@ -222,29 +223,37 @@
 
                     <!-- Add mode, choose style for a map item -->
                     <div ng-if="mode.display==='addChooseStyle'">
-                        <div class="dash-inner row dashboard" ng-init="small=false">
-                            <div data-role="list">
-                                <div class="item-list">
-                                    <div ng-repeat="styleItem in styles.existing" class="row">
-                                        <div class="item"
-                                             ng-class="{selected: styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage'), 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector', 'style-compo-layer':styleItem.Type == null || styleItem.Type == undefined}"
-                                             ng-click="selectStyle(styleItem)">
-                                            <div class="top">
-                                                <span class="item-title" title="{{styleItem.Name}}">{{truncate(mode.display,styleItem.Name)}}</span>
-                                                <span class="pull-right text-right item-list-style">{{(styleItem.Type) ? styleItem.Type : 'WMS'}}</span>
-                                            </div>
-                                            <div class="bottom" ng-show="styleItem.Date">
-                                                <div class="block">
-                                                    <i class="fa fa-calendar"></i>{{styleItem.Date | date:'yyyy-MM-dd'}}
+                        <div ng-if="styles.existing.length>0">
+                            <p translate="mapcontext.modal.select.style.list" style="margin-top:10px; margin-bottom:0;">Style followed by a star is the current style</p>
+                            <div class="dash-inner row dashboard" ng-init="small=false">
+                                <div data-role="list">
+                                    <div class="item-list">
+                                        <div ng-repeat="styleItem in styles.existing" class="row">
+                                            <div class="item col-xs-11"
+                                                 ng-class="{selected: styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage'), 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector', 'style-compo-layer':styleItem.Type == null || styleItem.Type == undefined}"
+                                                 ng-click="selectStyle(styleItem)">
+                                                <div class="top">
+                                                    <span class="item-title" title="{{styleItem.Name}}">{{truncate(mode.display,styleItem.Name)}}</span>
+                                                    <span class="pull-right text-right item-list-style">{{(styleItem.Type) ? styleItem.Type : 'WMS'}}</span>
                                                 </div>
-                                                <div class="block">
-                                                    <i class="fa fa-user"></i>{{styleItem.Owner}}
+                                                <div class="bottom" ng-show="styleItem.Date">
+                                                    <div class="block">
+                                                        <i class="fa fa-calendar"></i>{{styleItem.Date | date:'yyyy-MM-dd'}}
+                                                    </div>
+                                                    <div class="block">
+                                                        <i class="fa fa-user"></i>{{styleItem.Owner}}
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="col-xs-1" style="margin-top: 37px;"><span class="glyphicon glyphicon-star" ng-show="selected.item.layer.styleName===styleItem.Name"></span></div>
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div ng-if="styles.existing.length==0">
+                            <p translate="mapcontext.modal.select.style.empty" style="margin-top:10px; margin-bottom:0;">No associated style</p>
                         </div>
                     </div>
                 </div>
@@ -446,8 +455,9 @@
         <div class="modal-footer">
             <button type="button" id="cancelButton" class="btn btn-default" ng-click="cancel()" translate="mapcontext.modal.cancel">Cancel</button>
             <button ng-hide="(mode.display==='chooseLayer' && mode.source==='externe' && mode.dispWmsLayers!== true)" type="button" id="submitButton" class="btn btn-add" ng-click="validate()" >
-                <span ng-if="mode.display!=='chooseLayer'" translate="mapcontext.modal.validate">Validate</span>
+                <span ng-if="mode.display!=='chooseLayer' && mode.display!=='addChooseStyle'" translate="mapcontext.modal.validate">Validate</span>
                 <span ng-if="mode.display==='chooseLayer'" translate="mapcontext.modal.validate.layer">Validate</span>
+                <span ng-if="mode.display==='addChooseStyle'" translate="mapcontext.modal.associate">Validate</span>
             </button>
         </div>
     </div>
