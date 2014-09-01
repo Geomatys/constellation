@@ -1,0 +1,4 @@
+org.constellation.util.converter.DataReferenceToStringConverter
+org.constellation.util.converter.StringToDataReferenceConverter
+org.constellation.util.converter.StringToStyleReferenceConverter
+org.constellation.util.converter.StyleReferenceToStringConverter

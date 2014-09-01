@@ -53,13 +53,4 @@ public class StyleReference extends DataReference {
         super.setReference(checkReference(reference));
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("[StyleReference]");
-        sb.append("reference:\n").append(reference).append('\n');
-        sb.append("type:\n").append(type).append('\n');
-        sb.append("providerId:\n").append(providerId).append('\n');
-        sb.append("layerId:\n").append(layerId).append('\n');
-        return sb.toString();
-    }
 }

@@ -355,7 +355,8 @@ public class DataReference implements CharSequence, Comparable<DataReference>{
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + (this.reference != null ? this.reference.hashCode() : 0);
+        String reference = this.getReference();
+        hash = 37 * hash + (reference != null ? reference.hashCode() : 0);
         return hash;
     }
 
@@ -368,7 +369,9 @@ public class DataReference implements CharSequence, Comparable<DataReference>{
             return false;
         }
         final DataReference other = (DataReference) obj;
-        if ((this.reference == null) ? (other.reference != null) : !this.reference.equals(other.reference)) {
+        String reference = this.getReference();
+        String otherReference = other.getReference();
+        if ((reference == null) ? (otherReference != null) : !reference.equals(otherReference)) {
             return false;
         }
         return true;
@@ -376,16 +379,7 @@ public class DataReference implements CharSequence, Comparable<DataReference>{
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("[DataReference]");
-        sb.append("reference:\n").append(reference).append('\n');
-        sb.append("type:\n").append(type).append('\n');
-        sb.append("providerId:\n").append(providerId).append('\n');
-        sb.append("serviceURL:\n").append(serviceURL).append('\n');
-        sb.append("serviceSpec:\n").append(serviceSpec).append('\n');
-        sb.append("serviceId:\n").append(serviceId).append('\n');
-        sb.append("layerId:\n").append(layerId).append('\n');
-        sb.append("dataVersion:\n").append(dataVersion).append('\n');
-        return sb.toString();
+        return getReference();
     }
 
 	@Override
