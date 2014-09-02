@@ -733,7 +733,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                     function() {
                         Growl('success','Success','Metadata deleted');
                         csw.count({id: $routeParams.id}, {}, function(max) {
-                            csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
+                            csw.getRecords({id: $routeParams.id, count: max.value, startIndex: 0}, {}, function(response) {
                                 Dashboard($scope, response.BriefNode, false);
                                 $scope.filtertype = "";
                             });
