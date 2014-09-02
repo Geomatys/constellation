@@ -89,17 +89,17 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a ng-class="{filter_active : published==null}" ng-click="init(); published=null">
+                                        <a ng-class="{filter_active : published==null}" ng-click="init(); published=null; observation=null">
                                             <span translate="label.all">all</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : published}" ng-click="showPublished(true)">
+                                        <a ng-class="{filter_active : published}" ng-click="showPublished(true); observation=null">
                                             <span translate="label.yes">Yes</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : published==false}" ng-click="showPublished(false)">
+                                        <a ng-class="{filter_active : published==false}" ng-click="showPublished(false); observation=null">
                                             <span translate="label.no">No</span>
                                         </a>
                                     </li>
@@ -117,17 +117,17 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a ng-class="{filter_active : observation==null}" ng-click="init(); observation=null">
+                                        <a ng-class="{filter_active : observation==null}" ng-click="init(); observation=null; published=null">
                                             <span translate="label.all">all</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : observation}" ng-click="showSensorable(true)">
+                                        <a ng-class="{filter_active : observation}" ng-click="showSensorable(true); published=null">
                                             <span translate="label.yes">Yes</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : observation==false}" ng-click="showSensorable(false)">
+                                        <a ng-class="{filter_active : observation==false}" ng-click="showSensorable(false); published=null">
                                             <span translate="label.no">No</span>
                                         </a>
                                     </li>
