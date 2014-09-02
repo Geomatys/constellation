@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-angular.module('cstl-admin-security', [])
+angular.module('cstl-admin-security', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('UserController', function($scope, UserResource, $modal, Growl, $translate) {
         $scope.list = UserResource.query({"withDomainAndRoles": true});
@@ -122,7 +122,8 @@ angular.module('cstl-admin-security', [])
                 });
         }
     })
-    
+
+    // TODO move it, not an admin controller
     .controller('DomainSwitcherController', function(Account, $scope, $cookies, $window) {
         Account.get(function(account){
             $scope.domains = account.domains;

@@ -18,9 +18,9 @@
  * limitations under the License.
  */
 
-angular.module('cstl-admin-processing', [])
+angular.module('cstl-admin-processing', ['cstl-restapi', 'cstl-services'])
 
-    .controller('TaskController', function($scope, TaskService, $timeout, StompService) {
+    .controller('TaskController', function($scope, $timeout, TaskService, StompService) {
 
         $scope.tasks = TaskService.listTasks();
 

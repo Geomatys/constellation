@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-angular.module('cstl-admin-system', [])
+angular.module('cstl-admin-system', ['cstl-restapi', 'cstl-services'])
 
     .controller('MetricsController', function($scope, $window, $http, Metrics) {
 
