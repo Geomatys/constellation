@@ -324,9 +324,9 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
                 cache: false,
                 contentType: false,
                 processData: false,
-                success: function (data) {
+                success: function (response) {
                     $scope.$apply(function() {
-                        $scope.import.dataPath = data.dataPath;
+                        $scope.import.dataPath = response.dataPath;
                         $scope.loader.upload = false;
                         $scope.import.currentStep = 'step2Metadata';
                         $scope.import.allowNext = true;
