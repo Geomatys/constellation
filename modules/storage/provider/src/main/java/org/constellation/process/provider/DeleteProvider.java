@@ -29,8 +29,8 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.process.provider.DeleteProviderDescriptor.DELETE_DATA;
-import static org.constellation.process.provider.DeleteProviderDescriptor.PROVIDER_ID;
+import static org.constellation.process.provider.DeleteProviderDescriptor.*;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 
 /**
@@ -43,6 +43,17 @@ public final class DeleteProvider extends AbstractCstlProcess{
 
     public DeleteProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
+    }
+
+    public DeleteProvider(final String providerId, Boolean deletaData) {
+        this(INSTANCE, toParameter(providerId, deletaData));
+    }
+
+    private static ParameterValueGroup toParameter(String providerId, Boolean deletaData) {
+        ParameterValueGroup params = INSTANCE.getInputDescriptor().createValue();
+        getOrCreate(PROVIDER_ID, params).setValue(providerId);
+        getOrCreate(DELETE_DATA, params).setValue(deletaData);
+        return params;
     }
 
     /**

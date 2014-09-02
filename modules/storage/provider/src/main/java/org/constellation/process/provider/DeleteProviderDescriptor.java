@@ -24,6 +24,7 @@ import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
 import org.geotoolkit.process.Process;
+import org.geotoolkit.process.ProcessDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -65,6 +66,8 @@ public class DeleteProviderDescriptor extends AbstractProcessDescriptor {
     public DeleteProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
+
+    public static final ProcessDescriptor INSTANCE = new DeleteProviderDescriptor();
 
     @Override
     public Process createProcess(ParameterValueGroup input) {
