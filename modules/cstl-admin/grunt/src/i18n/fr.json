@@ -637,6 +637,8 @@
     "metadata.edition.heading.check.validation.notpassed":"Echec de la validation, merci de vérifier les valeurs des champs.",
     "metadata.edition.occurrence.field.add":"Ajouter une nouvelle occurrence de champ",
     "metadata.edition.occurrence.field.remove":"Retirer l'occurrence de champ",
+    "metadata.edition.occurrence.block.add":"Ajouter une nouvelle occurrence de block",
+    "metadata.edition.occurrence.block.remove":"Retirer l'occurrence de block",
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",
     "metrics.jvm.gc.marksweepcount": "Total de \"Mark Sweep\"",

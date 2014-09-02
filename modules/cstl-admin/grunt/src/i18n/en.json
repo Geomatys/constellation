@@ -562,6 +562,8 @@
     "metadata.edition.heading.check.validation.notpassed":"Failed to validate your current form, please check your values.",
     "metadata.edition.occurrence.field.add":"Add field occurrence",
     "metadata.edition.occurrence.field.remove":"Remove field occurrence",
+    "metadata.edition.occurrence.block.add":"Add block occurrence",
+    "metadata.edition.occurrence.block.remove":"Remove block occurrence",
 
     "msg.add.data.style.association": "Associate a style to the selected data",
     "msg.add.data.mapcontext.association": "Associate a mapcontext to the selected data.",
