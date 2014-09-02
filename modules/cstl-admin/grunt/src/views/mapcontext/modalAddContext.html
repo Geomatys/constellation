@@ -97,11 +97,11 @@
                             <!-- Tab layers list -->
                             <div class="tab-pane block-border" ng-class="{active:mode.selTab==='tabLayers'}" style="padding-top: 7px;">
                                 <div class="row dash-inner" ng-class="{'border-bottom':layers.toAdd.length > 0}">
-                                    <div class="col-sm-6" style="margin-top: 8px;">
+                                    <div class="col-xs-6 col-sm-4 col-md-6" style="margin-top: 8px;">
                                         <p style="font-weight: bold; font-size: 13px;" translate="layer.listing.title">Layers list</p>
                                     </div>
-                                    <div class="col-sm-6" style="margin-bottom: 7px;">
-                                        <button type="button" class="btn btn-add form-control" ng-click="goToAddLayerToContext()">
+                                    <div class="col-xs-6 col-sm-8 col-md-6" style="margin-bottom: 7px;">
+                                        <button type="button" class="btn btn-add btn-add-layer form-control" ng-click="goToAddLayerToContext()">
                                             <span class="fa fa-plus" style="margin-right:5px;"></span>
                                             <span translate="mapcontext.modal.add.layer">Add layer</span>
                                         </button>
@@ -123,57 +123,68 @@
                                                         </div>
                                                         <div class="col-xs-8 no-padding" ng-click="selectItem(layerToAdd)">
                                                             <div class="item layer compo" ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
-                                                                <div class="top">
+                                                                <div class="top edit-mapcontext-modale">
                                                                     <span class="item-title" title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? truncate(mode.display,layerToAdd.layer.Name) : truncate(mode.display,layerToAdd.layer.externalLayer)}}</span>
-                                                                    <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':(layerToAdd.layer.Type) ? layerToAdd.layer.Type : 'WMS'}}</span>
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd!=selected.item"
-                                                                         src="img/vector-multipoint-mapcontext.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.Subtype=='Geometry' && layerToAdd!=selected.item"
-                                                                         src="img/vector-multigeometry-mapcontext.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px; width:22px" />
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon') && layerToAdd!=selected.item"
-                                                                         src="img/vector-poly-mapcontext.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString') && layerToAdd!=selected.item"
-                                                                         src="img/vector-polyline-mapcontext.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.externalLayer && layerToAdd!==selected.item"
-                                                                         src="img/layer-external.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR' && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd==selected.item"
-                                                                         src="img/vector-multipoint-mapcontext-selected.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR' && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon') && layerToAdd==selected.item"
-                                                                         src="img/vector-poly-mapcontext-selected.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.Subtype=='Geometry' && layerToAdd==selected.item"
-                                                                         src="img/vector-multigeometry-mapcontext-selected.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px; width:22px" />
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString') && layerToAdd==selected.item"
-                                                                         src="img/vector-polyline-mapcontext-selected.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.externalLayer && layerToAdd==selected.item"
-                                                                         src="img/layer-external-selected.svg"
-                                                                         class="pull-right"
-                                                                         style="margin-top:6px; margin-right:10px;" />
                                                                 </div>
                                                                 <div class="bottom">
-                                                                    <div class="block" ng-hide="layerToAdd.layer.externalLayer">
-                                                                        <i class="fa fa-calendar"></i>{{layerToAdd.layer.Date | date:'yyyy-MM-dd'}}
+                                                                            <span class="pull-right text-right item-list-style" style="margin-right: 7px;">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':(layerToAdd.layer.Type) ? layerToAdd.layer.Type : 'WMS'}}</span>
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd!=selected.item"
+                                                                                 src="img/vector-multipoint-mapcontext.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px;" />
+                                                                            <img ng-if="layerToAdd.layer.Subtype=='Geometry' && layerToAdd!=selected.item"
+                                                                                 src="img/vector-multigeometry-mapcontext.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px; width:22px" />
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon') && layerToAdd!=selected.item"
+                                                                                 src="img/vector-poly-mapcontext.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px;" />
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString') && layerToAdd!=selected.item"
+                                                                                 src="img/vector-polyline-mapcontext.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px;" />
+                                                                            <img ng-if="layerToAdd.layer.externalLayer && layerToAdd!==selected.item"
+                                                                                 src="img/layer-external.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px;" />
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR' && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd==selected.item"
+                                                                                 src="img/vector-multipoint-mapcontext-selected.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px;" />
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR' && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon') && layerToAdd==selected.item"
+                                                                                 src="img/vector-poly-mapcontext-selected.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px;" />
+                                                                            <img ng-if="layerToAdd.layer.Subtype=='Geometry' && layerToAdd==selected.item"
+                                                                                 src="img/vector-multigeometry-mapcontext-selected.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px; width:22px" />
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString') && layerToAdd==selected.item"
+                                                                                 src="img/vector-polyline-mapcontext-selected.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px;" />
+                                                                            <img ng-if="layerToAdd.layer.externalLayer && layerToAdd==selected.item"
+                                                                                 src="img/layer-external-selected.svg"
+                                                                                 class="pull-right"
+                                                                                 style="margin-top:4px; margin-right:10px;" />
+                                                                    <div class="hidden-xs hidden-md hidden-lg">
+                                                                        <div class="block tooltipicon" ng-hide="layerToAdd.layer.externalLayer" style="margin-top:0;">
+                                                                            <i class="fa fa-calendar" tooltip data-placement="bottom" title="{{layerToAdd.layer.Date | date:'yyyy-MM-dd'}}"></i>
+                                                                        </div>
+                                                                        <div class="block tooltipicon"  ng-hide="layerToAdd.layer.externalLayer" style="margin-top:0;">
+                                                                            <i class="fa fa-user" tooltip data-placement="bottom" title="{{layerToAdd.layer.Owner}}"></i>
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="block" ng-hide="layerToAdd.layer.externalLayer">
-                                                                        <i class="fa fa-user"></i>{{layerToAdd.layer.Owner}}
+                                                                    <div class="hidden-sm">
+                                                                        <div class="block" ng-hide="layerToAdd.layer.externalLayer">
+                                                                            <i class="fa fa-calendar"></i>{{layerToAdd.layer.Date | date:'yyyy-MM-dd'}}
+                                                                        </div>
+                                                                        <div class="block" ng-hide="layerToAdd.layer.externalLayer">
+                                                                            <i class="fa fa-user"></i>{{layerToAdd.layer.Owner}}
+                                                                        </div>
                                                                     </div>
+
                                                                 </div>
                                                             </div>
                                                         </div>
