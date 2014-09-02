@@ -134,6 +134,36 @@ public class OM2ObservationWriter implements ObservationWriter {
     }
 
     /**
+     * Build a new Observation writer for the given data source.
+     *
+     * @param source Data source on the database.
+     * @param isPostgres {@code True} if the database is a postgresql db, {@code false} otherwise.
+     * @param properties
+     *
+     * @throws org.apache.sis.storage.DataStoreException
+     */
+    public OM2ObservationWriter(final DataSource source, final boolean isPostgres, final Map<String, Object> properties) throws DataStoreException {
+        final String oidBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        if (oidBase == null) {
+            this.observationIdBase = "";
+        } else {
+            this.observationIdBase = oidBase;
+        }
+        final String sidBase = (String) properties.get(OMFactory.SENSOR_ID_BASE);
+        if (sidBase == null) {
+            this.sensorIdBase = "";
+        } else {
+            this.sensorIdBase = sidBase;
+        }
+
+        if (source == null) {
+            throw new DataStoreException("The source object is null");
+        }
+        this.isPostgres = isPostgres;
+        this.source = source;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
