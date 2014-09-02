@@ -26,6 +26,7 @@ import java.io.IOException;
  *
  * @author Martin Desruisseaux (Geomatys)
  */
+@SuppressWarnings("serial")
 public class ParseException extends IOException {
     /**
      * Constructs a new exception with the given message.

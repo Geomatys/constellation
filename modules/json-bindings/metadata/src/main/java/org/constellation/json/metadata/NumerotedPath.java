@@ -32,7 +32,7 @@ import java.io.IOException;
  *
  * @author Martin Desruisseaux (Geomatys)
  */
-final class NumerotedPath {
+final class NumerotedPath implements Comparable<NumerotedPath> {
     /**
      * The path elements.
      */
@@ -50,16 +50,71 @@ final class NumerotedPath {
      * @param indices The index of each elements in the path. This array will be partially copied.
      */
     NumerotedPath(final String[] path, final int[] indices) {
-        this.path     = path;
-        this.indices  = Arrays.copyOfRange(indices, 0, path.length);
+        this.path    = path;
+        this.indices = Arrays.copyOfRange(indices, 0, path.length);
     }
 
     /**
-     * Returns a hash code value for this key.
+     * Invoked when the last index is irrelevant for us, except for differentiating singletons from collections.
+     */
+    final void ignoreLastIndex() {
+        final int last = path.length - 1;
+        if (indices[last] != 0) {
+            indices[last] = 1;
+        }
+    }
+
+    /**
+     * Returns {@code true} if the values can be multiple.
+     */
+    final boolean isMultiOccurrenceAllowed() {
+        return indices[indices.length - 1] != 0;
+    }
+
+    /**
+     * Returns a sub-path containing only the given number of components.
+     */
+    final NumerotedPath head(final int depth) {
+        if (depth == path.length) {
+            return this;
+        }
+        return new NumerotedPath(Arrays.copyOfRange(path, 0, depth), indices);
+    }
+
+    /**
+     * Returns {@code true} if this path is a child of the given path.
+     */
+    final boolean isChildOf(final NumerotedPath other) {
+        if (other != null) { // Special case for the needs of FormReader.writeMetadata.
+            if (path.length <= other.path.length) {
+                return false;
+            }
+            for (int i = other.path.length; --i >= 0;) {
+                if (!path[i].equals(other.path[i]) || indices[i] != other.indices[i]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Compares the given path with this one for order.
      */
     @Override
-    public int hashCode() {
-        return Arrays.hashCode(path) ^ Arrays.hashCode(indices);
+    public int compareTo(final NumerotedPath other) {
+        final int length = Math.min(path.length, other.path.length);
+        for (int i=0; i<length; i++) {
+            int c = path[i].compareTo(other.path[i]);
+            if (c == 0) {
+                c = indices[i] - other.indices[i];
+                if (c == 0) {
+                    continue;
+                }
+            }
+            return c;
+        }
+        return path.length - other.path.length;
     }
 
     /**
@@ -70,6 +125,14 @@ final class NumerotedPath {
         return (other instanceof NumerotedPath) &&
                Arrays.equals(path,    ((NumerotedPath) other).path) &&
                Arrays.equals(indices, ((NumerotedPath) other).indices);
+    }
+
+    /**
+     * Returns a hash code value for this key.
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(path) ^ Arrays.hashCode(indices);
     }
 
     /**

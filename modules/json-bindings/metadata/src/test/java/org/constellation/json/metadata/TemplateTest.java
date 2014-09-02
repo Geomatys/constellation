@@ -170,7 +170,6 @@ public final strictfp class TemplateTest {
      * @throws IOException if an error occurred while reading the test JSON file.
      */
     @Test
-    @org.junit.Ignore
     public void testRead() throws IOException {
         final DefaultMetadata expected = createMetadata();
         final DefaultMetadata metadata = new DefaultMetadata();
