@@ -1625,10 +1625,10 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/top/{type}")
-    @Produces({MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_JSON})
-    public Response getTopDataList(@PathParam("domainId") int domainId, @PathParam("type") String type) {
+     @Path("/list/top/{type}")
+     @Produces({MediaType.APPLICATION_JSON})
+     @Consumes({MediaType.APPLICATION_JSON})
+     public Response getTopDataList(@PathParam("domainId") int domainId, @PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
 
         final List<Integer> providerIds = providerBusiness.getProviderIdsForDomain(domainId);
@@ -1654,6 +1654,70 @@ public class DataRest {
             }
         }
 
+        return Response.ok(briefs).build();
+    }
+
+    @GET
+    @Path("/list/published/{published}/top")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getPublishedDataList(@PathParam("domainId") int domainId, @PathParam("published") boolean published) {
+        final List<DataBrief> briefs = new ArrayList<>();
+
+        final List<Integer> providerIds = providerBusiness.getProviderIdsForDomain(domainId);
+        for (final Integer providerId : providerIds) {
+            final Provider provider = providerBusiness.getProvider(providerId);
+            final String parent = provider.getParent();
+            if (parent != null && !parent.isEmpty()) {
+                // Remove all providers that have a parent
+                continue;
+            }
+            final List<org.constellation.engine.register.Data> datas;
+            datas = providerBusiness.getDatasFromProviderId(provider.getId());
+            for (final org.constellation.engine.register.Data data : datas) {
+
+                if (data.isVisible()) {
+                    final QName name = new QName(data.getNamespace(), data.getName());
+                    final DataBrief db = dataBusiness.getDataBrief(name, providerId);
+                    if ((published==true && (db.getTargetService() == null || db.getTargetService().size() == 0)) || (published==false && db.getTargetService() != null && db.getTargetService().size() > 0)) {
+                        continue;
+                    }
+                    briefs.add(db);
+                }
+            }
+        }
+        return Response.ok(briefs).build();
+    }
+
+    @GET
+    @Path("/list/observation/{sensorable}/top")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getSensorableDataList(@PathParam("domainId") int domainId, @PathParam("sensorable") boolean sensorable) {
+        final List<DataBrief> briefs = new ArrayList<>();
+
+        final List<Integer> providerIds = providerBusiness.getProviderIdsForDomain(domainId);
+        for (final Integer providerId : providerIds) {
+            final Provider provider = providerBusiness.getProvider(providerId);
+            final String parent = provider.getParent();
+            if (parent != null && !parent.isEmpty()) {
+                // Remove all providers that have a parent
+                continue;
+            }
+            final List<org.constellation.engine.register.Data> datas;
+            datas = providerBusiness.getDatasFromProviderId(provider.getId());
+            for (final org.constellation.engine.register.Data data : datas) {
+
+                if (data.isVisible()) {
+                    final QName name = new QName(data.getNamespace(), data.getName());
+                    final DataBrief db = dataBusiness.getDataBrief(name, providerId);
+                    if ((sensorable==true && (db.getTargetSensor() == null || db.getTargetSensor().size() == 0)) || (sensorable==false && db.getTargetSensor() != null && db.getTargetSensor().size() > 0)) {
+                        continue;
+                    }
+                    briefs.add(db);
+                }
+            }
+        }
         return Response.ok(briefs).build();
     }
 

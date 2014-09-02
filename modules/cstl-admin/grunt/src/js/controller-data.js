@@ -121,6 +121,34 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             });
         };
 
+        $scope.showPublished = function(published){
+            $scope.published=published;
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
+            dataListing.listPublished({published:published}, function(response) {
+                Dashboard($scope, response, true);
+                modalLoader.close();
+            }, function() {
+                modalLoader.close();
+            });
+        };
+
+        $scope.showSensorable = function(observation){
+            $scope.observation=observation;
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
+            dataListing.listSensorable({observation:observation}, function(response) {
+                Dashboard($scope, response, true);
+                modalLoader.close();
+            }, function() {
+                modalLoader.close();
+            });
+        };
+
         $scope.getDisplayName = function(providerName, dataName) {
                 if (providerName == dataName){
                     return dataName;

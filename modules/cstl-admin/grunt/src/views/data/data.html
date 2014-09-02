@@ -89,12 +89,12 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a ng-class="{filter_active : published}" ng-click="published=true">
+                                        <a ng-class="{filter_active : published}" ng-click="showPublished(true)">
                                             <span translate="label.yes">Yes</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : published==='false'}" ng-click="published=false">
+                                        <a ng-class="{filter_active : published==false}" ng-click="showPublished(false)">
                                             <span translate="label.no">No</span>
                                         </a>
                                     </li>
@@ -112,12 +112,12 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a ng-class="{filter_active : observation}" ng-click="observation=true">
+                                        <a ng-class="{filter_active : observation}" ng-click="showSensorable(true)">
                                             <span translate="label.yes">Yes</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : observation==='false'}" ng-click="observation=false">
+                                        <a ng-class="{filter_active : observation==false}" ng-click="showSensorable(false)">
                                             <span translate="label.no">No</span>
                                         </a>
                                     </li>
@@ -126,7 +126,7 @@
                             <li class="divider-vertical"></li>
                         </ul>
                         <button type="button"
-                                ng-click="ordertype='Name';orderreverse=false; published=null; observation=null"
+                                ng-click="init(); published=null; observation=null"
                                 title="{{'label.search.refresh' | translate }}"
                                 class="btn btn-xs btn-info btn-data">
                             <i class="fa fa-times"></i>
@@ -451,11 +451,6 @@
                                                     class="btn btn-small">
                                                 <i class="glyphicon glyphicon-trash"></i>
                                             </button>
-                                            <button type="button"
-                                                    ng-click="editLinkedStyle(style.Provider, style.Name, selected);"
-                                                    class="btn btn-small">
-                                                <i class="glyphicon glyphicon-pencil"></i>
-                                            </button>
                                             {{truncateTitleBlock(style.Name)}}
                                         </div>
                                         <div class="row">
@@ -617,12 +612,12 @@
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li>
-                                            <a ng-class="{filter_active : published}" ng-click="published=true">
+                                            <a ng-class="{filter_active : published}" ng-click="showPublished(true)">
                                                 <span translate="label.yes">Yes</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a ng-class="{filter_active : published==='false'}" ng-click="published=false">
+                                            <a ng-class="{filter_active : published==false}" ng-click="showPublished(false)">
                                                 <span translate="label.no">No</span>
                                             </a>
                                         </li>
@@ -640,12 +635,12 @@
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li>
-                                            <a ng-class="{filter_active : observation}" ng-click="observation=true">
+                                            <a ng-class="{filter_active : observation}" ng-click="showSensorable(true)">
                                                 <span translate="label.yes">Yes</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a ng-class="{filter_active : observation==='false'}" ng-click="observation=false">
+                                            <a ng-class="{filter_active : observation==false}" ng-click="showSensorable(false)">
                                                 <span translate="label.no">No</span>
                                             </a>
                                         </li>
@@ -654,7 +649,7 @@
                                 <li class="divider-vertical"></li>
                             </ul>
                             <button type="button" tooltip
-                                    ng-click="ordertype='Name';orderreverse=false; published=null; observation=null"
+                                    ng-click="init(); published=null; observation=null"
                                     title="{{'label.search.refresh' | translate }}"
                                     class="btn btn-xs btn-info btn-csw btn-data">
                                 <i class="fa fa-times"></i>
