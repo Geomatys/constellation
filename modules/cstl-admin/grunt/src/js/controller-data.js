@@ -1019,7 +1019,7 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
                 }
                 labels.toggle();
             });
-            $(document).on('click','.small-block .heading-block',function(){
+            $(document).on('click','#advancedViewMetadata .small-block .heading-block',function(){
                 var blockRow = $(this).parents('.block-row');
                 var parent = $(this).parent('.small-block');
                 parent.toggleClass('closed');
@@ -1033,7 +1033,7 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
                     icon.addClass('fa-angle-up');
                 }
             });
-            $(document).on('click','.collapse-row-heading',function(){
+            $(document).on('click','#advancedViewMetadata .collapse-row-heading',function(){
                 $(this).parent().toggleClass('open');
                 $(this).next().toggleClass('hide');
                 var icon=$(this).find('.data-icon');
