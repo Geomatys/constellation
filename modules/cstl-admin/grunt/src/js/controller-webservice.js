@@ -299,12 +299,12 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
     function ($scope, $routeParams , webService, provider, sos, Growl, $location) {
         $scope.type = $routeParams.type;
         $scope.id = $routeParams.id;
-//        $scope.db = {
+        $scope.db = {
 //            'url': 'localhost',
 //            'port': '5432',
 //            'className': 'org.postgresql.Driver',
 //            'name': ''
-//        };
+        };
 
         $scope.initSource = function() {
             if ($scope.type === 'csw') {
@@ -330,8 +330,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         };
 
         $scope.saveServiceSource = function() {
-//            var fullDbUrl = ($scope.db.className === 'org.postgresql.Driver') ? 'jdbc:postgresql' : 'jdbc:mysql';
-//            fullDbUrl += '://'+ $scope.db.url +':'+ $scope.db.port +'/'+ $scope.db.name;
+            var fullDbUrl = ($scope.db.className === 'org.postgresql.Driver') ? 'jdbc:postgresql' : 'jdbc:mysql';
+            fullDbUrl += '://'+ $scope.db.url +':'+ $scope.db.port +'/'+ $scope.db.name;
             if ($scope.type === 'csw') {
 //                $scope.source.automatic.bdd.className = $scope.db.className;
 //                $scope.source.automatic.bdd.connectURL = fullDbUrl;
