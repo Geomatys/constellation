@@ -209,47 +209,9 @@ public class LayerBusiness {
             final LayerSecurityFilter securityFilter = mapfactory.getSecurityFilter();
             final List<Layer> layers   = layerRepository.findByServiceId(service.getId());
             for (Layer layer : layers) {
-                final Data data          = dataRepository.findById(layer.getData());
-                final Provider provider  = providerRepository.findOne(data.getProvider());
-                final QName name         = new QName(layer.getNamespace(), layer.getName());
-                final List<Style> styles = styleRepository.findByLayer(layer);
-
-                org.constellation.configuration.Layer layerConfig = readLayerConfiguration(layer.getConfig());
-                if (securityFilter.allowed(login, name)) {
-                    if (layerConfig == null) {
-                        layerConfig = new org.constellation.configuration.Layer(name);
-                    }
-                    layerConfig.setId(layer.getId());
-
-                    // override with table values (TODO remove)
-                    layerConfig.setAlias(layer.getAlias());
-                    layerConfig.setDate(new Date(layer.getDate()));
-                    layerConfig.setOwner(layer.getOwner());
-                    layerConfig.setProviderID(provider.getIdentifier());
-                    layerConfig.setProviderType(provider.getType());
-                    
-                    // TODO layerDto.setAbstrac();
-                    // TODO layerDto.setAttribution(null);
-                    // TODO layerDto.setAuthorityURL(null);
-                    // TODO layerDto.setCrs(null);
-                    // TODO layerDto.setDataURL(null);
-                    // TODO layerDto.setDimensions(null);
-                    // TODO layerDto.setFilter(null);
-                    // TODO layerDto.setGetFeatureInfoCfgs(null);
-                    // TODO layerDto.setKeywords();
-                    // TODO layerDto.setMetadataURL(null);
-                    // TODO layerDto.setOpaque(Boolean.TRUE);
-                    
-
-                    for (Style style : styles) {
-                        final Provider styleProvider = providerRepository.findOne(style.getProvider());
-                        DataReference styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, styleProvider.getIdentifier(), style.getName());
-                        layerConfig.getStyles().add(styleProviderReference);
-                    }
-
-                     // TODO layerDto.setTitle(null);
-                     // TODO layerDto.setVersion();
-                    response.add(layerConfig);
+                org.constellation.configuration.Layer config = toLayerConfig(login, securityFilter, layer);
+                if (config != null) {
+                    response.add(config);
                 }
             }
         } else {
@@ -257,7 +219,92 @@ public class LayerBusiness {
         }
         return response;
     }
-    
+
+    /**
+     * Get a single layer from service spec and identifier and layer name and namespace.
+     *
+     * @param spec service type
+     * @param identifier service identifier
+     * @param name layer name
+     * @param namespace layer namespace
+     * @param login login for security check
+     * @return org.constellation.configuration.Layer
+     * @throws ConfigurationException
+     */
+    public org.constellation.configuration.Layer getLayer(final String spec, final String identifier, final String name,
+                                                          final String namespace, final String login) throws ConfigurationException {
+        final Service service = serviceRepository.findByIdentifierAndType(identifier, spec.toLowerCase());
+
+        if (service != null) {
+            final LayerContext context = readMapConfiguration(service.getConfig());
+            final MapFactory mapfactory = getMapFactory(context.getImplementation());
+            final LayerSecurityFilter securityFilter = mapfactory.getSecurityFilter();
+            Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace);
+            org.constellation.configuration.Layer layerConfig = toLayerConfig(login, securityFilter, layer);
+            if (layerConfig != null) {
+                return layerConfig;
+            } else {
+                throw new ConfigurationException("Not allowed to see this layer.");
+            }
+        } else {
+            throw new TargetNotFoundException("Unable to find a service:" + identifier);
+        }
+    }
+
+    /**
+     *
+     * @param login
+     * @param securityFilter
+     * @param layer
+     * @return
+     * @throws ConfigurationException
+     */
+    private org.constellation.configuration.Layer toLayerConfig(String login, LayerSecurityFilter securityFilter, Layer layer) throws ConfigurationException {
+        final Data data          = dataRepository.findById(layer.getData());
+        final Provider provider  = providerRepository.findOne(data.getProvider());
+        final QName name         = new QName(layer.getNamespace(), layer.getName());
+        final List<Style> styles = styleRepository.findByLayer(layer);
+
+        org.constellation.configuration.Layer layerConfig = readLayerConfiguration(layer.getConfig());
+        if (securityFilter.allowed(login, name)) {
+            if (layerConfig == null) {
+                layerConfig = new org.constellation.configuration.Layer(name);
+            }
+            layerConfig.setId(layer.getId());
+
+            // override with table values (TODO remove)
+            layerConfig.setAlias(layer.getAlias());
+            layerConfig.setDate(new Date(layer.getDate()));
+            layerConfig.setOwner(layer.getOwner());
+            layerConfig.setProviderID(provider.getIdentifier());
+            layerConfig.setProviderType(provider.getType());
+
+            // TODO layerDto.setAbstrac();
+            // TODO layerDto.setAttribution(null);
+            // TODO layerDto.setAuthorityURL(null);
+            // TODO layerDto.setCrs(null);
+            // TODO layerDto.setDataURL(null);
+            // TODO layerDto.setDimensions(null);
+            // TODO layerDto.setFilter(null);
+            // TODO layerDto.setGetFeatureInfoCfgs(null);
+            // TODO layerDto.setKeywords();
+            // TODO layerDto.setMetadataURL(null);
+            // TODO layerDto.setOpaque(Boolean.TRUE);
+
+
+            for (Style style : styles) {
+                final Provider styleProvider = providerRepository.findOne(style.getProvider());
+                DataReference styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, styleProvider.getIdentifier(), style.getName());
+                layerConfig.getStyles().add(styleProviderReference);
+            }
+
+             // TODO layerDto.setTitle(null);
+             // TODO layerDto.setVersion();
+            return layerConfig;
+        }
+        return null;
+    }
+
     private LayerContext readMapConfiguration(final String xml) throws ConfigurationException {
         try {
             if (xml != null) {
