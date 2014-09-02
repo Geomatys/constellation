@@ -19,6 +19,7 @@
 
 package org.constellation.admin;
 
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Sensor;
 import org.constellation.engine.register.CstlUser;
@@ -77,9 +78,31 @@ public class SensorBusiness {
 
     }
 
-    public void unlinkDataToSensor(QName dataName, String providerId, String sensorIdentifier) {
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataName.getLocalPart(), dataName.getNamespaceURI(), sensorIdentifier);
+    /**
+     * Proceed to remove the link between data and sensor.
+     *
+     * @param dataName given data name to find the data instance.
+     * @param providerId given provider identifier for data.
+     * @param sensorIdentifier given sensor identifier that will be unlinked.
+     */
+    public void unlinkDataToSensor(final QName dataName,
+                                   final String providerId,
+                                   final String sensorIdentifier) throws TargetNotFoundException {
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(
+                dataName.getLocalPart(),
+                dataName.getNamespaceURI(),
+                providerId);
         final Sensor sensor = sensorRepository.findByIdentifier(sensorIdentifier);
+        if(data == null){
+            throw new TargetNotFoundException("Cannot unlink data to sensor," +
+                    " because target data is not found for" +
+                    " name : "+dataName.getLocalPart()+" and provider : "+providerId);
+        }
+        if(sensor == null){
+            throw new TargetNotFoundException("Cannot unlink data to sensor," +
+                    " because target sensor is not found for" +
+                    " sensorIdentifier : "+sensorIdentifier);
+        }
         sensorRepository.unlinkDataToSensor(data.getId(),sensor.getId());
     }
 

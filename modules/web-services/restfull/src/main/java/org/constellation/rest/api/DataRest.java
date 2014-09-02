@@ -72,10 +72,7 @@ import org.constellation.admin.DatasetBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SensorBusiness;
 import org.constellation.admin.exception.ConstellationException;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.StringList;
+import org.constellation.configuration.*;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.CoverageMetadataBean;
@@ -2018,10 +2015,18 @@ public class DataRest {
 
     @POST
     @Path("unlink/sensor/{providerId}/{dataId}/{sensorId}")
-    public Response unlinkDataToSensor(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("sensorId") String sensorId, final SimpleValue value) {
+    public Response unlinkDataToSensor(final @PathParam("providerId") String providerId,
+                                       final @PathParam("dataId") String dataId,
+                                       final @PathParam("sensorId") String sensorId,
+                                       final SimpleValue value) {
         final String namespace = value.getValue();
         final QName name = new QName(namespace, dataId);
-        sensorBusiness.unlinkDataToSensor(name, providerId, sensorId);
+        try{
+            sensorBusiness.unlinkDataToSensor(name, providerId, sensorId);
+        }catch(TargetNotFoundException ex){
+            LOGGER.log(Level.WARNING,ex.getMessage(),ex);
+            return Response.status(500).entity("failed").build();
+        }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
