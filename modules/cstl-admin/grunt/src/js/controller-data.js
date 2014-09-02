@@ -668,22 +668,126 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             if(endsWith(strPath,'+')){
                 return true;
             }
-            if(strPath.indexOf('[')!=-1){
-                var number = strPath.substring(strPath.lastIndexOf('[')+1,strPath.length-1);
-                if(number>1){
-                    return true;
-                }
+            var number = getNumeroForPath(strPath);
+            if(number>1){
+                return true;
             }
             return false;
         };
 
+        /**
+         * Utility function that returns if the string ends with given suffix.
+         * @param str given string to check.
+         * @param suffix given suffix.
+         * @returns {boolean} returns true if str ends with suffix.
+         */
         function endsWith(str,suffix) {
             return str.indexOf(suffix, str.length - suffix.length) !== -1;
         }
 
+        /**
+         * Add new occurrence of given block.
+         * @param superBlockObj the parent of given block.
+         * @param blockObj the given block to create a new occurrence based on it.
+         */
+        $scope.addBlockOccurrence = function(superBlockObj, blockObj){
+            var newBlock = {"block":{}};
+            // Deep copy
+            newBlock.block = jQuery.extend(true,{}, blockObj.block);
+            var blockPath = newBlock.block.path;
+            var commonStr = blockPath.substring(0,blockPath.lastIndexOf('['));
+            var max = getMaxNumeroForBlock(superBlockObj,commonStr);
+            var numero = getNumeroForPath(blockPath);
+            for(var i=0;i<newBlock.block.children.length;i++){
+                var fieldObj = newBlock.block.children[i];
+                fieldObj.field.value=fieldObj.field.defaultValue;
+                var fieldPath = fieldObj.field.path;
+                fieldPath = fieldPath.replace(commonStr,'');
+                if(fieldPath.indexOf('[')==0){
+                    fieldPath = '['+max+fieldPath.substring(fieldPath.indexOf(']'));
+                    fieldPath = commonStr+fieldPath;
+                    fieldObj.field.path = fieldPath;
+                }
+            }
+            newBlock.block.path=commonStr+'['+max+']';
+            var indexOfBlock = superBlockObj.superblock.children.indexOf(blockObj);
+            superBlockObj.superblock.children.splice(indexOfBlock+1,0,newBlock);
+        };
+
+        /**
+         * Proceed to remove the given block occurrence from its parent superblock.
+         * @param superBlockObj the given block's parent.
+         * @param blockObj the given block to remove.
+         */
+        $scope.removeBlockOccurrence = function(superBlockObj,blockObj) {
+            var indexToRemove = superBlockObj.superblock.children.indexOf(blockObj);
+            superBlockObj.superblock.children.splice(indexToRemove,1);
+        };
+
+        /**
+         * Returns true if given block is an occurrence of another block.
+         * @param blockObj given block json to check.
+         * @returns {boolean} return true if block's path is not null and the occurrence number is >1.
+         */
+        $scope.isBlockOccurrence = function(blockObj){
+            var strPath = blockObj.block.path;
+            if(!strPath){
+                return false;
+            }
+            if(endsWith(strPath,'+')){
+                return true;
+            }
+            var number = getNumeroForPath(strPath);
+            if(number>1){
+                return true;
+            }
+            return false;
+        };
+
+        /**
+         * Returns the maximum number used in each block which is child of given superBlock
+         * and when block's path starts with given prefix.
+         * @param superBlockObj the given superblock json object.
+         * @param prefix the given string that each path must matches with.
+         * @returns {number} the result incremented number.
+         */
+        function getMaxNumeroForBlock(superBlockObj,prefix){
+            var max = 1;
+            for(var i=0;i<superBlockObj.superblock.children.length;i++){
+                var childObj = superBlockObj.superblock.children[i];
+                var childPath = childObj.block.path;
+                if(childPath && childPath.indexOf(prefix)!=-1){
+                    childPath = childPath.replace(prefix,'');
+                    if(childPath.indexOf('[')==0){
+                        var numero = childPath.substring(1,childPath.indexOf(']'));
+                        max = Math.max(max,parseInt(numero));
+                    }
+                }
+            }
+            max++;
+            return max;
+        }
+
+        /**
+         * Return the occurrence number of given path.
+         * @param path given path to read.
+         * @returns {null} if path does not contains occurrence number.
+         */
+        function getNumeroForPath(path){
+            if(path && path.indexOf('[')!=-1){
+                var number = path.substring(path.lastIndexOf('[')+1,path.length-1);
+                return number;
+            }
+            return null;
+        }
+
+        /**
+         * attach events click for editor blocks elements
+         * to allow collapsible/expandable panels.
+         */
         function initCollapseEvents () {
             if(window.collapseEditionEventsRegistered)return; //to fix a bug with angular
-            $(document).on('click','.small-block .heading-block',function(){
+            $(document).on('click','#editorMetadata .small-block .heading-block',function(){
                 var blockRow = $(this).parents('.block-row');
                 var parent = $(this).parent('.small-block');
                 parent.toggleClass('closed');
@@ -697,7 +801,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
                     icon.addClass('fa-angle-up');
                 }
             });
-            $(document).on('click','.collapse-row-heading',function(){
+            $(document).on('click','#editorMetadata .collapse-row-heading',function(){
                 $(this).parent().toggleClass('open');
                 $(this).next().toggleClass('hide');
                 var icon=$(this).find('.data-icon');
@@ -712,6 +816,14 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             window.collapseEditionEventsRegistered = true;
         }
 
+        /**
+         * Returns the title value of metadata.
+         * Note that this way is not generic,
+         * we need to find another way to retrieve the title for
+         * more generic metadata to support sensorML and ISO and others.
+         * //@FIXME do it more generic
+         * @returns {string} the title value located in json model.
+         */
         $scope.getMetadataTitle = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
                 //@FIXME get field with jsonPath
