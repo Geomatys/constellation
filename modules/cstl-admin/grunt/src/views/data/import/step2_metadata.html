@@ -1,9 +1,9 @@
 <div id="part2Metadata" ng-controller="ModalImportDataStep2MetadataController">
     <form id="uploadMetadataForm">
         <label translate="data.modal.metadata">Metadata</label>
-        <div ng-show="import.fsserver">
-            <ul class="breadcrumb col-sm-12">
-                <label class="col-sm-4 col-xs-5"
+        <div ng-if="import.fsserver">
+            <ul class="breadcrumb col-sm-12 row" style="margin-left: 0;margin-right: 0;">
+                <label class="col-sm-7"
                        translate="data.modal.import.server.label">Fill the server Path</label>
                 <div class="btn-lg tooltipicon">
                     <span type="button"
@@ -14,14 +14,16 @@
                 <input type="text"
                        name="serverMetadataPath"
                        placeholder="{{'data.modal.import.server.label'| translate}}"
-                       ng-model="currentPath" size="70"/>
+                       ng-model="currentPath" size="70"
+                       class="form-control form-control-fix"
+                       style="float: left;margin-right: 10px;width: 66%;"/>
                 <button class="btn btn-add ng-scope"
                         role="button"
                         ng-click="load()"
-                        ng-show="currentPath!=null"
+                        ng-if="currentPath"
                         translate="data.modal.import.server.label.list">List files</button>
             </ul>
-            <div class="row">
+            <div class="row" style="margin: 0;">
                 <div class="col-sm-12 well block-folders" style="overflow:auto; height:275px;">
                     <ul class="unstyled">
                         <li ng-repeat="item in columns | filter:search">
@@ -35,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <div ng-show="!import.fsserver" class="fileinput fileinput-new" data-provides="fileinput">
+        <div ng-if="!import.fsserver" class="fileinput fileinput-new" data-provides="fileinput">
             <div class="form-group">
                 <div class="input-group">
                     <div class="form-control uneditable-input" data-trigger="fileinput">
@@ -70,14 +72,13 @@
                        ng-trim="false">
             </div>
         </div>
-        <div class="col-xs-12" ng-show="import.enableSelectEPSGCode">
-            <label class="col-sm-12"translate="layer.listing.data.upload.selectEPSG">Select EPSG code</label>
+        <div class="col-xs-12" ng-if="import.enableSelectEPSGCode">
+            <label class="col-sm-12" translate="layer.listing.data.upload.selectEPSG">Select EPSG code</label>
             <input type="text"
                    ng-model="import.epsgSelected"
                    typeahead="epsgCode for epsgCode in epsgList | filter:$viewValue | limitTo:8"
                    class="form-control"
                    placeholder="{{'layer.listing.data.upload.typeEPSG' | translate}}"/>
-            <!--<button type="button" id="addProjectionButton" ng-show="import.epsgSelected!=null" class="btn btn-add ng-scope" ng-click="addProjection();" translate="layer.listing.data.upload.createEPSG">Affect projection</button>-->
         </div>
     </form>
 </div>
