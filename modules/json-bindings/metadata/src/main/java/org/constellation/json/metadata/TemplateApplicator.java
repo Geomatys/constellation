@@ -270,12 +270,12 @@ final class TemplateApplicator {
      * @param  children The children to add to the parent, or {@code null}.
      * @return The parent, newly created if the given {@code parent} was null.
      */
-    private static ValueNode addTo(final TemplateNode template, ValueNode parent, final ValueNode[] children) {
+    private ValueNode addTo(final TemplateNode template, ValueNode parent, final ValueNode[] children) {
         if (children != null) {
             for (final ValueNode child : children) {
                 if (child != null) {
                     if (parent == null) {
-                        parent = new ValueNode(template, null, null);
+                        parent = new ValueNode(template, indices, null);
                     }
                     parent.add(child);
                 }

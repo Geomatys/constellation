@@ -433,7 +433,7 @@
 						"name":"metadata.block.temporalExtension",
 						"multiplicity":62,
 						"help":"metadata.block.temporalExtension_help",
-						"path":"identificationInfo.extent.temporalElement",
+						"path":"identificationInfo[1].extent[1].temporalElement[1]",
 						"children":[{
 							"field":{
 								"name":"metadata.field.beginPosition",
@@ -482,7 +482,7 @@
 						"name":"metadata.block.distributionInfo",
 						"multiplicity":62,
 						"help":"metadata.block.distributionInfo_help",
-						"path":"distributionInfo.transferOptions",
+						"path":"distributionInfo.transferOptions[1]",
 						"children":[{
 							"field":{
 								"name":"metadata.field.transfertOptionLinkage",
@@ -512,7 +512,7 @@
 						"name":"metadata.block.resourceConstraints",
 						"multiplicity":1,
 						"help":"metadata.block.resourceConstraints_help",
-						"path":"identificationInfo.resourceConstraints",
+						"path":"identificationInfo[1].resourceConstraints[1]",
 						"children":[{
 							"field":{
 								"name":"metadata.field.useLimitation",
@@ -914,7 +914,7 @@
 						"name":"metadata.block.metadataContact",
 						"multiplicity":1,
 						"help":"metadata.block.metadataContact_help",
-						"path":"contact",
+						"path":"contact[1]",
 						"render":"CONTACT",
 						"children":[{
 							"field":{

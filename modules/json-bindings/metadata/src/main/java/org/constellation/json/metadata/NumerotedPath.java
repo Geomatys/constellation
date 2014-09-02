@@ -51,7 +51,7 @@ final class NumerotedPath {
      */
     NumerotedPath(final String[] path, final int[] indices) {
         this.path     = path;
-        this.indices  = (indices != null) ? Arrays.copyOfRange(indices, 0, path.length) : null;
+        this.indices  = Arrays.copyOfRange(indices, 0, path.length);
     }
 
     /**

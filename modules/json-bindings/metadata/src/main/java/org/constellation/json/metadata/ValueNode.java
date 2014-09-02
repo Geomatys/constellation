@@ -65,7 +65,7 @@ final class ValueNode extends ArrayList<ValueNode> {
     ValueNode(final TemplateNode template, final int[] indices, final Object value) {
         this.template = template;
         this.value    = value;
-        this.indices  = (indices != null) ? Arrays.copyOfRange(indices, 0, template.path.length) : null;
+        this.indices  = (template.path != null) ? Arrays.copyOfRange(indices, 0, template.path.length) : null;
     }
 
     /**
