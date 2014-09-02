@@ -444,10 +444,6 @@
             <configuration>
                 <warName>cstl-admin</warName>
                 <webResources>
-                    <resource>
-                        <directory>${project.basedir}/src/main/webapp</directory>
-                        <filtering>true</filtering>
-                    </resource>
                     <!-- Include grunt output directory -->
                     <resource>
                         <directory>${grunt.target.dir}</directory>

@@ -20,7 +20,7 @@ var cstlSession = {};
 
 /* App Module */
 
-var cstlAdminApp = angular.module('cstlAdminApp', [
+var cstlAdminApp = angular.module('CstlAdminApp', [
     // Angular official modules.
     'ngCookies',
     'ngResource',
@@ -47,7 +47,8 @@ var cstlAdminApp = angular.module('cstlAdminApp', [
     // Constellation modules.
     'cstl-directives',
     'cstl-restapi',
-    'cstl-services']);
+    'cstl-services',
+    'cstl-admin']);
 
 
 

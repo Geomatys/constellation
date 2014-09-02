@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-angular.module('CstlIndex', [
+angular.module('CstlIndexApp', [
     // Angular official modules.
     'ngCookies',
     'ngResource',
@@ -28,6 +28,10 @@ angular.module('CstlIndex', [
     // Constellation modules.
     'cstl-directives',
     'cstl-services'])
+
+    // -------------------------------------------------------------------------
+    //  Configuration
+    // -------------------------------------------------------------------------
     
     .config(function($routeProvider, $httpProvider, $translateProvider) {
         
@@ -53,6 +57,10 @@ angular.module('CstlIndex', [
         $translateProvider.preferredLanguage('en');
         $translateProvider.useCookieStorage();
     })
+
+    // -------------------------------------------------------------------------
+    //  Controllers
+    // -------------------------------------------------------------------------
 
     .controller('HeaderController', function($scope, $http, $cookies) {
         $http.get('app/conf').success(function(data) {
