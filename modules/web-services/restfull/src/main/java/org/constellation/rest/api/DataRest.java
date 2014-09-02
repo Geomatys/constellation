@@ -431,12 +431,7 @@ public class DataRest {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
         }
-
-
-
-
         return Response.ok(hashMap).build();
-
     }
 
     /**
