@@ -1712,19 +1712,28 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getIsoMetadataJson(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId,
             final @PathParam("type") String type, final @PathParam("prune") boolean prune) {
-        final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
-        
+
+        //@TODO get dataset or data metadata when dashboard will be added.
+        // meanwhile we returns the dataset metadata and if not exists we returns the data metadata.
+        //final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+        DefaultMetadata metadata;
+        try{
+            metadata = datasetBusiness.getMetadata(providerId,-1);
+        }catch(Exception ex){
+            metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+        }
+
         final StringBuilder buffer = new StringBuilder();
         if (metadata != null) {
             //prune the metadata
             metadata.prune();
-            
+
             //for debugging purposes
-            /*try{
-                System.out.println(XML.marshal(metadata));
-            }catch(Exception ex){
-                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-            }*/
+                /*try{
+                    System.out.println(XML.marshal(metadata));
+                }catch(Exception ex){
+                    LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+                }*/
 
             //get template name
             final String templateName;
