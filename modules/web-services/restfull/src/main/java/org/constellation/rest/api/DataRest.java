@@ -1661,17 +1661,17 @@ public class DataRest {
             final Provider provider = providerBusiness.getProvider(providerId);
             final String parent = provider.getParent();
             if (parent != null && !parent.isEmpty()) {
-                // Remove all providers that have a parent
+                // Skip all providers that have a parent ie : skip for tiled data to avoid duplication
                 continue;
             }
             final List<org.constellation.engine.register.Data> datas;
             datas = providerBusiness.getDatasFromProviderId(provider.getId());
             for (final org.constellation.engine.register.Data data : datas) {
-
                 if (data.isVisible()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
                     final DataBrief db = dataBusiness.getDataBrief(name, providerId);
-                    if ((published==true && (db.getTargetService() == null || db.getTargetService().size() == 0)) || (published==false && db.getTargetService() != null && db.getTargetService().size() > 0)) {
+                    if ((published && (db.getTargetService() == null || db.getTargetService().size() == 0)) ||
+                        (!published && db.getTargetService() != null && db.getTargetService().size() > 0)) {
                         continue;
                     }
                     briefs.add(db);
@@ -1703,7 +1703,8 @@ public class DataRest {
                 if (data.isVisible()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
                     final DataBrief db = dataBusiness.getDataBrief(name, providerId);
-                    if ((sensorable==true && (db.getTargetSensor() == null || db.getTargetSensor().size() == 0)) || (sensorable==false && db.getTargetSensor() != null && db.getTargetSensor().size() > 0)) {
+                    if ((sensorable && (db.getTargetSensor() == null || db.getTargetSensor().size() == 0)) ||
+                        (!sensorable && db.getTargetSensor() != null && db.getTargetSensor().size() > 0)) {
                         continue;
                     }
                     briefs.add(db);

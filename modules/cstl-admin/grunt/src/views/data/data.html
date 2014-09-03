@@ -23,19 +23,21 @@
     </div>
 </div>
 
-<!--
-<ul class="nav nav-tabs">
+<!--ul class="nav nav-tabs">
     <li id="dataTab" class="active tab-data" style="margin-left: 10px;">
-        <a ng-click="selectTab('tabdata')" data-toggle="tab"><span translate="data.dashboard.tab.data">Data</span></a>
+        <a ng-click="selectTab('tabdata')" data-toggle="tab">
+            <span translate="data.dashboard.tab.data">Data</span>
+        </a>
     </li>
     <li id="descriptionTab" class="tab-metadata">
-        <a ng-click="selectTab('tabmetadata')" data-toggle="tab"><span translate="data.dashboard.tab.metadata">Metadata</span></a>
+        <a ng-click="selectTab('tabmetadata')" data-toggle="tab">
+            <span translate="data.dashboard.tab.metadata">Metadata</span>
+        </a>
     </li>
-</ul>
--->
+</ul-->
 
-<div class="tab-content">
-    <div class="tab-pane" ng-class="{active:tabdata}" style="padding-top:0;" ng-show="tabdata">
+<div class="tab-content" ng-if="tabdata">
+    <div class="tab-pane" ng-class="{active:tabdata}" style="padding-top:0;">
         <div id="dataDashboard" class="row" ng-init="init(); published=null; observation=null">
         <div class="col-sm-12">
             <div class="frame dashboard">
@@ -567,8 +569,8 @@
     </div>
 </div>
 
-<div class="tab-content">
-    <div class="tab-pane" ng-class="{active:tabmetadata}" style="padding-top:0;" ng-show="tabmetadata">
+<div class="tab-content" ng-if="tabmetadata">
+    <div class="tab-pane" ng-class="{active:tabmetadata}" style="padding-top:0;">
         <div id="metadataDashboard" class="row" ng-init="init(); published=null; observation=null">
             <div class="col-sm-12">
                 <div class="frame dashboard">
