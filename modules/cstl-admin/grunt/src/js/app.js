@@ -49,6 +49,7 @@ var cstlAdminApp = angular.module('CstlAdminApp', [
     'cstl-restapi',
     'cstl-services',
     'cstl-admin',
+    'cstl-mapcontext',
     'cstl-webservice']);
 
 
