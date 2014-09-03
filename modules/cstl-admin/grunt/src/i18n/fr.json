@@ -745,6 +745,7 @@
     "service.config.source.internal.description": "Base de données des métadonnées de Constellation, décrivant les données publiées par les services",
     "service.config.source.internal.title": "Interne (SGBDR)",
     "service.config.source.sos.title":"Données de capteurs (SOS)",
+    "service.config.source.transactional": "Transactionnel",
     "service.create.end.addlayers.label": "Ajouter des couches au service",
     "service.create.end.addmetadata.label": "Voir les métadonnées",
     "service.create.end.description.label": "Description du service",

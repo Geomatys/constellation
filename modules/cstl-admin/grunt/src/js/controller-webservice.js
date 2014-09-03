@@ -173,10 +173,12 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         $scope.serviceInfo = true;
         $scope.serviceContact = false;
         $scope.serviceRights = false;
-        $scope.metadata = {};
-        $scope.metadata.keywords = [];
-        $scope.newService = {};
-        $scope.newService.tagText = '';
+        $scope.metadata = {
+            keywords: []
+        };
+        $scope.newService = {
+            tagText: ''
+        };
 
         $scope.getCurrentLang = function() {
             return $translate.use();
@@ -299,6 +301,9 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
     function ($scope, $routeParams , webService, provider, sos, Growl, $location) {
         $scope.type = $routeParams.type;
         $scope.id = $routeParams.id;
+        $scope.transactional = {
+            choice: null
+        };
         $scope.db = {
 //            'url': 'localhost',
 //            'port': '5432',
@@ -310,26 +315,30 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
             if ($scope.type === 'csw') {
                 $scope.source = {'automatic': {'@format': null}};
             } else if ($scope.type === 'sos') {
-                $scope.source = {'constellation-config.SOSConfiguration':
-                                    {'constellation-config.SMLConfiguration':
-                                        {'@format': 'filesystem',
-                                         'profile': 'discovery',
-                                         'dataDirectory': ''
-                                        },
-                                     'constellation-config.observationFilterType': 'om2',
-                                     'constellation-config.observationReaderType': 'om2',
-                                     'constellation-config.observationWriterType': 'om2',
-                                     'constellation-config.SMLType': 'filesystem',
-                                     'constellation-config.OMConfiguration':
-                                        {'@format': 'OM2',
-                                         'bdd': {}
-                                        }
+                $scope.source = {'constellation-config.SOSConfiguration': {
+                                    'profile': 'discovery',
+                                    'constellation-config.SMLConfiguration': {
+                                       '@format': 'filesystem',
+                                       'dataDirectory': ''
+                                    },
+                                    'constellation-config.observationFilterType': 'om2',
+                                    'constellation-config.observationReaderType': 'om2',
+                                    'constellation-config.observationWriterType': 'om2',
+                                    'constellation-config.SMLType': 'filesystem',
+                                    'constellation-config.OMConfiguration': {
+                                        '@format': 'OM2',
+                                        'bdd': {}
                                     }
-                                };
+                                }
+                            };
             }
         };
 
         $scope.saveServiceSource = function() {
+            if ($scope.transactional.choice) {
+                $scope.source['constellation-config.SOSConfiguration'].profile = 'transactional';
+            }
+
             var fullDbUrl = ($scope.db.className === 'org.postgresql.Driver') ? 'jdbc:postgresql' : 'jdbc:mysql';
             fullDbUrl += '://'+ $scope.db.url +':'+ $scope.db.port +'/'+ $scope.db.name;
             if ($scope.type === 'csw') {

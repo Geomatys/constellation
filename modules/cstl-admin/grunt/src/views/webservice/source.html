@@ -260,8 +260,12 @@
                                 <input type="password" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.password">
                             </div>
                         </div>
+                        <div class="form-group">
+                            <div class="checkbox inline">
+                                <input type="checkbox" ng-model="transactional.choice"><span translate="service.config.source.transactional">Transactional</span>
+                            </div>
+                        </div>
                         <div class="form-group row">
-                            <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.shared">Shared connection</label>
                             <div class="col-sm-11">
                                 <div class="checkbox inline" style="margin-top:0;">
                                     <input type="checkbox" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.sharedConnection">
