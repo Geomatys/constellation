@@ -245,4 +245,23 @@ cstlAdminApp
                 $rootScope.authenticated = false;
                 $location.path('');
             });
-        }]);
+        }])
+
+    .controller('DomainSwitcherController', function(Account, $scope, $cookies, $window) {
+    Account.get(function(account){
+        $scope.domains = account.domains;
+        for(var d in account.domains){
+            if(account.domains[d].id == $cookies.cstlActiveDomainId){
+                $scope.activeDomain=account.domains[d].name;
+                break;
+            }
+        }
+        $scope.changeDomain = function(i){
+            if($cookies.cstlActiveDomainId != account.domains[i].id){
+                $scope.activeDomain=account.domains[i].name;
+                $cookies.cstlActiveDomainId= ""+account.domains[i].id;
+                $window.location.href="admin.html";
+            }
+        };
+    })
+});

@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-angular.module('cstl-admin-security', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
+angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('UserController', function($scope, UserResource, $modal, Growl, $translate) {
         $scope.list = UserResource.query({"withDomainAndRoles": true});
@@ -121,26 +121,6 @@ angular.module('cstl-admin-security', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     });
                 });
         }
-    })
-
-    // TODO move it, not an admin controller
-    .controller('DomainSwitcherController', function(Account, $scope, $cookies, $window) {
-        Account.get(function(account){
-            $scope.domains = account.domains;
-            for(var d in account.domains){
-                if(account.domains[d].id == $cookies.cstlActiveDomainId){
-                    $scope.activeDomain=account.domains[d].name;
-                    break;
-                }
-            }
-            $scope.changeDomain = function(i){
-                if($cookies.cstlActiveDomainId != account.domains[i].id){
-                    $scope.activeDomain=account.domains[i].name;
-                    $cookies.cstlActiveDomainId= ""+account.domains[i].id;
-                    $window.location.href="admin.html";
-                }
-            };
-        })
     })
     
     .controller('DomainController', function($scope, $modal, DomainResource) {

@@ -129,6 +129,10 @@ module.exports = function(grunt) {
         // Merge script files.
         concat: {
             app: {
+                options: {
+                    banner: '(function(window, angular, undefined) {\'use strict\';',
+                    footer: '})(window, window.angular);'
+                },
                 files: {
                     '<%= target_dir %>/js/app.js': [
                         '<%= src_dir %>/js/app.js',
@@ -151,6 +155,10 @@ module.exports = function(grunt) {
                 }
             },
             app_index: {
+                options: {
+                    banner: '(function(window, angular, undefined) {\'use strict\';',
+                    footer: '})(window, window.angular);'
+                },
                 files: {
                     '<%= target_dir %>/js/app-index.js': [
                         '<%= src_dir %>/js/app-index.js',
