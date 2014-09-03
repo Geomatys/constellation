@@ -40,7 +40,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                     Growl('error', 'Error', 'Unable to get tasks list');
                 })['finally'](function(){
                 // On all case
-                modalLoader.close()
+                modalLoader.close();
             });
 
             angular.element($window).bind("scroll", function() {
@@ -85,7 +85,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                 templateUrl: 'views/tasks/modalAddTask.html',
                 controller: 'ModalAddTaskController',
                 resolve : {
-                    'processes' : function(){return TaskService.listProcess().$promise},
+                    'processes' : function(){return TaskService.listProcess().$promise;},
                     'task'      : function(){
                         if (idTask){
                             return TaskService.getParamsTask({id:idTask}).$promise;
@@ -93,7 +93,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                             return {
                                 'id' : 0,
                                 'name' : ""
-                            }
+                            };
                         }
                     }
                 }
@@ -104,40 +104,40 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         };
 
         $scope.truncate = function(small, text){
-            if(text != null) {
+            if(text !== null) {
                 if (window.innerWidth >= 1200) {
-                    if (small == true && text.length > 30) {
+                    if (small === true && text.length > 30) {
                         return text.substr(0, 30) + "...";
-                    } else if (small == false && text.length > 65) {
+                    } else if (small === false && text.length > 65) {
                         return text.substr(0, 65) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
-                    if (small == true && text.length > 22) {
+                    if (small === true && text.length > 22) {
                         return text.substr(0, 22) + "...";
-                    } else if (small == false && text.length > 50) {
+                    } else if (small === false && text.length > 50) {
                         return text.substr(0, 50) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 992) {
                     if (text.length > 40) {
                         return text.substr(0, 40) + "...";
-                    } else return text;
+                    } else {return text;}
                 }
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if(text != null) {
+            if(text !== null) {
                 if (window.innerWidth >= 1200) {
                     if (text.length > 40) {
                         return text.substr(0, 40) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
                     if (text.length > 30) {
                         return text.substr(0, 30) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 992) {
                     if (text.length > 20) {
                         return text.substr(0, 20) + "...";
-                    } else return text;
+                    } else {return text;}
                 }
             }
         };

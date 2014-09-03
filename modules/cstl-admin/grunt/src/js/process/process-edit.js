@@ -37,23 +37,27 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
             var tree = {};
             for (var p in processesList) {
-                var process = parseProcessDefaultName(processesList[p]);
-                tree[process[0]] = tree[process[0]] || [];
-                var codeInd = tree[process[0]].push(process[1])-1;
+                if(processesList.hasOwnProperty(p)){
+                    var process = parseProcessDefaultName(processesList[p]);
+                    tree[process[0]] = tree[process[0]] || [];
+                    var codeInd = tree[process[0]].push(process[1])-1;
 
-                if (process[0] == processAuthority && process[1] == processCode){
-                    $scope.option.processIndex = ""+codeInd;
+                    if (process[0] === processAuthority && process[1] === processCode){
+                        $scope.option.processIndex = ""+codeInd;
+                    }
                 }
             }
 
             var procTree = [];
             for (var auth in tree) {
-                var indAuth = procTree.push({
-                        'auth' : auth,
-                        'processes' : tree[auth]
-                    })-1;
-                if (auth == processAuthority) {
-                    $scope.option.authIndex = ""+indAuth;
+                if(tree.hasOwnProperty(auth)){
+                    var indAuth = procTree.push({
+                            'auth' : auth,
+                            'processes' : tree[auth]
+                        })-1;
+                    if (auth === processAuthority) {
+                        $scope.option.authIndex = ""+indAuth;
+                    }
                 }
             }
             return procTree;
@@ -69,28 +73,32 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 });
         }
 
+        function setSaved(ind, _el, iter){
+            switch($scope.inputs[iter].annotation.info){
+                case "valueClass:java.lang.Double":
+                    $scope.inputs[iter].save[ind] = parseFloat(jQuery(_el)[0].textContent);
+                    break;
+                case "valueClass:java.lang.Integer":
+                    $scope.inputs[iter].save[ind] = parseInt(jQuery(_el)[0].textContent);
+                    break;
+                case "valueClass:java.lang.Boolean":
+                    $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent === "true";
+                    break;
+                default:
+                    $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent;
+            }
+
+        }
+
         function restoreInputs(){
             if ($scope.task.inputs) {
                 var dom = jQuery(jQuery.parseXML($scope.task.inputs));
 
                 for (var iter in $scope.inputs){
-                    var name = $scope.inputs[iter].name;
-                    dom.find(name).each(function(ind, _el){
-                        switch($scope.inputs[iter].annotation.info){
-                            case "valueClass:java.lang.Double":
-                                $scope.inputs[iter].save[ind] = parseFloat(jQuery(_el)[0].textContent);
-                                break;
-                            case "valueClass:java.lang.Integer":
-                                $scope.inputs[iter].save[ind] = parseInt(jQuery(_el)[0].textContent);
-                                break;
-                            case "valueClass:java.lang.Boolean":
-                                $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent == "true";
-                                break;
-                            default:
-                                $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent;
-                        }
-
-                    });
+                    if($scope.inputs.hasOwnProperty(iter)){
+                        var name = $scope.inputs[iter].name;
+                        dom.find(name).each(setSaved(iter));
+                    }
                 }
             }
         }
@@ -118,7 +126,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         $scope.task = task;
         $scope.styles = [];
 
-        $scope.processes = createProcesses(processes['Entry']);
+        $scope.processes = createProcesses(processes.Entry);
 
         // scope functions
         $scope.close = $scope.cancel = $modalInstance.close;
@@ -127,7 +135,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             style.listAll({provider: 'sld'}, function (response) {
                 $scope.styles = [];
                 $.each(response.styles, function(i,style) {
-                    var styleName = style['Name'];
+                    var styleName = style.Name;
                     var styleRef = '${providerStyleType|sld|'+styleName+'}';
                     $scope.styles.push({name:styleName, ref:styleRef});
                 });
@@ -146,40 +154,46 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             $scope.task.inputs = '<input xmlns="http://www.geotoolkit.org/parameter">';
 
             for (var i in $scope.inputs){
-                var element = $scope.inputs[i];
+                if($scope.inputs.hasOwnProperty(i)){
+                    var element = $scope.inputs[i];
 
-                if (!$scope.isValid(element.name)) {
-                    Growl('error', 'Error', 'Form is invalid');
-                    return false;
-                }
+                    if (!$scope.isValid(element.name)) {
+                        Growl('error', 'Error', 'Form is invalid');
+                        return false;
+                    }
 
-                switch(element.annotation.info) {
+                    switch(element.annotation.info) {
 
-                    case "valueClass:java.lang.Boolean" :
-                        if (element.save && element.save.length > 0) {
-                            for (var s in element.save) {
-                                $scope.task.inputs += '<' + element.name + '>' + element.save[s] + '</' + element.name + '>';
+                        case "valueClass:java.lang.Boolean" :
+                            if (element.save && element.save.length > 0) {
+                                for (var s in element.save) {
+                                    if(element.save.hasOwnProperty(s)){
+                                        $scope.task.inputs += '<' + element.name + '>' + element.save[s] + '</' + element.name + '>';
+                                    }
+                                }
+                            } else {
+                                $scope.task.inputs += '<' + element.name + '>' + (element.default||false) + '</' + element.name + '>';
                             }
-                        } else {
-                            $scope.task.inputs += '<' + element.name + '>' + (element.default||false) + '</' + element.name + '>';
-                        }
-                        break;
+                            break;
 
-                    case "valueClass:java.lang.String" :
-                    default:
-                        if (element.save && element.save.length > 0) {
-                            for (var s in element.save) {
-                                $scope.task.inputs += '<' + element.name + '>' + element.save[s] + '</' + element.name + '>';
+                        case "valueClass:java.lang.String" : break;
+                        default:
+                            if (element.save && element.save.length > 0) {
+                                for (var save in element.save) {
+                                    if (element.save.hasOwnProperty(save)) {
+                                        $scope.task.inputs += '<' + element.name + '>' + element.save[save] + '</' + element.name + '>';
+                                    }
+                                }
+                            } else if (element.default) {
+                                $scope.task.inputs += '<' + element.name + '>' + element.default + '</' + element.name + '>';
                             }
-                        } else if (element.default) {
-                            $scope.task.inputs += '<' + element.name + '>' + element.default + '</' + element.name + '>';
-                        }
-                        break;
+                            break;
+                    }
                 }
             }
             $scope.task.inputs += '</input>';
 
-            if ($scope.task.id != 0){
+            if ($scope.task.id !== 0){
                 TaskService.updateParamsTask($scope.task).$promise
                     .then(function(response) {
                         Growl('success', 'Success', 'The task is correctly save');
@@ -204,8 +218,8 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
         // scope watcher
         $scope.$watch('option.authIndex', function(newValue, oldValue){
-            if (newValue != oldValue) {
-                if ($scope.option.processIndex == 0) {
+            if (newValue !== oldValue) {
+                if ($scope.option.processIndex === 0) {
                     getDescribeProcess();
                 } else {
                     $scope.option.processIndex = 0;
@@ -218,7 +232,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         }, true);
 
         $scope.$watch('describeProcess', function(newValue, oldValue){
-            if (newValue != oldValue) {
+            if (newValue !== oldValue) {
                 $scope.canManage = true;
 
                 var inputs = [];
@@ -247,7 +261,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                     });
                     return {
                         enumeration : enumerationList
-                    }
+                    };
                 };
 
                 dom.find('element[name=input]').find('element').each(function(a, el) {
@@ -265,7 +279,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                         })-1; // Push add to the end of the array and return length... so length-1 => last element insert
 
                     // Check mandatory once
-                    if (inputs[index].minOccurs == 0) {
+                    if (inputs[index].minOccurs === 0) {
                         inputs[index].mandatory = false;
                     }
 

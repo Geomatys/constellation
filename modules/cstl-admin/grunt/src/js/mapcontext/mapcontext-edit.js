@@ -103,7 +103,7 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.addTag = function() {
-            if (!$scope.tag.text || $scope.tag.text == '' || $scope.tag.text.length == 0) {
+            if (!$scope.tag.text || $scope.tag.text === '' || $scope.tag.text.length === 0) {
                 return;
             }
             $scope.tag.keywords.push($scope.tag.text);
@@ -112,22 +112,22 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         $scope.deleteTag = function(key) {
             if ($scope.tag.keywords.length > 0 &&
-                $scope.tag.text.length == 0 &&
+                $scope.tag.text.length === 0 &&
                 key === undefined) {
                 $scope.tag.keywords.pop();
-            } else if (key != undefined) {
+            } else if (key !== undefined) {
                 $scope.tag.keywords.splice(key, 1);
             }
         };
 
         $scope.updateNamePresent = function() {
-            $scope.mode.errorNoGivenName = (!$scope.ctxt.name || $scope.ctxt.name == null);
+            $scope.mode.errorNoGivenName = (!$scope.ctxt.name || $scope.ctxt.name === null);
         };
 
         $scope.validate = function () {
             // Verify on which step the user is.
             if ($scope.mode.display==='general') {
-                if ($scope.ctxt.name == undefined || $scope.ctxt.name == null || $scope.ctxt.name === '') {
+                if ($scope.ctxt.name === undefined || $scope.ctxt.name === null || $scope.ctxt.name === '') {
                     $scope.mode.errorNoGivenName = true;
                     Growl('error', 'Error', 'Name should be filled');
                     return;
@@ -175,11 +175,11 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
                     var extStyle = '';
                     if ($scope.selected.extLayer.Style) {
-                        for (var i=0; i < $scope.selected.extLayer.Style.length; i++) {
-                            if (i > 0) {
+                        for (var j=0; j < $scope.selected.extLayer.Style.length; j++) {
+                            if (j > 0) {
                                 extStyle += ',';
                             }
-                            var capsStyle = $scope.selected.extLayer.Style[i];
+                            var capsStyle = $scope.selected.extLayer.Style[j];
                             extStyle += capsStyle.Name;
                         }
                     }
@@ -218,10 +218,10 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     var possibleStyles = $scope.layers.toStyle.layer.externalStyle.split(',');
                     if (possibleStyles[0] !== $scope.styles.selected.Name) {
                         var indexForStyle;
-                        for (var i=0; i<possibleStyles.length; i++) {
-                            var s = possibleStyles[i];
+                        for (var k=0; k<possibleStyles.length; k++) {
+                            var s = possibleStyles[k];
                             if (s === $scope.styles.selected.Name) {
-                                indexForStyle = i;
+                                indexForStyle = k;
                             }
                         }
 
@@ -233,11 +233,11 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                         }
 
                         var finalStyles = '';
-                        for (var i=0; i<possibleStyles.length; i++) {
-                            if (i > 0) {
+                        for (var l=0; l<possibleStyles.length; l++) {
+                            if (l > 0) {
                                 finalStyles += ',';
                             }
-                            finalStyles += possibleStyles[i];
+                            finalStyles += possibleStyles[l];
                         }
                         $scope.layers.toStyle.layer.externalStyle = finalStyles;
                     }
@@ -371,7 +371,7 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         $scope.deleteMapItem = function(item) {
             var index = $scope.layers.toAdd.indexOf(item);
-            if (index != -1) {
+            if (index !== -1) {
                 $scope.layers.toAdd.splice(index, 1);
             }
 
@@ -451,13 +451,13 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         function useExtentForLayers(values) {
-            $scope.ctxt.crs = values['crs'];
-            $scope.ctxt.west = values['west'];
-            $scope.ctxt.south = values['south'];
-            $scope.ctxt.east = values['east'];
-            $scope.ctxt.north = values['north'];
+            $scope.ctxt.crs = values.crs;
+            $scope.ctxt.west = values.west;
+            $scope.ctxt.south = values.south;
+            $scope.ctxt.east = values.east;
+            $scope.ctxt.north = values.north;
             var extent = new OpenLayers.Bounds($scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north);
-            DataViewer.map.zoomToExtent(extent, true)
+            DataViewer.map.zoomToExtent(extent, true);
         }
 
         $scope.applyExtent = function() {
@@ -495,15 +495,15 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     });
                 });
             }
-        }
+        };
 
         $scope.truncate = function(test,text){
-            if(text != null) {
-                if (test != 'chooseLayer' && text.length > 30) {
+            if(text !== null) {
+                if (test !== 'chooseLayer' && text.length > 30) {
                     return text.substr(0, 30) + "...";
                 } else if (test === 'chooseLayer' && text.length > 60) {
                     return text.substr(0, 60) + "...";
-                } else return text;
+                } else {return text;}
             }
         };
     });

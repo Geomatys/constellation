@@ -124,9 +124,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }, function() {
                     modalLoader.close();
                 });
-            }else if($scope.currentTab === 'tabmetadata') {
-
             }
+            // TODO ??
+            /*else if($scope.currentTab === 'tabmetadata') {
+
+            }*/
             //display button that allow to scroll to top of the page from a certain height.
             angular.element($window).bind("scroll", function() {
                 $scope.hideScroll = this.pageYOffset < 220;
@@ -180,7 +182,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
          * @returns {*}
          */
         $scope.getDisplayName = function(providerName, dataName) {
-            if (providerName == dataName){
+            if (providerName === dataName){
                 return dataName;
             } else {
                 return dataName + ' ( ' + providerName + ' ) ';
