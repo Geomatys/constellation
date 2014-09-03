@@ -10,10 +10,6 @@ module.exports = function(grunt) {
         // Clean build directory.
         clean: ['<%= target_dir %>'],
 
-// TODO → Enabled JavaScript code style validation.
-        //TODO clenup globals after refactoring
-// Previous attempts using following configuration reveal more than 500 errors.
-
         // Validate JavaScript code style.
         jshint: {
             app: {
@@ -173,10 +169,10 @@ module.exports = function(grunt) {
                         '<%= src_dir %>/js/admin/*.js',
                         '<%= src_dir %>/js/mapcontext/*.js',
                         '<%= src_dir %>/js/process/*.js',
+                        '<%= src_dir %>/js/sensor/*.js',
                         '<%= src_dir %>/js/webservice/*.js',
                         '<%= src_dir %>/js/controller-data.js',
                         '<%= src_dir %>/js/controller-data-import.js',
-                        '<%= src_dir %>/js/controller-sensor.js',
                         '<%= src_dir %>/js/controller-style.js',
                         '<%= src_dir %>/js/cstl.data.viewer.js',
                         '<%= src_dir %>/js/cstl.viewer.wmts.js',
