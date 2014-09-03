@@ -23,7 +23,7 @@
     </div>
 </div>
 
-<!--ul class="nav nav-tabs">
+<ul class="nav nav-tabs">
     <li id="dataTab" class="active tab-data" style="margin-left: 10px;">
         <a ng-click="selectTab('tabdata')" data-toggle="tab">
             <span translate="data.dashboard.tab.data">Data</span>
@@ -34,10 +34,10 @@
             <span translate="data.dashboard.tab.metadata">Metadata</span>
         </a>
     </li>
-</ul-->
+</ul>
 
-<div class="tab-content" ng-if="tabdata">
-    <div class="tab-pane" ng-class="{active:tabdata}" style="padding-top:0;">
+<div class="tab-content" ng-if="currentTab==='tabdata'">
+    <div class="tab-pane" ng-class="{active:currentTab==='tabdata'}" style="padding-top:0;">
         <div id="dataDashboard" class="row" ng-init="init(); published=null; observation=null">
         <div class="col-sm-12">
             <div class="frame dashboard">
@@ -51,70 +51,77 @@
                                 <a translate="label.all">Tous</a>
                             </li>
                             <li ng-class="{active:filtertype=='VECTOR'}" ng-click="filtertype='VECTOR'">
-                                <a translate="label.vector">Vector</a
-                                        ></li>
+                                <a translate="label.vector">Vector</a>
+                            </li>
                             <li ng-class="{active:filtertype=='COVERAGE'}" ng-click="filtertype='COVERAGE'">
                                 <a translate="label.raster">Raster</a>
                             </li>
                         </ul>
                     </div>
                 </div>
-
                 <div class="navbar sort-navbar" ng-class="{'advanced-open':advancedSearch==true}">
                     <div class="navbar-inner">
                         <ul class="nav nav-style">
                             <li ng-click="ordertype='Name';orderreverse=!orderreverse">
                                 <a>
                                     <span translate="label.title">Title</span>
-                                    <i class="fa fa-caret-up" ng-if="ordertype === 'Name' && orderreverse"></i>
-                                    <i class="fa fa-caret-down" ng-if="ordertype === 'Name' && !orderreverse"></i>
+                                    <i class="fa fa-caret-up"
+                                       ng-if="ordertype === 'Name' && orderreverse"></i>
+                                    <i class="fa fa-caret-down"
+                                       ng-if="ordertype === 'Name' && !orderreverse"></i>
                                 </a>
                             </li>
                             <li class="divider-vertical"></li>
                             <li ng-click="ordertype='Date';orderreverse=!orderreverse">
                                 <a>
                                     <span translate="label.date">Date</span>
-                                    <i class="fa fa-caret-up" ng-if="ordertype === 'Date' && orderreverse"></i>
-                                    <i class="fa fa-caret-down" ng-if="ordertype === 'Date' && !orderreverse"></i>
+                                    <i class="fa fa-caret-up"
+                                       ng-if="ordertype === 'Date' && orderreverse"></i>
+                                    <i class="fa fa-caret-down"
+                                       ng-if="ordertype === 'Date' && !orderreverse"></i>
                                 </a>
                             </li>
                             <li class="divider-vertical"></li>
                             <li ng-click="ordertype='Owner';orderreverse=!orderreverse">
                                 <a>
                                     <span translate="label.owner">Owner</span>
-                                    <i class="fa fa-caret-up" ng-if="ordertype === 'Owner' && orderreverse"></i>
-                                    <i class="fa fa-caret-down" ng-if="ordertype === 'Owner' && !orderreverse"></i>
+                                    <i class="fa fa-caret-up"
+                                       ng-if="ordertype === 'Owner' && orderreverse"></i>
+                                    <i class="fa fa-caret-down"
+                                       ng-if="ordertype === 'Owner' && !orderreverse"></i>
                                 </a>
                             </li>
                             <li class="divider-vertical"></li>
                             <li class="dropdown pointer">
                                 <a class="dropdown-toggle" data-toggle="dropdown">
                                     <span>
-                                        <span class="hidden-tablet" translate="label.published">Published</span>
+                                        <span class="hidden-tablet"
+                                              translate="label.published">Published</span>
                                         <b class="caret"></b>
                                     </span>
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a ng-class="{filter_active : published==null}" ng-click="init(); published=null; observation=null">
+                                        <a ng-class="{filter_active : published==null}"
+                                           ng-click="init(); published=null; observation=null">
                                             <span translate="label.all">all</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : published}" ng-click="showPublished(true); observation=null">
+                                        <a ng-class="{filter_active : published}"
+                                           ng-click="showPublished(true); observation=null">
                                             <span translate="label.yes">Yes</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : published==false}" ng-click="showPublished(false); observation=null">
+                                        <a ng-class="{filter_active : published==false}"
+                                           ng-click="showPublished(false); observation=null">
                                             <span translate="label.no">No</span>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-
                             <li class="divider-vertical"></li>
-
                             <li class="dropdown pointer">
                                 <a class="dropdown-toggle" data-toggle="dropdown">
                                     <span>
@@ -124,17 +131,20 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a ng-class="{filter_active : observation==null}" ng-click="init(); observation=null; published=null">
+                                        <a ng-class="{filter_active : observation==null}"
+                                           ng-click="init(); observation=null; published=null">
                                             <span translate="label.all">all</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : observation}" ng-click="showSensorable(true); published=null">
+                                        <a ng-class="{filter_active : observation}"
+                                           ng-click="showSensorable(true); published=null">
                                             <span translate="label.yes">Yes</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a ng-class="{filter_active : observation==false}" ng-click="showSensorable(false); published=null">
+                                        <a ng-class="{filter_active : observation==false}"
+                                           ng-click="showSensorable(false); published=null">
                                             <span translate="label.no">No</span>
                                         </a>
                                     </li>
@@ -157,7 +167,9 @@
                                     ng-class="{'btn-small-selected':advancedSearch}">
                                 <i class="fa" ng-class="{'fa-plus':!advancedSearch, 'fa-minus':advancedSearch}"></i>
                             </button>
-                            <div class="col-sm-7 pull-right input-group" ng-show="!advancedSearch" style="padding-left: 5px;padding-right: 5px;">
+                            <div class="col-sm-7 pull-right input-group"
+                                 ng-show="!advancedSearch"
+                                 style="padding-left: 5px;padding-right: 5px;">
                                 <input type="text"
                                        class="searchbox search-query form-control form-control-fix"
                                        ng-model="searchTerm"/>
@@ -569,8 +581,8 @@
     </div>
 </div>
 
-<div class="tab-content" ng-if="tabmetadata">
-    <div class="tab-pane" ng-class="{active:tabmetadata}" style="padding-top:0;">
+<div class="tab-content" ng-if="currentTab==='tabmetadata'">
+    <div class="tab-pane" ng-class="{active:currentTab==='tabmetadata'}" style="padding-top:0;">
         <div id="metadataDashboard" class="row" ng-init="init(); published=null; observation=null">
             <div class="col-sm-12">
                 <div class="frame dashboard">
@@ -919,4 +931,9 @@
     </div>
 </div>
 
-<div scroll-to="" id="backtotop" class="backtotop" ng-hide="hideScroll"><span class="glyphicon glyphicon-chevron-up"></span></div>
+<div id="backtotop"
+     scroll-to=""
+     class="backtotop"
+     ng-if="!hideScroll">
+    <span class="glyphicon glyphicon-chevron-up"></span>
+</div>

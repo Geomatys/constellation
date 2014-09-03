@@ -27,7 +27,19 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
         $scope.advancedSearch = false;
         $scope.search = {};
         $scope.hideScroll = true;
+        $scope.currentTab = 'tabdata'; //possible values are 'tabdata' and 'tabmetadata'
 
+        /**
+         * Select appropriate tab 'tabdata' or 'tabmetadata'.
+         * @param item
+         */
+        $scope.selectTab = function(item) {
+            $scope.currentTab = item;
+        };
+
+        /**
+         * Toggle advanced search view panel.
+         */
         $scope.toggleAdvancedSearch = function(){
           if ($scope.advancedSearch){
               $scope.advancedSearch = false;
@@ -98,29 +110,37 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             }
         };
 
+        /**
+         * main function of dashboard that loads the list of objects from server.
+         */
         $scope.init = function() {
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
                 controller: 'ModalInstanceCtrl'
             });
-            dataListing.listAll({}, function(response) {
-                Dashboard($scope, response, true);
-                $scope.filtertype = "";
-                modalLoader.close();
-            }, function() {
-                modalLoader.close();
-            });
+            if($scope.currentTab === 'tabdata'){
+                dataListing.listAll({}, function(response) {
+                    Dashboard($scope, response, true);
+                    $scope.filtertype = "";
+                    modalLoader.close();
+                }, function() {
+                    modalLoader.close();
+                });
+            }else if($scope.currentTab === 'tabmetadata') {
 
+            }
+            //display button that allow to scroll to top of the page from a certain height.
             angular.element($window).bind("scroll", function() {
-                if (this.pageYOffset < 220) {
-                    $scope.hideScroll = true;
-                } else {
-                    $scope.hideScroll = false;
-                }
+                $scope.hideScroll = this.pageYOffset < 220;
                 $scope.$apply();
             });
         };
 
+        /**
+         * Apply filter to show only published data in service depending on given flag.
+         * ie: data is linked to services.
+         * @param published if true then proceed to show only published data.
+         */
         $scope.showPublished = function(published){
             $scope.published=published;
             var modalLoader = $modal.open({
@@ -135,27 +155,38 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             });
         };
 
+        /**
+         * Apply filter to show only sensorable data depending on given flag.
+         * ie: data is linked to sensors
+         * @param observation if true then proceed to show only sensorable data.
+         */
         $scope.showSensorable = function(observation){
             $scope.observation=observation;
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
                 controller: 'ModalInstanceCtrl'
             });
-            dataListing.listSensorable({observation:observation}, function(response) {
+            dataListing.listSensorable({observation:observation},
+               function(response) {//success
                 Dashboard($scope, response, true);
                 modalLoader.close();
-            }, function() {
+            }, function() {//error
                 modalLoader.close();
             });
         };
 
+        /**
+         * Returns formatted name of data for given data's provider and data's name.
+         * @param providerName given provider name.
+         * @param dataName given data name.
+         * @returns {*}
+         */
         $scope.getDisplayName = function(providerName, dataName) {
-                if (providerName == dataName){
-                    return dataName;
-                } else {
-                    return dataName + ' ( ' + providerName + ' ) ';
-                }
-
+            if (providerName == dataName){
+                return dataName;
+            } else {
+                return dataName + ' ( ' + providerName + ' ) ';
+            }
         };
 
         // Map methods
@@ -375,18 +406,6 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                     'dataId': function(){return $scope.selected.Id}
                 }
             });
-        };
-
-        $scope.tabdata = true;
-        $scope.tabmetadata = false;
-        $scope.selectTab = function(item) {
-            if (item === 'tabdata') {
-                $scope.tabdata = true;
-                $scope.tabmetadata = false;
-            } else if (item === 'tabmetadata') {
-                $scope.tabdata = false;
-                $scope.tabmetadata = true;
-            }
         };
 
         $scope.truncate = function(small, text){
@@ -647,8 +666,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             if(newField.field.path.indexOf('+')==-1){
                 newField.field.path = newField.field.path+'+';
             }
-            // Deep copy
-            //var newField = jQuery.extend(true, {}, field);
             var indexOfField = blockObj.block.children.indexOf(fieldObj);
             blockObj.block.children.splice(indexOfField+1,0,newField);
         };
@@ -702,7 +719,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             var blockPath = newBlock.block.path;
             var commonStr = blockPath.substring(0,blockPath.lastIndexOf('['));
             var max = getMaxNumeroForBlock(superBlockObj,commonStr);
-            var numero = getNumeroForPath(blockPath);
             for(var i=0;i<newBlock.block.children.length;i++){
                 var fieldObj = newBlock.block.children[i];
                 fieldObj.field.value=fieldObj.field.defaultValue;
@@ -856,9 +872,9 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             //@TODO save metadata
             if($scope.metadataValues && $scope.metadataValues.length>0){
                 dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.type.toLowerCase()},
+                    //JSON.stringify($scope.metadataValues[0],null,1),
                     $scope.metadataValues[0],
                     function(response) {
-                        console.debug(response);
                         $location.path('/data'); //redirect to data dashboard page
                     },
                     function(response) {
