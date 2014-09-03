@@ -614,7 +614,7 @@
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
-								"value":null
+								"value":"An author"
 							}
 						},{
 							"field":{
@@ -632,7 +632,7 @@
 								"name":"metadata.field.deliveryPoint",
 								"multiplicity":1,
 								"help":"metadata.field.deliveryPoint_help",
-								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address.deliveryPoint",
+								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address[1].deliveryPoint[1]",
 								"render":"textarea",
 								"obligation":"O",
 								"defaultValue":null,
@@ -643,7 +643,7 @@
 								"name":"metadata.field.city",
 								"multiplicity":1,
 								"help":"metadata.field.city_help",
-								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address.city",
+								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address[1].city",
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
@@ -654,7 +654,7 @@
 								"name":"metadata.field.postalCode",
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
-								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address.postalCode",
+								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address[1].postalCode",
 								"render":"integer",
 								"obligation":"O",
 								"defaultValue":null,
@@ -665,7 +665,7 @@
 								"name":"metadata.field.country",
 								"multiplicity":1,
 								"help":"metadata.field.country_help",
-								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address.country",
+								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address[1].country",
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":"France",
@@ -676,7 +676,7 @@
 								"name":"metadata.field.electronicMailAddress",
 								"multiplicity":1,
 								"help":"metadata.field.electronicMailAddress_help",
-								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address.electronicMailAddress",
+								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address[1].electronicMailAddress[1]",
 								"render":"mail",
 								"obligation":"M",
 								"defaultValue":null,
@@ -687,7 +687,7 @@
 								"name":"metadata.field.voice",
 								"multiplicity":1,
 								"help":"metadata.field.voice_help",
-								"path":"identificationInfo[1].pointOfContact[1].contactInfo.phone.voice",
+								"path":"identificationInfo[1].pointOfContact[1].contactInfo.phone[1].voice[1]",
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
@@ -698,7 +698,7 @@
 								"name":"metadata.field.linkage",
 								"multiplicity":1,
 								"help":"metadata.field.linkage_help",
-								"path":"identificationInfo[1].pointOfContact[1].contactInfo.onlineResource.linkage",
+								"path":"identificationInfo[1].pointOfContact[1].contactInfo.onlineResource[1].linkage",
 								"render":"web",
 								"obligation":"O",
 								"defaultValue":null,
@@ -744,7 +744,7 @@
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
-								"value":null
+								"value":"A collaborator"
 							}
 						},{
 							"field":{
@@ -762,7 +762,7 @@
 								"name":"metadata.field.deliveryPoint",
 								"multiplicity":1,
 								"help":"metadata.field.deliveryPoint_help",
-								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address.deliveryPoint",
+								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address[1].deliveryPoint[1]",
 								"render":"textarea",
 								"obligation":"O",
 								"defaultValue":null,
@@ -773,7 +773,7 @@
 								"name":"metadata.field.city",
 								"multiplicity":1,
 								"help":"metadata.field.city_help",
-								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address.city",
+								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address[1].city",
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
@@ -784,7 +784,7 @@
 								"name":"metadata.field.postalCode",
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
-								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address.postalCode",
+								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address[1].postalCode",
 								"render":"integer",
 								"obligation":"O",
 								"defaultValue":null,
@@ -795,7 +795,7 @@
 								"name":"metadata.field.country",
 								"multiplicity":1,
 								"help":"metadata.field.country_help",
-								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address.country",
+								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address[1].country",
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":"France",
@@ -806,7 +806,7 @@
 								"name":"metadata.field.electronicMailAddress",
 								"multiplicity":1,
 								"help":"metadata.field.electronicMailAddress_help",
-								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address.electronicMailAddress",
+								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address[1].electronicMailAddress[1]",
 								"render":"mail",
 								"obligation":"M",
 								"defaultValue":null,
@@ -817,7 +817,7 @@
 								"name":"metadata.field.voice",
 								"multiplicity":1,
 								"help":"metadata.field.voice_help",
-								"path":"identificationInfo[1].pointOfContact[2].contactInfo.phone.voice",
+								"path":"identificationInfo[1].pointOfContact[2].contactInfo.phone[1].voice[1]",
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
@@ -828,7 +828,137 @@
 								"name":"metadata.field.linkage",
 								"multiplicity":1,
 								"help":"metadata.field.linkage_help",
-								"path":"identificationInfo[1].pointOfContact[2].contactInfo.onlineResource.linkage",
+								"path":"identificationInfo[1].pointOfContact[2].contactInfo.onlineResource[1].linkage",
+								"render":"web",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						}
+					]}
+				},{
+					"block":{
+						"name":"metadata.block.pointOfContact",
+						"multiplicity":62,
+						"help":"metadata.block.pointOfContact_help",
+						"path":"identificationInfo[1].pointOfContact[3]",
+						"render":"CONTACT",
+						"children":[{
+							"field":{
+								"name":"metadata.field.organisationName",
+								"multiplicity":1,
+								"help":"metadata.field.organisationName_help",
+								"path":"identificationInfo[1].pointOfContact[3].organisationName",
+								"render":"text",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":"An organisation"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.role",
+								"multiplicity":1,
+								"help":"metadata.field.role_help",
+								"path":"identificationInfo[1].pointOfContact[3].role",
+								"render":"Role.codelist",
+								"obligation":"M",
+								"defaultValue":"CI_RoleCode.pointOfContact",
+								"value":"CI_RoleCode.distributor"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.individualName",
+								"multiplicity":1,
+								"help":"metadata.field.individualName_help",
+								"path":"identificationInfo[1].pointOfContact[3].individualName",
+								"render":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.positionName",
+								"multiplicity":1,
+								"help":"metadata.field.positionName_help",
+								"path":"identificationInfo[1].pointOfContact[3].positionName",
+								"render":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.deliveryPoint",
+								"multiplicity":1,
+								"help":"metadata.field.deliveryPoint_help",
+								"path":"identificationInfo[1].pointOfContact[3].contactInfo.address[1].deliveryPoint[1]",
+								"render":"textarea",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.city",
+								"multiplicity":1,
+								"help":"metadata.field.city_help",
+								"path":"identificationInfo[1].pointOfContact[3].contactInfo.address[1].city",
+								"render":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.postalCode",
+								"multiplicity":1,
+								"help":"metadata.field.postalCode_help",
+								"path":"identificationInfo[1].pointOfContact[3].contactInfo.address[1].postalCode",
+								"render":"integer",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.country",
+								"multiplicity":1,
+								"help":"metadata.field.country_help",
+								"path":"identificationInfo[1].pointOfContact[3].contactInfo.address[1].country",
+								"render":"text",
+								"obligation":"O",
+								"defaultValue":"France",
+								"value":"France"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.electronicMailAddress",
+								"multiplicity":1,
+								"help":"metadata.field.electronicMailAddress_help",
+								"path":"identificationInfo[1].pointOfContact[3].contactInfo.address[1].electronicMailAddress[1]",
+								"render":"mail",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.voice",
+								"multiplicity":1,
+								"help":"metadata.field.voice_help",
+								"path":"identificationInfo[1].pointOfContact[3].contactInfo.phone[1].voice[1]",
+								"render":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"metadata.field.linkage",
+								"multiplicity":1,
+								"help":"metadata.field.linkage_help",
+								"path":"identificationInfo[1].pointOfContact[3].contactInfo.onlineResource[1].linkage",
 								"render":"web",
 								"obligation":"O",
 								"defaultValue":null,

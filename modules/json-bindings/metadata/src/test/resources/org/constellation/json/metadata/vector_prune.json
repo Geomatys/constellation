@@ -156,6 +156,17 @@
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":"CI_RoleCode.author"
 							}
+						},{
+							"field":{
+								"name":"metadata.field.individualName",
+								"multiplicity":1,
+								"help":"metadata.field.individualName_help",
+								"path":"identificationInfo[1].pointOfContact[1].individualName",
+								"render":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"An author"
+							}
 						}
 					]}
 				},{
@@ -175,6 +186,48 @@
 								"obligation":"M",
 								"defaultValue":"CI_RoleCode.pointOfContact",
 								"value":"CI_RoleCode.collaborator"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.individualName",
+								"multiplicity":1,
+								"help":"metadata.field.individualName_help",
+								"path":"identificationInfo[1].pointOfContact[2].individualName",
+								"render":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"A collaborator"
+							}
+						}
+					]}
+				},{
+					"block":{
+						"name":"metadata.block.pointOfContact",
+						"multiplicity":62,
+						"help":"metadata.block.pointOfContact_help",
+						"path":"identificationInfo[1].pointOfContact[3]",
+						"render":"CONTACT",
+						"children":[{
+							"field":{
+								"name":"metadata.field.organisationName",
+								"multiplicity":1,
+								"help":"metadata.field.organisationName_help",
+								"path":"identificationInfo[1].pointOfContact[3].organisationName",
+								"render":"text",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":"An organisation"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.role",
+								"multiplicity":1,
+								"help":"metadata.field.role_help",
+								"path":"identificationInfo[1].pointOfContact[3].role",
+								"render":"Role.codelist",
+								"obligation":"M",
+								"defaultValue":"CI_RoleCode.pointOfContact",
+								"value":"CI_RoleCode.distributor"
 							}
 						}
 					]}

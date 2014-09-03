@@ -26,16 +26,19 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import org.opengis.metadata.citation.Party;
 import org.opengis.metadata.citation.Role;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.citation.DefaultIndividual;
-import org.apache.sis.metadata.iso.citation.DefaultResponsibility;
+import org.apache.sis.metadata.iso.citation.DefaultOrganisation;
+import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.apache.sis.metadata.iso.identification.AbstractIdentification;
+import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.util.CharSequences;
+import org.apache.sis.util.ComparisonMode;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -73,7 +76,7 @@ public final strictfp class TemplateTest {
      * Creates the metadata object corresponding to the {@link #JSON} string.
      */
     private static DefaultMetadata createMetadata() {
-        final AbstractIdentification identification = new AbstractIdentification();
+        final DefaultDataIdentification identification = new DefaultDataIdentification();
         identification.setCitation(new DefaultCitation("Data \"title\""));
         identification.setExtents(singleton(new DefaultExtent(null,
                 new DefaultGeographicBoundingBox(-11.4865013, -4.615912, 43.165467, 49.9990223), null, null)
@@ -83,8 +86,9 @@ public final strictfp class TemplateTest {
                 new DefaultKeywords("keyword 4", "keyword 5")
         ));
         identification.setPointOfContacts(asList(
-                new DefaultResponsibility(Role.AUTHOR,       null, new DefaultIndividual("An author",      null, null)),
-                new DefaultResponsibility(Role.COLLABORATOR, null, new DefaultIndividual("A collaborator", null, null))
+                responsibility(Role.AUTHOR,       new DefaultIndividual  ("An author",       null, null)),
+                responsibility(Role.COLLABORATOR, new DefaultIndividual  ("A collaborator",  null, null)),
+                responsibility(Role.DISTRIBUTOR,  new DefaultOrganisation("An organisation", null, null, null))
         ));
 
         final DefaultMetadata metadata = new DefaultMetadata();
@@ -95,6 +99,17 @@ public final strictfp class TemplateTest {
         metadata.setMetadataStandardVersion("2003/Cor.1:2006");
         metadata.setIdentificationInfo(singleton(identification));
         return metadata;
+    }
+
+    /**
+     * Helper method for {@link #createMetadata()}. We need the deprecated {@link DefaultResponsibleParty}
+     * instance because we need the legacy {@code organisationName} and {@code individualName} properties.
+     */
+    @SuppressWarnings("deprecation")
+    private static DefaultResponsibleParty responsibility(final Role role, final Party party) {
+        final DefaultResponsibleParty r = new DefaultResponsibleParty(role);
+        r.setParties(singleton(party));
+        return r;
     }
 
     /**
@@ -174,10 +189,23 @@ public final strictfp class TemplateTest {
      */
     @Test
     public void testRead() throws IOException {
+        /*
+         * Get the expected metadata with only the first keyword of the first DescriptiveKeywords section.
+         * This is because the JSON template restricts the first DescriptiveKeywords to only one keyword.
+         * Also clear the geographic bouding box inclusion flag.
+         */
         final DefaultMetadata expected = createMetadata();
+        ((List<?>) expected.getIdentificationInfo().iterator().next()
+                .getDescriptiveKeywords().iterator().next()
+                .getKeywords()).subList(1, 3).clear();
+        ((DefaultGeographicBoundingBox) expected.getIdentificationInfo().iterator().next()
+                .getExtents().iterator().next()
+                .getGeographicElements().iterator().next()).setInclusion(null);
+        /*
+         * Parse and compare.
+         */
         final DefaultMetadata metadata = new DefaultMetadata();
         Template.getInstance("profile_inspire_vector").read(readAllLines("vector_prune.json"), metadata, true);
-        metadata.prune();
-// TODO assertEquals(expected, metadata);
+        assertTrue(expected.equals(metadata, ComparisonMode.DEBUG));
     }
 }

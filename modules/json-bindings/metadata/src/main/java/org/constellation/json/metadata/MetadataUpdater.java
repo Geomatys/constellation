@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
 import java.nio.charset.Charset;
+import org.opengis.metadata.citation.Responsibility;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.constraint.LegalConstraints;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -204,7 +206,9 @@ final class MetadataUpdater {
      *
      * @todo We need a more generic mechanism.
      */
+    @SuppressWarnings("deprecation")
     private static Class<?> specialize(Class<?> type) {
+        if (type == Responsibility.class)   type = ResponsibleParty.class;
         if (type == Identification.class)   type = DataIdentification.class;
         if (type == GeographicExtent.class) type = GeographicBoundingBox.class;
         if (type == Constraints.class)      type = LegalConstraints.class;
