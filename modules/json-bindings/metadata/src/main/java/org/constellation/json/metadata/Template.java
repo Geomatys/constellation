@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.apache.sis.metadata.MetadataStandard;
+import org.constellation.json.metadata.binding.RootObj;
 
 
 /**
@@ -230,7 +231,23 @@ public class Template {
      */
     public void read(final Iterable<? extends CharSequence> json, final Object destination, final boolean skipNulls) throws IOException {
         final FormReader r = new FormReader(new LineReader(root.standard, json, null, null), depth, skipNulls);
-        r.read(null);
+        r.read((String[]) null);
+        r.writeToMetadata(root.standard, destination);
+    }
+
+    /**
+     * Parses the given JSON object and write the metadata values in the given metadata object.
+     * The {@code skipNulls} argument is used in the same way than in the
+     * {@link #read(Iterable, Object, boolean)} method.
+     *
+     * @param  json        Lines of the JSON file to parse.
+     * @param  destination Where to store the metadata values.
+     * @param  skipNulls   {@code true} for skipping {@code null} values instead than storing null in the metadata object.
+     * @throws IOException if an error occurred while parsing.
+     */
+    public void read(final RootObj json, final Object destination, final boolean skipNulls) throws IOException {
+        final FormReader r = new FormReader(null, depth, skipNulls);
+        r.read(json);
         r.writeToMetadata(root.standard, destination);
     }
 }

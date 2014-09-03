@@ -28,6 +28,7 @@ import java.io.IOException;
 import org.opengis.util.FactoryException;
 import org.apache.sis.util.CharSequences;
 import org.apache.sis.metadata.MetadataStandard;
+import org.constellation.json.metadata.binding.*;
 
 
 /**
@@ -81,7 +82,7 @@ final class FormReader {
     }
 
     /**
-     * Parses the given JSON lines and write the metadata values in the given metadata object.
+     * Parses the given JSON lines.
      *
      * <p>This method invokes itself recursively.</p>
      *
@@ -115,6 +116,25 @@ final class FormReader {
                 break;
             }
             isNextLineRequested = parser.isEmpty();
+        }
+    }
+
+    /**
+     * Parses the given JSON object.
+     *
+     * @throws ParseException if an error occurred while parsing.
+     */
+    final void read(final RootObj root) throws ParseException {
+        for (final SuperBlockObj sb : root.getRoot().getChildren()) {
+            for (final BlockObj bc : sb.getSuperblock().getChildren()) {
+                final Block block = bc.getBlock();
+                final String[] parent = parsePath(null, block.getPath());
+                for (final FieldObj fc : block.getChildren()) {
+                    final Field field = fc.getField();
+                    final String[] path = parsePath(parent, field.getPath());
+                    addValue(path, field.getValue());
+                }
+            }
         }
     }
 
