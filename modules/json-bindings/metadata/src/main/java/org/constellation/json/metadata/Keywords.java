@@ -64,6 +64,11 @@ final class Keywords {
     static final String CHILDREN = "\"children\"";
 
     /**
+     * The prefix in values (not keywords) when the value is missing.
+     */
+    static final String NIL_REASON = "nilReason:";
+
+    /**
      * Do not allow (for now) instantiation of this class.
      */
     private Keywords() {

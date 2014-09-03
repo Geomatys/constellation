@@ -63,7 +63,9 @@ final class FormReader {
 
     /**
      * The values for each path found in the file. Values can only be instances of {@link String},
-     * {@link Number} or {@link List}.
+     * {@link Number} or {@code List<Object>}.
+     *
+     * If the list of legal types is modified, consider revisiting {@link MetadataUpdater#value}.
      */
     private final SortedMap<NumerotedPath,Object> values;
 

@@ -23,7 +23,9 @@ import java.util.SortedMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import org.opengis.metadata.citation.Responsibility;
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -33,6 +35,8 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.Identification;
+import org.opengis.metadata.quality.ConformanceResult;
+import org.opengis.metadata.quality.Result;
 import org.opengis.util.CodeList;
 import org.opengis.util.FactoryException;
 import org.apache.sis.util.iso.Types;
@@ -42,6 +46,7 @@ import org.apache.sis.metadata.ValueExistencePolicy;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.geotoolkit.metadata.MetadataFactory;
 import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.xml.NilReason;
 
 
 /**
@@ -68,7 +73,8 @@ final class MetadataUpdater {
     NumerotedPath np;
 
     /**
-     * The current value.
+     * The current value. Can only be one of the instances documented in {@link FormReader#values}:
+     * {@link String}, {@link Number} or {@code List<Object>}.
      */
     private Object value;
 
@@ -156,8 +162,10 @@ final class MetadataUpdater {
 
     /**
      * Puts the given value for the given property in the given metadata object.
+     *
+     * @param value {@link String}, {@link Number} or {@code List<Object>}.
      */
-    private static void put(final AbstractMetadata metadata, final String identifier, Object value) {
+    private static void put(final AbstractMetadata metadata, final String identifier, Object value) throws ParseException {
         final Map<String,Object> values = metadata.asMap();
         if (value instanceof CharSequence && ((CharSequence) value).length() == 0) {
             value = null;
@@ -168,15 +176,14 @@ final class MetadataUpdater {
              * method is likely to fail. However that 'put' method provides a more accurate error message.
              */
             if (type != null) {
-                final boolean isCodeList = CodeList.class.isAssignableFrom(type);
-                if (isCodeList || type == Locale.class || type == Charset.class) {
-                    String text = value.toString();
-                    text = text.substring(text.indexOf('.') + 1).trim();
-                    if (isCodeList) {
-                        value = Types.forCodeName(type.asSubclass(CodeList.class), text, false);
-                    } else {
-                        value = text;
+                if (value instanceof List<?>) {
+                    @SuppressWarnings("unchecked") // See 'this.value' javadoc.
+                    final List<Object> list = (List<Object>) value;
+                    for (int i=list.size(); --i >= 0;) {
+                        list.set(i, convert(type, list.get(i)));
                     }
+                } else {
+                    value = convert(type, value);
                 }
             } else {
                 /*
@@ -190,6 +197,31 @@ final class MetadataUpdater {
             }
         }
         values.put(identifier, value); // See "multi-occurrences" in AbstractMetadata.asMap() javadoc.
+    }
+
+    /**
+     * Converts the given value to an instance of the given class before to store in the metadata object.
+     */
+    private static Object convert(final Class<?> type, Object value) throws ParseException {
+        if (!CharSequence.class.isAssignableFrom(type) && (value instanceof CharSequence)) {
+            String text = value.toString();
+            if (text.startsWith(Keywords.NIL_REASON)) try {
+                value = NilReason.valueOf(text.substring(Keywords.NIL_REASON.length())).createNilObject(type);
+            } catch (URISyntaxException | IllegalArgumentException e) {
+                throw new ParseException("Illegal value: \"" + text + "\".", e);
+            } else {
+                final boolean isCodeList = CodeList.class.isAssignableFrom(type);
+                if (isCodeList || type == Locale.class || type == Charset.class) {
+                    text = text.substring(text.indexOf('.') + 1).trim();
+                    if (isCodeList) {
+                        value = Types.forCodeName(type.asSubclass(CodeList.class), text, false);
+                    } else {
+                        value = text;
+                    }
+                }
+            }
+        }
+        return value;
     }
 
     /**
@@ -212,6 +244,7 @@ final class MetadataUpdater {
         if (type == Identification.class)   type = DataIdentification.class;
         if (type == GeographicExtent.class) type = GeographicBoundingBox.class;
         if (type == Constraints.class)      type = LegalConstraints.class;
+        if (type == Result.class)           type = ConformanceResult.class;
         return type;
     }
 }
