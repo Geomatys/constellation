@@ -49,7 +49,7 @@
 							}
 						}
 					]}
-				}, {
+				},{
 					"block":{
 						"name":"system.block.identification.identifier",
 						"multiplicity":62,
@@ -357,7 +357,7 @@
 						"name":"system.block.components",
 						"multiplicity":62,
 						"help":"system.block.components_help",
-						"path":"member.process.components.componentList.component",
+						"path":"member.process.inputs.componentList.component",
 						"children":[{
 							"field":{
 								"name":"system.field.component.name",

@@ -86,7 +86,12 @@ public class Template {
     private static final Map<String,Template> INSTANCES;
     static {
         try {
-            INSTANCES = load("profile_inspire_vector", "profile_inspire_raster");
+            INSTANCES = load(new byte[] {4, 6, 6, 10, 10},
+                    "profile_import",
+                    "profile_inspire_vector",
+                    "profile_inspire_raster",
+                    "profile_sensorml_component",
+                    "profile_sensorml_system");
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e); // Should never happen.
         }
@@ -95,14 +100,16 @@ public class Template {
     /**
      * Creates a pre-defined template from resource files of the given names.
      *
-     * @param names The resource file names, without the {@code ".json"} suffix.
+     * @param depths The depth of each file enumerated in {@code names}.
+     * @param names  The resource file names, without the {@code ".json"} suffix.
      */
-    private static Map<String,Template> load(final String... names) throws IOException {
+    private static Map<String,Template> load(final byte[] depths, final String... names) throws IOException {
         final List<String>         lines       = new ArrayList<>();
         final Map<String,String>   sharedLines = new HashMap<>();
         final Map<String,String[]> sharedPaths = new HashMap<>();
         final Map<String,Template> templates   = new LinkedHashMap<>(4);
-        for (final String name : names) {
+        for (int i=0; i<names.length; i++) {
+            final String name = names[i];
             try (final BufferedReader in = new BufferedReader(new InputStreamReader(
                     Template.class.getResourceAsStream(name + ".json"), "UTF-8")))
             {
@@ -111,7 +118,7 @@ public class Template {
                     lines.add(line);
                 }
             }
-            if (templates.put(name, new Template(lines, sharedLines, sharedPaths, 6)) != null) {
+            if (templates.put(name, new Template(lines, sharedLines, sharedPaths, depths[i])) != null) {
                 throw new AssertionError(name);
             }
             lines.clear();

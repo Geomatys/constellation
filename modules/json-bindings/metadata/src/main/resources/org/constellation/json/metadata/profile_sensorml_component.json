@@ -49,7 +49,7 @@
 							}
 						}
 					]}
-				}, {
+				},{
 					"block":{
 						"name":"component.block.identification.identifier",
 						"multiplicity":62,

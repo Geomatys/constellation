@@ -57,8 +57,11 @@ public final strictfp class TemplateTest {
     @Test
     public void validateInstances() throws ParseException {
         final Set<String> names = Template.getAvailableNames();
-        assertTrue("profile_inspire_vector", names.contains("profile_inspire_vector"));
-        assertTrue("profile_inspire_raster", names.contains("profile_inspire_raster"));
+        assertTrue("profile_import",             names.contains("profile_import"));
+        assertTrue("profile_inspire_vector",     names.contains("profile_inspire_vector"));
+        assertTrue("profile_inspire_raster",     names.contains("profile_inspire_raster"));
+        assertTrue("profile_sensorml_component", names.contains("profile_sensorml_component"));
+        assertTrue("profile_sensorml_system",    names.contains("profile_sensorml_system"));
         for (final String name : names) {
             final Template template = Template.getInstance(name);
             assertNotNull(name, template);
