@@ -153,7 +153,7 @@ cstlAdminApp
                     templateUrl: 'views/webservice/create.html',
                     controller: 'WebServiceCreateController'
                 })
-                .when('/description/:type/:id/:missing', {
+                .when('/description/:type/:id', {
                     templateUrl: 'views/data/description.html',
                     controller: 'DescriptionController'
                 })

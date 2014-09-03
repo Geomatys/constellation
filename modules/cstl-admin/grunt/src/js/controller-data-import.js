@@ -41,13 +41,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
         };
 
         $scope.close = function() {
-            if ($scope.import.currentStep === 'step4Netcdf') {
-                $modalInstance.close({type: $scope.import.uploadType,
-                                      file: $scope.import.providerId,
-                                      missing: $scope.import.metadata == null});
-            } else {
-                $modalInstance.dismiss('close');
-            }
+            $modalInstance.close({type: $scope.import.uploadType,
+                                  file: $scope.import.providerId});
         };
 
         $scope.showAssociate = function() {
@@ -76,8 +71,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                 }
                 Growl('success','Success','Postgis database successfully added');
                 $modalInstance.close({type: "vector",
-                                      file: $scope.import.identifier,
-                                      missing: $scope.import.metadata == null});
+                                      file: $scope.import.identifier});
             });
         };
 
@@ -150,8 +144,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                             $scope.showAssociate();
                                         } else {
                                             $modalInstance.close({type: $scope.import.uploadType,
-                                                                  file: $scope.import.providerId,
-                                                                  missing: $scope.import.metadata == null});
+                                                                  file: $scope.import.providerId});
                                         }
                                     }, function() {//failure
                                         Growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
@@ -194,8 +187,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                         if (!fileExtension || fileExtension !== "nc") {
                                             Growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
                                             $modalInstance.close({type: $scope.import.uploadType,
-                                                                  file: $scope.import.providerId,
-                                                                  missing: $scope.import.metadata == null});
+                                                                  file: $scope.import.providerId});
                                         } else {
                                             $scope.showAssociate();
                                             // todo: displayNetCDF(fileName);
@@ -233,7 +225,6 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                 }
                                 Growl('success','Success','Observation data '+ fileName +' successfully added');
                                 $scope.showAssociate();
-                                //$modalInstance.close({type: "observation", file: fileName, missing: $scope.metadata == null});
                             }, function(){//failure
                                 Growl('error','Error','Impossible to create dataSet');
                             });
@@ -253,12 +244,6 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                 }
                                 Growl('success','Success','Observation data '+ fileName +' successfully added');
                                 $scope.showAssociate();
-//                                if (!fileExtension || fileExtension !== "nc") {
-//                                    Growl('success','Success','Observation data '+ fileName +' successfully added');
-//                                    $modalInstance.close({type: "observation", file: fileName, missing: $scope.metadata == null});
-//                                } else {
-//                                    displayNetCDF(fileName);
-//                                }
                             }, function(){//failure
                                 Growl('error','Error','Impossible to create dataSet');
                             });
@@ -293,8 +278,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                         providerId: $scope.import.providerId
                     };
                     $modalInstance.close({type: $scope.import.uploadType,
-                                          file: $scope.import.providerId,
-                                          missing: $scope.import.metadata == null});
+                                          file: $scope.import.providerId});
                 },
                 function(){//error
                     Growl('error','Error','Impossible to set projection for data '+ $scope.import.fileName );
@@ -620,7 +604,6 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
             }
 
             $scope.close();
-            //$modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
         };
 
         $scope.uploadImportAndLinkSensor = function() {

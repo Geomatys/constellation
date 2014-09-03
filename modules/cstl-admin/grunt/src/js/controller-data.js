@@ -312,13 +312,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }
             });
             modal.result.then(function(result) {
-                if (result.missing) {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
+                        $location.path('/description/' + result.type + "/" + result.file);
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
-                }
             });
         };
 
@@ -331,13 +329,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }
             });
             modal.result.then(function(result) {
-                if (result.missing) {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
+                        $location.path('/description/' + result.type + "/" + result.file);
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
-                }
             });
         };
 
@@ -350,13 +346,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }
             });
             modal.result.then(function(result) {
-                if (result.missing) {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
+                        $location.path('/description/' + result.type + "/" + result.file);
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
-                }
             });
         };
         
@@ -460,7 +454,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
     'dataListing','$location', '$translate', 'UploadFiles', '$modal','textService',
     function ($scope, $routeParams,dataListing, $location, $translate, UploadFiles, $modal,textService) {
         $scope.provider = $routeParams.id;
-        $scope.missing = $routeParams.missing === 'true';
         $scope.type = $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
         $scope.typeLabelKey = "metadata.edition.dataset."+$scope.type;
 
