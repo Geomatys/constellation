@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.MetadataStandard;
 
 
@@ -229,9 +228,9 @@ public class Template {
      * @param  skipNulls   {@code true} for skipping {@code null} values instead than storing null in the metadata object.
      * @throws IOException if an error occurred while parsing.
      */
-    public void read(final Iterable<? extends CharSequence> json, final AbstractMetadata destination, final boolean skipNulls) throws IOException {
+    public void read(final Iterable<? extends CharSequence> json, final Object destination, final boolean skipNulls) throws IOException {
         final FormReader r = new FormReader(new LineReader(root.standard, json, null, null), depth, skipNulls);
         r.read(null);
-        r.writeToMetadata(destination);
+        r.writeToMetadata(root.standard, destination);
     }
 }

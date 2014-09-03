@@ -43,7 +43,6 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.TypeValuePolicy;
 import org.apache.sis.metadata.ValueExistencePolicy;
-import org.apache.sis.metadata.AbstractMetadata;
 import org.geotoolkit.metadata.MetadataFactory;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.xml.NilReason;
@@ -61,6 +60,11 @@ final class MetadataUpdater {
      * The metadata factory to use for creating new instances.
      */
     private static final MetadataFactory FACTORY = new MetadataFactory();
+
+    /**
+     * The metadata standard.
+     */
+    private final MetadataStandard standard;
 
     /**
      * The iterator over the (path, value) pairs.
@@ -82,7 +86,8 @@ final class MetadataUpdater {
      * Creates a new updater which will use the entries from the given map.
      * The given map shall not be empty.
      */
-    MetadataUpdater(final SortedMap<NumerotedPath,Object> values) {
+    MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values) {
+        this.standard = standard;
         it = values.entrySet().iterator();
         next();
     }
@@ -107,7 +112,7 @@ final class MetadataUpdater {
     /**
      * Updates the given metadata with the content of the map given at construction time.
      */
-    final void update(final NumerotedPath parent, final AbstractMetadata metadata)
+    final void update(final NumerotedPath parent, final Object metadata)
             throws ClassCastException, FactoryException, ParseException
     {
         String previousIdentifier = null;
@@ -124,14 +129,13 @@ final class MetadataUpdater {
              * stores the value now and check for the next entry.
              */
             if (np.path.length - childBase == 1) {
-                put(metadata, identifier, value);
+                put(metadata, identifier);
                 if (!next()) break;
             } else {
                 /*
                  * The entry is the first element of an other metadata object.
                  */
                 if (existingChildren == null) {
-                    final MetadataStandard standard = metadata.getStandard();
                     final Object child = standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER,
                             ValueExistencePolicy.NON_EMPTY).get(identifier);
                     if (child != null) {
@@ -142,31 +146,32 @@ final class MetadataUpdater {
                              * Equivalent to: existingChildren = Collections.singleton(child).iterator();
                              * but we inline the result for avoiding the creation of a temporary collection.
                              */
-                            update(np.head(childBase + 1), (AbstractMetadata) child); // TODO: avoid cast.
+                            update(np.head(childBase + 1), child);
                             continue;
                         }
                     }
                 }
                 if (existingChildren != null && existingChildren.hasNext()) {
-                    update(np.head(childBase + 1), (AbstractMetadata) existingChildren.next()); // TODO: avoid cast.
+                    update(np.head(childBase + 1), existingChildren.next());
                 } else {
                     existingChildren = Collections.emptyIterator();
                     final Class<?> type = specialize(getType(metadata, identifier));
                     final Object child = FACTORY.create(type, Collections.<String,Object>emptyMap());
-                    update(np.head(childBase + 1), (AbstractMetadata) child); // TODO: avoid cast.
-                    metadata.asMap().put(identifier, child);
+                    update(np.head(childBase + 1), child);
+                    asMap(metadata).put(identifier, child);
                 }
             }
         } while (np != null && np.isChildOf(parent));
     }
 
     /**
-     * Puts the given value for the given property in the given metadata object.
+     * Puts the current value for the given property in the given metadata object.
      *
      * @param value {@link String}, {@link Number} or {@code List<Object>}.
      */
-    private static void put(final AbstractMetadata metadata, final String identifier, Object value) throws ParseException {
-        final Map<String,Object> values = metadata.asMap();
+    private void put(final Object metadata, final String identifier) throws ParseException {
+        Object value = this.value; // Protect the field value from change.
+        final Map<String,Object> values = asMap(metadata);
         if (value instanceof CharSequence && ((CharSequence) value).length() == 0) {
             value = null;
         } else if (value != null) {
@@ -196,7 +201,7 @@ final class MetadataUpdater {
                 }
             }
         }
-        values.put(identifier, value); // See "multi-occurrences" in AbstractMetadata.asMap() javadoc.
+        values.put(identifier, value);
     }
 
     /**
@@ -225,15 +230,22 @@ final class MetadataUpdater {
     }
 
     /**
+     * Returns a view over the given metadata as a map of values.
+     */
+    private Map<String,Object> asMap(final Object metadata) {
+        return standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY);
+    }
+
+    /**
      * Returns the type of values for the given property in the given metadata.
      */
-    private static Class<?> getType(final AbstractMetadata metadata, final String identifier) {
-        return metadata.getStandard().asTypeMap(metadata.getClass(),
+    private Class<?> getType(final Object metadata, final String identifier) {
+        return standard.asTypeMap(metadata.getClass(),
                 KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.ELEMENT_TYPE).get(identifier);
     }
 
     /**
-     * HACK - for some abstract types returned by {@link #getType(AbstractMetadata, String)},
+     * HACK - for some abstract types returned by {@link #getType(Object, String)},
      * returns a hard-coded subtype to use instead.
      *
      * @todo We need a more generic mechanism.

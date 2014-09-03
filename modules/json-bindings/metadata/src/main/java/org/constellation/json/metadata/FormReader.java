@@ -27,7 +27,7 @@ import java.util.ConcurrentModificationException;
 import java.io.IOException;
 import org.opengis.util.FactoryException;
 import org.apache.sis.util.CharSequences;
-import org.apache.sis.metadata.AbstractMetadata;
+import org.apache.sis.metadata.MetadataStandard;
 
 
 /**
@@ -56,7 +56,7 @@ final class FormReader {
 
     /**
      * {@code true} for skipping {@code null} values instead than storing null in the metadata object.
-     * See the {@code skipNulls} argument of {@link Template#read(Iterable, AbstractMetadata, boolean)}
+     * See the {@code skipNulls} argument of {@link Template#read(Iterable, Object, boolean)}
      * for more information.
      */
     private final boolean skipNulls;
@@ -186,9 +186,9 @@ final class FormReader {
     /**
      * Writes the content of the {@link #values} map in the given metadata object.
      */
-    final void writeToMetadata(final AbstractMetadata destination) throws ParseException {
+    final void writeToMetadata(final MetadataStandard standard, final Object destination) throws ParseException {
         if (!values.isEmpty()) {
-            final MetadataUpdater updater = new MetadataUpdater(values);
+            final MetadataUpdater updater = new MetadataUpdater(standard, values);
             try {
                 updater.update(null, destination);
             } catch (IllegalArgumentException | ClassCastException | FactoryException e) {
