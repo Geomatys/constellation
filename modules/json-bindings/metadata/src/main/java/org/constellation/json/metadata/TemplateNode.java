@@ -60,6 +60,11 @@ final class TemplateNode {
     final String[] path;
 
     /**
+     * If there is a path or ignore, that path. Otherwise {@code null}.
+     */
+    final NumerotedPath ignore;
+
+    /**
      * The value of the {@code "defaultValue"} element found in the node, or {@code null}.
      */
     final Object defaultValue;
@@ -116,6 +121,7 @@ final class TemplateNode {
         final List<Object>       content  = new ArrayList<>();
         final List<TemplateNode> children = new ArrayList<>();
         String  path         = null;
+        String  ignore       = null;
         Object  defaultValue = null;
         int     valueIndex   = -1;
         int     pathIndex    = -1;
@@ -135,6 +141,8 @@ final class TemplateNode {
                     pathIndex = content.size() - 1;
                     content.set(pathIndex, parser.fullLineWithoutValue());
                 }
+            } else if (parser.regionMatches(Keywords.IGNORE)) {
+                ignore = (String) parser.getValue();
             } else if (parser.regionMatches(Keywords.DEFAULT_VALUE)) {
                 defaultValue = parser.getValue();
             } else if (parser.regionMatches(Keywords.VALUE)) {
@@ -196,6 +204,7 @@ final class TemplateNode {
         this.content            = content.toArray();
         this.children           = children.isEmpty() ? null : children.toArray(new TemplateNode[children.size()]);
         this.path               = (path != null) ? parser.sharedPath(path) : null;
+        this.ignore             = (ignore != null) ? new NumerotedPath(this.path, ignore) : null;
         this.defaultValue       = defaultValue;
         this.valueIndex         = valueIndex;
         this.pathIndex          = pathIndex;

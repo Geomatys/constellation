@@ -69,6 +69,14 @@ final class ValueNode extends ArrayList<ValueNode> {
     }
 
     /**
+     * Returns {@code true} if the path is equals to the given numeroted path.
+     */
+    final boolean pathEquals(final NumerotedPath np) {
+        return Arrays.equals(template.path, np.path) &&
+               Arrays.equals(indices, np.indices);
+    }
+
+    /**
      * Formats the path. Callers must ensure that {@link TemplateNode#path} is non-null
      * before to invoke this method.
      */

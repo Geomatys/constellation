@@ -176,7 +176,7 @@ final class FormReader {
                 }
                 list.add(value);
             } else if (values.put(key, value) != null) {
-                throw new ParseException(formatPath("Multi-occurrence not allowed for \"", path, "\"."));
+                throw new ParseException(formatPath("Path \"", path, "\" is repeated twice."));
             }
         }
     }

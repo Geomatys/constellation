@@ -20,6 +20,7 @@ package org.constellation.json.metadata;
 
 import java.util.Arrays;
 import java.io.IOException;
+import org.apache.sis.util.CharSequences;
 
 
 /**
@@ -42,6 +43,26 @@ final class NumerotedPath implements Comparable<NumerotedPath> {
      * The index of each elements in the path.
      */
     final int[] indices;
+
+    /**
+     * Creates a new key for the given node and indices specified in a space-separated list.
+     *
+     * @param path    The template containing the path.
+     * @param indices The index of each elements in the path.
+     */
+    NumerotedPath(final String[] path, final String indices) throws ParseException {
+        this.path = path;
+        Throwable cause = null;
+        try {
+            this.indices = CharSequences.parseInts(indices, ' ', 10);
+            if (this.indices.length == path.length) {
+                return;
+            }
+        } catch (NumberFormatException e) {
+            cause = e;
+        }
+        throw new ParseException("Illegal indices: \"" + indices + "\".", cause);
+    }
 
     /**
      * Creates a new key for the given node and indices.

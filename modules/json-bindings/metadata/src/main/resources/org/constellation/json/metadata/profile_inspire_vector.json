@@ -184,6 +184,7 @@
 						"multiplicity":62,
 						"help":"metadata.block.descriptiveKeyword_help",
 						"path":"identificationInfo.descriptiveKeywords",
+						"ignore":"1 1",
 						"children":[{
 							"field":{
 								"name":"metadata.field.keyword",

@@ -39,6 +39,11 @@ final class Keywords {
     static final String PATH = "\"path\"";
 
     /**
+     * The keyword for the path attribute in JSON file, including quotes.
+     */
+    static final String IGNORE = "\"ignore\"";
+
+    /**
      * The keyword for the "maximum occurrences" attribute in JSON file, including quotes.
      */
     static final String MAX_OCCURRENCES = "\"multiplicity\"";

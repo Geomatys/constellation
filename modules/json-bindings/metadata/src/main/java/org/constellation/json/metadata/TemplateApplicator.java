@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.KeyNamePolicy;
@@ -120,6 +121,7 @@ final class TemplateApplicator {
                 throw new ParseException(buffer.append('.').toString(), e);
             }
             filterNewValues(template);
+            filterIgnoredValues(template.ignore);
         }
         /*
          * If there is no value and the user asked us to prune empty nodes,
@@ -259,6 +261,21 @@ final class TemplateApplicator {
         final int maxOccurs = template.maxOccurs;
         if (size > maxOccurs) {
             nodes.subList(maxOccurs, size).clear();
+        }
+    }
+
+    /**
+     * Removes all nodes to ignore.
+     */
+    private void filterIgnoredValues(final NumerotedPath ignore) {
+        if (ignore != null) {
+            final Iterator<ValueNode> it = nodes.iterator();
+            while (it.hasNext()) {
+                final ValueNode node = it.next();
+                if (node.pathEquals(ignore)) {
+                    it.remove();
+                }
+            }
         }
     }
 
