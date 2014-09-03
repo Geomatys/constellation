@@ -2,3 +2,4 @@
 org.constellation.process.service.AddLayerToMapServiceDescriptor
 org.constellation.process.service.RemoveLayerFromMapServiceDescriptor
 org.constellation.process.service.AddDataToMapContextDescriptor
+org.constellation.process.service.RemoveDataFromMapContextDescriptor

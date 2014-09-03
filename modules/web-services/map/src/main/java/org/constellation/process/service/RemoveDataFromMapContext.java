@@ -20,16 +20,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.constellation.process.service.AddDataToMapContextDescriptor.*;
+import static org.constellation.process.service.RemoveDataFromMapContextDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 
 /**
  *
- * @author guilhem
+ * @author Quentin Boileau (Geomatys)
  */
-public class AddDataToMapContext extends AbstractCstlProcess {
+public class RemoveDataFromMapContext extends AbstractCstlProcess {
     
-    public AddDataToMapContext(final ParameterValueGroup input) {
+    public RemoveDataFromMapContext(final ParameterValueGroup input) {
         super(INSTANCE,input);
     }
 
@@ -39,54 +39,54 @@ public class AddDataToMapContext extends AbstractCstlProcess {
      * @param groupName
      * @param layerName
      * @param layerProvider
-     * @param layerStyle
      */
-    public AddDataToMapContext (final String providerID, final String groupName, final String layerName,
-                                final String layerProvider, final StyleReference layerStyle) {
-        this(toParameters(providerID, groupName, layerName, layerProvider, layerStyle));
+    public RemoveDataFromMapContext (final String providerID, final String groupName, final String layerName,
+                                final String layerProvider) {
+        this(toParameters(providerID, groupName, layerName, layerProvider));
     }
 
     private static ParameterValueGroup toParameters(final String providerID, final String groupName, final String layerName,
-                                                    final String layerProvider, final StyleReference layerStyle){
+                                                    final String layerProvider){
         final ParameterValueGroup params = INSTANCE.getInputDescriptor().createValue();
         getOrCreate(CONTEXT_PROVIDER_ID, params).setValue(providerID);
         getOrCreate(CONTEXT_NAME, params).setValue(groupName);
         getOrCreate(DATA_NAME, params).setValue(layerName);
         getOrCreate(DATA_PROVIDER_ID, params).setValue(layerProvider);
-        getOrCreate(LAYER_STYLE, params).setValue(layerStyle);
         return params;
     }
 
     @Override
     protected void execute() throws ProcessException {
-        fireProcessStarted("Start Add to map Context");
+        fireProcessStarted("Start remove to map Context");
         final String providerID         = getOrCreate(CONTEXT_PROVIDER_ID, inputParameters).stringValue();
         final String groupName          = getOrCreate(CONTEXT_NAME, inputParameters).stringValue();
         final String layerName          = getOrCreate(DATA_NAME, inputParameters).stringValue();
         final String layerProvider      = getOrCreate(DATA_PROVIDER_ID, inputParameters).stringValue();
-        final StyleReference layerStyle = (StyleReference) getOrCreate(LAYER_STYLE, inputParameters).getValue();
 
         final DataProvider p = DataProviders.getInstance().getProvider(providerID);
         if (p != null && p instanceof CoveragesGroupProvider) {
             final CoveragesGroupProvider coveragesGroupProvider = (CoveragesGroupProvider) p;
 
             final DataReference dataRef = new DataReference("${providerLayerType|" + layerProvider + "|" + layerName + "}");
-            final MapLayer layer = new MapLayer(dataRef, layerStyle);
             try {
                 final DefaultName key = new DefaultName(groupName);
-
                 MapContext rawMapContext = coveragesGroupProvider.getRawMapContext(key);
-                if (rawMapContext != null) {
-                    rawMapContext.getMapItem().getMapItems().add(layer);
-                } else {
-                    final List<MapItem> items = new ArrayList<>();
-                    items.add(layer);
-                    final MapItem item = new MapItem(items);
-                    rawMapContext = new MapContext(item, groupName);
+
+                if (rawMapContext == null) {
+                    throw new ProcessException("MapContext configuration not found for key : "+groupName,this, null);
                 }
+                List<MapItem> items = rawMapContext.getMapItem().getMapItems();
+                List<MapItem> toRemove = new ArrayList<>();
+                for (MapItem item : items) {
+                    if (item instanceof MapLayer && ((MapLayer)item).getDataReference().equals(dataRef)) {
+                        toRemove.add(item);
+                    }
+                }
+                rawMapContext.getMapItem().getMapItems().removeAll(toRemove);
+
                 coveragesGroupProvider.addRawMapContext(key, rawMapContext);
                 DataProviders.getInstance().getProvider(providerID).reload();
-                
+
             } catch (JAXBException | IOException ex) {
                 throw new ProcessException("JAXB error during add data to map context", this, ex);
             }

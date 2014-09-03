@@ -19,13 +19,10 @@
 
 package org.constellation.process.service;
 
-import java.io.File;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.provider.coveragesgroup.xml.DataReference;
-import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -36,11 +33,11 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
- * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
-public class AddDataToMapContextDescriptor extends AbstractCstlProcessDescriptor {
+public class RemoveDataFromMapContextDescriptor extends AbstractCstlProcessDescriptor {
     
-    public static final String NAME = "add-data-from-map-context";
+    public static final String NAME = "remove-data-from-map-context";
 
     public static final ParameterDescriptor<String> CONTEXT_PROVIDER_ID =
             new DefaultParameterDescriptor("context-provider", "The provider identifier of the coverages group", 
@@ -57,17 +54,13 @@ public class AddDataToMapContextDescriptor extends AbstractCstlProcessDescriptor
     public static final ParameterDescriptor<String> DATA_PROVIDER_ID =
             new DefaultParameterDescriptor("data-provider-id", "The identifier of the data provider", 
             String.class, null, true);
-    
-    public static final ParameterDescriptor<StyleReference> LAYER_STYLE =
-            new DefaultParameterDescriptor("layer-style", "The StyleReference for the layer style", 
-            StyleReference.class, null, true);
-    
+
     /** 
      * Input Parameters 
      */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{CONTEXT_PROVIDER_ID, CONTEXT_NAME, DATA_NAME, DATA_PROVIDER_ID, LAYER_STYLE});
+            new GeneralParameterDescriptor[]{CONTEXT_PROVIDER_ID, CONTEXT_NAME, DATA_NAME, DATA_PROVIDER_ID});
 
     
      /** 
@@ -76,17 +69,17 @@ public class AddDataToMapContextDescriptor extends AbstractCstlProcessDescriptor
     public static final ParameterDescriptorGroup OUTPUT_DESC =
             new DefaultParameterDescriptorGroup("OutputParameters");
     
-    public static final ProcessDescriptor INSTANCE = new AddDataToMapContextDescriptor();
+    public static final ProcessDescriptor INSTANCE = new RemoveDataFromMapContextDescriptor();
     
-    public AddDataToMapContextDescriptor() {
+    public RemoveDataFromMapContextDescriptor() {
          super(NAME, ConstellationProcessFactory.IDENTIFICATION,
-                new SimpleInternationalString("Add a layer to a coverages-group."),
+                new SimpleInternationalString("Remove a layer to a coverages-group."),
                 INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
     protected AbstractCstlProcess buildProcess(ParameterValueGroup input) {
-        return new AddDataToMapContext(input);
+        return new RemoveDataFromMapContext(input);
     }
     
 }
