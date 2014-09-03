@@ -20,6 +20,7 @@ package org.constellation.provider.coveragesgroup;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -134,6 +135,41 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
         return MapContextIO.readMapContextFile(mapContextFile, login, password, styleBusiness);
     }
 
+    /**
+     * Return the raw configuration MapContext.
+     * @param key
+     * @return
+     * @throws JAXBException
+     */
+    public org.constellation.provider.coveragesgroup.xml.MapContext getRawMapContext(final Name key) throws JAXBException  {
+        if (index == null) {
+            visit();
+        }
+        final File mapContextFile = index.get(key);
+        return MapContextIO.readRawMapContextFile(mapContextFile);
+    }
+
+    /**
+     * Add or update MapContext for a key
+     * @param key
+     * @param mapContext
+     * @throws JAXBException
+     * @throws IOException
+     */
+    public void addRawMapContext(final Name key, org.constellation.provider.coveragesgroup.xml.MapContext mapContext)
+            throws JAXBException, IOException {
+        if (index == null) {
+            visit();
+        }
+
+        File mapContextFile = index.get(key);
+        if (mapContextFile == null) {
+            mapContextFile = new File(path, key.getLocalPart() + ".xml");
+        }
+        MapContextIO.writeMapContext(mapContextFile, mapContext);
+        index.put(key, mapContextFile);
+    }
+
     private static ParameterValueGroup getSourceConfiguration(final ParameterValueGroup params){
         final List<ParameterValueGroup> groups = params.groups(SOURCE_CONFIG_DESCRIPTOR.getName().getCode());
         if(!groups.isEmpty()){
@@ -189,7 +225,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
             path = new File(urlPath.getPath());
         }
 
-        List<File> candidates = new ArrayList<File>() ;
+        List<File> candidates = new ArrayList<>() ;
 
         if (path.isDirectory()) {
             candidates.addAll(FileUtilities.scanDirectory(path, new FileFilter() {
@@ -205,7 +241,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
             candidates.add(path);
         }
 
-        index = new HashMap<Name, File>();
+        index = new HashMap<>();
         for (final File candidate : candidates) {
             try {
                 final MapContext mapContext = MapContextIO.readMapContextFile(candidate, "", "", styleBusiness);

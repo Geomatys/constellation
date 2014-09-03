@@ -158,7 +158,7 @@ public final class MapContextIO {
      */
     public static MapContext readMapContextFile(final File mapContextFile, final String login, final String password, final StyleBusiness sb) throws JAXBException {
 
-        final org.constellation.provider.coveragesgroup.xml.MapContext xmlMapCtx = readRawMapContextFile(mapContextFile, login, password);
+        final org.constellation.provider.coveragesgroup.xml.MapContext xmlMapCtx = readRawMapContextFile(mapContextFile);
         if (xmlMapCtx != null) {
             return ConvertersJaxbToGeotk.convertsMapContext(xmlMapCtx,login, password, sb);
         }
@@ -169,12 +169,10 @@ public final class MapContextIO {
      * Read a MapContext file and convert it into geotk MapContext object.
      *
      * @param mapContextFile
-     * @param login
-     * @param password
      * @return geotk MapContext or null
      * @throws JAXBException
      */
-    public static org.constellation.provider.coveragesgroup.xml.MapContext readRawMapContextFile(final File mapContextFile, final String login, final String password) throws JAXBException {
+    public static org.constellation.provider.coveragesgroup.xml.MapContext readRawMapContextFile(final File mapContextFile) throws JAXBException {
         if (mapContextFile != null) {
             final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(org.constellation.provider.coveragesgroup.xml.MapContext.class, ObjectFactory.class), null);
             final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
