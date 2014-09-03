@@ -388,7 +388,7 @@ public class ServiceBusiness {
                 details = getInstanceDetails(service.getId(), "eng");
             }
             service.setVersions(StringUtils.join(details.getVersions(), "µ"));
-            serviceRepository.update(service)
+            serviceRepository.update(service);
         }
     }
 
