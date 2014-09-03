@@ -257,7 +257,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     topic.id = stompClient.subscribe(topic.path, cb);
                     console.log('Subscribed to ' + topic.path + ' (' + topic.id  + ').');
                 } else {
-                    stompClient.connect('', '', function() {
+                    stompClient.connect({}, function() {
                         console.log('Connected to ' + url);
                         topic.id = stompClient.subscribe(topic.path, cb);
                         console.log('Subscribed to ' + topic.path + ' (' + topic.id  + ').');
