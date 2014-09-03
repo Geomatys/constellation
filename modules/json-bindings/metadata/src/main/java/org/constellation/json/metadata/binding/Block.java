@@ -37,6 +37,7 @@ public class Block implements Serializable, ChildEntity {
     private String help;
     private String path;
     private String render;
+    private String ignore;
 
     public Block(){
 
@@ -88,5 +89,13 @@ public class Block implements Serializable, ChildEntity {
 
     public void setRender(String render) {
         this.render = render;
+    }
+
+    public String getIgnore() {
+        return ignore;
+    }
+
+    public void setIgnore(String ignore) {
+        this.ignore = ignore;
     }
 }
