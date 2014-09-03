@@ -48,17 +48,9 @@ public abstract class AbstractProcessTest implements ApplicationContextAware {
     private static final String factory = ConstellationProcessFactory.NAME;
     private final String process;
     
-    private ApplicationContext applicationContext;
-    
-    @PostConstruct
-    public void setUpClass() {
-        SpringHelper.setApplicationContext(applicationContext);
-    }
-
-    
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+        SpringHelper.setApplicationContext(applicationContext);
     }
     
     protected AbstractProcessTest(final String process){
