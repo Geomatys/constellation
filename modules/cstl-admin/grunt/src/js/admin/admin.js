@@ -18,7 +18,9 @@
  * limitations under the License.
  */
 
-angular.module('cstl-admin', ['cstl-admin-system', 'cstl-admin-processing', 'cstl-admin-security'])
+angular.module('cstl-admin', ['cstl-admin-system',
+                              'cstl-admin-processing',
+                              'cstl-admin-security'])
 
     .controller('AdminController', function($scope, $location) {
 

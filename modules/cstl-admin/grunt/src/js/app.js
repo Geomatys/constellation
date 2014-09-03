@@ -48,7 +48,8 @@ var cstlAdminApp = angular.module('CstlAdminApp', [
     'cstl-directives',
     'cstl-restapi',
     'cstl-services',
-    'cstl-admin']);
+    'cstl-admin',
+    'cstl-webservice']);
 
 
 

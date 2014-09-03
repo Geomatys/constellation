@@ -1,395 +1,26 @@
 /*
  * Constellation - An open source and standard compliant SDI
- *      http://www.constellation-sdi.org
- *   (C) 2014, Geomatys
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 3 of the License, or (at your option) any later version.
+ *     http://www.constellation-sdi.org
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details..
+ *     Copyright 2014 Geomatys
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-'use strict';
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', 'Growl','$translate', '$window',
-    function ($scope, webService, provider, csw, sos, $modal, textService, Growl, $translate, $window) {
+angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-        $scope.typeFilter = {type: '!WEBDAV'};
-        $scope.hideScroll = true;
-        $scope.hideScrollServices = true;
-
-        var modalLoader = $modal.open({
-          templateUrl: 'views/modalLoader.html',
-          controller: 'ModalInstanceCtrl'
-        });
-
-        $scope.getCurrentLang = function() {
-            return $translate.use();
-        };
-
-        angular.element($window).bind("scroll", function() {
-            if (this.pageYOffset < 220) {
-                $scope.hideScrollServices = true;
-            } else {
-                $scope.hideScrollServices = false;
-            }
-            $scope.$apply();
-        });
-        webService.listAll({lang: $scope.getCurrentLang()}, function(response){
-            $scope.services = response;
-            modalLoader.close();
-        }, function() {
-            modalLoader.close();
-        });
-
-
-        // Show Capa methods
-        $scope.showCapa = function(service) {
-            if (service.versions.length > 1) {
-                var modal = $modal.open({
-                    templateUrl: 'views/webservice/modalChooseVersion.html',
-                    controller: 'WebServiceVersionsController',
-                    resolve: {
-                        service: function() { return service; }
-                    }
-                });
-                modal.result.then(function(result) {
-                    showModalCapa(service, result);
-                });
-            } else {
-                showModalCapa(service, service.versions[0]);
-            }
-        };
-
-        function showModalCapa(service, version) {
-            $modal.open({
-                templateUrl: 'views/webservice/modalCapa.html',
-                controller: 'WebServiceUtilsController',
-                resolve: {
-                    'details': function(textService){
-                        return textService.capa(service.type.toLowerCase(), service.identifier, version);
-                    }
-                }
-            });
-        };
-
-        // Show Logs methods
-        $scope.showLogs = function(service) {
-
-            $modal.open({
-                templateUrl: 'views/webservice/modalLogs.html',
-                controller: 'WebServiceUtilsController',
-                resolve: {
-                    'details': function(textService){
-                        return textService.logs(service.type.toLowerCase(), service.identifier);
-                    }
-                }
-            });
-        };
-
-        $scope.reload = function(service){
-            webService.restart({type: service.type, id: service.identifier}, {value: true},
-                function() { Growl('success','Success','Service '+ service.name +' successfully reloaded'); },
-                function() { Growl('error','Error','Service '+ service.name +' reload failed'); }
-            );
-        };
-        $scope.startOrStop = function(service){
-            if(service.status==='STARTED'){
-                webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
-                    if (response.status==="Success") {
-                        $scope.services = webService.listAll({lang: $scope.getCurrentLang()});
-                        Growl('success','Success','Service '+ service.name +' successfully stopped');
-                    }
-                }, function() { Growl('error','Error','Service '+ service.name +' stop failed'); });
-            }else{
-                webService.start({type: service.type, id: service.identifier}, {}, function(response) {
-                    if (response.status==="Success") {
-                        $scope.services = webService.listAll({lang: $scope.getCurrentLang()});
-                        Growl('success','Success','Service '+ service.name +' successfully started');
-                    }
-                }, function() { Growl('error','Error','Service '+ service.name +' start failed'); });
-            }
-        };
-
-        $scope.deleteService = function(service) {
-            if (confirm("Are you sure?")) {
-                if (service.type.toLowerCase() === 'sos') {
-                    // A provider has been created for this SOS service, so remove it
-                    provider.delete({id: service.identifier +"-om2"});
-                }
-                webService.delete({type: service.type, id: service.identifier}, {} ,
-                    function() { Growl('success','Success','Service '+ service.name +' successfully deleted');
-                        $scope.services = webService.listAll({lang: $scope.getCurrentLang()}); },
-                    function() { Growl('error','Error','Service '+ service.name +' deletion failed'); }
-                );
-            }
-        };
-
-        $scope.refreshIndex = function(service) {
-            csw.refresh({id: service.identifier}, {},
-                function() { Growl('success','Success','Search index for the service '+ service.name +' successfully refreshed'); },
-                function() { Growl('error','Error','Search index for the service '+ service.name +' failed to be updated'); }
-            );
-        };
-
-        $scope.getLayersCount = function(service) {
-            if (service.layersNumber !== null) {
-                return service.layersNumber;
-            }
-            return 0;
-        };
-    }]);
-
-cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$modalInstance', 'details',
-    function ($scope, webService, $modalInstance, details) {
-        $scope.details = details.data;
-        $scope.close = function() {
-            $modalInstance.dismiss('close');
-        };
-
-    }]);
-
-cstlAdminApp.controller('WebServiceVersionsController', ['$scope', 'webService', '$modalInstance', 'service',
-    function ($scope, webService, $modalInstance, service) {
-        $scope.service = service;
-        $scope.versions = service.versions;
-        $scope.close = function() {
-            $modalInstance.dismiss('close');
-        };
-
-        $scope.chooseVersion = function(version) {
-            $modalInstance.close(version);
-        };
-    }]);
-
-cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', 'Growl', '$translate',
-    function ($scope, $routeParams, webService, $filter, $location, Growl, $translate) {
-        $scope.type = $routeParams.type;
-        $scope.tonext = true;
-        $scope.serviceInfo = true;
-        $scope.serviceContact = false;
-        $scope.serviceRights = false;
-        $scope.metadata = {
-            keywords: []
-        };
-        $scope.newService = {
-            tagText: ''
-        };
-
-        $scope.getCurrentLang = function() {
-            return $translate.use();
-        };
-
-
-        $scope.getVersionsForType = function() {
-            if ($scope.type === 'wms') {
-                return [{ 'id': '1.1.1'}, { 'id': '1.3.0', 'checked': true }];
-            }
-            if ($scope.type === 'wfs') {
-                return [{ 'id': '1.1.0', 'checked': true}, { 'id': '2.0.0' }];
-            }
-            if ($scope.type === 'wcs') {
-                return [{ 'id': '1.0.0', 'checked': true}];
-            }
-            if ($scope.type === 'wmts') {
-                return [{ 'id': '1.0.0', 'checked': true}];
-            }
-            if ($scope.type === 'csw') {
-                return [{ 'id': '2.0.0'}, { 'id': '2.0.2', 'checked': true}];
-            }
-            if ($scope.type === 'sos') {
-                return [{ 'id': '1.0.0'}, { 'id': '2.0.0', 'checked': true}];
-            }
-            if ($scope.type === 'wps') {
-                return [{ 'id': '1.0.0', 'checked': true}];
-            }
-            return [];
-        };
-        $scope.versions = $scope.getVersionsForType();
-
-
-        $scope.goToServiceContact = function() {
-            if($scope.metadata.name!= null || $scope.metadata.identifier!=null){
-                $scope.serviceContact = true;
-                $scope.serviceInfo = false;
-                $scope.serviceRights = false;
-            } else {
-                $scope.invalideName=true;
-            }
-        };
-        $scope.goToServiceRights = function() {
-            if($scope.metadata.name!= null || $scope.metadata.identifier!=null){
-                $scope.serviceContact = false;
-                $scope.serviceRights = true;
-                $scope.serviceInfo = false;
-            } else {
-                $scope.invalideName=true;
-            }
-        };
-
-        $scope.goToServiceInfo = function() {
-            $scope.serviceContact = false;
-            $scope.serviceRights = false;
-            $scope.serviceInfo = true;
-        };
-
-        $scope.addTag = function() {
-            if (!$scope.newService.tagText || $scope.newService.tagText == '' || $scope.newService.tagText.length == 0) {
-                return;
-            }
-
-            $scope.metadata.keywords.push($scope.newService.tagText);
-            $scope.newService.tagText = '';
-        };
-
-        $scope.deleteTag = function(key) {
-            if ($scope.metadata.keywords.length > 0 &&
-                $scope.newService.tagText.length == 0 &&
-                key === undefined) {
-                $scope.metadata.keywords.pop();
-            } else if (key != undefined) {
-                $scope.metadata.keywords.splice(key, 1);
-            }
-        };
-
-        // define which version to set
-        $scope.selectedVersion = function (){
-            var selVersions = $filter('filter')($scope.versions, {checked: true});
-            var strVersions = [];
-            for(var i=0; i < selVersions.length; i++) {
-                strVersions.push(selVersions[i].id);
-            }
-            $scope.metadata.versions = strVersions;
-        };
-
-        // define which version is Selected
-        $scope.versionIsSelected = function(currentVersion){
-            return $.inArray(currentVersion, $scope.metadata.versions) > -1
-        };
-
-        $scope.saveServiceMetadata = function() {
-            // Ensures both name and identifier are filled
-            if (($scope.metadata.identifier == null || $scope.metadata.identifier == '') && $scope.metadata.name != null && $scope.metadata.name != '') {
-                $scope.metadata.identifier = $scope.metadata.name;
-            }
-            if (($scope.metadata.name == null || $scope.metadata.name == '') && $scope.metadata.identifier != null && $scope.metadata.identifier != '') {
-                $scope.metadata.name = $scope.metadata.identifier;
-            }
-
-            $scope.metadata.lang = $scope.getCurrentLang();
-
-            webService.create({type: $scope.type}, $scope.metadata,
-                function() {
-                    Growl('success', 'Success', 'Service ' + $scope.metadata.name + ' successfully created');
-                    if ($scope.type == 'csw' || $scope.type == 'sos') {
-                        $location.path('/webservice/'+ $scope.type +'/'+ $scope.metadata.identifier +'/source');
-                    } else {
-                        $location.path('/webservice');
-                    }
-                },
-
-                function() { Growl('error','Error','Service '+ $scope.metadata.name +' creation failed'); }
-            );
-        };
-    }]);
-
-cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', 'provider', 'sos', 'Growl', '$location',
-    function ($scope, $routeParams , webService, provider, sos, Growl, $location) {
-        $scope.type = $routeParams.type;
-        $scope.id = $routeParams.id;
-        $scope.transactional = {
-            choice: null
-        };
-        $scope.db = {
-//            'url': 'localhost',
-//            'port': '5432',
-//            'className': 'org.postgresql.Driver',
-//            'name': ''
-        };
-
-        $scope.initSource = function() {
-            if ($scope.type === 'csw') {
-                $scope.source = {'automatic': {'@format': null}};
-            } else if ($scope.type === 'sos') {
-                $scope.source = {'constellation-config.SOSConfiguration': {
-                                    'profile': 'discovery',
-                                    'constellation-config.SMLConfiguration': {
-                                       '@format': 'filesystem',
-                                       'dataDirectory': ''
-                                    },
-                                    'constellation-config.observationFilterType': 'om2',
-                                    'constellation-config.observationReaderType': 'om2',
-                                    'constellation-config.observationWriterType': 'om2',
-                                    'constellation-config.SMLType': 'filesystem',
-                                    'constellation-config.OMConfiguration': {
-                                        '@format': 'OM2',
-                                        'bdd': {}
-                                    }
-                                }
-                            };
-            }
-        };
-
-        $scope.saveServiceSource = function() {
-            if ($scope.transactional.choice) {
-                $scope.source['constellation-config.SOSConfiguration'].profile = 'transactional';
-            }
-
-            var fullDbUrl = ($scope.db.className === 'org.postgresql.Driver') ? 'jdbc:postgresql' : 'jdbc:mysql';
-            fullDbUrl += '://'+ $scope.db.url +':'+ $scope.db.port +'/'+ $scope.db.name;
-            if ($scope.type === 'csw') {
-//                $scope.source.automatic.bdd.className = $scope.db.className;
-//                $scope.source.automatic.bdd.connectURL = fullDbUrl;
-            } else {
-                $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.className = $scope.db.className;
-                $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.connectURL = fullDbUrl;
-            }
-
-            webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
-                Growl('success','Success','Service '+ $scope.id +' successfully updated');
-                if ($scope.type.toLowerCase() === 'sos') {
-                    createOmProvider();
-                    buildOmDatasource();
-                }
-                $location.path('/webservice');
-            }, function() {
-                Growl('error','Error','Service configuration update error');
-            });
-        };
-
-        function createOmProvider() {
-            provider.create({
-                id: $scope.id +'-om2'
-            }, {
-                type: "feature-store",
-                subType: "om2",
-                parameters: {
-                    port: $scope.db.port,
-                    host: $scope.db.url,
-                    database: $scope.db.name,
-                    user: $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.user,
-                    password: $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.password,
-                    sgbdtype: 'postgres'
-                }
-            }, function() {}, function() {
-                Growl('error','Error','Unable to create OM2 provider');
-            });
-        }
-        function buildOmDatasource() {
-            sos.build({
-                id: $scope.id
-            }, function() {}, function() {
-                Growl('error','Error','Unable to build OM2 datasource');
-            });
-        }
-    }]);
-
-cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', 'Dashboard', 'Growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies','$translate','$window',
-    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, Dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate, $window) {
+    .controller('WebServiceEditController', function($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, Dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate, $window) {
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -402,12 +33,12 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
 
 
         angular.element($window).bind("scroll", function() {
-                if (this.pageYOffset < 220) {
-                    $scope.hideScroll = true;
-                } else {
-                    $scope.hideScroll = false;
-                }
-                $scope.$apply();
+            if (this.pageYOffset < 220) {
+                $scope.hideScroll = true;
+            } else {
+                $scope.hideScroll = false;
+            }
+            $scope.$apply();
         });
 
         $scope.getCurrentLang = function() {
@@ -756,8 +387,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
             $('#viewerData').modal("show");
             var layerName = $scope.selected.Name;
             var modalLoader = $modal.open({
-              templateUrl: 'views/modalLoader.html',
-              controller: 'ModalInstanceCtrl'
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
             });
             if ($scope.service.type === 'WMTS') {
                 // GetCaps
@@ -800,36 +431,36 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
 //                            modalLoader.close();
 //                        });
 //                } else {
-                    var providerId = $scope.selected.Provider;
-                    if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
-                        layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
-                    } else {
-                        layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
-                    }
-                    DataViewer.layers = [layerData, layerBackground];
-                    dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
-                        // Success getting the metadata, try to find the data extent
-                        var md = response['gmd.MD_Metadata'];
-                        if (md) {
-                            var ident = md['gmd.identificationInfo'];
-                            if (ident) {
-                                var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
-                                if (extentMD) {
-                                    var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
-                                    var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
-                                        bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
-                                    DataViewer.initMap('dataMap');
-                                    DataViewer.map.zoomToExtent(extent, true);
-                                }
+                var providerId = $scope.selected.Provider;
+                if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
+                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
+                } else {
+                    layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+                }
+                DataViewer.layers = [layerData, layerBackground];
+                dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
+                    // Success getting the metadata, try to find the data extent
+                    var md = response['gmd.MD_Metadata'];
+                    if (md) {
+                        var ident = md['gmd.identificationInfo'];
+                        if (ident) {
+                            var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
+                            if (extentMD) {
+                                var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
+                                var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
+                                    bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
+                                DataViewer.initMap('dataMap');
+                                DataViewer.map.zoomToExtent(extent, true);
                             }
-                        } else {
-                            DataViewer.initMap('dataMap');
                         }
-                        modalLoader.close();
-                    }, function() {
+                    } else {
                         DataViewer.initMap('dataMap');
-                        modalLoader.close();
-                    });
+                    }
+                    modalLoader.close();
+                }, function() {
+                    DataViewer.initMap('dataMap');
+                    modalLoader.close();
+                });
 //                }
             }
         };
@@ -899,4 +530,4 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                 }
             }
         };
-    }]);
+    });
