@@ -28,7 +28,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.urlBoxSize = Math.min($scope.url.length,100);
         $scope.domainId = $cookies.cstlActiveDomainId;
-        $scope.writeOperationAvailable = $scope.type == 'csw' || $scope.type == 'sos' || $scope.type == 'wfs';
+        $scope.writeOperationAvailable = $scope.type === 'csw' || $scope.type === 'sos' || $scope.type === 'wfs';
         $scope.hideScroll = true;
 
 
@@ -64,7 +64,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                         Growl('error', 'error', response.data.message);
                         webService.domains({id: service.id}, function (domains) {
                             $scope.domains = domains;
-                        })
+                        });
                     });
                 } else {
                     webService.linkToDomain(pathParams, {}, function () {
@@ -178,14 +178,14 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         // define which version is Selected
         $scope.versionIsSelected = function(currentVersion){
-            return $.inArray(currentVersion, $scope.metadata.versions) > -1
+            return $.inArray(currentVersion, $scope.metadata.versions) > -1;
         };
 
         $scope.addTag = function() {
-            if (!$scope.tagText || $scope.tagText == '' || $scope.tagText.length == 0) {
+            if (!$scope.tagText || $scope.tagText === '' || $scope.tagText.length === 0) {
                 return;
             }
-            if ($scope.metadata.keywords ==null){
+            if ($scope.metadata.keywords ===null){
                 $scope.metadata.keywords = [];
             }
             $scope.metadata.keywords.push($scope.tagText);
@@ -194,10 +194,10 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         $scope.deleteTag = function(key) {
             if ($scope.metadata.keywords.length > 0 &&
-                $scope.tagText.length == 0 &&
+                $scope.tagText.length === 0 &&
                 key === undefined) {
                 $scope.metadata.keywords.pop();
-            } else if (key != undefined) {
+            } else if (key !== undefined) {
                 $scope.metadata.keywords.splice(key, 1);
             }
         };
@@ -232,7 +232,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 function() {
                     Growl('error','Error','Service description update failed');
                 }
-            )
+            );
         };
 
         // Show Capa methods
@@ -263,7 +263,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     }
                 }
             });
-        };
+        }
 
         // Show Logs methods
         $scope.showLogs = function(service) {
@@ -330,7 +330,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         $scope.deleteLayer = function() {
             var txt = ($scope.service.type.toLowerCase() === 'wmts') ? 'Are you sure? This will also delete the generated tiles for this layer.' : 'Are you sure?';
-            if ($scope.selected != null && confirm(txt)) {
+            if ($scope.selected !== null && confirm(txt)) {
                 if ($scope.service.type.toLowerCase() === 'sos') {
                     var idToDel = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
                     sos.removeSensor({id: $scope.service.identifier, sensor: idToDel}, function() {
@@ -368,7 +368,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.deleteMetadata = function() {
-            if ($scope.selected != null && confirm("Are you sure?")) {
+            if ($scope.selected !== null && confirm("Are you sure?")) {
                 csw.delete({id: $scope.service.identifier, metaId: $scope.selected.identifier}, {},
                     function() {
                         Growl('success','Success','Metadata deleted');
@@ -466,7 +466,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.showSensor = function() {
-            var sensorId = ($scope.selectedSensorsChild != null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+            var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
             $modal.open({
                 templateUrl: 'views/sensor/modalSensorView.html',
                 controller: 'SensorModalController',
@@ -493,40 +493,40 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.truncate = function(small, text){
-            if(text != null) {
+            if(text !== null) {
                 if (window.innerWidth >= 1200) {
-                    if (small == true && text.length > 22) {
+                    if (small === true && text.length > 22) {
                         return text.substr(0, 22) + "...";
-                    } else if (small == false && text.length > 65) {
+                    } else if (small === false && text.length > 65) {
                         return text.substr(0, 65) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
-                    if (small == true && text.length > 15) {
+                    if (small === true && text.length > 15) {
                         return text.substr(0, 15) + "...";
-                    } else if (small == false && text.length > 55) {
+                    } else if (small === false && text.length > 55) {
                         return text.substr(0, 55) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 992) {
                     if (text.length > 35) {
                         return text.substr(0, 35) + "...";
-                    } else return text;
+                    } else {return text;}
                 }
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if(text != null) {
+            if(text !== null) {
                 if (window.innerWidth >= 1200) {
                     if (text.length > 30) {
                         return text.substr(0, 30) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
                     if (text.length > 25) {
                         return text.substr(0, 25) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 992) {
                     if (text.length > 17) {
                         return text.substr(0, 17) + "...";
-                    } else return text;
+                    } else {return text;}
                 }
             }
         };

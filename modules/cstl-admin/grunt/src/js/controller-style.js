@@ -13,7 +13,6 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
-'use strict';
 
 /**
  * Controller for dashboard of styles.
@@ -98,40 +97,40 @@ cstlAdminApp.controller('StylesController', ['$scope', 'Dashboard', 'style', 'Gr
         };
 
         $scope.truncate = function(small, text){
-            if(text != null) {
+            if(text !== null) {
                 if (window.innerWidth >= 1200) {
-                    if (small == true && text.length > 20) {
+                    if (small === true && text.length > 20) {
                         return text.substr(0, 20) + "...";
-                    } else if (small == false && text.length > 60) {
+                    } else if (small === false && text.length > 60) {
                         return text.substr(0, 60) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
-                    if (small == true && text.length > 15) {
+                    if (small === true && text.length > 15) {
                         return text.substr(0, 15) + "...";
-                    } else if (small == false && text.length > 45) {
+                    } else if (small === false && text.length > 45) {
                         return text.substr(0, 45) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 992) {
                     if (text.length > 32) {
                         return text.substr(0, 32) + "...";
-                    } else return text;
+                    } else {return text;}
                 }
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if(text != null) {
+            if(text !== null) {
                 if (window.innerWidth >= 1200) {
                     if (text.length > 40) {
                         return text.substr(0, 40) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
                     if (text.length > 30) {
                         return text.substr(0, 30) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 992) {
                     if (text.length > 20) {
                         return text.substr(0, 20) + "...";
-                    } else return text;
+                    } else {return text;}
                 }
             }
         };
@@ -307,7 +306,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     "attribute":""
                 }
             };
-        };
+        }
         initOptionsSLD();
 
         /**
@@ -323,7 +322,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                 if($scope.selectedLayer !== null && $scope.stylechooser === 'existing'){
                     mapId = 'styledMapWithSelectedStyle';
                 }else {
-                    mapId = 'styledMapOL'
+                    mapId = 'styledMapOL';
                 }
                 //using $timeout to fix Angular bug :
                 // with modal to let OpenLayers map initialization when the map div is not rendered yet.
@@ -380,7 +379,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
         };
         $scope.fontsCodes = [];
         for(var code in $scope.fontsMapping){
-            $scope.fontsCodes.push(code);
+            if($scope.fontsMapping.hasOwnProperty(code)){
+                $scope.fontsCodes.push(code);
+            }
         }
 
         /**
@@ -439,7 +440,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     $scope.chooseType = false;
                     $scope.page.pageSld = 'views/style/chooseType.html';
                 }
-            }else if($scope.selectedStyle != null) {
+            }else if($scope.selectedStyle !== null) {
                 //we are in styles dashboard
                 if ($scope.selectedStyle.Type &&
                     ($scope.selectedStyle.Type.toLowerCase() === 'coverage' ||
@@ -597,7 +598,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
             }else {
                 $scope.noName = false;
                 if(mode ==='manual'){
-                    var rule = {
+                    var manualRule = {
                         "name": 'default',
                         "title":'',
                         "description":'',
@@ -605,8 +606,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                         "symbolizers": [],
                         "filter": null
                     };
-                    $scope.newStyle.rules.push(rule);
-                    $scope.setSelectedRule(rule);
+                    $scope.newStyle.rules.push(manualRule);
+                    $scope.setSelectedRule(manualRule);
                     $scope.editSelectedRule();
                 }else if(mode ==='auto_interval'){
                     $scope.optionsSLD.autoIntervalValues = {
@@ -673,7 +674,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                             name: ''
                         }
                     };
-                    var rule = {
+                    var paletteRule = {
                         "name": 'palette-rule',
                         "title":'',
                         "description":'',
@@ -681,8 +682,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                         "symbolizers": [{'@symbol':'raster'}],
                         "filter": null
                     };
-                    $scope.newStyle.rules.push(rule);
-                    $scope.setSelectedRule(rule);
+                    $scope.newStyle.rules.push(paletteRule );
+                    $scope.setSelectedRule(paletteRule );
                     $scope.editRasterPalette();
                 }else if(mode ==='raster_cellule'){
                     $scope.optionsSLD.rasterCells = {
@@ -724,7 +725,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                             }
                         }
                     };
-                    var rule = {
+                    var cellRule = {
                         "name": 'cell-rule',
                         "title":'',
                         "description":'',
@@ -743,8 +744,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                         }],
                         "filter": null
                     };
-                    $scope.newStyle.rules.push(rule);
-                    $scope.setSelectedRule(rule);
+                    $scope.newStyle.rules.push(cellRule);
+                    $scope.setSelectedRule(cellRule);
                     $scope.editRasterCells();
                 }
                 $scope.optionsSLD.filtersEnabled=false;
@@ -845,14 +846,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     $scope.optionsSLD.rasterPalette.palette.method = colorMap.function['@function'];
                     $scope.optionsSLD.rasterPalette.palette.intervalsCount = colorMap.function.interval;
 
-                    if(colorMap.function.nanColor && colorMap.function.nanColor != null){
+                    if(colorMap.function.nanColor && colorMap.function.nanColor !== null){
                         $scope.optionsSLD.rasterPalette.palette.nan.selected = true;
                         $scope.optionsSLD.rasterPalette.palette.nan.color = colorMap.function.nanColor;
                     }
                     $scope.optionsSLD.rasterPalette.repartition = colorMap.function.points;
                 }
                 //Load the selected band on the graph, the repartition of statistics is already present.
-                if($scope.dataBandsRepartition != null && $scope.optionsSLD.rasterPalette.band.selected){
+                if($scope.dataBandsRepartition !== null && $scope.optionsSLD.rasterPalette.band.selected){
                     var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
                     if(!selectedBand){
                         selectedBand = 0;
@@ -860,8 +861,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     var repartitionBand = $scope.dataBandsRepartition[selectedBand].repartition;
                     var xArray=[],yArray=[];
                     for(var key in repartitionBand){
-                        xArray.push(key);
-                        yArray.push(repartitionBand[key]);
+                        if(repartitionBand.hasOwnProperty(key)){
+                            xArray.push(key);
+                            yArray.push(repartitionBand[key]);
+                        }
                     }
                     $scope.optionsSLD.rasterPalette.dataXArray = xArray;
                     var dataRes = {
@@ -1065,7 +1068,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          */
         $scope.setSelectedSymbolizer = function (symbol){
             $scope.optionsSLD.selectedSymbolizer = symbol;
-        }
+        };
 
         /**
          * Function to move item in array with given indexes from and to.
@@ -1074,10 +1077,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          * @param to index in array
          */
         function move(array, from, to) {
-            if( to === from ) return;
+            if( to === from ) {return;}
             var target = array[from];
             var increment = to < from ? -1 : 1;
-            for(var k = from; k != to; k += increment){
+            for(var k = from; k !== to; k += increment){
                 array[k] = array[k + increment];
             }
             array[to] = target;
@@ -1095,16 +1098,16 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     var filter = $scope.optionsSLD.filters[i];
                     if(filter.attribute !==''){
                         if(filter.comparator === 'BETWEEN'){
-                            if(filter.value.indexOf(',')!=-1){
+                            if(filter.value.indexOf(',')!==-1){
                                 var arr= filter.value.split(',');
-                                if(arr.length==2 && arr[0].trim()!=='' && arr[1].trim()!==''){
+                                if(arr.length===2 && arr[0].trim()!=='' && arr[1].trim()!==''){
                                     strQuery += operator+filter.attribute + ' ' + filter.comparator +' '+ arr[0]+ ' AND '+arr[1];
                                 }
                             }
                         }else {
                             var strFilter = filter.value;
                             //escape CQL quote from the ui value before apply
-                            if(strFilter.indexOf("'") != -1){
+                            if(strFilter.indexOf("'") !== -1){
                                 var find = "'";
                                 var re = new RegExp(find, 'g');
                                 strFilter = strFilter.replace(re, "\\'");
@@ -1131,7 +1134,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
         $scope.restoreFilters = function() {
             if($scope.optionsSLD.selectedRule.filter !== null){
                 var cql = $scope.optionsSLD.selectedRule.filter;
-                if(cql.indexOf('\\\'') != -1){
+                if(cql.indexOf('\\\'') !== -1){
                     var find = "\\\\\'";
                     var re = new RegExp(find, 'g');
                     cql = cql.replace(re, "''");
@@ -1202,7 +1205,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          */
         var recursiveResolveFilter = function(obj,arrayRes){
             if(obj.CLASS_NAME ==='OpenLayers.Filter.Logical'){
-                if(obj.filters && obj.filters.length==2){
+                if(obj.filters && obj.filters.length===2){
                     if(obj.filters[0].CLASS_NAME === 'OpenLayers.Filter.Comparison' &&
                         obj.filters[1].CLASS_NAME === 'OpenLayers.Filter.Comparison'){
                         var comparator1 = convertOLComparatorToCQL(obj.filters[0].type);
@@ -1272,11 +1275,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          */
         var convertOLComparatorToCQL = function(olType){
             var comparator;
-            if(olType =='=='){
+            if(olType ==='=='){
                 comparator = '=';
-            }else if(olType =='..'){
+            }else if(olType ==='..'){
                 comparator = 'BETWEEN';
-            }else if(olType =='~'){
+            }else if(olType ==='~'){
                 comparator = 'LIKE';
             }else {
                 comparator = olType;
@@ -1291,11 +1294,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          */
         var convertOLOperatorToCQL = function(olType){
             var operator;
-            if(olType =='&&'){
+            if(olType ==='&&'){
                 operator = 'AND';
-            }else if(olType =='||'){
+            }else if(olType ==='||'){
                 operator = 'OR';
-            }else if(olType =='!'){
+            }else if(olType ==='!'){
                 operator = 'NOT';
             }
             return operator;
@@ -1314,7 +1317,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     "operator":''
                 };
                 $scope.optionsSLD.filters.push(filter);
-            }else if(operator ==''){
+            }else if(operator ===''){
                 $scope.optionsSLD.filters = $scope.optionsSLD.filters.slice(0,index+1);
             }
         };
@@ -1417,7 +1420,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
             if(properties && properties.length>0){
                 for(var i=0;i<properties.length;i++){
                     //skip geometry field
-                    if(properties[i].type.indexOf('com.vividsolutions') == -1){
+                    if(properties[i].type.indexOf('com.vividsolutions') === -1){
                         arrayRes.push(properties[i]);
                     }
                 }
@@ -1433,7 +1436,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                 provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
                     function(response) {
                         $scope.dataBbox = response.boundingBox;
-                        if(typeof callback =='function'){
+                        if(typeof callback ==='function'){
                             callback();
                         }
                     }, function() {
@@ -1471,7 +1474,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          */
         $scope.addStrokeDashArray = function(symbolizer,traitType) {
             if (traitType === 'pointille') {
-                if (symbolizer.stroke == undefined) {
+                if (symbolizer.stroke === undefined) {
                     symbolizer.stroke = {};
                 }
                 symbolizer.stroke.dashArray = [1, 1];
@@ -1486,10 +1489,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          * init the font model for symbolizer text.
          */
         $scope.initFontFamilies = function(symbolizer) {
-            if (symbolizer.font == undefined) {
+            if (symbolizer.font === undefined) {
                 symbolizer.font = {};
             }
-            if (symbolizer.font.family == undefined) {
+            if (symbolizer.font.family === undefined) {
                 symbolizer.font.family = [];
             }
         };
@@ -1500,7 +1503,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          * @returns {*|boolean}
          */
         $scope.isTTFValue = function(value) {
-            return (value && value.indexOf('ttf://') != -1);
+            return (value && value.indexOf('ttf://') !== -1);
         };
 
         /**
@@ -1598,7 +1601,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
             }else {
                 colors =$scope.optionsSLD.autoIntervalValues.palette.colors;
             }
-            if(colors.length==0){
+            if(colors.length===0){
                 colors.push('#e52520','#ffde00','#95c11f','#1d71b8','#662483');
             }
             var reverseColors =$scope.optionsSLD.autoIntervalValues.palette.reverseColors;
@@ -1662,7 +1665,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
             }else {
                 colors =$scope.optionsSLD.autoUniqueValues.palette.colors;
             }
-            if(colors.length==0){
+            if(colors.length===0){
                 colors.push('#e52520','#ffde00','#95c11f','#1d71b8','#662483');
             }
             var reverseColors =$scope.optionsSLD.autoUniqueValues.palette.reverseColors;
@@ -1714,15 +1717,17 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                                     $scope.optionsSLD.rasterPalette.repartition = $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points;
 
                                     //Load the selected band on the graph, the repartition of statistics is already present.
-                                    if($scope.dataBandsRepartition != null){
+                                    if($scope.dataBandsRepartition !== null){
                                         var loader = $('#chart_ajax_loader');
                                         loader.show();
                                         var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
                                         var repartition = $scope.dataBandsRepartition[selectedBand].repartition;
                                         var xArray=[],yArray=[];
                                         for(var key in repartition){
-                                            xArray.push(key);
-                                            yArray.push(repartition[key]);
+                                            if(repartition.hasOwnProperty(key)){
+                                                xArray.push(key);
+                                                yArray.push(repartition[key]);
+                                            }
                                         }
                                         $scope.optionsSLD.rasterPalette.dataXArray = xArray;
                                         var dataRes = {
@@ -1868,7 +1873,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          */
         $scope.addPalette = function(rule) {
             var palette = $scope.optionsSLD.rasterPalette.palette;
-            if (palette.index == undefined) {
+            if (palette.index === undefined) {
                 return;
             }
 
@@ -1878,13 +1883,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     name: $scope.optionsSLD.rasterPalette.band.selected.name
                 },
                 rgbChannels : null
-            }
+            };
 
             var colorMap = rule.symbolizers[0].colorMap;
 
-            if (colorMap == undefined ||
-                colorMap.function == undefined ||
-                colorMap.function['@function'] != palette.method) {
+            if (colorMap === undefined ||
+                colorMap.function === undefined ||
+                colorMap.function['@function'] !== palette.method) {
                 colorMap = {'function': {'@function': palette.method}};
             }
 
@@ -1901,26 +1906,26 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
             
             switch (palette.index) {
                 case 1:
-                    var delta = palette.rasterMaxValue - palette.rasterMinValue;
+                    var delta1 = palette.rasterMaxValue - palette.rasterMinValue;
                     if (!palette.inverse) {
-                        if (colorMap.function == undefined) {
+                        if (colorMap.function === undefined) {
                             colorMap.function = {};
                         }
                         colorMap.function.points =
                                 [
                                     {data: palette.rasterMinValue, color: '#e52520'},
-                                    {data: delta * 0.25 + palette.rasterMinValue, color: '#ffde00'},
-                                    {data: delta * 0.5 + palette.rasterMinValue, color: '#95c11f'},
-                                    {data: delta * 0.75 + palette.rasterMinValue, color: '#1d71b8'},
+                                    {data: delta1 * 0.25 + palette.rasterMinValue, color: '#ffde00'},
+                                    {data: delta1 * 0.5 + palette.rasterMinValue, color: '#95c11f'},
+                                    {data: delta1 * 0.75 + palette.rasterMinValue, color: '#1d71b8'},
                                     {data: palette.rasterMaxValue, color: '#662483'}
                                 ];
                     } else {
                         colorMap.function.points =
                                 [
                                     {data: palette.rasterMinValue, color: '#662483'},
-                                    {data: delta * 0.25 + palette.rasterMinValue, color: '#1d71b8'},
-                                    {data: delta * 0.5 + palette.rasterMinValue, color: '#95c11f'},
-                                    {data: delta * 0.75 + palette.rasterMinValue, color: '#ffde00'},
+                                    {data: delta1 * 0.25 + palette.rasterMinValue, color: '#1d71b8'},
+                                    {data: delta1 * 0.5 + palette.rasterMinValue, color: '#95c11f'},
+                                    {data: delta1 * 0.75 + palette.rasterMinValue, color: '#ffde00'},
                                     {data: palette.rasterMaxValue, color: '#e52520'}
                                 ];
                     }
@@ -1956,21 +1961,21 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     }
                     break;
                 case 4:
-                    var delta = palette.rasterMaxValue - palette.rasterMinValue;
+                    var delta4 = palette.rasterMaxValue - palette.rasterMinValue;
                     if (!palette.inverse) {
                         colorMap.function.points =
                                 [
                                     {data: palette.rasterMinValue, color: '#2d2e83'},
-                                    {data: delta * 0.25 + palette.rasterMinValue, color: '#1d71b8'},
-                                    {data: delta * 0.5 + palette.rasterMinValue, color: '#ffde00'},
+                                    {data: delta4 * 0.25 + palette.rasterMinValue, color: '#1d71b8'},
+                                    {data: delta4 * 0.5 + palette.rasterMinValue, color: '#ffde00'},
                                     {data: palette.rasterMinValue, color: '#e52520'}
                                 ];
                     } else {
                         colorMap.function.points =
                                 [
                                     {data: palette.rasterMinValue, color: '#e52520'},
-                                    {data: delta * 0.5 + palette.rasterMinValue, color: '#ffde00'},
-                                    {data: delta * 0.75 + palette.rasterMinValue, color: '#1d71b8'},
+                                    {data: delta4 * 0.5 + palette.rasterMinValue, color: '#ffde00'},
+                                    {data: delta4 * 0.75 + palette.rasterMinValue, color: '#1d71b8'},
                                     {data: palette.rasterMinValue, color: '#2d2e83'}
                                 ];
                     }
@@ -2080,7 +2085,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                         var layerData;
                         var layerBackground = null;
                         if($scope.selectedLayer !== null){
-                            if($scope.newStyle.rules.length ==0){
+                            if($scope.newStyle.rules.length ===0){
                                 layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
                             }else {
                                 layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name, "sld_temp");
@@ -2090,7 +2095,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                             //if there is no selectedLayer ie the sld editor in styles dashboard
                             if ($scope.dataType.toLowerCase() === 'raster') {
                                 //to avoid layer disappear when rules is empty
-                                if($scope.newStyle.rules.length ==0){
+                                if($scope.newStyle.rules.length ===0){
                                     layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
                                 }else {
                                     layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name, "sld_temp");
@@ -2219,23 +2224,23 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          * @param until
          * @returns {Array}
          */
-        if (typeof (Array.generate) == "undefined") {
+        if (typeof (Array.generate) === "undefined") {
             Array.generate = function (length, generator) {
                 var list = new Array(length);
                 for (var i = 0; i < length; i++) {
                     list[i] = generator(i);
                 }
                 return list;
-            }
+            };
         }
-        if (typeof (Math.randomInt) == "undefined") {
+        if (typeof (Math.randomInt) === "undefined") {
             Math.randomInt = function (min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
-            }
+            };
         }
-        if (typeof (Array.generateNumbers) == "undefined") {
+        if (typeof (Array.generateNumbers) === "undefined") {
             Array.generateNumbers = function (from, until) {
-                if (arguments.length == 1) {
+                if (arguments.length === 1) {
                     until = from;
                     from = 0;
                 }
@@ -2245,7 +2250,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                     list[i] = i + from;
                 }
                 return list;
-            }
+            };
         }
 
         /**
@@ -2286,8 +2291,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                             var repartition = response.bands[0].repartition;
                             var xArray=[],yArray=[];
                             for(var key in repartition){
-                                xArray.push(key);
-                                yArray.push(repartition[key]);
+                                if(repartition.hasOwnProperty(key)){
+                                    xArray.push(key);
+                                    yArray.push(repartition[key]);
+                                }
                             }
                             $scope.optionsSLD.rasterPalette.dataXArray = xArray;
                             var dataRes = {
@@ -2399,8 +2406,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
                         var xarray = [];
                         var yarray = [];
                         for(var key in response.mapping){
-                            xarray.push(key === '' ? 'empty':key);
-                            yarray.push(response.mapping[key]);
+                            if(response.mapping.hasOwnProperty(key)){
+                                xarray.push(key === '' ? 'empty':key);
+                                yarray.push(response.mapping[key]);
+                            }
                         }
                         var dataRes = {
                               json:{
@@ -2416,10 +2425,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
         };
 
         $scope.truncate = function(text){
-            if(text != null) {
+            if(text !== null) {
                 if (text.length > 30) {
                     return text.substr(0, 30) + "...";
-                } else return text;
+                } else {return text;}
             }
         };
 

@@ -66,7 +66,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
 
 
         $scope.goToServiceContact = function() {
-            if($scope.metadata.name!= null || $scope.metadata.identifier!=null){
+            if($scope.metadata.name!== null || $scope.metadata.identifier!==null){
                 $scope.serviceContact = true;
                 $scope.serviceInfo = false;
                 $scope.serviceRights = false;
@@ -75,7 +75,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
             }
         };
         $scope.goToServiceRights = function() {
-            if($scope.metadata.name!= null || $scope.metadata.identifier!=null){
+            if($scope.metadata.name!== null || $scope.metadata.identifier!==null){
                 $scope.serviceContact = false;
                 $scope.serviceRights = true;
                 $scope.serviceInfo = false;
@@ -91,7 +91,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
         };
 
         $scope.addTag = function() {
-            if (!$scope.newService.tagText || $scope.newService.tagText == '' || $scope.newService.tagText.length == 0) {
+            if (!$scope.newService.tagText || $scope.newService.tagText === '' || $scope.newService.tagText.length === 0) {
                 return;
             }
 
@@ -101,10 +101,10 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
 
         $scope.deleteTag = function(key) {
             if ($scope.metadata.keywords.length > 0 &&
-                $scope.newService.tagText.length == 0 &&
+                $scope.newService.tagText.length === 0 &&
                 key === undefined) {
                 $scope.metadata.keywords.pop();
-            } else if (key != undefined) {
+            } else if (key !== undefined) {
                 $scope.metadata.keywords.splice(key, 1);
             }
         };
@@ -121,15 +121,15 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
 
         // define which version is Selected
         $scope.versionIsSelected = function(currentVersion){
-            return $.inArray(currentVersion, $scope.metadata.versions) > -1
+            return $.inArray(currentVersion, $scope.metadata.versions) > -1;
         };
 
         $scope.saveServiceMetadata = function() {
             // Ensures both name and identifier are filled
-            if (($scope.metadata.identifier == null || $scope.metadata.identifier == '') && $scope.metadata.name != null && $scope.metadata.name != '') {
+            if (($scope.metadata.identifier === null || $scope.metadata.identifier === '') && $scope.metadata.name !== null && $scope.metadata.name !== '') {
                 $scope.metadata.identifier = $scope.metadata.name;
             }
-            if (($scope.metadata.name == null || $scope.metadata.name == '') && $scope.metadata.identifier != null && $scope.metadata.identifier != '') {
+            if (($scope.metadata.name === null || $scope.metadata.name === '') && $scope.metadata.identifier !== null && $scope.metadata.identifier !== '') {
                 $scope.metadata.name = $scope.metadata.identifier;
             }
 
@@ -138,7 +138,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
             webService.create({type: $scope.type}, $scope.metadata,
                 function() {
                     Growl('success', 'Success', 'Service ' + $scope.metadata.name + ' successfully created');
-                    if ($scope.type == 'csw' || $scope.type == 'sos') {
+                    if ($scope.type === 'csw' || $scope.type === 'sos') {
                         $location.path('/webservice/'+ $scope.type +'/'+ $scope.metadata.identifier +'/source');
                     } else {
                         $location.path('/webservice');
@@ -193,10 +193,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
 
             var fullDbUrl = ($scope.db.className === 'org.postgresql.Driver') ? 'jdbc:postgresql' : 'jdbc:mysql';
             fullDbUrl += '://'+ $scope.db.url +':'+ $scope.db.port +'/'+ $scope.db.name;
-            if ($scope.type === 'csw') {
-//                $scope.source.automatic.bdd.className = $scope.db.className;
-//                $scope.source.automatic.bdd.connectURL = fullDbUrl;
-            } else {
+            if ($scope.type !== 'csw') {
                 $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.className = $scope.db.className;
                 $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.connectURL = fullDbUrl;
             }

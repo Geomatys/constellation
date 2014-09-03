@@ -13,11 +13,10 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
-'use strict';
 
 /* Controllers */
-
-var dataNotReady = function(){alert("data not ready")};
+/*jshint -W079 */
+var dataNotReady = function(){alert("data not ready");};
 
 cstlAdminApp.controller('HeaderController', ['$scope','$http',
     function ($scope, $http) {
@@ -33,7 +32,7 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
             webService.listAll({}, function(response) {
                 var count = 0;
                 for (var i=0; i<response.instance.length; i++) {
-                    if (response.instance[i].status === 'STARTED' && response.instance[i].type != 'WEBDAV') {
+                    if (response.instance[i].status === 'STARTED' && response.instance[i].type !== 'WEBDAV') {
                         count++;
                     }
                 }

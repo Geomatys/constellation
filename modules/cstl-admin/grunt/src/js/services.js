@@ -122,6 +122,25 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     // -------------------------------------------------------------------------
 
     .factory('AuthInterceptor', function($rootScope, $q, $cookies, $cookieStore, CstlConfig, CstlUtils) {
+        /**
+         * Checks if an user is/was logged. This method can return true even
+         * the user session has expired.
+         *
+         * @return {Boolean} true if an user is/was logged, otherwise false
+         */
+        function isUserLogged() {
+            return angular.isDefined($cookies[CstlConfig['cookie.cstl.url']]);
+        }
+
+        /**
+         * Checks if the request url destination is the Constellation REST API.
+         *
+         * @return {Boolean}
+         */
+        function isCstlRequest(url) {
+            return url.indexOf(CstlConfig['inject.expr.ctrl.url']) === 0;
+        }
+
         return {
             'request': function(config) {
                 // Intercept request to Constellation REST API.
@@ -150,25 +169,6 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 return $q.reject(response);
             }
         };
-
-        /**
-         * Checks if an user is/was logged. This method can return true even
-         * the user session has expired.
-         *
-         * @return {Boolean} true if an user is/was logged, otherwise false
-         */
-        function isUserLogged() {
-            return angular.isDefined($cookies[CstlConfig['cookie.cstl.url']]);
-        }
-
-        /**
-         * Checks if the request url destination is the Constellation REST API.
-         *
-         * @return {Boolean}
-         */
-        function isCstlRequest(url) {
-            return url.indexOf(CstlConfig['inject.expr.ctrl.url']) === 0;
-        }
     })
 
     // -------------------------------------------------------------------------
@@ -182,7 +182,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     $rootScope.account = account;
 
                     $rootScope.hasRole = function(role) {
-                        return account.roles.indexOf(role) != -1;
+                        return account.roles.indexOf(role) !== -1;
                     };
 
                     $rootScope.hasMultipleDomains = function() {
@@ -234,7 +234,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     // -------------------------------------------------------------------------
     
     .factory('StompService', function(CstlUtils) {
-        return new Stomper(CstlUtils.compileUrl('@cstl/spring/ws/adminmessages', false));
+
 
         function Topic(stompClient, path) {
             var self = this;
@@ -266,6 +266,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 return topic;
             };
         }
+
+        return new Stomper(CstlUtils.compileUrl('@cstl/spring/ws/adminmessages', false));
     })
 
     // -------------------------------------------------------------------------
@@ -356,9 +358,9 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     templateUrl: 'views/style/modalStyleChoose.html',
                     controller: 'StyleModalController',
                     resolve: {
-                        exclude: function() { return $scope.selected.TargetStyle },
-                        selectedLayer: function() { return $scope.selected },
-                        selectedStyle: function() { return null },
+                        exclude: function() { return $scope.selected.TargetStyle; },
+                        selectedLayer: function() { return $scope.selected; },
+                        selectedStyle: function() { return null; },
                         serviceName: function() {
                             if ($scope.service) {
                                 // In WMS mode
@@ -367,7 +369,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                             // For portraying
                             return null;
                         },
-                        newStyle: function() { return null },
+                        newStyle: function() { return null; },
                         stylechooser: function(){return null;}
                     }
                 });
@@ -440,10 +442,10 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     resolve: {
                         newStyle: function() { return null; },
                         pageSld: function() {  return 'views/style/chooseType.html'; },
-                        selectedLayer: function() {  return null },
-                        selectedStyle: function() { return null },
-                        serviceName: function() {  return null },
-                        exclude: function() {  return null },
+                        selectedLayer: function() {  return null; },
+                        selectedStyle: function() { return null; },
+                        serviceName: function() {  return null; },
+                        exclude: function() {  return null; },
                         stylechooser: function(){return null;}
                     }
                 });
@@ -461,11 +463,11 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     templateUrl: 'views/style/modalStyleEdit.html',
                     controller: 'StyleModalController',
                     resolve: {
-                        newStyle: function() { return response},
-                        selectedLayer: function() {  return null },
-                        selectedStyle: function() { return scope.selected },
-                        serviceName: function() {  return null },
-                        exclude: function() {  return null },
+                        newStyle: function() { return response;},
+                        selectedLayer: function() {  return null; },
+                        selectedStyle: function() { return scope.selected; },
+                        serviceName: function() {  return null; },
+                        exclude: function() {  return null; },
                         stylechooser: function(){return null;}
                     }
                 });
@@ -483,11 +485,11 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     templateUrl: 'views/style/modalStyleEdit.html',
                     controller: 'StyleModalController',
                     resolve: {
-                        newStyle: function() { return response},
-                        selectedLayer: function() {  return selectedData },
-                        selectedStyle: function() { return null },
-                        serviceName: function() {  return null },
-                        exclude: function() {  return null },
+                        newStyle: function() { return response;},
+                        selectedLayer: function() {  return selectedData; },
+                        selectedStyle: function() { return null; },
+                        serviceName: function() {  return null; },
+                        exclude: function() {  return null; },
                         stylechooser: function(){return 'edit';}
                     }
                 });

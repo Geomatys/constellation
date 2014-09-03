@@ -13,13 +13,12 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
-'use strict';
 
 var cstlSession = {};
 
 
 /* App Module */
-
+/*jshint -W079 */
 var cstlAdminApp = angular.module('CstlAdminApp', [
     // Angular official modules.
     'ngCookies',
@@ -206,8 +205,7 @@ cstlAdminApp
 
             $rootScope.$on("$routeChangeStart", function(event, next, current) {
                 // Check if the status of the user. Is it authenticated or not?
-                if($rootScope.authenticated)
-                    return;
+                if($rootScope.authenticated){return;}
                 AuthService.authenticate({}, function() {
                     $rootScope.authenticated = true;
                 });
@@ -218,7 +216,7 @@ cstlAdminApp
                 window.location.href="index.html";
             });
 
-           $rootScope.hasRole = function(){return false}
+           $rootScope.hasRole = function(){return false;};
             
             // Call when the user is authenticated
            $rootScope.$on('event:auth-authConfirmed', function() {
@@ -227,7 +225,7 @@ cstlAdminApp
                Account.get(function(sessionData){
                 $rootScope.cstlSession=sessionData;
                 cstlSession = sessionData;
-               })
+               });
 
                // If the login page has been requested and the user is already logged in
                // the user is redirected to the home page
@@ -254,17 +252,17 @@ cstlAdminApp
     Account.get(function(account){
         $scope.domains = account.domains;
         for(var d in account.domains){
-            if(account.domains[d].id == $cookies.cstlActiveDomainId){
+            if(account.domains[d].id === $cookies.cstlActiveDomainId){
                 $scope.activeDomain=account.domains[d].name;
                 break;
             }
         }
         $scope.changeDomain = function(i){
-            if($cookies.cstlActiveDomainId != account.domains[i].id){
+            if($cookies.cstlActiveDomainId !== account.domains[i].id){
                 $scope.activeDomain=account.domains[i].name;
                 $cookies.cstlActiveDomainId= ""+account.domains[i].id;
                 $window.location.href="admin.html";
             }
         };
-    })
+    });
 });

@@ -57,12 +57,12 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     .factory('GeneralService', function($http) {
         return {
             "counts": function(){
-                return $http({ method: 'GET', url:'@cstl/api/1/general/counts;jsessionid='})
+                return $http({ method: 'GET', url:'@cstl/api/1/general/counts;jsessionid='});
             },
             "checkLogin":function(login){
-                return $http({method: 'POST', url: "@cstl/api/1/general/logincheck;jsessionid=", data: login})
+                return $http({method: 'POST', url: "@cstl/api/1/general/logincheck;jsessionid=", data: login});
             }
-        }
+        };
     })
 
     .factory('UserResource', function($resource) {
@@ -95,7 +95,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             "all": function(){
                 return $http({ method: 'GET', url:'@cstl/api/1/permission/;jsessionid='});
             }
-        }
+        };
     })
 
     .factory('webService', function($resource) {
@@ -197,7 +197,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'isGeophysic':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/isGeophysic;jsessionid='},
             'verifyCRS':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:id/crs'},
             'createPRJ':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/:id/createprj'},
-            'getAllCodeEPSG':   {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:id/epsgCode', transformResponse: function (data) {return {list: angular.fromJson(data)} }}
+            'getAllCodeEPSG':   {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:id/epsgCode', transformResponse: function (data) {return {list: angular.fromJson(data)}; }}
         });
     })
 

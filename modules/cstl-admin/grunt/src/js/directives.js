@@ -48,7 +48,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
             link: function(scope, element, attrs) {
 
                 // Observe 'page-switcher' attribute changes.
-                scope.$parent.$watch(attrs['pageSwitcher'], function(newVal) {
+                scope.$parent.$watch(attrs.pageSwitcher, function(newVal) {
                     watchAction(newVal);
                 }, true);
 
@@ -107,7 +107,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
             restrict: 'A',
             link: function(scope, element, attrs) {
 
-                scope.$watch(attrs['datepicker'], function(newVal) {
+                scope.$watch(attrs.datepicker, function(newVal) {
                     watchAction(newVal || {});
                 }, true);
 
@@ -138,7 +138,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
         return {
             restrict: 'A',
             link: function(scope, element, attrs) {
-                scope.$watch(attrs['tooltip'], function(options) {
+                scope.$watch(attrs.tooltip, function(options) {
                     options = options || {};
                     element.tooltip({
                         animation: options.animation,
@@ -171,7 +171,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
 
                 // Watch for changes in text field
                 scope.$watch(attrs.ngModel, function(value) {
-                    if (value != undefined) {
+                    if (value !== undefined) {
                         var tempEl = $('<span>' + value + '</span>').appendTo('body');
                         scope.inputWidth = tempEl.width() + 5;
                         tempEl.remove();
@@ -179,10 +179,10 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                 });
 
                 element.bind('keydown', function(e) {
-                    if (e.which == 9) {
+                    if (e.which === 9) {
                         e.preventDefault();
                     }
-                    if (e.which == 8) {
+                    if (e.which === 8) {
                         scope.$apply(attrs.deleteTag);
                     }
                 });
@@ -191,13 +191,13 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                     var key = e.which;
 
                     // Tab or Enter pressed
-                    if (key == 9 || key == 13) {
+                    if (key === 9 || key === 13) {
                         e.preventDefault();
                         scope.$apply(attrs.newTag);
                     }
                 });
             }
-        }
+        };
     })
 
     // -------------------------------------------------------------------------
@@ -208,17 +208,18 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
         return {
             restrict: 'A',
             link: function(scope, element, attrs) {
-                // Observe language changes.
-                $rootScope.$on('$translateChangeSuccess', onLanguageChanged);
 
                 // Language changed callback.
                 function onLanguageChanged() {
-                    if (attrs['activeMenu'] === $translate.use()) {
+                    if (attrs.activeMenu === $translate.use()) {
                         element.addClass('active');
                     } else {
                         element.removeClass('active');
                     }
                 }
+
+                // Observe language changes.
+                $rootScope.$on('$translateChangeSuccess', onLanguageChanged);
             }
         };
     })
@@ -231,17 +232,18 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
         return {
             restrict: 'A',
             link: function(scope, element, attrs) {
-                // Observe location changes.
-                $rootScope.$on('$locationChangeSuccess', onLocationChanged);
 
                 // Location changed callback.
                 function onLocationChanged() {
                     if (attrs.href.substring(1) === $location.path()) {
-                        element.addClass(attrs['activeLink']);
+                        element.addClass(attrs.activeLink);
                     } else {
-                        element.removeClass(attrs['activeLink']);
+                        element.removeClass(attrs.activeLink);
                     }
                 }
+
+                // Observe location changes.
+                $rootScope.$on('$locationChangeSuccess', onLocationChanged);
             }
         };
     })
@@ -255,14 +257,14 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
             restrict: 'A',
             link: function(scope, $element, attrs) {
                 $element.spectrum({
-                    color: scope.$eval(attrs['ngModel']),
+                    color: scope.$eval(attrs.ngModel),
                     showInput: true,
                     allowEmpty: true,
                     showAlpha: true,
                     preferredFormat: "hex",
                     showButtons: false,
                     change: function(color) {
-                        scope.$eval(attrs['oncolorchanged'] || '', { value: color });
+                        scope.$eval(attrs.oncolorchanged || '', { value: color });
                     }
                 });
 
@@ -376,7 +378,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                     angular.forEach(original, function(entity) {
                         var match = false;
                         for(var i = 0; i < toFilter.length; i++) {
-                            if(toFilter[i][attrs.displayAttr] == entity[attrs.displayAttr]) {
+                            if(toFilter[i][attrs.displayAttr] === entity[attrs.displayAttr]) {
                                 match = true;
                                 break;
                             }
@@ -423,21 +425,22 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                 var document = $window.document;
 
                 function scrollInto(idOrName) {//find element with the give id of name and scroll to the first element it finds
-                    if(!idOrName)
-                        $window.scrollTo(0, 0);
+                    if(!idOrName){$window.scrollTo(0, 0);}
                     //check if an element can be found with id attribute
                     var el = document.getElementById(idOrName);
                     if(!el) {//check if an element can be found with name attribute if there is no such id
                         el = document.getElementsByName(idOrName);
 
-                        if(el && el.length)
+                        if(el && el.length){
                             el = el[0];
-                        else
+
+                        }else{
                             el = null;
+                        }
                     }
 
                     if(el) //if an element is found, scroll to the element
-                        el.scrollIntoView();
+                    {el.scrollIntoView();}
                     //otherwise, ignore
                 }
 

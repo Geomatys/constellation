@@ -11,19 +11,49 @@ module.exports = function(grunt) {
         clean: ['<%= target_dir %>'],
 
 // TODO → Enabled JavaScript code style validation.
+        //TODO clenup globals after refactoring
 // Previous attempts using following configuration reveal more than 500 errors.
-//
-//        // Validate JavaScript code style.
-//        jshint: {
-//            app: {
-//                options: {
-//                    'curly': true,
-//                    'eqnull': true,
-//                    'eqeqeq': true
-//                },
-//                src: ['<%= src_dir %>/js/**/*.js']
-//            }
-//        },
+
+        // Validate JavaScript code style.
+        jshint: {
+            app: {
+                options: {
+                    'curly': true,
+                    'eqnull': true,
+                    'eqeqeq': true,
+                    'nonew':true,
+                    'noarg':true,
+                    'forin':true,
+                    'noempty':true,
+                    'undef':true,
+                    'bitwise':true,
+                    'browser':true,
+                    'jquery':true,
+                    'latedef':true,
+                    'immed':true,
+                    'freeze':true,
+                    'globals':{
+                        "angular":true,
+                        "Growl":true,
+                        "dataNotReady":true,
+                        "$translate":true,
+                        "cstlAdminApp":true,
+                        "console":true,
+                        "DataViewer":true,
+                        "confirm":true,
+                        "OpenLayers":true,
+                        "WmtsViewer":true,
+                        "d3":true,
+                        "alert":true,
+                        "Stomp":true,
+                        "SockJS":true,
+                        "Netcdf":true,
+                        "c3":true
+                    }
+                },
+                src: ['<%= src_dir %>/js/**/*.js']
+            }
+        },
 
         // Copy assets files.
         copy: {
@@ -233,13 +263,13 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
 //    grunt.loadNpmTasks('grunt-contrib-htmlmin');
-//    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-ng-annotate');
 
     // Register tasks.
-    grunt.registerTask('dev', [/*'jshint',*/ 'clean', 'copy', 'less', 'concat']);
-    grunt.registerTask('prod', [/*'jshint',*/ 'clean', 'copy', 'less', 'concat', 'ngAnnotate', 'uglify'/*, 'htmlmin'*/]);
-    grunt.registerTask('update', [/*'jshint',*/ 'copy:app', 'less:app', 'concat:app', 'concat:app_index']);
+    grunt.registerTask('dev', ['jshint', 'clean', 'copy', 'less', 'concat']);
+    grunt.registerTask('prod', ['jshint', 'clean', 'copy', 'less', 'concat', 'ngAnnotate', 'uglify'/*, 'htmlmin'*/]);
+    grunt.registerTask('update', ['jshint', 'copy:app', 'less:app', 'concat:app', 'concat:app_index']);
 };

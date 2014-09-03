@@ -13,7 +13,6 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
-'use strict';
 
 cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance', 'dataListing',
     'provider', 'firstStep', 'UploadFiles', 'Growl',
@@ -113,7 +112,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                         $scope.import.uploadType = selectedExtension.dataType;
                         if ($scope.import.uploadType === "vector") {
                             var subType;
-                            if (fileExtension=="shp" || fileExtension=="SHP") {
+                            if (fileExtension==="shp" || fileExtension==="SHP") {
                                 subType = "";
                             } else {
                                 subType = "shapefile";
@@ -260,7 +259,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
         };
 
         $scope.import.finish = function() {
-            if ($scope.import.uploadType != null ) {
+            if ($scope.import.uploadType !== null ) {
                 $scope.uploaded();
             } else {
                 Growl('error','Error','Select Data Type');
@@ -327,7 +326,7 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
             var extension = path.substring(lastPointIndex+1, path.length);
             dataListing.extension({}, {value: extension},
                 function(response) {//success
-                    if (response.dataType!="") {
+                    if (response.dataType!=="") {
                         $scope.import.uploadType = response.dataType;
                     }
                     $scope.import.allowNext = true;
@@ -376,7 +375,7 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
             var extension = $scope.currentPath.substring(lastPointIndex+1, $scope.currentPath.length);
             dataListing.extension({}, {value: extension},
                 function(response) {//success
-                    if (response.dataType!="") {
+                    if (response.dataType!=="") {
                         $scope.import.uploadType = response.dataType;
                     }
                 });
@@ -419,7 +418,7 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
             },function(response){//error
                 Growl('error','Error','Unable to connect database. Verify parrameters');
             });
-        }
+        };
 
 }]);
 
@@ -462,15 +461,15 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
         };
 
         $scope.import.allowNext = false;
-        if ($scope.import.dataPath != null && $scope.import.dataPath.length > 0){
+        if ($scope.import.dataPath !== null && $scope.import.dataPath.length > 0){
             $scope.import.identifier = $scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').substr(0,$scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').lastIndexOf('.'));
         }
-        if ($scope.import.identifier != null && $scope.import.identifier.length > 0) {
+        if ($scope.import.identifier !== null && $scope.import.identifier.length > 0) {
             $scope.import.allowNext = true;
         }
 
         $scope.verifyAllowNext = function(){
-                if (($scope.import.identifier != null && $scope.import.identifier.length > 0) ) {
+                if (($scope.import.identifier !== null && $scope.import.identifier.length > 0) ) {
                     var letters = /^[A-Za-zàèìòùáéíóúäëïöüñãõåæøâêîôû0-9\-_]+$/;
                     var id = $scope.import.identifier;
                     if(!id.match(letters)) {
@@ -479,7 +478,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                     }else {
                         $scope.import.allowNext = true;
                     }
-                }else if ($scope.import.metadata  != null && $scope.import.metadata.length > 0) {
+                }else if ($scope.import.metadata  !== null && $scope.import.metadata.length > 0) {
                     $scope.import.allowNext = true;
                 } else {
                     $scope.import.allowNext = false;
@@ -487,7 +486,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
         };
 
         $scope.import.next = function() {
-            if ($scope.import.metadata != null || $scope.import.identifier != null) {
+            if ($scope.import.metadata !== null || $scope.import.identifier !== null) {
                 $scope.uploadMetadata();
             } else {
                 $scope.selectType();
@@ -499,13 +498,13 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
             $scope.import.allowNext = false;
             if ($scope.import.db.url) {
                 $scope.importDb();
-            } else if ($scope.import.uploadType == null) {
+            } else if ($scope.import.uploadType === null) {
                 $scope.import.currentStep = 'step3Type';
                 $scope.import.allowSubmit = true;
             } else {
                 $scope.uploaded();
             }
-        }
+        };
 
         $scope.uploadMetadata = function() {
             var $form = $('#uploadMetadataForm');
@@ -538,7 +537,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
             $scope.$apply(function() {
                 $scope.import.metadata = md.value;
                 $scope.import.identifier = null;
-                if ($scope.import.metadata != null && $scope.import.metadata.length > 0){
+                if ($scope.import.metadata !== null && $scope.import.metadata.length > 0){
                     $scope.import.allowNext = true;
                 }
             });
@@ -625,19 +624,21 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
             });
         };
 
+        //success
+        function linkSensorImported(sensorId, response) {
+            for (var i=0; i<response.length; i++) {
+                dataListing.linkToSensor({providerId: response[i].Provider,
+                    dataId: response[i].Name,
+                    sensorId: sensorId}, {value: response[i].Namespace});
+            }
+        }
+
         function importAndLinkSensor(path) {
             sensor.add({}, {values: {'path' : path}}, function(sensors) {
                 Growl('success','Success','Sensor correctly imported');
                 for (var s=0; s<sensors.length; s++) {
                     var sensorId = sensors[s].identifier;
-                    dataListing.listDataForProv({providerId: $scope.import.providerId},
-                        function(response) {//success
-                            for (var i=0; i<response.length; i++) {
-                                dataListing.linkToSensor({providerId: response[i].Provider,
-                                                          dataId: response[i].Name,
-                                                          sensorId: sensorId}, {value: response[i].Namespace});
-                            }
-                        });
+                    dataListing.listDataForProv({providerId: $scope.import.providerId},linkSensorImported(sensorId));
                 }
             }, function() {
                 Growl('error','Error','Unable to import sensor');
@@ -656,8 +657,10 @@ cstlAdminApp.controller('ModalImportDataStep4SNetcdfController', ['$scope', 'dat
             $scope.coveragesData = dataListing.listCoverage({}, {value: providerId},
                 function(response) {//success
                     for (var key in response.values) {
-                        displayLayer(response.values[key]);
-                        break;
+                        if(response.values.hasOwnProperty(key)){
+                            displayLayer(response.values[key]);
+                            break;
+                        }
                     }
             });
         }
@@ -668,5 +671,5 @@ cstlAdminApp.controller('ModalImportDataStep4SNetcdfController', ['$scope', 'dat
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('dataPreviewMap');
-        };
+        }
     }]);

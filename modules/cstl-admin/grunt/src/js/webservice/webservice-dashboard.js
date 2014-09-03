@@ -79,7 +79,7 @@ angular.module('cstl-webservice-dashboard', ['cstl-restapi', 'cstl-services', 'p
                     }
                 }
             });
-        };
+        }
 
         // Show Logs methods
         $scope.showLogs = function(service) {

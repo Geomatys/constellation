@@ -27,7 +27,7 @@ angular.module('cstl-admin-processing', ['cstl-restapi', 'cstl-services'])
         var topic = StompService.subscribe('/topic/taskevents', function(data) {
             var event = JSON.parse(data.body);
             var task = $scope.tasks[event.id];
-            if (task != null) {
+            if (task !== null) {
                 task.percent = event.percent;
                 if (task.percent > 99) {
                     delete $scope.tasks[event.id];

@@ -38,7 +38,7 @@ angular.module('cstl-admin', ['cstl-admin-system',
             'domainmembers':   { name: 'domainmembers',   url: 'views/admin/domain/members.html'  }
         };
 
-        $scope.currentView = viewUrls['system_state'];
+        $scope.currentView = viewUrls.system_state;
 
         $scope.changeView = function(page) {
             $scope.currentView = viewUrls[page];
@@ -64,7 +64,7 @@ angular.module('cstl-admin', ['cstl-admin-system',
             $scope.changeView('groups');
         } else if ($location.url() === '/admin/domains') {
             $scope.changeView('domains');
-        } else if ($location.url().indexOf('/admin/domainmembers/') != -1) {
+        } else if ($location.url().indexOf('/admin/domainmembers/') !== -1) {
             $scope.changeView('domainmembers');
         }
     });

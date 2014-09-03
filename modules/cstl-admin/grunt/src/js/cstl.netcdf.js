@@ -3,7 +3,7 @@ window.Netcdf = {
 
     index: 0,
 
-    changedCRS: new Array(),
+    changedCRS: [],
     /**
      * Change layer saw
      * @param $caller
@@ -65,7 +65,7 @@ window.Netcdf = {
 
     chooseHorizontal : function(filter, state){
         var filterSelected = "none";
-        if(filter != ""){
+        if(filter !== ""){
             filterSelected=filter;
         }
 
@@ -108,7 +108,7 @@ window.Netcdf = {
             Netcdf.updateChangedCRS(layer, $(this).data("value"), $(this).html());
 
             $('#chooseHorizontal').modal("hide");
-        })
+        });
 
         var $nbElement = $("#nbElements");
         $nbElement.empty();
@@ -117,7 +117,7 @@ window.Netcdf = {
         $("#previous").parent().removeClass("disabled");
         $("#next").parent().removeClass("disabled");
 
-        if(Netcdf.index==0){
+        if(Netcdf.index===0){
             $("#previous").parent().addClass("disabled");
         }
 
@@ -133,7 +133,7 @@ window.Netcdf = {
         var toSaved = {"crsCode":value, "crsName":name};
         for (var i = 0; i < Netcdf.changedCRS.length; i++) {
             var alreadyChanged = Netcdf.changedCRS[i];
-            if(layer == alreadyChanged[0]){
+            if(layer === alreadyChanged[0]){
                 alreadyChanged[1] = toSaved;
                 var layerId = "#"+layer.replace(/[^\w\s]/gi, '');
                 $(layerId).val(value);
@@ -150,13 +150,13 @@ window.Netcdf = {
         var search = Netcdf.$caller.data("value");
         for (var i = 0; i < Netcdf.changedCRS.length; i++) {
             var changed = Netcdf.changedCRS[i];
-            if(search == changed[0]){
+            if(search === changed[0]){
                 return changed[1];
             }
         }
         return undefined;
     }
-}
+};
 
 
 

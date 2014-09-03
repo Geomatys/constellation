@@ -27,14 +27,15 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 templateUrl: 'views/admin/user/details.html',
                 controller: 'UserDetailsController',
                 resolve: {
-                    'isUpdate': function() {return true},
+                    'isUpdate': function() {return true;},
                     'user': function(){
                         return angular.copy($scope.list[i]);
                     }
                 }
             }).result.then(function(user){
-                    if(user != null)
+                    if(user !== null){
                         $scope.list[i] = user;
+                    }
                 });
         };
         $scope.add = function(i) {
@@ -42,14 +43,15 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 templateUrl: 'views/admin/user/add.html',
                 controller: 'UserDetailsController',
                 resolve: {
-                    'isUpdate': function() {return false},
+                    'isUpdate': function() {return false;},
                     'user': function(){
                         return {roles:[]};
                     }
                 }
             }).result.then(function(user){
-                    if(user != null)
+                    if(user !== null){
                         $scope.list[$scope.list.length] = user;
+                    }
                 });
         };
         $scope.deleteUser = function(i){
@@ -72,32 +74,35 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
         };
         $scope.deleteTag = function(role){
             var newRoles = [];
-            for(var i=0; i<user.roles.length; i++)
-                if(user.roles[i] != role)
+            for(var i=0; i<user.roles.length; i++){
+                if(user.roles[i] !== role){
                     newRoles[newRoles.length] = user.roles[i];
+                }
+            }
             user.roles = newRoles;
         };
 
         $scope.addRole = function(role){
-            for(var i=0; i < $scope.user.roles.length; i++)
-                if(role === $scope.user.roles[i])
-                    return;
+            for(var i=0; i < $scope.user.roles.length; i++){
+                if(role === $scope.user.roles[i]){return;}
+            }
 
-            $scope.user.roles[$scope.user.roles.length]=role
+            $scope.user.roles[$scope.user.roles.length]=role;
         };
         var timeout=null;
         $scope.checkLogin = function(login){
-            if(timeout != null){
+            if(timeout !== null){
                 window.clearTimeout(timeout);
                 timeout = null;
             }
             timeout = setTimeout(function(){
-                if($scope.user.login && $scope.user.login.length > 2)
+                if($scope.user.login && $scope.user.login.length > 2){
                     GeneralService.checkLogin($scope.user.login).success(function(res){
-                        $scope.loginInUse=res.available=="false"
+                        $scope.loginInUse=res.available==="false";
                     }).error(function(){
-                    })
-            }, 400)
+                    });
+                }
+            }, 400);
         };
 
 
@@ -105,14 +110,15 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
 
         $scope.save = function(){
             var userResource = new UserResource($scope.user);
-            if(isUpdate)
+            if(isUpdate){
                 userResource.$update(function(updated){
                     $modalInstance.close(updated);
                 }, function(){
                     $translate(['Error','admin.user.save.error']).then(function (translations) {
                         Growl('error', translations.Error,  translations['admin.user.save.error']);
-                    })});
-            else
+                    });});
+            }
+            else{
                 userResource.$save(function(saved){
                     $modalInstance.close(saved);
                 }, function(){
@@ -120,7 +126,8 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                         Growl('error', translations.Error,  translations['admin.user.save.error']);
                     });
                 });
-        }
+            }
+        };
     })
     
     .controller('DomainController', function($scope, $modal, DomainResource) {
@@ -139,11 +146,12 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                     templateUrl: 'views/admin/domain/details.html',
                     controller: 'DomainDetailsController',
                     resolve: {
-                        'domain': function(){ return {}}
+                        'domain': function(){ return {};}
                     }
                 }).result.then(function(domain){
-                        if(domain != null)
+                        if(domain !== null){
                             $scope.domains[$scope.domains.length] = domain;
+                        }
                     });
             };
 
@@ -163,11 +171,12 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                     templateUrl: 'views/admin/domain/details.html',
                     controller: 'DomainDetailsController',
                     resolve: {
-                        domain: function(){return DomainResource.get({id: $scope.domains[i].id})}
+                        domain: function(){return DomainResource.get({id: $scope.domains[i].id});}
                     }
                 }).result.then(function(domain){
-                        if(domain != null)
+                        if(domain !== null){
                             $scope.domains[i] = domain;
+                        }
                     });
             };
 
@@ -176,12 +185,13 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                     templateUrl: 'views/admin/domain/members.html',
                     controller: 'DomainMembersController',
                     resolve: {
-                        domain: function(){return DomainResource.get({id: $scope.domains[i].id}).$promise},
-                        members: function(){return DomainResource.members({id: $scope.domains[i].id}).$promise}
+                        domain: function(){return DomainResource.get({id: $scope.domains[i].id}).$promise;},
+                        members: function(){return DomainResource.members({id: $scope.domains[i].id}).$promise;}
                     }
                 }).result.then(function(domain){
-                        if(domain != null)
+                        if(domain !== null){
                             $scope.domains[$scope.domains.length] = domain;
+                        }
                     });
             };
         });
@@ -196,14 +206,15 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
 
         $scope.save = function(){
             var domainResource = new DomainResource($scope.domain);
-            if($scope.domain.id)
+            if($scope.domain.id){
                 domainResource.$update({id: $scope.domain.id }, function(updated){
                     $modalInstance.close(updated);
                 }, function(){
                     $translate(['Error','admin.domain.save.error']).then(function (translations) {
                         Growl('error', translations.Error,  translations['admin.domain.save.error']);
-                    })});
-            else
+                    });});
+            }
+            else{
                 domainResource.$save(function(saved){
                     $modalInstance.close(saved);
                 }, function(){
@@ -211,15 +222,16 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                         Growl('error', translations.Error,  translations['admin.domain.save.error']);
                     });
                 });
-        }
+            }
+        };
     })
     
     .controller('DomainMembersController', function($scope, $routeParams, DomainResource, DomainRoleResource, $modal) {
         DomainResource.get({id: $routeParams.domainId}, function(domain){
-            $scope.domain = domain
+            $scope.domain = domain;
         });
         DomainResource.members({id: $routeParams.domainId}, function(members){
-            $scope.members = members
+            $scope.members = members;
         });
 
         $scope.changeDomainRoles = function(user) {
@@ -227,14 +239,14 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 templateUrl: 'views/admin/domain/changeUserRoles.html',
                 controller: 'DomainChangeUserRolesController',
                 resolve: {
-                    'domain': function(){ return $scope.domain},
-                    'user': function(){ return angular.copy(user)},
-                    'allDomainRoles': function(){return DomainRoleResource.query().$promise}
+                    'domain': function(){ return $scope.domain;},
+                    'user': function(){ return angular.copy(user);},
+                    'allDomainRoles': function(){return DomainRoleResource.query().$promise;}
                 }
             }).result.then(function(domain){
                     DomainResource.members({id: $routeParams.domainId}, function(members){
-                        $scope.members = members
-                    })
+                        $scope.members = members;
+                    });
                 });
         };
 
@@ -243,19 +255,19 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 templateUrl: 'views/admin/domain/addMembers.html',
                 controller: 'DomainAddMembersController',
                 resolve: {
-                    'domain': function(){ return $scope.domain.$promise},
-                    'users': function(){ return DomainResource.nonmembers({id: $routeParams.domainId}).$promise}
+                    'domain': function(){ return $scope.domain.$promise;},
+                    'users': function(){ return DomainResource.nonmembers({id: $routeParams.domainId}).$promise;}
                 }
             }).result.then(function(domain){
                     DomainResource.members({id: $routeParams.domainId}, function(members){
-                        $scope.members = members
-                    })
+                        $scope.members = members;
+                    });
                 });
         };
         $scope.removeMemberFromDomain = function(i){
             DomainResource.removeMemberFromDomain({domainId: $scope.domain.id, userId: $scope.members[i].id}, function(){
                 $scope.members.splice(i, 1);
-            })
+            });
         };
     })
     
@@ -271,7 +283,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
             var user = $scope.users[i];
             DomainResource.addMemberToDomain({userId: user.id, domainId: $scope.domain.id}, [1], function(){
                 $scope.users.splice(i, 1);
-                if($scope.users.length==0){
+                if($scope.users.length===0){
                     $modalInstance.close('close');
                 }
             });
@@ -290,7 +302,9 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
         $scope.save = function(){
             var roleIds = [];
             for(var i in $scope.user.domainRoles){
-                roleIds[roleIds.length] = $scope.user.domainRoles[i].id;
+                if($scope.user.domainrole.hasOwnProperty(i)){
+                    roleIds[roleIds.length] = $scope.user.domainRoles[i].id;
+                }
             }
             DomainResource.updateMemberInDomain({userId: user.id, domainId: $scope.domain.id}, roleIds, function(){
                 $modalInstance.close(user);
@@ -316,12 +330,13 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                     templateUrl: 'views/admin/group/details.html',
                     controller: 'DomainRoleDetailsController',
                     resolve: {
-                        'domainrole': function(){ return {permissions:[]}},
-                        'allPermissions': function(){ return $scope.allPermissions }
+                        'domainrole': function(){ return {permissions:[]};},
+                        'allPermissions': function(){ return $scope.allPermissions; }
                     }
                 }).result.then(function(domainrole){
-                        if(domainrole != null)
+                        if(domainrole !== null){
                             $scope.domainroles[$scope.domainroles.length] = domainrole;
+                        }
                     });
             };
 
@@ -329,7 +344,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 DomainRoleResource.delete({id: $scope.domainroles[i].id}, {} , function(resp){
                     $scope.domainroles.splice(i, 1);
                 }, function(err){
-                    var errorCode = err.data
+                    var errorCode = err.data;
                     $translate(['Error',errorCode]).then(function (translations) {
                         Growl('error', translations.Error,  translations[errorCode]);
                     });
@@ -341,12 +356,12 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                     templateUrl: 'views/admin/group/details.html',
                     controller: 'DomainRoleDetailsController',
                     resolve: {
-                        'domainrole': function(){return DomainRoleResource.get({id: $scope.domainroles[i].id})},
-                        'allPermissions': function(){ return $scope.allPermissions }
+                        'domainrole': function(){return DomainRoleResource.get({id: $scope.domainroles[i].id});},
+                        'allPermissions': function(){ return $scope.allPermissions; }
                     }
                 }).result.then(function(domainrole){
-                        if(domainrole != null){
-                            domainrole.memberList = $scope.domainroles[i].memberList
+                        if(domainrole !== null){
+                            domainrole.memberList = $scope.domainroles[i].memberList;
                             $scope.domainroles[i] = domainrole;
                         }
                     });
@@ -366,7 +381,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
 
         $scope.save = function(){
             var domainResource = new DomainResource($scope.domainrole);
-            if($scope.domainrole.id == undefined){
+            if($scope.domainrole.id === undefined){
                 domainResource.$save(function(saved){
                     $modalInstance.close(saved);
                 }, function(){
@@ -380,7 +395,8 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 }, function(){
                     $translate(['Error','admin.domain.save.error']).then(function (translations) {
                         Growl('error', translations.Error,  translations['admin.domain.save.error']);
-                    })});
+                    });
+                });
             }
-        }
+        };
     });

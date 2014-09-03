@@ -13,8 +13,6 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
-'use strict';
-
 
 cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', 'webService',
     'dataListing', 'DomainResource', 'provider', '$window', 'style', 'textService', '$modal',
@@ -258,7 +256,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 dataListing.hideData({providerid: providerId, dataid: layerName}, {value : $scope.selected.Namespace},
                     function() { Growl('success','Success','Data '+ layerName +' successfully deleted');
                         dataListing.listDataForProv({providerId: providerId}, function(response) {
-                            if (response.length == 0) {
+                            if (response.length === 0) {
                                 provider.delete({id: providerId}, function() {
                                     dataListing.listAll({}, function(response) {
                                         $scope.fullList = response;
@@ -281,7 +279,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 templateUrl: 'views/data/modalViewMetadata.html',
                 controller: 'ViewMetadataModalController',
                 resolve: {
-                    'selected':function(){return $scope.selected},
+                    'selected':function(){return $scope.selected;},
                     'metadataValues':function(textService){
                         return textService.metadataJson($scope.selected.Provider,
                             $scope.selected.Name, $scope.selected.Type.toLowerCase(), true);
@@ -402,47 +400,47 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 templateUrl: 'views/data/linkedDomains.html',
                 controller: 'ModalDataLinkedDomainsController',
                 resolve: {
-                    'domains': function() {return dataListing.domains({dataId: $scope.selected.Id}).$promise},
-                    'dataId': function(){return $scope.selected.Id}
+                    'domains': function() {return dataListing.domains({dataId: $scope.selected.Id}).$promise;},
+                    'dataId': function(){return $scope.selected.Id;}
                 }
             });
         };
 
         $scope.truncate = function(small, text){
-            if(text != null) {
+            if(text !== null) {
                 if (window.innerWidth >= 1200) {
-                    if (small == true && text.length > 20) {
+                    if (small === true && text.length > 20) {
                         return text.substr(0, 20) + "...";
-                    } else if (small == false && text.length > 65) {
+                    } else if (small === false && text.length > 65) {
                         return text.substr(0, 65) + "...";
-                    } else return text;
+                    } else { return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
-                    if (small == true && text.length > 12) {
+                    if (small === true && text.length > 12) {
                         return text.substr(0, 12) + "...";
-                    } else if (small == false && text.length > 50) {
+                    } else if (small === false && text.length > 50) {
                         return text.substr(0, 50) + "...";
-                    } else return text;
+                    } else { return text ;}
                 } else if (window.innerWidth < 992) {
                     if (text.length > 30) {
                         return text.substr(0, 30) + "...";
-                    } else return text;
+                    } else { return text;}
                 }
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if(text != null) {
+            if(text !== null) {
                 if (window.innerWidth >= 1200) {
                     if (text.length > 40) {
                         return text.substr(0, 40) + "...";
-                    } else return text;
+                    } else { return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
                     if (text.length > 30) {
                         return text.substr(0, 30) + "...";
-                    } else return text;
+                    } else {return text;}
                 } else if (window.innerWidth < 992) {
                     if (text.length > 20) {
                         return text.substr(0, 20) + "...";
-                    } else return text;
+                    } else { return text; }
                 }
             }
         };
@@ -468,7 +466,7 @@ cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalIn
             Growl('error','error', response.data.message );
             dataListing.domains({dataId:dataId}, function(domains){
                $scope.domains = domains;          
-             })
+             });
           }); 
         }else{
         	dataListing.linkToDomain(pathParams, {}, function(){
@@ -477,7 +475,7 @@ cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalIn
             
           }); 
         }
-      }
+      };
 	
 }]);
 
@@ -663,7 +661,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             // Shallow copy
             newField.field = jQuery.extend({}, fieldObj.field);
             newField.field.value=fieldObj.field.defaultValue;
-            if(newField.field.path.indexOf('+')==-1){
+            if(newField.field.path.indexOf('+')===-1){
                 newField.field.path = newField.field.path+'+';
             }
             var indexOfField = blockObj.block.children.indexOf(fieldObj);
@@ -724,7 +722,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
                 fieldObj.field.value=fieldObj.field.defaultValue;
                 var fieldPath = fieldObj.field.path;
                 fieldPath = fieldPath.replace(commonStr,'');
-                if(fieldPath.indexOf('[')==0){
+                if(fieldPath.indexOf('[')===0){
                     fieldPath = '['+max+fieldPath.substring(fieldPath.indexOf(']'));
                     fieldPath = commonStr+fieldPath;
                     fieldObj.field.path = fieldPath;
@@ -777,9 +775,9 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             for(var i=0;i<superBlockObj.superblock.children.length;i++){
                 var childObj = superBlockObj.superblock.children[i];
                 var childPath = childObj.block.path;
-                if(childPath && childPath.indexOf(prefix)!=-1){
+                if(childPath && childPath.indexOf(prefix)!==-1){
                     childPath = childPath.replace(prefix,'');
-                    if(childPath.indexOf('[')==0){
+                    if(childPath.indexOf('[')===0){
                         var numero = childPath.substring(1,childPath.indexOf(']'));
                         max = Math.max(max,parseInt(numero));
                     }
@@ -795,7 +793,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
          * @returns {null} if path does not contains occurrence number.
          */
         function getNumeroForPath(path){
-            if(path && path.indexOf('[')!=-1){
+            if(path && path.indexOf('[')!==-1){
                 var number = path.substring(path.lastIndexOf('[')+1,path.length-1);
                 return number;
             }
@@ -807,7 +805,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
          * to allow collapsible/expandable panels.
          */
         function initCollapseEvents () {
-            if(window.collapseEditionEventsRegistered)return; //to fix a bug with angular
+            if(window.collapseEditionEventsRegistered){return;} //to fix a bug with angular
             $(document).on('click','#editorMetadata .small-block .heading-block',function(){
                 var blockRow = $(this).parents('.block-row');
                 var parent = $(this).parent('.small-block');
@@ -901,8 +899,9 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
          * @param parentBlock
          */
         $scope.updateIsoInspireSelectOneMenu = function(value,parentBlock) {
-            if(value != null) {
+            if(value !== null) {
                 var INSPIRE_ISO_MAP = {};
+                /* jshint ignore:start */
                 INSPIRE_ISO_MAP['Elevation'] = 'MD_TopicCategoryCode.elevation';
                 INSPIRE_ISO_MAP['Geology'] = 'MD_TopicCategoryCode.geoscientificInformation';
                 INSPIRE_ISO_MAP['Habitats and biotopes'] = 'MD_TopicCategoryCode.biota';
@@ -935,6 +934,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
                 INSPIRE_ISO_MAP['Utility and governmental services'] = 'MD_TopicCategoryCode.utilitiesCommunication';
                 INSPIRE_ISO_MAP['Soil'] = 'MD_TopicCategoryCode.geoscientificInformation';
                 INSPIRE_ISO_MAP['Energy resources'] = 'MD_TopicCategoryCode.economy';
+                /* jshint ignore:end */
                 var valueToSet=INSPIRE_ISO_MAP[value];
                 parentBlock.children[4].field.value=valueToSet;
             }
@@ -1001,45 +1001,88 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             }else{
                 $scope.listSelect=[];
             }
-        }
+        };
         $scope.dataInArray = function(item){
             if($scope.listSelect.length>0) {
                 for (var i = 0; i < $scope.listSelect.length; i++) {
-                    if ($scope.listSelect[i].Name == item.Name && $scope.listSelect[i].Provider == item.Provider) {
+                    if ($scope.listSelect[i].Name === item.Name && $scope.listSelect[i].Provider === item.Provider) {
                         $scope.listSelect.splice(i, 1);
                         break;
                     }
-                    if(i==$scope.listSelect.length-1){
-                        if ($scope.listSelect[i].Name != item.Name || $scope.listSelect[i].Provider != item.Provider){
+                    if(i===$scope.listSelect.length-1){
+                        if ($scope.listSelect[i].Name !== item.Name || $scope.listSelect[i].Provider !== item.Provider){
                             $scope.listSelect.push(item);
                             break;
                         }
                     }
                 }
-            } else $scope.listSelect.push(item);
+            } else { $scope.listSelect.push(item);}
 
             if($scope.listSelect.length < $scope.dataList.length){
                 $scope.dataSelect.all=false;
-            } else $scope.dataSelect.all=true;
-        }
+            } else { $scope.dataSelect.all=true; }
+        };
         $scope.isInSelected = function(item){
             for(var i=0; i < $scope.listSelect.length; i++){
-                if($scope.listSelect[i].Name == item.Name && $scope.listSelect[i].Provider == item.Provider){
+                if($scope.listSelect[i].Name === item.Name && $scope.listSelect[i].Provider === item.Provider){
                     return true;
                 }
             }
             return false;
-        }
+        };
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
 
+        function addLayer(tiledProvider) {
+            webService.addLayer({type: service.type, id: service.identifier},
+                {layerAlias: tiledProvider.dataId, layerId: tiledProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: tiledProvider.providerId},
+                function () {
+                    Growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
+                    $modalInstance.close();
+                },
+                function () {
+                    Growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
+                    $modalInstance.dismiss('close');
+                }
+            );
+        }
+
+        function pyramidGenerationError(i) {
+            Growl('error', 'Error', 'Failed to generate conform pyramid for ' + $scope.selected[i].Name);
+            $modalInstance.dismiss('close');
+        }
+
+        function success(response) {
+            Growl('success', 'Success', response.message);
+            // Not in WMTS and no pyramid requested
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
+            modalLoader.close();
+            $modalInstance.close();
+        }
+
+        function error(response) {
+            Growl('error', 'Error', response.message);
+            $modalInstance.dismiss('close');
+        }
+
+        function setScale(response) {
+            $scope.scales = response.Entry[0].split(',');
+        }
+
+        function errorOnPyramid(j) {
+            Growl('error', 'Error', 'Unable to pyramid data ' + $scope.selected[j].Name);
+        }
+
         $scope.choose = function() {
-            if ($scope.listSelect.length != 0) {
+            if ($scope.listSelect.length !== 0) {
                 $scope.selected = $scope.listSelect;
             }
-            if ($scope.selected == null) {
+            if ($scope.selected === null) {
                 Growl('warning', 'Warning', 'No data selected');
                 $modalInstance.dismiss('close');
                 return;
@@ -1063,86 +1106,36 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                         for(var i=0; i<$scope.selected.length; i++) {
                             if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
                                 // In the case of a wms service and user asked to pyramid the data
-                                dataListing.pyramidConform({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, {}, function (tiledProvider) {
-                                    webService.addLayer({type: service.type, id: service.identifier},
-                                        {layerAlias: tiledProvider.dataId, layerId: tiledProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: tiledProvider.providerId},
-                                        function () {
-                                            Growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
-                                            $modalInstance.close();
-                                        },
-                                        function () {
-                                            Growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
-                                            $modalInstance.dismiss('close');
-                                        }
-                                    );
-                                }, function () {
-                                    Growl('error', 'Error', 'Failed to generate conform pyramid for ' + $scope.selected[i].Name);
-                                    $modalInstance.dismiss('close');
-                                });
+                                dataListing.pyramidConform({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, {}, addLayer, pyramidGenerationError(i));
                             } else {
                                 webService.addLayer({type: service.type, id: service.identifier},
                                     {layerAlias: $scope.selected[i].Name, layerId: $scope.selected[i].Name, serviceType: service.type, serviceId: service.identifier, providerId: $scope.selected[i].Provider, layerNamespace: $scope.selected[i].Namespace},
-                                    function (response) {
-                                        Growl('success', 'Success', response.message);
-                                        modalLoader.close();
-                                        $modalInstance.close();
-                                    },
-                                    function (response) {
-                                        Growl('error', 'Error', response.message);
-                                        $modalInstance.dismiss('close');
-                                    }
-                                );
+                                    success,error);
                             }
                         }
-                        // Not in WMTS and no pyramid requested
-                        var modalLoader = $modal.open({
-                            templateUrl: 'views/modalLoader.html',
-                            controller: 'ModalInstanceCtrl'
-                        });
                         return;
                     }
-                    for(var i=0; i<$scope.selected.length; i++) {
+                    for(var j=0; j<$scope.selected.length; j++) {
                         // WMTS here, prepare form
-                        dataListing.pyramidScales({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, function (response) {
-                            $scope.scales = response.Entry[0].split(',');
-                        }, function () {
-                            Growl('error', 'Error', 'Unable to pyramid data ' + $scope.selected[i].Name);
-                        });
-
+                        dataListing.pyramidScales({providerId: $scope.selected[j].Provider, dataId: $scope.selected[j].Name}, setScale, errorOnPyramid(j));
                         $scope.wmtsParams = true;
                     }
                 } else {
                     // Finish the WMTS publish process
                     // Pyramid the data to get the new provider to add
-                    for(var i=0; i<$scope.selected.length; i++) {
-                        dataListing.pyramidData({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name},
-                            {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY},
-                            function (respProvider) {
-                                // Add the tiled provider to the service
-                                webService.addLayer({type: service.type, id: service.identifier},
-                                    {layerAlias: respProvider.dataId, layerId: respProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: respProvider.providerId},
-                                    function () {
-                                        Growl('success', 'Success', 'Layer ' + respProvider.dataId + ' successfully added to service ' + service.name);
-                                        $modalInstance.close();
-                                    },
-                                    function () {
-                                        Growl('error', 'Error', 'Layer ' + respProvider.dataId + ' failed to be added to service ' + service.name);
-                                        $modalInstance.dismiss('close');
-                                    }
-                                );
-                            }, function () {
-                                Growl('error', 'Error', 'Pyramid process failed for ' + $scope.selected[i].Name);
-                            });
+                    for(var k=0; k<$scope.selected.length; k++) {
+                        dataListing.pyramidData({providerId: $scope.selected[k].Provider, dataId: $scope.selected[k].Name},
+                            {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY}, addLayer, pyramidGenerationError(k));
                     }
                 }
             }
         };
 
         $scope.truncate = function(text){
-            if(text != null) {
+            if(text !== null) {
                 if (text.length > 40) {
                     return text.substr(0, 40) + "...";
-                } else return text;
+                } else { return text; }
             }
         };
     }]);
@@ -1157,7 +1150,7 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
         $scope.selectedData = selected;
 
         function initCollapseEvents () {
-            if(window.collapseEventsRegistered)return; //to fix a bug with angular
+            if(window.collapseEventsRegistered) {return;} //to fix a bug with angular
             $(document).on('click','.expand-all-btn',function(){
                 var labels = $(this).find('.label');
                 var icon = $(this).find('.fa');
@@ -1210,10 +1203,10 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
         }
 
         $scope.isDateField = function(render){
-            return (render.toLowerCase().indexOf('date') != -1);
+            return (render.toLowerCase().indexOf('date') !== -1);
         };
         $scope.isCodelistField = function(render){
-            return (render.toLowerCase().indexOf('codelist') != -1);
+            return (render.toLowerCase().indexOf('codelist') !== -1);
         };
 
         $scope.initMetadataViewer = function() {
