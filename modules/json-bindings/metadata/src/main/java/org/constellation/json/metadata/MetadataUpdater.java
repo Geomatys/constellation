@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Date;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import org.opengis.metadata.citation.Responsibility;
@@ -37,6 +38,9 @@ import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.quality.ConformanceResult;
 import org.opengis.metadata.quality.Result;
+import org.opengis.metadata.spatial.SpatialRepresentation;
+import org.opengis.metadata.spatial.VectorSpatialRepresentation;
+import org.opengis.referencing.ReferenceSystem;
 import org.opengis.util.CodeList;
 import org.opengis.util.FactoryException;
 import org.apache.sis.util.iso.Types;
@@ -45,6 +49,10 @@ import org.apache.sis.metadata.TypeValuePolicy;
 import org.apache.sis.metadata.ValueExistencePolicy;
 import org.geotoolkit.metadata.MetadataFactory;
 import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
+import org.apache.sis.internal.jaxb.metadata.ReferenceSystemMetadata;
+import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.xml.NilReason;
 
 
@@ -156,9 +164,11 @@ final class MetadataUpdater {
                 } else {
                     existingChildren = Collections.emptyIterator();
                     final Class<?> type = specialize(getType(metadata, identifier));
-                    final Object child = FACTORY.create(type, Collections.<String,Object>emptyMap());
-                    update(np.head(childBase + 1), child);
-                    asMap(metadata).put(identifier, child);
+                    if (!specialMetadataCases(type, metadata, identifier)) {
+                        final Object child = FACTORY.create(type, Collections.<String,Object>emptyMap());
+                        update(np.head(childBase + 1), child);
+                        asMap(metadata).put(identifier, child);
+                    }
                 }
             }
         } while (np != null && np.isChildOf(parent));
@@ -252,11 +262,70 @@ final class MetadataUpdater {
      */
     @SuppressWarnings("deprecation")
     private static Class<?> specialize(Class<?> type) {
-        if (type == Responsibility.class)   type = ResponsibleParty.class;
-        if (type == Identification.class)   type = DataIdentification.class;
-        if (type == GeographicExtent.class) type = GeographicBoundingBox.class;
-        if (type == Constraints.class)      type = LegalConstraints.class;
-        if (type == Result.class)           type = ConformanceResult.class;
+        if (type == Responsibility.class)        type = ResponsibleParty.class;
+        if (type == Identification.class)        type = DataIdentification.class;
+        if (type == GeographicExtent.class)      type = GeographicBoundingBox.class;
+        if (type == SpatialRepresentation.class) type = VectorSpatialRepresentation.class;
+        if (type == Constraints.class)           type = LegalConstraints.class;
+        if (type == Result.class)                type = ConformanceResult.class;
         return type;
+    }
+
+    /**
+     * Hard-coded handling of some special cases.
+     *
+     * @todo We need a more generic mechanism.
+     *
+     * @return {@code true} if we applied a special case.
+     */
+    private boolean specialMetadataCases(final Class<?> type, final Object metadata, final String identifier) throws ParseException {
+        if (metadata instanceof DefaultTemporalExtent && identifier.equals("extent")) {
+            /*
+             * Properties:
+             *   - identificationInfo.extent.temporalElement.extent.beginPosition
+             *   - identificationInfo.extent.temporalElement.extent.endPosition
+             *
+             * Reason: "extent" is a TemporalPrimitive, which is defined outside of ISO 19115.
+             */
+            boolean moved = false;
+            Date beginPosition = null, endPosition = null;
+            while (np.path.length >= 2 && np.path[np.path.length - 2].equals("extent")) {
+                final Date t = (value != null) ? new Date(((Number) value).longValue()) : null;
+                switch (np.path[np.path.length - 1]) {
+                    case "beginPosition": beginPosition = t; break;
+                    case "endPosition":   endPosition   = t; break;
+                    default: throw new ParseException("Unsupported property: \"" + np + "\".");
+                }
+                moved = true;
+                if (!next()) break;
+            }
+            if (moved) {
+                ((DefaultTemporalExtent) metadata).setBounds(beginPosition, endPosition);
+                return true;
+            }
+        } else if (type == ReferenceSystem.class && identifier.equals("referenceSystemInfo")) {
+            /*
+             * Properties:
+             *   - referenceSystemInfo.referenceSystemIdentifier.code
+             *
+             * Reason: "referenceSystemInfo" is a ReferenceSystem, which is defined outside of ISO 19115.
+             */
+            boolean moved = false;
+            String code = null;
+            while (np.path.length >= 2 && np.path[np.path.length - 2].equals("referenceSystemIdentifier")) {
+                switch (np.path[np.path.length - 1]) {
+                    case "code": code = (String) value; break;
+                    default: throw new ParseException("Unsupported property: \"" + np + "\".");
+                }
+                moved = true;
+                if (!next()) break;
+            }
+            if (moved) {
+                ((DefaultMetadata) metadata).setReferenceSystemInfo((code == null) ? Collections.<ReferenceSystem>emptySet() :
+                        Collections.<ReferenceSystem>singleton(new ReferenceSystemMetadata(new ImmutableIdentifier(null, null, code))));
+                return true;
+            }
+        }
+        return false;
     }
 }

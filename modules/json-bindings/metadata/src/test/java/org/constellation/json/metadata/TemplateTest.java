@@ -208,4 +208,17 @@ public final strictfp class TemplateTest {
         Template.getInstance("profile_inspire_vector").read(readAllLines("vector_prune.json"), metadata, true);
         assertTrue(expected.equals(metadata, ComparisonMode.DEBUG));
     }
+
+    /**
+     * Tests reading the un-pruned file. This test just ensures that no exception is thrown - we do not
+     * yet verify the content.
+     *
+     * @throws IOException if an error occurred while reading the test JSON file.
+     */
+    @Test
+    public void testReadFull() throws IOException {
+        final DefaultMetadata metadata = new DefaultMetadata();
+        Template.getInstance("profile_inspire_vector").read(readAllLines("vector_test.json"), metadata, false);
+        assertFalse(metadata.isEmpty());
+    }
 }

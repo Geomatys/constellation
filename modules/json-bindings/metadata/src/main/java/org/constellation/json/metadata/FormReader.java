@@ -176,7 +176,9 @@ final class FormReader {
                         throw new ConcurrentModificationException();
                     }
                 }
-                list.add(value);
+                if (value != null) { // 'null' can means an empty list, but not null element in the list.
+                    list.add(value);
+                }
             } else if (values.put(key, value) != null) {
                 throw new ParseException(formatPath("Path \"", path, "\" is repeated twice."));
             }
