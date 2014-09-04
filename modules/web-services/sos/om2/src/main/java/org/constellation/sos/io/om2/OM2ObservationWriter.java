@@ -809,13 +809,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         try {
             final Connection c              = source.getConnection();
             c.setAutoCommit(false);
-            int pid = -1;
-            final Statement stmt = c.createStatement();
-            final ResultSet rs = stmt.executeQuery("SELECT \"pid\" FROM \"om\".\"procedures\" WHERE id='" + procedureID + "'");
-            if (rs.next()) {
-                pid = rs.getInt(1);
-            }
-            rs.close();
+            final int pid = getPIDFromProcedure(procedureID, c);
             if (pid == -1) {
                 c.close();
                 LOGGER.log(Level.FINE, "Unable to find a procedure:{0}", procedureID);
@@ -848,6 +842,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             removeObservationForProcedure(procedureID);
             final Connection c              = source.getConnection();
             c.setAutoCommit(false);
+            final int pid = getPIDFromProcedure(procedureID, c);
+            
             final PreparedStatement stmtObsP = c.prepareStatement("DELETE FROM \"om\".\"offering_observed_properties\" "
                                                                 + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
             final PreparedStatement stmtFoi  = c.prepareStatement("DELETE FROM \"om\".\"offering_foi\" "
@@ -872,6 +868,16 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             stmtObs.executeUpdate();
             stmtObs.close();
             
+            // remove measure table
+            if (pid == -1) {
+                c.close();
+                LOGGER.log(Level.FINE, "Unable to find a procedure:{0}", procedureID);
+                return;
+            }
+            final Statement stmtDrop = c.createStatement();
+            stmtDrop.executeUpdate("DROP TABLE \"mesures\".\"mesure" + pid + "\"");
+            stmtDrop.close();
+                    
             //look for unused observed properties (execute the statement 2 times for remaining components)
             final Statement stmtOP = c.createStatement();
             for (int i = 0; i < 2; i++) {
