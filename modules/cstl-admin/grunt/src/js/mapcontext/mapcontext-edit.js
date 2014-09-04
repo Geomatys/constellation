@@ -498,7 +498,7 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.truncate = function(test,text){
-            if(text !== null) {
+            if(text) {
                 if (test !== 'chooseLayer' && text.length > 30) {
                     return text.substr(0, 30) + "...";
                 } else if (test === 'chooseLayer' && text.length > 60) {

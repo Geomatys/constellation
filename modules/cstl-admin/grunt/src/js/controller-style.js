@@ -97,7 +97,7 @@ cstlAdminApp.controller('StylesController', ['$scope', 'Dashboard', 'style', 'Gr
         };
 
         $scope.truncate = function(small, text){
-            if(text !== null) {
+            if(text) {
                 if (window.innerWidth >= 1200) {
                     if (small === true && text.length > 20) {
                         return text.substr(0, 20) + "...";
@@ -118,7 +118,7 @@ cstlAdminApp.controller('StylesController', ['$scope', 'Dashboard', 'style', 'Gr
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if(text !== null) {
+            if(text) {
                 if (window.innerWidth >= 1200) {
                     if (text.length > 40) {
                         return text.substr(0, 40) + "...";
@@ -2425,7 +2425,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
         };
 
         $scope.truncate = function(text){
-            if(text !== null) {
+            if(text) {
                 if (text.length > 30) {
                     return text.substr(0, 30) + "...";
                 } else {return text;}

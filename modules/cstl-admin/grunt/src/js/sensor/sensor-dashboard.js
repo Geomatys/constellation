@@ -101,7 +101,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         };
 
         $scope.truncate = function(small, text){
-            if(text !== null) {
+            if(text) {
                 if (window.innerWidth >= 1200) {
                     if (small === true && text.length > 30) {
                         return text.substr(0, 30) + "...";
@@ -122,7 +122,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if(text !== null) {
+            if(text) {
                 if (window.innerWidth >= 1200) {
                     if (text.length > 40) {
                         return text.substr(0, 40) + "...";
@@ -171,7 +171,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         };
 
         $scope.truncate = function(text){
-            if(text !== null) {
+            if(text) {
                 if (text.length > 30) {
                     return text.substr(0, 30) + "...";
                 } else {return text;}

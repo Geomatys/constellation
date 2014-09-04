@@ -135,7 +135,7 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
         };
 
         $scope.truncate = function(small, text){
-            if(text !== null) {
+            if(text) {
                 if (window.innerWidth >= 1200) {
                     if (small === true && text.length > 30) {
                         return text.substr(0, 30) + "...";
@@ -156,7 +156,7 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if(text !== null) {
+            if(text) {
                 if (window.innerWidth >= 1200) {
                     if (text.length > 40) {
                         return text.substr(0, 40) + "...";
