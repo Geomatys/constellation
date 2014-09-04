@@ -7,7 +7,9 @@
                 translate="edition.style.label.edition">Style Edition</h4>
         </div>
         <div class="modal-body" style="overflow-y: auto;">
-            <div ng-include="page.pageSld"/>
+            <div>
+                <ng-include src="page.pageSld"></ng-include>
+            </div>
         </div>
         <div class="modal-footer">
             <button type="button"

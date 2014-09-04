@@ -31,7 +31,9 @@
         
         <div class="modal-body modal-body-style" style="overflow-y: auto;">
             <div ng-show="isSelectedChooser('new') || isSelectedChooser('edit') || isSelectedChooser('duplicate')">
-                <div ng-include="page.pageSld"/>
+                <div>
+                    <ng-include src="page.pageSld"></ng-include>
+                </div>
             </div>
             <div class="row"  ng-show="isSelectedChooser('existing')">
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-left: 0;padding-right: 0;">

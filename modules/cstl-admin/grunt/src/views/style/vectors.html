@@ -183,16 +183,24 @@
                                         </div>
                                     </accordion-heading>
                                     <div ng-if="symbolizer['@symbol'] === 'point'">
-                                        <div ng-include="'views/style/point.html'"></div>
+                                        <div>
+                                            <ng-include src="'views/style/point.html'"></ng-include>
+                                        </div>
                                     </div>
                                     <div ng-if="symbolizer['@symbol'] === 'line'">
-                                        <div ng-include="'views/style/line.html'"></div>
+                                        <div>
+                                            <ng-include src="'views/style/line.html'"></ng-include>
+                                        </div>
                                     </div>
                                     <div ng-if="symbolizer['@symbol'] === 'polygon'">
-                                        <div ng-include="'views/style/polygon.html'"></div>
+                                        <div>
+                                            <ng-include src="'views/style/polygon.html'"></ng-include>
+                                        </div>
                                     </div>
                                     <div ng-if="symbolizer['@symbol'] === 'text'">
-                                        <div ng-include="'views/style/text.html'"></div>
+                                        <div>
+                                            <ng-include src="'views/style/text.html'"></ng-include>
+                                        </div>
                                     </div>
                                 </accordion-group>
                             </accordion>

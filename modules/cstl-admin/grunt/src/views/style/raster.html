@@ -136,10 +136,14 @@
                 </div>
                 <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='symbols'}">
                     <div ng-if="optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells">
-                        <div ng-include="'views/style/raster_sld.html'"></div>
+                        <div>
+                            <ng-include src="'views/style/raster_sld.html'"></ng-include>
+                        </div>
                     </div>
                     <div ng-if="optionsSLD.enableRasterCells && !optionsSLD.enableRasterPalette">
-                        <div ng-include="'views/style/raster_cells.html'"></div>
+                        <div>
+                            <ng-include src="'views/style/raster_cells.html'"></ng-include>
+                        </div>
                     </div>
                 </div>
                 <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='filters'}">
