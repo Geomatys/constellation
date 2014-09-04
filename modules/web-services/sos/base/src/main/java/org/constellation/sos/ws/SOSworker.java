@@ -20,10 +20,34 @@ package org.constellation.sos.ws;
 
 // JDK dependencies
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import javax.imageio.spi.ServiceRegistry;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.MonolineFormatter;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER_LC;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
@@ -37,6 +61,38 @@ import org.constellation.sos.factory.SMLFactory;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.sos.ws.DatablockParser.Values;
+import static org.constellation.sos.ws.DatablockParser.getResultValues;
+import static org.constellation.sos.ws.Normalizer.normalizeDocument;
+import static org.constellation.sos.ws.Normalizer.regroupObservation;
+import static org.constellation.sos.ws.SOSConstants.ACCEPTED_OUTPUT_FORMATS;
+import static org.constellation.sos.ws.SOSConstants.EVENT_TIME;
+import static org.constellation.sos.ws.SOSConstants.INSERTION_CAPABILITIES;
+import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
+import static org.constellation.sos.ws.SOSConstants.NOT_SUPPORTED;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_MODEL;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_QNAME;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_TEMPLATE;
+import static org.constellation.sos.ws.SOSConstants.OFFERING;
+import static org.constellation.sos.ws.SOSConstants.OPERATIONS_METADATA_100;
+import static org.constellation.sos.ws.SOSConstants.OPERATIONS_METADATA_200;
+import static org.constellation.sos.ws.SOSConstants.OUTPUT_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.PROCEDURE;
+import static org.constellation.sos.ws.SOSConstants.PROCEDURE_DESCRIPTION_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.PROFILES_V200;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V100;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
+import static org.constellation.sos.ws.SOSConstants.SOS;
+import static org.constellation.sos.ws.SOSConstants.SOS_FILTER_CAPABILITIES_V100;
+import static org.constellation.sos.ws.SOSConstants.SOS_FILTER_CAPABILITIES_V200;
+import static org.constellation.sos.ws.SOSConstants.SUPPORTED_FOI_TYPES;
+import static org.constellation.sos.ws.SOSConstants.SUPPORTED_OBS_TYPES;
+import static org.constellation.sos.ws.SOSUtils.BoundMatchEnvelope;
+import static org.constellation.sos.ws.SOSUtils.extractTimeBounds;
+import static org.constellation.sos.ws.SOSUtils.getCollectionBound;
+import static org.constellation.sos.ws.SOSUtils.getIDFromObject;
+import static org.constellation.sos.ws.SOSUtils.getSensorPosition;
+import static org.constellation.sos.ws.SOSUtils.samplingPointMatchEnvelope;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.UnauthorizedException;
@@ -65,6 +121,11 @@ import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.AcceptFormats;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 import org.geotoolkit.ows.xml.OWSXmlFactory;
 import org.geotoolkit.ows.xml.Range;
 import org.geotoolkit.ows.xml.RequestBase;
@@ -91,8 +152,34 @@ import org.geotoolkit.sos.xml.InsertResultTemplate;
 import org.geotoolkit.sos.xml.InsertResultTemplateResponse;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
+import static org.geotoolkit.sos.xml.ResponseModeType.INLINE;
+import static org.geotoolkit.sos.xml.ResponseModeType.OUT_OF_BAND;
+import static org.geotoolkit.sos.xml.ResponseModeType.RESULT_TEMPLATE;
 import org.geotoolkit.sos.xml.ResultTemplate;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildCapabilities;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildContents;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDataArrayProperty;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDeleteSensorResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildEnvelope;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureCollection;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetObservationByIdResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetObservationResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetResultResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetResultTemplateResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildInsertObservationResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildInsertResultResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildInsertResultTemplateResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildInsertSensorResponse;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildObservationCollection;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildOffering;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildRange;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeAfter;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeBefore;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeDuring;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeEquals;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimePeriod;
 import org.geotoolkit.sos.xml.SosInsertionMetadata;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
@@ -100,6 +187,7 @@ import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.DataRecord;
+import org.geotoolkit.swe.xml.PhenomenonProperty;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swes.xml.DeleteSensor;
 import org.geotoolkit.swes.xml.DeleteSensorResponse;
@@ -143,95 +231,6 @@ import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.temporal.TemporalObject;
 import org.opengis.temporal.TemporalPrimitive;
 import org.opengis.util.CodeList;
-
-import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-import java.io.File;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-
-import static org.constellation.api.QueryConstants.SERVICE_PARAMETER_LC;
-import static org.constellation.sos.ws.DatablockParser.getResultValues;
-import static org.constellation.sos.ws.Normalizer.normalizeDocument;
-import static org.constellation.sos.ws.Normalizer.regroupObservation;
-import static org.constellation.sos.ws.SOSConstants.ACCEPTED_OUTPUT_FORMATS;
-import static org.constellation.sos.ws.SOSConstants.EVENT_TIME;
-import static org.constellation.sos.ws.SOSConstants.INSERTION_CAPABILITIES;
-import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
-import static org.constellation.sos.ws.SOSConstants.NOT_SUPPORTED;
-import static org.constellation.sos.ws.SOSConstants.OBSERVATION_MODEL;
-import static org.constellation.sos.ws.SOSConstants.OBSERVATION_QNAME;
-import static org.constellation.sos.ws.SOSConstants.OBSERVATION_TEMPLATE;
-import static org.constellation.sos.ws.SOSConstants.OFFERING;
-import static org.constellation.sos.ws.SOSConstants.OPERATIONS_METADATA_100;
-import static org.constellation.sos.ws.SOSConstants.OPERATIONS_METADATA_200;
-import static org.constellation.sos.ws.SOSConstants.OUTPUT_FORMAT;
-import static org.constellation.sos.ws.SOSConstants.PROCEDURE;
-import static org.constellation.sos.ws.SOSConstants.PROCEDURE_DESCRIPTION_FORMAT;
-import static org.constellation.sos.ws.SOSConstants.PROFILES_V200;
-import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
-import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V100;
-import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
-import static org.constellation.sos.ws.SOSConstants.SOS;
-import static org.constellation.sos.ws.SOSConstants.SOS_FILTER_CAPABILITIES_V100;
-import static org.constellation.sos.ws.SOSConstants.SOS_FILTER_CAPABILITIES_V200;
-import static org.constellation.sos.ws.SOSConstants.SUPPORTED_FOI_TYPES;
-import static org.constellation.sos.ws.SOSConstants.SUPPORTED_OBS_TYPES;
-import static org.constellation.sos.ws.SOSUtils.BoundMatchEnvelope;
-import static org.constellation.sos.ws.SOSUtils.extractTimeBounds;
-import static org.constellation.sos.ws.SOSUtils.getCollectionBound;
-import static org.constellation.sos.ws.SOSUtils.getIDFromObject;
-import static org.constellation.sos.ws.SOSUtils.getSensorPosition;
-import static org.constellation.sos.ws.SOSUtils.samplingPointMatchEnvelope;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
-import static org.geotoolkit.sos.xml.ResponseModeType.INLINE;
-import static org.geotoolkit.sos.xml.ResponseModeType.OUT_OF_BAND;
-import static org.geotoolkit.sos.xml.ResponseModeType.RESULT_TEMPLATE;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildCapabilities;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildContents;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDataArrayProperty;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDeleteSensorResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildEnvelope;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureCollection;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetObservationByIdResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetObservationResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetResultResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetResultTemplateResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildInsertObservationResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildInsertResultResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildInsertResultTemplateResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildInsertSensorResponse;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildObservationCollection;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildOffering;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildRange;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeAfter;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeBefore;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeDuring;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeEquals;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimePeriod;
 
 
 /**
@@ -2397,7 +2396,11 @@ public class SOSworker extends AbstractWorker {
                         code = INVALID_PARAMETER_VALUE;
                         locator = "version";
                     }
-                    throw new CstlServiceException("version must be \"1.0.0\" or \"2.0.0\"!", code, locator);
+                    final StringBuilder sb = new StringBuilder();
+                    for (ServiceDef v : supportedVersions) {
+                        sb.append("\"").append(v.version.toString()).append("\"");
+                    }
+                    throw new CstlServiceException("version must be " + sb.toString() + "!", code, locator);
                 }
             } else {
                 if (versionMandatory) {
@@ -2457,7 +2460,7 @@ public class SOSworker extends AbstractWorker {
          */
         if (version.equals("1.0.0")) {
             final ObservationOffering offeringAll = omReader.getObservationOffering("offering-allSensor", version);
-            if (offering != null) {
+            if (offeringAll != null) {
                 updateOffering(offeringAll, template);
             } else {
                 createOffering(version, "allSensor", template);
@@ -2526,6 +2529,7 @@ public class SOSworker extends AbstractWorker {
 
         //we add the template phenomenon
         final List<String> observedProperties = template.getObservedProperties();
+        final List<PhenomenonProperty> observedPropertiesV100 = template.getFullObservedProperties();
 
         //we add the template feature of interest
         final String featureOfInterest = template.getFeatureOfInterest();
@@ -2549,7 +2553,7 @@ public class SOSworker extends AbstractWorker {
                                             srsName,
                                             time,
                                             Arrays.asList(process),
-                                            null,
+                                            observedPropertiesV100,
                                             observedProperties,
                                             Arrays.asList(featureOfInterest),
                                             offeringOutputFormat,

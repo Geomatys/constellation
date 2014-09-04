@@ -69,7 +69,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 
@@ -165,13 +164,16 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             final Connection c           = source.getConnection();
             c.setAutoCommit(false);
             int generatedID = getNewObservationId();
-            for (Observation observation : observations) {
-                final String oid = writeObservation(observation, c, generatedID);
-                c.commit();
-                results.add(oid);
-                generatedID++;
+            try {
+                for (Observation observation : observations) {
+                    final String oid = writeObservation(observation, c, generatedID);
+                    c.commit();
+                    results.add(oid);
+                    generatedID++;
+                }
+            } finally {
+                c.close();
             }
-            c.close();
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observations.", ex);
         }
@@ -286,6 +288,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     
     private String writePhenomenon(final PhenomenonProperty phenomenonP, final Connection c) throws SQLException {
         final String phenomenonId = getPhenomenonId(phenomenonP);
+        if (phenomenonId == null) return null;
+        
         final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
         stmtExist.setString(1, phenomenonId);
         final ResultSet rs = stmtExist.executeQuery();
@@ -389,11 +393,12 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     
     private void writeResult(final int oid, final int pid, final String procedureID, final Object result, final TemporalObject samplingTime, final Connection c) throws SQLException, DataStoreException {
         if (result instanceof Measure) {
+            buildMeasureTable(procedureID, pid, c);
             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"mesures\".\"mesure" + pid + "\" VALUES(?,?,?)");
             final Measure measure = (Measure) result;
             stmt.setInt(1, oid);
             stmt.setInt(2, 1);
-            stmt.setDouble(4, measure.getValue());
+            stmt.setDouble(3, measure.getValue());
             stmt.executeUpdate();
             stmt.close();
         } else if (result instanceof DataArrayProperty) {
@@ -478,6 +483,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 stmt2.setInt(2, oid);
                 stmt2.executeUpdate();
             }*/
+        } else if (result != null) {
+            throw new DataStoreException("This type of resultat is not supported :" + result.getClass().getName());
         }
     }
     
@@ -1081,6 +1088,41 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 insertFieldStmt.executeUpdate();
                 order++;
             }
+            insertFieldStmt.close();
+            
+        }
+    }
+    
+    private void buildMeasureTable(final String procedureID, final int pid, final Connection c) throws SQLException {
+        final String tableName = "mesure" + pid;
+        //look for existence
+        final boolean exist = measureTableExist(pid);
+        
+        if (!exist) {
+            final StringBuilder sb = new StringBuilder("CREATE TABLE \"mesures\".\"" + tableName + "\"("
+                                                     + "\"id_observation\" integer NOT NULL,"
+                                                     + "\"id\"             integer NOT NULL,");
+            if (!isPostgres) {
+                sb.append("\"value\" double);");
+            } else {
+                sb.append("\"value\" double precision);");
+            }
+            
+            final Statement stmt = c.createStatement();
+            stmt.executeUpdate(sb.toString());
+            stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_pk PRIMARY KEY (\"id_observation\", \"id\")");
+            stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName+ "_obs_fk FOREIGN KEY (\"id_observation\") REFERENCES \"om\".\"observations\"(\"id\")");
+            stmt.close();
+            
+            //fill procedure_descriptions table
+            final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)");
+            insertFieldStmt.setString(1, procedureID);
+            insertFieldStmt.setInt(2, 1);
+            insertFieldStmt.setString(3, "value");
+            insertFieldStmt.setString(4, "Quantity");
+            insertFieldStmt.setNull(5, java.sql.Types.VARCHAR);
+            insertFieldStmt.setNull(6, java.sql.Types.VARCHAR); // TODO
+            insertFieldStmt.executeUpdate();
             insertFieldStmt.close();
             
         }
