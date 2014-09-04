@@ -62,6 +62,7 @@ import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.CharSequences;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
@@ -910,12 +911,12 @@ public class DataRest {
     }
 
     /**
-     * Save metadata with merge from ISO19115 form
+     * Proceed to merge saved metadata with given values from metadata editor.
      *
-     * @param providerId
-     * @param type
-     * @param metadataValues
-     * @return 
+     * @param providerId the data provider identifier
+     * @param type the data type.
+     * @param metadataValues the values of metadata editor.
+     * @return {@link Response}
      */
     @POST
     @Path("metadata/merge/{providerId}/{type}")
@@ -941,13 +942,15 @@ public class DataRest {
             }
             final Template template = Template.getInstance(templateName);
 
-//            try{
-//                final CharSequence[] lines = CharSequences.splitOnEOL(metadataValues);
-//                template.read(Arrays.asList(lines),metadata,false);
-//            }catch(IOException ex){
-//                LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
-//                return Response.status(500).entity("failed").build();
-//            }
+            try{
+                //uncomment for debugging purposes.
+                //final CharSequence[] lines = CharSequences.splitOnEOL(metadataValues);
+                //template.read(Arrays.asList(lines),metadata,false);
+                template.read(metadataValues,metadata,false);
+            }catch(IOException ex){
+                LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
+                return Response.status(500).entity("failed").build();
+            }
             
             //Save metadata
             datasetBusiness.updateMetadata(providerId, -1, metadata);
