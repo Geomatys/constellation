@@ -73,20 +73,22 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 });
         }
 
-        function setSaved(ind, _el, iter){
-            switch($scope.inputs[iter].annotation.info){
-                case "valueClass:java.lang.Double":
-                    $scope.inputs[iter].save[ind] = parseFloat(jQuery(_el)[0].textContent);
-                    break;
-                case "valueClass:java.lang.Integer":
-                    $scope.inputs[iter].save[ind] = parseInt(jQuery(_el)[0].textContent);
-                    break;
-                case "valueClass:java.lang.Boolean":
-                    $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent === "true";
-                    break;
-                default:
-                    $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent;
-            }
+        function setSaved(dom, name, iter){
+            dom.find(name).each(function(ind, _el) {
+                switch ($scope.inputs[iter].annotation.info) {
+                    case "valueClass:java.lang.Double":
+                        $scope.inputs[iter].save[ind] = parseFloat(jQuery(_el)[0].textContent);
+                        break;
+                    case "valueClass:java.lang.Integer":
+                        $scope.inputs[iter].save[ind] = parseInt(jQuery(_el)[0].textContent);
+                        break;
+                    case "valueClass:java.lang.Boolean":
+                        $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent === "true";
+                        break;
+                    default:
+                        $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent;
+                }
+            });
 
         }
 
@@ -97,7 +99,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 for (var iter in $scope.inputs){
                     if($scope.inputs.hasOwnProperty(iter)){
                         var name = $scope.inputs[iter].name;
-                        dom.find(name).each(setSaved(iter));
+                        setSaved(dom, name, iter);
                     }
                 }
             }
@@ -134,7 +136,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         $scope.listAvailableStyles = function() {
             style.listAll({provider: 'sld'}, function (response) {
                 $scope.styles = [];
-                $.each(response.styles, function(i,style) {
+                jQuery.each(response.styles, function(i,style) {
                     var styleName = style.Name;
                     var styleRef = '${providerStyleType|sld|'+styleName+'}';
                     $scope.styles.push({name:styleName, ref:styleRef});
@@ -175,8 +177,6 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                                 $scope.task.inputs += '<' + element.name + '>' + (element.default||false) + '</' + element.name + '>';
                             }
                             break;
-
-                        case "valueClass:java.lang.String" : break;
                         default:
                             if (element.save && element.save.length > 0) {
                                 for (var save in element.save) {
