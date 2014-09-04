@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
     <bean id="siteBase" class="java.net.URI">
-        <constructor-arg value="http://localhost:8081/constellation/" />
+        <constructor-arg value="http://localhost:10080/constellation/" />
     </bean>
 
     <bean id="seleniumHub" class="java.net.URL">

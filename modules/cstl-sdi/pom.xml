@@ -144,7 +144,7 @@
                 <type>standalone</type>
                 <configuration>
                     <properties>
-                        <cargo.servlet.port>8081</cargo.servlet.port>
+                        <cargo.servlet.port>10080</cargo.servlet.port>
                     </properties>
                 </configuration>
             </configuration>
