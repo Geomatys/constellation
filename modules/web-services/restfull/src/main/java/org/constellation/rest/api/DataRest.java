@@ -161,6 +161,7 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
+import org.quartz.SchedulerException;
 
 /**
  * Manage data sending
@@ -1187,8 +1188,13 @@ public class DataRest {
         final org.geotoolkit.process.Process p = desc.createProcess(input);
 
         //add task in scheduler
-        CstlScheduler.getInstance().runOnce("Create conform pyramid for "+providerId+":"+dataId, p);
-        
+        try {
+            CstlScheduler.getInstance().runOnce("Create conform pyramid for "+providerId+":"+dataId, p);
+        } catch (SchedulerException e) {
+            LOGGER.log(Level.WARNING, "Unable to run pyramid process on scheduler");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+
         final ProviderData ref = new ProviderData(outProvider.getId(), outData.getName());
         return Response.ok(ref).status(202).build();
     }
@@ -1303,8 +1309,8 @@ public class DataRest {
         }
 
         // Update the parent attribute of the created provider
+        providerBusiness.updateParent(outProvider.getId(),providerId);
 
-          providerBusiness.updateParent(outProvider.getId(),providerId);
         //create the output pyramid coverage reference
         CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
         XMLCoverageReference outputRef;
@@ -1370,7 +1376,12 @@ public class DataRest {
         final org.geotoolkit.process.Process p = desc.createProcess(input);
 
         //add task in scheduler
-        CstlScheduler.getInstance().runOnce("Create pyramid "+crs+" for "+providerId+":"+dataId, p);
+        try {
+            CstlScheduler.getInstance().runOnce("Create pyramid "+crs+" for "+providerId+":"+dataId, p);
+        } catch (SchedulerException e) {
+            LOGGER.log(Level.WARNING, "Unable to run pyramid process on scheduler");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
                                 
         final ProviderData ref = new ProviderData(outProvider.getId(), outData.getName());
         return Response.ok(ref).status(202).build();

@@ -177,7 +177,7 @@ public final class CstlScheduler {
         getConfigurator().addTaskConfiguration(task);
     }
     
-    public void runOnce(String title, Process process){
+    public void runOnce(String title, Process process) throws SchedulerException {
         final TriggerBuilder tb = TriggerBuilder.newTrigger();
         final Trigger trigger = tb.startNow().build();
         
@@ -201,13 +201,7 @@ public final class CstlScheduler {
         
         
         once.add(task);
-        
-        try {
-            registerTask(task);
-        } catch (SchedulerException ex) {
-            LOGGER.log(Level.WARNING, "Failed to register task :"+task.getId()+","+task.getTitle()+" in scheduler.",ex);
-        }
-        
+        registerTask(task);
     }
     
     /**

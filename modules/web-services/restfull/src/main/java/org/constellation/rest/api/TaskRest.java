@@ -66,10 +66,7 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
+import org.quartz.*;
 
 /**
  * RestFull API for task management/operations.
@@ -381,30 +378,19 @@ public final class TaskRest {
         }
 
         //rebuild original values since we have changed the namespace
-        final ParameterDescriptorGroup originalDesc;
         try {
-            originalDesc = ProcessFinder.getProcessDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode()).getInputDescriptor();
+            final ProcessDescriptor processDesc = ProcessFinder.getProcessDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+            final ParameterDescriptorGroup originalDesc = processDesc.getInputDescriptor();
+            final ParameterValueGroup orig = originalDesc.createValue();
+            orig.values().addAll(params.values());
+
+            String title = taskParameter.getName()+" "+TASK_DATE.format(new Date());
+            CstlScheduler.getInstance().runOnce(title, processDesc.createProcess(orig));
         } catch (NoSuchIdentifierException ex) {
             return new AcknowlegementType("Failure", "No process for given id.");
         }  catch (InvalidParameterValueException ex) {
             throw new ConfigurationException(ex);
-        }
-        final ParameterValueGroup orig = originalDesc.createValue();
-        orig.values().addAll(params.values());
-
-        final Task task = new Task(UUID.randomUUID().toString());
-        task.setTitle(taskParameter.getName()+" "+TASK_DATE.format(new Date()));
-
-        final TriggerBuilder tb = TriggerBuilder.newTrigger();
-        final Trigger trigger = tb.startNow().build();
-        task.setTrigger((SimpleTrigger)trigger);
-
-        ProcessJobDetail detail = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(), orig);
-        task.setDetail(detail);
-
-        try{
-            CstlScheduler.getInstance().addTask(task);
-        }catch(ConfigurationException ex){
+        } catch (SchedulerException ex) {
             return new AcknowlegementType("Failure", "Failed to create task : "+ex.getMessage());
         }
 
