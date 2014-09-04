@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="siteBase" class="java.net.URI">
+        <constructor-arg value="http://localhost:8081/constellation/" />
+    </bean>
+
+    <bean id="seleniumHub" class="java.net.URL">
+        <constructor-arg value="http://localhost:4444/wd/hub"/>
+    </bean>
+
+    <bean id="capabilities" class="org.openqa.selenium.remote.DesiredCapabilities" factory-method="firefox"/>
+
+
+    <bean id="drv" class="org.openqa.selenium.remote.RemoteWebDriver" destroy-method="quit">
+        <constructor-arg type="java.net.URL" ref="seleniumHub"/>
+        <constructor-arg type="org.openqa.selenium.Capabilities" ref="capabilities"/>
+    </bean>
+</beans>

@@ -166,6 +166,7 @@
         <jersey.version>2.5</jersey.version>
 	    <jaxws.version>2.2.8</jaxws.version>
         <spring.version>4.0.6.RELEASE</spring.version>
+        <selenium.version>2.42.2</selenium.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
@@ -349,7 +350,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.2.2</version>
+                <version>4.3.5</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>

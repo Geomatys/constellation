@@ -15,6 +15,40 @@
   </properties>
 
   <dependencies>
+      <dependency>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.11</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-remote-driver</artifactId>
+          <version>${selenium.version}</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+          <version>${spring.version}</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-test</artifactId>
+          <version>${spring.version}</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-support</artifactId>
+          <version>${selenium.version}</version>
+          <scope>test</scope>
+      </dependency>
     <dependency>
       <groupId>org.constellation</groupId>
       <artifactId>cstl-admin</artifactId>
@@ -32,7 +66,7 @@
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-base</artifactId>
-      <version>0.9-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.media</groupId>
@@ -49,6 +83,8 @@
       <artifactId>jai_imageio</artifactId>
       <version>1.1</version>
     </dependency>
+      <!-- Test dependencies -->
+
   </dependencies>
 
   <build>
@@ -97,6 +133,52 @@
                 <password>admin</password>
                 <port>8080</port>
             </configuration>
+        </plugin>
+
+        <!-- Plugins to run integration test on apps -->
+        <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.2.4</version>
+            <configuration>
+                <type>standalone</type>
+                <configuration>
+                    <properties>
+                        <cargo.servlet.port>8081</cargo.servlet.port>
+                    </properties>
+                </configuration>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>start</id>
+                    <phase>pre-integration-test</phase>
+                    <goals>
+                        <goal>start</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>stop</id>
+                    <phase>post-integration-test</phase>
+                    <goals>
+                        <goal>stop</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.17</version>
+            <executions>
+                <execution>
+                    <id>default</id>
+                    <goals>
+                        <goal>integration-test</goal>
+                        <goal>verify</goal>
+                    </goals>
+                </execution>
+            </executions>
         </plugin>
     </plugins>
   </build>

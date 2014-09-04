@@ -31,20 +31,20 @@ module.exports = function(grunt) {
                     'globals':{
                         "angular":true,
                         "Growl":true,
-                        "dataNotReady":true,
                         "$translate":true,
-                        "cstlAdminApp":true,
                         "console":true,
-                        "DataViewer":true,
                         "confirm":true,
                         "OpenLayers":true,
-                        "WmtsViewer":true,
                         "d3":true,
                         "alert":true,
                         "Stomp":true,
                         "SockJS":true,
-                        "Netcdf":true,
-                        "c3":true
+                        "c3":true,
+                        "dataNotReady":true,
+                        "cstlAdminApp":true,
+                        "DataViewer":true,
+                        "WmtsViewer":true,
+                        "Netcdf":true
                     }
                 },
                 src: ['<%= src_dir %>/js/**/*.js']
