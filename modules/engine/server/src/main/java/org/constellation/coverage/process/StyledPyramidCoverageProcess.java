@@ -29,17 +29,10 @@ import java.util.logging.Level;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.ArraysExt;
 import org.constellation.configuration.TargetNotFoundException;
-import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.COVERAGE_BASE_NAME;
-import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.DOMAIN_ID;
-import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.IMAGE_FILE_PATH;
-import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.PROVIDER_OUT_ID;
-import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.PYRAMID_FOLDER;
-import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.STYLE;
+
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.*;
 import org.constellation.process.AbstractCstlProcess;
-import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviderFactory;
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.Providers;
+import org.constellation.provider.*;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.StyleReference;
 import org.geotoolkit.coverage.CoverageReference;
@@ -79,6 +72,7 @@ import org.opengis.util.NoSuchIdentifierException;
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 public class StyledPyramidCoverageProcess extends AbstractCstlProcess {
 
@@ -274,6 +268,8 @@ public class StyledPyramidCoverageProcess extends AbstractCstlProcess {
                 int count = domainRepository.addProviderDataToDomain(providerID, domainId );
                 LOGGER.info("Added " + count + " data to domain " + domainId);
             }
+
+            getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(outProvider.getSource());
         }
     }
     

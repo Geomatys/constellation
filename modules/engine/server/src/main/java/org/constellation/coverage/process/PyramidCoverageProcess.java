@@ -24,12 +24,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.process.AbstractCstlProcess;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.feature.type.DefaultName;
 
@@ -39,8 +40,6 @@ import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.coverage.mathcalc.MathCalcDescriptor;
-import org.opengis.coverage.Coverage;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
@@ -101,9 +100,13 @@ public class PyramidCoverageProcess extends AbstractCstlProcess {
             final URL fileUrl = URI.create("file:"+ pyramidFolder.getAbsolutePath() +"/tiles").toURL();
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(fileUrl);
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue("no namespace");
-            getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(pparams);
+
+            final DataProvider outProvider = DataProviders.getInstance().createProvider(providerID, factory, pparams);
+            getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(outProvider.getSource());
         } catch (MalformedURLException ex) {
             throw new ProcessException("the pyramid folder path is malformed", this, ex);
+        } catch (ConfigurationException ex) {
+            throw new ProcessException("Can't create provider", this, ex);
         }
     } 
  
@@ -114,5 +117,5 @@ public class PyramidCoverageProcess extends AbstractCstlProcess {
             return new DefaultName(baseName);
         }
     
-}
+    }
 }
