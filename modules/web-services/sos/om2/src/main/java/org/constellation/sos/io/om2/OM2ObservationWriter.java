@@ -413,65 +413,66 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 throw new DataStoreException("Only DataRecord/SimpleDataRecord is supported");
             }
             buildMeasureTable(procedureID, pid, array, c);
-            final List<Field> fields  = new ArrayList<>();
             final List<Field> fields2 = new ArrayList<>();
-            boolean hasTime = false;
             if (array.getPropertyElementType().getAbstractRecord() instanceof DataRecord) {
                 final DataRecord record = (DataRecord)array.getPropertyElementType().getAbstractRecord();
                 for (DataComponentProperty field : record.getField()) {
-                    if (field.getName().equalsIgnoreCase("Time")) {
-                        hasTime = true;
-                        fields2.add(new Field("Time", field.getName(), null, null));
-                    } else {
-                        if (field.getValue() instanceof Quantity) {
-                            final Quantity q = (Quantity)field.getValue();
-                            final String uom;
-                            if (q.getUom() != null) {
-                                uom = q.getUom().getCode();
-                            } else {
-                                uom = null;
-                            }
-                            final String desc = q.getDefinition();
-                            fields.add(new Field("Quantity", field.getName(), desc, uom));
-                            fields2.add(new Field("Quantity", field.getName(), desc, uom));
-                        } else if (field.getValue() instanceof AbstractText) {
-                            final AbstractText q = (AbstractText)field.getValue();
-                            final String desc = q.getDefinition();
-                            fields.add(new Field("Text", field.getName(), desc, null));
-                            fields2.add(new Field("Text", field.getName(), desc, null));
+
+                    if (field.getValue() instanceof AbstractTime) {
+                        final AbstractTime q = (AbstractTime) field.getValue();
+                        final String desc    = q.getDefinition();
+                        fields2.add(new Field("Time", field.getName(), desc, null));
+
+                    } else if (field.getValue() instanceof Quantity) {
+                        final Quantity q = (Quantity)field.getValue();
+                        final String uom;
+                        if (q.getUom() != null) {
+                            uom = q.getUom().getCode();
                         } else {
-                            throw new DataStoreException("Only Quantity and Text is supported for now");
+                            uom = null;
                         }
+                        final String desc = q.getDefinition();
+                        fields2.add(new Field("Quantity", field.getName(), desc, uom));
+                    } else if (field.getValue() instanceof AbstractText) {
+                        final AbstractText q = (AbstractText)field.getValue();
+                        final String desc = q.getDefinition();
+                        fields2.add(new Field("Text", field.getName(), desc, null));
+                    } else {
+                        throw new DataStoreException("Only Quantity, Time and Text are supported for now");
                     }
+
                 }
             } else {
                 final SimpleDataRecord record = (SimpleDataRecord)array.getPropertyElementType().getAbstractRecord();
                 for (AnyScalar field : record.getField()) {
-                    if (field.getName().equalsIgnoreCase("Time")) {
-                        hasTime = true;
-                        fields2.add(new Field("Time", field.getName(), null, null));
-                    } else {
-                        if (field.getValue() instanceof Quantity) {
-                            final Quantity q = (Quantity)field.getValue();
-                            final String uom  = q.getUom().getCode();
-                            final String desc = q.getDefinition();
-                            fields.add(new Field("Quantity", field.getName(), desc, uom));
-                            fields2.add(new Field("Quantity", field.getName(), desc, uom));
-                        } else if (field.getValue() instanceof AbstractText) {
-                            final AbstractText q = (AbstractText)field.getValue();
-                            final String desc = q.getDefinition();
-                            fields.add(new Field("Text", field.getName(), desc, null));
-                            fields2.add(new Field("Text", field.getName(), desc, null));
-                        } else if (field.getValue() instanceof AbstractBoolean) {
-                            final AbstractBoolean q = (AbstractBoolean)field.getValue();
-                            final String desc = q.getDefinition();
-                            fields.add(new Field("Boolean", field.getName(), desc, null));
-                            fields2.add(new Field("Boolean", field.getName(), desc, null));
+
+                    if (field.getValue() instanceof AbstractTime) {
+                        final AbstractTime q = (AbstractTime) field.getValue();
+                        final String desc    = q.getDefinition();
+                        fields2.add(new Field("Time", field.getName(), desc, null));
+
+                    } else if (field.getValue() instanceof Quantity) {
+                        final Quantity q = (Quantity)field.getValue();
+                        final String uom;
+                        if (q.getUom() != null) {
+                            uom = q.getUom().getCode();
                         } else {
-                            throw new DataStoreException("Only Quantity is supported for now");
+                            uom = null;
                         }
-                        
+                        final String desc = q.getDefinition();
+                        fields2.add(new Field("Quantity", field.getName(), desc, uom));
+                    } else if (field.getValue() instanceof AbstractText) {
+                        final AbstractText q = (AbstractText)field.getValue();
+                        final String desc = q.getDefinition();
+                        fields2.add(new Field("Text", field.getName(), desc, null));
+                    } else if (field.getValue() instanceof AbstractBoolean) {
+                        final AbstractBoolean q = (AbstractBoolean)field.getValue();
+                        final String desc = q.getDefinition();
+                        fields2.add(new Field("Boolean", field.getName(), desc, null));
+                    } else {
+                        throw new DataStoreException("Only Quantity, Time, Text and Boolean are supported for now");
                     }
+
                 }
             }
             final String values = array.getValues();
@@ -1151,7 +1152,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 }
 
                 //format time
-                if (field.fieldType.equals("Time")) {
+                if (field.fieldType.equals("Time") && value != null && !value.isEmpty()) {
                     try {
                         final long millis = new ISODateParser().parseToMillis(value);
                         value = "'" + new Timestamp(millis).toString() + "'";
