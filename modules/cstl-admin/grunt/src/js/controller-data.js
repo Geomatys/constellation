@@ -47,18 +47,33 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
           }
         };
 
+        /**
+         * Clean advanced search inputs.
+         */
         $scope.resetSearch = function(){
             $scope.search = {};
         };
 
+        /**
+         * pattern for inputs validity in advanced search
+         * @type {RegExp}
+         */
+        $scope.alphaPattern = /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/;
+
+        /**
+         * Check the validity against the pattern and display growl error for given validity.
+         * @param isInvalid
+         */
         $scope.checkIsValid = function(isInvalid){
           if (isInvalid){
               Growl('error','Error','Invalid Chars');
           }
         };
 
-        $scope.alphaPattern = /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/;
-
+        /**
+         * Binding action for search button in data dashboard.
+         * the result is stored with Dashboard service.
+         */
         $scope.callSearch = function(){
             if ($scope.searchTerm){
                 dataListing.findData({values: {'search': $scope.searchTerm}},
@@ -124,11 +139,10 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }, function() {
                     modalLoader.close();
                 });
+            }else if($scope.currentTab === 'tabmetadata') {
+                //@TODO call dataset rest api incoming works, do not modify this part!
+                modalLoader.close();
             }
-            // TODO ??
-            /*else if($scope.currentTab === 'tabmetadata') {
-
-            }*/
             //display button that allow to scroll to top of the page from a certain height.
             angular.element($window).bind("scroll", function() {
                 $scope.hideScroll = this.pageYOffset < 220;
@@ -409,7 +423,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
         };
 
         $scope.truncate = function(small, text){
-            if(text !== null) {
+            if(text) {
                 if (window.innerWidth >= 1200) {
                     if (small === true && text.length > 20) {
                         return text.substr(0, 20) + "...";
@@ -430,7 +444,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             }
         };
         $scope.truncateTitleBlock = function(text){
-            if(text !== null) {
+            if(text) {
                 if (window.innerWidth >= 1200) {
                     if (text.length > 40) {
                         return text.substr(0, 40) + "...";
