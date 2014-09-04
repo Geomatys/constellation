@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.admin.StyleBusiness;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.geotoolkit.io.X364;
@@ -51,6 +52,7 @@ public abstract class AbstractCstlProcess extends AbstractProcess {
     
     public AbstractCstlProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
+        SpringHelper.injectDependencies(this);
     }
     
     // affichage console ///////////////////////////////////////////////////////

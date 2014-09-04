@@ -19,7 +19,6 @@
 
 package org.constellation.process;
 
-import org.constellation.admin.SpringHelper;
 import org.geotoolkit.process.AbstractProcessDescriptor;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
@@ -55,9 +54,7 @@ public abstract class AbstractCstlProcessDescriptor extends AbstractProcessDescr
 
     @Override
     public final AbstractCstlProcess createProcess(final ParameterValueGroup input) {
-        final AbstractCstlProcess process = buildProcess(input);
-        SpringHelper.injectDependencies(process);
-        return process;
+        return buildProcess(input);
     }
 
     /**
