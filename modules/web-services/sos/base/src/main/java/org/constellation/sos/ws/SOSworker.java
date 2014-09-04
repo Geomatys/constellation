@@ -131,6 +131,7 @@ import org.geotoolkit.ows.xml.Range;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLUtilities;
 import org.geotoolkit.sml.xml.SmlFactory;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sos.xml.Capabilities;
@@ -2059,16 +2060,23 @@ public class SOSworker extends AbstractWorker {
             }
 
             //we create a new Identifier from the SensorML database
+            final String smlExtractedIdentifier = SensorMLUtilities.getSmlID(process);
             String num = "";
             if (temp.getProcedure() != null) {
-                if (temp.getProcedure().startsWith(sensorIdBase)) {
-                    id  = temp.getProcedure();
+                id  = temp.getProcedure();
+                if (id.startsWith(sensorIdBase)) {
                     num = id.substring(sensorIdBase.length());
-                    LOGGER.log(logLevel, "using specified sensor ID:{0} num ={1}", new Object[]{id, num});
+                } else {
+                    num = Integer.toString(smlWriter.getNewSensorId());
                 }
-            }
-
-            if (id.isEmpty()) {
+                LOGGER.log(logLevel, "using specified sensor ID:{0} num ={1}", new Object[]{id, num});
+                
+            } else if (!smlExtractedIdentifier.equals("unknow_identifier")){
+                num = Integer.toString(smlWriter.getNewSensorId());
+                id  = smlExtractedIdentifier;
+                
+                LOGGER.log(logLevel, "using extracted sensor ID:{0} num ={1}", new Object[]{id, num});
+            } else {
                 num = Integer.toString(smlWriter.getNewSensorId());
                 id  = sensorIdBase + num;
             }
@@ -2098,7 +2106,7 @@ public class SOSworker extends AbstractWorker {
                 
                 //we write the observation template in the O&M database
                 omWriter.writeObservationTemplate(temp);
-                assignedOffering = addSensorToOffering(process, num, temp, currentVersion);
+                assignedOffering = addSensorToOffering(num, temp, currentVersion);
             } else {
                 LOGGER.warning("unable to record Sensor template and location in O&M datasource: no O&M writer");
             }
@@ -2147,16 +2155,10 @@ public class SOSworker extends AbstractWorker {
             
             //we get the id of the sensor and we create a sensor object
             final String sensorId = request.getAssignedSensorId();
-            String num = null;
             if (currentVersion.equals("1.0.0")) {
                 if (sensorId == null) {
                     throw new CstlServiceException("The sensor identifier is missing.",
                                                  MISSING_PARAMETER_VALUE, "assignedSensorId");
-                } else if (sensorId.startsWith(sensorIdBase)) {
-                    num = sensorId.substring(sensorIdBase.length());
-                } else {
-                    throw new CstlServiceException("The sensor identifier is not valid it must start with " + sensorIdBase,
-                                                 INVALID_PARAMETER_VALUE, "assignedSensorId");
                 }
             } else {
                 final List<String> offeringNames = request.getOffering();
@@ -2212,7 +2214,7 @@ public class SOSworker extends AbstractWorker {
                         id = omWriter.writeObservation(obs);
                     } else {
                         //in first we verify that the observation is conform to the template
-                        final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME, RESULT_TEMPLATE, currentVersion);
+                        final Observation template = (Observation) omReader.getTemplateForProcedure(sensorId, currentVersion);
                         //if the observation to insert match the template we can insert it in the OM db
                         if (obs.matchTemplate(template)) {
                             if (obs.getSamplingTime() != null && obs.getResult() != null) {
@@ -2443,7 +2445,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If an error occurs during the the storage of offering in the datasource.
      */
-    private String addSensorToOffering(final AbstractSensorML sensor, final String num, final ObservationTemplate template, final String version) throws CstlServiceException, DataStoreException {
+    private String addSensorToOffering(final String num, final ObservationTemplate template, final String version) throws CstlServiceException, DataStoreException {
 
         final String offeringName          = "offering-" + num;
         final ObservationOffering offering = omReader.getObservationOffering(offeringName, version);

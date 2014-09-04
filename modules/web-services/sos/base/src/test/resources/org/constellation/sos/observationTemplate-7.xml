@@ -23,11 +23,5 @@
             </sa:position>
         </sa:SamplingPoint>
     </om:featureOfInterest>
-    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="om:Measure">
-        <om:name>measure-001</om:name>
-        <om:uom id="degrees">
-            <gml:unitsSystem>°C</gml:unitsSystem>
-        </om:uom>
-        <om:value>0.0</om:value>
-    </om:result>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="om:MeasureType" uom="°C">0.0</om:result>
 </om:Measurement>

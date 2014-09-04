@@ -1260,12 +1260,12 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         
         assertTrue(response instanceof InsertSensorResponseType);
 
-        assertEquals("urn:ogc:object:sensor:GEOM:4", response.getAssignedProcedure());
+        assertEquals("sensor-system", response.getAssignedProcedure());
 
         /**
          * we verify that the sensor is well registered
          */
-        DescribeSensorType DSrequest  = new DescribeSensorType("2.0.0","SOS","urn:ogc:object:sensor:GEOM:4", "http://www.opengis.net/sensorML/1.0.0");
+        DescribeSensorType DSrequest  = new DescribeSensorType("2.0.0","SOS","sensor-system", "http://www.opengis.net/sensorML/1.0.0");
         AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(DSrequest);
 
 
@@ -1282,9 +1282,9 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
     
     public void DeleteSensorTest() throws Exception {
         
-        final DeleteSensorType request = new DeleteSensorType("2.0.0","urn:ogc:object:sensor:GEOM:4");
+        final DeleteSensorType request = new DeleteSensorType("2.0.0","sensor-system");
         final DeleteSensorResponseType result = (DeleteSensorResponseType) worker.deleteSensor(request);
-        final DeleteSensorResponseType expResult = new DeleteSensorResponseType("urn:ogc:object:sensor:GEOM:4");
+        final DeleteSensorResponseType expResult = new DeleteSensorResponseType("sensor-system");
         
         assertEquals(expResult, result);
         

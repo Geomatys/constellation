@@ -452,4 +452,30 @@ public class FileObservationReader implements ObservationReader {
     public TemporalGeometricPrimitive getTimeForProcedure(final String version, final String sensorID) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
+
+    @Override
+    public Observation getTemplateForProcedure(String procedure, String version) throws DataStoreException {
+        for (File templateFile : observationTemplateDirectory.listFiles()) {
+            try {
+                final Unmarshaller unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
+                Object obj = unmarshaller.unmarshal(templateFile);
+                MARSHALLER_POOL.recycle(unmarshaller);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
+                if (obj instanceof Observation) {
+                    final Observation obs = (Observation) obj;
+                    if (obs.getProcedure() instanceof org.geotoolkit.observation.xml.Process) {
+                        final String processID = ((org.geotoolkit.observation.xml.Process)obs.getProcedure()).getHref();
+                        if (processID.equals(procedure)) {
+                            return obs;
+                        }
+                    }
+                }
+            } catch (JAXBException ex) {
+                throw new DataStoreException("Unable to unmarshall The file " + templateFile, ex);
+            }
+        }
+        return null;
+    }
 }

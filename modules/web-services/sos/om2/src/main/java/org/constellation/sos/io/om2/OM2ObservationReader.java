@@ -720,6 +720,37 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
+    public Observation getTemplateForProcedure(final String procedure, final String version) throws DataStoreException {
+        // TODO generate template from procedue description
+        Observation template = null;
+        try {
+            final Connection c = source.getConnection();
+            c.setReadOnly(true);
+            try {
+                final Statement stmt       = c.createStatement();
+                final ResultSet rs         = stmt.executeQuery("SELECT \"identifier\" FROM \"om\".\"observations\" WHERE \"identifier\" LIKE '" + observationTemplateIdBase + "%'");
+                String identifier = null;
+                if (rs.next()) {
+                    identifier = rs.getString(identifier);
+                }
+                rs.close();
+                stmt.close();
+                if (identifier != null) {
+                    template = getObservation(identifier, OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, version);
+                }
+            } finally {
+                c.close();
+            }
+        } catch (SQLException ex) {
+            throw new DataStoreException(ex.getMessage(), ex);
+        }
+        return template;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean existProcedure(final String href) throws DataStoreException {
         return getProcedureNames().contains(href);
     }

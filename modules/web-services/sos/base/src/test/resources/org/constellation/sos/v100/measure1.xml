@@ -37,11 +37,5 @@
             <sa:length/>
         </sa:SamplingCurve>
     </om:featureOfInterest>
-    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="om:Measure">
-        <om:name>measure-001</om:name>
-        <om:uom id="meters">
-            <gml:unitsSystem>m</gml:unitsSystem>
-        </om:uom>
-        <om:value>18.5</om:value>
-    </om:result>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="om:MeasureType" uom="m">18.5</om:result>
 </om:Measurement>

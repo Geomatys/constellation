@@ -702,7 +702,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                                                                       uomvalues.getVariable("var79"),
                                                                       uomvalues.getVariable("var80"),
                                                                       uomvalues.getVariable("var81"));
-                return new MeasureType(identifier, uom, val);
+                return new MeasureType(uom, val);
             } else {
                 throw new IllegalArgumentException("unexpected resultModel:" + resultModel);
             }
@@ -786,6 +786,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      */
     @Override
     public TemporalGeometricPrimitive getTimeForProcedure(final String version, final String sensorID) throws DataStoreException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+
+    @Override
+    public Observation getTemplateForProcedure(String procedure, String version) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 }
