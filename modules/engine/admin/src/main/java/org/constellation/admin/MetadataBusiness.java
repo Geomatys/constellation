@@ -31,32 +31,46 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import org.springframework.stereotype.Component;
 
 /**
+ * Business facade for metadata.
  *
  * @author guilhem
+ * @author Mehdi Sidhoum (Geomatys).
+ * @since 0.9
  */
 @Component
 public class MetadataBusiness {
-    
+    /**
+     * Injected data repository.
+     */
     @Inject
     private DataRepository dataRepository;
-    
+    /**
+     * Injected dataset repository.
+     */
     @Inject
     private DatasetRepository datasetRepository;
-    
+    /**
+     * Injected service repository.
+     */
     @Inject
     private ServiceRepository serviceRepository;
- 
+
+    /**
+     * Returns the xml as string representation of metadata for given metadata identifier.
+     *
+     * @param metadataId given metadata identifier
+     * @param includeService flag that indicates if service repository will be requested.
+     * @return String representation of metadata in xml.
+     */
     public String searchMetadata(final String metadataId, final boolean includeService)  {
         final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
         if (dataset != null) {
             return dataset.getMetadataIso();
         }
-        
         final Data data = dataRepository.findByMetadataId(metadataId);
         if (data != null) {
             return data.getIsoMetadata();
         }
-        
         if (includeService) {
             final Service service = serviceRepository.findByMetadataId(metadataId);
             if (service != null) {
@@ -65,41 +79,51 @@ public class MetadataBusiness {
         }
         return null;
     }
-    
+
+    /**
+     * Returns {@code true} if the xml metadata exists for given metadata identifier.
+     *
+     * @param metadataID given metadata identifier.
+     * @param includeService flag that indicates if service repository will be requested.
+     * @return boolean to indicates if metadata is present or not.
+     */
     public boolean existInternalMetadata(final String metadataID, final boolean includeService) {
         return searchMetadata(metadataID, includeService) != null;
     }
-    
+
+    /**
+     * Returns a list of all metadata identifiers.
+     *
+     * @param includeService flag that indicates if service repository will be requested.
+     * @return List of string identifiers.
+     */
     public List<String> getInternalMetadataIds(final boolean includeService) {
         final List<String> results = new ArrayList<>();
         final List<Dataset> datasets = datasetRepository.findAll();
-        for (Dataset record : datasets) {
+        for (final Dataset record : datasets) {
             if (record.getMetadataIso() != null) {
                 results.add(record.getMetadataId());
             }
         }
         if (includeService) {
             final List<Service> services = serviceRepository.findAll();
-            for (Service record : services) {
+            for (final Service record : services) {
                 if (record.getMetadataIso() != null) {
                     results.add(record.getMetadataId());
                 }
             }
         }
         final List<Data> datas = dataRepository.findAll();
-        for (Data record : datas) {
+        for (final Data record : datas) {
             if (record.isVisible() && record.getIsoMetadata() != null) {
                 results.add(record.getMetadataId());
             }
         }
-        
         return results;
     }
 
     /**
      * Returns all metadata stored in database.
-     *
-     * @TODO we need to get dataset's metadata and provider's metadata will be removed.
      *
      * @param includeService given flag to include service's metadata
      * @return List of all metadata as string xml stored in database.
