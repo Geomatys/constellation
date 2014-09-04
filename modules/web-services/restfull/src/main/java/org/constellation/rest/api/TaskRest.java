@@ -19,6 +19,8 @@
 package org.constellation.rest.api;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -78,7 +80,8 @@ import org.quartz.TriggerBuilder;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class TaskRest {
-    
+    private static final DateFormat TASK_DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
     @Inject
     private ProcessBusiness processBusiness;
 
@@ -390,10 +393,7 @@ public final class TaskRest {
         orig.values().addAll(params.values());
 
         final Task task = new Task(UUID.randomUUID().toString());
-
-        final Calendar calendar = Calendar.getInstance();
-
-        task.setTitle(taskParameter.getName()+" "+calendar.get(Calendar.YEAR)+"/"+calendar.get(Calendar.MONTH)+"/"+calendar.get(Calendar.DAY_OF_MONTH)+" "+calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE));
+        task.setTitle(taskParameter.getName()+" "+TASK_DATE.format(new Date()));
 
         final TriggerBuilder tb = TriggerBuilder.newTrigger();
         final Trigger trigger = tb.startNow().build();
