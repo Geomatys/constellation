@@ -163,8 +163,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         });
     })
 
-    .factory('metadataListing', function($resource) {
-        return $resource('@cstl/api/1/domain/$domainId/metadata/all/:includeService;jsessionid=', {}, {
+    .factory('datasetListing', function($resource) {
+        return $resource('@cstl/api/1/domain/$domainId/metadata/dataset/all;jsessionid=', {}, {
             'listAll':              {method: 'GET',    isArray: true }
         });
     })
