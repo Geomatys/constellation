@@ -36,6 +36,7 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
             <button class="btn btn-primary" id="service_details">service_details</button>
             <button class="btn btn-primary" id="layer">layer</button>
             <button class="btn btn-primary" id="task">task</button>
+            <button class="btn btn-primary" id="task_parameter">task_parameter</button>
             <button class="btn btn-primary" id="cstl_user">cstl_user</button>
             <button class="btn btn-primary" id="mapcontext">mapcontext</button>
             <button class="btn btn-primary" id="mapcontext_styled_layer">mapcontext_styled_layer</button>
@@ -104,6 +105,10 @@ result :
     $(function(){
         $("#task").on("click", function(){
             $("#query").val('select * from admin.task');
+            $("#sqlForm").submit();
+        });
+        $("#task_parameter").on("click", function(){
+            $("#query").val('select * from admin.task_parameter');
             $("#sqlForm").submit();
         });
         $("#provider").on("click", function(){
