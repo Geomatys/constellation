@@ -1,3 +1,22 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ * Copyright 2014 Geomatys.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.constellation.admin;
 
 import com.google.common.base.Optional;
@@ -9,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -48,41 +68,73 @@ import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Business facade for data.
+ *
+ * @author Mehdi Sidhoum (Geomatys).
+ * @version 0.9
+ * @since 0.9
+ */
+
 @Component
 public class DataBusiness {
-
+    /**
+     * Used for debugging purposes.
+     */
     private static final Logger LOGGER = Logging.getLogger(DataBusiness.class);
-
+    /**
+     * Injected user repository.
+     */
     @Inject
     private UserRepository userRepository;
-
+    /**
+     * Injected domain repository.
+     */
     @Inject
     private DomainRepository domainRepository;
-
+    /**
+     * Injected data repository.
+     */
     @Inject
     private DataRepository dataRepository;
-
+    /**
+     * Injected layer repository.
+     */
     @Inject
     private LayerRepository layerRepository;
-
+    /**
+     * Injected security manager.
+     */
     @Inject
     private org.constellation.security.SecurityManager securityManager;
-
+    /**
+     * Injected style repository.
+     */
     @Inject
     private StyleRepository styleRepository;
-
+    /**
+     * Injected service repository.
+     */
     @Inject
     private ServiceRepository serviceRepository;
-
+    /**
+     * Injected provider repository.
+     */
     @Inject
     private ProviderRepository providerRepository;
-    
+    /**
+     * Injected dataset repository.
+     */
     @Inject
     private DatasetRepository datasetRepository;
-
+    /**
+     * Injected sensor repository.
+     */
     @Inject
     private SensorRepository sensorRepository;
-
+    /**
+     * Injected lucene index engine.
+     */
     @Inject
     private IndexEngine indexEngine;
 
@@ -97,34 +149,57 @@ public class DataBusiness {
         return providerRepository.findOne(d.getProvider());
     }
 
-    public DefaultMetadata loadIsoDataMetadata(String providerId, QName name) {
-
+    /**
+     * Returns {@link DefaultMetadata} for given providerId and data name.
+     * @param providerId given data provider id.
+     * @param name given data name.
+     * @return {@link DefaultMetadata}
+     * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
+     */
+    public DefaultMetadata loadIsoDataMetadata(final String providerId,
+                                               final QName name) throws ConstellationException{
         DefaultMetadata metadata = null;
-        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
-        MarshallerPool pool = ISOMarshallerPool.getInstance();
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
+        final MarshallerPool pool = ISOMarshallerPool.getInstance();
         try {
             if (data != null && data.getIsoMetadata() != null) {
-                InputStream sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
+                final InputStream sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
                 final Unmarshaller m = pool.acquireUnmarshaller();
                 metadata = (DefaultMetadata) m.unmarshal(sr);
                 pool.recycle(m);
             }
-            
         } catch (UnsupportedEncodingException | JAXBException e) {
             throw new ConstellationException(e);
         }
         return metadata;
     }
 
-    public List<Data> searchOnMetadata(String queryString) throws ParseException, IOException {
-        List<Data> result = new ArrayList<>();
-        for (Integer dataId : indexEngine.searchOnMetadata(queryString)){
+    /**
+     * Search and returns result as list of {@link Data} for given query string.
+     * @param queryString the lucene query.
+     * @return list of {@link Data}
+     * @throws ParseException
+     * @throws IOException
+     */
+    public List<Data> searchOnMetadata(final String queryString) throws ParseException, IOException {
+        final List<Data> result = new ArrayList<>();
+        final Set<Integer> ids = indexEngine.searchOnMetadata(queryString);
+        for (final Integer dataId : ids){
             result.add(dataRepository.findById(dataId));
         }
         return result;
     }
 
-    public void saveMetadata(String providerId, QName name, DefaultMetadata metadata) {
+    /**
+     * Proceed to save metadata for given data provider id and data name.
+     * @param providerId data provider id.
+     * @param name data name.
+     * @param metadata given {@link DefaultMetadata} to save.
+     * @throws ConstellationException is thrown for JAXBException.
+     */
+    public void saveMetadata(final String providerId,
+                             final QName name,
+                             final DefaultMetadata metadata) throws ConstellationException {
         final StringWriter sw = new StringWriter();
         try {
             final Marshaller marshaller = ISOMarshallerPool.getInstance().acquireMarshaller();
@@ -132,7 +207,7 @@ public class DataBusiness {
         } catch (JAXBException ex) {
             throw new ConstellationException(ex);
         }
-        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
         data.setIsoMetadata(sw.toString());
         data.setMetadataId(metadata.getFileIdentifier());
         dataRepository.update(data);
@@ -140,18 +215,20 @@ public class DataBusiness {
     }
 
     /**
-     * Load a metadata for a provider.
+     * Load a metadata for given data provider id and data name.
      *
-     *
-     * @param providerIdentifier
-     * @param pool
-     * @param name
-     * @return
+     * @param providerIdentifier given data provider.
+     * @param name given data name.
+     * @param pool marshaller pool.
+     * @return {@link CoverageMetadataBean}
+     * @throws ConstellationException is thrown for JAXBException.
      */
-    public CoverageMetadataBean loadDataMetadata(final String providerIdentifier, final QName name, final MarshallerPool pool) {
+    public CoverageMetadataBean loadDataMetadata(final String providerIdentifier,
+                                                 final QName name,
+                                                 final MarshallerPool pool) throws ConstellationException {
         CoverageMetadataBean metadata = null;
         try {
-            Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
+            final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
             if (data != null && data.getMetadata() != null) {
                 final InputStream sr = new ByteArrayInputStream(data.getMetadata().getBytes());
                 final Unmarshaller m = pool.acquireUnmarshaller();
@@ -165,46 +242,104 @@ public class DataBusiness {
         }
         return null;
     }
-    public DataBrief getDataBrief(QName fullName,Integer providerId){
-        Data data = dataRepository.findByNameAndNamespaceAndProviderId(fullName.getLocalPart(),fullName.getNamespaceURI(), providerId);
-        List<Data> datas = new ArrayList<>();
+
+    /**
+     * Returns {@link DataBrief} for given data name and provider id as integer.
+     *
+     * @param fullName given data name.
+     * @param providerId given data provider as integer.
+     * @return {@link DataBrief}.
+     * @throws ConstellationException is thrown if result fails.
+     */
+    public DataBrief getDataBrief(QName fullName,Integer providerId) throws ConstellationException {
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderId(fullName.getLocalPart(),fullName.getNamespaceURI(), providerId);
+        final List<Data> datas = new ArrayList<>();
         datas.add(data);
-        List<DataBrief> dataBriefs = getDataBriefFrom(datas);
+        final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
         if (dataBriefs != null && dataBriefs.size() == 1) {
             return dataBriefs.get(0);
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));
     }
 
-    public DataBrief getDataBrief(QName fullName, String providerIdentifier) {
-        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(fullName.getLocalPart(), fullName.getNamespaceURI(), providerIdentifier);
-        List<Data> datas = new ArrayList<>();
+    /**
+     * Returns {@link DataBrief} for given data name and provider identifier as string.
+     *
+     * @param fullName given data name.
+     * @param providerIdentifier given data provider identifier.
+     * @return {@link DataBrief}
+     * @throws ConstellationException is thrown if result fails.
+     */
+    public DataBrief getDataBrief(final QName fullName,
+                                  final String providerIdentifier) throws ConstellationException {
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(fullName.getLocalPart(), fullName.getNamespaceURI(), providerIdentifier);
+        final List<Data> datas = new ArrayList<>();
         datas.add(data);
-        List<DataBrief> dataBriefs = getDataBriefFrom(datas);
+        final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
         if (dataBriefs != null && dataBriefs.size() == 1) {
             return dataBriefs.get(0);
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));
     }
 
+    /**
+     * Returns a list of {@link DataBrief} for given metadata identifier.
+     *
+     * @param metadataId given metadata identifier.
+     * @return list of {@link DataBrief}.
+     */
     public List<DataBrief> getDataBriefsFromMetadataId(final String metadataId) {
-        List<Data> datas = findByMetadataId(metadataId);
+        final List<Data> datas = findByMetadataId(metadataId);
         return getDataBriefFrom(datas);
     }
 
-    public DataBrief getDataLayer(final String layerAlias, final String dataProviderIdentifier) {
-        Data data = layerRepository.findDatasFromLayerAlias(layerAlias,dataProviderIdentifier);
-        List<Data> datas = new ArrayList<>();
+    /**
+     * Returns {@link DataBrief} for given layer alias and data provider identifier.
+     *
+     * @param layerAlias given layer name.
+     * @param dataProviderIdentifier given data provider identifier.
+     * @return {@link DataBrief}.
+     * @throws ConstellationException is thrown if result fails.
+     */
+    public DataBrief getDataLayer(final String layerAlias,
+                                  final String dataProviderIdentifier) throws ConstellationException {
+        final Data data = layerRepository.findDatasFromLayerAlias(layerAlias, dataProviderIdentifier);
+        final List<Data> datas = new ArrayList<>();
         datas.add(data);
-        List<DataBrief> dataBriefs = getDataBriefFrom(datas);
+        final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
         if (dataBriefs != null && !dataBriefs.isEmpty()){
             return dataBriefs.get(0);
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));
-
     }
 
-    private  List<Data> findByMetadataId(String metadataId) {
+    /**
+     * Returns list of {@link Data} for given dataSet id.
+     *
+     * @param datasetId the given dataSet id.
+     * @return the list of {@link Data}.
+     */
+    public List<Data> findByDatasetId(final Integer datasetId) {
+        return dataRepository.findByDatasetId(datasetId);
+    }
+
+    /**
+     * Returns a list of {@link DataBrief} for given dataSet id.
+     *
+     * @param datasetId the given dataSet id.
+     * @return the list of {@link DataBrief}.
+     */
+    public List<DataBrief> getDataBriefsFromDatasetId(final Integer datasetId) {
+        final List<Data> dataList = findByDatasetId(datasetId);
+        return getDataBriefFrom(dataList);
+    }
+
+    /**
+     * Returns a list of {@link Data} for given metadata identifier.
+     * @param metadataId given metadata identifier.
+     * @return list of {@link Data}.
+     */
+    private List<Data> findByMetadataId(final String metadataId) {
         List<Data> dataResult   = new ArrayList<>();
         final Dataset dataset   = datasetRepository.findByMetadataId(metadataId);
         final Data data         = dataRepository.findByMetadataId(metadataId);
@@ -217,14 +352,18 @@ public class DataBusiness {
             dataResult.add(data);
         }
         return dataResult;
-
     }
 
-    private List<DataBrief> getDataBriefFrom(List<Data> datas) {
-        List<DataBrief> dataBriefs = new ArrayList<>();
-        for (Data data : datas) {
-            List<Style> styles = styleRepository.findByData(data);
-            List<Service> services = serviceRepository.findByDataId(data.getId());
+    /**
+     * Convert a list of {@link Data} to list of {@link DataBrief}.
+     * @param datas given list of {@link Data}.
+     * @return the list of {@link DataBrief}.
+     */
+    private List<DataBrief> getDataBriefFrom(final List<Data> datas) {
+        final List<DataBrief> dataBriefs = new ArrayList<>();
+        for (final Data data : datas) {
+            final List<Style> styles = styleRepository.findByData(data);
+            final List<Service> services = serviceRepository.findByDataId(data.getId());
 
             final DataBrief db = new DataBrief();
             db.setId(data.getId());
@@ -242,7 +381,7 @@ public class DataBusiness {
             db.setTargetSensor(sensorRepository.getLinkedSensors(data));
 
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
-            for (Style style : styles) {
+            for (final Style style : styles) {
                 final StyleBrief sb = new StyleBrief();
                 sb.setId(style.getId());
                 sb.setType(style.getType());
@@ -255,25 +394,34 @@ public class DataBusiness {
             db.setTargetStyle(styleBriefs);
 
             final List<ServiceProtocol> serviceProtocols = new ArrayList<>(0);
-            for (Service service : services) {
+            for (final Service service : services) {
                 final List<String> protocol = new ArrayList<>(0);
-                protocol.add(ServiceDef.Specification.valueOf(service.getType().toUpperCase()).name());
-                protocol.add(ServiceDef.Specification.valueOf(service.getType().toUpperCase()).fullName);
+                final ServiceDef.Specification spec = ServiceDef.Specification.valueOf(service.getType().toUpperCase());
+                protocol.add(spec.name());
+                protocol.add(spec.fullName);
                 final ServiceProtocol sp = new ServiceProtocol(service.getIdentifier(), protocol);
                 serviceProtocols.add(sp);
             }
             db.setTargetService(serviceProtocols);
             dataBriefs.add(db);
         }
-
         return dataBriefs;
     }
 
-    private String getProviderIdentifier(int providerId) {
+    /**
+     * Returns provider identifier for given provider id.
+     * @param providerId given provider id.
+     * @return provider identifier as string.
+     */
+    private String getProviderIdentifier(final int providerId) {
         return providerRepository.findOne(providerId).getIdentifier();
-
     }
 
+    /**
+     * Proceed to remove data for given data name and provider identifier.
+     * @param name given data name.
+     * @param providerIdentifier given provider identifier.
+     */
     public void deleteData(final QName name, final String providerIdentifier) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
@@ -281,33 +429,50 @@ public class DataBusiness {
         }
     }
 
+    /**
+     * Proceed to remove data for provider identifier.
+     * @param providerIdentifier given provider identifier.
+     */
     public void deleteDataForProvider(final String providerIdentifier) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
-            List<Data> datas = dataRepository.findByProviderId(provider.getId());
-            for (Data data : datas) {
+            final List<Data> datas = dataRepository.findByProviderId(provider.getId());
+            for (final Data data : datas) {
                 dataRepository.delete(data.getId());
             }
-
         }
     }
 
+    /**
+     * Proceed to remove all data.
+     */
     public void deleteAll() {
         final List<Data> datas = dataRepository.findAll();
-        for (Data data : datas) {
+        for (final Data data : datas) {
             dataRepository.delete(data.getId());
         }
     }
 
-    public void create(final QName name, final String providerIdentifier, final String type, final boolean sensorable,
-            final boolean visible, final String subType, final String metadata) {
+    /**
+     * Proceed to create a new data for given parameters.
+     * @param name data name to create.
+     * @param providerIdentifier provider identifier.
+     * @param type data type.
+     * @param sensorable flag that indicates if data is sensorable.
+     * @param visible flag that indicates if data is visible.
+     * @param subType data subType.
+     * @param metadata metadata of data.
+     */
+    public void create(final QName name, final String providerIdentifier,
+                       final String type, final boolean sensorable,
+                       final boolean visible, final String subType, final String metadata) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
             final Data data = new Data();
             data.setDate(new Date().getTime());
             data.setName(name.getLocalPart());
             data.setNamespace(name.getNamespaceURI());
-            Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
             if (user.isPresent()) {
                 data.setOwner(user.get().getId());
             }
@@ -321,32 +486,59 @@ public class DataBusiness {
         }
     }
 
-    public void updateDataVisibility(QName name, String providerIdentifier, boolean visibility) {
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(),
+    /**
+     * Update data visibility for given data name and provider identifier.
+     * @param name data name.
+     * @param providerIdentifier provider identifier.
+     * @param visibility value to set
+     */
+    public void updateDataVisibility(final QName name,
+                                     final String providerIdentifier,
+                                     boolean visibility) {
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(),
+                name.getNamespaceURI(),
                 providerIdentifier);
         data.setVisible(visibility);
         dataRepository.update(data);
     }
 
-    public void addDataToDomain(int dataId, int domainId) {
+    /**
+     * Proceed to add a data domain.
+     * @param dataId given data Id.
+     * @param domainId given domain Id.
+     */
+    public void addDataToDomain(final int dataId, final int domainId) {
         domainRepository.addDataToDomain(dataId, domainId);
     }
 
+    /**
+     * proceed to remove data from domain.
+     * synchronized method.
+     * @param dataId given data id.
+     * @param domainId given domain id.
+     * @throws CstlConfigurationRuntimeException
+     */
     @Transactional("txManager")
-    public synchronized void removeDataFromDomain(int dataId, int domainId) {
-        List<Domain> findByLinkedService = domainRepository.findByLinkedData(dataId);
+    public synchronized void removeDataFromDomain(final int dataId,
+                                                  final int domainId)throws CstlConfigurationRuntimeException {
+        final List<Domain> findByLinkedService = domainRepository.findByLinkedData(dataId);
         if (findByLinkedService.size() == 1) {
             throw new CstlConfigurationRuntimeException("Could not unlink last domain from a data").withErrorCode("error.data.lastdomain");
         }
         domainRepository.removeDataFromDomain(dataId, domainId);
     }
 
+    /**
+     * Proceed to remove data for given provider.
+     * Synchronized method.
+     * @param providerID given provider identifier.
+     */
     @Transactional("txManager")
-    public synchronized void removeDataFromProvider(String providerID) {
+    public synchronized void removeDataFromProvider(final String providerID) {
         final Provider p = providerRepository.findByIdentifier(providerID);
         if (p != null) {
             final List<Data> datas = dataRepository.findByProviderId(p.getId());
-            for (Data data : datas) {
+            for (final Data data : datas) {
                 dataRepository.delete(data.getId());
             }
         }
