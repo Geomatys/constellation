@@ -139,6 +139,9 @@ public class FileSensorWriter implements SensorWriter {
         boolean delete = false;
         if (currentFile.exists()) {
             delete = currentFile.delete();
+        } else {
+            LOGGER.warning("unable to find a file " + currentFile.getName() + " to remove");
+            return false;
         }
         if (!delete) {
             throw new CstlServiceException("the service was unable to delete the file:" + currentFile.getName(), NO_APPLICABLE_CODE);

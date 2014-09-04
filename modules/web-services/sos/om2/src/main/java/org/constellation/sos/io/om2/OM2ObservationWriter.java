@@ -699,17 +699,21 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             stmt.close();
             final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
             for (String op : offering.getObservedProperties()) {
-                opstmt.setString(1, offering.getId());
-                opstmt.setString(2, op);
-                opstmt.executeUpdate();
+                if (op != null) {
+                    opstmt.setString(1, offering.getId());
+                    opstmt.setString(2, op);
+                    opstmt.executeUpdate();
+                }
             }
             opstmt.close();
             
             final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)");
             for (String foi : offering.getFeatureOfInterestIds()) {
-                foistmt.setString(1, offering.getId());
-                foistmt.setString(2, foi);
-                foistmt.executeUpdate();
+                if (foi != null) {
+                    foistmt.setString(1, offering.getId());
+                    foistmt.setString(2, foi);
+                    foistmt.executeUpdate();
+                }
             }
             foistmt.close();
             

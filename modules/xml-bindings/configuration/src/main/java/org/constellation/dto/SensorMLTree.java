@@ -208,4 +208,24 @@ public class SensorMLTree {
         }
         return false;
     }
+    
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[SensorMLTree]\n");
+        if (id != null) {
+            sb.append("id=").append(id).append("\n");
+        }
+        if (type != null) {
+            sb.append("type=").append(type).append("\n");
+        }
+        if (parent != null) {
+            sb.append("parent=").append(parent.id).append("\n");
+        }
+        if (children != null) {
+            sb.append("children:");
+            for (SensorMLTree child : children) {
+                sb.append(child.id).append("\n");
+            }
+        }
+        return sb.toString();
+    }
 }
