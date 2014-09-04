@@ -126,10 +126,10 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
 
         $scope.saveServiceMetadata = function() {
             // Ensures both name and identifier are filled
-            if (($scope.metadata.identifier === null || $scope.metadata.identifier === '') && $scope.metadata.name !== null && $scope.metadata.name !== '') {
+            if ((!$scope.metadata.identifier || $scope.metadata.identifier === '') && $scope.metadata.name && $scope.metadata.name !== '') {
                 $scope.metadata.identifier = $scope.metadata.name;
             }
-            if (($scope.metadata.name === null || $scope.metadata.name === '') && $scope.metadata.identifier !== null && $scope.metadata.identifier !== '') {
+            if ((!$scope.metadata.name || $scope.metadata.name === '') && $scope.metadata.identifier && $scope.metadata.identifier !== '') {
                 $scope.metadata.name = $scope.metadata.identifier;
             }
 
