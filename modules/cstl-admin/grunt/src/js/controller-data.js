@@ -357,7 +357,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }
             });
             modal.result.then(function(result) {
-                if(!result.file && !result.type){
+                if(!result.file){
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
@@ -378,7 +378,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }
             });
             modal.result.then(function(result) {
-                if(!result.file && !result.type){
+                if(!result.file){
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
@@ -399,7 +399,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }
             });
             modal.result.then(function(result) {
-                if(!result.file && !result.type){
+                if(!result.file){
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
@@ -886,7 +886,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             //@TODO save metadata
             if($scope.metadataValues && $scope.metadataValues.length>0){
                 dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.type.toLowerCase()},
-                    //JSON.stringify($scope.metadataValues[0],null,1),
+                    //JSON.stringify($scope.metadataValues[0],null,1), //uncomment for debugging purposes
                     $scope.metadataValues[0],
                     function(response) {
                         $location.path('/data'); //redirect to data dashboard page
