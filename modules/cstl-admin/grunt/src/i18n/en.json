@@ -149,6 +149,8 @@
     "data.dashboard.tab.metadata":"Metadata",
     "data.dashboard.metadata.title":"Available metadata",
 
+    "dataset.information.title":"Metadata list",
+
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",
 
