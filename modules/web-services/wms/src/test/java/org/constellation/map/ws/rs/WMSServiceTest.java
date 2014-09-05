@@ -19,46 +19,6 @@
 
 package org.constellation.map.ws.rs;
 
-import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.ServiceBusiness;
-import org.constellation.admin.SpringHelper;
-import org.constellation.api.ProviderType;
-import org.constellation.configuration.LayerContext;
-import org.constellation.map.configuration.LayerBusiness;
-import org.constellation.map.ws.QueryContext;
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.ProviderFactory;
-import org.constellation.test.utils.BasicMultiValueMap;
-import org.constellation.test.utils.BasicUriInfo;
-import org.constellation.test.utils.SpringTestRunner;
-import org.constellation.ws.WSEngine;
-import org.constellation.ws.Worker;
-import org.constellation.ws.embedded.AbstractGrizzlyServer;
-import org.constellation.ws.rs.WebService;
-import org.constellation.test.utils.TestDatabaseHandler;
-import org.geotoolkit.internal.referencing.CRSUtilities;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.wms.xml.GetFeatureInfo;
-import org.geotoolkit.wms.xml.GetMap;
-import org.junit.AfterClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.opengis.geometry.Envelope;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.namespace.QName;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -71,7 +31,22 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.namespace.QName;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.api.ProviderType;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.map.configuration.LayerBusiness;
+import org.constellation.map.ws.QueryContext;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
@@ -82,10 +57,35 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
+import org.constellation.test.utils.BasicMultiValueMap;
+import org.constellation.test.utils.BasicUriInfo;
+import org.constellation.test.utils.SpringTestRunner;
+import org.constellation.test.utils.TestDatabaseHandler;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
+import org.constellation.ws.rs.WebService;
+import org.geotoolkit.internal.referencing.CRSUtilities;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.ReferencingUtilities;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
+import org.geotoolkit.wms.xml.GetMap;
+import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Testing wms service value parsing.
@@ -127,13 +127,16 @@ public class WMSServiceTest implements ApplicationContextAware {
     
     private static boolean localdb_active = true;
     
+    @BeforeClass
+    public static void start() {
+        ConfigDirectory.setupTestEnvironement("WMSServiceTest");
+    }
+    
     @PostConstruct
     public void init() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("WMSServiceTest");
-
 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();

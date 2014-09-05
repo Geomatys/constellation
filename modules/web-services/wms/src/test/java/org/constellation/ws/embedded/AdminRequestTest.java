@@ -67,6 +67,7 @@ import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
 
 // JUnit dependencies
 
@@ -98,6 +99,12 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
     protected DataBusiness dataBusiness;
     
     private static boolean initialized = false;
+    
+    @BeforeClass
+    public static void startup() {
+        ConfigDirectory.setupTestEnvironement("AdminRequestTest");
+    }
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -106,7 +113,6 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("AdminRequestTest");
 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();

@@ -64,6 +64,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.configuration.ConfigDirectory;
 
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
@@ -79,6 +80,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
+import org.junit.BeforeClass;
 
 // JUnit dependencies
 
@@ -161,6 +163,12 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     private static boolean initialized = false;
     
     private static boolean localdb_active = true;
+    
+    @BeforeClass
+    public static void startup() {
+        ConfigDirectory.setupTestEnvironement("WMSAxesOrderTest");
+    }
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -242,6 +250,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      */
     @AfterClass
     public static void shutDown() {
+        ConfigDirectory.shutdownTestEnvironement("WMSAxesOrderTest");
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

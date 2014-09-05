@@ -105,6 +105,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
+import org.junit.BeforeClass;
 
 // JUnit dependencies
 
@@ -206,6 +207,11 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     private static boolean initialized = false;
     
+    @BeforeClass
+    public static void startup() {
+        ConfigDirectory.setupTestEnvironement("WMSRequestTest");
+    }
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -214,7 +220,6 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("WMSRequestTest");
                 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
