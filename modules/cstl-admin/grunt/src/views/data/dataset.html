@@ -1,0 +1,363 @@
+<div class="col-sm-12">
+    <div class="frame dashboard">
+        <div class="navbar navbar-default" style="margin-bottom:0;">
+            <div class="navbar-header">
+                <a class="navbar-brand" translate="dataset.information.title">Metadata list</a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li ng-class="{active:wrap.filtertype == ''}" ng-click="wrap.filtertype = ''">
+                        <a translate="label.all">All</a>
+                    </li>
+                    <li ng-class="{active:wrap.filtertype=='VECTOR'}" ng-click="wrap.filtertype='VECTOR'">
+                        <a translate="label.vector">Vector</a>
+                    </li>
+                    <li ng-class="{active:wrap.filtertype=='COVERAGE'}" ng-click="wrap.filtertype='COVERAGE'">
+                        <a translate="label.raster">Raster</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="navbar sort-navbar" ng-class="{'advanced-open':advancedSearch==true}">
+            <div class="navbar-inner">
+                <ul class="nav nav-style">
+                    <li ng-click="ordertype='Name';orderreverse=!orderreverse">
+                        <a>
+                            <span translate="label.title">Title</span>
+                            <i class="fa fa-caret-up" ng-if="ordertype === 'Name' && orderreverse"></i>
+                            <i class="fa fa-caret-down" ng-if="ordertype === 'Name' && !orderreverse"></i>
+                        </a>
+                    </li>
+                    <li class="divider-vertical"></li>
+                    <li ng-click="ordertype='Date';orderreverse=!orderreverse">
+                        <a>
+                            <span translate="label.date">Date</span>
+                            <i class="fa fa-caret-up" ng-if="ordertype === 'Date' && orderreverse"></i>
+                            <i class="fa fa-caret-down" ng-if="ordertype === 'Date' && !orderreverse"></i>
+                        </a>
+                    </li>
+                    <li class="divider-vertical"></li>
+                    <li ng-click="ordertype='Owner';orderreverse=!orderreverse">
+                        <a>
+                            <span translate="label.owner">Owner</span>
+                            <i class="fa fa-caret-up" ng-if="ordertype === 'Owner' && orderreverse"></i>
+                            <i class="fa fa-caret-down" ng-if="ordertype === 'Owner' && !orderreverse"></i>
+                        </a>
+                    </li>
+                    <li class="divider-vertical"></li>
+                </ul>
+                <button type="button"
+                        ng-click="init(); published=null; observation=null"
+                        title="{{'label.search.refresh' | translate }}"
+                        class="btn btn-xs btn-info btn-csw">
+                    <i class="fa fa-times"></i>
+                </button>
+                <div class="pull-right quick-search-panel">
+                    <button class="btn btn-sm pull-right btn-info btn-csw pull-right"
+                            ng-click="toggleAdvancedSearch()"
+                            tooltip-html-unsafe="{{advancedSearch?'label.search.advanced.hide':'label.search.advanced.show' | translate }}"
+                            tooltip-placement="bottom"
+                            style="margin-top:5px;"
+                            ng-class="{'btn-small-selected':advancedSearch}">
+                        <i class="fa" ng-class="{'fa-plus':!advancedSearch, 'fa-minus':advancedSearch}"></i>
+                    </button>
+                    <div class="col-sm-7 pull-right input-group"
+                         ng-show="!advancedSearch"
+                         style="padding-left: 5px;padding-right: 5px;">
+                        <input type="text"
+                               class="searchbox search-query form-control form-control-fix"
+                               ng-model="searchTerm"/>
+                        <span class="input-group-btn">
+                            <button class="btn btn-info btn-csw"
+                                    type="button"
+                                    ng-click="callSearch();"
+                                    title="{{'label.search' | translate}}"
+                                    style="height: 30px;margin: 0;">
+                                <i class="glyphicon glyphicon-search" style="vertical-align: top;"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dash-inner row" collapse="!advancedSearch">
+            <form name="searchForm" class="advanced-search-dataset">
+                <div class="row" style="padding-right: 15px; padding-left: 15px;">
+                    <div class="col-sm-4" ng-class="{'has-error': searchForm.title.$invalid}">
+                        <label class="control-label new-service-form-label"
+                               translate="data.search.filter.title">Title</label>
+                        <input type="text"
+                               class="form-control"
+                               name="title"
+                               ng-model="search.title"
+                               ng-pattern="alphaPattern"
+                               ng-change="checkIsValid(searchForm.title.$invalid)"/>
+                    </div>
+                    <div class="col-sm-4" ng-class="{'has-error': searchForm.abstract.$invalid}">
+                        <label class="control-label new-service-form-label"
+                               translate="data.search.filter.abstract">Abstract</label>
+                        <input type="text"
+                               class="form-control"
+                               name="abstract"
+                               ng-model="search.abstract"
+                               ng-pattern="alphaPattern"
+                               ng-change="checkIsValid(searchForm.abstract.$invalid)"/>
+                    </div>
+                    <div class="col-sm-4" ng-class="{'has-error': searchForm.keywords.$invalid}">
+                        <label class="control-label new-service-form-label"
+                               translate="data.search.filter.keywords">Keywords</label>
+                        <input type="text"
+                               class="form-control"
+                               name="keywords"
+                               ng-model="search.keywords"
+                               ng-pattern="alphaPattern"
+                               ng-change="checkIsValid(searchForm.keywords.$invalid)"/>
+                    </div>
+                </div>
+                <div class="form-group row" style="padding-right: 15px; padding-left: 15px;">
+                    <div class="col-sm-4" ng-class="{'has-error': searchForm.topic.$invalid}">
+                        <label class="control-label new-service-form-label"
+                               translate="data.search.filter.topic">Topic categories</label>
+                        <input type="text"
+                               class="form-control"
+                               name="topic"
+                               ng-model="search.topic"
+                               ng-pattern="alphaPattern"
+                               ng-change="checkIsValid(searchForm.topic.$invalid)"/>
+                    </div>
+                    <div class="col-sm-4"  ng-class="{'has-error': searchForm.data.$invalid}">
+                        <label class="control-label new-service-form-label"
+                               translate="data.search.filter.data">Variable</label>
+                        <input type="text"
+                               class="form-control"
+                               name="data"
+                               ng-model="search.data"
+                               ng-pattern="alphaPattern"
+                               ng-change="checkIsValid(searchForm.data.$invalid)"/>
+                    </div>
+                    <div class="col-sm-4" ng-class="{'has-error': searchForm.level.$invalid}">
+                        <label class="control-label new-service-form-label"
+                               translate="data.search.filter.level">Processing level</label>
+                        <input type="text"
+                               class="form-control"
+                               name="level"
+                               ng-model="search.level"
+                               ng-pattern="alphaPattern"
+                               ng-change="checkIsValid(searchForm.level.$invalid)"/>
+                    </div>
+                </div>
+                <div class="form-group row" style="padding-right: 15px; padding-left: 15px;">
+                    <div class="col-sm-4" ng-class="{'has-error': searchForm.area.$invalid}">
+                        <label class="control-label new-service-form-label"
+                               translate="data.search.filter.area">Area</label>
+                        <input type="text"
+                               class="form-control"
+                               name="area"
+                               ng-model="search.area"
+                               ng-pattern="alphaPattern"
+                               ng-change="checkIsValid(searchForm.area.$invalid)"/>
+                    </div>
+                    <div class="pull-right"  style="padding-right: 15px; padding-left: 15px;">
+                        <button type="button"
+                                class="btn btn-xs btn-info btn-csw"
+                                style="padding: 4px; margin-top: 6px;"
+                                ng-click="callSearch()"
+                                translate="label.search">Search</button>
+                        <button type="button"
+                                class="btn btn-xs btn-info btn-csw"
+                                style="padding: 4px; margin-top: 6px;"
+                                ng-click="resetSearch()"
+                                translate="label.clear">Clear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="dash-inner row">
+            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"
+                 ng-init="small=false"
+                 style="padding-right: 0;">
+                <div id="list" data-role="list">
+                    <div class="pagination-wrapper pagination-csw">
+                        <strong class="col-md-6">
+                            <span class="nb-results pull-left">{{countdata}}&nbsp;</span>
+                            <span class="nb-results" translate="label.count.data">available data</span>
+                        </strong>
+                        <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
+                            <button type="button"
+                                    ng-click="small=true"
+                                    class="pull-right btn btn-xs btn-info btn-csw"
+                                    ng-class="{'btn-small-selected':small==true}"
+                                    style="border-radius:0 3px 3px 0; margin-top: 5px; width:32px; height:34px;">
+                                <img src="img/btn-display-reduced.svg" alt="" />
+                            </button>
+                            <button type="button"
+                                    ng-click="small=false"
+                                    class="pull-right btn btn-xs btn-info btn-csw"
+                                    ng-class="{'btn-small-selected':small==false}"
+                                    style="margin-left: 10px; border-radius:3px 0 0 3px; margin-top: 5px; width:32px; height:34px;">
+                                <img src="img/btn-display-normal.svg" alt="" />
+                            </button>
+                            <p class="pull-right" style="margin-top:12px;" translate="label.display">Display :</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9"
+                                 style="padding-left:15px; margin-top: 5px;"
+                                 page-switcher="{page:currentpage,size:wrap.nbbypage,count:countdata}"
+                                 on-select-page="displayPage(page)"></div>
+                            <select class="nb-per-page input-small form-control pull-right col-xs-2 "
+                                    style="padding-left: 5px;padding-right: 5px; margin-right: 15px; margin-top: 5px;"
+                                    ng-model="wrap.nbbypage">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item-list">
+                        <div ng-repeat="dataset in dataList"
+                             ng-class="{'col-xs-6':small==true}"
+                             style="padding-left:0;">
+                            <div class="item metadata"
+                                 ng-class="{'selected':dataset==selected}"
+                                 ng-click="select(dataset);selectMetadataChild(null);">
+                                <div class="top">
+                                    <span class="item-title csw-title"
+                                          title="{{dataset.Name}}">{{truncate(small,dataset.Name)}}</span>
+                                    <span class="pull-right text-right item-list-style">METADATA</span>
+                                </div>
+                                <div class="bottom">
+                                    <div class="block">
+                                        <i class="fa fa-calendar"></i>{{dataset.Date | date:'yyyy-MM-dd'}}
+                                    </div>
+                                    <div class="block">
+                                        <i class="fa fa-user"></i>{{dataset.Owner}}
+                                    </div>
+                                    <div class="block pull-right">
+                                        <i class="fa fa-paperclip"></i>
+                                        <span ng-if="dataset.Children.length == 0"
+                                              translate="md.listing.no.data">No</span>
+                                        <span ng-if="dataset.Children.length > 0">{{dataset.Children.length}}</span>
+                                        <span ng-class="{hide:small==true}"
+                                              translate="md.listing.data.associated">associated data</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item"
+                                 style="margin-top:0;"
+                                 ng-if="dataset==selected"
+                                 ng-repeat="relatedData in dataset.Children"
+                                 ng-click="selectMetadataChild(relatedData)"
+                                 ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}">
+                                <div class="top">
+                                    <span class="item-title csw-title"
+                                          title="{{relatedData.Name}}">{{truncate(small,relatedData.Name)}}</span>
+                                    <span class="pull-right text-right item-list-style"
+                                          style="font-size:14px;">{{relatedData.Type}}</span>
+                                </div>
+                                <div class="bottom">
+                                    <div class="block">
+                                        <i class="fa fa-calendar"></i>{{relatedData.Date | date:'yyyy-MM-dd'}}
+                                    </div>
+                                    <div class="block">
+                                        <i class="fa fa-user"></i>{{relatedData.Owner}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-left: 0;">
+                <div id="selection">
+                    <div class="alert alert-info alert-csw"
+                         ng-if="!selected">
+                        <h4 translate="label.no.selected.metadata">No selected metadata</h4>
+                        <p translate="msg.no.selected.metadata"
+                           style="font-weight:normal;">Click on a metadata to display more information</p>
+                    </div>
+                    <div id="selected-item"
+                         class="selected-item"
+                         ng-if="selected">
+                        <div class="block-header block-header-md"
+                             ng-click="toggleUpDownSelected()">
+                            <strong class="item-title title-bloc"
+                                    title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
+                            <i class="fa fa-chevron-up pull-right"></i>
+                        </div>
+                        <div>
+                            <div class="block-content">
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2">
+                                        <img src="img/block-content-owner.svg" alt="" />
+                                    </div>
+                                    <div class="col-sm-9 col-md-10 description-text">
+                                        <span>{{selected.Owner}}</span>
+                                    </div>
+                                </div>
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2">
+                                        <img src="img/block-content-date.svg" alt="" />
+                                    </div>
+                                    <div class="col-sm-9 col-md-10 description-text">
+                                        <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="block-content"
+                                 ng-class="{'block-vector':selectedMetadataChild.Type=='VECTOR','block-raster':selectedMetadataChild.Type=='COVERAGE'}"
+                                 ng-if="selectedMetadataChild">
+                                <h6 translate="label.title">Title</h6>
+                                <span>{{truncateTitleBlock(selectedMetadataChild.Name)}}</span>
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2">
+                                        <img src="img/block-content-owner.svg" alt="" />
+                                    </div>
+                                    <div class="col-sm-9 col-md-10 description-text">
+                                        <span>{{selectedMetadataChild.Owner}}</span>
+                                    </div>
+                                </div>
+                                <div class="row description-block">
+                                    <div class="col-sm-3 col-md-2">
+                                        <img src="img/block-content-date.svg" alt="" />
+                                    </div>
+                                    <div class="col-sm-9 col-md-10 description-text">
+                                        <span>{{selectedMetadataChild.Date | date:'yyyy-MM-dd'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="block-action">
+                            <div class="row" style="padding-bottom: 5px">
+                                <div class="col-sm-2">
+                                    <span class="tooltipicon">
+                                        <a id="exportMD"
+                                           class="btn btn-info btn-csw"
+                                           ng-href="{{cstlUrl}}api/1/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{cstlSessionId}}"
+                                           data-placement="bottom"
+                                           title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
+                                            <i class="fa fa-download"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                                <div class="col-sm-2">
+                                    <span class="tooltipicon">
+                                        <button type="button"
+                                                id="deleteMetadata"
+                                                class="btn btn-danger btn-csw"
+                                                ng-click="deleteMetadata();"
+                                                data-placement="bottom"
+                                                title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
