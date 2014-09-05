@@ -26,6 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Date;
+import java.util.TimeZone;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import org.opengis.metadata.citation.Responsibility;
@@ -68,6 +71,14 @@ final class MetadataUpdater {
      * The metadata factory to use for creating new instances.
      */
     private static final MetadataFactory FACTORY = new MetadataFactory();
+
+    /**
+     * The object to use for parsing dates of the form "2014-09-11".
+     */
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    static {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     /**
      * The metadata standard.
@@ -218,6 +229,9 @@ final class MetadataUpdater {
      * Converts the given value to an instance of the given class before to store in the metadata object.
      */
     private static Object convert(final Class<?> type, Object value) throws ParseException {
+        if (type == Date.class) {
+            return toDate(value);
+        }
         if (!CharSequence.class.isAssignableFrom(type) && (value instanceof CharSequence)) {
             String text = value.toString();
             if (text.startsWith(Keywords.NIL_REASON)) try {
@@ -237,6 +251,25 @@ final class MetadataUpdater {
             }
         }
         return value;
+    }
+
+    /**
+     * Returns the given value as a date.
+     */
+    private static Date toDate(final Object value) throws ParseException {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Long) {
+            return new Date((Long) value);
+        }
+        try {
+            synchronized (DATE_FORMAT) {
+                return DATE_FORMAT.parse((String) value);
+            }
+        } catch (java.text.ParseException e) {
+            throw new ParseException("Illegal date: " + value, e);
+        }
     }
 
     /**
@@ -290,7 +323,7 @@ final class MetadataUpdater {
             boolean moved = false;
             Date beginPosition = null, endPosition = null;
             while (np.path.length >= 2 && np.path[np.path.length - 2].equals("extent")) {
-                final Date t = (value != null) ? new Date(((Number) value).longValue()) : null;
+                final Date t = toDate(value);
                 switch (np.path[np.path.length - 1]) {
                     case "beginPosition": beginPosition = t; break;
                     case "endPosition":   endPosition   = t; break;

@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.Metadata;
+import org.opengis.referencing.ReferenceSystem;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.TypeValuePolicy;
@@ -104,6 +107,11 @@ import org.apache.sis.metadata.ValueExistencePolicy;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class TemplateApplicator {
+    /**
+     * A path to be handled in a special way.
+     */
+    private static final String[] REFERENCE_SYSTEM = {"referenceSystemIdentifier", "code"};
+
     /**
      * {@code true} for omitting empty nodes.
      */
@@ -284,7 +292,11 @@ final class TemplateApplicator {
         Object value;
         do {
             final String identifier = template.path[pathOffset];
-            value = template.standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
+            if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM) && metadata instanceof Metadata) {
+                value = referenceSystem((Metadata) metadata); // Special case.
+            } else {
+                value = template.standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
+            }
             if (value == null) {
                 return;
             }
@@ -384,5 +396,18 @@ final class TemplateApplicator {
     static boolean isCollection(final MetadataStandard standard, final Object metadata, final CharSequence identifier) {
         return Collection.class.isAssignableFrom(standard.asTypeMap(metadata.getClass(),
                 KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.PROPERTY_TYPE).get(identifier));
+    }
+
+    /**
+     * Special case for {@link #REFERENCE_SYSTEM}.
+     */
+    private static String referenceSystem(final Metadata metadata) {
+        for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
+            for (final Identifier id : r.getIdentifiers()) {
+                final String code = id.getCode();
+                if (code != null) return code;
+            }
+        }
+        return null;
     }
 }

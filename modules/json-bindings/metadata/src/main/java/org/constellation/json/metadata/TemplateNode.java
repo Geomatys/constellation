@@ -233,6 +233,22 @@ final class TemplateNode {
     }
 
     /**
+     * Returns {@code true} if this path ends with the given suffix.
+     */
+    final boolean endsWith(final CharSequence[] suffix) {
+        int j = path.length - suffix.length;
+        if (j < 0) {
+            return false;
+        }
+        for (int i=0; i<suffix.length; i++, j++) {
+            if (!path[j].equals(suffix[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Validates the {@link #path} of this node and all child nodes.
      * This method shall be invoked on the root node after we finished to build the whole tree.
      * This method invokes itself recursively for validating children too.
