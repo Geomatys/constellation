@@ -357,6 +357,7 @@
     "label.validate": "Validate",
     "label.vector": "Vector",
     "label.count.data": "available data",
+    "label.count.dataset": "available dataset",
     "label.count.sensors": "available sensors",
     "label.count.style": "available style(s)",
     "label.count.tasks": "available task(s)",

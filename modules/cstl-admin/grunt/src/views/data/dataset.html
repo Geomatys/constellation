@@ -172,28 +172,28 @@
                 </div>
             </form>
         </div>
-        <div class="dash-inner row">
+        <div class="dash-inner row" style="padding-bottom: 10pt;">
             <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"
-                 ng-init="small=false"
+                 ng-init="dataCtrl.smallMode=false"
                  style="padding-right: 0;">
                 <div id="list" data-role="list">
                     <div class="pagination-wrapper pagination-csw">
                         <strong class="col-md-6">
                             <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
-                            <span class="nb-results" translate="label.count.data">available data</span>
+                            <span class="nb-results" translate="label.count.dataset">available dataset</span>
                         </strong>
                         <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
                             <button type="button"
-                                    ng-click="small=true"
+                                    ng-click="dataCtrl.smallMode=true"
                                     class="pull-right btn btn-xs btn-info btn-csw"
-                                    ng-class="{'btn-small-selected':small==true}"
+                                    ng-class="{'btn-small-selected':dataCtrl.smallMode}"
                                     style="border-radius:0 3px 3px 0; margin-top: 5px; width:32px; height:34px;">
                                 <img src="img/btn-display-reduced.svg" alt="" />
                             </button>
                             <button type="button"
-                                    ng-click="small=false"
+                                    ng-click="dataCtrl.smallMode=false"
                                     class="pull-right btn btn-xs btn-info btn-csw"
-                                    ng-class="{'btn-small-selected':small==false}"
+                                    ng-class="{'btn-small-selected':!dataCtrl.smallMode}"
                                     style="margin-left: 10px; border-radius:3px 0 0 3px; margin-top: 5px; width:32px; height:34px;">
                                 <img src="img/btn-display-normal.svg" alt="" />
                             </button>
@@ -217,14 +217,14 @@
                     </div>
                     <div class="item-list">
                         <div ng-repeat="dataset in wrap.dataList"
-                             ng-class="{'col-xs-6':small==true}"
+                             ng-class="{'col-xs-6':dataCtrl.smallMode}"
                              style="padding-left:0;">
                             <div class="item metadata"
                                  ng-class="{'selected':dataset==selected}"
                                  ng-click="select(dataset);selectMetadataChild(null);">
                                 <div class="top">
                                     <span class="item-title csw-title"
-                                          title="{{dataset.Name}}">{{truncate(small,dataset.Name)}}</span>
+                                          title="{{dataset.Name}}">{{truncate(dataCtrl.smallMode,dataset.Name)}}</span>
                                     <span class="pull-right text-right item-list-style">METADATA</span>
                                 </div>
                                 <div class="bottom">
@@ -239,7 +239,7 @@
                                         <span ng-if="dataset.Children.length == 0"
                                               translate="md.listing.no.data">No</span>
                                         <span ng-if="dataset.Children.length > 0">{{dataset.Children.length}}</span>
-                                        <span ng-class="{hide:small==true}"
+                                        <span ng-class="{hide:dataCtrl.smallMode}"
                                               translate="md.listing.data.associated">associated data</span>
                                     </div>
                                 </div>
@@ -249,10 +249,10 @@
                                  ng-if="dataset==selected"
                                  ng-repeat="relatedData in dataset.Children"
                                  ng-click="selectMetadataChild(relatedData)"
-                                 ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}">
+                                 ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':!dataCtrl.smallMode, 'col-xs-11':dataCtrl.smallMode, 'col-sm-offset-1':dataCtrl.smallMode}">
                                 <div class="top">
                                     <span class="item-title csw-title"
-                                          title="{{relatedData.Name}}">{{truncate(small,relatedData.Name)}}</span>
+                                          title="{{relatedData.Name}}">{{truncate(dataCtrl.smallMode,relatedData.Name)}}</span>
                                     <span class="pull-right text-right item-list-style"
                                           style="font-size:14px;">{{relatedData.Type}}</span>
                                 </div>

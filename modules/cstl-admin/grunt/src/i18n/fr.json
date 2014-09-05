@@ -401,6 +401,7 @@
     "label.validate": "Valider",
     "label.vector": "Vecteur",
     "label.count.data":"donnée(s) disponible(s)",
+    "label.count.dataset": "jeux de donnée(s) disponible(s)",
     "label.count.sensors": "capteur(s) disponible(s)",
     "label.count.style": "styles(s) disponible(s)",
     "label.count.tasks": "traitement(s) disponible(s)",

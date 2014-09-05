@@ -278,8 +278,8 @@
                          </div>
                     </form>
                 </div>
-                <div class="dash-inner row">
-                    <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="small=false">
+                <div class="dash-inner row" style="padding-bottom: 10pt;">
+                    <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="dataCtrl.smallMode=false">
                         <div id="list" data-role="list">
                             <div class="pagination-wrapper pagination-data">
                                 <strong class="col-md-6">
@@ -289,16 +289,16 @@
 
                                 <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
                                     <button type="button"
-                                            ng-click="small=true"
+                                            ng-click="dataCtrl.smallMode=true"
                                             class="pull-right btn btn-xs btn-info btn-data"
-                                            ng-class="{'btn-small-selected':small==true}"
+                                            ng-class="{'btn-small-selected':dataCtrl.smallMode}"
                                             style="border-radius:0 3px 3px 0; margin-top: 5px; width:32px; height:34px;">
                                         <img src="img/btn-display-reduced.svg" alt="" />
                                     </button>
                                     <button type="button"
-                                            ng-click="small=false"
+                                            ng-click="dataCtrl.smallMode=false"
                                             class="pull-right btn btn-xs btn-info btn-data"
-                                            ng-class="{'btn-small-selected':small==false}"
+                                            ng-class="{'btn-small-selected':!dataCtrl.smallMode}"
                                             style="margin-left: 10px; border-radius:3px 0 0 3px; margin-top: 5px; width:32px; height:34px;">
                                         <img src="img/btn-display-normal.svg" alt="" />
                                     </button>
@@ -325,11 +325,11 @@
                             <div class="item-list">
                                 <div class="item {{data.Type | lowercase}}"
                                      ng-repeat="data in wrap.dataList"
-                                     ng-class="{selected:data==selected, hide:(data.TargetService.length===0 && dataCtrl.published==true) || (data.TargetService.length>0 && dataCtrl.published==false) || (data.TargetSensor.length>0 && dataCtrl.observation==false) || (data.TargetSensor.length===0 && dataCtrl.observation==true), 'col-xs-6':small==true}"
+                                     ng-class="{selected:data==selected, hide:(data.TargetService.length===0 && dataCtrl.published==true) || (data.TargetService.length>0 && dataCtrl.published==false) || (data.TargetSensor.length>0 && dataCtrl.observation==false) || (data.TargetSensor.length===0 && dataCtrl.observation==true), 'col-xs-6':dataCtrl.smallMode}"
                                      ng-click="select(data)">
                                     <div class="top">
                                         <span class="item-title"
-                                              title="{{getDisplayName(data.Provider,data.Name)}}">{{truncate(small,getDisplayName(data.Provider,data.Name))}}</span>
+                                              title="{{getDisplayName(data.Provider,data.Name)}}">{{truncate(dataCtrl.smallMode,getDisplayName(data.Provider,data.Name))}}</span>
                                         <span class="pull-right text-right item-list-style" >{{data.Type}}</span>
                                         <span ng-if="data.Type=='COVERAGE' && data.subtype=='multiDimentions'"
                                               class="pull-right coverage-type-nd item-list-style"
@@ -383,7 +383,7 @@
                                              class="pull-right"
                                              style="margin-top:6px; margin-right:10px;" />
                                         <span ng-if="data.TargetSensor.length > 0"
-                                              ng-class="{blanc:data==selected, hide:small==true}"
+                                              ng-class="{blanc:data==selected, hide:dataCtrl.smallMode}"
                                               class="pull-right text-right item-list-style"
                                               style="margin-right:10px; font-weight:bold;"
                                               translate="sensor.observation" >Sensor observation</span>

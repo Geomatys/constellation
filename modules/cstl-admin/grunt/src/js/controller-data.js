@@ -36,7 +36,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             currentTab : 'tabdata',
             alphaPattern : /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/,
             published : null,
-            observation : null
+            observation : null,
+            smallMode : false
         };
         $scope.search = {};
         $scope.searchMD = {};
@@ -517,15 +518,15 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
         $scope.truncate = function(small, text){
             if(text) {
                 if (window.innerWidth >= 1200) {
-                    if (small === true && text.length > 20) {
+                    if (small && text.length > 20) {
                         return text.substr(0, 20) + "...";
-                    } else if (small === false && text.length > 65) {
+                    } else if (!small && text.length > 65) {
                         return text.substr(0, 65) + "...";
                     } else { return text;}
                 } else if (window.innerWidth < 1200 && window.innerWidth >= 992) {
-                    if (small === true && text.length > 12) {
+                    if (small && text.length > 12) {
                         return text.substr(0, 12) + "...";
-                    } else if (small === false && text.length > 50) {
+                    } else if (!small && text.length > 50) {
                         return text.substr(0, 50) + "...";
                     } else { return text ;}
                 } else if (window.innerWidth < 992) {
