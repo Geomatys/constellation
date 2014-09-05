@@ -221,11 +221,12 @@
                              style="padding-left:0;">
                             <div class="item metadata"
                                  ng-class="{'selected':dataset==selected}"
-                                 ng-click="select(dataset);selectMetadataChild(null);">
+                                 ng-click="select(dataset);selectDataSetChild(null);">
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{dataset.Name}}">{{truncate(dataCtrl.smallMode,dataset.Name)}}</span>
-                                    <span class="pull-right text-right item-list-style">METADATA</span>
+                                    <span class="pull-right text-right item-list-style"
+                                          translate="md.listing.metadata.type">METADATA</span>
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
@@ -248,8 +249,8 @@
                                  style="margin-top:0;"
                                  ng-if="dataset==selected"
                                  ng-repeat="relatedData in dataset.Children"
-                                 ng-click="selectMetadataChild(relatedData)"
-                                 ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':!dataCtrl.smallMode, 'col-xs-11':dataCtrl.smallMode, 'col-sm-offset-1':dataCtrl.smallMode}">
+                                 ng-click="selectDataSetChild(relatedData)"
+                                 ng-class="{selected:relatedData==dataCtrl.selectedDataSetChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':!dataCtrl.smallMode, 'col-xs-11':dataCtrl.smallMode, 'col-sm-offset-1':dataCtrl.smallMode}">
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{relatedData.Name}}">{{truncate(dataCtrl.smallMode,relatedData.Name)}}</span>
@@ -274,14 +275,14 @@
                     <div class="alert alert-info alert-csw"
                          ng-if="!selected">
                         <h4 translate="label.no.selected.metadata">No selected metadata</h4>
-                        <p translate="msg.no.selected.metadata"
-                           style="font-weight:normal;">Click on a metadata to display more information</p>
+                        <p style="font-weight:normal;"
+                           translate="msg.no.selected.metadata">Click on a metadata to display more information</p>
                     </div>
                     <div id="selected-item"
                          class="selected-item"
                          ng-if="selected">
                         <div class="block-header block-header-md"
-                             ng-click="toggleUpDownSelected()">
+                             ng-click="toggleUpDownSelectedMD()">
                             <strong class="item-title title-bloc"
                                     title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
                             <i class="fa fa-chevron-up pull-right"></i>
@@ -306,16 +307,16 @@
                                 </div>
                             </div>
                             <div class="block-content"
-                                 ng-class="{'block-vector':selectedMetadataChild.Type=='VECTOR','block-raster':selectedMetadataChild.Type=='COVERAGE'}"
-                                 ng-if="selectedMetadataChild">
+                                 ng-class="{'block-vector':dataCtrl.selectedDataSetChild.Type=='VECTOR','block-raster':dataCtrl.selectedDataSetChild.Type=='COVERAGE'}"
+                                 ng-if="dataCtrl.selectedDataSetChild">
                                 <h6 translate="label.title">Title</h6>
-                                <span>{{truncateTitleBlock(selectedMetadataChild.Name)}}</span>
+                                <span>{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</span>
                                 <div class="row description-block">
                                     <div class="col-sm-3 col-md-2">
                                         <img src="img/block-content-owner.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selectedMetadataChild.Owner}}</span>
+                                        <span>{{dataCtrl.selectedDataSetChild.Owner}}</span>
                                     </div>
                                 </div>
                                 <div class="row description-block">
@@ -323,34 +324,33 @@
                                         <img src="img/block-content-date.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selectedMetadataChild.Date | date:'yyyy-MM-dd'}}</span>
+                                        <span>{{dataCtrl.selectedDataSetChild.Date | date:'yyyy-MM-dd'}}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="block-action">
                             <div class="row" style="padding-bottom: 5px">
+                                <!--div class="col-sm-2">
+                                    <span class="tooltipicon">
+                                        <button type="button"
+                                                class="btn btn-danger btn-csw"
+                                                ng-click="editMetadata();"
+                                                data-placement="bottom"
+                                                title="{{'dataset.metadata.listing.selected.edit.button' | translate }}" tooltip>
+                                            <i class="glyphicon glyphicon-pencil"></i>
+                                        </button>
+                                    </span>
+                                </div-->
                                 <div class="col-sm-2">
                                     <span class="tooltipicon">
                                         <a id="exportMD"
                                            class="btn btn-info btn-csw"
-                                           ng-href="{{dataCtrl.cstlUrl}}api/1/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{dataCtrl.cstlSessionId}}"
+                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selected.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
                                            data-placement="bottom"
                                            title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
                                             <i class="fa fa-download"></i>
                                         </a>
-                                    </span>
-                                </div>
-                                <div class="col-sm-2">
-                                    <span class="tooltipicon">
-                                        <button type="button"
-                                                id="deleteMetadata"
-                                                class="btn btn-danger btn-csw"
-                                                ng-click="deleteMetadata();"
-                                                data-placement="bottom"
-                                                title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
-                                            <i class="glyphicon glyphicon-trash"></i>
-                                        </button>
                                     </span>
                                 </div>
                             </div>

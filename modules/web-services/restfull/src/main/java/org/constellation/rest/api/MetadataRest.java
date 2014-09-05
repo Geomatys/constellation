@@ -20,7 +20,9 @@
 package org.constellation.rest.api;
 
 import com.google.common.base.Optional;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.XML;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.DatasetBusiness;
 import org.constellation.admin.MetadataBusiness;
@@ -31,6 +33,7 @@ import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.UserRepository;
+import org.w3c.dom.Node;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -38,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -91,10 +95,11 @@ public class MetadataRest {
      * Returns all dataset in brief format with its own list of data in brief format.
      *
      * @return Response for client side as json.
+     * @TODO is it the right place? perhaps it should be moved to DatasetRest facade.
      */
     @GET
     @Path("dataset/all")
-    public Response getAllDataset() {
+    public Response getAllDataset(@PathParam("domainId") final int domainId) {
         final List<DataSetBrief> datasetBriefs = new ArrayList<>();
         final List<Dataset> datasets = datasetBusiness.getAllDataset();
         if(datasets!=null){
@@ -111,10 +116,39 @@ public class MetadataRest {
                 }
                 final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
                 final DataSetBrief dsb = new DataSetBrief(ds.getIdentifier(), provider.getType(), owner, dataBriefList);
+                try{
+                    final Node nodeMetadata = datasetBusiness.getMetadataNode(ds.getIdentifier(),domainId);
+                    if(nodeMetadata!=null){
+                        //@TODO fill the DataSetBrief properties for keywords, abstract and dateStamp
+                    }
+                }catch(Exception ex){
+                    LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+                }
                 datasetBriefs.add(dsb);
             }
         }
         return Response.ok(datasetBriefs).build();
+    }
+
+    /**
+     * Return as an attachment file the metadata of data set in xml format.
+     * @param datasetIdentifier given dataset identifier.
+     * @return the xml file
+     */
+    @GET
+    @Path("dataset/{datasetIdentifier}")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response downloadMetadataForDataSet(@PathParam("domainId") final int domainId,
+                                               @PathParam("datasetIdentifier") final String datasetIdentifier) {
+        try{
+            final DefaultMetadata metadata  =  datasetBusiness.getMetadata(datasetIdentifier, domainId);
+            final String xmlStr = XML.marshal(metadata);
+            return Response.ok(xmlStr, MediaType.APPLICATION_XML_TYPE)
+                    .header("Content-Disposition", "attachment; filename=\"" + datasetIdentifier + ".xml\"").build();
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "Failed to get xml metadata for dataset with identifier "+datasetIdentifier,ex);
+            return Response.status(500).entity("failed").build();
+        }
     }
 
 }

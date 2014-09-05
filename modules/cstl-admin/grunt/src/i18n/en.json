@@ -150,6 +150,8 @@
     "data.dashboard.metadata.title":"Available metadata",
 
     "dataset.information.title":"Metadata list",
+    "dataset.metadata.listing.selected.edit.button":"Edit dataset metadata",
+    "dataset.child.metadata.listing.selected.edit.button":"Edit metadata",
 
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",

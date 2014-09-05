@@ -19,13 +19,16 @@
 
 package org.constellation.admin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.util.List;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.ConfigurationException;
@@ -34,8 +37,15 @@ import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 
 /**
  *
@@ -49,6 +59,11 @@ import org.springframework.stereotype.Component;
 public class DatasetBusiness {
 
     /**
+     * w3c document builder factory.
+     */
+    protected final DocumentBuilderFactory dbf;
+
+    /**
      * Injected dataset repository.
      */
     @Inject
@@ -58,6 +73,14 @@ public class DatasetBusiness {
      */
     @Inject
     private DataRepository dataRepository;
+
+    /**
+     * Creates a new instance of {@link DatasetBusiness}.
+     */
+    public DatasetBusiness() {
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+    }
 
     /**
      * Get all dataset from dataset table.
@@ -110,12 +133,16 @@ public class DatasetBusiness {
      * @return {@link org.apache.sis.metadata.iso.DefaultMetadata}.
      * @throws ConfigurationException for JAXBException
      */
-    public DefaultMetadata getMetadata(String datasetIdentifier, int domainId) throws ConfigurationException {
+    public DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException {
         final Dataset dataset = getDataset(datasetIdentifier, domainId);
         final MarshallerPool pool = ISOMarshallerPool.getInstance();
         try {
             final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-            final byte[] byteArray = dataset.getMetadataIso().getBytes();
+            final String metadataStr = dataset.getMetadataIso();
+            if(metadataStr == null){
+                throw new ConfigurationException("Unable to get metadata for dataset identifier "+datasetIdentifier);
+            }
+            final byte[] byteArray = metadataStr.getBytes();
             final ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
             final DefaultMetadata metadata = (DefaultMetadata) unmarshaller.unmarshal(bais);
             pool.recycle(unmarshaller);
@@ -123,6 +150,43 @@ public class DatasetBusiness {
             return metadata;
         } catch (JAXBException ex) {
             throw new ConfigurationException("Unable to unmarshall the dataset metadata", ex);
+        }
+    }
+
+    /**
+     * Returns {@link Node} that represents the metadata document of dataset.
+     * @param datasetIdentifier the given dataset identifier.
+     * @param domainId domain id.
+     * @return {@link Node}
+     * @throws ConfigurationException
+     */
+    public Node getMetadataNode(final String datasetIdentifier, int domainId) throws ConfigurationException {
+        final Dataset dataset = getDataset(datasetIdentifier, domainId);
+        try {
+            return getNodeFromString(dataset.getMetadataIso());
+        } catch (MetadataIoException ex) {
+            throw new ConfigurationException("Unable to get w3c node for metadata of dataset!", ex);
+        }
+    }
+
+    /**
+     * Convert iso metadata string xml to w3c document.
+     *
+     * @param metadataStr the given metadata xml as string.
+     * @return {@link Node} that represents the metadata in w3c document format.
+     * @throws MetadataIoException
+     */
+    protected Node getNodeFromString(final String metadataStr) throws MetadataIoException {
+        if(metadataStr == null) {
+            return null;
+        }
+        try {
+            final InputSource source = new InputSource(new StringReader(metadataStr));
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.parse(source);
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            throw new MetadataIoException("unable to parse the metadata", ex, NO_APPLICABLE_CODE);
         }
     }
 

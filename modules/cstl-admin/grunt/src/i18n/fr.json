@@ -150,6 +150,8 @@
     "data.dashboard.metadata.title":"Métadonnées disponibles",
 
     "dataset.information.title":"Liste des métadonnées",
+    "dataset.metadata.listing.selected.edit.button":"Éditer la métadonnée",
+    "dataset.child.metadata.listing.selected.edit.button":"Éditer la métadonnée de la donnée",
 
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",
@@ -522,7 +524,7 @@
     "md.iso.topic.category": "Catégorie de sujet",
     "md.iso.username": "Nom de l'utilisateur",
     "md.listing.data.associated": "donnée(s) associée(s)",
-    "md.listing.metadata.type": "METADONNEES",
+    "md.listing.metadata.type": "MÉTADONNÉE",
     "md.listing.no.data": "0",
     "md.listing.no.sensor": "0",
     "md.listing.no.available.md": "Pas de métadonnée disponible",

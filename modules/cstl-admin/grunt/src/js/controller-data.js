@@ -37,7 +37,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             alphaPattern : /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/,
             published : null,
             observation : null,
-            smallMode : false
+            smallMode : false,
+            selectedDataSetChild : null
         };
         $scope.search = {};
         $scope.searchMD = {};
@@ -48,6 +49,18 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
          */
         $scope.selectTab = function(item) {
             $scope.dataCtrl.currentTab = item;
+        };
+
+        /**
+         * Select dataSet child item.
+         * @param item
+         */
+        $scope.selectDataSetChild = function(item) {
+            if ($scope.dataCtrl.selectedDataSetChild === item) {
+                $scope.dataCtrl.selectedDataSetChild = null;
+            } else {
+                $scope.dataCtrl.selectedDataSetChild = item;
+            }
         };
 
         /**
@@ -423,8 +436,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
         };
 
         $scope.unlinkSensor = function(sensorId) {
-            dataListing.unlinkSensor({providerId: $scope.selected.Provider, dataId: $scope.selected.Name, sensorId: sensorId}, {value: $scope.selected.Namespace},
-                function() {
+            dataListing.unlinkSensor({providerId: $scope.selected.Provider,
+                                      dataId: $scope.selected.Name,
+                                      sensorId: sensorId},
+                                     {value: $scope.selected.Namespace},
+                function(response) {//success
                     $scope.selected.TargetSensor.splice(0, 1);
                 });
         };
