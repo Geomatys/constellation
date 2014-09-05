@@ -25,21 +25,21 @@
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
                     <ul class="nav nav-style">
-                        <li ng-click="ordertype='Name';orderreverse=false"><a translate="label.title">
+                        <li ng-click="wrap.ordertype='Name';wrap.orderreverse=false"><a translate="label.title">
                             Title<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
-                        <li ng-click="ordertype='Date';orderreverse=true"><a translate="label.date">
+                        <li ng-click="wrap.ordertype='Date';wrap.orderreverse=true"><a translate="label.date">
                             Date<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
-                        <li ng-click="ordertype='Owner';orderreverse=false"><a translate="label.owner">
+                        <li ng-click="wrap.ordertype='Owner';wrap.orderreverse=false"><a translate="label.owner">
                             Owner<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
                     </ul>
                     <button type="button"
-                            ng-click="ordertype='Name';orderreverse=false"
+                            ng-click="wrap.ordertype='Name';wrap.orderreverse=false"
                             title="{{'label.search.refresh' | translate }}"
                             class="btn btn-xs btn-info btn-data btn-sos"><i class="fa fa-times"></i></button>
                     <div class="pull-right">

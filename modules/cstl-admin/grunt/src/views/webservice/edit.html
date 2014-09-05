@@ -69,25 +69,33 @@
                                 <div class="navbar sort-navbar">
                                     <div class="navbar-inner">
                                         <ul class="nav nav-style">
-                                            <li ng-click="ordertype= (service && service.type && service.type.toLowerCase()==='sos') ? 'id' : (service && service.type && service.type.toLowerCase==='csw') ? 'title' : 'Name';orderreverse=false"><a translate="service.edit.dashboard.header.title">
-                                                Title<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
-                                            </a></li>
+                                            <li ng-click="wrap.ordertype= (service && service.type && service.type.toLowerCase()==='sos') ? 'id' : (service && service.type && service.type.toLowerCase==='csw') ? 'title' : 'Name';wrap.orderreverse=false">
+                                                <a translate="service.edit.dashboard.header.title">
+                                                    Title<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                                                </a>
+                                            </li>
                                             <li class="divider-vertical"></li>
-                                            <li ng-click="ordertype= (service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'createDate' : 'Date';orderreverse=true"><a translate="service.edit.dashboard.header.date">
-                                                Date<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
-                                            </a></li>
+                                            <li ng-click="wrap.ordertype= (service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'createDate' : 'Date';wrap.orderreverse=true">
+                                                <a translate="service.edit.dashboard.header.date">
+                                                    Date<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                                                </a>
+                                            </li>
                                             <li class="divider-vertical"></li>
-                                            <li ng-click="ordertype=(service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'creator' : 'Owner';orderreverse=false"><a translate="service.edit.dashboard.header.owner">
-                                                Owner<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
-                                            </a></li>
+                                            <li ng-click="wrap.ordertype=(service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'creator' : 'Owner';wrap.orderreverse=false">
+                                                <a translate="service.edit.dashboard.header.owner">
+                                                    Owner<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                                                </a>
+                                            </li>
                                             <li class="divider-vertical"></li>
-                                            <li ng-click="ordertype='Type';orderreverse=false"><a translate="service.edit.dashboard.header.type">
-                                                Type<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
-                                            </a></li>
+                                            <li ng-click="wrap.ordertype='Type';wrap.orderreverse=false">
+                                                <a translate="service.edit.dashboard.header.type">
+                                                    Type<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                                                </a>
+                                            </li>
                                             <li class="divider-vertical"></li>
                                         </ul>
                                         <button type="button"
-                                                ng-click="ordertype= (service && service.type && service.type.toLowerCase()==='sos') ? 'id' : (service && service.type && service.type.toLowerCase==='csw') ? 'title' : 'Name';orderreverse=false"
+                                                ng-click="wrap.ordertype= (service && service.type && service.type.toLowerCase()==='sos') ? 'id' : (service && service.type && service.type.toLowerCase==='csw') ? 'title' : 'Name';wrap.orderreverse=false"
                                                 ng-class="{'btn-csw':type==='csw','btn-sos':type==='sos'}"
                                                 title="{{'label.search.refresh' | translate }}"
                                                 class="btn  btn-data btn-xs btn-info"><i class="fa fa-times"></i></button>
@@ -105,7 +113,10 @@
                                 <div class="dash-inner row dashboard" ng-init="small=false">
                                     <div id="list" data-role="list">
                                         <div class="pagination-wrapper pagination-data" ng-class="{'pagination-csw':type==='csw','pagination-sos':type==='sos'}">
-                                            <strong class="col-lg-6 col-xs-8 col-md-6"><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
+                                            <strong class="col-lg-6 col-xs-8 col-md-6">
+                                                <span class="nb-results pull-left">{{countdata}}&nbsp;</span>
+                                                <span class="nb-results" translate="label.count.data">available data</span>
+                                            </strong>
                                             <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
                                                 <button type="button" ng-click="small=true"
                                                         class="pull-right btn btn-xs btn-info btn-data"

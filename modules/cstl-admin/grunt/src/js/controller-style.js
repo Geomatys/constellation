@@ -36,7 +36,7 @@ cstlAdminApp.controller('StylesController', ['$scope', 'Dashboard', 'style', 'Gr
                     function(response) {
                         Dashboard($scope, response.styles, true);
                         $scope.wrap.filtertype = "";
-                        $scope.ordertype = "Name";
+                        $scope.wrap.ordertype = "Name";
                         modalLoader.close();
                     },
                     function() {
@@ -409,8 +409,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
          * @param ordType
          */
         $scope.clickFilter = function(ordType){
-            $scope.ordertype = ordType;
-            $scope.orderreverse = !$scope.orderreverse;
+            $scope.wrap.ordertype = ordType;
+            $scope.wrap.orderreverse = !$scope.wrap.orderreverse;
         };
 
         /**

@@ -25,17 +25,25 @@
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
                     <ul class="nav nav-style">
-                        <li ng-click="ordertype='name';orderreverse=false"><a translate="label.title">
-                            Title<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
-                        </a></li>
+                        <li ng-click="wrap.ordertype='name';wrap.orderreverse=false">
+                            <a>
+                                <span translate="label.title">Title</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="wrap.ordertype === 'name' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="wrap.ordertype === 'name' && !wrap.orderreverse"></i>
+                            </a>
+                        </li>
                         <li class="divider-vertical"></li>
-                        <li ng-click="ordertype='owner';orderreverse=false"><a translate="label.owner">
-                            Owner<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
-                        </a></li>
+                        <li ng-click="wrap.ordertype='owner';wrap.orderreverse=false">
+                            <a translate="label.owner">
+                                Owner<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                            </a>
+                        </li>
                         <li class="divider-vertical"></li>
                     </ul>
                     <button type="button"
-                            ng-click="ordertype='name';orderreverse=false"
+                            ng-click="wrap.ordertype='name';wrap.orderreverse=false"
                             class="btn btn-xs btn-info btn-mapcontext"
                             title="{{'label.search.refresh' | translate }}"
                             ><i class="fa fa-times"></i></button>

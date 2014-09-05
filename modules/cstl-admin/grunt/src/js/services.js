@@ -282,8 +282,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             scope.dataList = scope.dataList || [];
             scope.wrap.filtertext = scope.wrap.filtertext || "";
             scope.wrap.filtertype = scope.wrap.filtertype || undefined;
-            scope.ordertype = scope.ordertype || (scope.service && scope.service.type && scope.service.type.toLowerCase()==='sos') ? "id" : (scope.service && scope.service.type && scope.service.type.toLowerCase==='csw') ? "title" : "Name";
-            scope.orderreverse = scope.orderreverse || false;
+            scope.wrap.ordertype = scope.wrap.ordertype || (scope.service && scope.service.type && scope.service.type.toLowerCase()==='sos') ? "id" : (scope.service && scope.service.type && scope.service.type.toLowerCase==='csw') ? "title" : "Name";
+            scope.wrap.orderreverse = scope.wrap.orderreverse || false;
             scope.countdata = scope.countdata || 0;
             scope.wrap.nbbypage = scope.wrap.nbbypage || 10;
             scope.currentpage = scope.currentpage || 1;
@@ -298,7 +298,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 } else {
                     array = $filter('filter')(scope.fullList, {'$': scope.wrap.filtertext});
                 }
-                array = $filter('orderBy')(array, scope.ordertype, scope.orderreverse);
+                array = $filter('orderBy')(array, scope.wrap.ordertype, scope.wrap.orderreverse);
 
                 var list = [];
                 for (var i = 0; i < array.length; i++) {
@@ -341,7 +341,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 scope.displayPage(1);
             },true);
 
-            scope.$watch('ordertype+orderreverse', function() {
+            scope.$watch('wrap.ordertype+wrap.orderreverse', function() {
                 scope.displayPage(scope.currentpage);
             },true);
         };

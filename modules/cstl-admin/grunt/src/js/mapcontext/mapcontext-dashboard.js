@@ -38,7 +38,7 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
             });
             mapcontext.listLayers({}, function(response) {
                 Dashboard($scope, response, true);
-                $scope.ordertype='name';
+                $scope.wrap.ordertype='name';
                 modalLoader.close();
             }, function() {
                 modalLoader.close();

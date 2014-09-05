@@ -45,33 +45,33 @@
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
                     <ul class="nav nav-style">
-                        <li ng-click="ordertype='Name';orderreverse=!orderreverse">
+                        <li ng-click="wrap.ordertype='Name';wrap.orderreverse=!wrap.orderreverse">
                             <a>
                                 <span translate="label.title">Title</span>
-                                <i class="fa fa-caret-up" ng-if="ordertype === 'Name' && orderreverse"></i>
-                                <i class="fa fa-caret-down" ng-if="ordertype === 'Name' && !orderreverse"></i>
+                                <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'Name' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'Name' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
-                        <li ng-click="ordertype='Date';orderreverse=!orderreverse">
+                        <li ng-click="wrap.ordertype='Date';wrap.orderreverse=!wrap.orderreverse">
                             <a>
                                 <span translate="label.date">Date</span>
-                                <i class="fa fa-caret-up" ng-if="ordertype === 'Date' && orderreverse"></i>
-                                <i class="fa fa-caret-down" ng-if="ordertype === 'Date' && !orderreverse"></i>
+                                <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'Date' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'Date' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
-                        <li ng-click="ordertype='Owner';orderreverse=!orderreverse">
+                        <li ng-click="wrap.ordertype='Owner';wrap.orderreverse=!wrap.orderreverse">
                             <a>
                                 <span translate="label.owner">Owner</span>
-                                <i class="fa fa-caret-up" ng-if="ordertype === 'Owner' && orderreverse"></i>
-                                <i class="fa fa-caret-down" ng-if="ordertype === 'Owner' && !orderreverse"></i>
+                                <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'Owner' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'Owner' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
                     </ul>
                     <button type="button"
-                            ng-click="ordertype='Name';orderreverse=false"
+                            ng-click="wrap.ordertype='Name';wrap.orderreverse=false"
                             title="{{'label.search.refresh' | translate }}"
                             class="btn btn-xs btn-info btn-style">
                         <i class="fa fa-times"></i>

@@ -9,24 +9,24 @@
                 <div class="navbar sort-navbar" style="margin-bottom:6px;">
                     <div class="navbar-inner">
                         <ul class="nav nav-style">
-                            <li ng-click="$parent.ordertype='Name';$parent.orderreverse=false"><a translate="service.edit.dashboard.header.title">
+                            <li ng-click="$parent.wrap.ordertype='Name';$parent.wrap.orderreverse=false"><a translate="service.edit.dashboard.header.title">
                                 Title<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
                             </a></li>
                             <li class="divider-vertical"></li>
-                            <li ng-click="$parent.ordertype='Date';$parent.orderreverse=true"><a translate="service.edit.dashboard.header.date">
+                            <li ng-click="$parent.wrap.ordertype='Date';$parent.wrap.orderreverse=true"><a translate="service.edit.dashboard.header.date">
                                 Date<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
                             </a></li>
                             <li class="divider-vertical"></li>
-                            <li ng-click="$parent.ordertype='Owner';$parent.orderreverse=false"><a translate="service.edit.dashboard.header.owner">
+                            <li ng-click="$parent.wrap.ordertype='Owner';$parent.wrap.orderreverse=false"><a translate="service.edit.dashboard.header.owner">
                                 Owner<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
                             </a></li>
                             <li class="divider-vertical"></li>
-                            <li ng-click="$parent.ordertype='Owner';$parent.orderreverse=false"><a translate="service.edit.dashboard.header.type">
+                            <li ng-click="$parent.wrap.ordertype='Owner';$parent.wrap.orderreverse=false"><a translate="service.edit.dashboard.header.type">
                                 Type<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
                             </a></li>
                             <li class="divider-vertical"></li>
                         </ul>
-                        <button type="button" ng-click="$parent.ordertype='Name';$parent.orderreverse=false" class="btn btn-xs btn-data btn-sos"><i class="fa fa-times"></i></button>
+                        <button type="button" ng-click="$parent.wrap.ordertype='Name';$parent.wrap.orderreverse=false" class="btn btn-xs btn-data btn-sos"><i class="fa fa-times"></i></button>
                         <div class="pull-right">
                             <div style="position:relative;">
                                 <div class="ajax-loader" style="right:0;position:absolute;"></div>
