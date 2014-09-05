@@ -728,10 +728,10 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.setReadOnly(true);
             try {
                 final Statement stmt       = c.createStatement();
-                final ResultSet rs         = stmt.executeQuery("SELECT \"identifier\" FROM \"om\".\"observations\" WHERE \"identifier\" LIKE '" + observationTemplateIdBase + "%'");
+                final ResultSet rs         = stmt.executeQuery("SELECT \"identifier\" FROM \"om\".\"observations\" WHERE \"procedure\"='" + procedure + "'");
                 String identifier = null;
                 if (rs.next()) {
-                    identifier = rs.getString(identifier);
+                    identifier = rs.getString(1);
                 }
                 rs.close();
                 stmt.close();
