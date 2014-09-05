@@ -275,42 +275,42 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     // -------------------------------------------------------------------------
 
     .factory('Dashboard', function($filter) {
-        return function($scope, fullList, filterOnType) {
-
-            $scope.service = $scope.service || null;
-            $scope.fullList = fullList || [];
-            $scope.dataList = $scope.dataList || [];
-            $scope.filtertext = $scope.filtertext || "";
-            $scope.filtertype = $scope.filtertype || undefined;
-            $scope.ordertype = $scope.ordertype || ($scope.service && $scope.service.type && $scope.service.type.toLowerCase()==='sos') ? "id" : ($scope.service && $scope.service.type && $scope.service.type.toLowerCase==='csw') ? "title" : "Name";
-            $scope.orderreverse = $scope.orderreverse || false;
-            $scope.countdata = $scope.countdata || 0;
-            $scope.nbbypage = $scope.nbbypage || 10;
-            $scope.currentpage = $scope.currentpage || 1;
-            $scope.selected = $scope.selected || null;
-            $scope.exclude = $scope.exclude || [];
+        return function(scope, fullList, filterOnType) {
+            scope.wrap = scope.wrap || {};
+            scope.service = scope.service || null;
+            scope.fullList = fullList || [];
+            scope.dataList = scope.dataList || [];
+            scope.wrap.filtertext = scope.wrap.filtertext || "";
+            scope.wrap.filtertype = scope.wrap.filtertype || undefined;
+            scope.ordertype = scope.ordertype || (scope.service && scope.service.type && scope.service.type.toLowerCase()==='sos') ? "id" : (scope.service && scope.service.type && scope.service.type.toLowerCase==='csw') ? "title" : "Name";
+            scope.orderreverse = scope.orderreverse || false;
+            scope.countdata = scope.countdata || 0;
+            scope.wrap.nbbypage = scope.wrap.nbbypage || 10;
+            scope.currentpage = scope.currentpage || 1;
+            scope.selected = scope.selected || null;
+            scope.exclude = scope.exclude || [];
 
             // Dashboard methods
-            $scope.displayPage = function(page) {
+            scope.displayPage = function(page) {
                 var array;
                 if (filterOnType) {
-                    array = $filter('filter')($scope.fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
+                    array = $filter('filter')(scope.fullList, {'Type':scope.wrap.filtertype, '$': scope.wrap.filtertext});
                 } else {
-                    array = $filter('filter')($scope.fullList, {'$': $scope.filtertext});
+                    array = $filter('filter')(scope.fullList, {'$': scope.wrap.filtertext});
                 }
-                array = $filter('orderBy')(array, $scope.ordertype, $scope.orderreverse);
+                array = $filter('orderBy')(array, scope.ordertype, scope.orderreverse);
 
                 var list = [];
                 for (var i = 0; i < array.length; i++) {
                     var found = false;
-                    for (var j = 0; j < $scope.exclude.length; j++) {
-                        if ($scope.service && $scope.service.type.toLowerCase() === 'sos') {
-                            if ($scope.exclude[j].id === array[i].Name) {
+                    for (var j = 0; j < scope.exclude.length; j++) {
+                        if (scope.service && scope.service.type.toLowerCase() === 'sos') {
+                            if (scope.exclude[j].id === array[i].Name) {
                                 found = true;
                                 break;
                             }
                         } else {
-                            if ($scope.exclude[j].Name === array[i].Name) {
+                            if (scope.exclude[j].Name === array[i].Name) {
                                 found = true;
                                 break;
                             }
@@ -321,29 +321,29 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     }
                 }
 
-                var start = (page - 1) * $scope.nbbypage;
+                var start = (page - 1) * scope.wrap.nbbypage;
 
-                $scope.currentpage = page;
-                $scope.countdata = list.length;
-                $scope.dataList = list.splice(start, $scope.nbbypage);
-                $scope.selected = null;
+                scope.currentpage = page;
+                scope.countdata = list.length;
+                scope.dataList = list.splice(start, scope.wrap.nbbypage);
+                scope.selected = null;
             };
 
-            $scope.select = function(item) {
-                if ($scope.selected === item) {
-                    $scope.selected = null;
+            scope.select = function(item) {
+                if (scope.selected === item) {
+                    scope.selected = null;
                 } else {
-                    $scope.selected = item;
+                    scope.selected = item;
                 }
             };
 
-            $scope.$watch('nbbypage+filtertext+filtertype+fullList', function() {
-                $scope.displayPage(1);
-            });
+            scope.$watch('wrap.nbbypage+wrap.filtertext+wrap.filtertype+fullList', function() {
+                scope.displayPage(1);
+            },true);
 
-            $scope.$watch('ordertype+orderreverse', function() {
-                $scope.displayPage($scope.currentpage);
-            });
+            scope.$watch('ordertype+orderreverse', function() {
+                scope.displayPage(scope.currentpage);
+            },true);
         };
     })
 

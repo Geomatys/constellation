@@ -561,6 +561,11 @@ cstlAdminApp.controller('ModalImportDataStep3TypeController', ['$scope',
 cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sensor',
     'dataListing', 'Dashboard', 'Growl', '$cookies',
     function($scope, sensor, dataListing, Dashboard, Growl, $cookies) {
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         $scope.selectedSensorsChild = null;
 
         $scope.selectSensorsChild = function(item) {
@@ -574,7 +579,7 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
         $scope.initDashboardSensor = function() {
             sensor.list({}, function(response) {
                 Dashboard($scope, response.children, false);
-                $scope.nbbypage = 5;
+                $scope.wrap.nbbypage = 5;
             });
         };
 

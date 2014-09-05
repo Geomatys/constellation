@@ -15,10 +15,15 @@
  */
 
 cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', 'webService',
-    'dataListing', 'DomainResource', 'provider', '$window', 'style', 'textService', '$modal',
+    'dataListing','datasetListing', 'DomainResource', 'provider', '$window', 'style', 'textService', '$modal',
     'Growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, Dashboard, webService, dataListing, DomainResource,
+    function ($scope, $location, Dashboard, webService, dataListing, datasetListing, DomainResource,
               provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookies) {
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.domainId = $cookies.cstlActiveDomainId;
@@ -134,14 +139,19 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             if($scope.currentTab === 'tabdata'){
                 dataListing.listAll({}, function(response) {
                     Dashboard($scope, response, true);
-                    $scope.filtertype = "";
+                    $scope.wrap.filtertype = "";
                     modalLoader.close();
                 }, function() {
                     modalLoader.close();
                 });
             }else if($scope.currentTab === 'tabmetadata') {
-                //@TODO call dataset rest api incoming works, do not modify this part!
-                modalLoader.close();
+                datasetListing.listAll({}, function(response){//success
+                    Dashboard($scope, response, true);
+                    $scope.wrap.filtertype = "";
+                    modalLoader.close();
+                }, function(response){//error
+                    modalLoader.close();
+                });
             }
             //display button that allow to scroll to top of the page from a certain height.
             angular.element($window).bind("scroll", function() {
@@ -883,10 +893,9 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
          * Save the metadata in server.
          */
         $scope.save = function() {
-            //@TODO save metadata
             if($scope.metadataValues && $scope.metadataValues.length>0){
+                //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
                 dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.type.toLowerCase()},
-                    //JSON.stringify($scope.metadataValues[0],null,1), //uncomment for debugging purposes
                     $scope.metadataValues[0],
                     function(response) {
                         $location.path('/data'); //redirect to data dashboard page
@@ -962,6 +971,11 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
     'sensor', 'Dashboard', '$modalInstance', 'service', 'exclude', 'Growl', '$modal',
     function ($scope, dataListing, webService, sos, sensor, Dashboard, $modalInstance,
               service, exclude, Growl, $modal) {
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         $scope.service = service;
 
         $scope.getDefaultFilter = function() {
@@ -973,7 +987,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             }
             return '';
         };
-        $scope.nbbypage = 5;
+        $scope.wrap.nbbypage = 5;
         $scope.exclude = exclude;
 
         // WMTS params in the last form before closing the popup
@@ -993,7 +1007,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             } else {
                 dataListing.listAll({}, function (response) {
                     Dashboard($scope, response, true);
-                    $scope.filtertype = $scope.getDefaultFilter();
+                    $scope.wrap.filtertype = $scope.getDefaultFilter();
                 });
             }
         };
@@ -1148,7 +1162,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
         };
 
         $scope.truncate = function(text){
-            if(text !== null) {
+            if(text) {
                 if (text.length > 40) {
                     return text.substr(0, 40) + "...";
                 } else { return text; }

@@ -21,6 +21,11 @@
 angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('WebServiceEditController', function($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, Dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate, $window) {
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -113,7 +118,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 csw.count({id: $routeParams.id}, {}, function(max) {
                     csw.getRecords({id: $routeParams.id, count: max.value, startIndex: 0}, {}, function(response) {
                         Dashboard($scope, response.BriefNode, false);
-                        $scope.filtertype = "";
+                        $scope.wrap.filtertype = "";
 
                         var mdIds = [];
                         for (var i=0; i<response.BriefNode.length; i++) {
@@ -136,7 +141,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
                 $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
                     Dashboard($scope, response, true);
-                    $scope.filtertype = "";
+                    $scope.wrap.filtertype = "";
                 });
             }
         };
@@ -375,7 +380,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                         csw.count({id: $routeParams.id}, {}, function(max) {
                             csw.getRecords({id: $routeParams.id, count: max.value, startIndex: 0}, {}, function(response) {
                                 Dashboard($scope, response.BriefNode, false);
-                                $scope.filtertype = "";
+                                $scope.wrap.filtertype = "";
                             });
                         });
                     }, function() { Growl('error','Error','Failed to delete metadata'); }

@@ -21,9 +21,14 @@
 angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('TasksController', function ($scope, Dashboard, Growl, $modal, TaskService, $window){
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         var lastOpened = null;
 
-        $scope.nbbypage = 5; // Default value at 5
+        $scope.wrap.nbbypage = 5; // Default value at 5
         $scope.hideScroll = true;
 
         $scope.init = function() {

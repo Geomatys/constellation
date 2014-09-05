@@ -30,7 +30,10 @@
                         <div class="pull-right">
                             <div style="position:relative;">
                                 <div class="ajax-loader" style="right:0;position:absolute;"></div>
-                                <input type="text" ng-model="$parent.filtertext" class="searchbox search-query form-control" placeholder="..." />
+                                <input type="text"
+                                       ng-model="$parent.wrap.filtertext"
+                                       class="searchbox search-query form-control"
+                                       placeholder="..." />
                             </div>
                         </div>
                     </div>
@@ -45,11 +48,11 @@
 
                             <div class="row" style="margin-left: 0; margin-right: 0;">
                                 <div class="col-sm-9" style="padding-left:15px; margin-top: 5px;"
-                                     page-switcher="{page:currentpage,size:nbbypage,count:countdata}"
+                                     page-switcher="{page:currentpage,size:wrap.nbbypage,count:countdata}"
                                      on-select-page="displayPage(page)"></div>
                                 <select class="nb-per-page input-small form-control pull-right col-xs-2 "
                                         style="padding-left: 5px;padding-right: 5px; margin-right: 15px; margin-top: 5px;"
-                                        ng-model="$parent.nbbypage">
+                                        ng-model="$parent.wrap.nbbypage">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="20">20</option>

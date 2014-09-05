@@ -19,6 +19,11 @@
  */
 cstlAdminApp.controller('StylesController', ['$scope', 'Dashboard', 'style', 'Growl', 'StyleSharedService', '$modal','$window',
     function($scope, Dashboard, style, Growl, StyleSharedService, $modal, $window) {
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         $scope.hideScroll = true;
 
         $scope.init = function() {
@@ -30,7 +35,7 @@ cstlAdminApp.controller('StylesController', ['$scope', 'Dashboard', 'style', 'Gr
                 style.listAll({provider: 'sld'},
                     function(response) {
                         Dashboard($scope, response.styles, true);
-                        $scope.filtertype = "";
+                        $scope.wrap.filtertype = "";
                         $scope.ordertype = "Name";
                         modalLoader.close();
                     },
@@ -144,6 +149,12 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
     'selectedLayer','selectedStyle', 'serviceName', 'exclude','$timeout','stylechooser',
     function($scope, Dashboard, $modalInstance, style, $cookies, dataListing, provider, Growl,
              textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout,stylechooser) {
+
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         $scope.xmlStyle = '<xml></xml>';
         $scope.exclude = exclude;
 
@@ -333,14 +344,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', 'Dashboard', '$modalI
         //There is a bug in angular for uiModal we cannot fix it with a simple call $parent
         //the following is a fix to wrap the variable from the good scope.
         $scope.wrapScope = {
-            filterText : $scope.filtertext,
-            nbbypage : $scope.nbbypage || 10
+            filterText : $scope.wrap.filtertext,
+            nbbypage : $scope.wrap.nbbypage || 10
         };
         $scope.$watch('wrapScope.filterText', function() {
-            $scope.filtertext =$scope.wrapScope.filterText;
+            $scope.wrap.filtertext =$scope.wrapScope.filterText;
         });
         $scope.$watch('wrapScope.nbbypage', function() {
-            $scope.nbbypage =$scope.wrapScope.nbbypage;
+            $scope.wrap.nbbypage =$scope.wrapScope.nbbypage;
         });
 
         /**

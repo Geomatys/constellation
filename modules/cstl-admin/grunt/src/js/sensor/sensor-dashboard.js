@@ -21,6 +21,11 @@
 angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('SensorsController', function($scope, Dashboard, webService, sensor, $modal, Growl, $window) {
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         $scope.hideScroll = true;
 
         $scope.init = function() {
@@ -141,13 +146,18 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
     })
 
     .controller('SensorModalChooseController', function($scope, $modalInstance, Dashboard, dataListing, sensor, selectedData){
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
 
         sensor.list({}, function(response) {
             Dashboard($scope, response.children, false);
-            $scope.nbbypage = 5;
+            $scope.wrap.nbbypage = 5;
         });
 
         $scope.selectedSensorsChild = null;
