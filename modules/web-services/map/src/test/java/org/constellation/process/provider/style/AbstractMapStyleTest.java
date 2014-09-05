@@ -34,6 +34,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import javax.annotation.PostConstruct;
 
 /**
  *
@@ -48,6 +49,10 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
 
     public AbstractMapStyleTest(final String str) {
         super(str);
+    }
+    
+    @PostConstruct
+    public void fillSLDService() {
         final Collection<StyleProviderFactory> availableLayerServices = StyleProviders.getInstance().getFactories();
         for (StyleProviderFactory tmpService : availableLayerServices) {
             if ("sld".equals(tmpService.getName())) {
@@ -107,7 +112,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
      * Register a provider.
      * @param providerSource
      */
-    protected static void addProvider(String id,ParameterValueGroup providerSource) throws ConfigurationException {
+    protected void addProvider(String id,ParameterValueGroup providerSource) throws ConfigurationException {
         StyleProviders.getInstance().createProvider(id, (StyleProviderFactory) SLD_SERVICE, providerSource);
     }
 
@@ -115,7 +120,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
      * Un-register a provider
      * @param id
      */
-    protected static void removeProvider(String id) throws ConfigurationException {
+    protected void removeProvider(String id) throws ConfigurationException {
 
         StyleProvider provider = null;
         for (StyleProvider p : StyleProviders.getInstance().getProviders()) {

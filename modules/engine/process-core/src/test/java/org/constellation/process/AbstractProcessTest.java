@@ -45,7 +45,7 @@ import static org.junit.Assert.assertNotNull;
 public abstract class AbstractProcessTest implements ApplicationContextAware {
 
     protected static final Logger LOGGER = Logging.getLogger(AbstractProcessTest.class);
-    private static final String factory = ConstellationProcessFactory.NAME;
+    private final String factory = ConstellationProcessFactory.NAME;
     private final String process;
     
     @Override
