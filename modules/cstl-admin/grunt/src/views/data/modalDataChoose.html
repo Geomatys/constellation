@@ -69,7 +69,7 @@
                         </div>
                         <div class="item-list">
                             <div ng-if="service.type.toLowerCase() !== 'sos'">
-                                <div class="item {{data.Type.toLowerCase()}}" ng-repeat="data in dataList" ng-class="{selected:isInSelected(data)}" ng-click="dataInArray(data)">
+                                <div class="item {{data.Type.toLowerCase()}}" ng-repeat="data in wrap.dataList" ng-class="{selected:isInSelected(data)}" ng-click="dataInArray(data)">
                                     <div class="top">
                                         <span class="item-title title-modal">{{truncate(data.Name)}}</span>
                                         <span class="pull-right text-right item-list-style"  style="font-size:14px;">{{data.Type}}</span>
@@ -95,7 +95,7 @@
                                 </div>
                             </div>
                             <div ng-if="service.type.toLowerCase() === 'sos'">
-                                <div ng-repeat="sosdata in dataList">
+                                <div ng-repeat="sosdata in wrap.dataList">
                                     <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                         <div class="top">
                                             <span class="item-title">{{sosdata.id}}</span>

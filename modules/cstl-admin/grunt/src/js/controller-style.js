@@ -65,7 +65,7 @@ cstlAdminApp.controller('StylesController', ['$scope', 'Dashboard', 'style', 'Gr
                         function() {
                             Growl('success', 'Success', 'Style ' + styleName + ' successfully deleted');
                             style.listAll({provider: 'sld'}, function(response) {
-                                $scope.fullList = response.styles;
+                                $scope.wrap.fullList = response.styles;
                             });
                         },
                         function() {

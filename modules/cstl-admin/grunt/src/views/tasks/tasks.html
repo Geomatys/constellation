@@ -66,7 +66,7 @@
                         </div>
 
                         <div class="item-list">
-                            <div ng-repeat="registry in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
+                            <div ng-repeat="registry in wrap.dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                 <div class="item registry" ng-class="{selected:registry==selected}" ng-click="select(registry);selectProcessChild(null);">
                                     <div class="top">
                                         <span class="item-title" title="{{registry.name}}">{{truncate(small,registry.name)}} </span>

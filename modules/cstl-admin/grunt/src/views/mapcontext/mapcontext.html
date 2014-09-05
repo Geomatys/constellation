@@ -97,7 +97,7 @@
                         </div>
                         
                         <div class="item-list">
-                            <div ng-repeat="context in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
+                            <div ng-repeat="context in wrap.dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                 <div class="item mapcontext" ng-class="{'selected':context==selected}" ng-click="select(context);selectContextChild(null);">
                                     <div class="top">
                                         <span class="item-title" title="{{context.name}}">{{truncate(small,context.name)}}</span>

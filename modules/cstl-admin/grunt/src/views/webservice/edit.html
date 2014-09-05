@@ -149,7 +149,7 @@
                                         </div>
                                         <div class="item-list">
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
-                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer)">
+                                                <div class="item" ng-repeat="layer in wrap.dataList" ng-class="{selected:layer==selected,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title" title="{{layer.Name}}">{{truncate(small,layer.Name)}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
@@ -197,7 +197,7 @@
                                                 </div>
                                             </div>
                                             <div ng-if="type === 'csw'">
-                                                <div ng-repeat="cswdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
+                                                <div ng-repeat="cswdata in wrap.dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                                     <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null)">
                                                         <div class="top">
                                                             <span class="item-title csw-title" title="{{cswdata.title ? cswdata.title : cswdata.identifier}}">{{cswdata.title ? truncate(small,cswdata.title) : truncate(small,cswdata.identifier)}}</span>
@@ -234,7 +234,7 @@
                                                 </div>
                                             </div>
                                             <div ng-if="type === 'sos'">
-                                                <div ng-repeat="sosdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
+                                                <div ng-repeat="sosdata in wrap.dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                                     <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                                         <div class="top">
                                                             <span class="item-title" title="{{sosdata.id}}">{{truncate(small,sosdata.id)}}</span>

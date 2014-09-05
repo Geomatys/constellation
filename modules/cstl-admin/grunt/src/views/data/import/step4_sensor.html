@@ -39,7 +39,7 @@
                                 <div class="pull-right" page-switcher="{page:$parent.currentpage,size:$parent.wrap.nbbypage,count:$parent.countdata}" on-select-page="displayPage(page)"></div>
                             </div>
                             <div class="item-list">
-                                <div ng-repeat="sosdata in dataList">
+                                <div ng-repeat="sosdata in wrap.dataList">
                                     <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                         <div class="top">
                                             <span class="item-title">{{sosdata.id}}</span>

@@ -285,12 +285,12 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                             if (response.length === 0) {
                                 provider.delete({id: providerId}, function() {
                                     dataListing.listAll({}, function(response) {
-                                        $scope.fullList = response;
+                                        $scope.wrap.fullList = response;
                                     });
                                 });
                             } else {
                                 dataListing.listAll({}, function(response) {
-                                    $scope.fullList = response;
+                                    $scope.wrap.fullList = response;
                                 });
                             }
                         });
@@ -1027,7 +1027,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
 
         $scope.selectAllData = function() {
             if ($scope.dataSelect.all) {
-                $scope.listSelect = $scope.dataList.slice();
+                $scope.listSelect = $scope.wrap.dataList.slice();
             }else{
                 $scope.listSelect=[];
             }
@@ -1048,7 +1048,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 }
             } else { $scope.listSelect.push(item);}
 
-            if($scope.listSelect.length < $scope.dataList.length){
+            if($scope.listSelect.length < $scope.wrap.dataList.length){
                 $scope.dataSelect.all=false;
             } else { $scope.dataSelect.all=true; }
         };
