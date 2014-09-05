@@ -187,7 +187,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP.xml");
 
-        // System.out.println("result:\n" + result);
+        System.out.println("result:\n" + result);
 
         domCompare(expResult, result);
 
@@ -231,7 +231,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         final CstlDOMComparator comparator = new CstlDOMComparator(expected, actual);
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.ignoredAttributes.add("updateSequence");
-        comparator.ignoredAttributes.add("schemaLocation");
+        comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
         comparator.compare();
     }
 }
