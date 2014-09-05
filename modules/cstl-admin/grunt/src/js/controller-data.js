@@ -34,7 +34,9 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             searchMetadataTerm : "",
             hideScroll : true,
             currentTab : 'tabdata',
-            alphaPattern : /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/
+            alphaPattern : /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/,
+            published : null,
+            observation : null
         };
         $scope.search = {};
         $scope.searchMD = {};
@@ -243,7 +245,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
          * @param published if true then proceed to show only published data.
          */
         $scope.showPublished = function(published){
-            $scope.published=published;
+            $scope.dataCtrl.published=published;
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
                 controller: 'ModalInstanceCtrl'
@@ -262,7 +264,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
          * @param observation if true then proceed to show only sensorable data.
          */
         $scope.showSensorable = function(observation){
-            $scope.observation=observation;
+            $scope.dataCtrl.observation=observation;
             var modalLoader = $modal.open({
                 templateUrl: 'views/modalLoader.html',
                 controller: 'ModalInstanceCtrl'
