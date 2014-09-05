@@ -678,7 +678,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
          */
         $scope.metadataValues = [];
         dataListing.getDatasetMetadata({}, {values: {'providerId': $scope.provider,
-                                                     'type':$scope.type.toLowerCase(),
+                                                     'type':'import',
                                                      'prune':false}},
             function(response) {
                 if (response && response.root) {
@@ -977,7 +977,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
         $scope.save = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
                 //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
-                dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.type.toLowerCase()},
+                dataListing.mergeMetadata({'providerId':$scope.provider,'type':'import'},
                     $scope.metadataValues[0],
                     function(response) {
                         $location.path('/data'); //redirect to data dashboard page
@@ -1315,7 +1315,7 @@ cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstanc
         }
 
         $scope.isDateField = function(render){
-            return (render.toLowerCase().indexOf('date') !== -1);
+            return (render.toLowerCase().indexOf('date') !== -1 && render.toLowerCase().indexOf('codelist') === -1);
         };
         $scope.isCodelistField = function(render){
             return (render.toLowerCase().indexOf('codelist') !== -1);

@@ -797,12 +797,14 @@ public class DataRest {
             //get template name
             final String templateName;
             if("vector".equalsIgnoreCase(dataType)){
-                //vector
+                //vector template
                 templateName="profile_inspire_vector";
-            }else {
-                //@TODO make template for sensorML
-                //raster
+            }else if("raster".equalsIgnoreCase(dataType)){
+                //raster template
                 templateName="profile_inspire_raster";
+            }else {
+                //default template is import
+                templateName="profile_import";
             }
             final Template template = Template.getInstance(templateName);
             final StringBuilder buffer = new StringBuilder();
@@ -935,10 +937,13 @@ public class DataRest {
             //get template name
             final String templateName;
             if ("vector".equalsIgnoreCase(type)) {
-                //vector
+                //vector template
                 templateName = "profile_inspire_vector";
-            } else {
-                //raster
+            } else if ("raster".equalsIgnoreCase(type)){
+                //raster template
+                templateName = "profile_inspire_raster";
+            }else {
+                //default template is import
                 templateName = "profile_inspire_raster";
             }
             final Template template = Template.getInstance(templateName);
@@ -1809,11 +1814,14 @@ public class DataRest {
             //get template name
             final String templateName;
             if("vector".equalsIgnoreCase(type)){
-                //vector
+                //vector template
                 templateName="profile_inspire_vector";
-            }else {
-                //raster
+            }else if ("vector".equalsIgnoreCase(type)){
+                //raster template
                 templateName="profile_inspire_raster";
+            } else {
+                //default template is import
+                templateName="profile_import";
             }
             final Template template = Template.getInstance(templateName);
             try{
