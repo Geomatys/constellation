@@ -22,7 +22,7 @@
         </div>
     </div>
 </div>
-<!--
+
 <ul class="nav nav-tabs">
     <li id="dataTab" class="active tab-data" style="margin-left: 10px;">
         <a ng-click="selectTab('tabdata')" data-toggle="tab">
@@ -35,7 +35,7 @@
         </a>
     </li>
 </ul>
--->
+
 <div class="tab-content" ng-if="currentTab==='tabdata'">
     <div class="tab-pane" ng-class="{active:currentTab==='tabdata'}" style="padding-top:0;">
         <div id="dataDashboard" class="row" ng-init="init(); published=null; observation=null">
@@ -59,7 +59,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="navbar sort-navbar" ng-class="{'advanced-open':advancedSearch==true}">
+                <div class="navbar sort-navbar" ng-class="{'advanced-open':dataCtrl.advancedDataSearch==true}">
                     <div class="navbar-inner">
                         <ul class="nav nav-style">
                             <li ng-click="wrap.ordertype='Name';wrap.orderreverse=!wrap.orderreverse">
@@ -160,19 +160,19 @@
                         </button>
                         <div class="pull-right quick-search-panel">
                             <button class="btn btn-sm pull-right btn-info btn-data pull-right"
-                                    ng-click="toggleAdvancedSearch()"
-                                    tooltip-html-unsafe="{{advancedSearch?'label.search.advanced.hide':'label.search.advanced.show' | translate }}"
+                                    ng-click="toggleAdvancedDataSearch()"
+                                    tooltip-html-unsafe="{{dataCtrl.advancedDataSearch?'label.search.advanced.hide':'label.search.advanced.show' | translate }}"
                                     tooltip-placement="bottom"
                                     style="margin-top:5px;"
-                                    ng-class="{'btn-small-selected':advancedSearch}">
-                                <i class="fa" ng-class="{'fa-plus':!advancedSearch, 'fa-minus':advancedSearch}"></i>
+                                    ng-class="{'btn-small-selected':dataCtrl.advancedDataSearch}">
+                                <i class="fa" ng-class="{'fa-plus':!dataCtrl.advancedDataSearch, 'fa-minus':dataCtrl.advancedDataSearch}"></i>
                             </button>
                             <div class="col-sm-7 pull-right input-group"
-                                 ng-show="!advancedSearch"
+                                 ng-show="!dataCtrl.advancedDataSearch"
                                  style="padding-left: 5px;padding-right: 5px;">
                                 <input type="text"
                                        class="searchbox search-query form-control form-control-fix"
-                                       ng-model="searchTerm"/>
+                                       ng-model="dataCtrl.searchTerm"/>
                                 <span class="input-group-btn">
                                     <button class="btn btn-info btn-data"
                                             type="button"
@@ -186,7 +186,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="dash-inner row" collapse="!advancedSearch">
+                <div class="dash-inner row" collapse="!dataCtrl.advancedDataSearch">
                     <form name="searchForm" class="advanced-search-data">
                         <div class="row" style="padding-right: 15px; padding-left: 15px;">
                             <div class="col-sm-4" ng-class="{'has-error': searchForm.title.$invalid}">
@@ -445,7 +445,7 @@
                                         <div class="col-sm-2">
                                             <span class="tooltipicon">
                                                 <a id="exportMD" class="btn btn-info "
-                                                   ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/data/export/{{selected.Provider}}/{{selected.Name}};jsessionid={{cstlSessionId}}"
+                                                   ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/export/{{selected.Provider}}/{{selected.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
                                                    tooltip-placement="bottom"
                                                    tooltip-html-unsafe="{{'layer.listing.selected.export.button' | translate }}">
                                                         <i class="fa fa-download"></i>

@@ -6,7 +6,7 @@
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li ng-class="{active:wrap.filtertype == ''}" ng-click="wrap.filtertype = ''">
+                    <li ng-class="{active:wrap.filtertype==''}" ng-click="wrap.filtertype=''">
                         <a translate="label.all">All</a>
                     </li>
                     <li ng-class="{active:wrap.filtertype=='VECTOR'}" ng-click="wrap.filtertype='VECTOR'">
@@ -18,7 +18,7 @@
                 </ul>
             </div>
         </div>
-        <div class="navbar sort-navbar" ng-class="{'advanced-open':advancedSearch==true}">
+        <div class="navbar sort-navbar" ng-class="{'advanced-open':dataCtrl.advancedMetadataSearch==true}">
             <div class="navbar-inner">
                 <ul class="nav nav-style">
                     <li ng-click="wrap.ordertype='Name';wrap.orderreverse=!wrap.orderreverse">
@@ -54,23 +54,23 @@
                 </button>
                 <div class="pull-right quick-search-panel">
                     <button class="btn btn-sm pull-right btn-info btn-csw pull-right"
-                            ng-click="toggleAdvancedSearch()"
-                            tooltip-html-unsafe="{{advancedSearch?'label.search.advanced.hide':'label.search.advanced.show' | translate }}"
+                            ng-click="toggleAdvancedMDSearch()"
+                            tooltip-html-unsafe="{{dataCtrl.advancedMetadataSearch?'label.search.advanced.hide':'label.search.advanced.show' | translate }}"
                             tooltip-placement="bottom"
                             style="margin-top:5px;"
-                            ng-class="{'btn-small-selected':advancedSearch}">
-                        <i class="fa" ng-class="{'fa-plus':!advancedSearch, 'fa-minus':advancedSearch}"></i>
+                            ng-class="{'btn-small-selected':dataCtrl.advancedMetadataSearch}">
+                        <i class="fa" ng-class="{'fa-plus':!dataCtrl.advancedMetadataSearch, 'fa-minus':dataCtrl.advancedMetadataSearch}"></i>
                     </button>
                     <div class="col-sm-7 pull-right input-group"
-                         ng-show="!advancedSearch"
+                         ng-show="!dataCtrl.advancedMetadataSearch"
                          style="padding-left: 5px;padding-right: 5px;">
                         <input type="text"
                                class="searchbox search-query form-control form-control-fix"
-                               ng-model="searchTerm"/>
+                               ng-model="dataCtrl.searchMetadataTerm"/>
                         <span class="input-group-btn">
                             <button class="btn btn-info btn-csw"
                                     type="button"
-                                    ng-click="callSearch();"
+                                    ng-click="callSearchMD();"
                                     title="{{'label.search' | translate}}"
                                     style="height: 30px;margin: 0;">
                                 <i class="glyphicon glyphicon-search" style="vertical-align: top;"></i>
@@ -80,7 +80,7 @@
                 </div>
             </div>
         </div>
-        <div class="dash-inner row" collapse="!advancedSearch">
+        <div class="dash-inner row" collapse="!dataCtrl.advancedMetadataSearch">
             <form name="searchForm" class="advanced-search-dataset">
                 <div class="row" style="padding-right: 15px; padding-left: 15px;">
                     <div class="col-sm-4" ng-class="{'has-error': searchForm.title.$invalid}">
@@ -89,7 +89,7 @@
                         <input type="text"
                                class="form-control"
                                name="title"
-                               ng-model="search.title"
+                               ng-model="searchMD.title"
                                ng-pattern="alphaPattern"
                                ng-change="checkIsValid(searchForm.title.$invalid)"/>
                     </div>
@@ -99,7 +99,7 @@
                         <input type="text"
                                class="form-control"
                                name="abstract"
-                               ng-model="search.abstract"
+                               ng-model="searchMD.abstract"
                                ng-pattern="alphaPattern"
                                ng-change="checkIsValid(searchForm.abstract.$invalid)"/>
                     </div>
@@ -109,7 +109,7 @@
                         <input type="text"
                                class="form-control"
                                name="keywords"
-                               ng-model="search.keywords"
+                               ng-model="searchMD.keywords"
                                ng-pattern="alphaPattern"
                                ng-change="checkIsValid(searchForm.keywords.$invalid)"/>
                     </div>
@@ -121,7 +121,7 @@
                         <input type="text"
                                class="form-control"
                                name="topic"
-                               ng-model="search.topic"
+                               ng-model="searchMD.topic"
                                ng-pattern="alphaPattern"
                                ng-change="checkIsValid(searchForm.topic.$invalid)"/>
                     </div>
@@ -131,7 +131,7 @@
                         <input type="text"
                                class="form-control"
                                name="data"
-                               ng-model="search.data"
+                               ng-model="searchMD.data"
                                ng-pattern="alphaPattern"
                                ng-change="checkIsValid(searchForm.data.$invalid)"/>
                     </div>
@@ -141,7 +141,7 @@
                         <input type="text"
                                class="form-control"
                                name="level"
-                               ng-model="search.level"
+                               ng-model="searchMD.level"
                                ng-pattern="alphaPattern"
                                ng-change="checkIsValid(searchForm.level.$invalid)"/>
                     </div>
@@ -153,7 +153,7 @@
                         <input type="text"
                                class="form-control"
                                name="area"
-                               ng-model="search.area"
+                               ng-model="searchMD.area"
                                ng-pattern="alphaPattern"
                                ng-change="checkIsValid(searchForm.area.$invalid)"/>
                     </div>
@@ -161,12 +161,12 @@
                         <button type="button"
                                 class="btn btn-xs btn-info btn-csw"
                                 style="padding: 4px; margin-top: 6px;"
-                                ng-click="callSearch()"
+                                ng-click="callSearchMD()"
                                 translate="label.search">Search</button>
                         <button type="button"
                                 class="btn btn-xs btn-info btn-csw"
                                 style="padding: 4px; margin-top: 6px;"
-                                ng-click="resetSearch()"
+                                ng-click="resetSearchMD()"
                                 translate="label.clear">Clear</button>
                     </div>
                 </div>
@@ -334,7 +334,7 @@
                                     <span class="tooltipicon">
                                         <a id="exportMD"
                                            class="btn btn-info btn-csw"
-                                           ng-href="{{cstlUrl}}api/1/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{cstlSessionId}}"
+                                           ng-href="{{dataCtrl.cstlUrl}}api/1/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{dataCtrl.cstlSessionId}}"
                                            data-placement="bottom"
                                            title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
                                             <i class="fa fa-download"></i>

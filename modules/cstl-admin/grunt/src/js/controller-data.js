@@ -24,11 +24,17 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
          */
         $scope.wrap = {};
 
-        $scope.cstlUrl = $cookies.cstlUrl;
-        $scope.cstlSessionId = $cookies.cstlSessionId;
-        $scope.domainId = $cookies.cstlActiveDomainId;
-        $scope.advancedSearch = false;
+        $scope.dataCtrl = {
+            cstlUrl : $cookies.cstlUrl,
+            cstlSessionId : $cookies.cstlSessionId,
+            domainId : $cookies.cstlActiveDomainId,
+            advancedDataSearch : false,
+            advancedMetadataSearch : false,
+            searchTerm : "",
+            searchMetadataTerm : ""
+        };
         $scope.search = {};
+        $scope.searchMD = {};
         $scope.hideScroll = true;
         $scope.currentTab = 'tabdata'; //possible values are 'tabdata' and 'tabmetadata'
 
@@ -41,15 +47,27 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
         };
 
         /**
-         * Toggle advanced search view panel.
+         * Toggle advanced data search view panel.
          */
-        $scope.toggleAdvancedSearch = function(){
-          if ($scope.advancedSearch){
-              $scope.advancedSearch = false;
+        $scope.toggleAdvancedDataSearch = function(){
+          if ($scope.dataCtrl.advancedDataSearch){
+              $scope.dataCtrl.advancedDataSearch = false;
           }  else {
-              $scope.advancedSearch = true;
-              $scope.searchTerm ="";
+              $scope.dataCtrl.advancedDataSearch = true;
+              $scope.dataCtrl.searchTerm ="";
           }
+        };
+
+        /**
+         * Toggle advanced metadata search view panel.
+         */
+        $scope.toggleAdvancedMDSearch = function(){
+            if ($scope.dataCtrl.advancedMetadataSearch){
+                $scope.dataCtrl.advancedMetadataSearch = false;
+            }  else {
+                $scope.dataCtrl.advancedMetadataSearch = true;
+                $scope.dataCtrl.searchMetadataTerm ="";
+            }
         };
 
         /**
@@ -57,6 +75,13 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
          */
         $scope.resetSearch = function(){
             $scope.search = {};
+        };
+
+        /**
+         * Clean advanced metadata search inputs.
+         */
+        $scope.resetSearchMD = function(){
+            $scope.searchMD = {};
         };
 
         /**
@@ -80,8 +105,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
          * the result is stored with Dashboard service.
          */
         $scope.callSearch = function(){
-            if ($scope.searchTerm){
-                dataListing.findData({values: {'search': $scope.searchTerm}},
+            if ($scope.dataCtrl.searchTerm){
+                dataListing.findData({values: {'search': $scope.dataCtrl.searchTerm}},
                     function(response) {
                         Dashboard($scope, response, true);
                     },
@@ -122,6 +147,63 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                     });
                 } else {
                     dataListing.listAll({}, function(response) {
+                        Dashboard($scope, response, true);
+                    });
+                }
+            }
+        };
+
+        /**
+         * Binding action for search button in metadata dashboard.
+         * the result is stored with Dashboard service.
+         */
+        $scope.callSearchMD = function(){
+            if ($scope.dataCtrl.searchMetadataTerm){
+                //@TODO implements rest api to find in dataset.
+                Growl('info','About','Search on dataset is not implemented yet!');
+                /*datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchMetadataTerm}},
+                    function(response) {
+                        Dashboard($scope, response, true);
+                    },
+                    function(response){
+                        console.error(response);
+                        Growl('error','Error','Search failed:'+ response.data);
+                    }
+                );*/
+            }else{
+                if (!$.isEmptyObject($scope.searchMD)){
+                    var searchString = "";
+                    if ($scope.searchMD.title){
+                        searchString += " title:"+$scope.searchMD.title;
+                    }
+                    if ($scope.searchMD.abstract){
+                        searchString += " abstract:"+$scope.searchMD.abstract;
+                    }
+                    if ($scope.searchMD.keywords){
+                        searchString += " keywords:"+$scope.searchMD.keywords;
+                    }
+                    if ($scope.searchMD.topic){
+                        searchString += " topic:"+$scope.searchMD.topic;
+                    }
+                    if ($scope.searchMD.data){
+                        searchString += " data:"+$scope.searchMD.data;
+                    }
+                    if ($scope.searchMD.level){
+                        searchString += " level:"+$scope.searchMD.level;
+                    }
+                    if ($scope.searchMD.area){
+                        searchString += " area:"+$scope.searchMD.area;
+                    }
+                    //@TODO implements rest api to find in dataset.
+                    Growl('info','About','Search on dataset is not implemented yet!');
+                    /*datasetListing.findDataset({values: {'search': searchString}},function(response) {
+                        Dashboard($scope, response, true);
+                    }, function(response){
+                        console.error(response);
+                        Growl('error','Error','Search failed:'+ response.data);
+                    });*/
+                } else {
+                    datasetListing.listAll({}, function(response) {
                         Dashboard($scope, response, true);
                     });
                 }
@@ -230,15 +312,18 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
               controller: 'ModalInstanceCtrl'
             });
             if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
-                layerData = DataViewer.createLayerWithStyle($scope.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
+                layerData = DataViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,
+                                                            layerName,
+                                                            providerId,
+                                                            $scope.selected.TargetStyle[0].Name);
             } else {
-                layerData = DataViewer.createLayer($scope.cstlUrl, layerName, providerId);
+                layerData = DataViewer.createLayer($scope.dataCtrl.cstlUrl, layerName, providerId);
             }
 
             //to force the browser cache reloading styled layer.
             layerData.mergeNewParams({ts:new Date().getTime()});
 
-            var layerBackground = DataViewer.createLayer($scope.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+            var layerBackground = DataViewer.createLayer($scope.dataCtrl.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
 
             dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
