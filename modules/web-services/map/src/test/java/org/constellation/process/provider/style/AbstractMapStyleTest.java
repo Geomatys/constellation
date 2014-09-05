@@ -46,17 +46,14 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
     // dataStore service
     protected static ProviderFactory SLD_SERVICE;
 
-    static {
+    public AbstractMapStyleTest(final String str) {
+        super(str);
         final Collection<StyleProviderFactory> availableLayerServices = StyleProviders.getInstance().getFactories();
         for (StyleProviderFactory tmpService : availableLayerServices) {
             if ("sld".equals(tmpService.getName())) {
                 SLD_SERVICE = tmpService;
             }
         }
-    }
-
-    public AbstractMapStyleTest(final String str) {
-        super(str);
     }
 
     @BeforeClass
@@ -85,7 +82,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
      * @return
      * @throws MalformedURLException
      */
-    protected static ParameterValueGroup buildProvider(final String providerID, final boolean loadAll) throws MalformedURLException {
+    protected ParameterValueGroup buildProvider(final String providerID, final boolean loadAll) throws MalformedURLException {
 
         ParameterDescriptorGroup desc = SLD_SERVICE.getProviderDescriptor();
 
