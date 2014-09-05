@@ -196,7 +196,7 @@
                                        class="form-control"
                                        name="title"
                                        ng-model="search.title"
-                                       ng-pattern="alphaPattern"
+                                       ng-pattern="dataCtrl.alphaPattern"
                                        ng-change="checkIsValid(searchForm.title.$invalid)"/>
                             </div>
                             <div class="col-sm-4" ng-class="{'has-error': searchForm.abstract.$invalid}">
@@ -206,7 +206,7 @@
                                        class="form-control"
                                        name="abstract"
                                        ng-model="search.abstract"
-                                       ng-pattern="alphaPattern"
+                                       ng-pattern="dataCtrl.alphaPattern"
                                        ng-change="checkIsValid(searchForm.abstract.$invalid)"/>
                             </div>
                             <div class="col-sm-4" ng-class="{'has-error': searchForm.keywords.$invalid}">
@@ -216,7 +216,7 @@
                                        class="form-control"
                                        name="keywords"
                                        ng-model="search.keywords"
-                                       ng-pattern="alphaPattern"
+                                       ng-pattern="dataCtrl.alphaPattern"
                                        ng-change="checkIsValid(searchForm.keywords.$invalid)"/>
                             </div>
                         </div>
@@ -228,7 +228,7 @@
                                        class="form-control"
                                        name="topic"
                                        ng-model="search.topic"
-                                       ng-pattern="alphaPattern"
+                                       ng-pattern="dataCtrl.alphaPattern"
                                        ng-change="checkIsValid(searchForm.topic.$invalid)"/>
                             </div>
                             <div class="col-sm-4"  ng-class="{'has-error': searchForm.data.$invalid}">
@@ -238,7 +238,7 @@
                                        class="form-control"
                                        name="data"
                                        ng-model="search.data"
-                                       ng-pattern="alphaPattern"
+                                       ng-pattern="dataCtrl.alphaPattern"
                                        ng-change="checkIsValid(searchForm.data.$invalid)"/>
                             </div>
                             <div class="col-sm-4" ng-class="{'has-error': searchForm.level.$invalid}">
@@ -248,7 +248,7 @@
                                        class="form-control"
                                        name="level"
                                        ng-model="search.level"
-                                       ng-pattern="alphaPattern"
+                                       ng-pattern="dataCtrl.alphaPattern"
                                        ng-change="checkIsValid(searchForm.level.$invalid)"/>
                             </div>
                         </div>
@@ -260,7 +260,7 @@
                                        class="form-control"
                                        name="area"
                                        ng-model="search.area"
-                                       ng-pattern="alphaPattern"
+                                       ng-pattern="dataCtrl.alphaPattern"
                                        ng-change="checkIsValid(searchForm.area.$invalid)"/>
                             </div>
                             <div class="pull-right"  style="padding-right: 15px; padding-left: 15px;">

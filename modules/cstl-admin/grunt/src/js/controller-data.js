@@ -33,7 +33,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             searchTerm : "",
             searchMetadataTerm : "",
             hideScroll : true,
-            currentTab : 'tabdata'
+            currentTab : 'tabdata',
+            alphaPattern : /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/
         };
         $scope.search = {};
         $scope.searchMD = {};
@@ -83,12 +84,6 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
         $scope.resetSearchMD = function(){
             $scope.searchMD = {};
         };
-
-        /**
-         * pattern for inputs validity in advanced search
-         * @type {RegExp}
-         */
-        $scope.alphaPattern = /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/;
 
         /**
          * Check the validity against the pattern and display growl error for given validity.
