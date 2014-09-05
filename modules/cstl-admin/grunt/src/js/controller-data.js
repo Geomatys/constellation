@@ -31,19 +31,19 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             advancedDataSearch : false,
             advancedMetadataSearch : false,
             searchTerm : "",
-            searchMetadataTerm : ""
+            searchMetadataTerm : "",
+            hideScroll : true,
+            currentTab : 'tabdata'
         };
         $scope.search = {};
         $scope.searchMD = {};
-        $scope.hideScroll = true;
-        $scope.currentTab = 'tabdata'; //possible values are 'tabdata' and 'tabmetadata'
 
         /**
          * Select appropriate tab 'tabdata' or 'tabmetadata'.
          * @param item
          */
         $scope.selectTab = function(item) {
-            $scope.currentTab = item;
+            $scope.dataCtrl.currentTab = item;
         };
 
         /**
@@ -218,7 +218,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 templateUrl: 'views/modalLoader.html',
                 controller: 'ModalInstanceCtrl'
             });
-            if($scope.currentTab === 'tabdata'){
+            if($scope.dataCtrl.currentTab === 'tabdata'){
                 dataListing.listAll({}, function(response) {
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
@@ -226,7 +226,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
                 }, function() {
                     modalLoader.close();
                 });
-            }else if($scope.currentTab === 'tabmetadata') {
+            }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
                 datasetListing.listAll({}, function(response){//success
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
@@ -237,7 +237,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', 'Dashboard', '
             }
             //display button that allow to scroll to top of the page from a certain height.
             angular.element($window).bind("scroll", function() {
-                $scope.hideScroll = this.pageYOffset < 220;
+                $scope.dataCtrl.hideScroll = this.pageYOffset < 220;
                 $scope.$apply();
             });
         };

@@ -36,8 +36,8 @@
     </li>
 </ul>
 
-<div class="tab-content" ng-if="currentTab==='tabdata'">
-    <div class="tab-pane" ng-class="{active:currentTab==='tabdata'}" style="padding-top:0;">
+<div class="tab-content" ng-if="dataCtrl.currentTab==='tabdata'">
+    <div class="tab-pane" ng-class="{active:dataCtrl.currentTab==='tabdata'}" style="padding-top:0;">
         <div id="dataDashboard" class="row" ng-init="init(); published=null; observation=null">
             <div class="col-sm-12">
             <div class="frame dashboard">
@@ -635,8 +635,8 @@
     </div>
 </div>
 
-<div class="tab-content" ng-if="currentTab==='tabmetadata'">
-    <div class="tab-pane" ng-class="{active:currentTab==='tabmetadata'}" style="padding-top:0;">
+<div class="tab-content" ng-if="dataCtrl.currentTab==='tabmetadata'">
+    <div class="tab-pane" ng-class="{active:dataCtrl.currentTab==='tabmetadata'}" style="padding-top:0;">
         <div id="metadataDashboard" class="row" ng-init="init(); published=null; observation=null">
             <ng-include src="'views/data/dataset.html'"></ng-include>
         </div>
@@ -646,6 +646,6 @@
 <div id="backtotop"
      scroll-to=""
      class="backtotop"
-     ng-if="!hideScroll">
+     ng-if="!dataCtrl.hideScroll">
     <span class="glyphicon glyphicon-chevron-up"></span>
 </div>
