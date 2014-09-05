@@ -78,7 +78,7 @@ public class OM2DataStoreTest extends AbstractReadingTests{
             Connection con = ds.getConnection();
 
             final ScriptRunner exec = new ScriptRunner(con);
-            exec.run(getResourceAsStream("org/constellation/data/om2/structure_observations.sql"));
+            exec.run(getResourceAsStream("org/constellation/om2/structure_observations.sql"));
             exec.run(getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
 
             final Map params = new HashMap<>();

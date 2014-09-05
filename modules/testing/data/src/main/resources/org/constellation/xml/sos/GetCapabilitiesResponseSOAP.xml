@@ -516,6 +516,8 @@
                         </ns16:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:9"/>
+                        <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:depth"/>
+                        <sos:featureOfInterest xlink:href="station-006"/>
                         <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
                         <sos:resultModel>om:Observation</sos:resultModel>
                         <sos:resultModel>om:Measurement</sos:resultModel>

@@ -224,7 +224,10 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 }
             } else if (samplingTime instanceof Instant) {
                 final Instant instant = (Instant) samplingTime;
-                final Date date       = instant.getPosition().getDate();
+                Date date = null;
+                if (instant.getPosition() != null) {
+                    date  = instant.getPosition().getDate();
+                }
                 if (date != null) {
                     stmt.setTimestamp(3, new Timestamp(date.getTime()));
                 } else {
