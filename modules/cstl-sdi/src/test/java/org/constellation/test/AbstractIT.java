@@ -12,28 +12,28 @@ import java.net.URI;
 /**
  * @author bgarcia
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/applicationContext-test.xml" })
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = { "/applicationContext-test.xml" })
 public abstract class AbstractIT {
 
-    @Autowired
-    private URI siteBase;
-
-    @Autowired
-    private WebDriver drv;
-
-    @Before
-    public void setUp() {
-        getDrv().manage().deleteAllCookies();
-        getDrv().get(siteBase.toString());
-    }
-
-    public URI getSiteBase() {
-        return siteBase;
-    }
-
-    public WebDriver getDrv() {
-        return drv;
-    }
+//    @Autowired
+//    private URI siteBase;
+//
+//    @Autowired
+//    private WebDriver drv;
+//
+//    @Before
+//    public void setUp() {
+//        getDrv().manage().deleteAllCookies();
+//        getDrv().get(siteBase.toString());
+//    }
+//
+//    public URI getSiteBase() {
+//        return siteBase;
+//    }
+//
+//    public WebDriver getDrv() {
+//        return drv;
+//    }
 }
 
