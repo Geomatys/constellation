@@ -15,7 +15,10 @@
                     <div class="navbar sort-navbar">
                         <div class="navbar-inner">
                             <div class="col-xs-6" style="margin-top:9px;">
-                                <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.sensors">available sensors</span></strong>
+                                <strong>
+                                    <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
+                                    <span class="nb-results" translate="label.count.sensors">available sensors</span>
+                                </strong>
                             </div>
                             <div class="pull-right">
                                 <div style="position:relative;">
@@ -36,7 +39,9 @@
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </select>
-                                <div class="pull-right" page-switcher="{page:$parent.currentpage,size:$parent.wrap.nbbypage,count:$parent.countdata}" on-select-page="displayPage(page)"></div>
+                                <div class="pull-right"
+                                     page-switcher="{page:$parent.wrap.currentpage,size:$parent.wrap.nbbypage,count:$parent.wrap.countdata}"
+                                     on-select-page="displayPage(page)"></div>
                             </div>
                             <div class="item-list">
                                 <div ng-repeat="sosdata in wrap.dataList">

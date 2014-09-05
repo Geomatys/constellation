@@ -284,9 +284,9 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             scope.wrap.filtertype = scope.wrap.filtertype || undefined;
             scope.wrap.ordertype = scope.wrap.ordertype || (scope.service && scope.service.type && scope.service.type.toLowerCase()==='sos') ? "id" : (scope.service && scope.service.type && scope.service.type.toLowerCase==='csw') ? "title" : "Name";
             scope.wrap.orderreverse = scope.wrap.orderreverse || false;
-            scope.countdata = scope.countdata || 0;
+            scope.wrap.countdata = scope.wrap.countdata || 0;
             scope.wrap.nbbypage = scope.wrap.nbbypage || 10;
-            scope.currentpage = scope.currentpage || 1;
+            scope.wrap.currentpage = scope.wrap.currentpage || 1;
             scope.selected = scope.selected || null;
             scope.exclude = scope.exclude || [];
 
@@ -323,8 +323,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
 
                 var start = (page - 1) * scope.wrap.nbbypage;
 
-                scope.currentpage = page;
-                scope.countdata = list.length;
+                scope.wrap.currentpage = page;
+                scope.wrap.countdata = list.length;
                 scope.wrap.dataList = list.splice(start, scope.wrap.nbbypage);
                 scope.selected = null;
             };
@@ -342,7 +342,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             },true);
 
             scope.$watch('wrap.ordertype+wrap.orderreverse', function() {
-                scope.displayPage(scope.currentpage);
+                scope.displayPage(scope.wrap.currentpage);
             },true);
         };
     })

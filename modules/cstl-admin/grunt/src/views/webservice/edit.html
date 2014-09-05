@@ -114,7 +114,7 @@
                                     <div id="list" data-role="list">
                                         <div class="pagination-wrapper pagination-data" ng-class="{'pagination-csw':type==='csw','pagination-sos':type==='sos'}">
                                             <strong class="col-lg-6 col-xs-8 col-md-6">
-                                                <span class="nb-results pull-left">{{countdata}}&nbsp;</span>
+                                                <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
                                                 <span class="nb-results" translate="label.count.data">available data</span>
                                             </strong>
                                             <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
@@ -134,7 +134,7 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-sm-9" style="padding-left:15px; margin-top: 5px;"
-                                                     page-switcher="{page:currentpage,size:wrap.nbbypage,count:countdata}"
+                                                     page-switcher="{page:wrap.currentpage,size:wrap.nbbypage,count:wrap.countdata}"
                                                      on-select-page="displayPage(page)"></div>
                                                 <select class="nb-per-page input-small form-control pull-right col-xs-2 "
                                                         style="padding-left: 5px;padding-right: 5px; margin-right: 15px; margin-top: 5px;"
