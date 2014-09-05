@@ -19,6 +19,13 @@
 
 package org.constellation.sos.ws;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractTimePosition;
@@ -42,13 +49,6 @@ import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Static methods use to create valid XML file, by setting object into referenceMode.
@@ -120,7 +120,11 @@ public final class Normalizer {
             final String featureID   = getFeatureID(obs);
             final String key         = process.getHref() + '-' + featureID;
             
-            if (merged.containsKey(key)) {
+            if (obs instanceof MeasurementType) {
+                // measurment are not merged
+                merged.put(UUID.randomUUID().toString(), obs);
+                
+            } else if (merged.containsKey(key)) {
                 final AbstractObservation uniqueObs = (AbstractObservation) merged.get(key);
                 if (uniqueObs.getResult() instanceof DataArrayProperty) {
                     final DataArrayProperty mergedArrayP = (DataArrayProperty) uniqueObs.getResult();
@@ -174,13 +178,7 @@ public final class Normalizer {
                     }
                 }
             } else {
-                final Observation clone;
-                if (obs instanceof MeasurementType) {
-                    clone = (MeasurementType) obs;
-                } else {
-                    clone = SOSXmlFactory.cloneObservation(version, obs);
-                }
-                merged.put(key, clone);
+                merged.put(key, SOSXmlFactory.cloneObservation(version, obs));
             }
         }
 
@@ -195,14 +193,16 @@ public final class Normalizer {
         if (obs instanceof AbstractObservation) {
             final AbstractObservation observation = (AbstractObservation)obs;
             final FeatureProperty featProp = observation.getPropertyFeatureOfInterest();
-            if (featProp.getHref() != null) {
-                return featProp.getHref();
-            } else if (featProp.getAbstractFeature() != null) {
-                final AbstractFeature feature = featProp.getAbstractFeature();
-                if (feature.getName() != null) {
-                    return feature.getName();
-                } else if (feature.getId() != null) {
-                    return feature.getId();
+            if (featProp != null) {
+                if (featProp.getHref() != null) {
+                    return featProp.getHref();
+                } else if (featProp.getAbstractFeature() != null) {
+                    final AbstractFeature feature = featProp.getAbstractFeature();
+                    if (feature.getName() != null) {
+                        return feature.getName();
+                    } else if (feature.getId() != null) {
+                        return feature.getId();
+                    }
                 }
             }
         }

@@ -467,10 +467,21 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
                 final FeatureProperty prop    = buildFeatureProperty(version, feature); 
                 final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
-                final TemporalGeometricPrimitive time = buildTimePeriod(version, timeID, format2.format(startTime), format2.format(endTime));
                 final int pid                 = getPIDFromProcedure(procedure, c);
                 final List<Field> fields      = readFields(procedure, c);
                 final String uom              = fields.get(0).fieldUom;
+                String start = null;
+                if (startTime != null) {
+                    start = format2.format(startTime);
+                }
+                String end = null;
+                if (endTime != null) {
+                    end = format2.format(endTime);
+                }
+                TemporalGeometricPrimitive time = null;
+                if (start != null || end != null) {
+                    time = buildTimePeriod(version, timeID, start, end);
+                }
                 
                 /*
                  *  BUILD RESULT

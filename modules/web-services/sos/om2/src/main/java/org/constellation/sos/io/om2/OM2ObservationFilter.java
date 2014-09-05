@@ -130,7 +130,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             template = true;
         } else {
             sqlRequest = new StringBuilder("SELECT o.\"id\", o.\"identifier\", \"observed_property\", \"procedure\", \"foi\", \"time_begin\", \"time_end\" "
-                                         + "FROM \"om\".\"observations\" o WHERE ");
+                                         + "FROM \"om\".\"observations\" o WHERE \"identifier\" NOT LIKE '"+ observationTemplateIdBase +"%' AND ");
         }
         this.resultModel = resultModel;
     }
