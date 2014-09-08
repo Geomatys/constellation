@@ -1,26 +1,39 @@
+/*
+ * Constellation - An open source and standard compliant SDI
+ * http://www.constellation-sdi.org
+ *
+ * Copyright 2014 Geomatys.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.constellation.test;
 
 import org.constellation.test.pages.IndexPage;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author bgarcia
  */
 public class IndexPageIT extends AbstractIT{
-    /**
-     * TODO: remove me when the build will be fixed with the cargo plugin
-     */
-    @Test
-    public void testToRemoveWhenItWorks() {}
 
     /**
-     * TODO: get back to @Test annotation
+     *
      */
-    @Ignore
+    @Test
     public void testWeSeeIndexPage() {
-//        getDrv().get(getSiteBase().toString());
-//        new IndexPage(getDrv(), getSiteBase());
+        getDrv().get(getSiteBase().toString());
+        new IndexPage(getDrv(), getSiteBase());
     }
 
 }
