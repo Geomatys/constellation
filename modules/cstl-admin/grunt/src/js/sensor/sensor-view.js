@@ -39,7 +39,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 for (var i=0; i<measures.Entry.length; i++) {
                     var newMeasureId = measures.Entry[i];
                     var check = false;
-                    if (oldMeasures !== null) {
+                    if (oldMeasures) {
                         for (var j = 0; j < oldMeasures.length; j++) {
                             // Get back old values checked or not for new measures that match the chosen sensor
                             var oldMeasure = oldMeasures[j];
@@ -173,7 +173,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
             var line;
             if (measures.length === 1) {
                 line = d3.svg.line()
-                    .x(function (d) { return x(d.date); })
+                    .x(function (d) { return x(d.time); })
                     .y(function (d) { return y(d[measures[0]]); });
             } else {
                 line = d3.svg.line()
@@ -196,8 +196,9 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
             }
 
             data.forEach(function(d) {
+                console.debug(d);
                 if (measures.length === 1) {
-                    d.date = parseDate(d.date);
+                    d.time = parseDate(d.time);
                     d[measures[0]] = +d[measures[0]];
                 } else {
                     d[measures[0]] = +d[measures[0]];
@@ -207,7 +208,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
             if (measures.length === 1) {
                 x.domain(d3.extent(data, function (d) {
-                    return d.date;
+                    return d.time;
                 }));
                 y.domain(d3.extent(data, function (d) {
                     return d[measures[0]];
