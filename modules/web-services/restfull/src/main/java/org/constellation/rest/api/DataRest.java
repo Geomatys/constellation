@@ -62,7 +62,6 @@ import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.CharSequences;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
@@ -492,7 +491,7 @@ public class DataRest {
             }
         }
 
-        //verify unicity of data identifier
+        //verify uniqueness of data identifier
         final Provider dataName = providerBusiness.getProvider(hashMap.get("dataName"));
         if (dataName!=null){
             hashMap.put("msg", "dataName or identifier of metadata is already used");
@@ -784,6 +783,15 @@ public class DataRest {
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
+    /**
+     * Returns json result of template writer to apply a given template to metadata object.
+     * The path of each fields/blocks will be numerated.
+     * the returned json object will be used directly in html metadata editor.
+     *
+     * @param values given parameters.
+     * @return {@code Response}
+     * @throws ConfigurationException
+     */
     @POST
     @Path("metadata/dataset")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -798,10 +806,10 @@ public class DataRest {
             final String templateName;
             if("vector".equalsIgnoreCase(dataType)){
                 //vector template
-                templateName="profile_inspire_vector";
+                templateName="profile_default_vector";
             }else if("raster".equalsIgnoreCase(dataType)){
                 //raster template
-                templateName="profile_inspire_raster";
+                templateName="profile_default_raster";
             }else {
                 //default template is import
                 templateName="profile_import";
@@ -820,6 +828,122 @@ public class DataRest {
             LOGGER.log(Level.WARNING, "Metadata is null for providerId:{0}", providerId);
             return Response.status(500).entity("failed").build();
         }
+    }
+
+    /**
+     * Returns applied template for metadata for read mode only like metadata viewer.
+     * for reference (consult) purposes only.
+     *
+     * @param providerId given dataset identifier which is provider identifier.
+     * @param dataId data identifier
+     * @param type data type
+     * @param prune flag that indicates if template result will clean empty children/block.
+     * @return {@code Response}
+     */
+    @GET
+    @Path("metadataJson/iso/{providerId}/{dataId}/{type}/{prune}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getIsoMetadataJson(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId,
+                                       final @PathParam("type") String type, final @PathParam("prune") boolean prune) {
+
+        //@TODO get dataset or data metadata when dashboard will be added.
+        // meanwhile we returns the dataset metadata and if not exists we returns the data metadata.
+        //final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+        DefaultMetadata metadata;
+        try{
+            metadata = datasetBusiness.getMetadata(providerId,-1);
+        }catch(Exception ex){
+            metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+        }
+
+        final StringBuilder buffer = new StringBuilder();
+        if (metadata != null) {
+            //prune the metadata
+            metadata.prune();
+
+            //for debugging purposes
+                /*try{
+                    System.out.println(XML.marshal(metadata));
+                }catch(Exception ex){
+                    LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+                }*/
+
+            //get template name
+            final String templateName;
+            if("vector".equalsIgnoreCase(type)){
+                //vector template
+                templateName="profile_default_vector";
+            }else if ("vector".equalsIgnoreCase(type)){
+                //raster template
+                templateName="profile_default_raster";
+            } else {
+                //default template is import
+                templateName="profile_import";
+            }
+            final Template template = Template.getInstance(templateName);
+            try{
+                template.write(metadata,buffer,prune);
+            }catch(IOException ex){
+                LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
+                return Response.status(500).entity("failed").build();
+            }
+        }
+        return Response.ok(buffer.toString()).build();
+    }
+
+    /**
+     * Proceed to merge saved metadata with given values from metadata editor.
+     *
+     * @param providerId the data provider identifier
+     * @param type the data type.
+     * @param metadataValues the values of metadata editor.
+     * @return {@code Response}
+     */
+    @POST
+    @Path("metadata/merge/{providerId}/{type}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response mergeMetadata(@PathParam("providerId") final String providerId,
+                                  @PathParam("type") final String type,
+                                  final RootObj metadataValues) {
+        // for now assume that providerID == datasetID
+        try {
+
+            // Get previously saved metadata for the current data
+            final DefaultMetadata metadata = datasetBusiness.getMetadata(providerId, -1);
+
+            //get template name
+            final String templateName;
+            if ("vector".equalsIgnoreCase(type)) {
+                //vector template
+                templateName = "profile_default_vector";
+            } else if ("raster".equalsIgnoreCase(type)){
+                //raster template
+                templateName = "profile_default_raster";
+            }else {
+                //default template is import
+                templateName = "profile_default_raster";
+            }
+            final Template template = Template.getInstance(templateName);
+
+            try{
+                //uncomment for debugging purposes.
+                //final CharSequence[] lines = CharSequences.splitOnEOL(metadataValues);
+                //template.read(Arrays.asList(lines),metadata,false);
+                template.read(metadataValues,metadata,false);
+            }catch(IOException ex){
+                LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
+                return Response.status(500).entity("failed").build();
+            }
+
+            //Save metadata
+            datasetBusiness.updateMetadata(providerId, -1, metadata);
+        } catch (ConfigurationException ex) {
+            LOGGER.warning("Error while saving dataset metadata");
+            throw new ConstellationException(ex);
+        }
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
 
@@ -910,60 +1034,6 @@ public class DataRest {
             throw new ConstellationException(ex);
         }
         
-        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
-    /**
-     * Proceed to merge saved metadata with given values from metadata editor.
-     *
-     * @param providerId the data provider identifier
-     * @param type the data type.
-     * @param metadataValues the values of metadata editor.
-     * @return {@link Response}
-     */
-    @POST
-    @Path("metadata/merge/{providerId}/{type}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response mergeMetadata(@PathParam("providerId") final String providerId,
-                                  @PathParam("type") final String type,
-                                  final RootObj metadataValues) {
-        // for now assume that providerID == datasetID
-        try {
-
-            // Get previously saved metadata for the current data    
-            final DefaultMetadata metadata = datasetBusiness.getMetadata(providerId, -1);
-
-            //get template name
-            final String templateName;
-            if ("vector".equalsIgnoreCase(type)) {
-                //vector template
-                templateName = "profile_inspire_vector";
-            } else if ("raster".equalsIgnoreCase(type)){
-                //raster template
-                templateName = "profile_inspire_raster";
-            }else {
-                //default template is import
-                templateName = "profile_inspire_raster";
-            }
-            final Template template = Template.getInstance(templateName);
-
-            try{
-                //uncomment for debugging purposes.
-                //final CharSequence[] lines = CharSequences.splitOnEOL(metadataValues);
-                //template.read(Arrays.asList(lines),metadata,false);
-                template.read(metadataValues,metadata,false);
-            }catch(IOException ex){
-                LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
-                return Response.status(500).entity("failed").build();
-            }
-            
-            //Save metadata
-            datasetBusiness.updateMetadata(providerId, -1, metadata);
-        } catch (ConfigurationException ex) {
-            LOGGER.warning("Error while saving dataset metadata");
-            throw new ConstellationException(ex);
-        }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
@@ -1780,58 +1850,6 @@ public class DataRest {
             metadata.prune(); 
         }
         return Response.ok(metadata).build();
-    }
-
-    @GET
-    @Path("metadataJson/iso/{providerId}/{dataId}/{type}/{prune}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getIsoMetadataJson(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId,
-            final @PathParam("type") String type, final @PathParam("prune") boolean prune) {
-
-        //@TODO get dataset or data metadata when dashboard will be added.
-        // meanwhile we returns the dataset metadata and if not exists we returns the data metadata.
-        //final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
-        DefaultMetadata metadata;
-        try{
-            metadata = datasetBusiness.getMetadata(providerId,-1);
-        }catch(Exception ex){
-            metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
-        }
-
-        final StringBuilder buffer = new StringBuilder();
-        if (metadata != null) {
-            //prune the metadata
-            metadata.prune();
-
-            //for debugging purposes
-                /*try{
-                    System.out.println(XML.marshal(metadata));
-                }catch(Exception ex){
-                    LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-                }*/
-
-            //get template name
-            final String templateName;
-            if("vector".equalsIgnoreCase(type)){
-                //vector template
-                templateName="profile_inspire_vector";
-            }else if ("vector".equalsIgnoreCase(type)){
-                //raster template
-                templateName="profile_inspire_raster";
-            } else {
-                //default template is import
-                templateName="profile_import";
-            }
-            final Template template = Template.getInstance(templateName);
-            try{
-                template.write(metadata,buffer,prune);
-            }catch(IOException ex){
-                LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
-                return Response.status(500).entity("failed").build();
-            }
-        }
-        return Response.ok(buffer.toString()).build();
     }
 
     @GET

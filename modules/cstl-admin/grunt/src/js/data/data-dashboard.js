@@ -421,8 +421,12 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * Open metadata page for dataset metadata.
          */
         $scope.editMetadata = function() {
-            console.debug($scope.selected.Name);
-
+            var type = 'import';
+            if($scope.selected.Children && $scope.selected.Children.length >0){
+                type = $scope.selected.Children[0].Type.toLowerCase();
+            }
+            var template = type;
+            $location.path('/editmetadata/'+template+'/'+type+'/'+$scope.selected.Name);
         };
 
         // Style methods
@@ -485,7 +489,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/description/' + result.type + "/" + result.file);
+                        $location.path('/editmetadata/import/' + result.type + "/" + result.file);
                     }, function () {
                         Growl('error', 'Error', 'Unable to prepare metadata for next step!');
                     });
@@ -506,7 +510,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/description/' + result.type + "/" + result.file);
+                        $location.path('/editmetadata/import/' + result.type + "/" + result.file);
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
@@ -527,7 +531,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/description/' + result.type + "/" + result.file);
+                        $location.path('/editmetadata/import/' + result.type + "/" + result.file);
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });

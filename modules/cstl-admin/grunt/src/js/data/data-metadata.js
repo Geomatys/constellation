@@ -20,9 +20,10 @@
 
 angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('DescriptionController', function ($scope, $routeParams,dataListing, $location, $translate) {
+    .controller('EditMetadataController', function ($scope, $routeParams,dataListing, $location, $translate, Growl) {
         $scope.provider = $routeParams.id;
         $scope.type = $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
+        $scope.template = $routeParams.template || 'import';
         $scope.typeLabelKey = "metadata.edition.dataset."+$scope.type;
 
         /**
@@ -109,7 +110,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          */
         $scope.metadataValues = [];
         dataListing.getDatasetMetadata({}, {values: {'providerId': $scope.provider,
-                'type':'import',
+                'type':$scope.template,
                 'prune':false}},
             function(response) {
                 if (response && response.root) {
@@ -117,7 +118,6 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                 }
             },
             function(response) {
-                console.error(response);
                 Growl('error','Error','The server returned an error!');
             }
         );
@@ -393,29 +393,19 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             initCollapseEvents();
         };
 
-        $scope.delete = function(data) {
-            data.children = [];
-        };
-        $scope.add = function(data) {
-            var post = data.children.length + 1;
-            var newName = data.name + '-' + post;
-            data.children.push({"block":{name: newName,children: []}});
-        };
-
         /**
          * Save the metadata in server.
          */
         $scope.save = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
                 //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
-                dataListing.mergeMetadata({'providerId':$scope.provider,'type':'import'},
+                dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.template},
                     $scope.metadataValues[0],
                     function(response) {
                         $location.path('/data'); //redirect to data dashboard page
                     },
                     function(response) {
-                        console.error(response);
-                        Growl('error','Error','The server returned an error!');
+                        Growl('error','Error','Failed to save metadata because the server returned an error!');
                     }
                 );
             }
@@ -486,6 +476,9 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
 
         $scope.selectedData = selected;
 
+        /**
+         * Enable expand/collapsible events on each element in metadata view.
+         */
         function initCollapseEvents () {
             if(window.collapseEventsRegistered) {return;} //to fix a bug with angular
             $(document).on('click','.expand-all-btn',function(){
@@ -546,17 +539,11 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             return (render.toLowerCase().indexOf('codelist') !== -1);
         };
 
+        /**
+         * init function called with ng-init directive for metadata viewer page.
+         */
         $scope.initMetadataViewer = function() {
             initCollapseEvents();
-        };
-
-        $scope.delete = function(data) {
-            data.children = [];
-        };
-        $scope.add = function(data) {
-            var post = data.children.length + 1;
-            var newName = data.name + '-' + post;
-            data.children.push({"block":{name: newName,children: []}});
         };
 
         $scope.close = function() {

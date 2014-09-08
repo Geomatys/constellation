@@ -101,8 +101,8 @@
     "create.description.transactional": "Transactionnel",
     "create.description.version.title": "Version",
 
-    "data.information.page.title": "Informations sur la donnée",
-    "data.information.page.title.edition": "Edition des informations sur la donnée",
+    "data.information.page.title": "Informations sur le jeu de données",
+    "data.information.page.title.edition": "Édition de la métadonnée",
     "data.information.tab.metadata.title": "Saisie de la métadonnée",
     "data.information.tab.title": "Information sur l'image",
     "data.information.title": "Données disponibles",

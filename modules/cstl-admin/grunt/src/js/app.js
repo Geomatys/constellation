@@ -159,9 +159,9 @@ cstlAdminApp
                     templateUrl: 'views/webservice/create.html',
                     controller: 'WebServiceCreateController'
                 })
-                .when('/description/:type/:id', {
+                .when('/editmetadata/:template/:type/:id', {
                     templateUrl: 'views/data/description.html',
-                    controller: 'DescriptionController'
+                    controller: 'EditMetadataController'
                 })
                 .when('/data', {
                     templateUrl: 'views/data/data.html',

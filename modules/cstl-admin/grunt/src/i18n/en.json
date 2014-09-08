@@ -101,8 +101,8 @@
     "create.description.transactional":"Transactional",
     "create.description.version.title":"Version",
 
-    "data.information.page.title":"Information about data",
-    "data.information.page.title.edition":"Information about data edition",
+    "data.information.page.title":"Information about dataset",
+    "data.information.page.title.edition":"Metadata edition",
     "data.information.tab.metadata.title":"Edit Metadata",
     "data.information.tab.title":"Picture information",
     "data.information.title":"Available data",
