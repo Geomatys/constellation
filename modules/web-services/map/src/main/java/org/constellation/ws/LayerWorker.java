@@ -200,7 +200,7 @@ public abstract class LayerWorker extends AbstractWorker {
         try {
             return layerBusiness.getLayers(this.specification.name().toLowerCase(), getId(), login);
         } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, "Erro while getting layers", ex);
+            LOGGER.log(Level.WARNING, "Error while getting layers", ex);
         }
         return new ArrayList<>();
     }

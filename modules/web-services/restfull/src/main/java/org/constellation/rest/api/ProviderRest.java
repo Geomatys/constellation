@@ -103,6 +103,7 @@ public final class ProviderRest {
                 return Response.status(500).build();
             }
         } catch (DataStoreException e) {
+            LOGGER.log(Level.WARNING, "Cannot open provider "+providerIdentifier+" for domain "+domainId, e);
             return Response.status(500).build();
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -172,8 +173,6 @@ public final class ProviderRest {
     @Path("/{id}/crs")
     public Response verifyCRS(final @PathParam("domainId") int domainId, final @PathParam("id") String providerIdentifier){
         try {
-
-
             final HashMap<Name, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
             for( CoordinateReferenceSystem crs : nameCoordinateReferenceSystemHashMap.values()){
                 if (crs == null || crs instanceof ImageCRS){
@@ -183,6 +182,7 @@ public final class ProviderRest {
             return Response.ok(true).build();
 
         } catch (DataStoreException e) {
+            LOGGER.log(Level.WARNING, "Cannot get CRS for provider "+providerIdentifier+" for domain "+domainId, e);
             return Response.status(500).build();
         }
     }
@@ -217,11 +217,18 @@ public final class ProviderRest {
             return Response.ok(dd).build();
         }
         try {
+<<<<<<< HEAD
             final DataDescription result = LayerProviders.getDataDescription(id, layerName);
             CACHE_DATA_DESC.put(id+"_"+layerName,result);
             return Response.ok(result).build();
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+=======
+            return Response.ok(LayerProviders.getDataDescription(id, layerName)).build();
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+>>>>>>> REST : fix exception managemenent on multiple methods.
         }
     }
 
@@ -236,7 +243,8 @@ public final class ProviderRest {
         try {
             return Response.ok(LayerProviders.getPropertyValues(id, layerName, property)).build();
         } catch (CstlServiceException ex) {
-            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+            LOGGER.log(Level.WARNING, "Cannot retrieve information for layer "+layerName+" for domain "+domainId, ex);
+            return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
 
@@ -261,7 +269,8 @@ public final class ProviderRest {
                 ref.recycle(reader);
             }
         } catch (CstlServiceException|CoverageStoreException ex) {
-            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+            LOGGER.log(Level.WARNING, "Cannot retrieve information for layer "+layerName+" for domain "+domainId, ex);
+            return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
                 
        return Response.ok(new SimpleValue(isGeophysic)).build();
@@ -277,7 +286,8 @@ public final class ProviderRest {
         try {
             return Response.ok(providerBusiness.listPyramids(id, layerName)).build();
         } catch (DataStoreException ex) {
-            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+            LOGGER.log(Level.WARNING, "Cannot retrieve information for layer "+layerName+" for domain "+domainId, ex);
+            return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
     
@@ -292,7 +302,8 @@ public final class ProviderRest {
         try {
             return Response.ok(LayerProviders.getBandValues(id, layerName, bandIndex)).build();
         } catch (CstlServiceException ex) {
-            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+            LOGGER.log(Level.WARNING, "Cannot retrieve information for layer "+layerName+" for domain "+domainId, ex);
+            return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
 
@@ -306,9 +317,14 @@ public final class ProviderRest {
     @Path("metadata/{providerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId) throws ConfigurationException {
+    public Response getMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId) {
         // for now assume that providerID == datasetID
-        return Response.ok(datasetBusiness.getMetadata(providerId,domainId)).build();
+        try {
+            return Response.ok(datasetBusiness.getMetadata(providerId,domainId)).build();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Cannot retrieve metadata for provider "+providerId+" for domain "+domainId, e);
+            return Response.status(500).entity(new AcknowlegementType("Failure", e.getLocalizedMessage())).build();
+        }
     }
 
     /**
@@ -321,9 +337,14 @@ public final class ProviderRest {
     @Path("metadata/{providerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws ConfigurationException {
+    public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) {
         // for now assume that providerID == datasetID
-        datasetBusiness.updateMetadata(providerId, domainId, metadata);
-        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+        try {
+            datasetBusiness.updateMetadata(providerId, domainId, metadata);
+            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.WARNING, "Cannot update metadata for provider "+providerId+" for domain "+domainId, e);
+            return Response.status(500).entity(new AcknowlegementType("Failure", e.getLocalizedMessage())).build();
+        }
     }
 }
