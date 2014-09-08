@@ -65,20 +65,16 @@ window.Netcdf = {
 
     chooseHorizontal : function(filter, state){
         var filterSelected = "none";
-        if(filter !== ""){
+        if(filter){
             filterSelected=filter;
         }
-
-
         if(state === "previous"){
             Netcdf.index = Netcdf.index-10;
         }else if(state === "next"){
             Netcdf.index = Netcdf.index+10;
         }
-
         var url = window.location.protocol + "//" + window.location.host +"/constellation/api/1/crs/all/"+Netcdf.index+"/10/"+filterSelected;
         console.warn("URL : "+url);
-
 
         //Get Json EPSG list
         $.getJSON(url, Netcdf.buildCRSListing);
