@@ -33,7 +33,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                     }
                 }
             }).result.then(function(user){
-                    if(user !== null){
+                    if(user){
                         $scope.list[i] = user;
                     }
                 });
@@ -49,7 +49,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                     }
                 }
             }).result.then(function(user){
-                    if(user !== null){
+                    if(user){
                         $scope.list[$scope.list.length] = user;
                     }
                 });
@@ -91,7 +91,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
         };
         var timeout=null;
         $scope.checkLogin = function(login){
-            if(timeout !== null){
+            if(timeout){
                 window.clearTimeout(timeout);
                 timeout = null;
             }
@@ -149,7 +149,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                         'domain': function(){ return {};}
                     }
                 }).result.then(function(domain){
-                        if(domain !== null){
+                        if(domain){
                             $scope.domains[$scope.domains.length] = domain;
                         }
                     });
@@ -174,7 +174,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                         domain: function(){return DomainResource.get({id: $scope.domains[i].id});}
                     }
                 }).result.then(function(domain){
-                        if(domain !== null){
+                        if(domain){
                             $scope.domains[i] = domain;
                         }
                     });
@@ -189,7 +189,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                         members: function(){return DomainResource.members({id: $scope.domains[i].id}).$promise;}
                     }
                 }).result.then(function(domain){
-                        if(domain !== null){
+                        if(domain){
                             $scope.domains[$scope.domains.length] = domain;
                         }
                     });
@@ -334,7 +334,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                         'allPermissions': function(){ return $scope.allPermissions; }
                     }
                 }).result.then(function(domainrole){
-                        if(domainrole !== null){
+                        if(domainrole){
                             $scope.domainroles[$scope.domainroles.length] = domainrole;
                         }
                     });
@@ -360,7 +360,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                         'allPermissions': function(){ return $scope.allPermissions; }
                     }
                 }).result.then(function(domainrole){
-                        if(domainrole !== null){
+                        if(domainrole){
                             domainrole.memberList = $scope.domainroles[i].memberList;
                             $scope.domainroles[i] = domainrole;
                         }
