@@ -115,7 +115,7 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 $scope.tag.text.length === 0 &&
                 !key) {
                 $scope.tag.keywords.pop();
-            } else if (key !== undefined) {
+            } else if (key) {
                 $scope.tag.keywords.splice(key, 1);
             }
         };

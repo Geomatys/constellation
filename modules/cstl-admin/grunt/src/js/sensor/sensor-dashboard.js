@@ -82,7 +82,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
 
         $scope.deleteSensor = function() {
             if (confirm("Are you sure?")) {
-                var idToDel = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+                var idToDel = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
                 sensor.delete({sensor: idToDel}, function () {
                     Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed');
                     $scope.init();
@@ -93,7 +93,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         };
 
         $scope.showSensor = function() {
-            var idToView = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+            var idToView = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
             $modal.open({
                 templateUrl: 'views/sensor/modalViewSensorMetadata.html',
                 controller: 'ViewMetadataModalController',
@@ -171,7 +171,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         };
 
         $scope.choose = function() {
-            var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+            var sensorId = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
             dataListing.linkToSensor({providerId: selectedData.Provider, dataId: selectedData.Name, sensorId: sensorId}, {value: selectedData.Namespace},
                 function() {
                     selectedData.TargetSensor.push(sensorId);
