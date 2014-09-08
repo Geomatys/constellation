@@ -86,8 +86,10 @@ public class Template {
     private static final Map<String,Template> INSTANCES;
     static {
         try {
-            INSTANCES = load(new byte[] {4, 6, 6, 10, 10},
+            INSTANCES = load(new byte[] {4, 6, 6, 6, 6, 10, 10},
                     "profile_import",
+                    "profile_default_vector",
+                    "profile_default_raster",
                     "profile_inspire_vector",
                     "profile_inspire_raster",
                     "profile_sensorml_component",
