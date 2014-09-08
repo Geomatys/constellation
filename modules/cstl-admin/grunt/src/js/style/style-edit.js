@@ -199,7 +199,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         $scope.$watch('newStyle', function() {
             if($scope.optionsSLD.autoPreview){
                 var mapId = null;
-                if($scope.selectedLayer !== null && $scope.stylechooser === 'existing'){
+                if($scope.selectedLayer && $scope.stylechooser === 'existing'){
                     mapId = 'styledMapWithSelectedStyle';
                 }else {
                     mapId = 'styledMapOL';
@@ -287,7 +287,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         function initSldPage() {
             //if we are in data dashboard
-            if($scope.selectedLayer !== null) {
+            if($scope.selectedLayer) {
                 $scope.sldName = $scope.selectedLayer.Name + '-sld';
 
                 var layerName;
@@ -320,7 +320,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     $scope.chooseType = false;
                     $scope.page.pageSld = 'views/style/chooseType.html';
                 }
-            }else if($scope.selectedStyle !== null) {
+            }else if($scope.selectedStyle) {
                 //we are in styles dashboard
                 if ($scope.selectedStyle.Type &&
                     ($scope.selectedStyle.Type.toLowerCase() === 'coverage' ||
@@ -674,7 +674,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * make the rule editor panel visible.
          */
         $scope.editSelectedRule = function(){
-            if($scope.optionsSLD.selectedRule !== null){
+            if($scope.optionsSLD.selectedRule){
                 $scope.optionsSLD.enableRuleEditor = true;
                 $scope.optionsSLD.enableAutoIntervalEditor = false;
                 $scope.optionsSLD.enableAutoUniqueEditor = false;
@@ -726,14 +726,14 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     $scope.optionsSLD.rasterPalette.palette.method = colorMap.function['@function'];
                     $scope.optionsSLD.rasterPalette.palette.intervalsCount = colorMap.function.interval;
 
-                    if(colorMap.function.nanColor && colorMap.function.nanColor !== null){
+                    if(colorMap.function.nanColor && colorMap.function.nanColor){
                         $scope.optionsSLD.rasterPalette.palette.nan.selected = true;
                         $scope.optionsSLD.rasterPalette.palette.nan.color = colorMap.function.nanColor;
                     }
                     $scope.optionsSLD.rasterPalette.repartition = colorMap.function.points;
                 }
                 //Load the selected band on the graph, the repartition of statistics is already present.
-                if($scope.dataBandsRepartition !== null && $scope.optionsSLD.rasterPalette.band.selected){
+                if($scope.dataBandsRepartition && $scope.optionsSLD.rasterPalette.band.selected){
                     var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
                     if(!selectedBand){
                         selectedBand = 0;
@@ -785,7 +785,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * For Vector : make autoInterval Panel visible.
          */
         $scope.editAutoIntervalPanel = function(){
-            if($scope.optionsSLD.autoIntervalValues !== null){
+            if($scope.optionsSLD.autoIntervalValues){
                 $scope.optionsSLD.enableAutoIntervalEditor=true;
                 $scope.optionsSLD.enableRuleEditor = false;
                 $scope.optionsSLD.enableAutoUniqueEditor = false;
@@ -795,7 +795,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * For Vector : make autoUnique values panel to visible.
          */
         $scope.editAutoUniquePanel = function(){
-            if($scope.optionsSLD.autoUniqueValues !== null){
+            if($scope.optionsSLD.autoUniqueValues){
                 $scope.optionsSLD.enableAutoUniqueEditor = true;
                 $scope.optionsSLD.enableAutoIntervalEditor=false;
                 $scope.optionsSLD.enableRuleEditor = false;
@@ -805,7 +805,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * For Raster : make raster palette panel to visible
          */
         $scope.editRasterPalette = function() {
-            if($scope.optionsSLD.rasterPalette !== null) {
+            if($scope.optionsSLD.rasterPalette) {
                 $scope.optionsSLD.enableRasterPalette = true;
                 $scope.optionsSLD.enableRasterCells = false;
             }
@@ -814,7 +814,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * For Raster : make raster cells panel to visible
          */
         $scope.editRasterCells = function() {
-            if($scope.optionsSLD.rasterPalette !== null) {
+            if($scope.optionsSLD.rasterPalette) {
                 $scope.optionsSLD.enableRasterPalette = false;
                 $scope.optionsSLD.enableRasterCells = true;
             }
@@ -849,7 +849,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * the geometry type is given from the select element.
          */
         $scope.addSymbolizer = function() {
-            if($scope.optionsSLD.selectedRule !== null && $scope.optionsSLD.selectedSymbolizerType !== ""){
+            if($scope.optionsSLD.selectedRule && $scope.optionsSLD.selectedSymbolizerType){
                 var symbol;
                 if($scope.optionsSLD.selectedSymbolizerType === 'point'){
                     symbol={
@@ -1012,7 +1012,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * Called at init the ng-repeat for filters to read the current rule's filter and affect the local variable.
          */
         $scope.restoreFilters = function() {
-            if($scope.optionsSLD.selectedRule.filter !== null){
+            if($scope.optionsSLD.selectedRule.filter){
                 var cql = $scope.optionsSLD.selectedRule.filter;
                 if(cql.indexOf('\\\'') !== -1){
                     var find = "\\\\\'";
@@ -1588,7 +1588,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 $scope.addPalette($scope.optionsSLD.selectedRule);
                 $scope.displayCurrentStyle('styledMapOL', function(createdTmpStyle){
                     //get interpolation points for ui
-                    if ($scope.optionsSLD.rasterPalette.palette.index !== undefined) {
+                    if ($scope.optionsSLD.rasterPalette.palette.index) {
                         //show palette
                         style.paletteStyle({provider: 'sld_temp', name : $scope.newStyle.name, ruleName : $scope.optionsSLD.selectedRule.name},
                             function(response) {
@@ -1597,7 +1597,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                                     $scope.optionsSLD.rasterPalette.repartition = $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points;
 
                                     //Load the selected band on the graph, the repartition of statistics is already present.
-                                    if($scope.dataBandsRepartition !== null){
+                                    if($scope.dataBandsRepartition){
                                         var loader = $('#chart_ajax_loader');
                                         loader.show();
                                         var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
@@ -1651,7 +1651,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 }
             }
             //remove threshold vertical line on graph.
-            if(point.data !== null){
+            if(point.data){
                 for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
                     if($scope.optionsSLD.rasterPalette.dataXArray[j] >= point.data){
                         window.c3chart.xgrids.remove({value:j});
@@ -1930,7 +1930,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 return;
             }
 
-            if($scope.selectedLayer !== null && $scope.stylechooser === 'existing'){
+            if($scope.selectedLayer && $scope.stylechooser === 'existing'){
                 var styleName = null;
                 if ($scope.selected) {
                     styleName = $scope.selected.Name;
@@ -1963,7 +1963,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         //$scope.newStyle.rules = response.rules;
                         var layerData;
                         var layerBackground = null;
-                        if($scope.selectedLayer !== null){
+                        if($scope.selectedLayer){
                             if($scope.newStyle.rules.length ===0){
                                 layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
                             }else {
