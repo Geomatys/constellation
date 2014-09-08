@@ -161,26 +161,26 @@ final class MetadataUpdater {
                         if (child instanceof Collection<?> && TemplateApplicator.isCollection(standard, metadata, identifier)) {
                             existingChildren = ((Collection<?>) child).iterator();
                         } else {
-                            /*
-                             * Equivalent to: existingChildren = Collections.singleton(child).iterator();
-                             * but we inline the result for avoiding the creation of a temporary collection.
-                             */
-                            update(np.head(childBase + 1), child);
-                            continue;
+                            existingChildren = Collections.singleton(child).iterator();
                         }
                     }
                 }
+                final Object child;
                 if (existingChildren != null && existingChildren.hasNext()) {
-                    update(np.head(childBase + 1), existingChildren.next());
+                    child = existingChildren.next();
+                    if (specialMetadataCases(child.getClass(), metadata, identifier)) {
+                        continue;
+                    }
                 } else {
                     existingChildren = Collections.emptyIterator();
                     final Class<?> type = specialize(getType(metadata, identifier));
-                    if (!specialMetadataCases(type, metadata, identifier)) {
-                        final Object child = FACTORY.create(type, Collections.<String,Object>emptyMap());
-                        update(np.head(childBase + 1), child);
-                        asMap(metadata).put(identifier, child);
+                    if (specialMetadataCases(type, metadata, identifier)) {
+                        continue;
                     }
+                    child = FACTORY.create(type, Collections.<String,Object>emptyMap());
+                    asMap(metadata).put(identifier, child);
                 }
+                update(np.head(childBase + 1), child);
             }
         } while (np != null && np.isChildOf(parent));
     }
