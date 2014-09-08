@@ -215,7 +215,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                                 Growl('error','Error','Impossible to create dataSet');
                             });
                         } else if ($scope.import.uploadType === "observation" && fileExtension === "xml") {
-                            provider.create({id: fileName},{
+                            provider.create({id: $scope.import.providerId},{
                                 type: "observation-store",
                                 subType: "observation-xml",
                                 parameters: {
@@ -233,7 +233,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                             });
                         } else if ($scope.import.uploadType === "observation") {
                             provider.create({
-                                id: fileName
+                                id: $scope.import.providerId
                             }, {
                                 type: "observation-store",
                                 subType: "observation-file",
