@@ -18,6 +18,7 @@
  */
 package org.constellation.json.metadata;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -26,6 +27,9 @@ import java.util.Iterator;
 import java.util.Objects;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.Metadata;
+import org.opengis.temporal.Position;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 import org.opengis.referencing.ReferenceSystem;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.KeyNamePolicy;
@@ -286,7 +290,7 @@ final class TemplateApplicator {
      * @param  pathOffset Index of the first {@code path} element to use.
      * @throws ClassCastException if {@code metadata} is not an instance of the expected standard.
      */
-    private void getValues(final TemplateNode template, Object metadata, int pathOffset) throws ClassCastException {
+    private void getValues(final TemplateNode template, Object metadata, int pathOffset) throws ParseException, ClassCastException {
         Objects.requireNonNull(template.path);
         Objects.requireNonNull(metadata);
         Object value;
@@ -294,6 +298,8 @@ final class TemplateApplicator {
             final String identifier = template.path[pathOffset];
             if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM) && metadata instanceof Metadata) {
                 value = referenceSystem((Metadata) metadata); // Special case.
+            } else if (metadata instanceof Period) {
+                value = extent((Period) metadata, identifier); // Special case.
             } else {
                 value = template.standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY).get(identifier);
             }
@@ -409,5 +415,19 @@ final class TemplateApplicator {
             }
         }
         return null;
+    }
+
+    /**
+     * Special case for extent information.
+     */
+    private static Date extent(final Period metadata, final String identifier) throws ParseException {
+        final Instant instant;
+        switch (identifier) {
+            case "beginPosition": instant = metadata.getBeginning(); break;
+            case "endPosition":   instant = metadata.getBeginning(); break;
+            default: throw new ParseException("Unsupported extent property: " + identifier);
+        }
+        final Position position = instant.getPosition();
+        return (position != null) ? position.getDate() : null;
     }
 }
