@@ -263,7 +263,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.import.finish = function() {
-            if ($scope.import.uploadType !== null ) {
+            if ($scope.import.uploadType) {
                 $scope.uploaded();
             } else {
                 Growl('error','Error','Select Data Type');
@@ -329,7 +329,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             var extension = path.substring(lastPointIndex+1, path.length);
             dataListing.extension({}, {value: extension},
                 function(response) {//success
-                    if (response.dataType!=="") {
+                    if (response.dataType) {
                         $scope.import.uploadType = response.dataType;
                     }
                     $scope.import.allowNext = true;
@@ -377,7 +377,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             var extension = $scope.currentPath.substring(lastPointIndex+1, $scope.currentPath.length);
             dataListing.extension({}, {value: extension},
                 function(response) {//success
-                    if (response.dataType!=="") {
+                    if (response.dataType) {
                         $scope.import.uploadType = response.dataType;
                     }
                 });
@@ -459,15 +459,15 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.import.allowNext = false;
-        if ($scope.import.dataPath !== null && $scope.import.dataPath.length > 0){
+        if ($scope.import.dataPath && $scope.import.dataPath.length > 0){
             $scope.import.identifier = $scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').substr(0,$scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').lastIndexOf('.'));
         }
-        if ($scope.import.identifier !== null && $scope.import.identifier.length > 0) {
+        if ($scope.import.identifier && $scope.import.identifier.length > 0) {
             $scope.import.allowNext = true;
         }
 
         $scope.verifyAllowNext = function(){
-                if (($scope.import.identifier !== null && $scope.import.identifier.length > 0) ) {
+                if (($scope.import.identifier && $scope.import.identifier.length > 0) ) {
                     var letters = /^[A-Za-zàèìòùáéíóúäëïöüñãõåæøâêîôû0-9\-_]+$/;
                     var id = $scope.import.identifier;
                     if(!id.match(letters)) {
@@ -476,7 +476,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                     }else {
                         $scope.import.allowNext = true;
                     }
-                }else if ($scope.import.metadata  !== null && $scope.import.metadata.length > 0) {
+                }else if ($scope.import.metadata && $scope.import.metadata.length > 0) {
                     $scope.import.allowNext = true;
                 } else {
                     $scope.import.allowNext = false;
@@ -484,7 +484,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.import.next = function() {
-            if ($scope.import.metadata !== null || $scope.import.identifier !== null) {
+            if ($scope.import.metadata || $scope.import.identifier) {
                 $scope.uploadMetadata();
             } else {
                 $scope.selectType();
@@ -535,7 +535,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             $scope.$apply(function() {
                 $scope.import.metadata = md.value;
                 $scope.import.identifier = null;
-                if ($scope.import.metadata !== null && $scope.import.metadata.length > 0){
+                if ($scope.import.metadata && $scope.import.metadata.length > 0){
                     $scope.import.allowNext = true;
                 }
             });

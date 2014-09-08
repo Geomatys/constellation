@@ -437,7 +437,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          * @param parentBlock
          */
         $scope.updateIsoInspireSelectOneMenu = function(value,parentBlock) {
-            if(value !== null) {
+            if(value) {
                 var INSPIRE_ISO_MAP = {};
                 /* jshint ignore:start */
                 INSPIRE_ISO_MAP['Elevation'] = 'MD_TopicCategoryCode.elevation';

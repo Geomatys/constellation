@@ -399,6 +399,10 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             }
         };
 
+        /**
+         * Open metadata viewer popup and display metadata
+         * in appropriate template depending on data type property.
+         */
         $scope.displayMetadata = function() {
             $modal.open({
                 templateUrl: 'views/data/modalViewMetadata.html',
@@ -411,6 +415,14 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     }
                 }
             });
+        };
+
+        /**
+         * Open metadata page for dataset metadata.
+         */
+        $scope.editMetadata = function() {
+            console.debug($scope.selected.Name);
+
         };
 
         // Style methods
@@ -475,7 +487,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $location.path('/description/' + result.type + "/" + result.file);
                     }, function () {
-                        Growl('error', 'Error', 'Unable to save metadata');
+                        Growl('error', 'Error', 'Unable to prepare metadata for next step!');
                     });
                 }
             });
@@ -725,7 +737,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             }
             else{
                 if ($scope.service.type.toLowerCase() === 'sos') {
-                    var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+                    var sensorId = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
                     sos.importSensor({id: service.identifier}, {values: {"sensorId": sensorId}}, function () {
                         Growl('success', 'Success', 'Sensor ' + sensorId + ' imported in service ' + service.name);
                         $modalInstance.close();
