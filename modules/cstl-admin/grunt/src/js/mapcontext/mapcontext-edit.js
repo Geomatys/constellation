@@ -113,7 +113,7 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         $scope.deleteTag = function(key) {
             if ($scope.tag.keywords.length > 0 &&
                 $scope.tag.text.length === 0 &&
-                key === undefined) {
+                !key) {
                 $scope.tag.keywords.pop();
             } else if (key !== undefined) {
                 $scope.tag.keywords.splice(key, 1);

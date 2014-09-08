@@ -496,7 +496,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             $scope.import.allowNext = false;
             if ($scope.import.db.url) {
                 $scope.importDb();
-            } else if ($scope.import.uploadType === null) {
+            } else if (!$scope.import.uploadType) {
                 $scope.import.currentStep = 'step3Type';
                 $scope.import.allowSubmit = true;
             } else {

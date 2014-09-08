@@ -14,24 +14,24 @@ window.Netcdf = {
         var crs = data.Entry;
 
         var val = Netcdf.searchOnChanged();
-        if(val === undefined){
-            $("#horizontal").val(crs[0]);
-        }else{
+        if(val){
             $("#horizontal").val(val.crsName);
             $("#horizontal").data("value", val.crsCode);
+        }else{
+            $("#horizontal").val(crs[0]);
         }
 
-        if(crs[1]===undefined){
-            $("#vertical").parent().parent().hide();
-        }else{
+        if(crs[1]){
             $("#vertical").parent().parent().show();
             $("#vertical").val(crs[1]);
-        }
-        if(crs[2]===undefined){
-            $("#temporal").parent().parent().hide();
         }else{
+            $("#vertical").parent().parent().hide();
+        }
+        if(crs[2]){
             $("#temporal").parent().parent().show();
             $("#temporal").val(crs[2]);
+        }else{
+            $("#temporal").parent().parent().hide();
         }
     },
 

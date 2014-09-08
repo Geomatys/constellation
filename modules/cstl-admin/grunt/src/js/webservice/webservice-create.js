@@ -101,8 +101,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
 
         $scope.deleteTag = function(key) {
             if ($scope.metadata.keywords.length > 0 &&
-                $scope.newService.tagText.length === 0 &&
-                key === undefined) {
+                $scope.newService.tagText.length === 0 && !key) {
                 $scope.metadata.keywords.pop();
             } else if (key !== undefined) {
                 $scope.metadata.keywords.splice(key, 1);

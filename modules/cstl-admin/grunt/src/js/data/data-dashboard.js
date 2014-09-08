@@ -718,7 +718,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             if ($scope.listSelect.length !== 0) {
                 $scope.selected = $scope.listSelect;
             }
-            if ($scope.selected === null) {
+            if (!$scope.selected) {
                 Growl('warning', 'Warning', 'No data selected');
                 $modalInstance.dismiss('close');
                 return;

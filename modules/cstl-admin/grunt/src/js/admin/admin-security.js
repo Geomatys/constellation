@@ -381,17 +381,17 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
 
         $scope.save = function(){
             var domainResource = new DomainResource($scope.domainrole);
-            if($scope.domainrole.id === undefined){
-                domainResource.$save(function(saved){
-                    $modalInstance.close(saved);
+            if($scope.domainrole.id){
+                domainResource.$update({id: $scope.domainrole.id }, function(updated){
+                    $modalInstance.close(updated);
                 }, function(){
                     $translate(['Error','admin.domain.save.error']).then(function (translations) {
                         Growl('error', translations.Error,  translations['admin.domain.save.error']);
                     });
                 });
             } else {
-                domainResource.$update({id: $scope.domainrole.id }, function(updated){
-                    $modalInstance.close(updated);
+                domainResource.$save(function(saved){
+                    $modalInstance.close(saved);
                 }, function(){
                     $translate(['Error','admin.domain.save.error']).then(function (translations) {
                         Growl('error', translations.Error,  translations['admin.domain.save.error']);

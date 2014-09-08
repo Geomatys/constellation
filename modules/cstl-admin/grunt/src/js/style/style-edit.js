@@ -347,7 +347,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 $scope.page.pageSld = 'views/style/chooseType.html';
             }
             //prevent the sld object is never null
-            if ($scope.newStyle === null) {
+            if (!$scope.newStyle) {
                 $scope.newStyle = {
                     "name": $scope.sldName,
                     "rules": []
@@ -714,7 +714,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             break;
                         }
                     }
-                    if(bandIdentified===null){
+                    if(!bandIdentified){
                         bandIdentified = $scope.dataBands[0];
                     }
                     $scope.optionsSLD.rasterPalette.band.selected = bandIdentified;
@@ -1354,7 +1354,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         $scope.addStrokeDashArray = function(symbolizer,traitType) {
             if (traitType === 'pointille') {
-                if (symbolizer.stroke === undefined) {
+                if (!symbolizer.stroke) {
                     symbolizer.stroke = {};
                 }
                 symbolizer.stroke.dashArray = [1, 1];
@@ -1369,10 +1369,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * init the font model for symbolizer text.
          */
         $scope.initFontFamilies = function(symbolizer) {
-            if (symbolizer.font === undefined) {
+            if (!symbolizer.font) {
                 symbolizer.font = {};
             }
-            if (symbolizer.font.family === undefined) {
+            if (!symbolizer.font.family) {
                 symbolizer.font.family = [];
             }
         };
@@ -1753,7 +1753,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         $scope.addPalette = function(rule) {
             var palette = $scope.optionsSLD.rasterPalette.palette;
-            if (palette.index === undefined) {
+            if (!palette.index) {
                 return;
             }
 
@@ -1767,8 +1767,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
 
             var colorMap = rule.symbolizers[0].colorMap;
 
-            if (colorMap === undefined ||
-                colorMap.function === undefined ||
+            if (!colorMap|| !colorMap.function ||
                 colorMap.function['@function'] !== palette.method) {
                 colorMap = {'function': {'@function': palette.method}};
             }
@@ -1788,7 +1787,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 case 1:
                     var delta1 = palette.rasterMaxValue - palette.rasterMinValue;
                     if (!palette.inverse) {
-                        if (colorMap.function === undefined) {
+                        if (!colorMap.function) {
                             colorMap.function = {};
                         }
                         colorMap.function.points =
@@ -1991,10 +1990,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         //to force the browser cache reloading styled layer.
                         layerData.mergeNewParams({ts:new Date().getTime()});
 
-                        if(layerBackground ===null){
-                            DataViewer.layers = [layerData];
-                        }else {
+                        if(layerBackground){
                             DataViewer.layers = [layerData, layerBackground];
+                        }else {
+                            DataViewer.layers = [layerData];
                         }
                         DataViewer.initMap(mapId);
                         if ($scope.dataBbox) {
