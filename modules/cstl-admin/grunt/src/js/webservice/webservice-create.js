@@ -201,7 +201,8 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
             webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
                 Growl('success','Success','Service '+ $scope.id +' successfully updated');
                 if ($scope.type.toLowerCase() === 'sos') {
-                    createOmProvider();
+                    //@TODO confirm if we need to create OM provider here?
+                    //createOmProvider();
                     buildOmDatasource();
                 }
                 $location.path('/webservice');
