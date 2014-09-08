@@ -96,7 +96,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
             var idToView = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
             $modal.open({
                 templateUrl: 'views/sensor/modalViewSensorMetadata.html',
-                controller: 'ViewMetadataModalController',
+                controller: 'ViewSensorMLModalController',
                 resolve: {
                     'details': function(textService){
                         return textService.sensorMetadata(idToView);
@@ -142,6 +142,13 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
                     } else {return text;}
                 }
             }
+        };
+    })
+
+    .controller('ViewSensorMLModalController', function ($scope, $modalInstance, details) {
+        $scope.details = details.data;
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
         };
     })
 
