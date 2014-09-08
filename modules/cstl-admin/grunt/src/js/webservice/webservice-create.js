@@ -66,7 +66,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
 
 
         $scope.goToServiceContact = function() {
-            if($scope.metadata.name!== null || $scope.metadata.identifier!==null){
+            if($scope.metadata.name || $scope.metadata.identifier){
                 $scope.serviceContact = true;
                 $scope.serviceInfo = false;
                 $scope.serviceRights = false;
@@ -75,7 +75,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
             }
         };
         $scope.goToServiceRights = function() {
-            if($scope.metadata.name!== null || $scope.metadata.identifier!==null){
+            if($scope.metadata.name || $scope.metadata.identifier){
                 $scope.serviceContact = false;
                 $scope.serviceRights = true;
                 $scope.serviceInfo = false;
@@ -103,7 +103,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
             if ($scope.metadata.keywords.length > 0 &&
                 $scope.newService.tagText.length === 0 && !key) {
                 $scope.metadata.keywords.pop();
-            } else if (key !== undefined) {
+            } else if (key) {
                 $scope.metadata.keywords.splice(key, 1);
             }
         };

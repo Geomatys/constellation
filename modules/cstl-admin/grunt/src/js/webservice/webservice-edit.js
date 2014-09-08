@@ -201,7 +201,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             if ($scope.metadata.keywords.length > 0 &&
                 $scope.tagText.length === 0 && !key) {
                 $scope.metadata.keywords.pop();
-            } else if (key !== undefined) {
+            } else if (key) {
                 $scope.metadata.keywords.splice(key, 1);
             }
         };
@@ -334,9 +334,9 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         $scope.deleteLayer = function() {
             var txt = ($scope.service.type.toLowerCase() === 'wmts') ? 'Are you sure? This will also delete the generated tiles for this layer.' : 'Are you sure?';
-            if ($scope.selected !== null && confirm(txt)) {
+            if ($scope.selected && confirm(txt)) {
                 if ($scope.service.type.toLowerCase() === 'sos') {
-                    var idToDel = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+                    var idToDel = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
                     sos.removeSensor({id: $scope.service.identifier, sensor: idToDel}, function() {
                         Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed from service ' + $scope.service.name);
                         $scope.initScope();
@@ -372,7 +372,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.deleteMetadata = function() {
-            if ($scope.selected !== null && confirm("Are you sure?")) {
+            if ($scope.selected && confirm("Are you sure?")) {
                 csw.delete({id: $scope.service.identifier, metaId: $scope.selected.identifier}, {},
                     function() {
                         Growl('success','Success','Metadata deleted');
@@ -470,7 +470,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.showSensor = function() {
-            var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+            var sensorId = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
             $modal.open({
                 templateUrl: 'views/sensor/modalSensorView.html',
                 controller: 'SensorModalController',

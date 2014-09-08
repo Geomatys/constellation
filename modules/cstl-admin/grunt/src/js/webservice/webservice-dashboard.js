@@ -141,7 +141,7 @@ angular.module('cstl-webservice-dashboard', ['cstl-restapi', 'cstl-services', 'p
         };
 
         $scope.getLayersCount = function(service) {
-            if (service.layersNumber !== null) {
+            if (service.layersNumber) {
                 return service.layersNumber;
             }
             return 0;
