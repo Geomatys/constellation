@@ -135,52 +135,61 @@
             </configuration>
         </plugin>
 
-        <!-- Plugins to run integration test on apps -->
-        <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.2.4</version>
-            <configuration>
-                <type>standalone</type>
-                <configuration>
-                    <properties>
-                        <cargo.servlet.port>10080</cargo.servlet.port>
-                    </properties>
-                </configuration>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>start</id>
-                    <phase>pre-integration-test</phase>
-                    <goals>
-                        <goal>start</goal>
-                    </goals>
-                </execution>
-                <execution>
-                    <id>stop</id>
-                    <phase>post-integration-test</phase>
-                    <goals>
-                        <goal>stop</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
 
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.17</version>
-            <executions>
-                <execution>
-                    <id>default</id>
-                    <goals>
-                        <goal>integration-test</goal>
-                        <goal>verify</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
     </plugins>
   </build>
+<profiles>
+    <profile>
+        <id>fonctionalTest</id>
+        <build>
+            <plugins>
+                <!-- Plugins to run fonctionnal test on apps -->
+                <plugin>
+                    <groupId>org.codehaus.cargo</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <version>1.2.4</version>
+                    <configuration>
+                        <type>standalone</type>
+                        <configuration>
+                            <properties>
+                                <cargo.servlet.port>10080</cargo.servlet.port>
+                            </properties>
+                        </configuration>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>start</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>start</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>stop</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.17</version>
+                    <executions>
+                        <execution>
+                            <id>default</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
 </project>
