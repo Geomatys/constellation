@@ -1,22 +1,26 @@
 /*
  * Constellation - An open source and standard compliant SDI
- *      http://www.constellation-sdi.org
- *   (C) 2014, Geomatys
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 3 of the License, or (at your option) any later version.
+ *     http://www.constellation-sdi.org
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details..
+ *     Copyright 2014 Geomatys
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance', 'dataListing',
-    'provider', 'firstStep', 'UploadFiles', 'Growl',
-    function($scope, $modalInstance, dataListing, provider, firstStep, UploadFiles, Growl) {
+angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
+
+    .controller('ModalImportDataController', function($scope, $modalInstance, dataListing, provider, firstStep, UploadFiles, Growl) {
         $scope.import = {
             currentStep: firstStep,
             dataPath: null,
@@ -284,10 +288,9 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                 }
             );
         };
-    }]);
+    })
 
-cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataListing', '$cookies', 'Growl',
-    function($scope, dataListing, $cookies, Growl) {
+    .controller('ModalImportDataStep1LocalController', function($scope, dataListing, $cookies, Growl) {
         $scope.loader = {
             upload: false
         };
@@ -333,10 +336,9 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
                 }
             );
         };
-    }]);
+    })
 
-cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'dataListing',
-    function($scope, dataListing) {
+    .controller('ModalImportDataStep1ServerController', function($scope, dataListing) {
         $scope.import.allowNext = false;
         $scope.import.fsserver = true;
 
@@ -385,10 +387,9 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
             $scope.import.currentStep = 'step2Metadata';
             $scope.import.allowNext = true;
         };
-    }]);
+    })
 
-cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','provider', 'Growl',
-    function($scope, provider, Growl) {
+    .controller('ModalImportDataStep1DatabaseController', function($scope, provider, Growl) {
         $scope.import.allowNext = false;
         $scope.import.testConnected = false;
 
@@ -420,12 +421,9 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
             });
         };
 
-}]);
+})
 
-
-cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies',
-    'Growl', 'dataListing',
-    function($scope, $cookies, Growl, dataListing) {
+    .controller('ModalImportDataStep2MetadataController', function($scope, $cookies, Growl, dataListing) {
 
         $scope.columns = [];
 
@@ -543,10 +541,9 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
             });
         };
 
-    }]);
+    })
 
-cstlAdminApp.controller('ModalImportDataStep3TypeController', ['$scope',
-    function($scope) {
+    .controller('ModalImportDataStep3TypeController', function($scope) {
         $scope.changeAssociationState = function() {
             if ($scope.sensor.checked) {
                 $scope.import.allowSensorChoose = true;
@@ -556,11 +553,9 @@ cstlAdminApp.controller('ModalImportDataStep3TypeController', ['$scope',
                 $scope.import.allowSubmit = true;
             }
         };
-    }]);
+    })
 
-cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sensor',
-    'dataListing', 'Dashboard', 'Growl', '$cookies',
-    function($scope, sensor, dataListing, Dashboard, Growl, $cookies) {
+    .controller('ModalImportDataStep4SensorController', function($scope, sensor, dataListing, Dashboard, Growl, $cookies) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -649,10 +644,9 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
                 Growl('error','Error','Unable to import sensor');
             });
         }
-    }]);
+    })
 
-cstlAdminApp.controller('ModalImportDataStep4SNetcdfController', ['$scope', 'dataListing', 'Growl', '$cookies',
-    function($scope, dataListing, Growl, $cookies) {
+    .controller('ModalImportDataStep4SNetcdfController', function($scope, dataListing, Growl, $cookies) {
         function displayNetCDF(providerId) {
             $scope.import.currentStep = 'step4Netcdf';
             $scope.import.allowNext = false;
@@ -677,4 +671,4 @@ cstlAdminApp.controller('ModalImportDataStep4SNetcdfController', ['$scope', 'dat
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('dataPreviewMap');
         }
-    }]);
+    });

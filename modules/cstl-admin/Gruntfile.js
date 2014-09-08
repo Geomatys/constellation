@@ -129,7 +129,7 @@ module.exports = function(grunt) {
                     cleancss: true
                 },
                 files: {
-                    '<%= target_dir %>/css/app.css': '<%= src_dir %>/less/app.less'
+                    '<%= target_dir %>/css/cstl.css': '<%= src_dir %>/less/app.less'
                 }
             },
             lib: {
@@ -158,20 +158,19 @@ module.exports = function(grunt) {
                     footer: '})(window, window.angular);'
                 },
                 files: {
-                    '<%= target_dir %>/js/app.js': [
+                    '<%= target_dir %>/js/cstl.js': [
                         '<%= src_dir %>/js/app.js',
                         '<%= src_dir %>/js/directives.js',
                         '<%= src_dir %>/js/restapi.js',
                         '<%= src_dir %>/js/services.js',
-                        '<%= src_dir %>/js/controllers.js',
                         '<%= src_dir %>/js/admin/*.js',
+                        '<%= src_dir %>/js/data/*.js',
+                        '<%= src_dir %>/js/main/*.js',
                         '<%= src_dir %>/js/mapcontext/*.js',
                         '<%= src_dir %>/js/process/*.js',
                         '<%= src_dir %>/js/sensor/*.js',
+                        '<%= src_dir %>/js/style/*.js',
                         '<%= src_dir %>/js/webservice/*.js',
-                        '<%= src_dir %>/js/controller-data.js',
-                        '<%= src_dir %>/js/controller-data-import.js',
-                        '<%= src_dir %>/js/controller-style.js',
                         '<%= src_dir %>/js/cstl.data.viewer.js',
                         '<%= src_dir %>/js/cstl.viewer.wmts.js',
                         '<%= src_dir %>/js/cstl.netcdf.js'
@@ -184,7 +183,7 @@ module.exports = function(grunt) {
                     footer: '})(window, window.angular);'
                 },
                 files: {
-                    '<%= target_dir %>/js/app-index.js': [
+                    '<%= target_dir %>/js/cstl-index.js': [
                         '<%= src_dir %>/js/app-index.js',
                         '<%= src_dir %>/js/directives.js',
                         '<%= src_dir %>/js/restapi.js',
@@ -211,24 +210,24 @@ module.exports = function(grunt) {
         // Annotate AngularJS application script files for obfuscation.
         ngAnnotate: {
             app: {
-                src: ['<%= target_dir %>/js/app.js'],
-                dest: '<%= target_dir %>/js/app.js'
+                src: ['<%= target_dir %>/js/cstl.js'],
+                dest: '<%= target_dir %>/js/cstl.js'
             },
             app_index: {
-                src: ['<%= target_dir %>/js/app-index.js'],
-                dest: '<%= target_dir %>/js/app-index.js'
+                src: ['<%= target_dir %>/js/cstl-index.js'],
+                dest: '<%= target_dir %>/js/cstl-index.js'
             }
         },
 
         // Obfuscate application script files.
         uglify: {
             app: {
-                src: ['<%= target_dir %>/js/app.js'],
-                dest: '<%= target_dir %>/js/app.js'
+                src: ['<%= target_dir %>/js/cstl.js'],
+                dest: '<%= target_dir %>/js/cstl.js'
             },
             app_index: {
-                src: ['<%= target_dir %>/js/app-index.js'],
-                dest: '<%= target_dir %>/js/app-index.js'
+                src: ['<%= target_dir %>/js/cstl-index.js'],
+                dest: '<%= target_dir %>/js/cstl-index.js'
             }
         }
 

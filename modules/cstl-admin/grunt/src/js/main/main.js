@@ -1,33 +1,37 @@
 /*
  * Constellation - An open source and standard compliant SDI
- *      http://www.constellation-sdi.org
- *   (C) 2014, Geomatys
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 3 of the License, or (at your option) any later version.
+ *     http://www.constellation-sdi.org
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details..
+ *     Copyright 2014 Geomatys
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /* Controllers */
 /*jshint -W079 */
 var dataNotReady = function(){alert("data not ready");};
 
-cstlAdminApp.controller('HeaderController', ['$scope','$http',
-    function ($scope, $http) {
-        $http.get("app/conf").success(function(data){
-	       	  $scope.cstlLoginUrl = data.cstl + "spring/auth/form";
-	          $scope.cstlLogoutUrl = data.cstl + "logout";
-	      });
-}]);
+angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','Growl', 'UserResource', 'GeneralService', 'TaskService',
-    function ($scope, $location, webService, dataListing, Process, Growl, UserResource, GeneralService, task) {
+    .controller('HeaderController', function ($scope, $http) {
+        $http.get("app/conf").success(function(data){
+            $scope.cstlLoginUrl = data.cstl + "spring/auth/form";
+            $scope.cstlLogoutUrl = data.cstl + "logout";
+        });
+    })
+
+    .controller('MainController', function($scope, $location, webService, dataListing, ProcessService, Growl, UserResource, GeneralService, TaskService) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
                 var count = 0;
@@ -50,7 +54,7 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
                 Growl('error', 'Error', 'Unable to count data');
             });
 
-            task.listTasks({}, function(taskList) {
+            TaskService.listTasks({}, function(taskList) {
                 $scope.nbprocess = Object.keys(taskList).length;
             }, function() {
                 $scope.nbprocess = 0;
@@ -64,26 +68,22 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
                 Growl('error', 'Error', 'Unable to count users');
             });
         };
-    }]);
+    })
 
-cstlAdminApp.controller('LanguageController', ['$scope', '$translate',
-    function ($scope, $translate) {
+    .controller('LanguageController', function($scope, $translate) {
 
         $scope.currentLang = 'en';
 
         $scope.changeLanguage = function () {
             $translate.use($scope.currentLang);
         };
-    }]);
+    })
 
-cstlAdminApp.controller('MenuController', ['$scope',
-    function ($scope) {
+    .controller('MenuController', function($scope) {
 
+    })
 
-}]);
-
-cstlAdminApp.controller('LoginController', ['$scope', '$location', 'AuthService',
-    function ($scope, $location, AuthService) {
+    .controller('LoginController', function($scope, $location, AuthService) {
         $scope.rememberMe = true;
         $scope.login = function () {
             AuthService.login({
@@ -95,30 +95,27 @@ cstlAdminApp.controller('LoginController', ['$scope', '$location', 'AuthService'
                 }
             });
         };
-    }]);
+    })
 
-cstlAdminApp.controller('LogoutController', ['$location', 'AuthService',
-    function ($location, AuthService) {
+    .controller('LogoutController', function($location, AuthService) {
         AuthService.logout({
             success: function () {
                 $location.path('');
             }
         });
-    }]);
+    })
 
-cstlAdminApp.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', function($scope, $modalInstance){
-    $scope.ok = function () {
-    $modalInstance.close();
-  };
+    .controller('ModalInstanceCtrl', function($scope, $modalInstance){
+        $scope.ok = function () {
+            $modalInstance.close();
+        };
 
-  $scope.cancel = function () {
-    $modalInstance.dismiss();
-  };
-}]);
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    })
 
-
-cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Account',
-    function ($scope, resolvedAccount, Account) {
+    .controller('SettingsController', function($scope, resolvedAccount, Account) {
         $scope.success = null;
         $scope.error = null;
         $scope.settingsAccount = resolvedAccount;
@@ -135,11 +132,9 @@ cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Acc
                     $scope.error = "ERROR";
                 });
         };
-    }]);
+    })
 
-
-cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Sessions',
-    function ($scope, resolvedSessions, Sessions) {
+    .controller('SessionsController', function($scope, resolvedSessions, Sessions) {
         $scope.success = null;
         $scope.error = null;
         $scope.sessions = resolvedSessions;
@@ -155,13 +150,31 @@ cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Se
                     $scope.error = "ERROR";
                 });
         };
-    }]);
+    })
 
+    .controller('navCtrl', function($scope, $location) {
+        $scope.navClass = function (page) {
+            var currentRoute = $location.path().split('/')[1] || 'home';
+            return page === currentRoute ? 'menu-selected' : '';
+        };
+    })
 
+    .controller('DomainSwitcherController', function(Account, $scope, $cookies, $window) {
+        Account.get(function(account){
+            $scope.domains = account.domains;
+            for(var d in account.domains){
+                if(account.domains[d].id === $cookies.cstlActiveDomainId){
+                    $scope.activeDomain=account.domains[d].name;
+                    break;
+                }
+            }
+            $scope.changeDomain = function(i){
+                if($cookies.cstlActiveDomainId !== account.domains[i].id){
+                    $scope.activeDomain=account.domains[i].name;
+                    $cookies.cstlActiveDomainId= ""+account.domains[i].id;
+                    $window.location.href="admin.html";
+                }
+            };
+        });
+    });
 
-cstlAdminApp.controller('navCtrl', ['$scope', '$location', function ($scope, $location) {
-    $scope.navClass = function (page) {
-        var currentRoute = $location.path().split('/')[1] || 'home';
-        return page === currentRoute ? 'menu-selected' : '';
-    };
-}]);
