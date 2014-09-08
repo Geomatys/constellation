@@ -171,7 +171,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
 
                 // Watch for changes in text field
                 scope.$watch(attrs.ngModel, function(value) {
-                    if (value !== undefined) {
+                    if (value) {
                         var tempEl = $('<span>' + value + '</span>').appendTo('body');
                         scope.inputWidth = tempEl.width() + 5;
                         tempEl.remove();
@@ -364,7 +364,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                         loading.resolve(scope[scopeAttr]);
                     } else {
                         scope.$watch(scopeAttr, function(newValue, oldValue) {
-                            if(newValue !== undefined){
+                            if(newValue){
                                 loading.resolve(newValue);
                             }
                         });
