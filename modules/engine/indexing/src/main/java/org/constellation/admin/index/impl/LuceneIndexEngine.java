@@ -18,18 +18,18 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.SimpleFSLockFactory;
+import org.apache.lucene.store.NoLockFactory;
 import org.apache.lucene.util.Version;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.exception.ConstellationException;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.index.IndexEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.utils.MetadataFeeder;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -58,7 +58,7 @@ public class LuceneIndexEngine implements IndexEngine {
 
     private void createIndex() throws IOException {
         final File dataIndexDirectory = ConfigDirectory.getDataIndexDirectory();
-        final Directory directory = FSDirectory.open(dataIndexDirectory, new SimpleFSLockFactory());
+        final Directory directory = FSDirectory.open(dataIndexDirectory, NoLockFactory.getNoLockFactory());
         StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_46);
         IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46, analyzer);
         indexWriter = new IndexWriter(directory, config);
