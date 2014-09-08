@@ -260,8 +260,14 @@ final class MetadataUpdater {
         if (value == null) {
             return null;
         }
-        if (value instanceof Long) {
-            return new Date((Long) value);
+        if (value instanceof Number) {
+            return new Date(((Number) value).longValue());
+        }
+        final String t = (String) value;
+        if (t.indexOf('-') < 0) try {
+            return new Date(Long.valueOf(t));
+        } catch (NumberFormatException e) {
+            throw new ParseException("Illegal date: " + value, e);
         }
         try {
             synchronized (DATE_FORMAT) {

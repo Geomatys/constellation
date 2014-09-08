@@ -34,8 +34,8 @@ public class Field implements Serializable {
     private String help;
     private String path;
     private String render;
-    private String defaultValue;
-    private String value;
+    private Object defaultValue;
+    private Object value;
     private String obligation;
 
     public Field() {
@@ -82,7 +82,7 @@ public class Field implements Serializable {
         this.render = render;
     }
 
-    public String getDefaultValue() {
+    public Object getDefaultValue() {
         return defaultValue;
     }
 
@@ -90,7 +90,7 @@ public class Field implements Serializable {
         this.defaultValue = defaultValue;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
