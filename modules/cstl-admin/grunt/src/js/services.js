@@ -391,7 +391,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                             }, {
                                 values: {
                                     dataProvider: $scope.selected.Provider,
-                                    dataNamespace: "",
+                                    dataNamespace: $scope.selected.Namespace,
                                     dataId: $scope.selected.Name
                                 }
                             }, function () {
@@ -418,7 +418,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     );
                 } else {
                     var res = style.unlink({provider: providerName, name: styleName},
-                        {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
+                        {values: {dataProvider: dataProvider, dataNamespace: $scope.selected.Namespace, dataId: dataId}});
                     if (res) {
                         var index = -1;
                         for (var i = 0; i < $scope.selected.TargetStyle.length; i++) {
