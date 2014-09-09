@@ -18,12 +18,18 @@
  */
 package org.constellation.business;
 
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.api.ProviderType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.ProviderConfiguration;
+import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.engine.register.Provider;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -38,6 +44,12 @@ public interface IProviderBusiness {
     org.constellation.engine.register.Provider getProvider(String providerId);
 
     Provider getProvider(String providerId, int domainId);
+
+    Provider create(int domainId, String id, ProviderConfiguration config) throws ConfigurationException;
+
+    Set<Name> test(String providerIdentifier, ProviderConfiguration configuration) throws DataStoreException;
+
+    void update(int domainId, String id, ProviderConfiguration config);
 
     org.constellation.engine.register.Provider createProvider(String providerId, String o, ProviderType type, String factoryName, GeneralParameterValue config) throws IOException;
 
@@ -54,4 +66,6 @@ public interface IProviderBusiness {
     List<Integer> getProviderIdsForDomain(int domainId);
 
     List<Provider> getProviderChildren(String id);
+
+    ProviderPyramidChoiceList listPyramids(final String id, final String layerName) throws DataStoreException;
 }
