@@ -654,13 +654,13 @@ public abstract class FilterParser {
                 }
 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new FilterParserException(UNKNOW_CRS_ERROR_MSG + crsName,
+                throw new FilterParserException(UNKNOW_CRS_ERROR_MSG + crsName, e,
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } catch (FactoryException e) {
-                throw new FilterParserException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
+                throw new FilterParserException(FACTORY_BBOX_ERROR_MSG + e.getMessage(), e,
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
-                throw new FilterParserException(INCORRECT_BBOX_DIM_ERROR_MSG + e.getMessage(),
+                throw new FilterParserException(INCORRECT_BBOX_DIM_ERROR_MSG + e.getMessage(), e,
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
 
