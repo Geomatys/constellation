@@ -123,12 +123,6 @@
             <groupId>org.opengis</groupId>
             <artifactId>geoapi-pending</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -144,6 +138,17 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyLocale_fr</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-epsg</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
