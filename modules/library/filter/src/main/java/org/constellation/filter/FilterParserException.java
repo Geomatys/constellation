@@ -88,7 +88,6 @@ public class FilterParserException extends Exception {
      *
      * @param cause The cause of this exception.
      * @param exceptionCode The exception code.
-     * @param serviceDef The service definition.
      */
     public FilterParserException(final Exception cause, final CodeList exceptionCode) {
         this(cause, exceptionCode, null);
