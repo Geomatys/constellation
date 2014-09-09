@@ -342,7 +342,7 @@ final class MetadataUpdater {
                 ((DefaultTemporalExtent) metadata).setBounds(beginPosition, endPosition);
                 return true;
             }
-        } else if (type == ReferenceSystem.class && identifier.equals("referenceSystemInfo")) {
+        } else if (ReferenceSystem.class.isAssignableFrom(type) && identifier.equals("referenceSystemInfo")) {
             /*
              * Properties:
              *   - referenceSystemInfo.referenceSystemIdentifier.code
