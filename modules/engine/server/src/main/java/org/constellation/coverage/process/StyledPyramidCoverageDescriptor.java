@@ -52,7 +52,12 @@ public class StyledPyramidCoverageDescriptor  extends AbstractCstlProcessDescrip
     private static final String IMAGE_FILE_PATH_REMARKS = "The input image file.";
     public static final ParameterDescriptor<String> IMAGE_FILE_PATH =
             new DefaultParameterDescriptor<>(IMAGE_FILE_PATH_NAME, IMAGE_FILE_PATH_REMARKS, String.class, null, true);
-    
+
+    public static final String IMAGE_FILE_FORMAT_NAME = "image_file_format";
+    private static final String IMAGE_FILE_FORMAT_REMARKS = "The input image file format.";
+    public static final ParameterDescriptor<String> IMAGE_FILE_FORMAT =
+            new DefaultParameterDescriptor<>(IMAGE_FILE_FORMAT_NAME, IMAGE_FILE_FORMAT_REMARKS, String.class, "AUTO", true);
+
     public static final String STYLE_NAME = "pyramid_style";
     private static final String STYLE_REMARKS = "The style to apply to the pyramid.";
     public static final ParameterDescriptor<StyleReference> STYLE =
@@ -75,7 +80,7 @@ public class StyledPyramidCoverageDescriptor  extends AbstractCstlProcessDescrip
     
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{COVERAGE_BASE_NAME, STYLE, IMAGE_FILE_PATH, PYRAMID_FOLDER, PROVIDER_OUT_ID, DOMAIN_ID});
+            new GeneralParameterDescriptor[]{COVERAGE_BASE_NAME, STYLE, IMAGE_FILE_PATH,IMAGE_FILE_FORMAT, PYRAMID_FOLDER, PROVIDER_OUT_ID, DOMAIN_ID});
 
     
     public static final String PROVIDER_SOURCE_NAME = "provider_source";

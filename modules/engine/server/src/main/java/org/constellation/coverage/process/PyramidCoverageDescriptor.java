@@ -49,6 +49,11 @@ public class PyramidCoverageDescriptor extends AbstractProcessDescriptor {
     private static final String IMAGE_FILE_PATH_REMARKS = "The input image file.";
     public static final ParameterDescriptor<String> IMAGE_FILE_PATH =
             new DefaultParameterDescriptor<>(IMAGE_FILE_PATH_NAME, IMAGE_FILE_PATH_REMARKS, String.class, null, true);
+
+    public static final String IMAGE_FILE_FORMAT_NAME = "image_file_format";
+    private static final String IMAGE_FILE_FORMAT_REMARKS = "The input image file format.";
+    public static final ParameterDescriptor<String> IMAGE_FILE_FORMAT =
+            new DefaultParameterDescriptor<>(IMAGE_FILE_FORMAT_NAME, IMAGE_FILE_FORMAT_REMARKS, String.class, "AUTO", true);
     
     public static final String PYRAMID_FOLDER_NAME = "pyramid_folder";
     private static final String PYRAMID_FOLDER_REMARKS = "The path of the folder where the pyramid will be saved.";
@@ -59,10 +64,15 @@ public class PyramidCoverageDescriptor extends AbstractProcessDescriptor {
     private static final String PROVIDER_OUT_ID_REMARKS = "the  name of the output provider id.";
     public static final ParameterDescriptor<String> PROVIDER_OUT_ID =
             new DefaultParameterDescriptor<>(PROVIDER_OUT_ID_NAME, PROVIDER_OUT_ID_REMARKS, String.class, null, true);
-    
+
+    public static final String DOMAIN_ID_NAME = "domain-id";
+    private static final String DOMAIN_ID_REMARKS = "Identifier of the domain to add data.";
+    public static final ParameterDescriptor<Integer> DOMAIN_ID =
+            new DefaultParameterDescriptor(DOMAIN_ID_NAME, DOMAIN_ID_REMARKS, Integer.class, null, false);
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{COVERAGE_BASE_NAME, IMAGE_FILE_PATH, PYRAMID_FOLDER, PROVIDER_OUT_ID});
+            new GeneralParameterDescriptor[]{COVERAGE_BASE_NAME, IMAGE_FILE_PATH, IMAGE_FILE_FORMAT, PYRAMID_FOLDER, PROVIDER_OUT_ID, DOMAIN_ID});
 
     
     public static final String PROVIDER_SOURCE_NAME = "provider_source";

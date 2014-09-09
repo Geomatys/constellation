@@ -19,37 +19,43 @@
 
 package org.constellation.coverage.process;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
+import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.coverage.PyramidCoverageHelper;
-import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
+import org.geotoolkit.coverage.*;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.io.GridCoverageReadParam;
+import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.feature.type.DefaultName;
-
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.*;
-import static org.geotoolkit.parameter.Parameters.getOrCreate;
-import static org.geotoolkit.parameter.Parameters.value;
-import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static org.constellation.coverage.process.PyramidCoverageDescriptor.*;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.PROVIDER_SOURCE;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  * @author Quentin Boileau (Geomatys)
  */
-public class PyramidCoverageProcess extends AbstractCstlProcess {
+public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
 
     public PyramidCoverageProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
@@ -61,17 +67,22 @@ public class PyramidCoverageProcess extends AbstractCstlProcess {
      * @param providerID
      * @param imageFilePath
      * @param coverageBaseName
+     * @param domainId
      */
-    public PyramidCoverageProcess (final File pyramidFolder, final String providerID, final String imageFilePath, final String coverageBaseName) {
-        this(PyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, coverageBaseName));
+    public PyramidCoverageProcess (final File pyramidFolder, final String providerID, final String imageFilePath,
+                                   final String imageFileFormat, final String coverageBaseName, final Integer domainId) {
+        this(PyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, imageFileFormat, coverageBaseName, domainId));
     }
 
-    private static ParameterValueGroup toParameters(final File pyramidFolder, final String providerID, final String imageFilePath, final String coverageBaseName){
+    private static ParameterValueGroup toParameters(final File pyramidFolder, final String providerID, final String imageFilePath,
+                                                    final String imageFileFormat, final String coverageBaseName, final Integer domainId){
         final ParameterValueGroup params = PyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
         getOrCreate(PROVIDER_OUT_ID, params).setValue(providerID);
         getOrCreate(IMAGE_FILE_PATH, params).setValue(imageFilePath);
+        getOrCreate(IMAGE_FILE_FORMAT, params).setValue(imageFileFormat);
         getOrCreate(COVERAGE_BASE_NAME, params).setValue(coverageBaseName);
         getOrCreate(PYRAMID_FOLDER, params).setValue(pyramidFolder);
+        getOrCreate(DOMAIN_ID, params).setValue(domainId);
         return params;
     }
 
@@ -79,43 +90,95 @@ public class PyramidCoverageProcess extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
         final String providerID       = value(PROVIDER_OUT_ID, inputParameters);
         final String imageFilePath    = value(IMAGE_FILE_PATH, inputParameters);
+        final String imageFileFormat  = value(IMAGE_FILE_FORMAT, inputParameters);
         final String coverageBaseName = value(COVERAGE_BASE_NAME, inputParameters);
         final File pyramidFolder      = value(PYRAMID_FOLDER, inputParameters);
-        try {
-            PyramidCoverageHelper pyramidHelper = PyramidCoverageHelper.builder(coverageBaseName).
-                    inputFormat("AUTO").withDeeps(new double[]{1}).withBaseCoverageNamer(new SimpleCoverageNamer()).
-                    fromImage(imageFilePath).toFileStore(pyramidFolder.getAbsolutePath()).build();
-            pyramidHelper.buildPyramid(null);
-        } catch (DataStoreException | TransformException | FactoryException | MalformedURLException ex) {
-            throw new ProcessException("Error while building pyramid", this, ex);
-        }
-        
-        try {
-            final DataProviderFactory factory = DataProviders.getInstance().getFactory("coverage-store");
-            final ParameterValueGroup pparams = factory.getProviderDescriptor().createValue();
-            ParametersExt.getOrCreateValue(pparams, ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(providerID);
-            ParametersExt.getOrCreateValue(pparams, ProviderParameters.SOURCE_TYPE_DESCRIPTOR.getName().getCode()).setValue("coverage-store");
-            final ParameterValueGroup choiceparams = ParametersExt.getOrCreateGroup(pparams, factory.getStoreDescriptor().getName().getCode());
-            final ParameterValueGroup xmlpyramidparams = ParametersExt.getOrCreateGroup(choiceparams, XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.getName().getCode());
-            final URL fileUrl = URI.create("file:"+ pyramidFolder.getAbsolutePath() +"/tiles").toURL();
-            ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(fileUrl);
-            ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue("no namespace");
+        final Integer domainId        = value(DOMAIN_ID, inputParameters);
 
-            final DataProvider outProvider = DataProviders.getInstance().createProvider(providerID, factory, pparams);
-            getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(outProvider.getSource());
-        } catch (MalformedURLException ex) {
-            throw new ProcessException("the pyramid folder path is malformed", this, ex);
-        } catch (ConfigurationException ex) {
-            throw new ProcessException("Can't create provider", this, ex);
+        DataProvider provider = DataProviders.getInstance().getProvider(providerID);
+        CoverageStore outputCoverageStore = null;
+        Name referenceName = null;
+        if (provider != null) {
+            final DataStore mainStore = provider.getMainStore();
+            if (!(mainStore instanceof CoverageStore)) {
+                throw new ProcessException("Provider "+providerID+" reference a non coverage type store", this, null);
+            }
+
+            outputCoverageStore = (CoverageStore) mainStore;
+            final ParameterValueGroup configuration = outputCoverageStore.getConfiguration();
+            final String namespace = value(AbstractCoverageStoreFactory.NAMESPACE, configuration);
+
+            try {
+                final Set<Name> names = outputCoverageStore.getNames();
+                referenceName = new DefaultName(namespace, coverageBaseName);
+
+                final CoverageReference coverageReference;
+                if (names.contains(referenceName)) {
+                    coverageReference = outputCoverageStore.getCoverageReference(referenceName);
+                } else {
+                    coverageReference = outputCoverageStore.create(referenceName);
+                }
+
+                if (!(coverageReference instanceof PyramidalCoverageReference)) {
+                    throw new ProcessException("Provider "+providerID+" don't store pyramidal coverages.", this, null);
+                }
+            } catch (DataStoreException e) {
+                throw new ProcessException(e.getMessage(), this, e);
+            }
         }
+
+        if (outputCoverageStore == null) {
+            //create XMLCoverageStore
+            try {
+                final File finalPyramidFolder = new File(pyramidFolder, coverageBaseName);
+                referenceName = new DefaultName(coverageBaseName);
+                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName);
+            } catch (DataStoreException | MalformedURLException e) {
+                throw new ProcessException(e.getMessage(), this, e);
+            }
+        }
+
+        // get input CoverageStore
+        final CoverageStore inputCoverageStore;
+        try {
+            inputCoverageStore = getCoverageStoreFromInput(imageFilePath, imageFileFormat);
+        } catch (MalformedURLException e) {
+            throw new ProcessException(e.getMessage(), this, e);
+        }
+
+        //build pyramid
+        final PyramidCoverageBuilder builder = new PyramidCoverageBuilder(new Dimension(TILE_SIZE, TILE_SIZE), InterpolationCase.BILINEAR, 1);
+        final Envelope pyramidEnv = getPyramidWorldEnvelope();
+        try {
+            final PyramidalCoverageReference outCovRef = (PyramidalCoverageReference) getOrCreateCRef(outputCoverageStore, referenceName);
+            final Set<Name> inputNames = inputCoverageStore.getNames();
+            for (Name name : inputNames) {
+                final CoverageReference ref = inputCoverageStore.getCoverageReference(name);
+                final GridCoverageReader reader = ref.acquireReader();
+                final GridCoverageReadParam readParam = new GridCoverageReadParam();
+                readParam.setDeferred(true);
+                final GridCoverage coverage = reader.read(ref.getImageIndex(), readParam);
+                ref.recycle(reader);
+
+                if (coverage instanceof GridCoverageStack) {
+                    throw new ProcessException("CoverageStack implementation not supported.", this, null);
+                }
+
+                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef);
+                final Map<Envelope, double[]> map = new HashMap<>();
+                map.put(pyramidEnv, scales);
+                builder.create(ref, outputCoverageStore, referenceName, map, null, null, null);
+            }
+        } catch (DataStoreException | FactoryException | TransformException e) {
+            throw new ProcessException(e.getMessage(), this, e);
+        }
+
+        //finally create provider from store configuration
+        if (provider == null) {
+            provider = createProvider(providerID, outputCoverageStore, domainId);
+        }
+
+        getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(provider.getSource());
     } 
  
-    private static class SimpleCoverageNamer implements PyramidCoverageHelper.CoverageNamer {
-
-        @Override
-        public DefaultName getName(String baseName, int n) {
-            return new DefaultName(baseName);
-        }
-    
-    }
 }

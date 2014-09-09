@@ -20,13 +20,11 @@ package org.constellation.coverage;
 
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.ArraysExt;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.coverage.PyramidCoverageBuilder;
+import org.geotoolkit.coverage.*;
 import org.geotoolkit.coverage.filestore.FileCoverageStoreFactory;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.GridGeometry2D;
+import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.memory.MPCoverageStore;
 import org.geotoolkit.coverage.postgresql.PGCoverageStoreFactory;
@@ -75,6 +73,8 @@ public class PyramidCoverageHelper {
 
         IBuilder withDeeps(double[] deeps);
 
+        IBuilder withEnvelope(Envelope deeps);
+
         IBuilder withTile(int width, int height);
 
         IBuilder withBaseCoverageNamer(CoverageNamer coverageNamer);
@@ -88,6 +88,7 @@ public class PyramidCoverageHelper {
     private CoverageNamer coverageNamer;
     private List<GridCoverage2D> coveragesPyramid;
     private double[] depth;
+    private Envelope envelope;
     
     @Inject
     private PropertyRepository propertyRepository;
@@ -109,6 +110,7 @@ public class PyramidCoverageHelper {
             this.baseCoverageName = builder.baseCoverageName;
 
             this.depth = builder.depth;
+            this.envelope = builder.envelope;
         }
     }
 
@@ -144,43 +146,34 @@ public class PyramidCoverageHelper {
             final CoverageReference ref = store.getCoverageReference(name);
             final GridCoverageReader reader = ref.acquireReader();
 
-            final GridCoverage2D coverage = (GridCoverage2D) reader.read(0,
-                    null);
-            final GridGeometry2D gridGeometry = (GridGeometry2D) reader
-                    .getGridGeometry(ref.getImageIndex());
+            final GridCoverageReadParam param = new GridCoverageReadParam();
+            param.setDeferred(true);
+            final GridCoverage coverage = reader.read(ref.getImageIndex(), param);
+            ref.recycle(reader);
 
-            if ((gridGeometry.getCoordinateReferenceSystem() instanceof NetcdfCRS)) {
-                break;
-            }
-
-            final double widthGeometry = gridGeometry.getExtent2D().getWidth();
-            final double heightGeometry = gridGeometry.getExtent2D().getHeight();
-
-            final String pictureWidth;
-            final String pictureHeight;
-            if (propertyRepository != null) {
-                pictureHeight = propertyRepository.getValue("picture_max_height", "500");
-                pictureWidth  = propertyRepository.getValue("picture_max_width", "500");
+            if (coverage instanceof GridCoverageStack) {
+                // TODO handle stack
             } else {
-                pictureHeight = "500";
-                pictureWidth  = "500";
-            }
-            final double userWidth     = Double.parseDouble(pictureWidth);
-            final double userHeight    = Double.parseDouble(pictureHeight);
+                final GridCoverage2D coverage2D = (GridCoverage2D) coverage;
+                final GridGeometry2D gridGeometry = coverage2D.getGridGeometry();
 
-            // If coverage size higher than user selected size else add on an
-            // other list to create separate file
-            if (widthGeometry > userWidth || heightGeometry > userHeight) {
-                coverages.add(coverage);
+                if ((gridGeometry.getCoordinateReferenceSystem() instanceof NetcdfCRS)) {
+                    //FIXME normalize CRS ?
+                    break;
+                }
+
+                // Always pyramid coverage for WMTS
+                coverages.add(coverage2D);
             }
         }
         return coverages;
     }
 
-    public Map<Envelope, double[]> getResolutionPerEnvelope(
-            GridCoverage coverage) {
+    public Map<Envelope, double[]> getResolutionPerEnvelope() {
         Map<Envelope, double[]> map = new HashMap<>();
-        map.put(coverage.getEnvelope(), depth);
+        if (envelope != null) {
+            map.put(envelope, depth);
+        }
         return map;
     }
 
@@ -207,32 +200,34 @@ public class PyramidCoverageHelper {
         List<GridCoverage2D> coverages = getCoveragesPyramid();
         int coverageCount = 1;
         for (GridCoverage2D coverage : coverages) {
-            final Envelope env = coverage.getEnvelope();
-            final GridGeometry2D gg = coverage.getGridGeometry();
-            int gridspan = gg.getExtent2D().getSpan(0);
 
-            //calculate scales
-            final double spanX = env.getSpan(0);
-            final double baseScale = spanX / gridspan;
-            double scale = spanX / 256;
-            double[] scales = new double[0];
-            while (true) {
-                if (scale <= baseScale) {
-                    //fit to exact match to preserve base quality.
-                    scale = baseScale;
-                }
-                scales = ArraysExt.insert(scales, scales.length, 1);
-                scales[scales.length - 1] = scale;
+            final Map<Envelope, double[]> resolution_Per_Envelope = getResolutionPerEnvelope();
+            if (resolution_Per_Envelope.isEmpty()) {
+                final Envelope coverageEnv = coverage.getEnvelope();
+                final GridGeometry2D gg = coverage.getGridGeometry();
+                int gridspan = gg.getExtent2D().getSpan(0);
 
-                if (scale <= baseScale) {
-                    break;
+                //calculate scales
+                final double spanX = coverageEnv.getSpan(0);
+                final double baseScale = spanX / gridspan;
+                double scale = spanX / 256;
+                double[] scales = new double[0];
+                while (true) {
+                    if (scale <= baseScale) {
+                        //fit to exact match to preserve base quality.
+                        scale = baseScale;
+                    }
+                    scales = ArraysExt.insert(scales, scales.length, 1);
+                    scales[scales.length - 1] = scale;
+
+                    if (scale <= baseScale) {
+                        break;
+                    }
+                    scale = scale / 2;
                 }
-                scale = scale / 2;
+                resolution_Per_Envelope.put(coverageEnv, scales);
             }
 
-
-            Map<Envelope, double[]> resolution_Per_Envelope = new HashMap<>();
-            resolution_Per_Envelope.put(env,scales);
             pyramidCoverageBuilder.create(coverage, getCoverageStore(),
                     coverageNamer.getName(baseCoverageName, coverageCount),
                     resolution_Per_Envelope, null, listener, null);
@@ -506,6 +501,7 @@ public class PyramidCoverageHelper {
         private String outputFormat = "PNG";
         private String inputFormat = "geotiff";
         private double[] depth = new double[] { 1, 0.5, 0.25, 0.125 };
+        private Envelope envelope = null;
         private InterpolationCase interpolation = InterpolationCase.BILINEAR;
         private CoverageNamer coverageNamer = new CoverageNamer() {
 
@@ -530,6 +526,12 @@ public class PyramidCoverageHelper {
         @Override
         public IBuilder withDeeps(double[] deeps) {
             this.depth = deeps;
+            return this;
+        }
+
+        @Override
+        public IBuilder withEnvelope(Envelope envelope) {
+            this.envelope = envelope;
             return this;
         }
 
