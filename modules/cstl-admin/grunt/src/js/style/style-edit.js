@@ -1231,8 +1231,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         $scope.loadDataProperties = function() {
             if($scope.providerId && $scope.layerName) {
-                provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
-                    function(response) {
+                provider.dataDesc({},{values: {'providerId':$scope.providerId, 'dataId':$scope.layerName}},
+                    function(response) {//success
                         $scope.dataProperties = response;
                         $scope.attributesTypeNumber = getOnlyNumbersFields(response.properties);
                         $scope.attributesExcludeGeometry = getFieldsExcludeGeometry(response.properties);
@@ -1252,7 +1252,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             }
                         }
                     },
-                    function() {
+                    function() {//error
                         Growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
                     }
                 );
@@ -1313,13 +1313,13 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         $scope.initDataLayerProperties = function(callback) {
             if($scope.providerId && $scope.layerName) {
-                provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
-                    function(response) {
+                provider.dataDesc({},{values: {'providerId':$scope.providerId, 'dataId':$scope.layerName}},
+                    function(response) {//success
                         $scope.dataBbox = response.boundingBox;
                         if(typeof callback ==='function'){
                             callback();
                         }
-                    }, function() {
+                    }, function() {//error
                         Growl('error', 'Error', 'Unable to get data description');
                     }
                 );
