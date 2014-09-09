@@ -394,18 +394,63 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         /**
          * Open metadata viewer popup and display metadata
          * in appropriate template depending on data type property.
+         * this function is called from data dashboard.
          */
-        $scope.displayMetadata = function() {
+        $scope.displayMetadataFromDD = function() {
             $modal.open({
                 templateUrl: 'views/data/modalViewMetadata.html',
                 controller: 'ViewMetadataModalController',
+                resolve: {
+                    'selected':function(){return $scope.selected;},
+                    'isMDdashboard':function(){return false;},
+                    'metadataValues':function(textService){
+                        return textService.metadataJson($scope.selected.Provider,
+                            $scope.selected.Name, $scope.selected.Type.toLowerCase(), true);
+                    }
+                }
+            });
+        };
+
+        /**
+         * Open metadata viewer popup and display metadata
+         * in appropriate template depending on data type property.
+         * this function is called from metadata dashboard.
+         */
+        $scope.displayMetadataFromMD = function() {
+            var type = 'import';
+            if($scope.selected.Children && $scope.selected.Children.length >0){
+                type = $scope.selected.Children[0].Type.toLowerCase();
+            }
+            $modal.open({
+                templateUrl: 'views/data/modalViewMetadata.html',
+                controller: 'ViewMetadataModalController',
+                resolve: {
+                    'selected':function(){return $scope.selected;},
+                    'isMDdashboard':function(){return true;},
+                    'metadataValues':function(textService){
+                        return textService.metadataJson($scope.selected.Name,
+                            $scope.selected.Name, type, true);
+                    }
+                }
+            });
+        };
+
+        /**
+         * Open metadata editor in modal popup.
+         * //@TODO implements the opening of metadata in editor.
+         * //this function is never called yet.
+         */
+        $scope.displayMetadataEditor = function() {
+            $modal.open({
+                templateUrl: 'views/data/modalEditMetadata.html',
+                controller: 'EditMetadataModalController'/*,
                 resolve: {
                     'selected':function(){return $scope.selected;},
                     'metadataValues':function(textService){
                         return textService.metadataJson($scope.selected.Provider,
                             $scope.selected.Name, $scope.selected.Type.toLowerCase(), true);
                     }
-                }
+                }*/
             });
         };
 

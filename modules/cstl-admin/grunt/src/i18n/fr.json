@@ -152,6 +152,8 @@
     "dataset.information.title":"Liste des métadonnées",
     "dataset.metadata.listing.selected.edit.button":"Éditer la métadonnée",
     "dataset.child.metadata.listing.selected.edit.button":"Éditer la métadonnée de la donnée",
+    "dataset.metadata.listing.selected.export.button":"Exporter la métadonnée",
+    "dataset.metadata.listing.selected.view.button":"Afficher la métadonnée",
 
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",

@@ -152,6 +152,8 @@
     "dataset.information.title":"Metadata list",
     "dataset.metadata.listing.selected.edit.button":"Edit dataset metadata",
     "dataset.child.metadata.listing.selected.edit.button":"Edit metadata",
+    "dataset.metadata.listing.selected.export.button":"Export metadata",
+    "dataset.metadata.listing.selected.view.button":"Show metadata",
 
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",

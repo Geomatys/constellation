@@ -334,7 +334,19 @@
                                 <div class="col-sm-2">
                                     <span class="tooltipicon">
                                         <button type="button"
-                                                class="btn btn-danger btn-csw"
+                                                id="seeMetadata"
+                                                class="btn btn-csw"
+                                                ng-click="displayMetadataFromMD()"
+                                                data-placement="bottom"
+                                                title="{{'dataset.metadata.listing.selected.view.button' | translate }}" tooltip>
+                                            <i class="glyphicon glyphicon-file"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div class="col-sm-2">
+                                    <span class="tooltipicon">
+                                        <button type="button"
+                                                class="btn btn-csw"
                                                 ng-click="editMetadata();"
                                                 data-placement="bottom"
                                                 title="{{'dataset.metadata.listing.selected.edit.button' | translate }}" tooltip>
@@ -345,10 +357,10 @@
                                 <div class="col-sm-2">
                                     <span class="tooltipicon">
                                         <a id="exportMD"
-                                           class="btn btn-info btn-csw"
+                                           class="btn btn-csw"
                                            ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selected.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
                                            data-placement="bottom"
-                                           title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
+                                           title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
                                             <i class="fa fa-download"></i>
                                         </a>
                                     </span>

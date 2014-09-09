@@ -478,9 +478,18 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
 
     })
 
-    .controller('ViewMetadataModalController', function($scope, $modalInstance, $http, selected, metadataValues) {
+    /*.controller('EditMetadataModalController', function($scope, $controller) {
+        $controller('EditMetadataController', {$scope: $scope});
+
+        console.debug($scope.codeLists);
+    })*/
+
+    .controller('ViewMetadataModalController', function($scope, $modalInstance, $http, selected, metadataValues, isMDdashboard) {
         $scope.metadataValues = [];
         $scope.metadataValues.push(metadataValues.data);
+        $scope.theme = {
+            "mdDashboard": isMDdashboard || false
+        };
 
         $scope.selectedData = selected;
 
