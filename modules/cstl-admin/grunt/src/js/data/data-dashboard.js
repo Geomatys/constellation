@@ -701,8 +701,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             );
         }
 
-        function pyramidGenerationError(i) {
-            Growl('error', 'Error', 'Failed to generate conform pyramid for ' + $scope.selected[i].Name);
+        function pyramidGenerationError() {
+            Growl('error', 'Error', 'Failed to generate pyramid');
             $modalInstance.dismiss('close');
         }
 
@@ -726,8 +726,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             $scope.scales = response.Entry[0].split(',');
         }
 
-        function errorOnPyramid(j) {
-            Growl('error', 'Error', 'Unable to pyramid data ' + $scope.selected[j].Name);
+        function errorOnPyramid() {
+               Growl('error', 'Error', 'No scale can automatically be set');
         }
 
         $scope.choose = function() {
@@ -758,7 +758,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                         for(var i=0; i<$scope.selected.length; i++) {
                             if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
                                 // In the case of a wms service and user asked to pyramid the data
-                                dataListing.pyramidConform({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, {}, addLayer, pyramidGenerationError(i));
+                                dataListing.pyramidConform({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, {}, addLayer, pyramidGenerationError);
                             } else {
                                 webService.addLayer({type: service.type, id: service.identifier},
                                     {layerAlias: $scope.selected[i].Name, layerId: $scope.selected[i].Name, serviceType: service.type, serviceId: service.identifier, providerId: $scope.selected[i].Provider, layerNamespace: $scope.selected[i].Namespace},
@@ -767,9 +767,10 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                         }
                         return;
                     }
+
                     for(var j=0; j<$scope.selected.length; j++) {
                         // WMTS here, prepare form
-                        dataListing.pyramidScales({providerId: $scope.selected[j].Provider, dataId: $scope.selected[j].Name}, setScale, errorOnPyramid(j));
+                        dataListing.pyramidScales({providerId: $scope.selected[j].Provider, dataId: $scope.selected[j].Name}, setScale, errorOnPyramid);
                         $scope.wmtsParams = true;
                     }
                 } else {
@@ -777,7 +778,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     // Pyramid the data to get the new provider to add
                     for(var k=0; k<$scope.selected.length; k++) {
                         dataListing.pyramidData({providerId: $scope.selected[k].Provider, dataId: $scope.selected[k].Name},
-                            {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY}, addLayer, pyramidGenerationError(k));
+                            {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY}, addLayer, pyramidGenerationError);
                     }
                 }
             }
