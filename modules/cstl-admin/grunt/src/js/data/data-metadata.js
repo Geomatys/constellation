@@ -34,6 +34,9 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             $scope.codeLists = response;
         });
 
+        /**
+         * This is the predefined values for some fields.
+         */
         $scope.predefinedValues = {};
         $scope.predefinedValues.inspireThemes = [
             "Addresses","Hydrography","Administrative units","Land cover",
@@ -389,6 +392,9 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             }
         };
 
+        /**
+         * Init editor events
+         */
         $scope.initMetadataEditorEvents = function() {
             initCollapseEvents();
         };
@@ -398,11 +404,13 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          */
         $scope.save = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
+                //console.debug($scope.metadataValues[0]);
                 //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
                 dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.template},
                     $scope.metadataValues[0],
                     function(response) {
                         $location.path('/data'); //redirect to data dashboard page
+                        Growl('success','Success','Metadata saved with success!');
                     },
                     function(response) {
                         Growl('error','Error','Failed to save metadata because the server returned an error!');
