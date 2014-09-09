@@ -89,7 +89,7 @@ public class GenericNodeindexTest {
 
     private static NodeIndexer indexer;
 
-    private static final File configDirectory  = new File("GenericIndexTest");
+    private static final File configDirectory  = new File("GenericNodeIndexTest");
 
     @BeforeClass
     public static void setUpClass() throws Exception {
