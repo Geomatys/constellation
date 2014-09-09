@@ -52,6 +52,7 @@ import org.constellation.admin.ProviderBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProviderConfiguration;
+import org.constellation.dto.ParameterValues;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.Dataset;
@@ -479,10 +480,11 @@ public final class ProviderRest {
     /**
      * @see LayerProviders#getDataDescription(String, String)
      */
-    @GET
-    @Path("{id}/{layerName}/dataDescription")
-    public Response dataDescription(final @PathParam("domainId") int domainId, final @PathParam("id") String id,
-                                    final @PathParam("layerName") String layerName) {
+    @POST
+    @Path("dataDescription")
+    public Response dataDescription(final ParameterValues values) {
+        final String id = values.getValues().get("providerId");
+        final String layerName = values.getValues().get("dataId");
         try {
             return Response.ok(LayerProviders.getDataDescription(id, layerName)).build();
         } catch (CstlServiceException ex) {

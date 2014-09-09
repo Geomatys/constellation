@@ -31,6 +31,7 @@ import org.constellation.json.binding.Style;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.rest.dto.*;
+import org.constellation.util.Util;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
@@ -195,7 +196,8 @@ public final class StyleRest {
          */
         final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
         final DataStore dataStore = dataprovider.getMainStore();
-        final Name typeName = new DefaultName(layerName);
+        final QName qName = Util.parseQName(layerName);
+        final Name typeName = new DefaultName(qName);
         final QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.setTypeName(typeName);
         queryBuilder.setProperties(new String[]{attribute});
@@ -419,7 +421,8 @@ public final class StyleRest {
          */
         final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
         final DataStore dataStore = dataprovider.getMainStore();
-        final Name typeName = new DefaultName(layerName);
+        final QName qName = Util.parseQName(layerName);
+        final Name typeName = new DefaultName(qName);
         final QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.setTypeName(typeName);
         queryBuilder.setProperties(new String[]{attribute});
@@ -616,7 +619,8 @@ public final class StyleRest {
 
         final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
         final DataStore dataStore = dataprovider.getMainStore();
-        final Name typeName = new DefaultName(layerName);
+        final QName qName =  Util.parseQName(layerName);
+        final Name typeName = new DefaultName(qName);
         final QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.setTypeName(typeName);
         queryBuilder.setProperties(new String[]{attribute});
@@ -682,7 +686,10 @@ public final class StyleRest {
                 final FeatureIterator it = featureCollection.iterator();
                 while(it.hasNext()){
                     final Feature feature = it.next();
-                    final Object value = property.evaluate(feature);
+                    Object value = property.evaluate(feature);
+                    if(value == null){
+                        value = "null";
+                    }
                     Long count = mapping.get(value);
                     if(mapping.get(value)!=null){
                         count++;
@@ -724,7 +731,8 @@ public final class StyleRest {
        final DataStore store = provider.getMainStore();
        if(store instanceof CoverageStore){
            final CoverageStore coverageStore = (CoverageStore) store;
-           final CoverageReference coverageReference = coverageStore.getCoverageReference(new DefaultName(values.get("dataId")));
+           final QName qName = Util.parseQName(values.get("dataId"));
+           final CoverageReference coverageReference = coverageStore.getCoverageReference(new DefaultName(qName));
            GridCoverageReadParam params = new GridCoverageReadParam();
            params.setDeferred(true);
            final GridCoverage coverage = coverageReference.acquireReader().read(coverageReference.getImageIndex(), params);
