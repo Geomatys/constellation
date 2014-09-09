@@ -3,6 +3,7 @@ package org.constellation.coverage.process;
 import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.ArraysExt;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
@@ -25,6 +26,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -38,6 +40,8 @@ import static org.geotoolkit.parameter.Parameters.value;
  * @author Quentin Boileau (Geomatys)
  */
 public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess {
+    @Autowired
+    private DomainRepository domainRepository;
 
     private static final String TILE_FORMAT = "PNG";
     protected static final int TILE_SIZE = 256;
