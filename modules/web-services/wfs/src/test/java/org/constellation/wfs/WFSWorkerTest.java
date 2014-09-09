@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
@@ -464,8 +466,13 @@ public class WFSWorkerTest implements ApplicationContextAware {
                     FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl-mdw.xml"),
                     sw.toString());
         } else {
+            // try to fix an issue with variant generated prefix
+            final String resultCapa   = sw.toString();
+            final String gmlPrefix    = getGmlPrefix(resultCapa);
+            final File expectedFile   = FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml");
+            final String expectedCapa = FileUtilities.getStringFromFile(expectedFile).replace("{gmlPrefix}", gmlPrefix);
             domCompare(
-                    FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
+                    expectedCapa,
                     sw.toString());
         }
 
@@ -1608,5 +1615,15 @@ public class WFSWorkerTest implements ApplicationContextAware {
         final CstlDOMComparator comparator = new CstlDOMComparator(expected, actual);
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
+    }
+    
+    private static String getGmlPrefix(final String xml) {
+        Pattern p = Pattern.compile("xmlns:([^=]+)=\"http://www.opengis.net/gml\"");
+        Matcher matcher = p.matcher(xml);
+        if (matcher.find())
+        {
+            return matcher.group(1);
+        }
+        return null;
     }
 }
