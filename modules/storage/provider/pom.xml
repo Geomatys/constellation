@@ -49,6 +49,10 @@
   -->
     <dependencies>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.constellation.library</groupId>
             <artifactId>cstl-lib-api</artifactId>
             <version>${project.version}</version>
@@ -58,16 +62,16 @@
             <artifactId>cstl-lib-base</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>cstl-engine-process-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>cstl-engine-admin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.constellation.engine</groupId>-->
+            <!--<artifactId>cstl-engine-process-core</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.constellation.engine</groupId>-->
+            <!--<artifactId>cstl-engine-admin</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-jaxp-core</artifactId>
@@ -76,15 +80,32 @@
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-feature</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-style</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-render</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-render2d</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine.register</groupId>
+            <artifactId>cstl-register-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>cstl-engine-process-core</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.constellation.engine</groupId>-->
+            <!--<artifactId>cstl-engine-process-core</artifactId>-->
+            <!--<version>${project.version}</version>-->
+            <!--<type>test-jar</type>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
          <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
@@ -103,13 +124,13 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.constellation.web-services</groupId>
-            <artifactId>cstl-web-ogc</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.constellation.web-services</groupId>-->
+            <!--<artifactId>cstl-web-ogc</artifactId>-->
+            <!--<version>${project.version}</version>-->
+            <!--<type>test-jar</type>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
   </dependencies>
 
 </project>

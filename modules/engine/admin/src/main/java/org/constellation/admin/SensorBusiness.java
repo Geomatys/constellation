@@ -19,6 +19,7 @@
 
 package org.constellation.admin;
 
+import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Sensor;
@@ -36,7 +37,7 @@ import javax.xml.namespace.QName;
 import java.util.List;
 
 @Component
-public class SensorBusiness {
+public class SensorBusiness implements ISensorBusiness {
 
     @Inject
     private UserRepository userRepository;

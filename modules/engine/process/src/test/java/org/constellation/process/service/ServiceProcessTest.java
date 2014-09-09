@@ -18,8 +18,8 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.util.ReflectionUtilities;
@@ -39,7 +39,7 @@ import java.util.logging.Level;
 public abstract class ServiceProcessTest extends AbstractProcessTest {
 
     @Inject
-    protected ServiceBusiness serviceBusiness;
+    protected IServiceBusiness serviceBusiness;
     
     private static String configName;
     protected static String serviceName;
@@ -77,7 +77,7 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
      */
     protected abstract boolean checkInstanceExist(final String identifier);
 
-    protected static void deleteInstance(final ServiceBusiness serviceBusiness, String identifier) {
+    protected static void deleteInstance(final IServiceBusiness serviceBusiness, String identifier) {
         try {
             serviceBusiness.delete(serviceName.toLowerCase(), identifier);
             if (WSEngine.getWorkersMap(serviceName) != null) {

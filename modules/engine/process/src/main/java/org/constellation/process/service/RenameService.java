@@ -19,11 +19,13 @@
 
 package org.constellation.process.service;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.constellation.process.service.RenameServiceDescriptor.IDENTIFIER;
 import static org.constellation.process.service.RenameServiceDescriptor.NEW_NAME;
@@ -35,6 +37,8 @@ import static org.geotoolkit.parameter.Parameters.value;
  * @author Guilhem Legal (Geomatys)
  */
 public class RenameService extends AbstractCstlProcess {
+    @Autowired
+    public IServiceBusiness serviceBusiness;
 
     public RenameService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);

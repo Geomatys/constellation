@@ -22,14 +22,14 @@ package org.constellation.ws.embedded;
 
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
 import org.constellation.configuration.LayerContext;
-import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
@@ -97,16 +97,16 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
     }
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     @Inject
-    protected LayerBusiness layerBusiness;
+    protected ILayerBusiness layerBusiness;
     
     @Inject
-    protected ProviderBusiness providerBusiness;
+    protected IProviderBusiness providerBusiness;
     
     @Inject
-    protected DataBusiness dataBusiness;
+    protected IDataBusiness dataBusiness;
     
      private static final String WFS_DESCRIBE_FEATURE_TYPE_URL =
                "request=DescribeFeatureType"

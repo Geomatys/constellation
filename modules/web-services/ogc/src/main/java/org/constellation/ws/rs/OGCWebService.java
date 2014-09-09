@@ -25,8 +25,8 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.IncorrectCredentialsException;
@@ -98,7 +98,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     private final String serviceName;
     
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     /**
      * Initialize the basic attributes of a web serviceType.

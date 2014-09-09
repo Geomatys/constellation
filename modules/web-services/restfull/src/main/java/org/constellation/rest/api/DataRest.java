@@ -67,11 +67,11 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationBusiness;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.DatasetBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.SensorBusiness;
 import org.constellation.admin.exception.ConstellationException;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.*;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
@@ -182,16 +182,16 @@ public class DataRest {
     private DataRepository dataRepository;
 
     @Inject
-    private DataBusiness dataBusiness;
+    private IDataBusiness dataBusiness;
     
     @Inject
-    private DatasetBusiness datasetBusiness;
+    private IDatasetBusiness datasetBusiness;
 
     @Inject
-    private ProviderBusiness providerBusiness;
+    private IProviderBusiness providerBusiness;
 
     @Inject
-    private SensorBusiness sensorBusiness;
+    private ISensorBusiness sensorBusiness;
 
 
     /**
@@ -963,7 +963,7 @@ public class DataRest {
                 briefs.add(db);
             }
             return Response.ok(briefs).build();
-        } catch (ParseException | IOException ex) {
+        } catch (ConstellationException | IOException ex) {
             return Response.ok("Failed to parse query : "+ex.getMessage()).status(500).build();
         }
     }

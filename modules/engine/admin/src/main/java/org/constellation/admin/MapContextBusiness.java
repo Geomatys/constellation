@@ -23,6 +23,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
+import org.constellation.business.IDataBusiness;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.*;
@@ -55,7 +56,7 @@ public class MapContextBusiness {
     private DataRepository dataRepository;
 
     @Inject
-    private DataBusiness dataBusiness;
+    private IDataBusiness dataBusiness;
 
     @Inject
     private ProviderRepository providerRepository;

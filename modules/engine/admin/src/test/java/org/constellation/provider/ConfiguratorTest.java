@@ -24,6 +24,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
 import org.junit.AfterClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
@@ -54,6 +55,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Johann Sorel (Geomatys)
  */
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
 public class ConfiguratorTest implements ApplicationContextAware {

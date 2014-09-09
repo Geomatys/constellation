@@ -19,18 +19,17 @@
 package org.constellation.ws;
 
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.StyleBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
 import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.factory.FactoryNotFoundException;
@@ -61,10 +60,10 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
 public abstract class LayerWorker extends AbstractWorker {
 
     @Inject
-    private LayerBusiness layerBusiness;
+    private ILayerBusiness layerBusiness;
 
     @Inject
-    protected StyleBusiness styleBusiness;
+    protected IStyleBusiness styleBusiness;
 
     private LayerContext layerContext;
 

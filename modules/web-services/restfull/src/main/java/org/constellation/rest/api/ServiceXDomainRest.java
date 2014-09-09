@@ -1,6 +1,6 @@
 package org.constellation.rest.api;
 
-import org.constellation.admin.ServiceBusiness;
+import org.constellation.business.IServiceBusiness;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -15,7 +15,7 @@ public class ServiceXDomainRest {
 
         
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
 
     @POST
     @Path("/{domainId}/service/{serviceId}")

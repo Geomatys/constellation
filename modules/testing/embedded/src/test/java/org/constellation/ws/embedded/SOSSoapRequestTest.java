@@ -18,8 +18,8 @@
  */
 package org.constellation.ws.embedded;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
@@ -76,7 +76,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
     private static final String SOS_DEFAULT = "http://localhost:9191/sos/default";
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static boolean initialized = false;
     

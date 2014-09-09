@@ -20,7 +20,7 @@
 package org.constellation.rest.api;
 
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ServiceBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.BriefNodeList;
@@ -63,7 +63,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 public class CSWServicesRest {
 
     @Autowired
-    protected ServiceBusiness serviceBusiness;
+    protected IServiceBusiness serviceBusiness;
     
     @POST
     @Path("{id}/index/refresh")

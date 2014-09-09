@@ -18,11 +18,13 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.constellation.process.service.StopServiceDescriptor.IDENTIFIER;
 import static org.constellation.process.service.StopServiceDescriptor.SERVICE_TYPE;
@@ -34,6 +36,8 @@ import static org.geotoolkit.parameter.Parameters.value;
  * @author Quentin Boileau (Geomatys).
  */
 public class StopService extends AbstractCstlProcess {
+    @Autowired
+    public IServiceBusiness serviceBusiness;
 
     public StopService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);

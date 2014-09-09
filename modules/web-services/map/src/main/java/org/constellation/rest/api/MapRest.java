@@ -20,8 +20,9 @@
 package org.constellation.rest.api;
 
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.StyleBusiness;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
@@ -32,9 +33,7 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
-import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.security.SecurityManager;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -67,16 +66,16 @@ public class MapRest {
     private static final Logger LOGGER = Logging.getLogger(MapRest.class);
 
     @Inject
-    private StyleBusiness styleBusiness;
+    private IStyleBusiness styleBusiness;
     
     @Inject
-    private LayerBusiness layerBusiness;
+    private ILayerBusiness layerBusiness;
     
     @Inject
     private SecurityManager securityManager;
 
     @Inject
-    private DataBusiness dataBusiness;
+    private IDataBusiness dataBusiness;
 
     /**
      * Extracts and returns the list of {@link Layer}s available on a "map" service.

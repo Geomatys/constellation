@@ -7,6 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.ProviderType;
+import org.constellation.business.IProviderBusiness;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
@@ -19,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProviderBusiness {
+public class ProviderBusiness implements IProviderBusiness {
 
     @Inject
     private UserRepository userRepository;

@@ -26,7 +26,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.internal.jaxb.geometry.ObjectFactory;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.StyleBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.provider.coveragesgroup.xml.DataReference;
 import org.constellation.provider.coveragesgroup.xml.MapLayer;
 import org.constellation.provider.coveragesgroup.xml.StyleReference;
@@ -156,7 +156,7 @@ public final class MapContextIO {
      * @return geotk MapContext or null
      * @throws JAXBException
      */
-    public static MapContext readMapContextFile(final File mapContextFile, final String login, final String password, final StyleBusiness sb) throws JAXBException {
+    public static MapContext readMapContextFile(final File mapContextFile, final String login, final String password, final IStyleBusiness sb) throws JAXBException {
 
         final org.constellation.provider.coveragesgroup.xml.MapContext xmlMapCtx = readRawMapContextFile(mapContextFile);
         if (xmlMapCtx != null) {

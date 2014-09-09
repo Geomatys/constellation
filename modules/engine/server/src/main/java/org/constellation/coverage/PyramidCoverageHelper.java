@@ -52,9 +52,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
-import javax.inject.Inject;
 import org.constellation.admin.SpringHelper;
 import org.constellation.engine.register.repository.PropertyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Helper class to ease the pyramid process.
@@ -90,7 +90,7 @@ public class PyramidCoverageHelper {
     private double[] depth;
     private Envelope envelope;
     
-    @Inject
+    @Autowired
     private PropertyRepository propertyRepository;
 
     public PyramidCoverageHelper(Builder builder) throws DataStoreException {

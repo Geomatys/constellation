@@ -20,8 +20,8 @@
 
 package org.constellation.metadata;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.test.utils.Order;
@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 public class FileSystemCSWworkerTest extends CSWworkerTest {
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static File dataDirectory;
     

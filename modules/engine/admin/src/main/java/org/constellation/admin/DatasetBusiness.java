@@ -31,6 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.business.IDatasetBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.Data;
@@ -56,7 +57,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
  * @since 0.9
  */
 @Component
-public class DatasetBusiness {
+public class DatasetBusiness implements IDatasetBusiness {
 
     /**
      * w3c document builder factory.

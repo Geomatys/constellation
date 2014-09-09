@@ -18,9 +18,10 @@
  */
 package org.constellation.admin;
 
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.springframework.context.ApplicationContext;
+
+import java.util.logging.Logger;
 
 public class SpringHelper {
 

@@ -6,6 +6,7 @@ import org.constellation.ServiceDef;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.DefaultServiceConfiguration;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.CstlConfigurationRuntimeException;
@@ -54,7 +55,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 @Component
-public class ServiceBusiness {
+public class ServiceBusiness implements IServiceBusiness {
 
     @Inject
     private SecurityManager securityManager;

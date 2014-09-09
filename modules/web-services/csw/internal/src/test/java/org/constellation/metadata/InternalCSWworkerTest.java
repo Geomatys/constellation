@@ -37,6 +37,9 @@ import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
+import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.engine.register.Provider;
 import org.constellation.generic.database.Automatic;
@@ -72,13 +75,13 @@ import org.opengis.parameter.ParameterValueGroup;
 public class InternalCSWworkerTest extends CSWworkerTest {
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
 
     @Inject
-    private ProviderBusiness providerBusiness;
+    private IProviderBusiness providerBusiness;
     
     @Inject
-    private DatasetBusiness datasetBusiness;
+    private IDatasetBusiness datasetBusiness;
     
     @PostConstruct
     public void setUpClass() {

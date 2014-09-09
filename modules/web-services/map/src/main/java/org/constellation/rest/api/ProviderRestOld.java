@@ -20,7 +20,7 @@
 package org.constellation.rest.api;
 
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.DataBusiness;
+import org.constellation.business.IDataBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
@@ -85,7 +85,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 public class ProviderRestOld {
 
     @Inject
-    private DataBusiness dataBusiness;
+    private IDataBusiness dataBusiness;
     
     private static final Logger LOGGER = Logging.getLogger(ProviderRestOld.class);
     

@@ -23,8 +23,8 @@ package org.constellation.ws.soap;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.WebServiceUtilities;
@@ -119,7 +119,7 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
     private volatile WebServiceContext context;
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     /**
      * Initialize the basic attributes of a web serviceType.

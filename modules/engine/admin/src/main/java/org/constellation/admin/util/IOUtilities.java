@@ -19,22 +19,16 @@
 
 package org.constellation.admin.util;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.sis.util.Static;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.slf4j.Logger;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
@@ -45,8 +39,6 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @since 0.9
  */
 public final class IOUtilities extends Static {
-
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(IOUtilities.class);
 
     /**
      * Transform a {@link MutableStyle} instance into a {@link String} instance.
@@ -91,90 +83,4 @@ public final class IOUtilities extends Static {
             throw new IOException("An error occurred while writing ParameterDescriptorGroup XML.", ex);
         }
     }
-
-    /**
-     * Reads an {@link InputStream} to build a {@link GeneralParameterValue}
-     * instance according the specified {@link ParameterDescriptorGroup}.
-     *
-     * @param stream
-     *            the stream to read
-     * @param descriptor
-     *            the parameter descriptor
-     * @return a {@link GeneralParameterValue} instance
-     * @throws IOException
-     *             on error while reading {@link GeneralParameterValue} XML
-     */
-    public static GeneralParameterValue readParameter(final InputStream stream,
-            final ParameterDescriptorGroup descriptor) throws IOException {
-        ensureNonNull("stream", stream);
-        ensureNonNull("descriptor", descriptor);
-        try {
-            final ParameterValueReader reader = new ParameterValueReader(descriptor);
-            reader.setInput(stream);
-            return reader.read();
-        } catch (XMLStreamException ex) {
-            throw new IOException("An error occurred while parsing ParameterDescriptorGroup XML.", ex);
-        } finally {
-            try {
-                stream.close();
-            } catch (IOException ex) {
-                LOGGER.warn("Error while closing stream", ex);
-            }
-        }
-    }
-
-    public static GeneralParameterValue readParameter(final InputStream stream,
-            final GeneralParameterDescriptor descriptor) throws IOException {
-        ensureNonNull("stream", stream);
-        ensureNonNull("descriptor", descriptor);
-        try {
-            final ParameterValueReader reader = new ParameterValueReader(descriptor);
-            reader.setInput(stream);
-            return reader.read();
-        } catch (XMLStreamException ex) {
-            throw new IOException("An error occurred while parsing ParameterDescriptorGroup XML.", ex);
-        } finally {
-            try {
-                stream.close();
-            } catch (IOException ex) {
-                LOGGER.warn("Error while closing stream", ex);
-            }
-        }
-    }
-    
-    public static GeneralParameterValue readParameter(final String xml,
-            final GeneralParameterDescriptor descriptor) throws IOException {
-        ensureNonNull("xml", xml);
-        ensureNonNull("descriptor", descriptor);
-        try {
-            final ParameterValueReader reader = new ParameterValueReader(descriptor);
-            reader.setInput(xml);
-            return reader.read();
-        } catch (XMLStreamException ex) {
-            throw new IOException("An error occurred while parsing ParameterDescriptorGroup XML.", ex);
-        } 
-    }
-
-    /**
-     * Reads a {@link String} instance from the specified {@link InputStream}.
-     *
-     * @return a {@link String} instance
-     * @throws IOException
-     *             if an I/O error occurs
-     */
-    public static String readString(final InputStream stream) throws IOException {
-        ensureNonNull("stream", stream);
-        try {
-            final StringWriter writer = new StringWriter();
-            IOUtils.copy(stream, writer);
-            return writer.toString();
-        } finally {
-            try {
-                stream.close();
-            } catch (IOException ex) {
-                LOGGER.warn("Error while closing stream", ex);
-            }
-        }
-    }
-
  }

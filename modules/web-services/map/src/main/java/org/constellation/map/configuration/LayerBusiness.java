@@ -19,6 +19,7 @@
 
 package org.constellation.map.configuration;
 
+import org.constellation.business.ILayerBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.LayerContext;
@@ -69,7 +70,7 @@ import java.util.List;
  * @author Guilhem Legal (Geomatys)
  */
 @Component
-public class LayerBusiness {
+public class LayerBusiness implements ILayerBusiness {
     
     @Inject
     private UserRepository userRepository;

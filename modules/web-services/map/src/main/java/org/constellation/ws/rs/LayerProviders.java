@@ -22,7 +22,7 @@ package org.constellation.ws.rs;
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.StyleBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
@@ -119,7 +119,7 @@ import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 public final class LayerProviders {
     
     @Inject
-    StyleBusiness styleBusiness;
+    IStyleBusiness styleBusiness;
 
     /**
      * Default rendering options.

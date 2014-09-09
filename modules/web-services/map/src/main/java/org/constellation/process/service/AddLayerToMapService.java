@@ -18,6 +18,7 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.business.ILayerBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.GetFeatureInfoCfg;
@@ -55,7 +56,7 @@ import static org.geotoolkit.parameter.Parameters.value;
 public class AddLayerToMapService extends AbstractCstlProcess {
 	
     @Autowired
-    protected LayerBusiness layerBusiness;
+    protected ILayerBusiness layerBusiness;
     
     AddLayerToMapService(final ProcessDescriptor desc, final ParameterValueGroup input) {
         super(desc, input);

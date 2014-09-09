@@ -19,6 +19,10 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
@@ -130,16 +134,16 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     }
     
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     @Inject
-    protected LayerBusiness layerBusiness;
+    protected ILayerBusiness layerBusiness;
     
     @Inject
-    protected ProviderBusiness providerBusiness;
+    protected IProviderBusiness providerBusiness;
     
     @Inject
-    protected DataBusiness dataBusiness;
+    protected IDataBusiness dataBusiness;
     
     /**
      * The layer to test.

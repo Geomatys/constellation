@@ -24,13 +24,10 @@ package org.constellation.sos.ws;
 import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ServiceBusiness;
-import org.constellation.admin.SpringHelper;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
@@ -43,7 +40,6 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,7 +55,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
     private static DefaultDataSource ds = null;
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static String url;
     

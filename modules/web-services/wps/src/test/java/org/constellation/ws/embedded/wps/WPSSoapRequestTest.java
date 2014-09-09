@@ -18,8 +18,8 @@
  */
 package org.constellation.ws.embedded.wps;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
@@ -70,7 +70,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
     }
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static boolean initialized = false;
     

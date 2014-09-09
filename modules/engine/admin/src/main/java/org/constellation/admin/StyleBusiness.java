@@ -39,6 +39,7 @@ import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.StyleType;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleBrief;
@@ -88,7 +89,7 @@ import com.google.common.base.Optional;
  * @since 0.9
  */
 @Component
-public final class StyleBusiness {
+public final class StyleBusiness implements IStyleBusiness {
 
     @Inject
     UserRepository userRepository;

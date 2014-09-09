@@ -19,8 +19,8 @@
 package org.constellation.rest.api;
 
 import org.constellation.ServiceDef;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.SensorBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.NotRunningServiceException;
@@ -73,10 +73,10 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 public class SOSRest {
     
     @Inject
-    private SensorBusiness sensorBusiness;
+    private ISensorBusiness sensorBusiness;
     
     @Inject
-    private ProviderBusiness providerBusiness;
+    private IProviderBusiness providerBusiness;
     
     @GET
     @Path("{id}/build")

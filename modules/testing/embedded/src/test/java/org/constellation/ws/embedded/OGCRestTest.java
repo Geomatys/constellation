@@ -36,12 +36,12 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
-import org.constellation.admin.DatasetBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.api.ProviderType;
+import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -65,10 +65,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,13 +94,13 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
     }
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
 
     @Inject
-    private ProviderBusiness providerBusiness;
+    private IProviderBusiness providerBusiness;
     
     @Inject
-    private DatasetBusiness datasetBusiness;
+    private IDatasetBusiness datasetBusiness;
     
     private static ConstellationClient client;
     

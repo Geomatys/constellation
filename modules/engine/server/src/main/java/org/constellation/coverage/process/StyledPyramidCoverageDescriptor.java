@@ -23,7 +23,7 @@ import java.io.File;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
-import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.provider.ProviderDescriptorConstant;
 import org.constellation.util.StyleReference;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -96,7 +96,7 @@ public class StyledPyramidCoverageDescriptor  extends AbstractCstlProcessDescrip
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public StyledPyramidCoverageDescriptor() {
-        super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
+        super(NAME, ProviderDescriptorConstant.IDENTIFICATION_CSTL, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     public static final StyledPyramidCoverageDescriptor INSTANCE = new StyledPyramidCoverageDescriptor();

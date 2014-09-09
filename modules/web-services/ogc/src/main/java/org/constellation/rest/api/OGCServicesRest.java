@@ -21,6 +21,7 @@ package org.constellation.rest.api;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -85,7 +86,7 @@ public final class OGCServicesRest {
     private ServiceRepository serviceRepository;
     
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     /**
      * Find and returns a i18n service {@link Instance}.

@@ -21,8 +21,8 @@ package org.constellation.ws.embedded;
 
 // JUnit dependencies
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
@@ -93,7 +93,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
     }
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static String getDefaultURL() {
         return "http://localhost:" +  grizzly.getCurrentPort() + "/sos/default?";

@@ -29,8 +29,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
@@ -58,7 +58,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
     private static DefaultDataSource ds = null;
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static String url;
     

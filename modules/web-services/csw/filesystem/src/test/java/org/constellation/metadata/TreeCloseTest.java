@@ -19,8 +19,8 @@
 
 package org.constellation.metadata;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.test.utils.SpringTestRunner;
@@ -77,7 +77,7 @@ public class TreeCloseTest implements ApplicationContextAware {
     }
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static CSWworker worker;
 

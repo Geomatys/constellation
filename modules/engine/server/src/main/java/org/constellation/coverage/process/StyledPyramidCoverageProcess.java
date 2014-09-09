@@ -21,7 +21,9 @@ package org.constellation.coverage.process;
 
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Providers;
@@ -44,6 +46,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.*;
 import java.io.File;
@@ -62,7 +65,11 @@ import static org.geotoolkit.parameter.Parameters.value;
  * @author Quentin Boileau (Geomatys)
  */
 public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess {
+    @Autowired
+    private DomainRepository domainRepository;
 
+    @Autowired
+    private IStyleBusiness styleBusiness;
     
     public StyledPyramidCoverageProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);

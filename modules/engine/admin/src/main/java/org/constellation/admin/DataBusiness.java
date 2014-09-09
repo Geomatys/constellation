@@ -43,6 +43,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
+import org.constellation.business.IDataBusiness;
 import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
@@ -77,7 +78,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Component
-public class DataBusiness {
+public class DataBusiness implements IDataBusiness {
     /**
      * Used for debugging purposes.
      */
@@ -178,12 +179,17 @@ public class DataBusiness {
      * Search and returns result as list of {@link Data} for given query string.
      * @param queryString the lucene query.
      * @return list of {@link Data}
-     * @throws ParseException
+     * @throws ConstellationException
      * @throws IOException
      */
-    public List<Data> searchOnMetadata(final String queryString) throws ParseException, IOException {
+    public List<Data> searchOnMetadata(final String queryString) throws IOException, ConstellationException {
         final List<Data> result = new ArrayList<>();
-        final Set<Integer> ids = indexEngine.searchOnMetadata(queryString);
+        final Set<Integer> ids;
+        try {
+            ids = indexEngine.searchOnMetadata(queryString);;
+        } catch( ParseException ex) {
+            throw new ConstellationException(ex);
+        }
         for (final Integer dataId : ids){
             result.add(dataRepository.findById(dataId));
         }

@@ -19,7 +19,7 @@
 
 package org.constellation.ogc.configuration;
 
-import org.constellation.admin.ServiceBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
@@ -44,7 +44,7 @@ import java.util.Map;
 public abstract class OGCConfigurer extends ServiceConfigurer {
 
     @Autowired
-    protected ServiceBusiness serviceBusiness;
+    protected IServiceBusiness serviceBusiness;
     
     
     /**

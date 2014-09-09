@@ -39,11 +39,9 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef.Query;
-import org.constellation.admin.StyleBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.provider.AbstractData;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.DefaultCoverageReference;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
@@ -75,14 +73,14 @@ public class CoveragesGroupLayerDetails extends AbstractData {
     private MarshallerPool pool;
     private Unmarshaller unmarshaller;
 
-    public CoveragesGroupLayerDetails(final Name name, final File file, final StyleBusiness styleBusiness) {
+    public CoveragesGroupLayerDetails(final Name name, final File file, final IStyleBusiness styleBusiness) {
         this(name, file, null, null, styleBusiness);
     }
 
     /**
      * hacked method to pass the login/pass to WebMapServer
      */
-    public CoveragesGroupLayerDetails(final Name name, final File file, final String login, final String password, final StyleBusiness styleBusiness) {
+    public CoveragesGroupLayerDetails(final Name name, final File file, final String login, final String password, final IStyleBusiness styleBusiness) {
         super(name, Collections.EMPTY_LIST);
 
         // Parsing ctxt : MapBuilder.createContext
@@ -93,7 +91,7 @@ public class CoveragesGroupLayerDetails extends AbstractData {
         }
     }
 
-    private MapContext createMapContextForFile(final File file, final String login, final String password, final StyleBusiness styleBusiness) throws JAXBException {
+    private MapContext createMapContextForFile(final File file, final String login, final String password, final IStyleBusiness styleBusiness) throws JAXBException {
         pool = new MarshallerPool(JAXBContext.newInstance(org.constellation.provider.coveragesgroup.xml.MapContext.class, org.apache.sis.internal.jaxb.geometry.ObjectFactory.class), null);
         unmarshaller = pool.acquireUnmarshaller();
         final Object result = unmarshaller.unmarshal(file);

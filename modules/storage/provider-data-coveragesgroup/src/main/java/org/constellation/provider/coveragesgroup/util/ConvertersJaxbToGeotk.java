@@ -23,6 +23,7 @@ import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
@@ -73,7 +74,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.TargetNotFoundException;
 
 
@@ -89,7 +89,7 @@ public final class ConvertersJaxbToGeotk {
     private static final Logger LOGGER = Logging.getLogger(ConvertersJaxbToGeotk.class);
     public static final String ORIGINAL_CONFIG = "original_config";
 
-    public static MapItem convertsMapLayer(final org.constellation.provider.coveragesgroup.xml.MapLayer mapLayer, final String login, final String password, final StyleBusiness sb) {
+    public static MapItem convertsMapLayer(final org.constellation.provider.coveragesgroup.xml.MapLayer mapLayer, final String login, final String password, final IStyleBusiness sb) {
         ArgumentChecks.ensureNonNull("mapLayer", mapLayer);
         ArgumentChecks.ensureNonNull("dataReference", mapLayer.getDataReference());
 
@@ -137,7 +137,7 @@ public final class ConvertersJaxbToGeotk {
         return emptyLayer;
     }
 
-    public static MapItem convertsMapItem(final org.constellation.provider.coveragesgroup.xml.MapItem mapItem, final String login, final String password, final StyleBusiness sb) {
+    public static MapItem convertsMapItem(final org.constellation.provider.coveragesgroup.xml.MapItem mapItem, final String login, final String password, final IStyleBusiness sb) {
         final MapItem mi = MapBuilder.createItem();
         for (org.constellation.provider.coveragesgroup.xml.MapItem currentMapItem : mapItem.getMapItems()) {
             if (currentMapItem instanceof org.constellation.provider.coveragesgroup.xml.MapLayer) {
@@ -153,7 +153,7 @@ public final class ConvertersJaxbToGeotk {
         return mi;
     }
 
-    public static MapContext convertsMapContext(final org.constellation.provider.coveragesgroup.xml.MapContext mapContext, final String login, final String password, final StyleBusiness sb) {
+    public static MapContext convertsMapContext(final org.constellation.provider.coveragesgroup.xml.MapContext mapContext, final String login, final String password, final IStyleBusiness sb) {
         final MapContext mc = MapBuilder.createContext();
         mc.setName(mapContext.getName());
         mc.items().add(convertsMapItem(mapContext.getMapItem(), login, password, sb));
@@ -165,7 +165,7 @@ public final class ConvertersJaxbToGeotk {
      * @param styleRefStr
      * @return MutableStyle from DataReference if found, or default MutableStyle.
      */
-    private static MutableStyle convertsDataReferenceToMutableStyle(final String styleRefStr, final StyleBusiness sb) {
+    private static MutableStyle convertsDataReferenceToMutableStyle(final String styleRefStr, final IStyleBusiness sb) {
 
         String providerID = null;
         String styleName = null;

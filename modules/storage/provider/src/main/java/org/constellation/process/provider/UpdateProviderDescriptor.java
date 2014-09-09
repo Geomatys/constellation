@@ -19,7 +19,6 @@
 package org.constellation.process.provider;
 
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
@@ -68,7 +67,7 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public UpdateProviderDescriptor() {
-        super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
+        super(NAME, ProviderDescriptorConstant.IDENTIFICATION_CSTL, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override

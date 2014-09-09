@@ -23,10 +23,9 @@ import com.google.common.base.Optional;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.XML;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.DatasetBusiness;
-import org.constellation.admin.MetadataBusiness;
-import org.constellation.admin.ProviderBusiness;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.engine.register.CstlUser;
@@ -62,28 +61,22 @@ public class MetadataRest {
     private static final Logger LOGGER = Logging.getLogger(MetadataRest.class);
 
     /**
-     * Injected metadata business.
-     */
-    @Inject
-    private MetadataBusiness metadataBusiness;
-
-    /**
      * Injected provider business.
      */
     @Inject
-    private ProviderBusiness providerBusiness;
+    private IProviderBusiness providerBusiness;
 
     /**
      * Injected dataset business.
      */
     @Inject
-    private DatasetBusiness datasetBusiness;
+    private IDatasetBusiness datasetBusiness;
 
     /**
      * Injected data business.
      */
     @Inject
-    private DataBusiness dataBusiness;
+    private IDataBusiness dataBusiness;
 
     /**
      * Injected user repository.

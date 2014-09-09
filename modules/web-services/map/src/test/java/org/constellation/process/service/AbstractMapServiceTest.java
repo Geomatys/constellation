@@ -18,14 +18,14 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
-import org.constellation.map.configuration.LayerBusiness;
 
 import javax.inject.Inject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.admin.ServiceBusiness;
 import static org.constellation.process.service.ServiceProcessTest.serviceName;
 import org.constellation.ws.WSEngine;
 
@@ -36,7 +36,7 @@ import org.constellation.ws.WSEngine;
 public abstract class AbstractMapServiceTest extends ServiceProcessTest {
 
     @Inject
-    protected LayerBusiness layerBusiness;
+    protected ILayerBusiness layerBusiness;
 
     public AbstractMapServiceTest (final String str, final String serviceName, final Class workerClass) {
         super(str, serviceName, workerClass);
@@ -97,7 +97,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
         return context;
     }
 
-    protected static void deleteInstance(final ServiceBusiness serviceBusiness, final LayerBusiness layerBusiness, String identifier) {
+    protected static void deleteInstance(final IServiceBusiness serviceBusiness, final ILayerBusiness layerBusiness, String identifier) {
         try {
             layerBusiness.removeForService(serviceName, identifier);
         } catch (ConfigurationException ex) {

@@ -19,8 +19,8 @@
 package org.constellation.ws.embedded;
 
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.ConfigurationException;
@@ -70,7 +70,7 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
     }
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static boolean initialized = false;
     

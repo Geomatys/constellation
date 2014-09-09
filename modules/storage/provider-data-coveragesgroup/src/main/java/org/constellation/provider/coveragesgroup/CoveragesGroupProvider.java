@@ -30,12 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import org.apache.sis.storage.DataStore;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.StyleBusiness;
 import org.constellation.api.DataType;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
 import org.constellation.provider.ProviderFactory;
@@ -48,6 +47,7 @@ import org.geotoolkit.map.MapContext;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -62,8 +62,8 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
     private boolean visited;
     private File path;
 
-    @Inject
-    private StyleBusiness styleBusiness;
+    @Autowired
+    private IStyleBusiness styleBusiness;
     
     public CoveragesGroupProvider(String providerId, final ProviderFactory service, final ParameterValueGroup param) {
         super(providerId, service,param);

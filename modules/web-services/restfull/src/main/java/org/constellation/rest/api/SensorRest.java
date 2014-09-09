@@ -27,6 +27,8 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SensorBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
@@ -96,10 +98,10 @@ public class SensorRest {
     private static final Logger LOGGER = Logging.getLogger(SensorRest.class);
     
     @Inject
-    private SensorBusiness sensorBusiness;
+    private ISensorBusiness sensorBusiness;
     
     @Inject
-    private ProviderBusiness providerBusiness;
+    private IProviderBusiness providerBusiness;
     
     @GET
     @Path("list")

@@ -19,7 +19,7 @@
 package org.constellation.webservice.map.component;
 
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.StyleBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
@@ -80,7 +80,7 @@ public class SetupBusiness  {
     
     
     @Inject
-    private StyleBusiness styleBusiness;
+    private IStyleBusiness styleBusiness;
 
     @PostConstruct
     public void contextInitialized() {

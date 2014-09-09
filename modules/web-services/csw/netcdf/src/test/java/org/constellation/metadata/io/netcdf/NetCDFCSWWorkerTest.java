@@ -21,8 +21,8 @@ package org.constellation.metadata.io.netcdf;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.util.ComparisonMode;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
@@ -69,7 +69,7 @@ import static org.junit.Assert.fail;
 public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static File dataDirectory;
     

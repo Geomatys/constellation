@@ -25,10 +25,9 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.inject.Inject;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.TaskBusiness;
 import org.constellation.api.TaskState;
+import org.constellation.business.ITaskBusiness;
 import org.constellation.engine.register.Task;
 import org.constellation.provider.DataProviders;
 import org.geotoolkit.parameter.ParameterGroup;
@@ -36,6 +35,7 @@ import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Listener for Pyramidal process loaded via {@link PyramidCoverageHelper}
@@ -54,8 +54,8 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     private final String path;
     private final String identifier;
 
-    @Inject
-    private TaskBusiness taskBusiness;
+    @Autowired
+    private ITaskBusiness taskBusiness;
     
     public PyramidCoverageProcessListener(final Integer userId, final String path, final String identifier) {
         SpringHelper.injectDependencies(this);

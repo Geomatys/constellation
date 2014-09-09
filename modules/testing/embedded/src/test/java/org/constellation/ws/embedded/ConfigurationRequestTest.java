@@ -21,8 +21,8 @@ package org.constellation.ws.embedded;
 // JUnit dependencies
 
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -86,7 +86,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
     private static File configDirectory;
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static boolean initialized = false;
     

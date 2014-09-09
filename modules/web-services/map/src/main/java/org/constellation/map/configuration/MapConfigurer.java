@@ -26,6 +26,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.StyleBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -98,10 +100,10 @@ import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 public class MapConfigurer extends OGCConfigurer {
     
     @Inject
-    StyleBusiness styleBusiness;
+    IStyleBusiness styleBusiness;
     
     @Inject
-    LayerBusiness layerBusiness;
+    ILayerBusiness layerBusiness;
 
     /**
      * Returns a Constellation {@link ProcessDescriptor} from its name.

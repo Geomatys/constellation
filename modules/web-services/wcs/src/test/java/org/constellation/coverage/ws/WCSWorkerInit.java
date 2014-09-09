@@ -25,15 +25,15 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.data.CoverageSQLTestCase;
-import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
@@ -82,16 +82,16 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
     protected static WCSWorker WORKER;
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     @Inject
-    protected LayerBusiness layerBusiness;
+    protected ILayerBusiness layerBusiness;
     
     @Inject
-    protected ProviderBusiness providerBusiness;
+    protected IProviderBusiness providerBusiness;
     
     @Inject
-    protected DataBusiness dataBusiness;
+    protected IDataBusiness dataBusiness;
     
     private static boolean initialized = false;
     

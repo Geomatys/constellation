@@ -59,8 +59,12 @@
     <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-epsg</artifactId>
-    </dependency>   
-    <dependency>
+    </dependency>
+      <dependency>
+          <groupId>org.geotoolkit</groupId>
+          <artifactId>geotk-widgets-swing</artifactId>
+      </dependency>
+      <dependency>
       <groupId>org.constellation</groupId>
       <artifactId>cstl-client</artifactId>
       <version>${project.version}</version>

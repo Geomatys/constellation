@@ -49,6 +49,8 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.DatasetBusiness;
 import org.constellation.admin.ProviderBusiness;
+import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProviderConfiguration;
@@ -107,10 +109,10 @@ public final class ProviderRest {
     private DomainRepository domainRepository;
     
     @Inject
-    private ProviderBusiness providerBusiness;
+    private IProviderBusiness providerBusiness;
     
     @Inject
-    private DatasetBusiness datasetBusiness;
+    private IDatasetBusiness datasetBusiness;
     
 
     @POST

@@ -18,12 +18,14 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.Details;
 import org.constellation.process.AbstractCstlProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.constellation.process.service.SetConfigServiceDescriptor.CONFIGURATION;
 import static org.constellation.process.service.SetConfigServiceDescriptor.IDENTIFIER;
@@ -36,6 +38,8 @@ import static org.geotoolkit.parameter.Parameters.value;
  * @author Quentin Boileau (Geomatys).
  */
 public class SetConfigService extends AbstractCstlProcess {
+    @Autowired
+    public IServiceBusiness serviceBusiness;
 
     public SetConfigService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);

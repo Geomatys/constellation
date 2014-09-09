@@ -19,29 +19,34 @@
 package org.constellation.rest.api;
 
 import org.constellation.admin.ConfigurationBusiness;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.dto.ServiceLayersDTO;
 import org.constellation.api.CommonConstants;
-import org.constellation.configuration.*;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IServiceBusiness;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerSummary;
+import org.constellation.configuration.ServiceReport;
+import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.repository.LayerRepository;
-import org.constellation.map.configuration.LayerBusiness;
-import org.constellation.security.*;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -61,15 +66,15 @@ import java.util.List;
 public class AdminRest {
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     @Inject
     private LayerRepository layerRepository;
 
     @Inject
-    private LayerBusiness layerBusiness;
+    private ILayerBusiness layerBusiness;
 
     @Inject
-    private DataBusiness dataBusiness;
+    private IDataBusiness dataBusiness;
 
     @Inject
     private org.constellation.security.SecurityManager securityManager;

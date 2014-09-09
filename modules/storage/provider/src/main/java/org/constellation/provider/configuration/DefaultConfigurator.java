@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
@@ -35,14 +34,13 @@ import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.StyleBusiness;
 import org.constellation.admin.exception.ConstellationException;
-import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.ProviderType;
 import org.constellation.api.StyleType;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.engine.register.Style;
@@ -54,6 +52,7 @@ import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProviders;
 import org.constellation.util.MetadataMapBuilder;
+import org.constellation.util.ParamUtilities;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -70,6 +69,7 @@ import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Symbolizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Node;
 
 /**
@@ -79,14 +79,14 @@ import org.w3c.dom.Node;
  */
 public final class DefaultConfigurator implements Configurator {
 
-    @Inject
-    private ProviderBusiness providerBusiness;
+    @Autowired
+    private IProviderBusiness providerBusiness;
     
-    @Inject
-    private DataBusiness dataBusiness;
+    @Autowired
+    private IDataBusiness dataBusiness;
 
-    @Inject
-    private StyleBusiness styleBusiness;
+    @Autowired
+    private IStyleBusiness styleBusiness;
     
     public DefaultConfigurator() {
         SpringHelper.injectDependencies(this);
@@ -134,7 +134,7 @@ public final class DefaultConfigurator implements Configurator {
         if(factory==null) factory = StyleProviders.getInstance().getFactory(impl);
         if(factory==null) return null;
         try {
-            ParameterValueGroup params = (ParameterValueGroup)IOUtilities.readParameter(record.getConfig(), factory.getProviderDescriptor());
+            ParameterValueGroup params = (ParameterValueGroup) ParamUtilities.readParameter(record.getConfig(), factory.getProviderDescriptor());
             return params;
         } catch (IOException | UnconvertibleObjectException ex) {
             throw new ConfigurationException("Error while reading provider configuration for:" + providerId, ex);
@@ -302,7 +302,7 @@ public final class DefaultConfigurator implements Configurator {
     public void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
         final org.constellation.engine.register.Provider pr = providerBusiness.getProvider(providerId);
         try {
-            final String configString = IOUtilities.writeParameter(config);
+            final String configString = ParamUtilities.writeParameter(config);
             pr.setConfig(configString);
             checkDataUpdate(pr);
         } catch (IOException e) {

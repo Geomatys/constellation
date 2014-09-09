@@ -36,14 +36,14 @@ import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
-import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.map.ws.QueryContext;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
@@ -75,7 +75,6 @@ import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.geotoolkit.wms.xml.GetMap;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -106,16 +105,16 @@ public class WMSServiceTest implements ApplicationContextAware {
     }
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     @Inject
-    protected LayerBusiness layerBusiness;
+    protected ILayerBusiness layerBusiness;
     
     @Inject
-    protected ProviderBusiness providerBusiness;
+    protected IProviderBusiness providerBusiness;
     
     @Inject
-    protected DataBusiness dataBusiness;
+    protected IDataBusiness dataBusiness;
     
     private static final double DELTA = 0.00000001;
     private static WMSService service;

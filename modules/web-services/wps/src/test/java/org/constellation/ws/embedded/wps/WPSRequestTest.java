@@ -20,8 +20,8 @@ package org.constellation.ws.embedded.wps;
 
 // JUnit dependencies
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
@@ -75,7 +75,7 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
     private static final String WPS_GETCAPABILITIES2 ="request=GetCapabilities&service=WpS&version=1.0.0";
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     private static boolean initialized = false;
     

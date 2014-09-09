@@ -23,6 +23,7 @@ import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.DefaultInternationalString;
 import org.constellation.admin.StyleBusiness;
+import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
@@ -102,7 +103,7 @@ import static org.geotoolkit.style.StyleConstants.DEFAULT_UOM;
 public final class StyleRest {
     
     @Inject
-    private StyleBusiness styleBusiness;
+    private IStyleBusiness styleBusiness;
 
     /**
      * @see StyleBusiness#createStyle(String, MutableStyle)

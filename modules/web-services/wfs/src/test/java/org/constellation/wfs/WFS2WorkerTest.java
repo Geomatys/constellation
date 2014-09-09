@@ -40,6 +40,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
@@ -194,16 +198,16 @@ public class WFS2WorkerTest implements ApplicationContextAware {
     private static WFSWorker worker ;
     
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
     
     @Inject
-    protected LayerBusiness layerBusiness;
+    protected ILayerBusiness layerBusiness;
     
     @Inject
-    protected ProviderBusiness providerBusiness;
+    protected IProviderBusiness providerBusiness;
     
     @Inject
-    protected DataBusiness dataBusiness;
+    protected IDataBusiness dataBusiness;
 
     private static final DefaultDataSource ds = null;
 

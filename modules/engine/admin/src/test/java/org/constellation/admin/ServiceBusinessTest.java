@@ -18,6 +18,7 @@
  */
 package org.constellation.admin;
 
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.dto.AccessConstraint;
@@ -37,7 +38,7 @@ import java.util.Arrays;
 public class ServiceBusinessTest {
 
     @Autowired
-    private ServiceBusiness serviceBusiness;
+    private IServiceBusiness serviceBusiness;
 
     @Test
     public void createService() throws ConfigurationException {

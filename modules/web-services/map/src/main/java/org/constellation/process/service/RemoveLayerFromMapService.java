@@ -18,9 +18,9 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.business.ILayerBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
-import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.DataReference;
@@ -42,7 +42,7 @@ import static org.geotoolkit.parameter.Parameters.value;
 public class RemoveLayerFromMapService extends AbstractCstlProcess {
 	
     @Autowired
-    protected LayerBusiness layerBusiness;
+    protected ILayerBusiness layerBusiness;
     
     RemoveLayerFromMapService(final ProcessDescriptor desc, final ParameterValueGroup input) {
         super(desc, input);

@@ -32,18 +32,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.coveragesgroup.util.xml;
+package org.constellation.provider.coveragesgroup.xml;
 
 import org.apache.sis.internal.jaxb.geometry.ObjectFactory;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.GFIParam;
 import org.constellation.configuration.GetFeatureInfoCfg;
-import org.constellation.provider.coveragesgroup.xml.DataReference;
-import org.constellation.provider.coveragesgroup.xml.MapContext;
-import org.constellation.provider.coveragesgroup.xml.MapItem;
-import org.constellation.provider.coveragesgroup.xml.MapLayer;
-import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.geotoolkit.se.xml.v110.DescriptionType;
 import org.geotoolkit.se.xml.v110.FeatureTypeStyleType;
 import org.geotoolkit.sld.xml.v110.StyledLayerDescriptor;
@@ -323,8 +318,8 @@ public class ProvidersXmlTest {
         assertEquals("coverage:my_thirdlayer", ml1.getDataReference().getValue());
         assertEquals("my_newstyle", ml1.getStyleReference().getValue());
 
-        assertEquals("postgis_test:my_layer", ((MapLayer)mapItems.get(2)).getDataReference().getValue());
-        assertEquals("my_style", ((MapLayer)mapItems.get(2)).getStyleReference().getValue());
+        assertEquals("postgis_test:my_layer", ((MapLayer) mapItems.get(2)).getDataReference().getValue());
+        assertEquals("my_style", ((MapLayer) mapItems.get(2)).getStyleReference().getValue());
     }
 
     /**
@@ -346,9 +341,9 @@ public class ProvidersXmlTest {
         assertFalse(mapItems.isEmpty());
         assertEquals(1, mapItems.size());
 
-        assertEquals("postgis_test:my_layer", ((MapLayer)mapItems.get(0)).getDataReference().getValue());
-        assertEquals("my_style", ((MapLayer)mapItems.get(0)).getStyleReference().getValue());
-        assertEquals(1, ((MapLayer)mapItems.get(0)).getGetFeatureInfoCfgs().size());
+        assertEquals("postgis_test:my_layer", ((MapLayer) mapItems.get(0)).getDataReference().getValue());
+        assertEquals("my_style", ((MapLayer) mapItems.get(0)).getStyleReference().getValue());
+        assertEquals(1, ((MapLayer) mapItems.get(0)).getGetFeatureInfoCfgs().size());
         List<GetFeatureInfoCfg> gfiCfg = ((MapLayer)mapItems.get(0)).getGetFeatureInfoCfgs();
         assertEquals("image/png", gfiCfg.get(0).getMimeType());
         assertEquals("org.some.package.ClassImage", gfiCfg.get(0).getBinding());
@@ -388,8 +383,8 @@ public class ProvidersXmlTest {
         assertEquals("coverage:my_thirdlayer", ml1.getDataReference().getValue());
         assertEquals("my_newstyle", ml1.getStyleReference().getValue());
 
-        assertEquals("postgis_test:my_layer", ((MapLayer)mapItems.get(2)).getDataReference().getValue());
-        assertEquals("my_style", ((MapLayer)mapItems.get(2)).getStyleReference().getValue());
+        assertEquals("postgis_test:my_layer", ((MapLayer) mapItems.get(2)).getDataReference().getValue());
+        assertEquals("my_style", ((MapLayer) mapItems.get(2)).getStyleReference().getValue());
     }
 
     @After

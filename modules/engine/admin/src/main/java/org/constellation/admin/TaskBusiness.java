@@ -19,6 +19,7 @@
 
 package org.constellation.admin;
 
+import org.constellation.business.ITaskBusiness;
 import org.constellation.engine.register.Task;
 import org.constellation.engine.register.repository.TaskRepository;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Guilhem Legal (Geomatys)
  */
 @Component
-public class TaskBusiness {
+public class TaskBusiness implements ITaskBusiness{
     
     private TaskRepository taskRepository;
 

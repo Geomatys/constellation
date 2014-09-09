@@ -1,6 +1,6 @@
 package org.constellation.rest.api;
 
-import org.constellation.admin.DataBusiness;
+import org.constellation.business.IDataBusiness;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.PermissionConstants;
 import org.constellation.engine.register.repository.DataRepository;
@@ -23,7 +23,7 @@ import java.util.Set;
 public class DataXDomainRest {
 
     @Inject
-    private DataBusiness business;
+    private IDataBusiness business;
 
     @Inject
     private DomainRepository domainRepository;

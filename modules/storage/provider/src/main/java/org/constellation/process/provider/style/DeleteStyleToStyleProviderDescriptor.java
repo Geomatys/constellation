@@ -19,7 +19,7 @@
 package org.constellation.process.provider.style;
 
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.provider.ProviderDescriptorConstant;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
@@ -69,7 +69,7 @@ public class DeleteStyleToStyleProviderDescriptor extends AbstractProcessDescrip
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public DeleteStyleToStyleProviderDescriptor() {
-        super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
+        super(NAME, ProviderDescriptorConstant.IDENTIFICATION_CSTL, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override

@@ -17,22 +17,22 @@
  * limitations under the License.
  */
 
-package org.constellation.provider.coveragesgroup.util;
+package org.constellation.provider.coveragesgroup;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.StyleBusiness;
+import org.constellation.business.IStyleBusiness;
+import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
 import org.constellation.provider.coveragesgroup.xml.DataReference;
 import org.constellation.provider.coveragesgroup.xml.MapLayer;
 import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.geotoolkit.map.MapItem;
 import static org.junit.Assert.assertNotNull;
 
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
@@ -49,8 +49,8 @@ public class ConvertersJaxbToGeotkTest implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
     
-    @Inject
-    private StyleBusiness styleBusiness;
+    @Autowired
+    private IStyleBusiness styleBusiness;
     
     @PostConstruct
     public void setUpClass() {
