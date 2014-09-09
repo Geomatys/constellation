@@ -79,7 +79,6 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     });
                 }
             };
-
         });
 
         $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id, lang:$scope.getCurrentLang()});
@@ -409,32 +408,6 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             } else {
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
                 var layerData;
-//                if ($scope.service.type === 'WMS') {
-//                    textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
-//                        .success(function (data, status, headers, config) {
-//                            var capabilities = DataViewer.format.read(data);
-//                            var layers = capabilities.capability.layers;
-//                            var capsLayer;
-//                            for(var i=0; i < layers.length; i++) {
-//                                var l = layers[i];
-//                                if (l.name === layerName) {
-//                                    capsLayer = l;
-//                                    break;
-//                                }
-//                            }
-//                            var llbbox = capsLayer.llbbox;
-//                            var extent = new OpenLayers.Bounds(llbbox[0], llbbox[1], llbbox[2], llbbox[3]);
-//                            layerData = DataViewer.createLayerWMS($cookies.cstlUrl, layerName, $scope.service.identifier);
-//
-//                            //to force the browser cache reloading styled layer.
-//                            layerData.mergeNewParams({ts:new Date().getTime()});
-//
-//                            DataViewer.layers = [layerData, layerBackground];
-//                            DataViewer.initMap('dataMap');
-//                            DataViewer.map.zoomToExtent(extent, true);
-//                            modalLoader.close();
-//                        });
-//                } else {
                 var providerId = $scope.selected.Provider;
                 if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
                     layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
@@ -442,30 +415,21 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
                 }
                 DataViewer.layers = [layerData, layerBackground];
-                dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
-                    // Success getting the metadata, try to find the data extent
-                    var md = response['gmd.MD_Metadata'];
-                    if (md) {
-                        var ident = md['gmd.identificationInfo'];
-                        if (ident) {
-                            var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
-                            if (extentMD) {
-                                var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
-                                var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
-                                    bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
-                                DataViewer.initMap('dataMap');
-                                DataViewer.map.zoomToExtent(extent, true);
-                            }
-                        }
-                    } else {
+                provider.dataDesc({},{values: {'providerId':providerId,'dataId':layerName}},
+                    function(response) {//success
                         DataViewer.initMap('dataMap');
+                        var bbox = response.boundingBox;
+                        if (bbox) {
+                            var extent = new OpenLayers.Bounds(bbox[0],bbox[1],bbox[2],bbox[3]);
+                            DataViewer.map.zoomToExtent(extent, true);
+                        }
+                        modalLoader.close();
+                    }, function() {//error
+                        // failed to find a metadata, just load the full map
+                        DataViewer.initMap('dataMap');
+                        modalLoader.close();
                     }
-                    modalLoader.close();
-                }, function() {
-                    DataViewer.initMap('dataMap');
-                    modalLoader.close();
-                });
-//                }
+                );
             }
         };
 

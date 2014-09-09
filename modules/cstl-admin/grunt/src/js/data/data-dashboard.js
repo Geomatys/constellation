@@ -339,29 +339,21 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
 
             var layerBackground = DataViewer.createLayer($scope.dataCtrl.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
-
-            dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
-                // Success getting the metadata, try to find the data extent
-                DataViewer.initMap('dataMap');
-                var md = response['gmd.MD_Metadata'];
-                if (md) {
-                    var ident = md['gmd.identificationInfo'];
-                    if (ident) {
-                        var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
-                        if (extentMD) {
-                            var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
-                            var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
-                                bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
-                            DataViewer.map.zoomToExtent(extent, true);
-                        }
+            provider.dataDesc({},{values: {'providerId':providerId,'dataId':layerName}},
+                function(response) {//success
+                    DataViewer.initMap('dataMap');
+                    var bbox = response.boundingBox;
+                    if (bbox) {
+                        var extent = new OpenLayers.Bounds(bbox[0],bbox[1],bbox[2],bbox[3]);
+                        DataViewer.map.zoomToExtent(extent, true);
                     }
+                    modalLoader.close();
+                }, function() {//error
+                    // failed to find a metadata, just load the full map
+                    DataViewer.initMap('dataMap');
+                    modalLoader.close();
                 }
-                modalLoader.close();
-            }, function() {
-                // failed to find a metadata, just load the full map
-                DataViewer.initMap('dataMap');
-                modalLoader.close();
-            });
+            );
         };
 
         $scope.deleteData = function() {
