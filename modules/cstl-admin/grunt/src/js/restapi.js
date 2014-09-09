@@ -194,7 +194,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'create':           {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
             'delete':           {method: 'DELETE',  url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
             'metadata':         {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/metadata/:providerId;jsessionid='},
-            'dataDesc':         {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/dataDescription;jsessionid='},
+            'dataDesc':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/dataDescription;jsessionid='},
             'isGeophysic':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/isGeophysic;jsessionid='},
             'verifyCRS':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:id/crs'},
             'createPRJ':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/:id/createprj'},
