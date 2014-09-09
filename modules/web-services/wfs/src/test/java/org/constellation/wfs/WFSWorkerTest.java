@@ -487,8 +487,13 @@ public class WFSWorkerTest implements ApplicationContextAware {
                     FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-mdw.xml"),
                     sw.toString());
         } else {
+            // try to fix an issue with variant generated prefix
+            final String resultCapa   = sw.toString();
+            final String gmlPrefix    = getGmlPrefix(resultCapa);
+            final File expectedFile   = FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml");
+            final String expectedCapa = FileUtilities.getStringFromFile(expectedFile).replace("{gmlPrefix}", gmlPrefix);
             domCompare(
-                    FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml"),
+                    expectedCapa,
                     sw.toString());
         }
 
@@ -532,8 +537,12 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
+        String resultCapa   = sw.toString();
+        String gmlPrefix    = getGmlPrefix(resultCapa);
+        File expectedFile   = FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml");
+        String expectedCapa = FileUtilities.getStringFromFile(expectedFile).replace("{gmlPrefix}", gmlPrefix);
         domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml"),
+                expectedCapa,
                 sw.toString());
 
         acceptVersion = new AcceptVersionsType("1.1.0");
@@ -545,8 +554,12 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
+        resultCapa   = sw.toString();
+        gmlPrefix    = getGmlPrefix(resultCapa);
+        expectedFile = FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml");
+        expectedCapa = FileUtilities.getStringFromFile(expectedFile).replace("{gmlPrefix}", gmlPrefix);
         domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml"),
+                expectedCapa,
                 sw.toString());
 
         acceptVersion = new AcceptVersionsType("1.1.0");
@@ -558,8 +571,12 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
+        resultCapa   = sw.toString();
+        gmlPrefix    = getGmlPrefix(resultCapa);
+        expectedFile = FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml");
+        expectedCapa = FileUtilities.getStringFromFile(expectedFile).replace("{gmlPrefix}", gmlPrefix);
         domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml"),
+                expectedCapa,
                 sw.toString());
 
         pool.recycle(marshaller);
