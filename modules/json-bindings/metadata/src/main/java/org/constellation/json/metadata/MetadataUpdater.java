@@ -222,9 +222,7 @@ final class MetadataUpdater {
                 }
             }
         }
-        if (value != null || !TemplateApplicator.isCollection(standard, metadata, identifier)) {
-            values.put(identifier, value);
-        }
+        values.put(identifier, value);
     }
 
     /**

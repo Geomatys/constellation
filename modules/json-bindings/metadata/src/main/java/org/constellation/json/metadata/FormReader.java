@@ -180,9 +180,14 @@ final class FormReader {
     /**
      * Adds the given metadata value to the {@link #values} map.
      */
-    private void addValue(final String[] path, final Object value) throws ParseException {
+    private void addValue(final String[] path, Object value) throws ParseException {
         if (path == null) {
             throw new ParseException("Missing path for value: " + value);
+        }
+        if (value instanceof CharSequence && CharSequences.skipTrailingWhitespaces(
+                (CharSequence) value, 0, ((CharSequence) value).length()) <= 0)
+        {
+            value = null;
         }
         if (value != null || !skipNulls) {
             final NumerotedPath key = new NumerotedPath(path, indices);
