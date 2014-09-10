@@ -42,14 +42,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -180,9 +177,11 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
         if (metadataFile.exists()) {
            boolean suceed = false;
            try{
-            suceed =  Files.deleteIfExists(metadataFile.toPath());
+               // see http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4715154
+                System.gc();
+                suceed =  Files.deleteIfExists(metadataFile.toPath());
            } catch (IOException ex) {
-               LOGGER.warning("IO exception while deleting file: " + ex.getMessage());
+                LOGGER.warning("IO exception while deleting file: " + ex.getMessage());
            }
            if (suceed) {
                if (indexer != null) {
@@ -302,7 +301,7 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
     /**
      * Update an object by calling the setter of the specified property with the specified value.
      * 
-     * @param parent The parent object on witch call the setters.
+     * @param nodes The parent object on witch call the setters.
      * @param propertyName The name of the property to update on the parent (can contain an ordinal).
      * @param value The new value to update.
      * 
