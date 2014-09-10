@@ -215,7 +215,7 @@ public class ProviderBusiness implements IProviderBusiness {
         }
     }
 
-    private ParameterValueGroup fillProviderParameter(String type, String subType, Map<String, String> inParams, ParameterValueGroup sources) {
+    protected ParameterValueGroup fillProviderParameter(String type, String subType, Map<String, String> inParams, ParameterValueGroup sources) {
         switch (type) {
             case "sld":
                 final String sldPath = inParams.get("path");
