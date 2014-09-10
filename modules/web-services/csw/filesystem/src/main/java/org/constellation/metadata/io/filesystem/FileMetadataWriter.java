@@ -48,6 +48,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -176,7 +178,12 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
     public boolean deleteMetadata(final String metadataID) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(metadataID);
         if (metadataFile.exists()) {
-           final boolean suceed =  metadataFile.delete();
+           boolean suceed = false;
+           try{
+            suceed =  Files.deleteIfExists(metadataFile.toPath());
+           } catch (IOException ex) {
+               LOGGER.warning("IO exception while deleting file: " + ex.getMessage());
+           }
            if (suceed) {
                if (indexer != null) {
                    indexer.removeDocument(metadataID);
@@ -193,7 +200,7 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
                     }
                 }
            } else {
-               LOGGER.severe("unable to delete the matadata file");
+               LOGGER.warning("unable to delete the matadata file");
            }
            return suceed;
         } else {
