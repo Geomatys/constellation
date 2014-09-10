@@ -78,6 +78,7 @@ import org.geotoolkit.wmts.xml.v100.TileMatrixSetLink;
 import org.geotoolkit.wmts.xml.v100.URLTemplateType;
 import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -278,7 +279,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 for(Pyramid pr : set.getPyramids()){
                     final TileMatrixSet tms = new TileMatrixSet();
                     tms.setIdentifier(new CodeType(pr.getId()));
-                    tms.setSupportedCRS(IdentifiedObjects.getIdentifierOrName(pr.getCoordinateReferenceSystem()));
+                    tms.setSupportedCRS(getCRSCode(pr.getCoordinateReferenceSystem()));
 
                     final List<TileMatrix> tm = new ArrayList<>();
                     final double[] scales = pr.getScales();
@@ -315,6 +316,20 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         putCapabilitiesInCache("1.0.0", null, c);
         LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
         return (Capabilities) c.applySections(sections);
+    }
+
+    /**
+     * Return CRS code name.
+     * @param candidate
+     * @return crs code
+     */
+    private String getCRSCode(CoordinateReferenceSystem candidate) {
+        // Workaround for normalize WGS84 that return "EPSG:WGS 84"
+        // for IdentifiedObjects.getIdentifierOrName() call
+        if (CRS.equalsIgnoreMetadata(CommonCRS.WGS84.normalizedGeographic(), candidate)) {
+            return "CRS:84";
+        }
+        return IdentifiedObjects.getIdentifierOrName(candidate);
     }
 
     /**
