@@ -5,10 +5,18 @@
             <h4 class="modal-title" translate="data.information.page.title.edition">Metadata edition</h4>
         </div>
         <div class="modal-body" style="height: 575px;overflow-y: auto;">
-            <div ng-include="'views/data/description.html'"></div>
+            <div ng-include="'views/data/metadata_fragment.html'"></div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-default" ng-click="close()" translate="label.close">Close</button>
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="close()"
+                    translate="data.modal.cancel">Cancel</button>
+            <button type="button"
+                    class="btn btn-info"
+                    ng-click="save2()">
+                <span translate="metadata.edition.heading.save">Save modifications</span>
+            </button>
         </div>
     </div>
 </div>
