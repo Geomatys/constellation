@@ -441,16 +441,26 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * //this function is never called yet.
          */
         $scope.displayMetadataEditor = function() {
-            $modal.open({
+            var type = 'import';
+            if($scope.selected.Children && $scope.selected.Children.length >0){
+                type = $scope.selected.Children[0].Type.toLowerCase();
+            }
+            var template = type;
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
+            var modalEditor = $modal.open({
                 templateUrl: 'views/data/modalEditMetadata.html',
-                controller: 'EditMetadataModalController'/*,
+                controller: 'EditMetadataModalController',
                 resolve: {
-                    'selected':function(){return $scope.selected;},
-                    'metadataValues':function(textService){
-                        return textService.metadataJson($scope.selected.Provider,
-                            $scope.selected.Name, $scope.selected.Type.toLowerCase(), true);
-                    }
-                }*/
+                    'id':function(){return $scope.selected.Name;},
+                    'type':function(){return type;},
+                    'template':function(){return template;}
+                }
+            });
+            modalEditor.opened.then(function() {
+                modalLoader.close();
             });
         };
 
@@ -767,6 +777,11 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                Growl('error', 'Error', 'No scale can automatically be set');
         }
 
+        /**
+         * @FIXME rewrite this function to call rest api outside loop
+         * the server side must provide method to treat pyramid with an array instead of treating for each data item.
+         * @TODO ugly code, the client side should never call rest api inside a loop.
+         */
         $scope.choose = function() {
             if ($scope.listSelect.length !== 0) {
                 $scope.selected = $scope.listSelect;
