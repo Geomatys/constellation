@@ -24,7 +24,10 @@
             </ul>
             <div style="margin-top:20px;">
                 <div class="tab-pane active">
-                    <form class="form-horizontal" name="metadataform" role="form">
+                    <form id="metadataform"
+                          class="form-horizontal"
+                          name="metadataform"
+                          role="form">
                         <div class="row alert alert-info" style="margin: 0;">
                             <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                                 <h4 style="font-weight:bold">
@@ -376,7 +379,8 @@
                             </div>
                         </div>
                         <div class="row buttons-block">
-                            <span style="color:#db4747;" translate="metadata.edition.heading.requiredFields">(*) Required field</span>
+                            <span style="color:#db4747;"
+                                  translate="metadata.edition.heading.requiredFields">(*) Required field</span>
                             <button type="button"
                                     class="btn btn-info pull-right"
                                     onclick="jQuery('html, body').animate({scrollTop: '0px'}, 1000);">
@@ -387,6 +391,7 @@
                     </form>
                     <div id="validationPopup"
                          class="modal fade"
+                         style="overflow:hidden;"
                          tabindex="-1"
                          role="dialog"
                          aria-labelledby="modalValidTitle"
