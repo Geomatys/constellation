@@ -753,22 +753,6 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             $modalInstance.dismiss('close');
         }
 
-        function success(response) {
-            Growl('success', 'Success', response.message);
-            // Not in WMTS and no pyramid requested
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
-            modalLoader.close();
-            $modalInstance.close();
-        }
-
-        function error(response) {
-            Growl('error', 'Error', response.message);
-            $modalInstance.dismiss('close');
-        }
-
         function setScale(response) {
             $scope.scales = response.Entry[0].split(',');
         }
@@ -807,16 +791,29 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if ($scope.wmtsParams === false) {
                     // just add the data if we are not in the case of the wmts service
                     if (service.type.toLowerCase() !== 'wmts') {
-                        for(var i=0; i<$scope.selected.length; i++) {
+                        angular.forEach($scope.selected, function(value, key){
                             if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
                                 // In the case of a wms service and user asked to pyramid the data
-                                dataListing.pyramidConform({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, {}, addLayer, pyramidGenerationError);
+                                dataListing.pyramidConform({providerId: value.Provider, dataId: value.Name}, {}, addLayer, pyramidGenerationError);
                             } else {
+                                var modalLoader = $modal.open({
+                                    templateUrl: 'views/modalLoader.html',
+                                    controller: 'ModalInstanceCtrl'
+                                });
                                 webService.addLayer({type: service.type, id: service.identifier},
-                                    {layerAlias: $scope.selected[i].Name, layerId: $scope.selected[i].Name, serviceType: service.type, serviceId: service.identifier, providerId: $scope.selected[i].Provider, layerNamespace: $scope.selected[i].Namespace},
-                                    success,error);
+                                    {layerAlias: value.Name, layerId: value.Name, serviceType: service.type, serviceId: service.identifier, providerId: value.Provider, layerNamespace: value.Namespace},
+                                function(response) {
+                                    Growl('success', 'Success', response.message);
+                                    modalLoader.close();
+                                    $modalInstance.close();
+                                },
+                                function(response) {
+                                    Growl('error', 'Error', response.message);
+                                    modalLoader.close();
+                                    $modalInstance.dismiss('close');
+                                });
                             }
-                        }
+                        });
                         return;
                     }
 
