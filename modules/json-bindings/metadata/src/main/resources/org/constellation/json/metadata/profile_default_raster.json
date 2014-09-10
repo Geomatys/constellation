@@ -91,28 +91,6 @@
 								"defaultValue":"LanguageCode.fra",
 								"value":null
 							}
-						},{
-							"field":{
-								"name":"metadata.field.graphicOverViewFileName",
-								"multiplicity":1,
-								"help":"metadata.field.graphicOverViewFileName_help",
-								"path":"identificationInfo.graphicOverview.fileName",
-								"render":"UPLOADIMAGE.text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.rsIdentifier",
-								"multiplicity":1,
-								"help":"metadata.field.rsIdentifier_help",
-								"path":"identificationInfo.citation.identifier.code",
-								"render":"text",
-								"obligation":"M",
-								"defaultValue":"identifier",
-								"value":null
-							}
 						}
 					]}
 				},{
