@@ -218,7 +218,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                     getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
 
 
-                    providerBusiness.createProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
+                    providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
@@ -244,7 +244,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 getOrCreateValue(layer2, "name").setValue("NamedPlaces");
                 getOrCreateValue(layer2, "style").setValue("cite_style_NamedPlaces");
 
-                providerBusiness.createProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
+                providerBusiness.storeProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
 
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
@@ -277,7 +277,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 
-                providerBusiness.createProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
+                providerBusiness.storeProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
                 
                 // MDWEB store
@@ -306,7 +306,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                     getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
                     getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
 
-                    providerBusiness.createProvider("smlSrc", null, ProviderType.LAYER, "feature-store", sourceSML);
+                    providerBusiness.storeProvider("smlSrc", null, ProviderType.LAYER, "feature-store", sourceSML);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "System"),         "smlSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "Component"),      "smlSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "DataSourceType"), "smlSrc", "VECTOR", false, true, null, null);

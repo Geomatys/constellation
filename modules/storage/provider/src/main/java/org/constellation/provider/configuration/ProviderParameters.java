@@ -48,7 +48,7 @@ public final class ProviderParameters {
     // Source parameters ///////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     public static final String SOURCE_DESCRIPTOR_NAME = "source";
-    //TODO remove this parameter, duplicates argument in factory createProvider method.
+    //TODO remove this parameter, duplicates argument in factory storeProvider method.
     /** /!\ NO ! Keep ALL the arguments, because we need them for old configuration import.
      */
     public static final ParameterDescriptor<String> SOURCE_ID_DESCRIPTOR =

@@ -161,7 +161,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
 
                     choice.values().add(pgconfig);
 
-                    providerBusiness.createProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
+                    providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
@@ -183,7 +183,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 getOrCreateValue(layer2, "name").setValue("NamedPlaces");
                 getOrCreateValue(layer2, "style").setValue("cite_style_NamedPlaces");
                 
-                providerBusiness.createProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
+                providerBusiness.storeProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
 
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
@@ -216,7 +216,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 
-                providerBusiness.createProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
+                providerBusiness.storeProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
                 
                 DataProviders.getInstance().reload();

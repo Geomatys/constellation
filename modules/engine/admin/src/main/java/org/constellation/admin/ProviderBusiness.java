@@ -137,8 +137,8 @@ public class ProviderBusiness implements IProviderBusiness {
     }
 
 
-    public Provider createProvider(final String identifier, final String parent, final ProviderType type, final String serviceName,
-            final GeneralParameterValue config) throws IOException {
+    public Provider storeProvider(final String identifier, final String parent, final ProviderType type, final String serviceName,
+                                  final GeneralParameterValue config) throws IOException {
         Provider provider = new Provider();
         Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
         if (user.isPresent()) {

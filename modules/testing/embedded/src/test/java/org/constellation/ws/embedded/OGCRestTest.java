@@ -218,7 +218,7 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         m.marshal(meta, sw);
         CSWMarshallerPool.getInstance().recycle(m);
         
-        final Provider prov = providerBusiness.createProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
+        final Provider prov = providerBusiness.storeProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
         datasetBusiness.createDataset(identifier, prov.getId(), meta.getFileIdentifier(), sw.toString());
     }
 

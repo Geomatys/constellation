@@ -140,7 +140,7 @@ public class WFSServiceTest implements ApplicationContextAware {
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 
-                providerBusiness.createProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
+                providerBusiness.storeProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
                 
                 final LayerContext config = new LayerContext();

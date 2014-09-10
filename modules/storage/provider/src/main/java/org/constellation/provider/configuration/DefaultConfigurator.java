@@ -151,7 +151,7 @@ public final class DefaultConfigurator implements Configurator {
         
 //        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config)
         try {
-            final org.constellation.engine.register.Provider pr = providerBusiness.createProvider(providerId, null, type, factoryName, config);
+            final org.constellation.engine.register.Provider pr = providerBusiness.storeProvider(providerId, null, type, factoryName, config);
             checkDataUpdate(pr);
         } catch ( IOException ex) {
             throw new ConfigurationException(ex);

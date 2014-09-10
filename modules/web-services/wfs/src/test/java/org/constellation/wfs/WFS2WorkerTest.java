@@ -45,13 +45,9 @@ import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
 import org.constellation.configuration.LayerContext;
-import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.ProviderFactory;
@@ -261,7 +257,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                     pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
                     choice.values().add(pgconfig);
 
-                    providerBusiness.createProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
+                    providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
@@ -284,7 +280,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 getOrCreateValue(layer, "name").setValue("NamedPlaces");
                 getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
 
-                providerBusiness.createProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
+                providerBusiness.storeProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
 
                 dataBusiness.create(new QName("http://www.opengis.net/gml/3.2", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml/3.2", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
@@ -317,7 +313,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 
-                providerBusiness.createProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
+                providerBusiness.storeProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
                 
                 // MDWEB store
@@ -346,7 +342,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                     getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
                     getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
 
-                    providerBusiness.createProvider("smlSrc", null, ProviderType.LAYER, "feature-store", sourceSML);
+                    providerBusiness.storeProvider("smlSrc", null, ProviderType.LAYER, "feature-store", sourceSML);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "System"),         "smlSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "Component"),      "smlSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "DataSourceType"), "smlSrc", "VECTOR", false, true, null, null);

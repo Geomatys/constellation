@@ -150,7 +150,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
                 choice.values().add(pgconfig);
 
-                providerBusiness.createProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
+                providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);

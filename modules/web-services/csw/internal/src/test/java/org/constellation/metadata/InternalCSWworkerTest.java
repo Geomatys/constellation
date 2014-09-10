@@ -32,9 +32,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
-import org.constellation.admin.DatasetBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
 import org.constellation.business.IDatasetBusiness;
@@ -280,7 +277,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         pool.recycle(m);
         
         
-        final Provider prov = providerBusiness.createProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
+        final Provider prov = providerBusiness.storeProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
         datasetBusiness.createDataset(identifier, prov.getId(), meta.getFileIdentifier(), sw.toString());
     }
 }

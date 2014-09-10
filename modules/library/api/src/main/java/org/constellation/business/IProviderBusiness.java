@@ -51,7 +51,7 @@ public interface IProviderBusiness {
 
     void update(int domainId, String id, ProviderConfiguration config);
 
-    org.constellation.engine.register.Provider createProvider(String providerId, String o, ProviderType type, String factoryName, GeneralParameterValue config) throws IOException;
+    org.constellation.engine.register.Provider storeProvider(String providerId, String o, ProviderType type, String factoryName, GeneralParameterValue config) throws IOException;
 
     List<org.constellation.engine.register.Data> getDatasFromProviderId(Integer id);
 
