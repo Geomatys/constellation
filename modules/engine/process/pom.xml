@@ -63,11 +63,6 @@
             <artifactId>cstl-engine-process-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.constellation</groupId>
-            <artifactId>cstl-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.constellation.engine</groupId>

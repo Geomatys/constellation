@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.process.client;
+package org.constellation.admin.process;
 
 
 import org.constellation.ServiceDef;
@@ -33,9 +33,6 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
-import static org.constellation.process.client.RefreshIndexDescriptor.CSTL_ASYNCHRONOUS;
-import static org.constellation.process.client.RefreshIndexDescriptor.CSTL_CSW_INSTANCE;
-import static org.constellation.process.client.RefreshIndexDescriptor.CSTL_DESCRIPTOR_GROUP;
 import static org.geotoolkit.io.X364.BOLD;
 import static org.geotoolkit.io.X364.FOREGROUND_DEFAULT;
 import static org.geotoolkit.io.X364.FOREGROUND_GREEN;
@@ -60,9 +57,9 @@ public class RefreshIndex extends AbstractCstlProcess {
     public RefreshIndex(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
         
-        CSTL_CONFIG   = inputParameters.groups(CSTL_DESCRIPTOR_GROUP.getName().getCode()).get(0);
-        CSW_INSTANCE  = CSTL_CONFIG.parameter(CSTL_CSW_INSTANCE.getName().getCode()).stringValue();
-        ASYNCHRONOUS  = CSTL_CONFIG.parameter(CSTL_ASYNCHRONOUS.getName().getCode()).booleanValue();
+        CSTL_CONFIG   = inputParameters.groups(RefreshIndexDescriptor.CSTL_DESCRIPTOR_GROUP.getName().getCode()).get(0);
+        CSW_INSTANCE  = CSTL_CONFIG.parameter(RefreshIndexDescriptor.CSTL_CSW_INSTANCE.getName().getCode()).stringValue();
+        ASYNCHRONOUS  = CSTL_CONFIG.parameter(RefreshIndexDescriptor.CSTL_ASYNCHRONOUS.getName().getCode()).booleanValue();
         
     }
 

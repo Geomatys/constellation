@@ -16,10 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.process.restart;
+package org.constellation.admin.process;
 
 import org.constellation.process.AbstractProcessTest;
-import org.constellation.process.client.RestartDescriptor;
+import org.constellation.admin.process.RestartDescriptor;
 
 /**
  *

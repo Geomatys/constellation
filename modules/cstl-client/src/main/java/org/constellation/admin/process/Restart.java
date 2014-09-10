@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.process.client;
+package org.constellation.admin.process;
 
 
 import org.constellation.admin.service.ConstellationServer;
@@ -29,9 +29,6 @@ import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.constellation.process.client.RestartDescriptor.CSTL_DESCRIPTOR_GROUP;
-import static org.constellation.process.client.RestartDescriptor.CSTL_WS_INSTANCE;
-import static org.constellation.process.client.RestartDescriptor.CSTL_WS_TYPE;
 import static org.geotoolkit.io.X364.BOLD;
 import static org.geotoolkit.io.X364.FOREGROUND_DEFAULT;
 import static org.geotoolkit.io.X364.FOREGROUND_GREEN;
@@ -56,9 +53,9 @@ public class Restart extends AbstractCstlProcess {
     public Restart(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
         
-        CSTL_CONFIG   = inputParameters.groups(CSTL_DESCRIPTOR_GROUP.getName().getCode()).get(0);
-        WS_INSTANCE   = CSTL_CONFIG.parameter(CSTL_WS_INSTANCE.getName().getCode()).stringValue();
-        WS_TYPE       = CSTL_CONFIG.parameter(CSTL_WS_TYPE.getName().getCode()).stringValue();
+        CSTL_CONFIG   = inputParameters.groups(RestartDescriptor.CSTL_DESCRIPTOR_GROUP.getName().getCode()).get(0);
+        WS_INSTANCE   = CSTL_CONFIG.parameter(RestartDescriptor.CSTL_WS_INSTANCE.getName().getCode()).stringValue();
+        WS_TYPE       = CSTL_CONFIG.parameter(RestartDescriptor.CSTL_WS_TYPE.getName().getCode()).stringValue();
         
     }
 
