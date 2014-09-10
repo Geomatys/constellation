@@ -20,7 +20,7 @@
 package org.constellation.metadata;
 
 import org.apache.sis.internal.jaxb.gmx.Anchor;
-import org.apache.sis.internal.jaxb.metadata.ReferenceSystemMetadata;
+import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.DefaultMetadataExtensionInformation;

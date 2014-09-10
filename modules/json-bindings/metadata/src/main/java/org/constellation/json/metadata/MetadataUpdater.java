@@ -54,7 +54,7 @@ import org.geotoolkit.metadata.MetadataFactory;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
-import org.apache.sis.internal.jaxb.metadata.ReferenceSystemMetadata;
+import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.xml.NilReason;
 
