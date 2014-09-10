@@ -297,28 +297,12 @@
                                         <span>{{selected.Owner}}</span>
                                     </div>
                                 </div>
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-date.svg" alt="" />
-                                    </div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
-                                    </div>
-                                </div>
                             </div>
                             <div class="block-content"
                                  ng-class="{'block-vector':dataCtrl.selectedDataSetChild.Type=='VECTOR','block-raster':dataCtrl.selectedDataSetChild.Type=='COVERAGE'}"
                                  ng-if="dataCtrl.selectedDataSetChild">
                                 <h6 translate="label.title">Title</h6>
                                 <span>{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</span>
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-owner.svg" alt="" />
-                                    </div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{dataCtrl.selectedDataSetChild.Owner}}</span>
-                                    </div>
-                                </div>
                                 <div class="row description-block">
                                     <div class="col-sm-3 col-md-2">
                                         <img src="img/block-content-date.svg" alt="" />
