@@ -162,6 +162,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.SchedulerException;
+import org.w3c.dom.Node;
 
 /**
  * Manage data sending
@@ -950,26 +951,73 @@ public class DataRest {
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
-
+    /**
+     * Proceed to search data for query.
+     * @param values given parameters
+     * @return {code Response} that contains all data that matches the lucene query.
+     */
     @POST
     @Path("metadata/find")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response findMetadata(final ParameterValues values) {
+    public Response findMetadata(@PathParam("domainId") final int domainId, final ParameterValues values) {
         final String search = values.getValues().get("search");
         List<DataBrief> briefs = new ArrayList<>();
         final List<org.constellation.engine.register.Data> datas;
         try {
             datas = dataBusiness.searchOnMetadata(search);
-            for (org.constellation.engine.register.Data data : datas ) {
-                final QName name = new QName(data.getNamespace(), data.getName());
-                final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
-                briefs.add(db);
+            if(datas != null && !datas.isEmpty()){
+                for (org.constellation.engine.register.Data data : datas) {
+                    final QName name = new QName(data.getNamespace(), data.getName());
+                    final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
+                    briefs.add(db);
+                }
+            }else {
+                //@TODO remove this else when we will add data metadata in cstl db after SIS implementation.
+                final List<DataSetBrief> datasetBriefs = new ArrayList<>();
+                final List<Dataset> datasetList = datasetBusiness.searchOnMetadata(search);
+                for (final Dataset ds : datasetList) {
+                    final DataSetBrief dsb = buildDatsetBrief(ds,domainId);
+                    datasetBriefs.add(dsb);
+                }
+                for(final DataSetBrief dsb : datasetBriefs){
+                    briefs.addAll(dsb.getChildren());
+                }
             }
             return Response.ok(briefs).build();
         } catch (ConstellationException | IOException ex) {
             return Response.ok("Failed to parse query : "+ex.getMessage()).status(500).build();
         }
+    }
+
+    /**
+     * Build {@link DataSetBrief} instance from {@link Dataset} and domain id.
+     * @param dataset given dataset object.
+     * @param domainId given domain id.
+     * @return {@link DataSetBrief} built from the given dataset.
+     */
+    private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId){
+        final Integer dataSetId = dataset.getId();
+        final Provider provider = providerBusiness.getProvider(dataset.getProviderId());
+        final Optional<CstlUser> optUser = userRepository.findById(provider.getOwner());
+        String owner = null;
+        if(optUser!=null && optUser.isPresent()){
+            final CstlUser user = optUser.get();
+            if(user != null){
+                owner = user.getLogin();
+            }
+        }
+        final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
+        final DataSetBrief dsb = new DataSetBrief(dataset.getIdentifier(), provider.getType(), owner, dataBriefList);
+        try{
+            final Node nodeMetadata = datasetBusiness.getMetadataNode(dataset.getIdentifier(),domainId);
+            if(nodeMetadata!=null){
+                //@TODO fill the DataSetBrief properties for keywords, abstract and dateStamp
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+        }
+        return dsb;
     }
 
     /**

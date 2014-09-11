@@ -74,6 +74,11 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     public Dataset findByIdentifier(String identifier) {
         return dsl.select().from(DATASET).where(DATASET.IDENTIFIER.eq(identifier)).fetchOneInto(Dataset.class);
     }
+
+    @Override
+    public Dataset findById(int id) {
+        return dsl.select().from(DATASET).where(DATASET.ID.eq(id)).fetchOneInto(Dataset.class);
+    }
     
     @Override
     public List<Dataset> findByProviderIdentifier(String identifier) {

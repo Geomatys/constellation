@@ -173,17 +173,14 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.callSearchMD = function(){
             if ($scope.dataCtrl.searchMetadataTerm){
-                //@TODO implements rest api to find in dataset.
-                Growl('info','About','Search on dataset is not implemented yet!');
-                /*datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchMetadataTerm}},
-                 function(response) {
-                 Dashboard($scope, response, true);
+                datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchMetadataTerm}},
+                 function(response) {//success
+                    Dashboard($scope, response, true);
                  },
-                 function(response){
-                 console.error(response);
-                 Growl('error','Error','Search failed:'+ response.data);
-                 }
-                 );*/
+                 function(response){//error
+                    console.error(response);
+                    Growl('error','Error','Search failed:'+ response.data);
+                 });
             }else{
                 if (!$.isEmptyObject($scope.searchMD)){
                     var searchString = "";
@@ -208,14 +205,13 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     if ($scope.searchMD.area){
                         searchString += " area:"+$scope.searchMD.area;
                     }
-                    //@TODO implements rest api to find in dataset.
-                    Growl('info','About','Search on dataset is not implemented yet!');
-                    /*datasetListing.findDataset({values: {'search': searchString}},function(response) {
-                     Dashboard($scope, response, true);
-                     }, function(response){
-                     console.error(response);
-                     Growl('error','Error','Search failed:'+ response.data);
-                     });*/
+                    datasetListing.findDataset({values: {'search': searchString}},
+                        function(response) {//success
+                            Dashboard($scope, response, true);
+                        }, function(response){ //error
+                            console.error(response);
+                            Growl('error','Error','Search failed:'+ response.data);
+                        });
                 } else {
                     datasetListing.listAll({}, function(response) {
                         Dashboard($scope, response, true);

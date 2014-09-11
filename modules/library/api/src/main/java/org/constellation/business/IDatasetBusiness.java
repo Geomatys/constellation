@@ -19,11 +19,13 @@
 package org.constellation.business;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
 import org.w3c.dom.Node;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -46,4 +48,6 @@ public interface IDatasetBusiness {
     Node getMetadataNode(String identifier, int domainId) throws ConfigurationException;
 
     void linkDataTodataset(Dataset dataset, List<Data> datasFromProviderId);
+
+    List<Dataset> searchOnMetadata(String search) throws IOException, ConstellationException;
 }

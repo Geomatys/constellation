@@ -188,7 +188,7 @@ public class DataBusiness implements IDataBusiness {
         final List<Data> result = new ArrayList<>();
         final Set<Integer> ids;
         try {
-            ids = indexEngine.searchOnMetadata(queryString);;
+            ids = indexEngine.searchOnMetadata(queryString, "dataId");
         } catch( ParseException ex) {
             throw new ConstellationException(ex);
         }
@@ -222,7 +222,7 @@ public class DataBusiness implements IDataBusiness {
         data.setIsoMetadata(sw.toString());
         data.setMetadataId(metadata.getFileIdentifier());
         dataRepository.update(data);
-        indexEngine.addMetadataToIndex(metadata, data.getId());
+        indexEngine.addMetadataToIndexForData(metadata, data.getId());
     }
 
     /**
@@ -237,13 +237,12 @@ public class DataBusiness implements IDataBusiness {
     public CoverageMetadataBean loadDataMetadata(final String providerIdentifier,
                                                  final QName name,
                                                  final MarshallerPool pool) throws ConstellationException {
-        CoverageMetadataBean metadata = null;
         try {
             final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
             if (data != null && data.getMetadata() != null) {
                 final InputStream sr = new ByteArrayInputStream(data.getMetadata().getBytes());
                 final Unmarshaller m = pool.acquireUnmarshaller();
-                metadata = (CoverageMetadataBean) m.unmarshal(sr);
+                final CoverageMetadataBean metadata = (CoverageMetadataBean) m.unmarshal(sr);
                 pool.recycle(m);
                 return metadata;
             }

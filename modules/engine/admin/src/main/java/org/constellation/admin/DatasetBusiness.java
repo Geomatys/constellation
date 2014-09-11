@@ -20,7 +20,9 @@
 package org.constellation.admin;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -29,8 +31,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.exception.ConstellationException;
+import org.constellation.admin.index.IndexEngine;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.TargetNotFoundException;
@@ -76,6 +81,11 @@ public class DatasetBusiness implements IDatasetBusiness {
      */
     @Inject
     private DataRepository dataRepository;
+    /**
+     * Injected lucene index engine.
+     */
+    @Inject
+    private IndexEngine indexEngine;
 
     /**
      * Creates a new instance of {@link DatasetBusiness}.
@@ -219,6 +229,7 @@ public class DatasetBusiness implements IDatasetBusiness {
             dataset.setMetadataIso(metadataString);
             dataset.setMetadataId(metadata.getFileIdentifier());
             datasetRepository.update(dataset);
+            indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
@@ -256,5 +267,29 @@ public class DatasetBusiness implements IDatasetBusiness {
             data.setDatasetId(ds.getId());
             dataRepository.update(data);
         }
+    }
+
+    /**
+     * Search and returns result as list of {@link Dataset} for given query string.
+     * @param queryString the lucene query.
+     * @return list of {@link Dataset}
+     * @throws org.constellation.admin.exception.ConstellationException
+     * @throws IOException
+     */
+    public List<Dataset> searchOnMetadata(final String queryString) throws IOException, ConstellationException {
+        final List<Dataset> result = new ArrayList<>();
+        final Set<Integer> ids;
+        try {
+            ids = indexEngine.searchOnMetadata(queryString, "datasetId");
+        } catch( ParseException ex) {
+            throw new ConstellationException(ex);
+        }
+        for (final Integer datasetId : ids){
+            final Dataset d = datasetRepository.findById(datasetId);
+            if(d!=null){
+                result.add(d);
+            }
+        }
+        return result;
     }
 }

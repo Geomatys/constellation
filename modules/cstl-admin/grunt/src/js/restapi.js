@@ -166,7 +166,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     .factory('datasetListing', function($resource) {
         return $resource('@cstl/api/1/domain/$domainId/metadata/dataset/all;jsessionid=', {}, {
             'listAll':              {method: 'GET',    isArray: true },
-            'downloadMetadata':     {method: 'GET',    url: '@cstl/api/1/domain/$domainId/metadata/dataset/:datasetIdentifier;jsessionid='}
+            'downloadMetadata':     {method: 'GET',    url: '@cstl/api/1/domain/$domainId/metadata/dataset/:datasetIdentifier;jsessionid='},
+            'findDataset':          {method: 'POST',   url: '@cstl/api/1/domain/$domainId/metadata/dataset/find;jsessionid=', isArray: true}
         });
     })
 

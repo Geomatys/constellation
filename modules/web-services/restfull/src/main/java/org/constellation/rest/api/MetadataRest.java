@@ -23,11 +23,13 @@ import com.google.common.base.Optional;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.XML;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
+import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
@@ -38,6 +40,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -97,26 +100,7 @@ public class MetadataRest {
         final List<Dataset> datasets = datasetBusiness.getAllDataset();
         if(datasets!=null){
             for(final Dataset ds : datasets){
-                final Integer dataSetId = ds.getId();
-                final Provider provider = providerBusiness.getProvider(ds.getProviderId());
-                final Optional<CstlUser> optUser = userRepository.findById(provider.getOwner());
-                String owner = null;
-                if(optUser!=null && optUser.isPresent()){
-                    final CstlUser user = optUser.get();
-                    if(user != null){
-                        owner = user.getLogin();
-                    }
-                }
-                final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
-                final DataSetBrief dsb = new DataSetBrief(ds.getIdentifier(), provider.getType(), owner, dataBriefList);
-                try{
-                    final Node nodeMetadata = datasetBusiness.getMetadataNode(ds.getIdentifier(),domainId);
-                    if(nodeMetadata!=null){
-                        //@TODO fill the DataSetBrief properties for keywords, abstract and dateStamp
-                    }
-                }catch(Exception ex){
-                    LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-                }
+                final DataSetBrief dsb = buildDatsetBrief(ds,domainId);
                 datasetBriefs.add(dsb);
             }
         }
@@ -142,6 +126,61 @@ public class MetadataRest {
             LOGGER.log(Level.WARNING, "Failed to get xml metadata for dataset with identifier "+datasetIdentifier,ex);
             return Response.status(500).entity("failed").build();
         }
+    }
+
+    /**
+     * Proceed to search dataset for query.
+     * @param values given parameters
+     * @return {code Response} that contains all dataset that matches the lucene query.
+     */
+    @POST
+    @Path("dataset/find")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response findDataset(@PathParam("domainId") final int domainId, final ParameterValues values) {
+        final String search = values.getValues().get("search");
+        List<DataSetBrief> briefs = new ArrayList<>();
+        final List<Dataset> datasetList;
+        try {
+            datasetList = datasetBusiness.searchOnMetadata(search);
+            for (final Dataset ds : datasetList) {
+                final DataSetBrief dsb = buildDatsetBrief(ds,domainId);
+                briefs.add(dsb);
+            }
+            return Response.ok(briefs).build();
+        } catch (ConstellationException | IOException ex) {
+            return Response.ok("Failed to parse query : "+ex.getMessage()).status(500).build();
+        }
+    }
+
+    /**
+     * Build {@link DataSetBrief} instance from {@link Dataset} and domain id.
+     * @param dataset given dataset object.
+     * @param domainId given domain id.
+     * @return {@link DataSetBrief} built from the given dataset.
+     */
+    private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId){
+        final Integer dataSetId = dataset.getId();
+        final Provider provider = providerBusiness.getProvider(dataset.getProviderId());
+        final Optional<CstlUser> optUser = userRepository.findById(provider.getOwner());
+        String owner = null;
+        if(optUser!=null && optUser.isPresent()){
+            final CstlUser user = optUser.get();
+            if(user != null){
+                owner = user.getLogin();
+            }
+        }
+        final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
+        final DataSetBrief dsb = new DataSetBrief(dataset.getIdentifier(), provider.getType(), owner, dataBriefList);
+        try{
+            final Node nodeMetadata = datasetBusiness.getMetadataNode(dataset.getIdentifier(),domainId);
+            if(nodeMetadata!=null){
+                //@TODO fill the DataSetBrief properties for keywords, abstract and dateStamp
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+        }
+        return dsb;
     }
 
 }
