@@ -193,7 +193,10 @@ public class DataBusiness implements IDataBusiness {
             throw new ConstellationException(ex);
         }
         for (final Integer dataId : ids){
-            result.add(dataRepository.findById(dataId));
+            final Data d = dataRepository.findById(dataId);
+            if(d!=null){
+                result.add(d);
+            }
         }
         return result;
     }
