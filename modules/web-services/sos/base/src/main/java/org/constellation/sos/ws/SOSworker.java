@@ -2067,12 +2067,12 @@ public class SOSworker extends AbstractWorker {
                 if (id.startsWith(sensorIdBase)) {
                     num = id.substring(sensorIdBase.length());
                 } else {
-                    num = Integer.toString(smlWriter.getNewSensorId());
+                    num = id;
                 }
                 LOGGER.log(logLevel, "using specified sensor ID:{0} num ={1}", new Object[]{id, num});
                 
             } else if (!smlExtractedIdentifier.equals("unknow_identifier")){
-                num = Integer.toString(smlWriter.getNewSensorId());
+                num = smlExtractedIdentifier;
                 id  = smlExtractedIdentifier;
                 
                 LOGGER.log(logLevel, "using extracted sensor ID:{0} num ={1}", new Object[]{id, num});

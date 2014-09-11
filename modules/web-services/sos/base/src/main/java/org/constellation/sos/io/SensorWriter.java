@@ -82,6 +82,7 @@ public interface SensorWriter {
 
     /**
      * Create a new identifier for a sensor.
+     * @throws org.constellation.ws.CstlServiceException
      */
     int getNewSensorId() throws CstlServiceException;
 

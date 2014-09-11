@@ -79,7 +79,7 @@ public class FileSensorWriter implements SensorWriter {
             throw new MetadataIoException("The sensor configuration object is null", NO_APPLICABLE_CODE);
         }
         this.sensorIdBase = (String) properties.get(SMLFactory.SENSOR_ID_BASE);
-        uncommittedFiles = new ArrayList<File>();
+        uncommittedFiles = new ArrayList<>();
         if (configuration.getDataDirectory() == null) {
             throw new MetadataIoException("The sensor data directory is null", NO_APPLICABLE_CODE);
         }
@@ -140,7 +140,7 @@ public class FileSensorWriter implements SensorWriter {
         if (currentFile.exists()) {
             delete = currentFile.delete();
         } else {
-            LOGGER.warning("unable to find a file " + currentFile.getName() + " to remove");
+            LOGGER.log(Level.WARNING, "unable to find a file {0} to remove", currentFile.getName());
             return false;
         }
         if (!delete) {
@@ -176,7 +176,7 @@ public class FileSensorWriter implements SensorWriter {
      */
     @Override
     public void startTransaction() throws CstlServiceException {
-        uncommittedFiles = new ArrayList<File>();
+        uncommittedFiles = new ArrayList<>();
     }
 
     /**
@@ -190,7 +190,7 @@ public class FileSensorWriter implements SensorWriter {
                 LOGGER.log(Level.WARNING, "unable to delete the file:{0}", f.getName());
             }
         }
-        uncommittedFiles = new ArrayList<File>();
+        uncommittedFiles = new ArrayList<>();
     }
 
     /**
@@ -198,7 +198,7 @@ public class FileSensorWriter implements SensorWriter {
      */
     @Override
     public void endTransaction() throws CstlServiceException {
-        uncommittedFiles = new ArrayList<File>();
+        uncommittedFiles = new ArrayList<>();
     }
 
     /**
@@ -211,16 +211,18 @@ public class FileSensorWriter implements SensorWriter {
             for (File f : dataDirectory.listFiles()) {
                 String id = f.getName();
                 id = id.substring(0, id.indexOf(".xml"));
-                id = id.substring(id.indexOf(sensorIdBase) + sensorIdBase.length());
-                try {
-                    final int curentID = Integer.parseInt(id);
-                    if (curentID > maxID) {
-                        maxID = curentID;
+                if (id.startsWith(sensorIdBase)) {
+                    id = id.substring(id.indexOf(sensorIdBase) + sensorIdBase.length());
+                    try {
+                        final int curentID = Integer.parseInt(id);
+                        if (curentID > maxID) {
+                            maxID = curentID;
+                        }
+                    } catch (NumberFormatException ex) {
+                        throw new CstlServiceException("unable to parse the identifier:" + id, ex, NO_APPLICABLE_CODE);
                     }
-                } catch (NumberFormatException ex) {
-                    throw new CstlServiceException("unable to parse the identifier:" + id, ex, NO_APPLICABLE_CODE);
                 }
-            }
+            } 
         }
         return maxID + 1;
     }
