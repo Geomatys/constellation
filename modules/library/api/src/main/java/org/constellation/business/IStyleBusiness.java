@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- *
+ * @author Cédric Briançon (Geomatys)
  */
 public interface IStyleBusiness {
     void deleteStyle(String id, String name) throws ConfigurationException;

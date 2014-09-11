@@ -18,15 +18,17 @@
  */
 package org.constellation.business;
 
-import org.constellation.engine.register.Task;
+import java.util.List;
 
 /**
  * @author Cédric Briançon (Geomatys)
  */
-public interface ITaskBusiness {
-    void writeTask(String uuidTask, String pyramid, Integer userId, long start);
+public interface IMetadataBusiness {
+    String searchMetadata(final String metadataId, final boolean includeService);
 
-    Task getTask(String uuidTask);
+    boolean existInternalMetadata(final String metadataID, final boolean includeService);
 
-    void update(Task pyramidTask);
+    List<String> getInternalMetadataIds(final boolean includeService);
+
+    List<String> getAllMetadata(final boolean includeService);
 }

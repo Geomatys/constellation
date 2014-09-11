@@ -27,6 +27,7 @@ import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
@@ -37,6 +38,7 @@ import javax.xml.namespace.QName;
 import java.util.List;
 
 @Component
+@Primary
 public class SensorBusiness implements ISensorBusiness {
 
     @Inject

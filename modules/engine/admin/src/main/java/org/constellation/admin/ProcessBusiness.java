@@ -30,6 +30,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
+import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.ChainProcess;
 import org.constellation.engine.register.repository.ChainProcessRepository;
@@ -39,6 +40,7 @@ import org.geotoolkit.process.chain.model.Chain;
 import org.geotoolkit.process.chain.model.ChainMarshallerPool;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
         
 /**
@@ -46,7 +48,8 @@ import org.springframework.stereotype.Component;
  * @author Guilhem Legal (Geomatys)
  */
 @Component
-public class ProcessBusiness {
+@Primary
+public class ProcessBusiness implements IProcessBusiness {
 
     @Inject
     private ChainProcessRepository chainRepository;

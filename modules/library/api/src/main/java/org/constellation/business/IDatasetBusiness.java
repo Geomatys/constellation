@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
 import java.util.List;
 
 /**
- *
+ * @author Cédric Briançon (Geomatys)
  */
 public interface IDatasetBusiness {
     Dataset createDataset(String identifier, int providerId, String metadataId, String metadataXml);

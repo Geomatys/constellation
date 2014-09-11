@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * @author Cédric Briançon (Geomatys)
  */
 public interface IServiceBusiness {
     void stop(String service, String identifier) throws ConfigurationException;

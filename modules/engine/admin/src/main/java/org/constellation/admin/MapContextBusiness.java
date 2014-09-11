@@ -24,6 +24,7 @@ import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.business.IDataBusiness;
+import org.constellation.business.IMapContextBusiness;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.*;
@@ -37,6 +38,7 @@ import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -44,7 +46,8 @@ import javax.xml.namespace.QName;
 import java.util.*;
 
 @Component
-public class MapContextBusiness {
+@Primary
+public class MapContextBusiness implements IMapContextBusiness {
 
     @Inject
     private MapContextRepository mapContextRepository;

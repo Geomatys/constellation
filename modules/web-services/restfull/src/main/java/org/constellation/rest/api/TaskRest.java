@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamException;
 
 import com.google.common.base.Optional;
 import org.constellation.admin.ProcessBusiness;
+import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
@@ -80,7 +81,7 @@ public final class TaskRest {
     private static final DateFormat TASK_DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
     @Inject
-    private ProcessBusiness processBusiness;
+    private IProcessBusiness processBusiness;
 
     @Inject
     private TaskParameterRepository taskParameterRepository;

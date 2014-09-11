@@ -19,8 +19,8 @@
 package org.constellation.metadata.io.internal;
 
 import org.apache.sis.xml.Namespaces;
-import org.constellation.admin.MetadataBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.business.IMetadataBusiness;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.DomMetadataReader;
@@ -85,7 +85,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     private final boolean displayServiceMetadata = false;
     
     @Inject
-    private MetadataBusiness metadataBusiness;
+    private IMetadataBusiness metadataBusiness;
     
     /**
      * Build a new CSW File Reader.

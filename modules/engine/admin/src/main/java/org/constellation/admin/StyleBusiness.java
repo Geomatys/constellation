@@ -79,6 +79,7 @@ import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Symbolizer;
 import org.opengis.style.TextSymbolizer;
 import org.opengis.util.FactoryException;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
@@ -89,6 +90,7 @@ import com.google.common.base.Optional;
  * @since 0.9
  */
 @Component
+@Primary
 public final class StyleBusiness implements IStyleBusiness {
 
     @Inject

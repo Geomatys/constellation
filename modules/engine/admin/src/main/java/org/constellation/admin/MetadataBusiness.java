@@ -22,12 +22,15 @@ package org.constellation.admin;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+
+import org.constellation.business.IMetadataBusiness;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,7 +41,8 @@ import org.springframework.stereotype.Component;
  * @since 0.9
  */
 @Component
-public class MetadataBusiness {
+@Primary
+public class MetadataBusiness implements IMetadataBusiness {
     /**
      * Injected data repository.
      */

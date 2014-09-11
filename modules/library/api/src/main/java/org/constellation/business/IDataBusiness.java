@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- *
+ * @author Cédric Briançon (Geomatys)
  */
 public interface IDataBusiness {
     void deleteData(QName qName, String id);

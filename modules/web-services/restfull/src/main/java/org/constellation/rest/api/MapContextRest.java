@@ -22,6 +22,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.MapContextBusiness;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
+import org.constellation.business.IMapContextBusiness;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
@@ -78,7 +79,7 @@ public class MapContextRest {
     private static final org.geotoolkit.georss.xml.v100.ObjectFactory OBJ_GEORSS_FACT = new org.geotoolkit.georss.xml.v100.ObjectFactory();
 
     @Inject
-    private MapContextBusiness contextBusiness;
+    private IMapContextBusiness contextBusiness;
 
     @Inject
     private MapContextRepository contextRepository;

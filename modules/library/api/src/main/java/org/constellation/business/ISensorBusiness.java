@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 import java.util.List;
 
 /**
- *
+ * @author Cédric Briançon (Geomatys)
  */
 public interface ISensorBusiness {
     void linkDataToSensor(QName name, String providerId, String sensorId);

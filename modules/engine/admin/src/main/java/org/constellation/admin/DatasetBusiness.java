@@ -40,6 +40,7 @@ import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.utils.ISOMarshallerPool;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -57,6 +58,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
  * @since 0.9
  */
 @Component
+@Primary
 public class DatasetBusiness implements IDatasetBusiness {
 
     /**

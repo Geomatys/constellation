@@ -31,6 +31,7 @@ import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.util.FileUtilities;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +56,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 @Component
+@Primary
 public class ServiceBusiness implements IServiceBusiness {
 
     @Inject

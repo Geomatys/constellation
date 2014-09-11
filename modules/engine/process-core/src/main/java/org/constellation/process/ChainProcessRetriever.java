@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import org.constellation.admin.ProcessBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.geotoolkit.process.ProcessDescriptor;
 
@@ -35,7 +36,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 public class ChainProcessRetriever {
     
     @Inject
-    private ProcessBusiness processBusiness;
+    private IProcessBusiness processBusiness;
 
     public ChainProcessRetriever() {
         SpringHelper.injectDependencies(this);

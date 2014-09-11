@@ -22,6 +22,7 @@ import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.dto.ServiceLayersDTO;
 import org.constellation.api.CommonConstants;
+import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IServiceBusiness;
@@ -80,7 +81,7 @@ public class AdminRest {
     private org.constellation.security.SecurityManager securityManager;
     
     @Inject
-    private ConfigurationBusiness configurationBusiness;
+    private IConfigurationBusiness configurationBusiness;
 
     /**
      * service to return available service list

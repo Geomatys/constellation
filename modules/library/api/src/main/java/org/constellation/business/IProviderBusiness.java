@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * @author Cédric Briançon (Geomatys)
  */
 public interface IProviderBusiness {
     List<String> getProviderIds();

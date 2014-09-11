@@ -66,6 +66,7 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.utils.ISOMarshallerPool;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +79,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Component
+@Primary
 public class DataBusiness implements IDataBusiness {
     /**
      * Used for debugging purposes.

@@ -18,15 +18,26 @@
  */
 package org.constellation.business;
 
-import org.constellation.engine.register.Task;
+import org.constellation.admin.dto.MapContextLayersDTO;
+import org.constellation.dto.ParameterValues;
+import org.constellation.engine.register.MapcontextStyledLayer;
+import org.opengis.util.FactoryException;
+
+import java.util.List;
 
 /**
  * @author Cédric Briançon (Geomatys)
  */
-public interface ITaskBusiness {
-    void writeTask(String uuidTask, String pyramid, Integer userId, long start);
+public interface IMapContextBusiness {
+    List<MapContextLayersDTO> findAllMapContextLayers();
 
-    Task getTask(String uuidTask);
+    void setMapItems(final int contextId, final List<MapcontextStyledLayer> layers);
 
-    void update(Task pyramidTask);
+    MapContextLayersDTO findMapContextLayers(int contextId);
+
+    String findStyleName(Integer styleId);
+
+    ParameterValues getExtent(int contextId) throws FactoryException;
+
+    ParameterValues getExtentForLayers(final List<MapcontextStyledLayer> styledLayers) throws FactoryException;
 }

@@ -18,15 +18,22 @@
  */
 package org.constellation.business;
 
-import org.constellation.engine.register.Task;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.engine.register.ChainProcess;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.chain.model.Chain;
+
+import java.util.List;
 
 /**
  * @author Cédric Briançon (Geomatys)
  */
-public interface ITaskBusiness {
-    void writeTask(String uuidTask, String pyramid, Integer userId, long start);
+public interface IProcessBusiness {
+    List<ProcessDescriptor> getChainDescriptors() throws ConfigurationException;
 
-    Task getTask(String uuidTask);
+    void createChainProcess(final Chain chain) throws ConfigurationException;
 
-    void update(Task pyramidTask);
+    boolean deleteChainProcess(final String auth, final String code);
+
+    ChainProcess getChainProcess(final String auth, final String code);
 }

@@ -18,15 +18,18 @@
  */
 package org.constellation.business;
 
-import org.constellation.engine.register.Task;
+import java.io.File;
 
 /**
  * @author Cédric Briançon (Geomatys)
  */
-public interface ITaskBusiness {
-    void writeTask(String uuidTask, String pyramid, Integer userId, long start);
+public interface IConfigurationBusiness {
+    File getConfigurationDirectory();
 
-    Task getTask(String uuidTask);
+    File getDataDirectory();
 
-    void update(Task pyramidTask);
+    String getProperty(final String key);
+
+    void setProperty(final String key, final String value);
+
 }

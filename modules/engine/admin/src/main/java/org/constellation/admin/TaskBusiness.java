@@ -22,15 +22,19 @@ package org.constellation.admin;
 import org.constellation.business.ITaskBusiness;
 import org.constellation.engine.register.Task;
 import org.constellation.engine.register.repository.TaskRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 @Component
+@Primary
 public class TaskBusiness implements ITaskBusiness{
-    
+
     private TaskRepository taskRepository;
 
     public void writeTask(String uuidTask, String pyramid, Integer userId, final long start) {
