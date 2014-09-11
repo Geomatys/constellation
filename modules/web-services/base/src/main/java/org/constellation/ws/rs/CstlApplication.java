@@ -26,6 +26,8 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * This class is here to initiate the webservice at startup instead of waiting for the first request to instanciate the service.
@@ -34,9 +36,12 @@ import java.util.Set;
 @ApplicationPath("/")
 public class CstlApplication extends Application {
 
+    private static final Logger LOGGER = Logging.getLogger(CstlApplication.class);
+    
     private final Set<Object> singletons = new HashSet<>();
     
     public CstlApplication() {
+        LOGGER.info("Starting CSTL Application");
         final Iterator<WebService> ite = ServiceRegistry.lookupProviders(WebService.class);
         while (ite.hasNext()) {
             WebService ws = ite.next();

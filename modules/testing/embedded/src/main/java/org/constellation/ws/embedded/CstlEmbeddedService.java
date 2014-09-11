@@ -253,9 +253,9 @@ public class CstlEmbeddedService extends CommandLine {
                 config.register(JacksonFeature.class);
                 config.register(MultiPartFeature.class);
                 config.register(RolesAllowedDynamicFeature.class);
-                ApplicationHandler handler = new ApplicationHandler(config);
+                //ApplicationHandler handler = new ApplicationHandler(config);
                 
-                threadSelector = GrizzlyHttpServerFactory.createHttpServer(currentUri, handler, true);
+                threadSelector = GrizzlyHttpServerFactory.createHttpServer(currentUri, config, true);
                 
                 
                 

@@ -18,14 +18,20 @@
  */
 package org.constellation.ws.rs;
 
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ws.rs.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 public class RestApplication extends ResourceConfig {
+    private static final Logger LOGGER = Logging.getLogger(RestApplication.class);
+    
     public RestApplication() {
          super(JacksonFeature.class, MultiPartFeature.class, RolesAllowedDynamicFeature.class);
-                  
+         LOGGER.info("Starting Rest API Application");
+         packages("org.constellation.rest.api;org.constellation.ws.rest;org.constellation.metadata.ws.rs.provider;org.constellation.ws.rs.provider");
     }
+    
 }

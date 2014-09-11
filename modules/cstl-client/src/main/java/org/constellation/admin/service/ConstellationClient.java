@@ -25,7 +25,6 @@ import org.constellation.configuration.AcknowlegementType;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientResponse;
-import org.glassfish.jersey.client.filter.HttpBasicAuthFilter;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -156,7 +155,7 @@ public final class ConstellationClient {
     public ConstellationClient basicAuth(final String login, final String password) {
         ensureNonNull("login",    login);
         ensureNonNull("password", password);
-        this.client.register(new HttpBasicAuthFilter(login, password));
+        this.client.register(new BasicAuthenticator(login, password));
         return this;
     }
     
