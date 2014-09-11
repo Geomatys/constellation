@@ -101,7 +101,7 @@ public class MetadataRest {
                 final Provider provider = providerBusiness.getProvider(ds.getProviderId());
                 final Optional<CstlUser> optUser = userRepository.findById(provider.getOwner());
                 String owner = null;
-                if(optUser!=null){
+                if(optUser!=null && optUser.isPresent()){
                     final CstlUser user = optUser.get();
                     if(user != null){
                         owner = user.getLogin();
