@@ -52,9 +52,11 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.ReferenceIdentifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Component
+@Primary
 public class ProviderBusiness implements IProviderBusiness {
     private static final Logger LOGGER = Logging.getLogger(ProviderBusiness.class);
 
