@@ -635,7 +635,7 @@
     "metadata.edition.dataset.raster":"Données raster",
     "metadata.edition.heading.save":"Enregistrer les modifications",
     "metadata.edition.heading.requiredFields":"(*) Champ obligatoire",
-    "metadata.edition.heading.scrolltotop":"Retour en haut de page",
+    "metadata.edition.heading.scrolltotop":"Retour en haut",
     "metadata.edition.validation.required":"Ce champ est obligatoire",
     "metadata.edition.validation.url":"Format URL non valide ",
     "metadata.edition.validation.email":"Format E-mail non valide",
