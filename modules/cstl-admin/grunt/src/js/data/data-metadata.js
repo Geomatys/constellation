@@ -21,9 +21,9 @@
 angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('EditMetadataController', function ($scope, $routeParams,dataListing, $location, $translate, Growl) {
-        $scope.provider = $routeParams.id;
-        $scope.type = $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
-        $scope.template = $routeParams.template || 'import';
+        $scope.provider = $scope.provider || $routeParams.id;
+        $scope.type = $scope.type || $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
+        $scope.template = $scope.template || $routeParams.template || 'import';
         $scope.typeLabelKey = "metadata.edition.dataset."+$scope.type;
 
         /**
@@ -181,16 +181,6 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
         $scope.showValidationPopup = function(form) {
             var validationPopup = $('#validationPopup');
             validationPopup.modal("show");
-            validationPopup.on('hidden.bs.modal', function(e){
-                if(form && form.$invalid){
-                    var firstInvalid = $('.highlight-invalid').get(0);
-                    if(firstInvalid){
-                        $('html, body').animate(
-                            {scrollTop: $(firstInvalid).offset().top-200}, 1000);
-                        $(firstInvalid).focus();
-                    }
-                }
-            });
         };
 
         /**
@@ -374,8 +364,38 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                     icon.addClass('fa-angle-up');
                 }
             });
+            $(document).on('hidden.bs.modal','#validationPopup', function(e){
+                if($('#metadataform').hasClass('ng-invalid')){
+                    var selClass = '.highlight-invalid';
+                    var firstInvalid = $(selClass).get(0);
+                    if(firstInvalid){
+                        var modalBody = $(selClass).parents('.modal-body');
+                        if(modalBody && modalBody.get(0)){
+                            modalBody.animate(
+                                {scrollTop: $(firstInvalid).offset().top-200}, 1000);
+                        }else {
+                            $('html, body').animate(
+                                {scrollTop: $(firstInvalid).offset().top-200}, 1000);
+                        }
+                        $(firstInvalid).focus();
+                    }
+                }
+            });
             window.collapseEditionEventsRegistered = true;
         }
+
+        /**
+         * Scrolling to top with animation effect.
+         */
+        $scope.scrollToTop = function(){
+            var elem = $('.scrolltotop');
+            var modalBody = elem.parents('.modal-body');
+            if(modalBody && modalBody.get(0)){
+                modalBody.animate({scrollTop: '0px'}, 1000);
+            }else {
+                jQuery('html, body').animate({scrollTop: '0px'}, 1000);
+            }
+        };
 
         /**
          * Returns the title value of metadata.
@@ -400,7 +420,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
         };
 
         /**
-         * Save the metadata in server.
+         * Save for metadata in page editor mode.
          */
         $scope.save = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
@@ -413,6 +433,26 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                         Growl('success','Success','Metadata saved with success!');
                     },
                     function(response) {
+                        Growl('error','Error','Failed to save metadata because the server returned an error!');
+                    }
+                );
+            }
+        };
+        /**
+         * Save for metadata in modal editor mode.
+         */
+        $scope.save2 = function() {
+            if($scope.metadataValues && $scope.metadataValues.length>0){
+                //console.debug($scope.metadataValues[0]);
+                //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
+                dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.template},
+                    $scope.metadataValues[0],
+                    function(response) {//success
+                        $scope.close();
+                        Growl('success','Success','Metadata saved with success!');
+                    },
+                    function(response) {//error
+                        $scope.close();
                         Growl('error','Error','Failed to save metadata because the server returned an error!');
                     }
                 );
@@ -478,11 +518,18 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
 
     })
 
-    /*.controller('EditMetadataModalController', function($scope, $controller) {
+    .controller('EditMetadataModalController', function($scope, $modalInstance, $controller,id,type,template) {
+        $scope.provider = id;
+        $scope.type = type;
+        $scope.template = template;
+        $scope.current = {};
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
         $controller('EditMetadataController', {$scope: $scope});
 
-        console.debug($scope.codeLists);
-    })*/
+    })
 
     .controller('ViewMetadataModalController', function($scope, $modalInstance, $http, selected, metadataValues, isMDdashboard) {
         $scope.metadataValues = [];

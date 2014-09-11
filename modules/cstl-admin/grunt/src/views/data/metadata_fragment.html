@@ -1,0 +1,108 @@
+
+<div class="row" style="margin: 0;">
+    <div class="row bg-white" style="padding-bottom:30px;">
+        <div class="col-sm-12">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab">
+                        <span translate="data.information.tab.metadata.title">Edit metadata</span>
+                    </a>
+                </li>
+            </ul>
+            <div style="margin-top:20px;">
+                <div class="tab-pane active">
+                    <form id="metadataform"
+                          class="form-horizontal"
+                          name="metadataform"
+                          role="form">
+                        <div class="row alert alert-info" style="margin: 0;">
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                <h4 style="font-weight:bold">
+                                    <span translate="metadata.edition.heading.title">Metadata title :</span>
+                                    <span style="font-weight:normal;font-size:15px;margin-left:15pt;">{{getMetadataTitle()}}</span>
+                                </h4><br/>
+                                <h5>
+                                    <span translate="metadata.edition.heading.type">Metadata type :</span>
+                                    <span style="font-size:13px;color:#999999;margin-left:10pt;">{{typeLabelKey | translate}}</span>
+                                </h5>
+                            </div>
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="text-align: right;">
+                                <div class="col-md-12" style="margin-top: 10pt;">
+                                    <button type="button"
+                                            class="btn btn-link"
+                                            style="font-size: 12px;"
+                                            ng-click="checkValidation(metadataform)">
+                                        <i class="fa fa-check-square-o"></i>
+                                        <span translate="metadata.edition.heading.check.validation">Check validation</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin: 0;">
+                            <div id="editorMetadata" ng-init="initMetadataEditorEvents()">
+                                <div ng-repeat="rootObj in metadataValues"
+                                     ng-include="'views/data/metadata_templating.html'"></div>
+                            </div>
+                        </div>
+                        <div class="row buttons-block">
+                            <span style="color:#db4747;" translate="metadata.edition.heading.requiredFields">(*) Required field</span>
+                            <button type="button"
+                                    class="btn btn-info pull-right scrolltotop"
+                                    ng-click="scrollToTop();">
+                                <i class="fa fa-chevron-up"></i>
+                                <span translate="metadata.edition.heading.scrolltotop">Scroll to top</span>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="validationPopup"
+                         class="modal fade"
+                         style="overflow:hidden;"
+                         tabindex="-1"
+                         role="dialog"
+                         aria-labelledby="modalValidTitle"
+                         aria-hidden="true">
+                        <div class="modal-dialog" style="width: 400px;margin-top: 90pt;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button"
+                                            class="close"
+                                            data-dismiss="modal"
+                                            aria-hidden="true">×</button>
+                                    <h4 id="modalValidTitle"
+                                        class="modal-title"
+                                        translate="metadata.edition.heading.check.validation">Validation check</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div ng-if="metadataform.$valid" class="row" style="margin:0;">
+                                        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2"
+                                             style="color: #13ac13;font-size: 30pt;">
+                                            <i class="fa fa-check-circle"></i>
+                                        </div>
+                                        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10" style="margin-top: 8pt;">
+                                            <span style="margin: 13pt 5pt;"
+                                              translate="metadata.edition.heading.check.validation.passed">Well done ! your current form is valid.</span>
+                                        </div>
+                                    </div>
+                                    <div ng-if="metadataform.$invalid" class="row" style="margin:0;">
+                                        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2"
+                                             style="color: #e52929;font-size: 30pt;">
+                                            <i class="fa fa-times-circle"></i>
+                                        </div>
+                                        <span class="col-xs-9 col-sm-9 col-md-9 col-lg-9"
+                                              style="margin: 13pt 5pt;"
+                                              translate="metadata.edition.heading.check.validation.notpassed">Failed to validate your current form, please check your values.</span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button"
+                                            class="btn btn-default"
+                                            data-dismiss="modal">Ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

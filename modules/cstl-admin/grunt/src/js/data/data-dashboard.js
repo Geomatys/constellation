@@ -446,26 +446,32 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 type = $scope.selected.Children[0].Type.toLowerCase();
             }
             var template = type;
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
-            var modalEditor = $modal.open({
+            openModalEditor($scope.selected.Name,type,template);
+        };
+
+        /**
+         * Open modal for metadata editor
+         * for given provider id, data type and template.
+         * @param id
+         * @param type
+         * @param template
+         */
+        function openModalEditor(id,type,template){
+            $modal.open({
                 templateUrl: 'views/data/modalEditMetadata.html',
                 controller: 'EditMetadataModalController',
                 resolve: {
-                    'id':function(){return $scope.selected.Name;},
+                    'id':function(){return id;},
                     'type':function(){return type;},
                     'template':function(){return template;}
                 }
             });
-            modalEditor.opened.then(function() {
-                modalLoader.close();
-            });
-        };
+        }
 
         /**
          * Open metadata page for dataset metadata.
+         * use $scope.displayMetadataEditor for Constellation SDI.
+         * this function will be used in Constellation Enterprise.
          */
         $scope.editMetadata = function() {
             var type = 'import';
@@ -536,7 +542,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/editmetadata/import/' + result.type + "/" + result.file);
+                        $scope.init(); //needed after import
+                        openModalEditor(result.file,result.type,"import");
+
                     }, function () {
                         Growl('error', 'Error', 'Unable to prepare metadata for next step!');
                     });
@@ -557,7 +565,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/editmetadata/import/' + result.type + "/" + result.file);
+                        $scope.init(); //needed after import
+                        openModalEditor(result.file,result.type,"import");
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
@@ -578,7 +587,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     return;
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                        $location.path('/editmetadata/import/' + result.type + "/" + result.file);
+                        $scope.init(); //needed after import
+                        openModalEditor(result.file,result.type,"import");
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
