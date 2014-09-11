@@ -47,6 +47,7 @@ import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProviderConfiguration;
+import org.constellation.dto.DataDescription;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.provider.Data;
@@ -87,6 +88,10 @@ public final class ProviderRest {
     @Inject
     private IDatasetBusiness datasetBusiness;
 
+    /**
+     * @FIXME remove this cache used for demo and add more generic cache management (Spring).
+     */
+    private static final Map<String,DataDescription> CACHE_DATA_DESC = new HashMap<>();
 
     @POST
     @Path("/{id}/test")
@@ -207,8 +212,14 @@ public final class ProviderRest {
     public Response dataDescription(final ParameterValues values) {
         final String id = values.getValues().get("providerId");
         final String layerName = values.getValues().get("dataId");
+        final DataDescription dd = CACHE_DATA_DESC.get(id+"_"+layerName);
+        if(dd != null) {
+            return Response.ok(dd).build();
+        }
         try {
-            return Response.ok(LayerProviders.getDataDescription(id, layerName)).build();
+            final DataDescription result = LayerProviders.getDataDescription(id, layerName);
+            CACHE_DATA_DESC.put(id+"_"+layerName,result);
+            return Response.ok(result).build();
         } catch (CstlServiceException ex) {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }

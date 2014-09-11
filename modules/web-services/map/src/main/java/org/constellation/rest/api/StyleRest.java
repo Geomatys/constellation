@@ -106,6 +106,11 @@ public final class StyleRest {
     private IStyleBusiness styleBusiness;
 
     /**
+     * @FIXME remove this cache used for demo and add more generic cache management (Spring).
+     */
+    private final static Map<String,ParameterValueGroup> CACHE_HISTOGRAM = new HashMap<>();
+
+    /**
      * @see StyleBusiness#createStyle(String, MutableStyle)
      */
     @PUT
@@ -728,11 +733,18 @@ public final class StyleRest {
    @POST
    @Path("statistics")
    public Response getHistogram(final ParameterValues values) throws NoSuchIdentifierException, ProcessException, DataStoreException {
-       final DataProvider provider = DataProviders.getInstance().getProvider(values.get("dataProvider"));
+       final String id = values.get("dataProvider");
+       final String dataId = values.get("dataId");
+       final ParameterValueGroup pvg = CACHE_HISTOGRAM.get(id+"_"+dataId);
+       if(pvg != null){
+           final ImageStatistics statistics = (ImageStatistics) pvg.parameter("outStatistic").getValue();
+           return ok(statistics);
+       }
+       final DataProvider provider = DataProviders.getInstance().getProvider(id);
        final DataStore store = provider.getMainStore();
        if(store instanceof CoverageStore){
            final CoverageStore coverageStore = (CoverageStore) store;
-           final QName qName = Util.parseQName(values.get("dataId"));
+           final QName qName = Util.parseQName(dataId);
            final CoverageReference coverageReference = coverageStore.getCoverageReference(new DefaultName(qName));
            GridCoverageReadParam params = new GridCoverageReadParam();
            params.setDeferred(true);
@@ -745,7 +757,8 @@ public final class StyleRest {
            procparams.parameter("inCoverage").setValue(coverage);
            final org.geotoolkit.process.Process process = desc.createProcess(procparams);
            final ParameterValueGroup result = process.call();
-           ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
+           CACHE_HISTOGRAM.put(id+"_"+dataId,result);
+           final ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
            return ok(statistics);
        }
        return ok(new AcknowlegementType("Failure", "datastore is not coverage store."));
