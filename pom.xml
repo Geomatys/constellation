@@ -172,7 +172,7 @@
 	    <jaxws.version>2.2.8</jaxws.version>
         <spring.version>4.0.6.RELEASE</spring.version>
         <selenium.version>2.42.2</selenium.version>
-        <jackson.version>2.2.0</jackson.version>
+        <jackson.version>2.3.2</jackson.version>
         <joda.version>2.2</joda.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
