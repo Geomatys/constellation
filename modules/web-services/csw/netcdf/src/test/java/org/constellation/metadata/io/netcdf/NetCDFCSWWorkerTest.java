@@ -100,6 +100,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
                 Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
                 configuration.putParameter("transactionSecurized", "false");
                 configuration.putParameter("shiroAccessible", "false");
+                configuration.putParameter("locale", "en");
 
                 serviceBusiness.create("csw", "default", configuration, null, null);
 

@@ -18,11 +18,35 @@
  */
 package org.constellation.metadata.io.netcdf;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.sis.internal.jaxb.LegacyNamespaces;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.generic.database.Automatic;
 import org.constellation.jaxb.MarshallWarnings;
+import static org.constellation.metadata.CSWConstants.NETCDF_EXT;
+import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.ISO_QUERYABLE;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -34,17 +58,33 @@ import org.constellation.util.ReflectionUtilities;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
 import org.geotoolkit.csw.xml.DomainValues;
+import static org.geotoolkit.csw.xml.TypeNames.METADATA_QNAME;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Creator_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Date_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Format_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Identifier_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Language_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Publisher_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Subject_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Title_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Type_QNAME;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Abstract_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Modified_QNAME;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
-import org.opengis.metadata.citation.ResponsibleParty;
+import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import org.opengis.metadata.citation.Responsibility;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.distribution.Distributor;
@@ -60,47 +100,6 @@ import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.util.InternationalString;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
-import java.util.logging.Level;
-
-import static org.constellation.metadata.CSWConstants.NETCDF_EXT;
-import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
-import static org.constellation.metadata.CSWQueryable.ISO_QUERYABLE;
-import static org.geotoolkit.csw.xml.TypeNames.METADATA_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Creator_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Date_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Format_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Identifier_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Language_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Publisher_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Subject_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Title_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Type_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Abstract_QNAME;
-import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Modified_QNAME;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
-import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 
 /**
  *
@@ -130,6 +129,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     private final boolean usePathAsIdentifier;
 
     private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
+    
+    private Locale locale = null;
+    
     /**
      * Build a new CSW NetCDF File Reader.
      *
@@ -176,6 +178,10 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 LOGGER.info("cache system have been disabled");
             }
             setIsCacheEnabled(c);
+        }
+        final String localeString = configuration.getParameter("locale");
+        if (localeString != null) {
+            locale = Locale.forLanguageTag(localeString);
         }
     }
 
@@ -847,6 +853,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             marshaller.setProperty(XML.TIMEZONE, tz);
             marshaller.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, replace);
             marshaller.setProperty(XML.GML_VERSION, LegacyNamespaces.VERSION_3_2_1);
+            if (locale != null) {
+                marshaller.setProperty(XML.LOCALE, locale);
+            }
             marshaller.marshal(obj, document);
 
             return document.getDocumentElement();
