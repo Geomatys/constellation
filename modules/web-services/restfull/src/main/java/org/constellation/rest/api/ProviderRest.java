@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -41,6 +42,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.collection.Cache;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
@@ -91,7 +93,7 @@ public final class ProviderRest {
     /**
      * @FIXME remove this cache used for demo and add more generic cache management (Spring).
      */
-    private static final Map<String,DataDescription> CACHE_DATA_DESC = new HashMap<>();
+    private static final Cache<String,DataDescription> CACHE_DATA_DESC = new Cache<>(10, 10, true);
 
     @POST
     @Path("/{id}/test")
@@ -210,25 +212,23 @@ public final class ProviderRest {
     @POST
     @Path("dataDescription")
     public Response dataDescription(final ParameterValues values) {
-        final String id = values.getValues().get("providerId");
-        final String layerName = values.getValues().get("dataId");
-        final DataDescription dd = CACHE_DATA_DESC.get(id+"_"+layerName);
-        if(dd != null) {
-            return Response.ok(dd).build();
-        }
         try {
-<<<<<<< HEAD
-            final DataDescription result = LayerProviders.getDataDescription(id, layerName);
-            CACHE_DATA_DESC.put(id+"_"+layerName,result);
-            return Response.ok(result).build();
-        } catch (CstlServiceException ex) {
-            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
-=======
-            return Response.ok(LayerProviders.getDataDescription(id, layerName)).build();
+            final String id = values.getValues().get("providerId");
+            final String layerName = values.getValues().get("dataId");
+            final String cacheKey = id+"_"+layerName;
+
+            return Response.ok(
+                    CACHE_DATA_DESC.getOrCreate(cacheKey, new Callable<DataDescription>() {
+                        @Override
+                        public DataDescription call() throws Exception {
+                            return LayerProviders.getDataDescription(id, layerName);
+                        }
+                    })
+            ).build();
+
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, null, ex);
             return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
->>>>>>> REST : fix exception managemenent on multiple methods.
         }
     }
 
