@@ -54,7 +54,7 @@ CREATE TABLE "om"."observed_properties" (
 
 CREATE TABLE "om"."procedures" (
     "id"     character varying(200) NOT NULL,
-    "shape"  postgis.geometry,
+    "shape"  geometry,
     "crs"    integer,
     "pid"    integer NOT NULL
 );
@@ -73,7 +73,7 @@ CREATE TABLE "om"."sampling_features" (
     "name"             character varying(200),
     "description"      character varying(200),
     "sampledfeature"   character varying(200),
-    "shape"            postgis.geometry,
+    "shape"            geometry,
     "crs"              integer
 );
 
