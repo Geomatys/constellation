@@ -38,17 +38,6 @@
 							}
 						},{
 							"field":{
-								"name":"metadata.field.lineageStatement",
-								"multiplicity":1,
-								"help":"metadata.field.lineageStatement_help",
-								"path":"dataQualityInfo.lineage.statement",
-								"render":"textarea",
-								"obligation":"M",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
 								"name":"metadata.field.date",
 								"multiplicity":1,
 								"help":"metadata.field.date_help",
@@ -78,17 +67,6 @@
 								"render":"MaintenanceFrequency.codelist",
 								"obligation":"M",
 								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.language",
-								"multiplicity":1,
-								"help":"metadata.field.language_help",
-								"path":"identificationInfo.language",
-								"render":"Language.codelist",
-								"obligation":"M",
-								"defaultValue":"LanguageCode.fra",
 								"value":null
 							}
 						}
@@ -140,55 +118,6 @@
 								"path":"identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
 								"render":"DATE.codelist",
 								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						}
-					]}
-				},{
-					"block":{
-						"name":"metadata.block.spatialRepresentation",
-						"multiplicity":1,
-						"help":"metadata.block.spatialRepresentation_help",
-						"path":null,
-						"children":[{
-							"field":{
-								"name":"metadata.field.type",
-								"multiplicity":1,
-								"help":"metadata.field.type_help",
-								"path":"identificationInfo.spatialRepresentationType",
-								"render":"CODELIST.readonly",
-								"obligation":"M",
-								"defaultValue":"MD_SpatialRepresentationTypeCode.grid",
-								"value":null
-							}
-						}
-					]}
-				},{
-					"block":{
-						"name":"metadata.block.refSystemInfo",
-						"multiplicity":1,
-						"help":"metadata.block.refSystemInfo_help",
-						"path":null,
-						"children":[{
-							"field":{
-								"name":"metadata.field.code",
-								"multiplicity":1,
-								"help":"metadata.field.code_help",
-								"path":"referenceSystemInfo.referenceSystemIdentifier.code",
-								"render":"ReferenceSystemIdentifier.codelist",
-								"obligation":"M",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.distance",
-								"multiplicity":1,
-								"help":"metadata.field.distance_help",
-								"path":"identificationInfo.spatialResolution.distance",
-								"render":"text",
-								"obligation":"M",
 								"defaultValue":null,
 								"value":null
 							}
@@ -273,25 +202,6 @@
 								"render":"DATE.text",
 								"obligation":"O",
 								"defaultValue":null,
-								"value":null
-							}
-						}
-					]}
-				},{
-					"block":{
-						"name":"metadata.block.distributionInfo",
-						"multiplicity":1,
-						"help":"metadata.block.distributionInfo_help",
-						"path":null,
-						"children":[{
-							"field":{
-								"name":"metadata.field.format",
-								"multiplicity":1,
-								"help":"metadata.field.format_help",
-								"path":"distributionInfo.distributionFormat.name",
-								"render":"DistributionFormat.codelist",
-								"obligation":"M",
-								"defaultValue":"SHP",
 								"value":null
 							}
 						}
@@ -598,136 +508,6 @@
 							}
 						}
 					]}
-				},{
-					"block":{
-						"name":"metadata.block.metadataContact",
-						"multiplicity":1,
-						"help":"metadata.block.metadataContact_help",
-						"path":"contact",
-						"render":"CONTACT",
-						"children":[{
-							"field":{
-								"name":"metadata.field.organisationName",
-								"multiplicity":1,
-								"help":"metadata.field.organisationName_help",
-								"path":"contact.organisationName",
-								"render":"text",
-								"obligation":"M",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.role",
-								"multiplicity":1,
-								"help":"metadata.field.role_help",
-								"path":"contact.role",
-								"render":"CODELIST.readonly",
-								"obligation":"M",
-								"defaultValue":"CI_RoleCode.pointOfContact",
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.individualName",
-								"multiplicity":1,
-								"help":"metadata.field.individualName_help",
-								"path":"contact.individualName",
-								"render":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.positionName",
-								"multiplicity":1,
-								"help":"metadata.field.positionName_help",
-								"path":"contact.positionName",
-								"render":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.deliveryPoint",
-								"multiplicity":1,
-								"help":"metadata.field.deliveryPoint_help",
-								"path":"contact.contactInfo.address.deliveryPoint",
-								"render":"textarea",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.city",
-								"multiplicity":1,
-								"help":"metadata.field.city_help",
-								"path":"contact.contactInfo.address.city",
-								"render":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.postalCode",
-								"multiplicity":1,
-								"help":"metadata.field.postalCode_help",
-								"path":"contact.contactInfo.address.postalCode",
-								"render":"integer",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.country",
-								"multiplicity":1,
-								"help":"metadata.field.country_help",
-								"path":"contact.contactInfo.address.country",
-								"render":"text",
-								"obligation":"O",
-								"defaultValue":"France",
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.electronicMailAddress",
-								"multiplicity":1,
-								"help":"metadata.field.electronicMailAddress_help",
-								"path":"contact.contactInfo.address.electronicMailAddress",
-								"render":"mail",
-								"obligation":"M",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.voice",
-								"multiplicity":1,
-								"help":"metadata.field.voice_help",
-								"path":"contact.contactInfo.phone.voice",
-								"render":"text",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.linkage",
-								"multiplicity":1,
-								"help":"metadata.field.linkage_help",
-								"path":"contact.contactInfo.onlineResource.linkage",
-								"render":"web",
-								"obligation":"O",
-								"defaultValue":null,
-								"value":null
-							}
-						}
-					]}
 				}
 			]}
 		},{
@@ -806,17 +586,6 @@
 								"render":"Language.codelist",
 								"obligation":"M",
 								"defaultValue":"LanguageCode.fra",
-								"value":null
-							}
-						},{
-							"field":{
-								"name":"metadata.field.parentIdentifier",
-								"multiplicity":1,
-								"help":"metadata.field.parentIdentifier_help",
-								"path":"parentIdentifier",
-								"render":"text",
-								"obligation":"O",
-								"defaultValue":null,
 								"value":null
 							}
 						},{
