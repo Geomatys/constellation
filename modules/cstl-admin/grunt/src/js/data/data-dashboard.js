@@ -393,6 +393,10 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * this function is called from data dashboard.
          */
         $scope.displayMetadataFromDD = function() {
+            var type = $scope.selected.Type.toLowerCase();
+            if(type.toLowerCase() === 'coverage'){
+                type = 'raster';
+            }
             $modal.open({
                 templateUrl: 'views/data/modalViewMetadata.html',
                 controller: 'ViewMetadataModalController',
@@ -401,7 +405,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     'isMDdashboard':function(){return false;},
                     'metadataValues':function(textService){
                         return textService.metadataJson($scope.selected.Provider,
-                            $scope.selected.Name, $scope.selected.Type.toLowerCase(), true);
+                            $scope.selected.Name, type, true);
                     }
                 }
             });
@@ -416,6 +420,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             var type = 'import';
             if($scope.selected.Children && $scope.selected.Children.length >0){
                 type = $scope.selected.Children[0].Type.toLowerCase();
+            }
+            if(type.toLowerCase() === 'coverage'){
+                type = 'raster';
             }
             $modal.open({
                 templateUrl: 'views/data/modalViewMetadata.html',
@@ -433,13 +440,14 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
 
         /**
          * Open metadata editor in modal popup.
-         * //@TODO implements the opening of metadata in editor.
-         * //this function is never called yet.
          */
         $scope.displayMetadataEditor = function() {
             var type = 'import';
-            if($scope.selected.Children && $scope.selected.Children.length >0){
-                type = $scope.selected.Children[0].Type.toLowerCase();
+            if($scope.selected.Type){
+                type = $scope.selected.Type.toLowerCase();
+            }
+            if(type === 'coverage'){
+                type = 'raster';
             }
             var template = type;
             openModalEditor($scope.selected.Name,type,template);

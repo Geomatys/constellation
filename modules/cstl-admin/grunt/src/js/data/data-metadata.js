@@ -23,6 +23,9 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
     .controller('EditMetadataController', function ($scope, $routeParams,dataListing, $location, $translate, Growl) {
         $scope.provider = $scope.provider || $routeParams.id;
         $scope.type = $scope.type || $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
+        if($scope.type.toLowerCase() === 'coverage'){
+            $scope.type = 'raster';
+        }
         $scope.template = $scope.template || $routeParams.template || 'import';
         $scope.typeLabelKey = "metadata.edition.dataset."+$scope.type;
 

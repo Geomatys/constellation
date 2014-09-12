@@ -879,7 +879,7 @@ public class DataRest {
             if("vector".equalsIgnoreCase(type)){
                 //vector template
                 templateName="profile_default_vector";
-            }else if ("vector".equalsIgnoreCase(type)){
+            }else if ("raster".equalsIgnoreCase(type)){
                 //raster template
                 templateName="profile_default_raster";
             } else {
