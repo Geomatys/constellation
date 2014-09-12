@@ -224,25 +224,19 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * main function of dashboard that loads the list of objects from server.
          */
         $scope.init = function() {
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
             if($scope.dataCtrl.currentTab === 'tabdata'){
-                dataListing.listAll({}, function(response) {
+                dataListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
-                    modalLoader.close();
-                }, function() {
-                    modalLoader.close();
+                }, function() {//error
+                    Growl('error','Error','Unable to load list of data!');
                 });
             }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
                 datasetListing.listAll({}, function(response){//success
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
-                    modalLoader.close();
                 }, function(response){//error
-                    modalLoader.close();
+                    Growl('error','Error','Unable to load list of dataset!');
                 });
             }
             //display button that allow to scroll to top of the page from a certain height.
@@ -259,15 +253,10 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.showPublished = function(published){
             $scope.dataCtrl.published=published;
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
-            dataListing.listPublished({published:published}, function(response) {
+            dataListing.listPublished({published:published}, function(response) {//success
                 Dashboard($scope, response, true);
-                modalLoader.close();
-            }, function() {
-                modalLoader.close();
+            }, function() { //error
+                Growl('error','Error','Unable to show published data!');
             });
         };
 
@@ -278,16 +267,11 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.showSensorable = function(observation){
             $scope.dataCtrl.observation=observation;
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
             dataListing.listSensorable({observation:observation},
                 function(response) {//success
                     Dashboard($scope, response, true);
-                    modalLoader.close();
                 }, function() {//error
-                    modalLoader.close();
+                    Growl('error','Error','Unable to show sensorable data!');
                 });
         };
 
@@ -317,10 +301,6 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
 
             var providerId = $scope.selected.Provider;
             var layerData;
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
             if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
                 layerData = DataViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,
                     layerName,
@@ -343,11 +323,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                         var extent = new OpenLayers.Bounds(bbox[0],bbox[1],bbox[2],bbox[3]);
                         DataViewer.map.zoomToExtent(extent, true);
                     }
-                    modalLoader.close();
                 }, function() {//error
                     // failed to find a metadata, just load the full map
                     DataViewer.initMap('dataMap');
-                    modalLoader.close();
                 }
             );
         };
@@ -810,20 +788,14 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                                 // In the case of a wms service and user asked to pyramid the data
                                 dataListing.pyramidConform({providerId: value.Provider, dataId: value.Name}, {}, addLayer, pyramidGenerationError);
                             } else {
-                                var modalLoader = $modal.open({
-                                    templateUrl: 'views/modalLoader.html',
-                                    controller: 'ModalInstanceCtrl'
-                                });
                                 webService.addLayer({type: service.type, id: service.identifier},
                                     {layerAlias: value.Name, layerId: value.Name, serviceType: service.type, serviceId: service.identifier, providerId: value.Provider, layerNamespace: value.Namespace},
                                 function(response) {
                                     Growl('success', 'Success', response.message);
-                                    modalLoader.close();
                                     $modalInstance.close();
                                 },
                                 function(response) {
                                     Growl('error', 'Error', response.message);
-                                    modalLoader.close();
                                     $modalInstance.dismiss('close');
                                 });
                             }

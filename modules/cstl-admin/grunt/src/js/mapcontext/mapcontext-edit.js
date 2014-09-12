@@ -471,26 +471,16 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         $scope.searchAndDisplayWmsLayers = function() {
             if ($scope.external.serviceUrl) {
-                var modalLoader = $modal.open({
-                    templateUrl: 'views/modalLoader.html',
-                    controller: 'ModalInstanceCtrl'
-                });
-
                 // Try in WMS version 1.3.0
                 mapcontext.listExtLayers({version: "1.3.0"}, $scope.external.serviceUrl, function(response) {
                     $scope.external.layers = response;
-                    modalLoader.close();
-
                     $scope.mode.dispWmsLayers = true;
                 }, function() {
                     // If it fails tries it in version 1.1.1
                     mapcontext.listExtLayers({version: "1.1.1"}, $scope.external.serviceUrl, function(response) {
                         $scope.external.layers = response;
-                        modalLoader.close();
-
                         $scope.mode.dispWmsLayers = true;
                     }, function() {
-                        modalLoader.close();
                         Growl('error', 'Error', 'Unable to find layers for this url');
                     });
                 });

@@ -26,11 +26,6 @@ angular.module('cstl-webservice-dashboard', ['cstl-restapi', 'cstl-services', 'p
         $scope.hideScroll = true;
         $scope.hideScrollServices = true;
 
-        var modalLoader = $modal.open({
-            templateUrl: 'views/modalLoader.html',
-            controller: 'ModalInstanceCtrl'
-        });
-
         $scope.getCurrentLang = function() {
             return $translate.use();
         };
@@ -43,11 +38,10 @@ angular.module('cstl-webservice-dashboard', ['cstl-restapi', 'cstl-services', 'p
             }
             $scope.$apply();
         });
-        webService.listAll({lang: $scope.getCurrentLang()}, function(response){
+        webService.listAll({lang: $scope.getCurrentLang()}, function(response){//success
             $scope.services = response;
-            modalLoader.close();
-        }, function() {
-            modalLoader.close();
+        }, function() {//error
+            Growl('error','Error','Unable to show services list!');
         });
 
 

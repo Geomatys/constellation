@@ -389,10 +389,6 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         $scope.showLayer = function() {
             $('#viewerData').modal("show");
             var layerName = $scope.selected.Name;
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
             if ($scope.service.type === 'WMTS') {
                 // GetCaps
                 textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
@@ -403,7 +399,6 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                         var layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, capabilities);
                         WmtsViewer.map.addLayer(layerData);
                         WmtsViewer.map.zoomToMaxExtent();
-                        modalLoader.close();
                     });
             } else {
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
@@ -423,11 +418,9 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                             var extent = new OpenLayers.Bounds(bbox[0],bbox[1],bbox[2],bbox[3]);
                             DataViewer.map.zoomToExtent(extent, true);
                         }
-                        modalLoader.close();
                     }, function() {//error
                         // failed to find a metadata, just load the full map
                         DataViewer.initMap('dataMap');
-                        modalLoader.close();
                     }
                 );
             }

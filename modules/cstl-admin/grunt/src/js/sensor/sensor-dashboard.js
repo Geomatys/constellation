@@ -29,15 +29,10 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         $scope.hideScroll = true;
 
         $scope.init = function() {
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
-            sensor.list({}, function(response) {
+            sensor.list({}, function(response) {//success
                 Dashboard($scope, response.children, false);
-                modalLoader.close();
-            }, function() {
-                modalLoader.close();
+            }, function() {//error
+                Growl('error','Error','Unable to show sensor list!');
             });
             angular.element($window).bind("scroll", function() {
                 if (this.pageYOffset < 220) {

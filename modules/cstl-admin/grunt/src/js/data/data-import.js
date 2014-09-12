@@ -290,7 +290,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
     })
 
-    .controller('ModalImportDataStep1LocalController', function($scope, dataListing, $cookies, Growl) {
+    .controller('ModalImportDataStep1LocalController', function($scope, dataListing, $cookies, Growl, cfpLoadingBar) {
         $scope.loader = {
             upload: false
         };
@@ -310,16 +310,22 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 cache: false,
                 contentType: false,
                 processData: false,
+                beforeSend: function(){
+                    cfpLoadingBar.start();
+                    cfpLoadingBar.inc();
+                },
                 success: function (response) {
                     $scope.$apply(function() {
                         $scope.import.dataPath = response.dataPath;
                         $scope.loader.upload = false;
                         $scope.import.currentStep = 'step2Metadata';
                         $scope.import.allowNext = true;
+                        cfpLoadingBar.complete();
                     });
                 },
                 error: function(){
                     Growl('error', 'Error', 'error while uploading data');
+                    cfpLoadingBar.complete();
                 }
             });
         };
@@ -423,7 +429,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
 })
 
-    .controller('ModalImportDataStep2MetadataController', function($scope, $cookies, Growl, dataListing) {
+    .controller('ModalImportDataStep2MetadataController', function($scope, $cookies, Growl, dataListing, cfpLoadingBar) {
 
         $scope.columns = [];
 
@@ -515,18 +521,21 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 cache: false,
                 contentType: false,
                 processData: false,
+                beforeSend: function(){
+                    cfpLoadingBar.start();
+                    cfpLoadingBar.inc();
+                },
                 success: function(result) {
                     $scope.import.mdPath = result.metadataPath;
                     $scope.import.dataName = result.dataName;
                     $scope.import.dataTitle = result.metatitle;
                     $scope.import.metaIdentifier = result.metaIdentifier;
                     $scope.selectType();
+                    cfpLoadingBar.complete();
                 },
                 error: function(result){
                     Growl('error','Error',result.responseJSON.msg);
-//                    $scope.import.currentStep = 'step2Metadata';
-//                    $scope.import.allowNext = false;
-//                    $scope.import.allowSubmit = false;
+                    cfpLoadingBar.complete();
                 }
             });
         };
@@ -555,7 +564,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
     })
 
-    .controller('ModalImportDataStep4SensorController', function($scope, sensor, dataListing, Dashboard, Growl, $cookies) {
+    .controller('ModalImportDataStep4SensorController', function($scope, sensor, dataListing, Dashboard, Growl, $cookies, cfpLoadingBar) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -618,8 +627,17 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 cache: false,
                 contentType: false,
                 processData: false,
+                beforeSend: function(){
+                    cfpLoadingBar.start();
+                    cfpLoadingBar.inc();
+                },
                 success: function (path) {
                     importAndLinkSensor(path.dataPath);
+                    cfpLoadingBar.complete();
+                },
+                error: function (data){
+                    Growl('error','Error','Unable to upload sensor');
+                    cfpLoadingBar.complete();
                 }
             });
         };

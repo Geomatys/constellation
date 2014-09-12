@@ -25,23 +25,14 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
         $scope.hideScroll = true;
 
         $scope.init = function() {
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
-            modalLoader.opened.then(function() {
-                style.listAll({provider: 'sld'},
-                    function(response) {
-                        Dashboard($scope, response.styles, true);
-                        $scope.wrap.filtertype = "";
-                        $scope.wrap.ordertype = "Name";
-                        modalLoader.close();
-                    },
-                    function() {
-                        modalLoader.close();
-                    }
-                );
-            });
+            style.listAll({provider: 'sld'},function(response) {//success
+                    Dashboard($scope, response.styles, true);
+                    $scope.wrap.filtertype = "";
+                    $scope.wrap.ordertype = "Name";
+                },function() {//error
+                    Growl('error','Error','Unable to show styles list!');
+                }
+            );
             angular.element($window).bind("scroll", function() {
                 if (this.pageYOffset < 220) {
                     $scope.hideScroll = true;

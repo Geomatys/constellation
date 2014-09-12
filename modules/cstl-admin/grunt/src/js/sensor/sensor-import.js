@@ -20,7 +20,7 @@
 
 angular.module('cstl-sensor-import', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('SensorAddModalController', function ($scope, $modalInstance, sensor, Growl, $cookies) {
+    .controller('SensorAddModalController', function ($scope, $modalInstance, sensor, Growl, $cookies, cfpLoadingBar) {
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
@@ -38,13 +38,19 @@ angular.module('cstl-sensor-import', ['ngCookies', 'cstl-restapi', 'cstl-service
                 cache: false,
                 contentType: false,
                 processData: false,
+                beforeSend: function(){
+                    cfpLoadingBar.start();
+                    cfpLoadingBar.inc();
+                },
                 success: function (data) {
                     Growl('success','Success','Sensor correctly imported');
                     $modalInstance.close();
+                    cfpLoadingBar.complete();
                 },
                 error: function (data){
                     Growl('error','Error','Unable to import sensor');
                     $modalInstance.dismiss('close');
+                    cfpLoadingBar.complete();
                 }
             });
         };

@@ -199,14 +199,16 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         $scope.$watch('newStyle', function() {
             if($scope.optionsSLD.autoPreview){
                 var mapId = null;
+                var timeout = 100;
                 if($scope.selectedLayer && $scope.stylechooser === 'existing'){
                     mapId = 'styledMapWithSelectedStyle';
+                    timeout = 400;
                 }else {
                     mapId = 'styledMapOL';
                 }
                 //using $timeout to fix Angular bug :
                 // with modal to let OpenLayers map initialization when the map div is not rendered yet.
-                $timeout(function(){$scope.displayCurrentStyle(mapId,null);},100);
+                $timeout(function(){$scope.displayCurrentStyle(mapId,null);},timeout);
             }
         },true);
 
@@ -449,6 +451,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         $scope.setStyleChooser = function(choice) {
             $scope.stylechooser = choice;
             if(choice ==='existing'){
+                console.debug('22222222');
                 setTimeout(function(){$scope.displayCurrentStyle('styledMapWithSelectedStyle',null);},100);
             }else {
                 setTimeout(function(){$scope.displayCurrentStyle('styledMapOL',null);},100);

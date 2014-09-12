@@ -32,10 +32,6 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         $scope.hideScroll = true;
 
         $scope.init = function() {
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
             TaskService.listParamsTask({}).$promise
                 .then(function(response){
                     // On success
@@ -45,7 +41,6 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                     Growl('error', 'Error', 'Unable to get tasks list');
                 })['finally'](function(){
                 // On all case
-                modalLoader.close();
             });
 
             angular.element($window).bind("scroll", function() {

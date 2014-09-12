@@ -24,11 +24,13 @@ var cstlAdminApp = angular.module('CstlAdminApp', [
     'ngCookies',
     'ngResource',
     'ngRoute',
+    'ngAnimate',
     // Libraries modules.
     'base64',
     'hljs',
     'pascalprecht.translate',
     'rzModule',
+    'angular-loading-bar',
     'ui.ace',
     'ui.bootstrap.modal',
     'ui.bootstrap.buttons',

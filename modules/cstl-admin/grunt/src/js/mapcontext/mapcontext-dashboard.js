@@ -32,16 +32,11 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
         $scope.hideScroll = true;
 
         $scope.init = function() {
-            var modalLoader = $modal.open({
-                templateUrl: 'views/modalLoader.html',
-                controller: 'ModalInstanceCtrl'
-            });
-            mapcontext.listLayers({}, function(response) {
+            mapcontext.listLayers({}, function(response) {//success
                 Dashboard($scope, response, true);
                 $scope.wrap.ordertype='name';
-                modalLoader.close();
-            }, function() {
-                modalLoader.close();
+            }, function() {//error
+                Growl('error','Error','Unable to show layers list!');
             });
             angular.element($window).bind("scroll", function() {
                 if (this.pageYOffset < 220) {
