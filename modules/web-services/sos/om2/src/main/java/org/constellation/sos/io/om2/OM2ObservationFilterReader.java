@@ -567,9 +567,11 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     String value = rs.getString(i + 3);
                     Field field = fields.get(i);
                     // for time TODO remove when field will be typed
-                    if (field.fieldType.equals("Time")) {
+                    if (value != null && field.fieldType.equals("Time")) {
                         value = value.replace(' ', 'T');
                         value = value.substring(0, value.length() - 2);
+                    } else if (value == null) {
+                        value = "";
                     }
                     values.append(value).append(encoding.getTokenSeparator());
                 }
