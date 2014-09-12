@@ -22,14 +22,17 @@ import java.util.Set;
 import java.util.List;
 import java.util.Locale;
 import java.util.ArrayList;
+import java.util.Date;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.opengis.metadata.citation.Party;
 import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.citation.DateType;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
+import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
 import org.apache.sis.metadata.iso.citation.DefaultIndividual;
 import org.apache.sis.metadata.iso.citation.DefaultOrganisation;
 import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
@@ -76,8 +79,10 @@ public final strictfp class TemplateTest {
      * Creates the metadata object corresponding to the {@link #JSON} string.
      */
     private static DefaultMetadata createMetadata() {
+        final DefaultCitation citation = new DefaultCitation("Data \"title\"");
+        citation.setDates(singleton(new DefaultCitationDate(new Date(1272844800000L + 24*60*60*1000), DateType.CREATION)));
         final DefaultDataIdentification identification = new DefaultDataIdentification();
-        identification.setCitation(new DefaultCitation("Data \"title\""));
+        identification.setCitation(citation);
         identification.setExtents(singleton(new DefaultExtent(null,
                 new DefaultGeographicBoundingBox(-11.4865013, -4.615912, 43.165467, 49.9990223), null, null)
         ));

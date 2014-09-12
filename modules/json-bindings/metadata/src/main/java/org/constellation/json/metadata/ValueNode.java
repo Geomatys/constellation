@@ -22,7 +22,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.TimeZone;
 import java.util.MissingResourceException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.opengis.util.Enumerated;
@@ -40,6 +43,15 @@ import org.apache.sis.util.CharSequences;
  */
 @SuppressWarnings("serial")
 final class ValueNode extends ArrayList<ValueNode> {
+    /**
+     * The object to use for parsing dates of the form "2014-09-11".
+     * Usage of this format shall be synchronized on {@code DATE_FORMAT}.
+     */
+    static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    static {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
     /**
      * The template for which this node contains a value.
      */
@@ -95,8 +107,6 @@ final class ValueNode extends ArrayList<ValueNode> {
             p = null;
         } else if (value instanceof Number) {
             p = value.toString();
-        } else if (value instanceof Date) {
-            p = Long.toString(((Date) value).getTime());
         } else if (value instanceof Angle) {
             p = Double.toString(((Angle) value).degrees());
         } else {
@@ -107,6 +117,11 @@ final class ValueNode extends ArrayList<ValueNode> {
             if (value instanceof Enumerated) {
                 out.append(Types.getStandardName(value.getClass())).append('.')
                    .append(Types.getCodeName((Enumerated) value));
+            } else if (value instanceof Date) {
+                synchronized (DATE_FORMAT) {
+                    p = DATE_FORMAT.format(value);
+                }
+                out.append(p);
             } else if (value instanceof Locale) {
                 String language;
                 try {

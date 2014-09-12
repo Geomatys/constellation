@@ -497,7 +497,7 @@
 								"path":"dataQualityInfo.report.result.specification.date.date",
 								"render":"DATE.readonly",
 								"obligation":"M",
-								"defaultValue":1272844800000,
+								"defaultValue":"2010-05-03",
 								"value":null
 							}
 						},{

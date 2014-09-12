@@ -26,9 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Date;
-import java.util.TimeZone;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import org.opengis.metadata.citation.Responsibility;
@@ -71,14 +68,6 @@ final class MetadataUpdater {
      * The metadata factory to use for creating new instances.
      */
     private static final MetadataFactory FACTORY = new MetadataFactory();
-
-    /**
-     * The object to use for parsing dates of the form "2014-09-11".
-     */
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     /**
      * The metadata standard.
@@ -270,8 +259,8 @@ final class MetadataUpdater {
             throw new ParseException("Illegal date: " + value, e);
         }
         try {
-            synchronized (DATE_FORMAT) {
-                return DATE_FORMAT.parse((String) value);
+            synchronized (ValueNode.DATE_FORMAT) {
+                return ValueNode.DATE_FORMAT.parse((String) value);
             }
         } catch (java.text.ParseException e) {
             throw new ParseException("Illegal date: " + value, e);

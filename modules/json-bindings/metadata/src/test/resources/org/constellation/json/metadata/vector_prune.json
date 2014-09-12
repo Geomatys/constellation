@@ -25,6 +25,28 @@
 								"defaultValue":null,
 								"value":"Data \"title\""
 							}
+						},{
+							"field":{
+								"name":"metadata.field.date",
+								"multiplicity":1,
+								"help":"metadata.field.date_help",
+								"path":"identificationInfo[1].citation.date[1].date",
+								"render":"DATE.text",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":"2010-05-04"
+							}
+						},{
+							"field":{
+								"name":"metadata.field.dateType",
+								"multiplicity":1,
+								"help":"metadata.field.dateType_help",
+								"path":"identificationInfo[1].citation.date[1].dateType",
+								"render":"DATE.codelist",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":"CI_DateTypeCode.creation"
+							}
 						}
 					]}
 				},{

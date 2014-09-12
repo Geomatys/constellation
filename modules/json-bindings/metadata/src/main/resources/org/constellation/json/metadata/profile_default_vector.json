@@ -349,9 +349,9 @@
 								"multiplicity":1,
 								"help":"metadata.field.report.specification.date_help",
 								"path":"dataQualityInfo.report.result.specification.date.date",
-								"render":"DATE.readonly",
+								"render":"DATE.text",
 								"obligation":"M",
-								"defaultValue":1272844800000,
+								"defaultValue":null,
 								"value":null
 							}
 						},{
