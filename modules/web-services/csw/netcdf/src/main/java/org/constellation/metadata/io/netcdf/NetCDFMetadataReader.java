@@ -328,6 +328,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         }
         if (metadataFile != null && metadataFile.exists()) {
             final ImageCoverageReader reader = new ImageCoverageReader();
+            if (locale != null) {
+                reader.setLocale(locale);
+            }
             try {
                 reader.setInput(metadataFile);
                 final Object obj = reader.getMetadata();
@@ -644,6 +647,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         final String identifierPrefix    = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
         final List<String> result        = new ArrayList<>();
         final ImageCoverageReader reader = new ImageCoverageReader();
+        if (locale != null) {
+            reader.setLocale(locale);
+        }
         try {
             for (File metadataFile : directory.listFiles()) {
 
@@ -717,6 +723,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         final String identifierPrefix = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
         final List<Object> results = new ArrayList<>();
         final ImageCoverageReader reader = new ImageCoverageReader();
+        if (locale != null) {
+            reader.setLocale(locale);
+        }
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
             if (fileName.endsWith(CURRENT_EXT)) {
