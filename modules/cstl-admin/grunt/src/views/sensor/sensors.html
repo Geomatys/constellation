@@ -2,7 +2,6 @@
     <div class="col-sm-9">
         <h3 class="header-title" translate="page.header.title.sensors">Sensors Dashboard</h3>
     </div>
-    <!-- Menu to create services -->
     <div class="col-sm-3">
         <div class="pull-right">
             <a class="btn btn-add btn-lg"
@@ -14,7 +13,7 @@
         </div>
     </div>
 </div>
-<div id="dataDashboard" class="row" ng-init="init()">
+<div id="sensorDashboard" class="row" ng-init="init()">
     <div class="col-sm-12">
         <div class="frame dashboard">
             <div class="navbar navbar-default" style="margin-bottom: 0px;">
@@ -68,7 +67,7 @@
             <div class="dash-inner row">
                 <div class="pull-left"
                      style="width: 60%; margin-bottom: 5px;"
-                     ng-init="small=false">
+                     ng-init="sensorCtrl.smallMode=false">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-data pagination-sos">
                             <strong class="col-lg-6 col-xs-8 col-md-6">
@@ -78,16 +77,16 @@
                             <div class="hidden-sm hidden-xs pull-right col-md-6"
                                  style="padding-right:0;">
                                 <button type="button"
-                                        ng-click="small=true"
+                                        ng-click="sensorCtrl.smallMode=true"
                                         class="pull-right btn btn-xs btn-info btn-sos  btn-data"
-                                        ng-class="{'btn-small-selected':small==true}"
+                                        ng-class="{'btn-small-selected':sensorCtrl.smallMode}"
                                         style="border-radius:0 3px 3px 0; margin-top: 5px; width:32px; height:34px;">
                                     <img src="img/btn-display-reduced.svg" alt="" />
                                 </button>
                                 <button type="button"
-                                        ng-click="small=false"
+                                        ng-click="sensorCtrl.smallMode=false"
                                         class="pull-right btn btn-xs btn-info btn-sos btn-data"
-                                        ng-class="{'btn-small-selected':small==false}"
+                                        ng-class="{'btn-small-selected':!sensorCtrl.smallMode}"
                                         style="margin-left: 10px; border-radius:3px 0 0 3px; margin-top: 5px; width:32px; height:34px;">
                                     <img src="img/btn-display-normal.svg" alt="" />
                                 </button>
@@ -111,7 +110,7 @@
                         </div>
                         <div class="item-list">
                             <div ng-repeat="sosdata in wrap.dataList"
-                                 ng-class="{'col-xs-6':small==true}"
+                                 ng-class="{'col-xs-6':sensorCtrl.smallMode}"
                                  style="padding-left:0;">
                                 <div class="item"
                                      ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}"
@@ -119,8 +118,8 @@
                                     <div class="top">
                                         <span class="item-title"
                                               ng-class="{'title-sensorSystem':sosdata.type==='System'}"
-                                              title="{{sosdata.id}}">{{truncate(small,sosdata.id)}}</span>
-                                        <span ng-if="sosdata.type==='System' && !small"
+                                              title="{{sosdata.id}}">{{truncate(sensorCtrl.smallMode,sosdata.id)}}</span>
+                                        <span ng-if="sosdata.type==='System' && !sensorCtrl.smallMode"
                                               class="pull-right text-right item-list-style"
                                               style="width:172px;"
                                               translate="label.sensor.system">sensor system</span>
@@ -148,11 +147,11 @@
                                      style="margin-top:0;"
                                      ng-if="sosdata==selected"
                                      ng-repeat="soschild in sosdata.children"
-                                     ng-class="{'selected':soschild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}"
+                                     ng-class="{'selected':soschild===sensorCtrl.selectedSensorsChild, 'child':!sensorCtrl.smallMode, 'col-xs-11':sensorCtrl.smallMode, 'col-sm-offset-1':sensorCtrl.smallMode}"
                                      ng-click="selectSensorsChild(soschild)">
                                     <div class="top">
                                         <span class="item-title"
-                                              title="{{soschild.id}}">{{truncate(small,soschild.id)}}</span>
+                                              title="{{soschild.id}}">{{truncate(sensorCtrl.smallMode,soschild.id)}}</span>
                                         <span class="pull-right text-right item-list-style"
                                               translate="label.sensor">sensor</span>
                                     </div>
@@ -204,9 +203,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="block-content" ng-if="selectedSensorsChild != null">
+                            <div class="block-content" ng-if="sensorCtrl.selectedSensorsChild != null">
                                 <h6 translate="label.title">Title</h6>
-                                <span>{{truncateTitleBlock(selectedSensorsChild.id)}}</span>
+                                <span>{{truncateTitleBlock(sensorCtrl.selectedSensorsChild.id)}}</span>
                                 <div class="separator"></div>
                                 <h6 translate="label.type">Type</h6>
                                 <span translate="label.sensor">sensor</span>
@@ -248,6 +247,6 @@
 <div scroll-to=""
      id="backtotop"
      class="backtotop"
-     ng-hide="hideScroll">
+     ng-hide="sensorCtrl.hideScroll">
     <span class="glyphicon glyphicon-chevron-up"></span>
 </div>

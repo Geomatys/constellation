@@ -315,9 +315,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
 
             var layerBackground = DataViewer.createLayer($scope.dataCtrl.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
+            DataViewer.initMap('dataMap');
             provider.dataDesc({},{values: {'providerId':providerId,'dataId':layerName}},
                 function(response) {//success
-                    DataViewer.initMap('dataMap');
                     var bbox = response.boundingBox;
                     if (bbox) {
                         var extent = new OpenLayers.Bounds(bbox[0],bbox[1],bbox[2],bbox[3]);
@@ -325,7 +325,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     }
                 }, function() {//error
                     // failed to find a metadata, just load the full map
-                    DataViewer.initMap('dataMap');
+                    //do nothing.
                 }
             );
         };
