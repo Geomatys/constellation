@@ -1690,6 +1690,16 @@ h3.popover-title {
 .quick-search-panel{
   max-width:300px;
 }
+/* fix bug with modal issue */
+.datepicker{
+  z-index: 1060 !important;
+}
+body.modal-open{
+  overflow: inherit !important;
+}
+.modal{
+  overflow: auto !important;
+}
 
 /* -------------- Responsive -------------- */
 
