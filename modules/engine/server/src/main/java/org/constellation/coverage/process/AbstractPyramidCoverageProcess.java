@@ -56,6 +56,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         final ParameterValueGroup storeParams = XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
         getOrCreate(XMLCoverageStoreFactory.NAMESPACE, storeParams).setValue("no namespace");
         getOrCreate(XMLCoverageStoreFactory.PATH, storeParams).setValue(pyramidFolder.toURI().toURL());
+        getOrCreate(XMLCoverageStoreFactory.CACHE_TILE_STATE, storeParams).setValue(true);
 
         final CoverageStore store = CoverageStoreFinder.open(storeParams);
         if (store == null) {
