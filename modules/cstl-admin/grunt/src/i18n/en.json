@@ -154,6 +154,8 @@
     "dataset.child.metadata.listing.selected.edit.button":"Edit metadata",
     "dataset.metadata.listing.selected.export.button":"Export metadata",
     "dataset.metadata.listing.selected.view.button":"Show metadata",
+    "sensor.metadata.listing.selected.view.button":"Show metadata",
+    "sensor.metadata.listing.selected.edit.button":"Edit sensor metadata",
 
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",
