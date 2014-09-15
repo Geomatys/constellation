@@ -37,7 +37,7 @@ import org.geotoolkit.feature.catalog.FeatureAttributeImpl;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.feature.catalog.FeatureTypeImpl;
 import org.geotoolkit.feature.catalog.PropertyTypeImpl;
-import org.apache.sis.metadata.iso.service.DefaultServiceIdentification;
+import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.sml.xml.v100.IoComponentPropertyType;
 import org.geotoolkit.sml.xml.v100.SensorML;

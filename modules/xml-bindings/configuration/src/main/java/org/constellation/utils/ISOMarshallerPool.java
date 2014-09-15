@@ -76,7 +76,7 @@ public class ISOMarshallerPool {
         } catch (ClassNotFoundException ex) {}
 
         // we add the extensions classes
-        classeList.add(org.apache.sis.metadata.iso.service.DefaultServiceIdentification.class);
+        classeList.add(org.apache.sis.metadata.iso.identification.DefaultServiceIdentification.class);
 
          return classeList.toArray(new Class[classeList.size()]);
     }

@@ -1093,7 +1093,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             else*/ if ("MD_ScopeCode".equals(className)) {
                 packageName = "org.opengis.metadata.maintenance";
             } else if ("SV_ServiceIdentification".equals(className)) {
-                packageName = "org.apache.sis.metadata.iso.service";
+                packageName = "org.apache.sis.metadata.iso.identification";
             } else if (className.startsWith("FRA_")) {
                 packageName = "org.apache.sis.internal.profile.fra";
                 className = className.substring(4); // Remove "FRA_" prefix.
