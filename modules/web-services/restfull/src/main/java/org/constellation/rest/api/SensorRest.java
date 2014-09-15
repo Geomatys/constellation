@@ -26,8 +26,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.SensorBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.AcknowlegementType;
@@ -42,6 +40,7 @@ import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Sensor;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.json.metadata.Template;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.provider.observationstore.ObservationStoreProvider;
@@ -175,6 +174,50 @@ public class SensorRest {
             }
         } else {
             return Response.status(404).build();
+        }
+    }
+
+    /**
+     * Returns applied template for metadata sensorML for read mode only like metadata viewer.
+     * for reference (consult) purposes only.
+     *
+     * @param sensorid given sensor identifier.
+     * @param type sensor type system or component.
+     * @param prune flag that indicates if template result will clean empty children/block.
+     * @return {@code Response}
+     */
+    @GET
+    @Path("metadataJson/{sensorid}/{type}/{prune}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getSensorMetadataJson(final @PathParam("sensorid") String sensorid,
+                                          final @PathParam("type") String type,
+                                          final @PathParam("prune") boolean prune) {
+        final Sensor record = sensorBusiness.getSensor(sensorid);
+        if (record != null) {
+            try {
+                final AbstractSensorML sml = SOSUtils.unmarshallSensor(record.getMetadata());
+                final StringBuilder buffer = new StringBuilder();
+                if (sml != null) {
+                    //get template name
+                    final String templateName;
+                    if("system".equalsIgnoreCase(type)){
+                        templateName="profile_sensorml_system";
+                    }else if ("component".equalsIgnoreCase(type)){
+                        templateName="profile_sensorml_component";
+                    } else {
+                        templateName="profile_sensorml_system";
+                    }
+                    final Template template = Template.getInstance(templateName);
+                    template.write(sml,buffer,prune);
+                }
+                return Response.ok(buffer.toString()).build();
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, "error while writing metadata sensorML to json.", ex);
+                return Response.status(500).entity("failed").build();
+            }
+        } else {
+            return Response.status(500).entity("There is no sensor for id "+sensorid).build();
         }
     }
     
