@@ -157,6 +157,7 @@
 
     "sensor.metadata.listing.selected.view.button":"Afficher la métadonnée",
     "sensor.metadata.listing.selected.edit.button":"Éditer la métadonnée",
+    "sensor.metadata.listing.selected.export.button":"Exporter la métadonnée",
 
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",

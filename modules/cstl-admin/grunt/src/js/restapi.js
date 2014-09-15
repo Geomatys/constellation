@@ -234,14 +234,15 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
 
     .factory('sensor', function($resource) {
         return $resource('@cstl/api/1/sensor', {}, {
-            'list':        {method: 'GET',  url: '@cstl/api/1/sensor/list;jsessionid='},
-            'add':         {method: 'PUT',  url: '@cstl/api/1/sensor/add;jsessionid=', isArray: true},
-            'delete':      {method: 'DELETE',  url: '@cstl/api/1/sensor/:sensor;jsessionid='},
-            'getMetadata': {method: 'GET',  url: '@cstl/api/1/sensor/:sensor;jsessionid='},
-            'listMeasures': {method: 'GET',  url: '@cstl/api/1/sensor/observedProperties/identifiers;jsessionid='},
-            'measuresForSensor':    {method: 'GET', url: '@cstl/api/1/sensor/observedProperty/identifiers/:sensorID;jsessionid='},
-            'sensorsForMeasure':    {method: 'GET', url: '@cstl/api/1/sensor/sensors/identifiers/:measure;jsessionid='},
-            'getFeatures':  {method: 'GET',  url: '@cstl/api/1/sensor/location/:sensor;jsessionid='}
+            'list':                 {method: 'GET',     url: '@cstl/api/1/sensor/list;jsessionid='},
+            'add':                  {method: 'PUT',     url: '@cstl/api/1/sensor/add;jsessionid=', isArray: true},
+            'delete':               {method: 'DELETE',  url: '@cstl/api/1/sensor/:sensor;jsessionid='},
+            'getMetadata':          {method: 'GET',     url: '@cstl/api/1/sensor/:sensor;jsessionid='},
+            'listMeasures':         {method: 'GET',     url: '@cstl/api/1/sensor/observedProperties/identifiers;jsessionid='},
+            'measuresForSensor':    {method: 'GET',     url: '@cstl/api/1/sensor/observedProperty/identifiers/:sensorID;jsessionid='},
+            'sensorsForMeasure':    {method: 'GET',     url: '@cstl/api/1/sensor/sensors/identifiers/:measure;jsessionid='},
+            'getFeatures':          {method: 'GET',     url: '@cstl/api/1/sensor/location/:sensor;jsessionid='},
+            'downloadMetadata':     {method: 'GET',     url: '@cstl/api/1/sensor/metadata/download/:sensor;jsessionid='}
         });
     })
 

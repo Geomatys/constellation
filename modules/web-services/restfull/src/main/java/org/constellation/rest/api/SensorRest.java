@@ -24,8 +24,10 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.XML;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.AcknowlegementType;
@@ -219,6 +221,29 @@ public class SensorRest {
         } else {
             return Response.status(500).entity("There is no sensor for id "+sensorid).build();
         }
+    }
+
+    /**
+     * Return as an attachment file the metadata of sensor in xml format.
+     * @param sensorid given sensor identifier.
+     * @return the xml file
+     */
+    @GET
+    @Path("metadata/download/{sensorid}")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response downloadMetadataForSensor(@PathParam("sensorid") final String sensorid) {
+        try{
+            final Sensor record = sensorBusiness.getSensor(sensorid);
+            if (record != null) {
+                final String sensorML = record.getMetadata();
+                return Response.ok(sensorML, MediaType.APPLICATION_XML_TYPE)
+                        .header("Content-Disposition", "attachment; filename=\"" + sensorid + ".xml\"").build();
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "Failed to get xml metadata for sensor with identifier "+sensorid,ex);
+            return Response.status(500).entity("failed").build();
+        }
+        return Response.status(500).entity("failed").build();
     }
     
     @PUT

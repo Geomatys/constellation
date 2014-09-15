@@ -20,13 +20,16 @@
 
 angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('SensorsController', function($scope, Dashboard, webService, sensor, $modal, Growl, $window) {
+    .controller('SensorsController', function($scope, Dashboard, webService, sensor, $modal, Growl, $window, $cookies) {
         /**
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
         $scope.wrap.ordertype = 'id';
         $scope.sensorCtrl = {
+            cstlUrl : $cookies.cstlUrl,
+            cstlSessionId : $cookies.cstlSessionId,
+            domainId : $cookies.cstlActiveDomainId,
             selectedSensorsChild : null,
             smallMode : false,
             hideScroll : true
@@ -90,18 +93,68 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
             }
         };
 
-        $scope.showSensor = function() {
-            var idToView = ($scope.sensorCtrl.selectedSensorsChild) ? $scope.sensorCtrl.selectedSensorsChild.id : $scope.selected.id;
+        /**
+         * Open metadata viewer popup and display metadata sensorML
+         * this function is called from sensor dashboard.
+         */
+        $scope.displayMetadataSensorML = function() {
+            var idToView,typeToSend;
+            if(($scope.sensorCtrl.selectedSensorsChild)){
+                idToView = $scope.sensorCtrl.selectedSensorsChild.id;
+                typeToSend = $scope.sensorCtrl.selectedSensorsChild.type;
+            }else {
+                idToView = $scope.selected.id;
+                typeToSend = $scope.selected.type;
+            }
             $modal.open({
-                templateUrl: 'views/sensor/modalViewSensorMetadata.html',
-                controller: 'ViewSensorMLModalController',
+                templateUrl: 'views/data/modalViewMetadata.html',
+                controller: 'ViewMetadataModalController',
                 resolve: {
-                    'details': function(textService){
-                        return textService.sensorMetadata(idToView);
+                    'dashboardName':function(){return 'sensor';},
+                    'metadataValues':function(textService){
+                        //@TODO the server must provide the SensorML as json.
+                        return textService.sensorMetadataJson(idToView,typeToSend,true);
+
+
+
                     }
                 }
             });
         };
+
+        /**
+         * Open metadata editor in modal popup.
+         */
+        $scope.displayMetadataSensorMLEditor = function() {
+            var sensorId,typeToSend;
+            if(($scope.sensorCtrl.selectedSensorsChild)){
+                sensorId = $scope.sensorCtrl.selectedSensorsChild.id;
+                typeToSend = $scope.sensorCtrl.selectedSensorsChild.type;
+            }else {
+                sensorId = $scope.selected.id;
+                typeToSend = $scope.selected.type;
+            }
+            openModalEditor(sensorId,typeToSend,typeToSend);
+        };
+
+        /**
+         * Open modal for metadata editor
+         * for given provider id, data type and template.
+         * @param id
+         * @param type
+         * @param template
+         */
+        function openModalEditor(id,type,template){
+            $modal.open({
+                templateUrl: 'views/data/modalEditMetadata.html',
+                controller: 'EditMetadataModalController',
+                resolve: {
+                    'id':function(){return id;},
+                    'type':function(){return type;},
+                    'template':function(){return template;}
+                }
+            });
+        }
 
         $scope.truncate = function(small, text){
             if(text) {
@@ -140,13 +193,6 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
                     } else {return text;}
                 }
             }
-        };
-    })
-
-    .controller('ViewSensorMLModalController', function ($scope, $modalInstance, details) {
-        $scope.details = details.data;
-        $scope.close = function() {
-            $modalInstance.dismiss('close');
         };
     })
 

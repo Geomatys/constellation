@@ -5,7 +5,7 @@
             <h4 class="modal-title" translate="data.modal.view.sensor.title">View sensor</h4>
         </div>
         <div class="modal-body" style="height: 575px;overflow-y: auto;">
-            <code hljs source="details" style="background-color:transparent;"></code>
+            <div ng-include="'views/data/metadata_preview.html'"></div>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" ng-click="close()" translate="label.close">Close</button>

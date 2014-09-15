@@ -194,6 +194,7 @@
                                         title="{{selected.id}}">{{truncateTitleBlock(selected.id)}}</strong>
                                 <i class="fa fa-chevron-down pull-right"></i>
                             </div>
+                            <div>
                             <div class="block-content">
                                 <div class="row description-block">
                                     <div class="col-sm-3 col-md-2">
@@ -219,17 +220,39 @@
                                 <h6 translate="label.type">Type</h6>
                                 <span translate="label.sensor">sensor</span>
                             </div>
+                            </div>
                             <div class="block-action">
                                 <div class="row">
+                                    <!--div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-sos"
+                                                    ng-click="displayMetadataSensorML()"
+                                                    data-placement="bottom"
+                                                    title="{{'sensor.metadata.listing.selected.view.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-file"></i>
+                                            </button>
+                                        </span>
+                                    </div-->
+                                    <!--div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-sos"
+                                                    ng-click="displayMetadataSensorMLEditor();"
+                                                    data-placement="bottom"
+                                                    title="{{'sensor.metadata.listing.selected.edit.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-pencil"></i>
+                                            </button>
+                                        </span>
+                                    </div-->
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
-                                            <button class="btn btn-sos"
-                                                    type="button"
-                                                    ng-click="showSensor()"
-                                                    data-placement="bottom"
-                                                    title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
-                                                <i class="fa fa-eye"></i>
-                                            </button>
+                                            <a class="btn btn-sos"
+                                               ng-href="{{sensorCtrl.cstlUrl}}api/1/sensor/metadata/download/{{sensorCtrl.selectedSensorsChild?sensorCtrl.selectedSensorsChild.id:selected.id}};jsessionid={{$scope.sensorCtrl.cstlSessionId}}"
+                                               data-placement="bottom"
+                                               title="{{'sensor.metadata.listing.selected.export.button' | translate }}" tooltip>
+                                                <i class="fa fa-download"></i>
+                                            </a>
                                         </span>
                                     </div>
                                     <div class="col-sm-2">
