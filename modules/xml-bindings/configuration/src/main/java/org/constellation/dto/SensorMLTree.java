@@ -19,10 +19,7 @@
 
 package org.constellation.dto;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,10 +31,12 @@ import java.util.Objects;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SensorMLTree {
-    
+
     private String type;
-    
+
     private String id;
+
+    private String owner;
     
     private List<SensorMLTree> children;
     
@@ -48,9 +47,10 @@ public class SensorMLTree {
         
     }
     
-    public SensorMLTree(final String id, final String type) {
+    public SensorMLTree(final String id, final String type, final String owner) {
         this.id   = id;
         this.type = type;
+        this.owner = owner;
     }
     
     /**
@@ -81,7 +81,15 @@ public class SensorMLTree {
         this.id = id;
     }
 
-     /**
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    /**
      * @return the parent
      */
     public SensorMLTree getParent() {
@@ -165,7 +173,7 @@ public class SensorMLTree {
     }
 
     public static SensorMLTree buildTree(final List<SensorMLTree> nodeList) {
-        final SensorMLTree root = new SensorMLTree("root", "System");
+        final SensorMLTree root = new SensorMLTree("root", "System", null);
         
         for (SensorMLTree node : nodeList) {
             final SensorMLTree parent = getParent(node, nodeList);

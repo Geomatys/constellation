@@ -530,9 +530,9 @@ public final class SOSUtils {
             if (compos != null && compos.getComponentList() != null) {
                 for (ComponentProperty cp : compos.getComponentList().getComponent()){
                     if (cp.getHref() != null) {
-                        results.add(new SensorMLTree(cp.getHref(), "unknow"));
+                        results.add(new SensorMLTree(cp.getHref(), "unknown", null));
                     } else if (cp.getAbstractProcess()!= null) {
-                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess())));
+                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess()), null));
                     } else {
                         LOGGER.warning("SML system component has no href or embedded object");
                     }
@@ -544,9 +544,9 @@ public final class SOSUtils {
             if (compos != null && compos.getComponentList() != null) {
                 for (ComponentProperty cp : compos.getComponentList().getComponent()){
                     if (cp.getHref() != null) {
-                        results.add(new SensorMLTree(cp.getHref(), "unknow"));
+                        results.add(new SensorMLTree(cp.getHref(), "unknown", null));
                     } else if (cp.getAbstractProcess()!= null) {
-                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess())));
+                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess()),null));
                     } else {
                         LOGGER.warning("SML system component has no href or embedded object");
                     }

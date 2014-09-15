@@ -151,10 +151,10 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         function generateD3Graph(csv, measures) {
-
+            var jquerySel = '.sos_edit_graph';
             var margin = {top: 10, right: 70, bottom: 30, left: 50},
-                width = $('.sos_edit_graph').width() - margin.left - margin.right,
-                height = $('.sos_edit_graph').height() - margin.top - margin.bottom;
+                width = $(jquerySel).width() - margin.left - margin.right,
+                height = $(jquerySel).height() - margin.top - margin.bottom;
 
             var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
 

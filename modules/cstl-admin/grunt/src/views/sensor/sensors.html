@@ -25,30 +25,39 @@
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
                     <ul class="nav nav-style">
-                        <li ng-click="wrap.ordertype='Name';wrap.orderreverse=false">
-                            <a translate="label.title">Title
-                                <i class="fa fa-caret-up"></i>
-                                <i class="fa fa-caret-down"></i>
+                        <li ng-click="wrap.ordertype='id';wrap.orderreverse=!wrap.orderreverse">
+                            <a>
+                                <span translate="label.title">Title</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="wrap.ordertype === 'id' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="wrap.ordertype === 'id' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
-                        <li ng-click="wrap.ordertype='Date';wrap.orderreverse=true">
-                            <a translate="label.date">Date
-                                <i class="fa fa-caret-up"></i>
-                                <i class="fa fa-caret-down"></i>
+                        <li ng-click="wrap.ordertype='Date';wrap.orderreverse=!wrap.orderreverse">
+                            <a>
+                                <span translate="label.date">Date</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="wrap.ordertype === 'Date' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="wrap.ordertype === 'Date' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
-                        <li ng-click="wrap.ordertype='Owner';wrap.orderreverse=false">
-                            <a translate="label.owner">Owner
-                                <i class="fa fa-caret-up"></i>
-                                <i class="fa fa-caret-down"></i>
+                        <li ng-click="wrap.ordertype='owner';wrap.orderreverse=!wrap.orderreverse">
+                            <a>
+                                <span translate="label.owner">owner</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="wrap.ordertype === 'owner' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="wrap.ordertype === 'owner' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
                     </ul>
                     <button type="button"
-                            ng-click="wrap.ordertype='Name';wrap.orderreverse=false"
+                            ng-click="init();wrap.ordertype='id';wrap.orderreverse=false;wrap.filtertext='';"
                             title="{{'label.search.refresh' | translate }}"
                             class="btn btn-xs btn-info btn-data btn-sos">
                         <i class="fa fa-times"></i>
@@ -132,7 +141,7 @@
                                             <i class="fa fa-calendar"></i>{{sosdata.createDate | date:'yyyy-MM-dd'}}
                                         </div>
                                         <div class="block">
-                                            <i class="fa fa-user"></i>{{sosdata.creator}}
+                                            <i class="fa fa-user"></i>{{sosdata.owner}}
                                         </div>
                                         <div class="block pull-right">
                                             <i class="fa fa-paperclip"></i>
@@ -147,7 +156,7 @@
                                      style="margin-top:0;"
                                      ng-if="sosdata==selected"
                                      ng-repeat="soschild in sosdata.children"
-                                     ng-class="{'selected':soschild===sensorCtrl.selectedSensorsChild, 'child':!sensorCtrl.smallMode, 'col-xs-11':sensorCtrl.smallMode, 'col-sm-offset-1':sensorCtrl.smallMode}"
+                                     ng-class="{'selected':soschild===sensorCtrl.selectedSensorsChild,'child':!sensorCtrl.smallMode,'col-xs-11':sensorCtrl.smallMode,'col-sm-offset-1':sensorCtrl.smallMode}"
                                      ng-click="selectSensorsChild(soschild)">
                                     <div class="top">
                                         <span class="item-title"
@@ -160,7 +169,7 @@
                                             <i class="fa fa-calendar"></i>{{soschild.createDate | date:'yyyy-MM-dd'}}
                                         </div>
                                         <div class="block">
-                                            <i class="fa fa-user"></i>{{soschild.creator}}
+                                            <i class="fa fa-user"></i>{{soschild.owner}}
                                         </div>
                                     </div>
                                 </div>
@@ -191,7 +200,7 @@
                                         <img src="img/block-content-owner.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.creator}}</span>
+                                        <span>{{selected.owner}}</span>
                                     </div>
                                 </div>
                                 <div class="row description-block">

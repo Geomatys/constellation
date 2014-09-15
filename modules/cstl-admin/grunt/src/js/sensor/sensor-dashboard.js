@@ -25,6 +25,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
+        $scope.wrap.ordertype = 'id';
         $scope.sensorCtrl = {
             selectedSensorsChild : null,
             smallMode : false,

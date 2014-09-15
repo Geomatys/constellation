@@ -19,6 +19,7 @@
 
 package org.constellation.rest.api;
 
+import com.google.common.base.Optional;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -36,9 +37,11 @@ import org.constellation.configuration.StringList;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SensorMLTree;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Sensor;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.provider.observationstore.ObservationStoreProvider;
@@ -102,6 +105,12 @@ public class SensorRest {
     
     @Inject
     private IProviderBusiness providerBusiness;
+
+    /**
+     * Injected user repository.
+     */
+    @Inject
+    private UserRepository userRepository;
     
     @GET
     @Path("list")
@@ -116,11 +125,27 @@ public class SensorRest {
         final List<SensorMLTree> values = new ArrayList<>();
         final List<Sensor> sensors = sensorBusiness.getAll();
         for (final Sensor sensor : sensors) {
-            final SensorMLTree t = new SensorMLTree(sensor.getIdentifier(), sensor.getType());
+            final Optional<CstlUser> optUser = userRepository.findById(sensor.getOwner());
+            String owner = null;
+            if(optUser!=null && optUser.isPresent()){
+                final CstlUser user = optUser.get();
+                if(user != null){
+                    owner = user.getLogin();
+                }
+            }
+            final SensorMLTree t = new SensorMLTree(sensor.getIdentifier(), sensor.getType(), owner);
             final List<SensorMLTree> children = new ArrayList<>();
             final List<Sensor> records = sensorBusiness.getChildren(sensor);
-            for (Sensor record : records) {
-                children.add(new SensorMLTree(record.getIdentifier(), record.getType()));
+            for (final Sensor record : records) {
+                final Optional<CstlUser> optUserChild = userRepository.findById(sensor.getOwner());
+                String ownerChild = null;
+                if(optUserChild!=null && optUserChild.isPresent()){
+                    final CstlUser user = optUserChild.get();
+                    if(user != null){
+                        ownerChild = user.getLogin();
+                    }
+                }
+                children.add(new SensorMLTree(record.getIdentifier(), record.getType(), ownerChild));
             }
             t.setChildren(children);
             values.add(t);

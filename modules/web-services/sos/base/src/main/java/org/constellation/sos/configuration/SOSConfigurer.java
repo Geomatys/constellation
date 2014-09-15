@@ -217,7 +217,7 @@ public class SOSConfigurer extends OGCConfigurer {
                 final AbstractSensorML sml = reader.getSensor(sensorID);
                 final String smlType       = getSensorMLType(sml);
                 final String smlID         = getSmlID(sml);
-                final SensorMLTree t       = new SensorMLTree(smlID, smlType);
+                final SensorMLTree t       = new SensorMLTree(smlID, smlType, null);
                 final List<SensorMLTree> children = SOSUtils.getChildren(sml);
                 t.setChildren(children);
                 values.add(t);
