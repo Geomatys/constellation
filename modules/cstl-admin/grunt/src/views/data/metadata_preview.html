@@ -1,6 +1,6 @@
 <div id="advancedViewMetadata" ng-init="initMetadataViewer()">
     <h3 class="expand-all-btn"
-        ng-class="{'datasetTheme':theme.mdDashboard}">
+        ng-class="{'datasetTheme':theme.isDatasetDashboard,'sensorTheme':theme.isSensorDashboard}">
         <span class="label" style="display:none;" translate="metadata.view.expandall">Expand all</span>
         <span class="label" translate="metadata.view.collapseall">Collapse all</span>
         <i class="pull-right fa fa-compress" style="margin-top: 6px;"></i>
@@ -15,7 +15,7 @@
         <div ng-if="jsonObject.superblock">
             <div class="row-fluid">
                 <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 small-block">
-                    <h3 class="heading-block clickable" ng-class="{'datasetTheme':theme.mdDashboard}">
+                    <h3 class="heading-block clickable" ng-class="{'datasetTheme':theme.isDatasetDashboard,'sensorTheme':theme.isSensorDashboard}">
                         {{jsonObject.superblock.name | translate}}
                         <i class="data-icon fa fa-angle-up"></i>
                     </h3>
@@ -39,8 +39,6 @@
             <div class="collapse-row-heading">
                 <span class="data-icon fa fa-angle-up"></span>
                 <span class="text">{{jsonObject.block.name | translate}}</span>
-                <!--button ng-click="add(jsonObject.block)">Add node</button>
-                <button ng-click="delete(jsonObject.block)" ng-show="jsonObject.block.children.length > 0">Delete nodes</button-->
             </div>
             <div class="collapse-row-inner">
                 <div class="table-mimic">

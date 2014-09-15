@@ -379,8 +379,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 templateUrl: 'views/data/modalViewMetadata.html',
                 controller: 'ViewMetadataModalController',
                 resolve: {
-                    'selected':function(){return $scope.selected;},
-                    'isMDdashboard':function(){return false;},
+                    'dashboardName':function(){return 'data';},
                     'metadataValues':function(textService){
                         return textService.metadataJson($scope.selected.Provider,
                             $scope.selected.Name, type, true);
@@ -406,8 +405,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 templateUrl: 'views/data/modalViewMetadata.html',
                 controller: 'ViewMetadataModalController',
                 resolve: {
-                    'selected':function(){return $scope.selected;},
-                    'isMDdashboard':function(){return true;},
+                    'dashboardName':function(){return 'dataset';},
                     'metadataValues':function(textService){
                         return textService.metadataJson($scope.selected.Name,
                             $scope.selected.Name, type, true);

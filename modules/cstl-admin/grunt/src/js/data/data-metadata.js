@@ -537,14 +537,14 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
 
     })
 
-    .controller('ViewMetadataModalController', function($scope, $modalInstance, $http, selected, metadataValues, isMDdashboard) {
+    .controller('ViewMetadataModalController', function($scope, $modalInstance, $http, metadataValues, dashboardName) {
         $scope.metadataValues = [];
         $scope.metadataValues.push(metadataValues.data);
         $scope.theme = {
-            "mdDashboard": isMDdashboard || false
+            "isDataDashboard": dashboardName === 'data' || false,
+            "isDatasetDashboard": dashboardName === 'dataset' || false,
+            "isSensorDashboard": dashboardName === 'sensor' || false
         };
-
-        $scope.selectedData = selected;
 
         /**
          * Enable expand/collapsible events on each element in metadata view.
