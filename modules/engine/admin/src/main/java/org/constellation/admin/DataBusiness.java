@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -38,6 +39,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
@@ -49,6 +51,7 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
@@ -65,7 +68,11 @@ import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviders;
 import org.constellation.utils.ISOMarshallerPool;
+import org.geotoolkit.data.FeatureStore;
+import org.opengis.feature.PropertyType;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -552,5 +559,29 @@ public class DataBusiness implements IDataBusiness {
                 dataRepository.delete(data.getId());
             }
         }
+    }
+
+    public ParameterValues getVectorDataColumns(int id) throws DataStoreException {
+        final Provider provider = getProvider(id);
+        final DataProvider dataProvider = DataProviders.getInstance().getProvider(provider.getIdentifier());
+        if (!(dataProvider.getMainStore() instanceof FeatureStore)) {
+            throw new DataStoreException("Not a vector data requested");
+        }
+
+        final List<String> colNames = new ArrayList<>();
+        final String dataName = dataRepository.findById(id).getName();
+        final FeatureStore store = (FeatureStore) dataProvider.getMainStore();
+        final org.opengis.feature.FeatureType ft = store.getFeatureType(dataName);
+        for (final PropertyType prop : ft.getProperties(true)) {
+            colNames.add(prop.getName().toString());
+        }
+
+        final ParameterValues values = new ParameterValues();
+        final HashMap<String, String> mapVals = new HashMap<>();
+        for (final String colName : colNames) {
+            mapVals.put(colName, colName);
+        }
+        values.setValues(mapVals);
+        return values;
     }
 }

@@ -19,17 +19,20 @@
 package org.constellation.business;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -66,4 +69,6 @@ public interface IDataBusiness {
     void removeDataFromDomain(int dataId, int domainId) throws CstlConfigurationRuntimeException;
 
     List<DataBrief> getDataBriefsFromDatasetId(Integer dataSetId);
+
+    ParameterValues getVectorDataColumns(int id) throws DataStoreException;
 }
