@@ -576,7 +576,7 @@ public class DataRest {
                         if (zipDir.exists()) {
                             recursiveDelete(zipDir);
                         }
-                        FileUtilities.unzip(zipFile, zipDir, new CRC32());
+                        FileUtilities.unzip(zipFile, zipDir.toPath(), new CRC32());
                         filePath = zipDir.getAbsolutePath();
                     }
 
