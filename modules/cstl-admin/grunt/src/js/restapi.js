@@ -330,6 +330,17 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
                 });
                 return promise;
             },
+            sensorMetadataJson : function(sensor, type, prune){
+                var promise = $http({
+                    url: '@cstl/api/1/sensor/metadataJson/'+ sensor+'/'+ type +'/'+ prune +';jsessionid=',
+                    method: "GET",
+                    headers: {'Accept': 'application/json'}
+                });
+                promise.error(function(errorMsg) {
+                    Growl('warning', 'Warning', 'Error cannot get metadata for sensor '+ sensor);
+                });
+                return promise;
+            },
             sensorMetadata : function(sensor){
                 var promise = $http({
                     url: '@cstl/api/1/sensor/'+ sensor+';jsessionid=',
