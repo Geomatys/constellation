@@ -22,6 +22,7 @@ import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
@@ -29,18 +30,14 @@ import org.constellation.dto.Details;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
+import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.Data;
 import org.constellation.util.DataReference;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.GridMosaic;
-import org.geotoolkit.coverage.Pyramid;
-import org.geotoolkit.coverage.PyramidSet;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
-import org.geotoolkit.coverage.TileReference;
+import org.geotoolkit.coverage.*;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
@@ -83,8 +80,12 @@ import org.opengis.referencing.operation.TransformException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
+import javax.imageio.ImageReader;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.inject.Named;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -539,13 +540,54 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 throw new CstlServiceException("TileRow out of band" + rowIndex + " > " +  mosaic.getGridSize().height, INVALID_PARAMETER_VALUE, "tilerow");
             }
 
-            final Map hints = new HashMap();
-            final TileReference tile = mosaic.getTile(columnIndex, rowIndex, hints);
-            return tile;
+            if (mosaic.isMissing(columnIndex, rowIndex)) {
+                return emptyTile(mosaic, columnIndex, rowIndex);
+            } else {
+                final Map hints = new HashMap();
+                return mosaic.getTile(columnIndex, rowIndex, hints);
+            }
 
         } catch(DataStoreException ex) {
             throw new CstlServiceException("Unexpected error : " + ex.getMessage(), ex , NO_APPLICABLE_CODE);
         }
 
+    }
+
+    /**
+     * Create empty TileReference with black image as input.
+     * @param mosaic
+     * @param columnIndex
+     * @param rowIndex
+     * @return TileReference
+     */
+    private TileReference emptyTile(final GridMosaic mosaic, final int columnIndex, final int rowIndex) {
+        return  new TileReference() {
+            @Override
+            public ImageReader getImageReader() throws IOException {
+                return null;
+            }
+
+            @Override
+            public ImageReaderSpi getImageReaderSpi() {
+                return null;
+            }
+
+            @Override
+            public Object getInput() {
+                //TODO cache empty image
+                Color color = new Color(0x00FFFFFF, true);
+                return Cstl.getPortrayalService().writeBlankImage(color,mosaic.getTileSize());
+            }
+
+            @Override
+            public int getImageIndex() {
+                return 0;
+            }
+
+            @Override
+            public Point getPosition() {
+                return new Point(columnIndex, rowIndex);
+            }
+        };
     }
 }
