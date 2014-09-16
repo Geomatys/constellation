@@ -270,6 +270,21 @@ public class OM2BaseReader {
         return result;
     }
     
+    protected Field getFieldForPhenomenon(final String procedureID, final String phenomenon, final Connection c) throws SQLException {
+        Field result = null;
+        final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND \"field_name\"= ?");
+        stmt.setString(1, procedureID);
+        stmt.setString(2, phenomenon);
+        final ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            result = new Field(rs.getString("field_type"),
+                      rs.getString("field_name"),
+                      rs.getString("field_definition"),
+                      rs.getString("uom"));
+        }
+        return result;
+    }
+    
     protected int getPIDFromObservation(final String obsIdentifier, final Connection c) throws SQLException {
         final PreparedStatement stmt = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"observations\", \"om\".\"procedures\" p WHERE \"identifier\"=? AND \"procedure\"=p.\"id\"");
         stmt.setString(1, obsIdentifier);

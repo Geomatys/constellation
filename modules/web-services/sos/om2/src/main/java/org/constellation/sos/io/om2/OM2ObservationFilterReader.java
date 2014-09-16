@@ -548,7 +548,19 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             LOGGER.info(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final StringBuilder values                  = new StringBuilder();
-            final List<Field> fields                    = readFields(currentProcedure, c);
+            final List<Field> fields;
+            if (!currentFields.isEmpty()) {
+                fields = new ArrayList<>();
+                // we add the main field
+                if (timeField != null) {
+                    fields.add(timeField);
+                }
+                for (String f : currentFields) {
+                    fields.add(getFieldForPhenomenon(currentProcedure, f, c));
+                }
+            } else {
+                fields = readFields(currentProcedure, c);
+            }
             final TextBlock encoding;
             if ("text/csv".equals(responseFormat)) {
                 encoding = getCsvTextEncoding("2.0.0");
@@ -564,8 +576,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             while (rs.next()) {
                 
                 for (int i = 0; i < fields.size(); i++) {
-                    String value = rs.getString(i + 3);
                     Field field = fields.get(i);
+                    String value = rs.getString(field.fieldName);
                     // for time TODO remove when field will be typed
                     if (value != null && field.fieldType.equals("Time")) {
                         value = value.replace(' ', 'T');
@@ -603,7 +615,20 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final StringBuilder values                  = new StringBuilder();
             final TextBlock encoding;
-            final List<Field> fields                    = readFields(currentProcedure, c);
+            final List<Field> fields;
+            if (!currentFields.isEmpty()) {
+                fields = new ArrayList<>();
+                // we add the main field
+                final Field timeField = getTimeField(currentProcedure, c);
+                if (timeField != null) {
+                    fields.add(timeField);
+                }
+                for (String f : currentFields) {
+                    fields.add(getFieldForPhenomenon(currentProcedure, f, c));
+                }
+            } else {
+                fields = readFields(currentProcedure, c);
+            }
             if ("text/csv".equals(responseFormat)) {
                 encoding = getCsvTextEncoding("2.0.0");
                 // Add the header
@@ -624,8 +649,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 
                 long currentMainValue = -1;
                 for (int i = 0; i < fields.size(); i++) {
-                    String value = rs.getString(i + 3);
                     Field field = fields.get(i);
+                    String value = rs.getString(field.fieldName);
                     
                     if (i == 0) {
                         if (field.fieldType.equals("Time")) {
