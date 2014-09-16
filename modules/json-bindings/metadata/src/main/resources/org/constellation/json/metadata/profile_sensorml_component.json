@@ -4,9 +4,9 @@
 		"multiplicity":1,
 		"children":[{
 			"superblock":{
-				"name":"component.block.identification",
+				"name":"component.sblock.identification",
 				"multiplicity":1,
-				"help":"component.block.identification_help",
+				"help":"component.sblock.identification_help",
 				"path":null,
 				"children":[{
 					"block":{
