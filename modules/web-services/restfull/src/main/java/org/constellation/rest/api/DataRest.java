@@ -2095,31 +2095,17 @@ public class DataRest {
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
+    /**
+     * Get the properties (columns) names for a vector data.
+     *
+     * @param id Vector data identifier
+     * @return
+     * @throws DataStoreException
+     */
     @GET
     @Path("{id}/vector/columns")
     public Response getVectorDataColumns(final @PathParam("id") int id) throws DataStoreException {
-        final Provider provider = dataBusiness.getProvider(id);
-        final DataProvider dataProvider = DataProviders.getInstance().getProvider(provider.getIdentifier());
-        if (!(dataProvider.getMainStore() instanceof FeatureStore)) {
-            return Response.ok("Not a feature requested").build();
-        }
-
-        final List<String> colNames = new ArrayList<>();
-        final String dataName = dataRepository.findById(id).getName();
-        final FeatureStore store = (FeatureStore)dataProvider.getMainStore();
-        final org.opengis.feature.FeatureType ft = store.getFeatureType(dataName);
-        for (final PropertyType prop : ft.getProperties(true)) {
-            colNames.add(prop.getName().toString());
-        }
-
-        final ParameterValues values = new ParameterValues();
-        final HashMap<String,String> mapVals = new HashMap<>();
-        for (final String colName : colNames) {
-            mapVals.put(colName, colName);
-        }
-        values.setValues(mapVals);
-
-        return Response.ok(values).build();
+        return Response.ok(dataBusiness.getVectorDataColumns(id)).build();
     }
 
     ///////////////////////////////////////
