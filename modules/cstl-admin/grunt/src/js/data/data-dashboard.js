@@ -59,7 +59,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * @param item
          */
         $scope.selectDataSetChild = function(item) {
-            if ($scope.dataCtrl.selectedDataSetChild === item) {
+            if ($scope.dataCtrl.selectedDataSetChild && item && $scope.dataCtrl.selectedDataSetChild.Id === item.Id) {
                 $scope.dataCtrl.selectedDataSetChild = null;
             } else {
                 $scope.dataCtrl.selectedDataSetChild = item;
@@ -228,6 +228,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 dataListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
+                    $scope.wrap.ordertype = "Name";
                 }, function() {//error
                     Growl('error','Error','Unable to load list of data!');
                 });
@@ -235,6 +236,26 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 datasetListing.listAll({}, function(response){//success
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
+                    $scope.wrap.ordertype = "Name";
+
+                    if($scope.selected){//data is selected in data Dashboard
+                        //then we need to highlight the metadata associated in MD dashboard
+                        $scope.dataCtrl.selectedDataSetChild = $scope.selected;
+                        for(var i =0;i<response.length;i++){
+                            if($scope.containsRefData(response[i])){
+                                $scope.selectDS(response[i]);
+                                break;
+                            }
+                        }
+                        $scope.dataCtrl.searchMetadataTerm = $scope.selected.Name;
+                        $scope.callSearchMD();
+                    }else {
+                        //otherwise reset selection
+                        $scope.dataCtrl.selectedDataSetChild = null;
+                        $scope.selectedDS = null;
+                        $scope.dataCtrl.searchMetadataTerm = "";
+                    }
+
                 }, function(response){//error
                     Growl('error','Error','Unable to load list of dataset!');
                 });
@@ -395,8 +416,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.displayMetadataFromMD = function() {
             var type = 'import';
-            if($scope.selected.Children && $scope.selected.Children.length >0){
-                type = $scope.selected.Children[0].Type.toLowerCase();
+            if($scope.selectedDS.Children && $scope.selectedDS.Children.length >0){
+                type = $scope.selectedDS.Children[0].Type.toLowerCase();
             }
             if(type.toLowerCase() === 'coverage'){
                 type = 'raster';
@@ -407,8 +428,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 resolve: {
                     'dashboardName':function(){return 'dataset';},
                     'metadataValues':function(textService){
-                        return textService.metadataJson($scope.selected.Name,
-                            $scope.selected.Name, type, true);
+                        return textService.metadataJson($scope.selectedDS.Name,
+                            $scope.selectedDS.Name, type, true);
                     }
                 }
             });
@@ -419,14 +440,14 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.displayMetadataEditor = function() {
             var type = 'import';
-            if($scope.selected.Type){
-                type = $scope.selected.Type.toLowerCase();
+            if($scope.selectedDS.Type){
+                type = $scope.selectedDS.Type.toLowerCase();
             }
             if(type === 'coverage'){
                 type = 'raster';
             }
             var template = type;
-            openModalEditor($scope.selected.Name,type,template);
+            openModalEditor($scope.selectedDS.Name,type,template);
         };
 
         /**
@@ -455,11 +476,25 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.editMetadata = function() {
             var type = 'import';
-            if($scope.selected.Children && $scope.selected.Children.length >0){
-                type = $scope.selected.Children[0].Type.toLowerCase();
+            if($scope.selectedDS.Children && $scope.selectedDS.Children.length >0){
+                type = $scope.selectedDS.Children[0].Type.toLowerCase();
             }
             var template = type;
-            $location.path('/editmetadata/'+template+'/'+type+'/'+$scope.selected.Name);
+            $location.path('/editmetadata/'+template+'/'+type+'/'+$scope.selectedDS.Name);
+        };
+
+        $scope.containsRefData = function(dataset) {
+            if($scope.selected){
+                var idToMatch = $scope.selected.Id;
+                if(dataset && dataset.Children){
+                    for(var i=0;i<dataset.Children.length;i++){
+                        if(idToMatch === dataset.Children[i].Id){
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         };
 
         // Style methods

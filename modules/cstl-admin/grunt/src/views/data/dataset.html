@@ -6,13 +6,13 @@
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li ng-class="{active:wrap.filtertype==''}" ng-click="wrap.filtertype=''">
+                    <li ng-class="{'active':wrap.filtertype==''}" ng-click="wrap.filtertype=''">
                         <a translate="label.all">All</a>
                     </li>
-                    <li ng-class="{active:wrap.filtertype=='VECTOR'}" ng-click="wrap.filtertype='VECTOR'">
+                    <li ng-class="{'active':wrap.filtertype=='VECTOR'}" ng-click="wrap.filtertype='VECTOR'">
                         <a translate="label.vector">Vector</a>
                     </li>
-                    <li ng-class="{active:wrap.filtertype=='COVERAGE'}" ng-click="wrap.filtertype='COVERAGE'">
+                    <li ng-class="{'active':wrap.filtertype=='COVERAGE'}" ng-click="wrap.filtertype='COVERAGE'">
                         <a translate="label.raster">Raster</a>
                     </li>
                 </ul>
@@ -221,8 +221,8 @@
                              ng-class="{'col-xs-6':dataCtrl.smallMode}"
                              style="padding-left:0;">
                             <div class="item metadata"
-                                 ng-class="{'selected':dataset==selected}"
-                                 ng-click="select(dataset);selectDataSetChild(null);">
+                                 ng-class="{'selected':dataset.id==selectedDS.id}"
+                                 ng-click="selectDS(dataset);selectDataSetChild(null);">
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{dataset.Name}}">{{truncate(dataCtrl.smallMode,dataset.Name)}}</span>
@@ -241,17 +241,17 @@
                                         <span ng-if="dataset.Children.length == 0"
                                               translate="md.listing.no.data">No</span>
                                         <span ng-if="dataset.Children.length > 0">{{dataset.Children.length}}</span>
-                                        <span ng-class="{hide:dataCtrl.smallMode}"
+                                        <span ng-class="{'hide':dataCtrl.smallMode}"
                                               translate="md.listing.data.associated">associated data</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="item"
                                  style="margin-top:0;"
-                                 ng-if="dataset==selected"
+                                 ng-if="dataset.id==selectedDS.id"
                                  ng-repeat="relatedData in dataset.Children"
                                  ng-click="selectDataSetChild(relatedData)"
-                                 ng-class="{selected:relatedData==dataCtrl.selectedDataSetChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':!dataCtrl.smallMode, 'col-xs-11':dataCtrl.smallMode, 'col-sm-offset-1':dataCtrl.smallMode}">
+                                 ng-class="{'selected':relatedData.Id==dataCtrl.selectedDataSetChild.Id,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':!dataCtrl.smallMode, 'col-xs-11':dataCtrl.smallMode, 'col-sm-offset-1':dataCtrl.smallMode}">
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{relatedData.Name}}">{{truncate(dataCtrl.smallMode,relatedData.Name)}}</span>
@@ -274,18 +274,18 @@
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-left: 0;">
                 <div id="selection">
                     <div class="alert alert-info alert-csw"
-                         ng-if="!selected">
+                         ng-if="!selectedDS">
                         <h4 translate="label.no.selected.metadata">No selected metadata</h4>
                         <p style="font-weight:normal;"
                            translate="msg.no.selected.metadata">Click on a metadata to display more information</p>
                     </div>
                     <div id="selected-item"
                          class="selected-item"
-                         ng-if="selected">
+                         ng-if="selectedDS">
                         <div class="block-header block-header-md"
                              ng-click="toggleUpDownSelectedMD()">
                             <strong class="item-title title-bloc"
-                                    title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
+                                    title="{{selectedDS.Name}}">{{truncateTitleBlock(selectedDS.Name)}}</strong>
                             <i class="fa fa-chevron-up pull-right"></i>
                         </div>
                         <div>
@@ -295,7 +295,7 @@
                                         <img src="img/block-content-owner.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.Owner}}</span>
+                                        <span>{{selectedDS.Owner}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -343,7 +343,7 @@
                                     <span class="tooltipicon">
                                         <a id="exportMD"
                                            class="btn btn-csw"
-                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selected.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
+                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selectedDS.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
                                            data-placement="bottom"
                                            title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
                                             <i class="fa fa-download"></i>

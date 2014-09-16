@@ -1008,7 +1008,7 @@ public class DataRest {
             }
         }
         final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
-        final DataSetBrief dsb = new DataSetBrief(dataset.getIdentifier(), provider.getType(), owner, dataBriefList);
+        final DataSetBrief dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), provider.getType(), owner, dataBriefList);
         try{
             final Node nodeMetadata = datasetBusiness.getMetadataNode(dataset.getIdentifier(),domainId);
             if(nodeMetadata!=null){

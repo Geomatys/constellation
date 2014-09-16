@@ -288,6 +288,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             scope.wrap.nbbypage = scope.wrap.nbbypage || 10;
             scope.wrap.currentpage = scope.wrap.currentpage || 1;
             scope.selected = scope.selected || null;
+            scope.selectedDS = scope.selectedDS || null;
             scope.exclude = scope.exclude || [];
 
             // Dashboard methods
@@ -326,7 +327,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 scope.wrap.currentpage = page;
                 scope.wrap.countdata = list.length;
                 scope.wrap.dataList = list.splice(start, scope.wrap.nbbypage);
-                scope.selected = null;
+                //scope.selected = null;
             };
 
             scope.select = function(item) {
@@ -334,6 +335,14 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     scope.selected = null;
                 } else {
                     scope.selected = item;
+                }
+            };
+
+            scope.selectDS = function(item) {
+                if (item && scope.selectedDS && scope.selectedDS.id === item.id) {
+                    scope.selectedDS = null;
+                } else {
+                    scope.selectedDS = item;
                 }
             };
 

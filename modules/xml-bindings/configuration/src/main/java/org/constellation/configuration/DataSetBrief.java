@@ -37,6 +37,7 @@ import java.util.List;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DataSetBrief implements Serializable {
+    private Integer id;
     @XmlElement(name="Name")
     private String name;
     @XmlElement(name="Type")
@@ -54,7 +55,8 @@ public class DataSetBrief implements Serializable {
 
     public DataSetBrief() {}
 
-    public DataSetBrief(final String name, final String type, final String owner, final List<DataBrief> children) {
+    public DataSetBrief(final Integer id, final String name, final String type, final String owner, final List<DataBrief> children) {
+        this.id = id;
         this.name = name;
         this.type = type;
         this.owner = owner;
@@ -117,10 +119,19 @@ public class DataSetBrief implements Serializable {
         this.dateStamp = dateStamp;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "DatasetBrief{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", owner='" + owner + '\'' +
                 ", children=" + children +
