@@ -51,10 +51,19 @@ angular.module('cstl-admin-system', ['cstl-restapi'])
         }
     })
 
-    .controller('LogsController', function($scope, LogsService) {
+    .controller('LogsController', function($scope, LogsService, Dashboard, Growl) {
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+        $scope.wrap.ordertype = 'name';
 
         $scope.init = function() {
-            $scope.loggers = LogsService.findAll();
+            LogsService.findAll({}, function(response) {//success
+                Dashboard($scope, response, true);
+            }, function(response){//error
+                Growl('error','Error','Search failed:');
+            });
         };
 
         $scope.changeLevel = function(name, level) {
