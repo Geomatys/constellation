@@ -86,7 +86,7 @@
                     </ul>
                     <ul class="nav nav-pills" ng-controller="navCtrl">
                         <li class="hidden-sm hidden-md">
-                            <a ng-class="navClass('webservice')" href="#/webservice">
+                            <a ng-class="navClass('webservice')" href="#/webservice" id="webserviceLink">
                                 <span class="glyphicon glyphicon-cloud"></span>
                                 <span translate="global.menu.web-service">Services web</span>
                             </a>
@@ -98,43 +98,43 @@
                             </a>
                         </li>
                         <li>
-                            <a ng-class="navClass('data')" href="#/data">
+                            <a ng-class="navClass('data')" href="#/data" id="dataLink">
                                 <span class="glyphicon glyphicon-file"></span>
                                 <span translate="global.menu.data">Données</span>
                             </a>
                         </li>
                         <li>
-                            <a ng-class="navClass('sensors')" href="#/sensors">
+                            <a ng-class="navClass('sensors')" href="#/sensors" id="sensorLink">
                                 <span ng-class="navClass('sensors')" class="icon-menu-sensor"></span>
                                 <span translate="global.menu.sensor">Sensor</span>
                             </a>
                         </li>
                         <li>
-                            <a ng-class="navClass('styles')" href="#/styles">
+                            <a ng-class="navClass('styles')" href="#/styles" id="stylesLink">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span translate="global.menu.style">Styles</span>
                             </a>
                         </li>
                         <li class="hidden-sm">
-                            <a ng-class="navClass('mapcontext')" href="#/mapcontext">
+                            <a ng-class="navClass('mapcontext')" href="#/mapcontext" id="mapcontextLink">
                                 <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
                                 <span translate="global.menu.mapcontext">Map context</span>
                             </a>
                         </li>
                         <li ng-if="!hasRole('cstl-admin')" class="hidden-sm">
-                            <a ng-class="navClass('tasks')" href="#/tasks">
+                            <a ng-class="navClass('tasks')" href="#/tasks" id="task">
                                 <span class="glyphicon glyphicon-cog"></span>
                                 <span translate="global.menu.tasks">Tasks</span>
                             </a>
                         </li>
                         <li ng-if="hasRole('cstl-admin')" class="hidden-sm hidden-md">
-                            <a ng-class="navClass('tasks')" href="#/tasks">
+                            <a ng-class="navClass('tasks')" href="#/tasks" id="taskAdmin">
                                 <span class="glyphicon glyphicon-cog"></span>
                                 <span translate="global.menu.tasks">Tasks</span>
                             </a>
                         </li>
                         <li class="hidden-sm hidden-md" ng-if="hasRole('cstl-admin')">
-                            <a ng-class="navClass('admin')" href="#/admin">
+                            <a ng-class="navClass('admin')" href="#/admin" id="admin">
                                 <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
                                 <span translate="global.menu.admin.main">Administration</span>
                             </a>
