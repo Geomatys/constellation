@@ -159,6 +159,15 @@
     "sensor.metadata.listing.selected.edit.button":"Éditer la métadonnée",
     "sensor.metadata.listing.selected.export.button":"Exporter la métadonnée",
 
+    "disclaimer.cstl.website":"Site de Constellation-SDI",
+    "disclaimer.cstl.github":"Github de Constellation-SDI",
+    "disclaimer.inspire":"(Conforme INSPIRE)",
+    "disclaimer.underdev":"(2.0 en cours de développement)",
+    "disclaimer.services":"Services existants",
+    "disclaimer.about":"A propos de Constellation-SDI",
+    "disclaimer.about.text":"Constellation-SDI permet de créer simplement une Infrastructure de Données Spatiales complète allant du catalogage de ressources géographiques jusqu’à l’exploitation d’une plateforme de capteurs remontant des informations en temps réel.",
+
+
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",
 

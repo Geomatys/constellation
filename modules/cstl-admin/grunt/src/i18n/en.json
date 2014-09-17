@@ -158,6 +158,15 @@
     "sensor.metadata.listing.selected.edit.button":"Edit sensor metadata",
     "sensor.metadata.listing.selected.export.button":"Export metadata",
 
+    "disclaimer.cstl.website":"Constellation-SDI website",
+    "disclaimer.cstl.github":"Constellation-SDI github",
+    "disclaimer.inspire":"(INSPIRE-compliant)",
+    "disclaimer.underdev":"(2.0 work in progress)",
+    "disclaimer.services":"Existing services",
+    "disclaimer.about":"About Constellation-SDI",
+    "disclaimer.about.text":"Constellation-SDI makes it possible to easily create a complete Spatial Data Infrastructure, from cataloguing geographic resources to operating a platform of sensors that feeds back information in real time.",
+
+
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",
 
