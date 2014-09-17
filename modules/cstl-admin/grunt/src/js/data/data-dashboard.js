@@ -284,6 +284,32 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         };
 
         /**
+         * Reset filters for dashboard
+         */
+        $scope.resetFilters = function(){
+            if($scope.dataCtrl.currentTab === 'tabdata'){
+                dataListing.listAll({}, function(response) {//success
+                    Dashboard($scope, response, true);
+                    $scope.wrap.filtertype = "";
+                    $scope.wrap.ordertype = "Name";
+                    $scope.dataCtrl.searchTerm="";
+                }, function() {//error
+                    Growl('error','Error','Unable to load list of data!');
+                });
+            }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
+                datasetListing.listAll({}, function(response){//success
+                    Dashboard($scope, response, true);
+                    $scope.wrap.filtertype = "";
+                    $scope.wrap.ordertype = "Name";
+                    $scope.dataCtrl.selectedDataSetChild = null;
+                    $scope.selectedDS = null;
+                }, function(response){//error
+                    Growl('error','Error','Unable to load list of dataset!');
+                });
+            }
+        };
+
+        /**
          * Apply filter to show only published data in service depending on given flag.
          * ie: data is linked to services.
          * @param published if true then proceed to show only published data.
