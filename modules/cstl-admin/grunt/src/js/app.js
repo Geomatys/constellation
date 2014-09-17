@@ -56,8 +56,10 @@ var cstlAdminApp = angular.module('CstlAdminApp', [
     'cstl-process',
     'cstl-sensor',
     'cstl-style',
-    'cstl-webservice']);
-
+    'cstl-webservice'])
+    .config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
+        cfpLoadingBarProvider.latencyThreshold = 250;
+    }]);
 
 
 cstlAdminApp

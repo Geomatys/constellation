@@ -21,7 +21,7 @@
 angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('DataController', function($scope, $location, Dashboard, webService, dataListing, datasetListing, DomainResource,
-                                            provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookies) {
+                                            provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookies, cfpLoadingBar) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -171,16 +171,16 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * Binding action for search button in metadata dashboard.
          * the result is stored with Dashboard service.
          */
-        $scope.callSearchMD = function(){
-            if ($scope.dataCtrl.searchMetadataTerm){
-                datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchMetadataTerm}},
-                 function(response) {//success
-                    Dashboard($scope, response, true);
-                 },
-                 function(response){//error
-                    console.error(response);
-                    Growl('error','Error','Search failed:'+ response.data);
-                 });
+        $scope.callSearchMDForTerm = function(term){
+            if (term){
+                datasetListing.findDataset({values: {'search': term}},
+                    function(response) {//success
+                        Dashboard($scope, response, true);
+                    },
+                    function(response){//error
+                        console.error(response);
+                        Growl('error','Error','Search failed:'+ response.data);
+                    });
             }else{
                 if (!$.isEmptyObject($scope.searchMD)){
                     var searchString = "";
@@ -219,6 +219,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 }
             }
         };
+        $scope.callSearchMD = function(){
+            $scope.callSearchMDForTerm($scope.dataCtrl.searchMetadataTerm);
+        };
 
         /**
          * main function of dashboard that loads the list of objects from server.
@@ -229,6 +232,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
                     $scope.wrap.ordertype = "Name";
+                    $scope.dataCtrl.searchTerm="";
                 }, function() {//error
                     Growl('error','Error','Unable to load list of data!');
                 });
@@ -241,19 +245,19 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     if($scope.selected){//data is selected in data Dashboard
                         //then we need to highlight the metadata associated in MD dashboard
                         $scope.dataCtrl.selectedDataSetChild = $scope.selected;
+                        var term = "";
                         for(var i =0;i<response.length;i++){
                             if($scope.containsRefData(response[i])){
-                                $scope.selectDS(response[i]);
+                                $scope.selectedDS = response[i];
+                                term = response[i].Name;
                                 break;
                             }
                         }
-                        $scope.dataCtrl.searchMetadataTerm = $scope.selected.Name;
-                        $scope.callSearchMD();
+                        $scope.callSearchMDForTerm(term);
                     }else {
                         //otherwise reset selection
                         $scope.dataCtrl.selectedDataSetChild = null;
                         $scope.selectedDS = null;
-                        $scope.dataCtrl.searchMetadataTerm = "";
                     }
 
                 }, function(response){//error
@@ -335,6 +339,23 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             layerData.mergeNewParams({ts:new Date().getTime()});
 
             var layerBackground = DataViewer.createLayer($scope.dataCtrl.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+
+            //attach event loader in modal map viewer
+            layerData.events.register("loadstart", layerData, function() {
+                $scope.$apply(function() {
+                    window.cfpLoadingBar_parentSelector = '#dataMap';
+                    cfpLoadingBar.start();
+                    cfpLoadingBar.inc();
+                });
+            });
+//            layerData.events.register("tileloaded", layerData, function() {
+//                console.debug("Tile loaded. " + this.numLoadingTiles + " left.");
+//            });
+            layerData.events.register("loadend", layerData, function() {
+                cfpLoadingBar.complete();
+                window.cfpLoadingBar_parentSelector = null;
+            });
+
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('dataMap');
             provider.dataDesc({},{values: {'providerId':providerId,'dataId':layerName}},
@@ -483,6 +504,11 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             $location.path('/editmetadata/'+template+'/'+type+'/'+$scope.selectedDS.Name);
         };
 
+        /**
+         * Returns true if the given dataset have children which was selected in data dashboard.
+         * @param dataset
+         * @returns {boolean}
+         */
         $scope.containsRefData = function(dataset) {
             if($scope.selected){
                 var idToMatch = $scope.selected.Id;
