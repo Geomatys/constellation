@@ -1,0 +1,67 @@
+/*
+ * Constellation - An open source and standard compliant SDI
+ *
+ *    http://www.constellation-sdi.org
+ *
+ *    Copyright 2014 Geomatys.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#footer {
+  height:auto;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  text-align: center;
+
+  >ul{
+    display: inline-block;
+    margin-bottom:0;
+    >li.copy{
+      margin-top:4px;
+      margin-bottom:4px;
+      padding:10px;
+      color: #5e5e5e;
+      &.launchedby{
+        padding-right:5px;
+      }
+    }
+    >li>a{
+        color: #5e5e5e;
+        line-height: 18px;
+        margin: 4px 5px;
+        padding: 10px;
+    }
+    > li.open > a,
+    > li:hover > a,
+    > li:focus > a,
+    > li > a.menu-selected {
+      color: #3e3e3e;
+      background-color: @header-nav-link-active-bg-color;
+    }
+  }
+  img.logo-geomatys{
+    width:100px;
+    margin-right:20px;
+    margin-top:3px;
+  }
+  a.logo-geomatys-a{
+    padding:0;
+    margin:0;
+  }
+  a.logo-geomatys-a:hover{
+    background-color:transparent;
+  }
+}
+

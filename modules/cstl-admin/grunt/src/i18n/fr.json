@@ -429,6 +429,9 @@
     "label.create.account":"Créer le compte",
     "label.display":"Affichage :",
     "label.service.url": "URL du service",
+    "label.sitemap":"Plan du site",
+    "label.disclaimer":"Mentions légales",
+    "label.lauchedby":"Lancé par",
 
     "layer.listing.data.add.button.label": "Ajouter une donnée",
     "layer.listing.data.create.button.label": "Créer une donnée",

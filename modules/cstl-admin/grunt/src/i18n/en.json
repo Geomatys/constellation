@@ -384,6 +384,9 @@
     "label.create.account":"Create account",
     "label.display":"Display :",
     "label.service.url": "Service URL",
+    "label.sitemap":"Site map",
+    "label.disclaimer":"Disclaimer",
+    "label.lauchedby":"Launched by",
 
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
