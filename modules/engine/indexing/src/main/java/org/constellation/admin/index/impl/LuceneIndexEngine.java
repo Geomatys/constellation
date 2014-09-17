@@ -20,7 +20,6 @@
 package org.constellation.admin.index.impl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntField;
@@ -45,6 +44,7 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.utils.MetadataFeeder;
+import org.geotoolkit.lucene.analysis.standard.ClassicAnalyzer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -86,8 +86,8 @@ public class LuceneIndexEngine implements IndexEngine {
     private void createIndex() throws IOException {
         final File dataIndexDirectory = ConfigDirectory.getDataIndexDirectory();
         final Directory directory = FSDirectory.open(dataIndexDirectory, NoLockFactory.getNoLockFactory());
-        StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_46);
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46, analyzer);
+        final ClassicAnalyzer analyzer = new ClassicAnalyzer(Version.LUCENE_4_9);
+        final IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_9, analyzer);
         indexWriter = new IndexWriter(directory, config);
         indexWriter.commit();
     }
@@ -181,8 +181,10 @@ public class LuceneIndexEngine implements IndexEngine {
         final Set<Integer> result = new HashSet<>();
         initIndexSearcher();
         final TopScoreDocCollector collector = TopScoreDocCollector.create(5, true);
-        final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_46, new String[]{
-                "title", "abstract", "keywords", "topic", "data", "level", "area" }, new StandardAnalyzer(Version.LUCENE_46));
+        final ClassicAnalyzer analyzer = new ClassicAnalyzer(Version.LUCENE_4_9);
+        final MultiFieldQueryParser queryParser = new MultiFieldQueryParser(Version.LUCENE_4_9,
+                new String[]{"title", "abstract", "keywords", "topic", "data", "level", "area" },
+                analyzer);
         queryParser.setDefaultOperator(QueryParser.Operator.OR);
         final Query q = queryParser.parse(queryString);
         indexSearcher.search(q, collector);
