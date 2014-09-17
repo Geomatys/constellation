@@ -67,6 +67,18 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         };
 
         /**
+         * Override the select function to togle item selection from data dashboard.
+         * @param item
+         */
+        $scope.select = function(item) {
+            if (item && $scope.selected &&$scope.selected.Id === item.Id) {
+                $scope.selected = null;
+            } else {
+                $scope.selected = item;
+            }
+        };
+
+        /**
          * Toggle advanced data search view panel.
          */
         $scope.toggleAdvancedDataSearch = function(){

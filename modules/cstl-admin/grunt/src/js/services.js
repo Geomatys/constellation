@@ -327,10 +327,9 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 scope.wrap.currentpage = page;
                 scope.wrap.countdata = list.length;
                 scope.wrap.dataList = list.splice(start, scope.wrap.nbbypage);
-                //scope.selected = null;
             };
 
-            scope.select = function(item) {
+            scope.select = scope.select || function(item) {
                 if (scope.selected === item) {
                     scope.selected = null;
                 } else {
