@@ -41,6 +41,11 @@ angular.module('CstlIndexApp', [
                 templateUrl: 'views/registration.html',
                 controller: 'RegisterController'
             })
+            .when('/disclaimer', {
+                templateUrl: 'views/disclaimer.html',
+                controller: 'MainController'
+            })
+
             .otherwise({
                 templateUrl: 'views/main.html'
             });
