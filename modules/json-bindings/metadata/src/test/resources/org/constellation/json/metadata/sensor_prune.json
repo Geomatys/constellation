@@ -1,0 +1,45 @@
+{
+	"root":{
+		"name":"SensorML",
+		"multiplicity":1,
+		"children":[{
+			"superblock":{
+				"name":"system.sblock.identification",
+				"multiplicity":1,
+				"help":"system.sblock.identification_help",
+				"path":null,
+				"children":[{
+					"block":{
+						"name":"system.block.identification.uniqueID",
+						"multiplicity":1,
+						"help":"system.block.identification.uniqueID_help",
+						"path":null,
+						"children":[{
+							"field":{
+								"name":"system.field.uniqueID.name",
+								"multiplicity":1,
+								"help":"system.field.uniqueID.name_help",
+								"path":"member[1].realProcess.identification[1].identifierList.identifier[1].name",
+								"render":"readonly",
+								"obligation":"M",
+								"defaultValue":"uniqueID",
+								"value":"My identifier"
+							}
+						},{
+							"field":{
+								"name":"system.field.uniqueID.value",
+								"multiplicity":1,
+								"help":"system.field.uniqueID.value_help",
+								"path":"member[1].realProcess.identification[1].identifierList.identifier[1].term.value",
+								"render":"text",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":"My identifier term"
+							}
+						}
+					]}
+				}
+			]}
+		}
+	]}
+}

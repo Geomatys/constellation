@@ -82,6 +82,9 @@ public class Template {
     /**
      * Pre-defined instances. This map shall not be modified after class initialization,
      * in order to allow concurrent access without synchronization.
+     *
+     * <p>By convention, name containing the {@code "sensor"} substring will be assumed to implement the
+     * {@link SensorMLStandard#INSTANCE} standard, and all other {@link MetadataStandard#ISO_19115}.</p>
      */
     private static final Map<String,Template> INSTANCES;
     static {
@@ -120,7 +123,13 @@ public class Template {
                     lines.add(line);
                 }
             }
-            if (templates.put(name, new Template(lines, sharedLines, sharedPaths, depths[i])) != null) {
+            MetadataStandard standard = MetadataStandard.ISO_19115;
+            if (name.contains("sensorml_system")) {
+                standard = SensorMLStandard.SYSTEM;
+            } else if (name.contains("sensorml_component")) {
+                standard = SensorMLStandard.COMPONENT;
+            }
+            if (templates.put(name, new Template(standard, lines, sharedLines, sharedPaths, depths[i])) != null) {
                 throw new AssertionError(name);
             }
             lines.clear();
@@ -145,10 +154,10 @@ public class Template {
      * @param  sharedLines An initially empty map to be filled by {@link LineReader}
      *                     for sharing same {@code String} instances when possible.
      */
-    private Template(final Iterable<String> template, final Map<String,String> sharedLines,
+    private Template(final MetadataStandard standard, final Iterable<String> template, final Map<String,String> sharedLines,
             final Map<String,String[]> sharedPaths, final int depth) throws IOException
     {
-        root = new TemplateNode(new LineReader(MetadataStandard.ISO_19115, template, sharedLines, sharedPaths), true, null);
+        root = new TemplateNode(new LineReader(standard, template, sharedLines, sharedPaths), true, null);
         this.depth = depth;
         /*
          * Do not validate the path (root.validatePath(null)). We will do that in JUnit tests instead,

@@ -65,7 +65,7 @@ import org.apache.sis.xml.NilReason;
  */
 final class MetadataUpdater {
     /**
-     * The metadata factory to use for creating new instances.
+     * The metadata factory to use for creating new instances of ISO 19115 objects.
      */
     private static final MetadataFactory FACTORY = new MetadataFactory();
 
@@ -73,6 +73,11 @@ final class MetadataUpdater {
      * The metadata standard.
      */
     private final MetadataStandard standard;
+
+    /**
+     * The metadata factory to use for creating new instances.
+     */
+    private final MetadataFactory factory;
 
     /**
      * The iterator over the (path, value) pairs.
@@ -96,6 +101,7 @@ final class MetadataUpdater {
      */
     MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values) {
         this.standard = standard;
+        factory = (standard instanceof SensorMLStandard) ? ((SensorMLStandard) standard).factory : FACTORY;
         it = values.entrySet().iterator();
         next();
     }
@@ -166,7 +172,7 @@ final class MetadataUpdater {
                     if (specialMetadataCases(type, metadata, identifier)) {
                         continue;
                     }
-                    child = FACTORY.create(type, Collections.<String,Object>emptyMap());
+                    child = factory.create(type, Collections.<String,Object>emptyMap());
                     asMap(metadata).put(identifier, child);
                 }
                 update(np.head(childBase + 1), child);

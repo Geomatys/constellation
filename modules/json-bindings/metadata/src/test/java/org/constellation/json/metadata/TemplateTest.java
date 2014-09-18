@@ -76,7 +76,7 @@ public final strictfp class TemplateTest {
     }
 
     /**
-     * Creates the metadata object corresponding to the {@link #JSON} string.
+     * Creates the metadata object corresponding to the test JSon string.
      */
     private static DefaultMetadata createMetadata() {
         final DefaultCitation citation = new DefaultCitation("Data \"title\"");
@@ -127,7 +127,7 @@ public final strictfp class TemplateTest {
     /**
      * Returns all lines read from the test resource of the given name.
      */
-    private static List<String> readAllLines(final String file) throws IOException {
+    static List<String> readAllLines(final String file) throws IOException {
         final List<String> lines = new ArrayList<>();
         try (final BufferedReader in = open(file)) {
             String line;
@@ -145,7 +145,7 @@ public final strictfp class TemplateTest {
      * @param  actual The JSON content produced by {@link Template}.
      * @throws IOException if an error occurred while reading the expected JSON file.
      */
-    private static void assertJsonEquals(final String expectedFile, final CharSequence actual) throws IOException {
+    static void assertJsonEquals(final String expectedFile, final CharSequence actual) throws IOException {
         int lineNumber = 0;
         final CharSequence[] lines = CharSequences.splitOnEOL(actual);
         try (final BufferedReader in = open(expectedFile)) {

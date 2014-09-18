@@ -316,8 +316,11 @@ final class TemplateNode {
      */
     final void write(final Object metadata, final Appendable out, final boolean prune, final int maxDepth) throws IOException {
         final TemplateApplicator f = new TemplateApplicator(prune, maxDepth);
-        for (final ValueNode root : f.createValueTree(this, metadata)) {
-            writeTree(root, out, true);
+        final ValueNode[] tree = f.createValueTree(this, metadata);
+        if (tree != null) {
+            for (final ValueNode root : tree) {
+                writeTree(root, out, true);
+            }
         }
     }
 
