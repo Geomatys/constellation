@@ -149,6 +149,7 @@ public final class ConfigDirectory {
      */
     public static File getDataDirectory() {
         File constellationDataDirectory;
+        String cstlDirPath = System.getProperty("constellation_directory");
 
         if (DATA_DIRECTORY != null && !DATA_DIRECTORY.isEmpty()) {
             constellationDataDirectory = new File(DATA_DIRECTORY);
@@ -157,7 +158,11 @@ public final class ConfigDirectory {
             } else if (!constellationDataDirectory.isDirectory()) {
                 LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", DATA_DIRECTORY);
             }
-        } else {
+        } else if(cstlDirPath != null && !cstlDirPath.isEmpty()){
+            // Config path defined in environment variable
+            constellationDataDirectory = new File(cstlDirPath, ".constellation-data");
+            return constellationDataDirectory;
+        } else{
             constellationDataDirectory = new File(System.getProperty("user.home"), ".constellation-data");
             if (!constellationDataDirectory.exists()) {
                 constellationDataDirectory.mkdir();
@@ -434,6 +439,16 @@ public final class ConfigDirectory {
             } else if (!constellationDirectory.isDirectory()) {
                 LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", USER_DIRECTORY);
             }
+            return constellationDirectory;
+        }
+
+
+        /*
+         * 3) config path defined in environment variable
+         */
+        String cstlDirPath = System.getProperty("constellation_directory");
+        if(cstlDirPath != null && !cstlDirPath.isEmpty()){
+            constellationDirectory = new File(cstlDirPath, ".constellation");
             return constellationDirectory;
         }
 
