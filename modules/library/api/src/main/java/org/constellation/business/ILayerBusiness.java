@@ -37,7 +37,7 @@ public interface ILayerBusiness {
 
     void removeForService(String serviceName, String identifier) throws ConfigurationException;
 
-    List<Layer> getLayers(String spec, String identifier, String login) throws ConfigurationException;
+    List<Layer> getLayers(String serviceType, String serviceName, String userLogin) throws ConfigurationException;
 
     Layer getLayer(String spec, String identifier, String name, String namespace, String login) throws ConfigurationException;
 

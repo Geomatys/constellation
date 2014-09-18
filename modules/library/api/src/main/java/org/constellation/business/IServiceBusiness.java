@@ -52,11 +52,27 @@ public interface IServiceBusiness {
 
     Object getConfiguration(String serviceType, String identifier) throws ConfigurationException;
 
-    Object create(String s, String identifier, Object configuration, Details serviceMetadata, Integer domainId) throws ConfigurationException;
+    /**
+     * Create a new service instance from input information.
+     * @param serviceType Type of service to instantiate (CSW, WMS, etc.)
+     * @param identifier The name to give to the service.
+     * @param configuration An optional configuration specific to the queried type of service (WPS --> PRocessContext, etc.).
+     * @param serviceMetadata An ISO 19115-2 metadata file to describe the service. If null a default empty metadata will be created.
+     * @param domainId A domain to put service into. Optional.
+     * @return
+     * @throws ConfigurationException
+     */
+    Object create(String serviceType, String identifier, Object configuration, Details serviceMetadata, Integer domainId) throws ConfigurationException;
 
     List<String> getServiceIdentifiers(String wms);
 
-    Service getServiceByIdentifierAndType(String name, String id);
+    /**
+     * Try to retrieve a service of the given type, using its name.
+     * @param type Type of the service (WMTS, WPS, etc.) we search.
+     * @param id The name of the service to return.
+     * @return A service of the queried type matching input name, or null if we cannot find any.
+     */
+    Service getServiceByIdentifierAndType(String type, String id);
 
     Details getInstanceDetails(String service, String id, String language) throws ConfigurationException;
 

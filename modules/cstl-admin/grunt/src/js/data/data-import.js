@@ -423,7 +423,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 $scope.import.allowNext = true;
 
             },function(response){//error
-                Growl('error','Error','Unable to connect database. Verify parrameters');
+                Growl('error','Error','Unable to connect database. Verify parameters');
             });
         };
 

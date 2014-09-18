@@ -40,7 +40,7 @@ import java.util.Map;
 public interface IDataBusiness {
     void deleteData(QName qName, String id);
 
-    void create(QName name, String identifier, String type, boolean sensorable, boolean visible, String subType, String metadataXml);
+    void create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, String subType, String metadataXml);
 
     void removeDataFromProvider(String providerId);
 

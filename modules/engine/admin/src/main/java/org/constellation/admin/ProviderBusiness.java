@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +22,6 @@ import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.ProviderType;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
-import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
@@ -40,13 +38,19 @@ import org.constellation.provider.CoverageData;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
+import org.constellation.provider.ProviderFactory;
+import org.geotoolkit.coverage.CoverageStoreFactory;
+import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.Pyramid;
 import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.FileFeatureStoreFactory;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.observation.ObservationStoreFactory;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.storage.DataStoreFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
@@ -59,6 +63,22 @@ import org.springframework.stereotype.Component;
 @Primary
 public class ProviderBusiness implements IProviderBusiness {
     private static final Logger LOGGER = Logging.getLogger(ProviderBusiness.class);
+
+    /**
+     * Identifier of the possible provider types.
+     * @deprecated Used for current provider management mechanism. Removed when providers will be simplified in
+     * DataStoreSource.
+     */
+    static enum SPI_NAMES {
+        COVERAGE_SPI_NAME("coverage-store"),
+        FEATURE_SPI_NAME("feature-store"),
+        OBSERVATION_SPI_NAME("observation-store");
+
+        public final String name;
+        private SPI_NAMES(final String providerSPIName) {
+            name = providerSPIName;
+        }
+    }
 
     @Inject
     private UserRepository userRepository;
@@ -170,6 +190,42 @@ public class ProviderBusiness implements IProviderBusiness {
         return DataProviders.getInstance().testProvider(providerIdentifier, providerService, sources);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Provider create(final int domainId, final String id, final DataStoreFactory spi, ParameterValueGroup spiConfiguration) throws ConfigurationException {
+        if (getProvider(id) != null) {
+            throw new ConfigurationException("A provider already exists for name "+id);
+        }
+
+        final String providerType;
+        if (spi instanceof CoverageStoreFactory) {
+            providerType = SPI_NAMES.COVERAGE_SPI_NAME.name;
+        } else if (spi instanceof FeatureStoreFactory) {
+            providerType = SPI_NAMES.FEATURE_SPI_NAME.name;
+        } else if (spi instanceof ObservationStoreFactory) {
+            providerType = SPI_NAMES.OBSERVATION_SPI_NAME.name;
+        } else {
+            throw new ConfigurationException("No provider can be created for following factory and parameters : " +
+                    spi.getDisplayName() + "\n"+spiConfiguration);
+        }
+        final DataProviderFactory pFactory = DataProviders.getInstance().getFactory(providerType);
+        final ParameterValueGroup providerConfig = pFactory.getProviderDescriptor().createValue();
+
+        providerConfig.parameter("id").setValue(id);
+        providerConfig.parameter("providerType").setValue(providerType);
+        final ParameterValueGroup choice =
+                providerConfig.groups("choice").get(0).addGroup(spiConfiguration.getDescriptor().getName().getCode());
+        Parameters.copy(spiConfiguration, choice);
+
+        return create(domainId, id, pFactory.getName(), providerConfig);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Provider create(final int domainId, final String id, final ProviderConfiguration config) throws ConfigurationException {
         final String type = config.getType();
         final String subType = config.getSubType();
@@ -181,16 +237,22 @@ public class ProviderBusiness implements IProviderBusiness {
         sources.parameter("id").setValue(id);
         sources.parameter("providerType").setValue(type);
 
-        sources = fillProviderParameter(type, subType, inParams, sources);
+        return create(domainId, id, providerService.getName(), fillProviderParameter(type, subType, inParams, sources));
+    }
 
-        DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Provider create(final int domainId, final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException {
+        final DataProviderFactory providerSPI = DataProviders.getInstance().getFactory(providerSPIName);
+        DataProviders.getInstance().createProvider(id, providerSPI, providerConfig);
         final int count = domainRepository.addProviderDataToDomain(id, domainId);
         final Provider provider = getProvider(id);
         final int provId = provider.getId();
-        // for now we assume provider == dataset
-        final Dataset dataset = datasetBusiness.createDataset(id, provId, null, null);
 
-        // link to dataset
+        // for now we assume provider == dataset, so we create a dataset bound to the new provider.
+        final Dataset dataset = datasetBusiness.createDataset(id, provId, null, null);
         datasetBusiness.linkDataTodataset(dataset, getDatasFromProviderId(provId));
 
         LOGGER.info("Added " + count + " data to domain " + domainId);
@@ -224,8 +286,11 @@ public class ProviderBusiness implements IProviderBusiness {
                 String folderPath = sldPath.substring(0, sldPath.lastIndexOf('/'));
                 sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
                 break;
+
             case "feature-store":
 
+                // TODO : What's going on here ? We should have received parameters matching a specific factory, not some
+                // randomly named parameters.
                 boolean foundProvider = false;
                 try {
                     final String filePath = inParams.get("path");
@@ -233,14 +298,14 @@ public class ProviderBusiness implements IProviderBusiness {
                         final URL url = new URL("file:" + filePath);
                         final File folder = new File(filePath);
                         final File[] candidates;
-                        if(folder.isDirectory()){
+                        if (folder.isDirectory()) {
                             candidates = folder.listFiles();
-                        }else{
+                        } else {
                             candidates = new File[]{folder};
                         }
 
                         search:
-                        for(File candidate : candidates) {
+                        for (File candidate : candidates) {
                             final String candidateName = candidate.getName().toLowerCase();
 
                             //loop on features file factories
@@ -252,7 +317,7 @@ public class ProviderBusiness implements IProviderBusiness {
                                     for (String tempExtension : fileFactory.getFileExtensions()) {
                                         //we do not want shapefiles or dbf types, a folder provider will be created in those cases
                                         if (candidateName.endsWith(tempExtension)) {
-                                            if (!tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf") && candidates.length>1) {
+                                            if (!tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf") && candidates.length > 1) {
                                                 //found a factory which can handle it
                                                 final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
                                                         factory.getParametersDescriptor().getName().getCode());
@@ -296,106 +361,33 @@ public class ProviderBusiness implements IProviderBusiness {
                     LOGGER.log(Level.WARNING, "unable to create url from path", e);
                 }
 
-                if(!foundProvider){
-                    switch (subType) {
-                        case "shapefile":
-                            try {
-                                final String shpPath = inParams.get("path");
-                                final URL url = new URL("file:" + shpPath);
-                                final ParameterValueGroup shpFolderParams = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
-                                shpFolderParams.parameter("url").setValue(url);
-                                shpFolderParams.parameter("namespace").setValue("no namespace");
-                            } catch (MalformedURLException e) {
-                                LOGGER.log(Level.WARNING, "unable to create url from path", e);
-                            }
-                            break;
-                        case "om2":
-                            final ParameterValueGroup omParams = sources.groups("choice").get(0).addGroup("OM2Parameters");
-                            omParams.parameter("host").setValue(inParams.get("host"));
-                            omParams.parameter("port").setValue(Integer.parseInt(inParams.get("port")));
-                            omParams.parameter("database").setValue(inParams.get("database"));
-                            omParams.parameter("user").setValue(inParams.get("user"));
-                            omParams.parameter("password").setValue(inParams.get("password"));
-                            omParams.parameter("sgbdtype").setValue(inParams.get("sgbdtype"));
-                            omParams.parameter("namespace").setValue("no namespace");
-                            break;
-                        case "postgresql":
-                            final ParameterValueGroup pgParams = sources.groups("choice").get(0).addGroup("PostgresParameters");
-                            final int port = Integer.parseInt(inParams.get("port"));
-                            pgParams.parameter("identifier").setValue("postgresql");
-                            pgParams.parameter("host").setValue(inParams.get("host"));
-                            pgParams.parameter("port").setValue(port);
-                            pgParams.parameter("user").setValue(inParams.get("user"));
-                            pgParams.parameter("password").setValue(inParams.get("password"));
-                            pgParams.parameter("database").setValue(inParams.get("database"));
-                            pgParams.parameter("namespace").setValue("no namespace");
-                            pgParams.parameter("simple types").setValue(true);
-                            break;
-                        default:
-                            final ParameterValueGroup defParams = sources.groups("choice").get(0).addGroup("PostgresParameters");
-                            final int defPort = Integer.parseInt(inParams.get("port"));
-                            defParams.parameter("identifier").setValue("postgresql");
-                            defParams.parameter("host").setValue(inParams.get("host"));
-                            defParams.parameter("port").setValue(defPort);
-                            defParams.parameter("user").setValue(inParams.get("user"));
-                            defParams.parameter("password").setValue(inParams.get("password"));
-                            defParams.parameter("database").setValue(inParams.get("database"));
-                            defParams.parameter("namespace").setValue("no namespace");
-                            defParams.parameter("simple types").setValue(true);
-                            break;
-                    }
+                if (!foundProvider) {
+                    final FeatureStoreFactory featureFactory = FeatureStoreFinder.getFactoryById(subType);
+                    final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
+                    final ParameterValueGroup choice =
+                            sources.groups("choice").get(0).addGroup(cvgConfig.getDescriptor().getName().getCode());
+                    Parameters.copy(cvgConfig, choice);
                 }
                 break;
+
             case "coverage-store":
-                URL fileUrl = null;
-
-                switch (subType) {
-                    case "coverage-xml-pyramid":
-                        try {
-                            final String pyramidPath = inParams.get("path");
-                            fileUrl = URI.create(pyramidPath).toURL();
-                        } catch (MalformedURLException e) {
-                            LOGGER.log(Level.WARNING, "unable to create url from path", e);
-                        }
-                        final ParameterValueGroup xmlCovParams = sources.groups("choice").get(0).addGroup("XMLCoverageStoreParameters");
-                        xmlCovParams.parameter("identifier").setValue("coverage-xml-pyramid");
-                        xmlCovParams.parameter("path").setValue(fileUrl);
-                        xmlCovParams.parameter("type").setValue("AUTO");
-                        break;
-                    case "coverage-file":
-                        try {
-                            final String covPath = inParams.get("path");
-                            fileUrl = URI.create("file:"+covPath).toURL();
-                        } catch (MalformedURLException e) {
-                            LOGGER.log(Level.WARNING, "unable to create url from path", e);
-                        }
-
-                        final ParameterValueGroup fileCovParams = sources.groups("choice").get(0).addGroup("FileCoverageStoreParameters");
-                        fileCovParams.parameter("identifier").setValue("coverage-file");
-                        fileCovParams.parameter("path").setValue(fileUrl);
-                        fileCovParams.parameter("type").setValue("AUTO");
-                        fileCovParams.parameter("namespace").setValue("no namespace");
-                        break;
-                    case "pgraster":
-                        final ParameterValueGroup pgRasterParams = sources.groups("choice").get(0).addGroup("PGRasterParameters");
-                        final int port = Integer.parseInt(inParams.get("port"));
-                        pgRasterParams.parameter("identifier").setValue("postgresql");
-                        pgRasterParams.parameter("host").setValue(inParams.get("host"));
-                        pgRasterParams.parameter("port").setValue(port);
-                        pgRasterParams.parameter("user").setValue(inParams.get("user"));
-                        pgRasterParams.parameter("password").setValue(inParams.get("password"));
-                        pgRasterParams.parameter("database").setValue(inParams.get("database"));
-                        pgRasterParams.parameter("simple types").setValue(true);
-                        break;
-                    default:
-                        LOGGER.log(Level.WARNING, "error on subtype definition");
+                // TODO : remove this crappy hack after provider system refactoring.
+                final String filePath = inParams.get("path");
+                if (filePath != null && !filePath.toLowerCase().startsWith("file:")) {
+                    inParams.put("path", "file:"+filePath);
                 }
+                final CoverageStoreFactory cvgFactory = CoverageStoreFinder.getFactoryById(subType);
+                final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, cvgFactory.getParametersDescriptor(), true);
+                final ParameterValueGroup choice =
+                        sources.groups("choice").get(0).addGroup(cvgConfig.getDescriptor().getName().getCode());
+                Parameters.copy(cvgConfig, choice);
                 break;
+
             case "observation-store":
 
                 switch (subType) {
+                    // TODO : Remove this hacky switch / case when input map will have the right identifier for url parameter.
                     case "observation-file":
-
                         final ParameterValueGroup ncObsParams = sources.groups("choice").get(0).addGroup("ObservationFileParameters");
                         ncObsParams.parameter("identifier").setValue("observationFile");
                         ncObsParams.parameter("namespace").setValue("no namespace");

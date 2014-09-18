@@ -25,7 +25,9 @@ import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.engine.register.Provider;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.storage.DataStoreFactory;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,7 +47,48 @@ public interface IProviderBusiness {
 
     Provider getProvider(String providerId, int domainId);
 
+    /**
+     * Create and save a provider object from input identifier and {@link org.constellation.configuration.ProviderConfiguration} object.
+     *
+     * @param domainId identifier of the domain to put created provider into.
+     * @param id The identifier (name) to give to the created provider.
+     * @param config Serialized provider configuration (entire parameter group, as defined in the matching {@link org.constellation.provider.DataProviderFactory}.
+     * @return A new {@link Provider} object, containing given configuration.
+     * @throws ConfigurationException If a provider already exists with the given name, or if the configuration is invalid.
+     *
+     * @deprecated : Following procedure will be removed once the new DataStoreSource system will be created.
+     */
     Provider create(int domainId, String id, ProviderConfiguration config) throws ConfigurationException;
+
+    /**
+     * Create and save a provider object with given identifier. Input spi and configuration must be {@link org.geotoolkit.storage.DataStoreFactory}
+     * and its proper configuration filled from {@link org.geotoolkit.storage.DataStoreFactory#getParametersDescriptor()}.
+     *
+     * @param domainId identifier of the domain to put created provider into.
+     * @param id The identifier (name) to give to the created provider.
+     * @param spi {@link org.geotoolkit.storage.DataStoreFactory} to identify underlying data source type.
+     * @param spiConfiguration The configuration needed for spi parameter to open a valid data source.
+     * @return A new {@link Provider} object, containing given configuration.
+     * @throws ConfigurationException If a provider already exists with the given name, or if the configuration is invalid.
+     *
+     * @deprecated : Following procedure will be removed once the new DataStoreSource system will be created.
+     */
+    Provider create(final int domainId, final String id, final DataStoreFactory spi, ParameterValueGroup spiConfiguration) throws ConfigurationException;
+
+    /**
+     * Create and save a provider object with given identifier. Input spi and configuration must be {@link org.constellation.provider.DataProviderFactory}
+     * and its proper configuration filled from {@link org.constellation.provider.DataProviderFactory#getProviderDescriptor()}.
+     *
+     * @param domainId identifier of the domain to put created provider into.
+     * @param id The identifier (name) to give to the created provider.
+     * @param providerSPIName Name of the {@link org.constellation.provider.DataProviderFactory} to identify underlying data source type.
+     * @param providerConfig The configuration needed for providerSPI parameter to open a valid data source.
+     * @return A new {@link Provider} object, containing given configuration.
+     * @throws ConfigurationException If a provider already exists with the given name, or if the configuration is invalid.
+     *
+     * @deprecated : Following procedure will be removed once the new DataStoreSource system will be created.
+     */
+    Provider create(final int domainId, final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException;
 
     Set<Name> test(String providerIdentifier, ProviderConfiguration configuration) throws DataStoreException;
 

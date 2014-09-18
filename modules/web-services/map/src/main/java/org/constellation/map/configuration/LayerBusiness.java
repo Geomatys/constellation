@@ -200,9 +200,9 @@ public class LayerBusiness implements ILayerBusiness {
         }
     }
     
-    public List<org.constellation.configuration.Layer> getLayers(final String spec, final String identifier, final String login) throws ConfigurationException {
+    public List<org.constellation.configuration.Layer> getLayers(final String serviceType, final String serviceName, final String login) throws ConfigurationException {
         final List<org.constellation.configuration.Layer> response = new ArrayList<>();
-        final Service service = serviceRepository.findByIdentifierAndType(identifier, spec.toLowerCase());
+        final Service service = serviceRepository.findByIdentifierAndType(serviceName, serviceType.toLowerCase());
         
         if (service != null) {
             final LayerContext context = readMapConfiguration(service.getConfig());
@@ -216,7 +216,7 @@ public class LayerBusiness implements ILayerBusiness {
                 }
             }
         } else {
-            throw new TargetNotFoundException("Unable to find a service:" + identifier);
+            throw new TargetNotFoundException("Unable to find a service:" + serviceName);
         }
         return response;
     }

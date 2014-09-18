@@ -69,6 +69,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-observation-store</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
@@ -114,6 +119,12 @@
         <dependency>
             <groupId>org.constellation.storage</groupId>
             <artifactId>cstl-store-data-coveragesgroup</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-data-coveragestore</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
