@@ -29,9 +29,9 @@
                             <a>
                                 <span translate="label.title">Title</span>
                                 <i class="fa fa-caret-up"
-                                   ng-if="wrap.ordertype === 'id' && wrap.orderreverse"></i>
+                                   ng-if="wrap.ordertype == 'id' && wrap.orderreverse"></i>
                                 <i class="fa fa-caret-down"
-                                   ng-if="wrap.ordertype === 'id' && !wrap.orderreverse"></i>
+                                   ng-if="wrap.ordertype == 'id' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
@@ -39,9 +39,9 @@
                             <a>
                                 <span translate="label.date">Date</span>
                                 <i class="fa fa-caret-up"
-                                   ng-if="wrap.ordertype === 'Date' && wrap.orderreverse"></i>
+                                   ng-if="wrap.ordertype == 'Date' && wrap.orderreverse"></i>
                                 <i class="fa fa-caret-down"
-                                   ng-if="wrap.ordertype === 'Date' && !wrap.orderreverse"></i>
+                                   ng-if="wrap.ordertype == 'Date' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
@@ -49,15 +49,15 @@
                             <a>
                                 <span translate="label.owner">owner</span>
                                 <i class="fa fa-caret-up"
-                                   ng-if="wrap.ordertype === 'owner' && wrap.orderreverse"></i>
+                                   ng-if="wrap.ordertype == 'owner' && wrap.orderreverse"></i>
                                 <i class="fa fa-caret-down"
-                                   ng-if="wrap.ordertype === 'owner' && !wrap.orderreverse"></i>
+                                   ng-if="wrap.ordertype == 'owner' && !wrap.orderreverse"></i>
                             </a>
                         </li>
                         <li class="divider-vertical"></li>
                     </ul>
                     <button type="button"
-                            ng-click="init();wrap.ordertype='id';wrap.orderreverse=false;wrap.filtertext='';"
+                            ng-click="resetFilters();"
                             title="{{'label.search.refresh' | translate }}"
                             class="btn btn-xs btn-info btn-data btn-sos">
                         <i class="fa fa-times"></i>
@@ -122,17 +122,17 @@
                                  ng-class="{'col-xs-6':sensorCtrl.smallMode}"
                                  style="padding-left:0;">
                                 <div class="item"
-                                     ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}"
-                                     ng-click="select(sosdata);selectSensorsChild(null);">
+                                     ng-class="{'sensor-sos':sosdata.type!='System','sensor-system':sosdata.type=='System','selected':sosdata.id==sensorCtrl.selectedSensor.id}"
+                                     ng-click="toggleSelectSensor(sosdata);selectSensorsChild(null);">
                                     <div class="top">
                                         <span class="item-title"
-                                              ng-class="{'title-sensorSystem':sosdata.type==='System'}"
+                                              ng-class="{'title-sensorSystem':sosdata.type=='System'}"
                                               title="{{sosdata.id}}">{{truncate(sensorCtrl.smallMode,sosdata.id)}}</span>
-                                        <span ng-if="sosdata.type==='System' && !sensorCtrl.smallMode"
+                                        <span ng-if="sosdata.type=='System' && !sensorCtrl.smallMode"
                                               class="pull-right text-right item-list-style"
                                               style="width:172px;"
                                               translate="label.sensor.system">sensor system</span>
-                                        <span ng-if="sosdata.type!=='System'"
+                                        <span ng-if="sosdata.type!='System'"
                                               class="pull-right text-right item-list-style"
                                               translate="label.sensor">sensor</span>
                                     </div>
@@ -154,9 +154,9 @@
                                 </div>
                                 <div class="item sensor-sos"
                                      style="margin-top:0;"
-                                     ng-if="sosdata==selected"
+                                     ng-if="sosdata.id==sensorCtrl.selectedSensor.id"
                                      ng-repeat="soschild in sosdata.children"
-                                     ng-class="{'selected':soschild===sensorCtrl.selectedSensorsChild,'child':!sensorCtrl.smallMode,'col-xs-11':sensorCtrl.smallMode,'col-sm-offset-1':sensorCtrl.smallMode}"
+                                     ng-class="{'selected':soschild.id==sensorCtrl.selectedSensorsChild.id,'child':!sensorCtrl.smallMode,'col-xs-11':sensorCtrl.smallMode,'col-sm-offset-1':sensorCtrl.smallMode}"
                                      ng-click="selectSensorsChild(soschild)">
                                     <div class="top">
                                         <span class="item-title"
@@ -180,18 +180,18 @@
                 <div class="pull-left" style="width: 40%;">
                     <div id="selection">
                         <div class="alert alert-sos alert-info alert-data"
-                             ng-class="{hide: selected != null}">
+                             ng-class="{hide: sensorCtrl.selectedSensor}">
                             <h4 translate="label.no.selected.sensor">No selected sensor</h4>
                             <p translate="msg.no.selected.sensor"
                                style="font-weight:normal;">Click on a data to display more information</p>
                         </div>
                         <div class="selected-item"
                              id="selected-item"
-                             ng-class="{hide: selected == null}">
+                             ng-class="{hide: !sensorCtrl.selectedSensor}">
                             <div class="block-header block-header-sos"
                                  ng-click="toggleUpDownSelected()">
                                 <strong class="item-title title-bloc"
-                                        title="{{selected.id}}">{{truncateTitleBlock(selected.id)}}</strong>
+                                        title="{{sensorCtrl.selectedSensor.id}}">{{truncateTitleBlock(sensorCtrl.selectedSensor.id)}}</strong>
                                 <i class="fa fa-chevron-down pull-right"></i>
                             </div>
                             <div>
@@ -201,7 +201,7 @@
                                         <img src="img/block-content-owner.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.owner}}</span>
+                                        <span>{{sensorCtrl.selectedSensor.owner}}</span>
                                     </div>
                                 </div>
                                 <div class="row description-block">
@@ -209,11 +209,11 @@
                                         <img src="img/block-content-date.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
+                                        <span>{{sensorCtrl.selectedSensor.createDate | date:'yyyy-MM-dd'}}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="block-content" ng-if="sensorCtrl.selectedSensorsChild != null">
+                            <div class="block-content" ng-if="sensorCtrl.selectedSensorsChild">
                                 <h6 translate="label.title">Title</h6>
                                 <span>{{truncateTitleBlock(sensorCtrl.selectedSensorsChild.id)}}</span>
                                 <div class="separator"></div>
@@ -248,7 +248,7 @@
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
                                             <a class="btn btn-sos"
-                                               ng-href="{{sensorCtrl.cstlUrl}}api/1/sensor/metadata/download/{{sensorCtrl.selectedSensorsChild?sensorCtrl.selectedSensorsChild.id:selected.id}};jsessionid={{$scope.sensorCtrl.cstlSessionId}}"
+                                               ng-href="{{sensorCtrl.cstlUrl}}api/1/sensor/metadata/download/{{sensorCtrl.selectedSensorsChild?sensorCtrl.selectedSensorsChild.id:sensorCtrl.selectedSensor.id}};jsessionid={{$scope.sensorCtrl.cstlSessionId}}"
                                                data-placement="bottom"
                                                title="{{'sensor.metadata.listing.selected.export.button' | translate }}" tooltip>
                                                 <i class="fa fa-download"></i>

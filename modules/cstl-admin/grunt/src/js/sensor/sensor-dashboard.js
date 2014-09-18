@@ -20,7 +20,8 @@
 
 angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('SensorsController', function($scope, Dashboard, webService, sensor, $modal, Growl, $window, $cookies) {
+    .controller('SensorsController', function($scope, $routeParams, $filter, Dashboard, webService, sensor,
+                                              $modal, Growl, $window, $cookies) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -30,9 +31,11 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
             cstlUrl : $cookies.cstlUrl,
             cstlSessionId : $cookies.cstlSessionId,
             domainId : $cookies.cstlActiveDomainId,
+            selectedSensor : null,
             selectedSensorsChild : null,
             smallMode : false,
-            hideScroll : true
+            hideScroll : true,
+            highlightSensor:$routeParams.id || null
         };
 
         /**
@@ -41,6 +44,16 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         $scope.init = function() {
             sensor.list({}, function(response) {//success
                 Dashboard($scope, response.children, false);
+                if($scope.sensorCtrl.highlightSensor){
+                    var resArray = $filter('filter')(response.children, {'id': $scope.sensorCtrl.highlightSensor});
+                    if(resArray && resArray.length>0){
+                        $scope.sensorCtrl.selectedSensor=resArray[0];
+                        $scope.wrap.filtertext = $scope.sensorCtrl.highlightSensor;
+                    }
+                }else {
+                    $scope.sensorCtrl.selectedSensor=null;
+                    $scope.wrap.filtertext='';
+                }
             }, function() {//error
                 Growl('error','Error','Unable to show sensor list!');
             });
@@ -51,6 +64,22 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
                     $scope.sensorCtrl.hideScroll = false;
                 }
                 $scope.$apply();
+            });
+        };
+
+        /**
+         * Reset filters for dashboard
+         */
+        $scope.resetFilters = function(){
+            sensor.list({}, function(response) {//success
+                Dashboard($scope, response.children, false);
+                $scope.wrap.ordertype='id';
+                $scope.wrap.orderreverse=false;
+                $scope.wrap.filtertext='';
+                $scope.sensorCtrl.selectedSensorsChild = null;
+                $scope.sensorCtrl.selectedSensor = null;
+            }, function() {//error
+                Growl('error','Error','Unable to show sensor list!');
             });
         };
 
@@ -66,11 +95,18 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
                 controller: 'SensorAddModalController'
             });
             modal.result.then(function() {
-                sensor.list({}, function(sensors) {
-                    Dashboard($scope, sensors.children, false);
-                    $scope.init();
+                sensor.list({}, function(response) {
+                    Dashboard($scope, response.children, false);
                 });
             });
+        };
+
+        $scope.toggleSelectSensor = function(item) {
+            if (item && $scope.sensorCtrl.selectedSensor && $scope.sensorCtrl.selectedSensor.id === item.id) {
+                $scope.sensorCtrl.selectedSensor = null;
+            } else {
+                $scope.sensorCtrl.selectedSensor = item;
+            }
         };
 
         $scope.selectSensorsChild = function(item) {
@@ -83,10 +119,14 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
 
         $scope.deleteSensor = function() {
             if (confirm("Are you sure?")) {
-                var idToDel = ($scope.sensorCtrl.selectedSensorsChild) ? $scope.sensorCtrl.selectedSensorsChild.id : $scope.selected.id;
+                var idToDel = ($scope.sensorCtrl.selectedSensorsChild) ? $scope.sensorCtrl.selectedSensorsChild.id : $scope.sensorCtrl.selectedSensor.id;
                 sensor.delete({sensor: idToDel}, function () {
                     Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed');
-                    $scope.init();
+                    sensor.list({}, function(response) {
+                        Dashboard($scope, response.children, false);
+                        $scope.sensorCtrl.selectedSensor = null;
+                        $scope.sensorCtrl.selectedSensorsChild = null;
+                    });
                 }, function () {
                     Growl('error', 'Error', 'Unable to remove sensor ' + idToDel);
                 });
@@ -103,8 +143,8 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
                 idToView = $scope.sensorCtrl.selectedSensorsChild.id;
                 typeToSend = $scope.sensorCtrl.selectedSensorsChild.type;
             }else {
-                idToView = $scope.selected.id;
-                typeToSend = $scope.selected.type;
+                idToView = $scope.sensorCtrl.selectedSensor.id;
+                typeToSend = $scope.sensorCtrl.selectedSensor.type;
             }
             $modal.open({
                 templateUrl: 'views/data/modalViewMetadata.html',
@@ -131,8 +171,8 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
                 sensorId = $scope.sensorCtrl.selectedSensorsChild.id;
                 typeToSend = $scope.sensorCtrl.selectedSensorsChild.type;
             }else {
-                sensorId = $scope.selected.id;
-                typeToSend = $scope.selected.type;
+                sensorId = $scope.sensorCtrl.selectedSensor.id;
+                typeToSend = $scope.sensorCtrl.selectedSensor.type;
             }
             openModalEditor(sensorId,typeToSend,typeToSend);
         };
@@ -203,6 +243,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         $scope.wrap = {};
 
         $scope.sensorModalChooseCtrl = {
+            selectedSensor : null,
             selectedSensorsChild : null,
             hideScroll : true
         };
@@ -216,8 +257,18 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
             $scope.wrap.nbbypage = 5;
         });
 
+        $scope.toggleSelectSensor = function(item) {
+            if (item && $scope.sensorModalChooseCtrl.selectedSensor &&
+                $scope.sensorModalChooseCtrl.selectedSensor.id === item.id) {
+                $scope.sensorModalChooseCtrl.selectedSensor = null;
+            } else {
+                $scope.sensorModalChooseCtrl.selectedSensor = item;
+            }
+        };
+
         $scope.selectSensorsChild = function(item) {
-            if ($scope.sensorModalChooseCtrl.selectedSensorsChild === item) {
+            if (item && $scope.sensorModalChooseCtrl.selectedSensorsChild &&
+                $scope.sensorModalChooseCtrl.selectedSensorsChild.id === item.id) {
                 $scope.sensorModalChooseCtrl.selectedSensorsChild = null;
             } else {
                 $scope.sensorModalChooseCtrl.selectedSensorsChild = item;
@@ -225,8 +276,11 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         };
 
         $scope.choose = function() {
-            var sensorId = ($scope.sensorModalChooseCtrl.selectedSensorsChild) ? $scope.sensorModalChooseCtrl.selectedSensorsChild.id : $scope.selected.id;
-            dataListing.linkToSensor({providerId: selectedData.Provider, dataId: selectedData.Name, sensorId: sensorId}, {value: selectedData.Namespace},
+            var sensorId = ($scope.sensorModalChooseCtrl.selectedSensorsChild) ? $scope.sensorModalChooseCtrl.selectedSensorsChild.id : $scope.sensorModalChooseCtrl.selectedSensor.id;
+            dataListing.linkToSensor({providerId: selectedData.Provider,
+                                      dataId: selectedData.Name,
+                                      sensorId: sensorId},
+                                     {value: selectedData.Namespace},
                 function() {
                     selectedData.TargetSensor.push(sensorId);
                 });

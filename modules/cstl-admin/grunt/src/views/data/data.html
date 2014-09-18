@@ -379,10 +379,16 @@
                                              src="img/icon-sensor-non-active.svg"
                                              class="pull-right"
                                              style="margin-top:6px; margin-right:10px;" />
-                                        <img ng-if="data.TargetSensor.length > 0"
-                                             src="img/icon-sensor-active.svg"
+                                        <div ng-if="data.TargetSensor.length > 0"
                                              class="pull-right"
-                                             style="margin-top:6px; margin-right:10px;" />
+                                             style="text-shadow:none;">
+                                            <a ng-href="#/sensors/{{data.TargetSensor[0]}}"
+                                               tooltip-html-unsafe="Go to sensor page"
+                                               tooltip-placement="right">
+                                                <img src="img/icon-sensor-active.svg"
+                                                     style="margin-top:0; margin-right:10px;" />
+                                            </a>
+                                        </div>
                                         <span ng-if="data.TargetSensor.length > 0"
                                               ng-class="{'blanc':data==selected, 'hide':dataCtrl.smallMode}"
                                               class="pull-right text-right item-list-style"

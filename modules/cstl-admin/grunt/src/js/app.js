@@ -171,7 +171,7 @@ cstlAdminApp
                     templateUrl: 'views/data/data.html',
                     controller: 'DataController'
                 })
-                .when('/sensors', {
+                .when('/sensors/:id?', {
                     templateUrl: 'views/sensor/sensors.html',
                     controller: 'SensorsController'
                 })
