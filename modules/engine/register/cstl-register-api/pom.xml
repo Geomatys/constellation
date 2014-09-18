@@ -43,12 +43,17 @@
       <plugin>
         <groupId>com.geomatys.maven</groupId>
         <artifactId>geomatys-sqlpojo-plugin</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.4-SNAPSHOT</version>
         <dependencies>
           <dependency>
             <groupId>org.constellation.engine</groupId>
             <artifactId>derby-store</artifactId>
             <version>${project.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.180</version>
           </dependency>
         </dependencies>
         <executions>
@@ -60,6 +65,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
+              <jdbcURL>jdbc:h2:${basedir}/target/db</jdbcURL>
               <targetSchema>ADMIN</targetSchema>
               <changeLog>cstl/db/db-changelog.xml</changeLog>
               <targetPackage>org.constellation.engine.register</targetPackage>
