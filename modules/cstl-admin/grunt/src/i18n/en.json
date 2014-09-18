@@ -157,6 +157,7 @@
     "sensor.metadata.listing.selected.view.button":"Show metadata",
     "sensor.metadata.listing.selected.edit.button":"Edit sensor metadata",
     "sensor.metadata.listing.selected.export.button":"Export metadata",
+    "data.listing.selected.goto.sensor":"Go to sensor page",
 
     "disclaimer.cstl.website":"Constellation-SDI website",
     "disclaimer.cstl.github":"Constellation-SDI github",

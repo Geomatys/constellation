@@ -158,6 +158,7 @@
     "sensor.metadata.listing.selected.view.button":"Afficher la métadonnée",
     "sensor.metadata.listing.selected.edit.button":"Éditer la métadonnée",
     "sensor.metadata.listing.selected.export.button":"Exporter la métadonnée",
+    "data.listing.selected.goto.sensor":"Aller à la page des capteurs",
 
     "disclaimer.cstl.website":"Site de Constellation-SDI",
     "disclaimer.cstl.github":"Github de Constellation-SDI",
