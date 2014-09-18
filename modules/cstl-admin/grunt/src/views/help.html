@@ -1,0 +1,145 @@
+<div class="logo-wrapper row" style="margin-bottom: 5px;">
+    <div style="margin-bottom:20px;">
+        <h3 class="header-title" translate="label.help">Getting started</h3>
+    </div>
+</div>
+
+<div>
+    <div class="container-fluid" ng-init="helpState='data'">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="menuLeft">
+                    <div class="panel panel-default">
+                        <div class="panel-body" style="padding:0pt;">
+                            <div class="list-group">
+                                <a class="list-group-item" ng-class="{active:helpState=='data'}"
+                                   ng-click="helpState='data'">
+                                    <span  translate="help.menu.data"> Add data</span>
+                                </a>
+                                <a class="list-group-item" ng-class="{active:helpState=='style'}"
+                                   ng-click="helpState='style'" >
+                                    <span translate="help.menu.style">Edit style</span>
+                                </a>
+                                <a class="list-group-item" ng-class="{active:helpState=='service'}"
+                                   ng-click="helpState='service'">
+                                    <span translate="help.menu.service">Create service</span>
+                                </a>
+                                <a class="list-group-item" ng-class="{active:helpState=='servicedata'}"
+                                   ng-click="helpState='servicedata'">
+                                    <span translate="help.menu.service.data">Add data in service</span>
+                                </a>
+                                <a class="list-group-item" ng-class="{active:helpState=='mapcontext'}"
+                                   ng-click="helpState='mapcontext'">
+                                    <span translate="help.menu.mapcontext">Create mapcontext</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <div class="col-sm-9">
+                <div class="rightPanel">
+                    <div ng-if="helpState=='data'">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" translate="help.menu.data">Add data</h3>
+                            </div>
+                            <div class="panel-body">
+                                <ol style="font-size:14px; line-height:50px;">
+                                    <li translate="help.data.first">Cliquer sur "Méta/données" dans le menu afin d'accéder au dashboard des données</li>
+                                    <li translate="help.data.second">Cliquer sur Ajouter une donnée</li>
+                                    <li translate="help.data.third">Choisir la source de la donnée</li>
+                                    <ul style="line-height:30px;">
+                                        <li translate="help.data.third.local"><b>Fichier local :</b> Données importées depuis l'ordinateur de l'utilisateur</li>
+                                        <li translate="help.data.third.server"><b>Fichier serveur :</b> Données importées depuis un serveur externe</li>
+                                        <li translate="help.data.third.db"><b>Base de données :</b> Donnée importées depuis une base de données</li>
+                                    </ul>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="helpState=='style'">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" translate="help.menu.style">Edit data style</h3>
+                            </div>
+                            <div class="panel-body">
+                                <ol style="font-size:14px; line-height:50px;">
+                                    <li translate="help.style.first">Dans le dashboard de données, cliquer sur une donnée</li>
+                                    <li translate="help.style.second">Sur le panneau de droite, cliquer sur "Styles associés" puis "Associer un nouveau style"</li>
+                                    <li translate="help.style.third">Il est possible d'utiliser un style existant ou d'en créer un nouveau en définissant des règles</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="helpState=='service'">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" translate="help.menu.service">Create service</h3>
+                            </div>
+                            <div class="panel-body">
+                                <ol style="font-size:14px; line-height:50px;">
+                                    <li translate="help.service.first">Cliquer sur "Service web" dans le menu afin d'accéder au dashboard des services</li>
+                                    <li translate="help.service.second">Cliquer sur "Créer un service" et choisir le type de service</li>
+                                    <ul style="line-height:30px;">
+                                        <li translate="help.service.second.wms"><b>WMS :</b> Service de cartes</li>
+                                        <li translate="help.service.second.wfs"><b>WFS :</b> Service de données vectorielles</li>
+                                        <li translate="help.service.second.wcs"><b>WCS :</b> Service de grilles de données</li>
+                                        <li translate="help.service.second.wmts"><b>WMTS :</b> Service de cartes tuilées</li>
+                                        <li translate="help.service.second.csw"><b>CSW :</b> Service de catalogues de données</li>
+                                        <li translate="help.service.second.sos"><b>SOS :</b> Service de données capteur</li>
+                                        <li translate="help.service.second.wps"><b>WPS :</b> Service de géotraitements</li>
+                                    </ul>
+                                    <li  translate="help.service.third">Il suffit ensuite de remplir les informations sur le service (déscription + métadonnées du service)</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="helpState=='servicedata'">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" translate="help.menu.service.data">Add data in service</h3>
+                            </div>
+                            <div class="panel-body">
+                                <ol style="font-size:14px; line-height:50px;">
+                                    <li translate="help.service.data.first">Cliquer sur "Service web" dans le menu afin d'accéder au dashboard des services</li>
+                                    <li translate="help.service.data.second">Cliquer sur le titre d'un service ou sur le bouton "outils > éditer"</li>
+                                    <li translate="help.service.data.third">Dans l'onglet "Données" cliquer sur "Ajouter"</li>
+                                    <li translate="help.service.data.four">Sélectionner la donnée à ajouter et cliquer sur choisir</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="helpState=='mapcontext'">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" translate="help.menu.mapcontext">Create mapcontext</h3>
+                            </div>
+                            <div class="panel-body">
+                                <ol style="font-size:14px; line-height:50px;">
+                                    <li translate="help.mapcontext.first">Cliquer sur "Cartographie" dans le menu afin d'accéder au dashboard des contexte cartographiques</li>
+                                    <li translate="help.mapcontext.second">Cliquer sur "Ajouter"</li>
+                                    <li translate="help.mapcontext.third">Dans l'onglet "Information" compléter les information sur le contexte</li>
+                                    <li translate="help.mapcontext.four">Dans l'onglet "Couches", cliquer sur "Ajouter une couche" puis sélectionner la source des données à ajouter</li>
+                                    <ul style="line-height:30px;">
+                                        <li translate="help.mapcontext.four.intern"><b>Interne :</b> Données stockées sur un service WMS de Constellation-SDI</li>
+                                        <li translate="help.mapcontext.four.extern"><b>Externe :</b> Données accessibles depuis un service externe via une URL</li>
+                                    </ul>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

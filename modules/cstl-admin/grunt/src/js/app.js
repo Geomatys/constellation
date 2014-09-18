@@ -195,6 +195,10 @@ cstlAdminApp
                     templateUrl: 'views/disclaimer.html',
                     controller: 'MainController'
                 })
+                .when('/help', {
+                    templateUrl: 'views/help.html',
+                    controller: 'MainController'
+                })
 
                 .otherwise({
                     templateUrl: 'views/main.html',
