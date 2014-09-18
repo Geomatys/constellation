@@ -19,47 +19,7 @@ var cstlSession = {};
 
 /* App Module */
 /*jshint -W079 */
-var cstlAdminApp = angular.module('CstlAdminApp', [
-    // Angular official modules.
-    'ngCookies',
-    'ngResource',
-    'ngRoute',
-    'ngAnimate',
-    // Libraries modules.
-    'base64',
-    'hljs',
-    'pascalprecht.translate',
-    'rzModule',
-    'angular-loading-bar',
-    'ui.ace',
-    'ui.bootstrap.modal',
-    'ui.bootstrap.buttons',
-    'ui.bootstrap.tpls-accordion',
-    'ui.bootstrap.transition',
-    'ui.bootstrap.collapse',
-    'ui.bootstrap.accordion',
-    'ui.bootstrap.tpls-popover',
-    'ui.bootstrap.position',
-    'ui.bootstrap.bindHtml',
-    'ui.bootstrap.tooltip',
-    'ui.bootstrap.popover',
-    'ui.bootstrap.tpls-typeahead',
-    'ui.bootstrap.typeahead',
-    // Constellation modules.
-    'cstl-directives',
-    'cstl-restapi',
-    'cstl-services',
-    'cstl-admin',
-    'cstl-data',
-    'cstl-main',
-    'cstl-mapcontext',
-    'cstl-process',
-    'cstl-sensor',
-    'cstl-style',
-    'cstl-webservice'])
-    .config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
-        cfpLoadingBarProvider.latencyThreshold = 250;
-    }]);
+var cstlAdminApp = angular.module('CstlAdminApp', ['CstlAdminDep']);
 
 
 cstlAdminApp
