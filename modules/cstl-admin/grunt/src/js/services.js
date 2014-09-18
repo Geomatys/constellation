@@ -345,13 +345,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 }
             };
 
-            scope.$watch('wrap.nbbypage+wrap.filtertext+wrap.filtertype', function() {
+            scope.$watch('wrap.nbbypage+wrap.filtertext+wrap.filtertype+wrap.fullList', function() {
                 scope.displayPage(1);
-            },true);
-
-            scope.$watch('wrap.fullList', function() {
-                scope.displayPage(1);
-                scope.selected = null;
             },true);
 
             scope.$watch('wrap.ordertype+wrap.orderreverse', function() {

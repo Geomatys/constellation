@@ -54,7 +54,8 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                     function() {
                         Growl('success', 'Success', 'Style ' + styleName + ' successfully deleted');
                         style.listAll({provider: 'sld'}, function(response) {
-                            $scope.wrap.fullList = response.styles;
+                            Dashboard($scope, response.styles, true);
+                            $scope.selected=null;
                         });
                     },
                     function() {

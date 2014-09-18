@@ -323,7 +323,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             modal.result.then(function() {
                 if ($scope.type.toLowerCase() !== 'sos') {
                     $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
-                        $scope.wrap.fullList = response;
+                        Dashboard($scope, response, true);
                     });
                 } else {
                     $scope.initScope();
@@ -351,7 +351,8 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
                             Growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully deleted from service ' + $scope.service.name);
                             $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
-                                $scope.wrap.fullList = response;
+                                Dashboard($scope, response, true);
+                                $scope.selected=null;
                             });
                         },
                         function () {

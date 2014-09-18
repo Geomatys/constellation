@@ -425,22 +425,27 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 }
 
                 dataListing.hideData({providerid: providerId, dataid: layerName}, {value : $scope.selected.Namespace},
-                    function() { Growl('success','Success','Data '+ layerName +' successfully deleted');
+                    function() {//success
+                        Growl('success','Success','Data '+ layerName +' successfully deleted');
                         dataListing.listDataForProv({providerId: providerId}, function(response) {
                             if (response.length === 0) {
                                 provider.delete({id: providerId}, function() {
                                     dataListing.listAll({}, function(response) {
-                                        $scope.wrap.fullList = response;
+                                        Dashboard($scope, response, true);
+                                        $scope.selected=null;
                                     });
                                 });
                             } else {
                                 dataListing.listAll({}, function(response) {
-                                    $scope.wrap.fullList = response;
+                                    Dashboard($scope, response, true);
+                                    $scope.selected=null;
                                 });
                             }
                         });
                     },
-                    function() { Growl('error','Error','Data '+ layerName +' deletion failed'); }
+                    function() {//error
+                        Growl('error','Error','Data '+ layerName +' deletion failed');
+                    }
                 );
             }
         };
