@@ -17,15 +17,16 @@
                     <span class="fileinput-filename"></span>
                 </div>
                 <span class="input-group-addon btn btn-default btn-file">
-                    <span class="fileinput-new" translate="data.modal.select">Select file</span>
-                    <span class="fileinput-exists" translate="data.modal.change">Change</span>
+                    <span class="fileinput-new" translate="data.modal.select" id="selectFile">Select file</span>
+                    <span class="fileinput-exists" translate="data.modal.change" id="changeFile">Change</span>
                     <input type="file"
                            name="data"
+                           id="dataFile"
                            onchange="angular.element(this).scope().verifyExtension(this.value);"/>
                 </span>
                 <a class="input-group-addon btn btn-default fileinput-exists"
                    data-dismiss="fileinput"
-                   translate="data.modal.remove">Remove</a>
+                   translate="data.modal.remove" id="removeFile">Remove</a>
             </div>
         </div>
         <div class="alert alert-data"

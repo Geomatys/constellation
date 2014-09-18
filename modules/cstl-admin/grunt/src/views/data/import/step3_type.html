@@ -1,6 +1,6 @@
 <div id="part3Type" ng-controller="ModalImportDataStep3TypeController">
     <div class="row" style="margin-left:0; margin-right:0; height: 150px; padding-top: 18px;">
-        <div class="col-sm-4" style="text-align:center;">
+        <div class="col-sm-4" style="text-align:center;" id="vectorData">
             <label class="radio data-type-choose" ng-class="{'type-selected':import.uploadType==='vector'}">
                 <div class="col-sm-12" style="margin-top: 5px;">
                     <img src="img/icon/vector.svg" />
@@ -12,8 +12,8 @@
                        style="margin-left:0; display: none;"/>
                 <div translate="layer.listing.data.upload.vector.label" style="margin-top:10px;">Vector data</div>
             </label>
-        </div>
-        <div class="col-sm-4" style="text-align:center;">
+        </div >
+        <div class="col-sm-4" style="text-align:center;" id="rasterData">
             <label class="radio data-type-choose" ng-class="{'type-selected':import.uploadType==='raster'}">
                 <div class="col-sm-12" style="margin-top: 5px;">
                     <img src="img/icon/raster.svg" />
@@ -26,7 +26,7 @@
                 <div translate="layer.listing.data.upload.raster.label" style="margin-top:10px;">Raster data</div>
             </label>
         </div>
-        <div class="col-sm-4" style="text-align:center;">
+        <div class="col-sm-4" style="text-align:center;" id="sensorData">
             <label class="radio data-type-choose" ng-class="{'type-selected':import.uploadType==='sensor'}">
                 <div class="col-sm-12" style="margin-top: 5px;">
                     <img src="img/icon/sensor.svg" />
