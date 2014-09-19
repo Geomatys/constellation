@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="14px" height="12px" viewBox="0 0 14 12" enable-background="new 0 0 14 12" xml:space="preserve">
+	 width="14px" height="12px" viewBox="0 0 14 12" style="enable-background:new 0 0 14 12;" xml:space="preserve">
+<style type="text/css"><![CDATA[ .st0{fill:#E3E3E3;}]]></style>
 <g>
-	<g>
-		<polygon fill="#E3E3E3" points="0.65,3.25 7,6 13.35,3.25 7,0.5 		"/>
-	</g>
-	<g>
-		<polygon fill="#E3E3E3" points="7,7.01 3.08,5.31 0.65,6 7,8.75 13.35,6 11.12,5.27 		"/>
-	</g>
-	<g>
-		<polygon fill="#E3E3E3" points="7,9.76 3.08,8.06 0.65,8.75 7,11.5 13.35,8.75 11.12,8.02 		"/>
-	</g>
+	<g><polygon class="st0" points="0.6,3.2 7,6 13.3,3.2 7,0.5"/></g>
+	<g><polygon class="st0" points="7,7 3.1,5.3 0.6,6 7,8.8 13.3,6 11.1,5.3"/></g>
+	<g><polygon class="st0" points="7,9.8 3.1,8.1 0.6,8.8 7,11.5 13.3,8.8 11.1,8"/></g>
 </g>
 </svg>

@@ -3,31 +3,32 @@
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="872px" height="72px" viewBox="0 0 872 72" style="enable-background:new 0 0 872 72;" xml:space="preserve">
 <style type="text/css"><![CDATA[
-	.st3{opacity:0.13;fill:none;stroke:#000000;stroke-width:2;enable-background:new    ;}
-	.st4{opacity:0.13;fill:#3D3D3C;stroke:#000000;stroke-width:2;enable-background:new    ;}
+	.st0{fill:#4D4D4D;} .st1{opacity:0.13;fill:none;stroke:#000000;stroke-width:0.75;enable-background:new;}
+	.st2{fill:#5B5B5B;} .st3{opacity:0.13;fill:none;stroke:#000000;stroke-width:2;enable-background:new;}
+	.st4{opacity:0.13;fill:#3D3D3C;stroke:#000000;stroke-width:2;enable-background:new;}
 ]]></style>
-<rect x="-1" y="-1.08" fill="#4D4D4D" width="872" height="72"/>
-<rect x="816.37" y="13.11" transform="matrix(-1 -4.651204e-03 4.651204e-03 -1 1635.601 33.0142)" class="st4" width="2.94" height="2.99"/>
-<rect x="803.83" y="38.27" transform="matrix(-1 -4.651204e-03 4.651204e-03 -1 1610.4041 83.2764)" class="st4" width="2.94" height="2.99"/>
-<rect x="796.78" y="22.94" transform="matrix(-1 -4.485028e-03 4.485028e-03 -1 1596.3784 52.4505)" class="st4" width="2.94" height="2.99"/>
-<rect x="858.76" y="32.11" transform="matrix(-1 -4.651204e-03 4.651204e-03 -1 1720.2935 71.2117)" class="st4" width="2.94" height="2.99"/>
-<rect x="838.3" y="38.37" transform="matrix(-1 -5.296118e-03 5.296118e-03 -1 1679.3308 84.1784)" class="st4" width="2.95" height="2.99"/>
-<rect x="721.13" y="50.51" transform="matrix(-1 -4.634276e-03 4.634276e-03 -1 1444.9573 107.3599)" class="st4" width="2.95" height="2.99"/>
-<rect x="758.71" y="36.76" transform="matrix(-1 -4.649535e-03 4.649535e-03 -1 1520.1704 80.0458)" class="st4" width="2.94" height="2.99"/>
-<rect x="740.96" y="28.75" transform="matrix(-1 -4.799737e-03 4.799737e-03 -1 1484.7135 64.0539)" class="st4" width="2.95" height="2.99"/>
-<rect x="770.75" y="3.26" transform="matrix(-1 -4.485028e-03 4.485028e-03 -1 1544.4065 12.9736)" class="st4" width="2.94" height="2.99"/>
-<rect x="687.53" y="14.59" transform="matrix(-1 -4.468577e-03 4.468577e-03 -1 1377.925 35.2491)" class="st4" width="2.95" height="2.99"/>
-<rect x="619.41" y="41.25" transform="matrix(-1 -4.303116e-03 4.303116e-03 -1 1241.572 88.1625)" class="st4" width="2.95" height="2.99"/>
-<rect x="606.85" y="6.55" transform="matrix(-1 -4.817141e-03 4.817141e-03 -1 1216.5889 19.0206)" class="st4" width="2.94" height="2.99"/>
-<rect x="572.76" y="47.55" transform="matrix(-1 -4.649535e-03 4.649535e-03 -1 1148.218 100.7494)" class="st4" width="2.94" height="2.98"/>
-<rect x="559.39" y="30.24" transform="matrix(-1 -4.799737e-03 4.799737e-03 -1 1121.5638 66.1623)" class="st4" width="2.95" height="2.99"/>
-<rect x="651.45" y="6.55" transform="matrix(-1 -4.651204e-03 4.651204e-03 -1 1305.7896 19.1271)" class="st4" width="2.94" height="2.99"/>
-<rect x="701.71" y="60.23" transform="matrix(-1 -4.635707e-03 4.635707e-03 -1 1406.0715 126.6995)" class="st4" width="2.95" height="2.98"/>
-<polyline class="st3" points="547.63,43.74 598.08,39.68 619.4,14.52 668.53,21.04 688.07,-0.79 "/>
-<polyline class="st3" points="619.4,70.24 651.43,38.34 740.38,41.27 759.65,54.8 798.24,-0.79 "/>
-<polyline class="st3" points="871,63.16 831.97,16.83 816.85,57.24 777.7,54.8 766.66,70.24 "/>
-<polygon fill="#5B5B5B" points="572.54,-1.08 536.65,70.67 -0.68,70.92 -0.65,-1.08 "/>
-<path opacity="0.13" fill="none" stroke="#000000" stroke-width="0.75" enable-background="new" d="M728.7,0.61"/>
-<rect x="656.22" y="50.51" transform="matrix(-1 -5.296118e-03 5.296118e-03 -1 1315.104 107.4835)" class="st4" width="2.95" height="2.98"/>
-<rect x="707.36" y="8.08" transform="matrix(-1 -4.483597e-03 4.483597e-03 -1 1417.6033 22.3284)" class="st4" width="2.94" height="2.99"/>
+<rect x="-1" y="-1.1" class="st0" width="872" height="72"/>
+<rect x="816.4" y="13.1" transform="matrix(1 4.649568e-03 -4.649568e-03 1 7.678223e-02 -3.8024)" class="st4" width="2.9" height="3"/>
+<rect x="803.8" y="38.3" transform="matrix(1 4.651112e-03 -4.651112e-03 1 0.1936 -3.7451)" class="st4" width="2.9" height="3"/>
+<rect x="796.8" y="22.9" transform="matrix(1 4.485005e-03 -4.485005e-03 1 0.1177 -3.5799)" class="st4" width="2.9" height="3"/>
+<rect x="858.8" y="32.1" transform="matrix(1 4.651112e-03 -4.651112e-03 1 0.1656 -4.0006)" class="st4" width="2.9" height="3"/>
+<rect x="838.3" y="38.4" transform="matrix(1 5.296185e-03 -5.296185e-03 1 0.2229 -4.447)" class="st4" width="3" height="3"/>
+<rect x="721.1" y="50.5" transform="matrix(1 4.634177e-03 -4.634177e-03 1 0.2488 -3.3481)" class="st4" width="3" height="3"/>
+<rect x="758.7" y="36.8" transform="matrix(1 4.651112e-03 -4.651112e-03 1 0.1861 -3.5352)" class="st4" width="2.9" height="3"/>
+<rect x="740.9" y="28.8" transform="matrix(1 4.799680e-03 -4.799680e-03 1 0.1537 -3.563)" class="st4" width="3" height="3"/>
+<rect x="770.7" y="3.3" transform="matrix(1 4.485005e-03 -4.485005e-03 1 2.905273e-02 -3.4633)" class="st4" width="2.9" height="3"/>
+<rect x="687.5" y="14.6" transform="matrix(1 4.468674e-03 -4.468674e-03 1 7.879639e-02 -3.0787)" class="st4" width="3" height="3"/>
+<rect x="619.4" y="41.3" transform="matrix(1 4.303171e-03 -4.303171e-03 1 0.1897 -2.6713)" class="st4" width="3" height="3"/>
+<rect x="606.8" y="6.6" transform="matrix(1 4.815620e-03 -4.815620e-03 1 4.583740e-02 -2.9293)" class="st4" width="2.9" height="3"/>
+<rect x="572.7" y="47.5" transform="matrix(1 4.651112e-03 -4.651112e-03 1 0.2343 -2.6702)" class="st4" width="2.9" height="3"/>
+<rect x="559.4" y="30.2" transform="matrix(1 4.799680e-03 -4.799680e-03 1 0.1588 -2.6915)" class="st4" width="3" height="3"/>
+<rect x="651.4" y="6.6" transform="matrix(1 4.649568e-03 -4.649568e-03 1 4.443359e-02 -3.0357)" class="st4" width="2.9" height="3"/>
+<rect x="701.7" y="60.2" transform="matrix(1 4.634177e-03 -4.634177e-03 1 0.2936 -3.258)" class="st4" width="3" height="3"/>
+<polyline class="st3" points="547.6,43.7 598.1,39.7 619.4,14.5 668.5,21 688.1,-0.8 "/>
+<polyline class="st3" points="619.4,70.2 651.4,38.3 740.4,41.3 759.7,54.8 798.2,-0.8 "/>
+<polyline class="st3" points="871,63.2 832,16.8 816.8,57.2 777.7,54.8 766.7,70.2 "/>
+<polygon class="st2" points="572.5,-1.1 536.7,70.7 -0.7,70.9 -0.6,-1.1 "/>
+<path class="st1" d="M728.7,0.6"/>
+<rect x="656.2" y="50.5" transform="matrix(1 5.296185e-03 -5.296185e-03 1 0.2846 -3.4825)" class="st4" width="3" height="3"/>
+<rect x="707.3" y="8.1" transform="matrix(1 4.485005e-03 -4.485005e-03 1 5.010986e-02 -3.1789)" class="st4" width="2.9" height="3"/>
 </svg>

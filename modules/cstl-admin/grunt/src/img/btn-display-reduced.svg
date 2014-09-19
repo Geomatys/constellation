@@ -2,10 +2,10 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="20px" height="20px" viewBox="0 0 20 20" enable-background="new 0 0 20 20" xml:space="preserve">
-<rect x="0.04" y="2.04" fill="#FFFFFF" width="8.42" height="3.14"/>
-<rect x="0.04" y="8.43" fill="#FFFFFF" width="8.42" height="3.14"/>
-<rect x="0.04" y="14.83" fill="#FFFFFF" width="8.42" height="3.14"/>
-<rect x="11.61" y="2.04" fill="#FFFFFF" width="8.42" height="3.14"/>
-<rect x="11.61" y="8.43" fill="#FFFFFF" width="8.42" height="3.14"/>
-<rect x="11.61" y="14.83" fill="#FFFFFF" width="8.42" height="3.14"/>
+<rect x="0" y="2" fill="#FFFFFF" width="8.4" height="3.1"/>
+<rect x="0" y="8.4" fill="#FFFFFF" width="8.4" height="3.1"/>
+<rect x="0" y="14.8" fill="#FFFFFF" width="8.4" height="3.1"/>
+<rect x="11.6" y="2" fill="#FFFFFF" width="8.4" height="3.1"/>
+<rect x="11.6" y="8.4" fill="#FFFFFF" width="8.4" height="3.1"/>
+<rect x="11.6" y="14.8" fill="#FFFFFF" width="8.4" height="3.1"/>
 </svg>

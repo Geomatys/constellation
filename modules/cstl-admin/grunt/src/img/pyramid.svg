@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="872px" height="72px" viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
-<rect x="-1" y="-0.58" fill="#D6ECF6" width="872" height="72"/>
-<polygon fill="#EFF6F7" points="520.33,0.09 483.53,70.5 -0.68,70.74 -0.65,0.09 "/>
-<g opacity="0.3">
+	 width="872px" height="72px" viewBox="0 0 872 72" style="enable-background:new 0 0 872 72;" xml:space="preserve">
+<style type="text/css"><![CDATA[
+	.st0{fill:#EFF6F7;}	.st1{opacity:0.3;} .st2{fill:#6AB2D1;} .st3{fill:#D6ECF6;} .st4{fill:#3E98C0;} .st5{fill:#A2C3D5;}
+]]></style>
+<rect x="-1" y="-0.6" class="st3" width="872" height="72"/>
+<polygon class="st0" points="520.3,0.1 483.5,70.5 -0.7,70.7 -0.6,0.1 "/>
+<g class="st1">
 	<g>
-		<polygon fill="#A2C3D5" points="696.47,59.25 648.51,59.25 680.25,47.63 728.2,47.63 		"/>
-		<polygon fill="#A2C3D5" points="755.4,59.25 707.45,59.25 739.18,47.63 787.13,47.63 		"/>
-		<polygon fill="#A2C3D5" points="814.33,59.25 766.38,59.25 798.12,47.63 846.07,47.63 		"/>
-		<polygon fill="#A2C3D5" points="736.31,44.15 688.36,44.15 720.09,32.54 768.04,32.54 		"/>
-		<polygon fill="#A2C3D5" points="795.24,44.15 747.29,44.15 779.02,32.54 826.98,32.54 		"/>
-		<polygon fill="#A2C3D5" points="871,32.54 837.96,32.54 806.22,44.15 854.18,44.15 871,38 		"/>
-		<polygon fill="#A2C3D5" points="781.97,71.42 806.22,62.54 758.27,62.54 734.02,71.42 		"/>
-		<polygon fill="#A2C3D5" points="723.04,71.42 747.29,62.54 699.33,62.54 675.08,71.42 		"/>
-		<polygon fill="#A2C3D5" points="664.1,71.42 688.36,62.54 640.4,62.54 616.15,71.42 		"/>
+		<polygon class="st5" points="696.5,59.2 648.5,59.2 680.2,47.6 728.2,47.6"/>
+		<polygon class="st5" points="755.4,59.2 707.5,59.2 739.2,47.6 787.1,47.6"/>
+		<polygon class="st5" points="814.3,59.2 766.4,59.2 798.1,47.6 846.1,47.6"/>
+		<polygon class="st5" points="736.3,44.2 688.4,44.2 720.1,32.5 768,32.5"/>
+		<polygon class="st5" points="795.2,44.2 747.3,44.2 779,32.5 827,32.5"/>
+		<polygon class="st5" points="871,32.5 838,32.5 806.2,44.2 854.2,44.2 871,38"/>
+		<polygon class="st5" points="782,71.4 806.2,62.5 758.3,62.5 734,71.4"/>
+		<polygon class="st5" points="723,71.4 747.3,62.5 699.3,62.5 675.1,71.4"/>
+		<polygon class="st5" points="664.1,71.4 688.4,62.5 640.4,62.5 616.2,71.4"/>
 	</g>
 	<g>
-		<polygon fill="#6AB2D1" points="699.48,51.97 637.68,51.97 678.57,36.27 740.37,36.27 		"/>
-		<polygon fill="#6AB2D1" points="778.54,51.97 716.74,51.97 757.64,36.27 819.44,36.27 		"/>
-		<polygon fill="#6AB2D1" points="748.62,32.85 686.82,32.85 727.71,17.15 789.52,17.15 		"/>
-		<polygon fill="#6AB2D1" points="827.68,32.85 765.88,32.85 806.78,17.15 868.58,17.15 		"/>
+		<polygon class="st2" points="699.5,52 637.7,52 678.6,36.3 740.4,36.3"/>
+		<polygon class="st2" points="778.5,52 716.7,52 757.6,36.3 819.4,36.3"/>
+		<polygon class="st2" points="748.6,32.9 686.8,32.9 727.7,17.1 789.5,17.1"/>
+		<polygon class="st2" points="827.7,32.9 765.9,32.9 806.8,17.1 868.6,17.1"/>
 	</g>
-	<polygon fill="#3E98C0" points="764.66,27.76 673.2,27.76 733.73,4.53 825.19,4.53 	"/>
+	<polygon class="st4" points="764.7,27.8 673.2,27.8 733.7,4.5 825.2,4.5"/>
 </g>
 </svg>

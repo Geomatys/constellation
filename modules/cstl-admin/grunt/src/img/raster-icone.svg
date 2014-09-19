@@ -3,12 +3,12 @@
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="81px" height="81px" viewBox="0 0 81 81" enable-background="new 0 0 81 81" xml:space="preserve">
 <g>
-		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="289.5" y1="-370" x2="369.5" y2="-370" gradientTransform="matrix(1 0 0 -1 -289 -329.5)">
-		<stop  offset="0" style="stop-color:#2D2E83"/>
-		<stop  offset="0.2577" style="stop-color:#8BB31D"/>
-		<stop  offset="0.5215" style="stop-color:#FFED00"/>
-		<stop  offset="0.7791" style="stop-color:#F39200"/>
-		<stop  offset="1" style="stop-color:#BE1622"/>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="578.5" y1="801.5" x2="658.5" y2="801.5" gradientTransform="matrix(1 0 0 1 -578 -761)">
+	<stop  offset="0" style="stop-color:#2D2E83"/>
+	<stop  offset="0.2577" style="stop-color:#8BB31D"/>
+	<stop  offset="0.5215" style="stop-color:#FFED00"/>
+	<stop  offset="0.7791" style="stop-color:#F39200"/>
+	<stop  offset="1" style="stop-color:#BE1622"/>
 	</linearGradient>
 	<rect x="0.5" y="0.5" fill="url(#SVGID_1_)" width="80" height="80"/>
 	<path fill="#575756" d="M80,1v79H1V1H80 M81,0H0v81h81V0L81,0z"/>

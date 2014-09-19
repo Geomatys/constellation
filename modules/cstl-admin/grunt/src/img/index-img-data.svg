@@ -2,6 +2,6 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="66px" height="66px" viewBox="0 0 66 66" enable-background="new 0 0 66 66" xml:space="preserve">
-<path fill="#D3D3D3" d="M50.74,9.5L23.79,0L5.75,51.31L47.38,66l12.87-36.61L50.74,9.5z"/>
-<polyline fill="#B2B2B2" points="50.74,9.5 45.57,24.19 60.25,29.39 "/>
+<path fill="#D3D3D3" d="M50.7,9.5L23.8,0l-18,51.3L47.4,66l12.9-36.6L50.7,9.5z"/>
+<polyline fill="#B2B2B2" points="50.7,9.5 45.6,24.2 60.2,29.4 "/>
 </svg>
