@@ -701,6 +701,8 @@
     "metadata.edition.occurrence.field.remove":"Retirer l'occurrence de champ",
     "metadata.edition.occurrence.block.add":"Ajouter une nouvelle occurrence de block",
     "metadata.edition.occurrence.block.remove":"Retirer l'occurrence de block",
+    "metadata.edition.sensor.component":"Capteur composant",
+    "metadata.edition.sensor.system":"Capteur système",
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",
     "metrics.jvm.gc.marksweepcount": "Total de \"Mark Sweep\"",

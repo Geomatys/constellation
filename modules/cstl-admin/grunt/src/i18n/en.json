@@ -625,6 +625,8 @@
     "metadata.edition.occurrence.field.remove":"Remove field occurrence",
     "metadata.edition.occurrence.block.add":"Add block occurrence",
     "metadata.edition.occurrence.block.remove":"Remove block occurrence",
+    "metadata.edition.sensor.component":"Sensor component",
+    "metadata.edition.sensor.system":"Sensor system",
 
     "msg.add.data.style.association": "Associate a style to the selected data",
     "msg.add.data.mapcontext.association": "Associate a mapcontext to the selected data.",
