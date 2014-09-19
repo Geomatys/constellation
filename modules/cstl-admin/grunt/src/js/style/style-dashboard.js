@@ -29,6 +29,8 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                     Dashboard($scope, response.styles, true);
                     $scope.wrap.filtertype = "";
                     $scope.wrap.ordertype = "Name";
+                    $scope.wrap.filtertext='';
+                    $scope.wrap.orderreverse=false;
                 },function() {//error
                     Growl('error','Error','Unable to show styles list!');
                 }
@@ -41,6 +43,22 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                 }
                 $scope.$apply();
             });
+        };
+
+        /**
+         * Reset filters for dashboard
+         */
+        $scope.resetFilters = function(){
+            style.listAll({provider: 'sld'},function(response) {//success
+                    Dashboard($scope, response.styles, true);
+                    $scope.wrap.filtertype = "";
+                    $scope.wrap.ordertype = "Name";
+                    $scope.wrap.filtertext='';
+                    $scope.wrap.orderreverse=false;
+                },function() {//error
+                    Growl('error','Error','Unable to show styles list!');
+                }
+            );
         };
 
         /**

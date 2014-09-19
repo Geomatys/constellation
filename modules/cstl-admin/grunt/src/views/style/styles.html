@@ -71,7 +71,7 @@
                         <li class="divider-vertical"></li>
                     </ul>
                     <button type="button"
-                            ng-click="wrap.ordertype='Name';wrap.orderreverse=false"
+                            ng-click="resetFilters();"
                             title="{{'label.search.refresh' | translate }}"
                             class="btn btn-xs btn-info btn-style">
                         <i class="fa fa-times"></i>
@@ -88,7 +88,9 @@
                 </div>
             </div>
             <div class="dash-inner row">
-                <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="small=false">
+                <div class="pull-left"
+                     style="width: 60%;margin-bottom: 5px;"
+                     ng-init="small=false">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-style">
                             <strong class="col-lg-6 col-xs-8 col-md-6">
@@ -128,7 +130,7 @@
                         <div class="item-list">
                             <div class="item style-{{style.Type | lowercase}}"
                                  ng-repeat="style in wrap.dataList"
-                                 ng-class="{selected:style==selected, 'col-xs-6':small==true}"
+                                 ng-class="{selected:style.Id==selected.Id, 'col-xs-6':small==true}"
                                  ng-click="select(style)">
                                 <div class="top">
                                     <span class="item-title" title="{{style.Name}}">{{truncate(small,style.Name)}}</span>
@@ -160,39 +162,55 @@
                 </div>
                 <div class="pull-left" style="width: 40%;">
                     <div id="selection">
-                        <div class="alert alert-info alert-style" ng-class="{hide: selected != null}">
+                        <div class="alert alert-info alert-style" ng-class="{hide: selected}">
                             <h4 translate="label.no.selected.style">No selected style</h4>
                             <p translate="msg.no.selected.style">Click on a style to display more information</p>
                         </div>
-                        <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
+                        <div class="selected-item" id="selected-item" ng-class="{hide: !selected}">
                             <div class="block-header block-header-style" ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc" title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
+                                <strong class="item-title title-bloc"
+                                        title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
                                 <i class="fa fa-chevron-down pull-right"></i>
                             </div>
-                            <div class="block-content" ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
+                            <div class="block-content"
+                                 ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
                                 <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2"><img src="img/block-content-owner.svg" alt="" /></div>
-                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.Owner}}</span></div>
+                                    <div class="col-sm-3 col-md-2">
+                                        <img src="img/block-content-owner.svg" alt="" />
+                                    </div>
+                                    <div class="col-sm-9 col-md-10 description-text">
+                                        <span>{{selected.Owner}}</span>
+                                    </div>
                                 </div>
                                 <div class="row description-block">
                                     <div class="col-sm-3 col-md-2"><img src="img/block-content-date.svg" alt="" /></div>
-                                    <div class="col-sm-9 col-md-10 description-text"><span>{{selected.Date | date:'yyyy-MM-dd'}}</span></div>
+                                    <div class="col-sm-9 col-md-10 description-text">
+                                        <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="block-action block-action-style">
                                 <div class="row" style="padding-bottom: 5px">
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
-                                            <button type="button" id="editStyleBtn" class="btn btn-style" ng-click="editStyle()"
-                                                    data-placement="bottom" title="{{'style.listing.selected.edit.button' | translate }}" tooltip>
+                                            <button type="button"
+                                                    id="editStyleBtn"
+                                                    class="btn btn-style"
+                                                    ng-click="editStyle()"
+                                                    data-placement="bottom"
+                                                    title="{{'style.listing.selected.edit.button' | translate }}" tooltip>
                                                 <i class="glyphicon glyphicon-pencil"></i>
                                             </button>
                                         </span>
                                     </div>
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
-                                            <button type="button" id="deleteStyleBtn" class="btn btn-style" ng-click="deleteStyle()"
-                                                    data-placement="bottom" title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                            <button type="button"
+                                                    id="deleteStyleBtn"
+                                                    class="btn btn-style"
+                                                    ng-click="deleteStyle()"
+                                                    data-placement="bottom"
+                                                    title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
                                                 <i class="fa fa-trash-o"></i>
                                             </button>
                                         </span>
@@ -207,4 +225,9 @@
     </div>
 </div>
 
-<div scroll-to="" id="backtotop" class="backtotop" ng-hide="hideScroll"><span class="glyphicon glyphicon-chevron-up"></span></div>
+<div scroll-to=""
+     id="backtotop"
+     class="backtotop"
+     ng-hide="hideScroll">
+    <span class="glyphicon glyphicon-chevron-up"></span>
+</div>
