@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-stylesheet href="svg.css" type="text/css"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+	 width="40px" height="40px" viewBox="0 0 40 40" style="enable-background:new 0 0 40 40;" xml:space="preserve">
+<style type="text/css">
+<![CDATA[
+	.st0{fill:#1A769E;}	.st1{fill:#EDEDED;}
+]]>
+</style>
 <rect fill="#C6C6C6" width="40" height="40"/>
 <g>
 	<rect x="5.77" y="11.85" fill="#FFFFFF" width="27.7" height="21.31"/>
 	<g>
-		<rect x="14.88" y="14.92" fill="#1A769E" width="3.8" height="3.79"/>
-		<rect x="20.57" y="14.92" fill="#1A769E" width="3.79" height="3.79"/>
-		<rect x="26.26" y="14.92" fill="#1A769E" width="3.79" height="3.79"/>
-		<rect x="9.19" y="20.61" fill="#1A769E" width="3.79" height="3.79"/>
-		<rect x="14.88" y="20.61" fill="#1A769E" width="3.8" height="3.79"/>
-		<rect x="20.57" y="20.61" fill="#1A769E" width="3.79" height="3.79"/>
-		<rect x="26.26" y="20.61" fill="#1A769E" width="3.79" height="3.79"/>
-		<rect x="9.19" y="26.3" fill="#1A769E" width="3.79" height="3.79"/>
-		<rect x="14.88" y="26.3" fill="#1A769E" width="3.8" height="3.79"/>
-		<rect x="20.57" y="26.3" fill="#1A769E" width="3.79" height="3.79"/>
-		<path fill="#70706F" d="M9.19,7.33H5.39v26.56h28.46V7.33h-3.79H9.19z M31.95,31.99H7.29V13.02h24.66V31.99z"/>
-		<path fill="#EDEDED" d="M12.03,9.92c0,0.52-0.43,0.95-0.95,0.95l0,0c-0.52,0-0.95-0.43-0.95-0.95V6.51c0-0.52,0.42-0.95,0.95-0.95
+		<rect x="14.88" y="14.92" class="st0" width="3.8" height="3.79"/>
+		<rect x="20.57" y="14.92" class="st0" width="3.79" height="3.79"/>
+		<rect x="26.26" y="14.92" class="st0" width="3.79" height="3.79"/>
+		<rect x="9.19" y="20.61" class="st0" width="3.79" height="3.79"/>
+		<rect x="14.88" y="20.61" class="st0" width="3.8" height="3.79"/>
+		<rect x="20.57" y="20.61" class="st0" width="3.79" height="3.79"/>
+		<rect x="26.26" y="20.61" class="st0" width="3.79" height="3.79"/>
+		<rect x="9.19" y="26.3" class="st0" width="3.79" height="3.79"/>
+		<rect x="14.88" y="26.3" class="st0" width="3.8" height="3.79"/>
+		<rect x="20.57" y="26.3" class="st0" width="3.79" height="3.79"/>
+		<path fill="#70706F" d="M9.19,7.33h-3.8v26.56h28.46V7.33h-3.79H9.19z M31.95,31.99H7.29V13.02h24.66V31.99z"/>
+		<path class="st1" d="M12.03,9.92c0,0.52-0.43,0.95-0.95,0.95l0,0c-0.52,0-0.95-0.43-0.95-0.95V6.51c0-0.52,0.42-0.95,0.95-0.95
 			l0,0c0.52,0,0.95,0.42,0.95,0.95V9.92z"/>
-		<path fill="#EDEDED" d="M29.11,9.92c0,0.52-0.42,0.95-0.95,0.95l0,0c-0.52,0-0.95-0.43-0.95-0.95V6.51c0-0.52,0.42-0.95,0.95-0.95
+		<path class="st1" d="M29.11,9.92c0,0.52-0.42,0.95-0.95,0.95l0,0c-0.52,0-0.95-0.43-0.95-0.95V6.51c0-0.52,0.42-0.95,0.95-0.95
 			l0,0c0.52,0,0.95,0.42,0.95,0.95V9.92z"/>
 	</g>
 </g>

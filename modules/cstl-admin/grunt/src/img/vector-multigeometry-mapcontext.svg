@@ -1,56 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="81px" height="81px" viewBox="0 0 81 81" enable-background="new 0 0 81 81" xml:space="preserve">
+	 width="81px" height="81px" viewBox="0 0 81 81" style="enable-background:new 0 0 81 81;" xml:space="preserve">
+<style type="text/css"><![CDATA[
+	.st0{fill:#B2AFAC;stroke:#D6D6D4;stroke-miterlimit:10;}
+	.st1{fill:#93908D;}
+	.st2{fill:none;stroke:#93908D;stroke-width:4;}
+]]></style>
 <g>
-	<polyline fill="none" stroke="#93908D" stroke-width="4" points="3.55,67.56 25.17,49.77 45.92,76.98 54.35,63.87 	"/>
+	<polyline class="st2" points="3.55,67.56 25.17,49.77 45.92,76.98 54.35,63.87 	"/>
 	<g>
-		<rect x="21.71" y="46" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-		<path fill="#93908D" d="M28.4,46.84v5.85h-5.85v-5.85H28.4 M31.1,44.15H19.87v11.23H31.1V44.15L31.1,44.15z"/>
+		<rect x="21.71" y="46" class="st0" width="7.54" height="7.54"/>
+		<path class="st1" d="M28.4,46.84v5.85h-5.85v-5.85H28.4 M31.1,44.15H19.87v11.23H31.1V44.15L31.1,44.15z"/>
 	</g>
 	<g>
-		<rect x="1.7" y="63.33" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-		<path fill="#93908D" d="M8.39,64.17v5.85H2.55v-5.85H8.39 M11.09,61.48H-0.14v11.23h11.23V61.48L11.09,61.48z"/>
+		<rect x="1.7" y="63.33" class="st0" width="7.54" height="7.54"/>
+		<path class="st1" d="M8.39,64.17v5.85H2.55v-5.85H8.39 M11.09,61.48H-0.14v11.23h11.23V61.48L11.09,61.48z"/>
 	</g>
 	<g>
-		<rect x="42.33" y="71.61" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-		<path fill="#93908D" d="M49.02,72.46v5.85h-5.85v-5.85H49.02 M51.71,69.77H40.48V81h11.23L51.71,69.77L51.71,69.77z"/>
+		<rect x="42.33" y="71.61" class="st0" width="7.54" height="7.54"/>
+		<path class="st1" d="M49.02,72.46v5.85h-5.85v-5.85H49.02 M51.71,69.77H40.48V81h11.23V69.77L51.71,69.77z"/>
 	</g>
 	<g>
-		<rect x="51.71" y="57.23" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-		<path fill="#93908D" d="M58.4,58.07v5.85h-5.85v-5.85H58.4 M61.1,55.38H49.87v11.23H61.1V55.38L61.1,55.38z"/>
+		<rect x="51.71" y="57.23" class="st0" width="7.54" height="7.54"/>
+		<path class="st1" d="M58.4,58.07v5.85h-5.85v-5.85H58.4 M61.1,55.38H49.87v11.23H61.1V55.38L61.1,55.38z"/>
 	</g>
 </g>
 <g>
-	<rect x="5.47" y="5.42" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="29.39" height="29.39"/>
-	<rect x="5.47" y="5.42" fill="none" stroke="#93908D" stroke-width="4" width="29.39" height="29.4"/>
+	<rect x="5.47" y="5.42" class="st0" width="29.39" height="29.39"/>
+	<rect x="5.47" y="5.42" class="st2" width="29.39" height="29.4"/>
 	<g>
-		<rect x="31.1" y="31.04" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-		<path fill="#93908D" d="M37.79,31.89v5.85h-5.85v-5.85H37.79 M40.48,29.19H29.25v11.23h11.23V29.19L40.48,29.19z"/>
+		<rect x="31.1" y="31.04" class="st0" width="7.54" height="7.54"/>
+		<path class="st1" d="M37.79,31.89v5.85h-5.85v-5.85H37.79 M40.48,29.19H29.25v11.23h11.23V29.19L40.48,29.19z"/>
 	</g>
 	<g>
-		<rect x="31.1" y="1.85" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-		<path fill="#93908D" d="M37.79,2.69v5.85h-5.85V2.69H37.79 M40.48,0H29.25v11.23h11.23V0L40.48,0z"/>
+		<rect x="31.1" y="1.85" class="st0" width="7.54" height="7.54"/>
+		<path class="st1" d="M37.79,2.69v5.85h-5.85V2.69H37.79 M40.48,0H29.25v11.23h11.23V0L40.48,0z"/>
 	</g>
 	<g>
-		<rect x="1.7" y="1.85" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-		<path fill="#93908D" d="M8.4,2.69v5.85H2.55V2.69H8.4 M11.09,0H-0.14v11.23h11.23V0L11.09,0z"/>
+		<rect x="1.7" y="1.85" class="st0" width="7.54" height="7.54"/>
+		<path class="st1" d="M8.4,2.69v5.85H2.55V2.69H8.4 M11.09,0H-0.14v11.23h11.23V0L11.09,0z"/>
 	</g>
 	<g>
-		<rect x="1.7" y="31.04" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-		<path fill="#93908D" d="M8.4,31.88v5.85H2.55v-5.85H8.4 M11.09,29.19H-0.14v11.23h11.23V29.19L11.09,29.19z"/>
+		<rect x="1.7" y="31.04" class="st0" width="7.54" height="7.54"/>
+		<path class="st1" d="M8.4,31.88v5.85H2.55v-5.85H8.4 M11.09,29.19H-0.14v11.23h11.23V29.19L11.09,29.19z"/>
 	</g>
 </g>
 <g>
-	<rect x="64.98" y="4.51" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-	<path fill="#93908D" d="M71.67,5.36v5.85h-5.85V5.36H71.67 M74.36,2.67H63.13V13.9h11.23V2.67L74.36,2.67z"/>
+	<rect x="64.98" y="4.51" class="st0" width="7.54" height="7.54"/>
+	<path class="st1" d="M71.67,5.36v5.85h-5.85V5.36H71.67 M74.36,2.67H63.13V13.9h11.23V2.67L74.36,2.67z"/>
 </g>
 <g>
-	<rect x="52.87" y="19.81" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-	<path fill="#93908D" d="M59.56,20.65v5.85h-5.85v-5.85H59.56 M62.25,17.96H51.02v11.23h11.23V17.96L62.25,17.96z"/>
+	<rect x="52.87" y="19.81" class="st0" width="7.54" height="7.54"/>
+	<path class="st1" d="M59.56,20.65v5.85h-5.85v-5.85H59.56 M62.25,17.96H51.02v11.23h11.23V17.96L62.25,17.96z"/>
 </g>
 <g>
-	<rect x="71.62" y="29.19" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
-	<path fill="#93908D" d="M78.31,30.04v5.85h-5.85v-5.85H78.31 M81,27.35H69.77v11.23H81V27.35L81,27.35z"/>
+	<rect x="71.62" y="29.19" class="st0" width="7.54" height="7.54"/>
+	<path class="st1" d="M78.31,30.04v5.85h-5.85v-5.85H78.31 M81,27.35H69.77v11.23H81V27.35L81,27.35z"/>
 </g>
 </svg>
