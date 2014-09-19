@@ -60,6 +60,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         $scope.deleteTask = function(idTask) {
             TaskService.deleteParamsTask({id:idTask}).$promise.then(function(){
                 $scope.init();
+                $scope.selected=null;
             });
         };
 
