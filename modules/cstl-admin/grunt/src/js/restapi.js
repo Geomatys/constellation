@@ -242,7 +242,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'measuresForSensor':    {method: 'GET',     url: '@cstl/api/1/sensor/observedProperty/identifiers/:sensorID;jsessionid='},
             'sensorsForMeasure':    {method: 'GET',     url: '@cstl/api/1/sensor/sensors/identifiers/:measure;jsessionid='},
             'getFeatures':          {method: 'GET',     url: '@cstl/api/1/sensor/location/:sensor;jsessionid='},
-            'downloadMetadata':     {method: 'GET',     url: '@cstl/api/1/sensor/metadata/download/:sensor;jsessionid='}
+            'downloadMetadata':     {method: 'GET',     url: '@cstl/api/1/sensor/metadata/download/:sensor;jsessionid='},
+            'getJsonMetadata':      {method: 'GET',     url: '@cstl/api/1/sensor/metadataJson/:sensorId/:type/:prune;jsessionid='}
         });
     })
 
