@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="22px" height="22px" viewBox="-4 -2 22 22" enable-background="new -4 -2 22 22" xml:space="preserve">
+	 width="22px" height="22px" viewBox="0 0 22 22" enable-background="new 0 0 22 22" xml:space="preserve">
 <g>
-	<rect x="-0.959" y="1.037" opacity="0.44" fill="#3E98C0" stroke="#2C718D" stroke-width="2" width="15.927" height="15.927"/>
-	<rect x="-0.959" y="1.037" fill="none" stroke="#2C718D" stroke-width="2" width="15.927" height="15.928"/>
+	
+		<rect x="3.07" y="3.04" opacity="0.44" fill="#3E98C0" stroke="#2C718D" stroke-width="2" enable-background="new    " width="15.93" height="15.93"/>
+	<rect x="3.07" y="3.04" fill="none" stroke="#2C718D" stroke-width="2" width="15.93" height="15.93"/>
 	<g>
-		<rect x="12.864" y="-1" fill="#3E98C0" width="4.081" height="4.082"/>
-		<path fill="#2C718D" d="M15.945,0v2.082h-2.081V0H15.945 M17.945-2h-6.081v6.082h6.081V-2L17.945-2z"/>
+		<rect x="16.89" y="1" fill="#3E98C0" width="4.08" height="4.08"/>
+		<path fill="#2C718D" d="M19.97,2v2.08h-2.08V2H19.97 M21.97,0h-6.08v6.08h6.08V0L21.97,0z"/>
 	</g>
 	<g>
-		<rect x="12.864" y="14.918" fill="#3E98C0" width="4.081" height="4.082"/>
-		<path fill="#2C718D" d="M15.945,15.918V18h-2.081v-2.082H15.945 M17.945,13.918h-6.081V20h6.081V13.918L17.945,13.918z"/>
+		<rect x="16.89" y="16.92" fill="#3E98C0" width="4.08" height="4.08"/>
+		<path fill="#2C718D" d="M19.97,17.92V20h-2.08v-2.08H19.97 M21.97,15.92h-6.08V22h6.08V15.92L21.97,15.92z"/>
 	</g>
 	<g>
-		<rect x="-3" y="14.918" fill="#3E98C0" width="4.081" height="4.082"/>
-		<path fill="#2C718D" d="M0.081,15.918V18H-2v-2.082H0.081 M2.081,13.918H-4V20h6.081V13.918L2.081,13.918z"/>
+		<rect x="1.03" y="16.92" fill="#3E98C0" width="4.08" height="4.08"/>
+		<path fill="#2C718D" d="M4.11,17.92V20H2.03v-2.08H4.11 M6.11,15.92H0.03V22h6.08V15.92L6.11,15.92z"/>
 	</g>
 	<g>
-		<rect x="-3" y="-1" fill="#3E98C0" width="4.081" height="4.082"/>
-		<path fill="#2C718D" d="M0.081,0v2.082H-2V0H0.081 M2.081-2H-4v6.082h6.081V-2L2.081-2z"/>
+		<rect x="1.03" y="1" fill="#3E98C0" width="4.08" height="4.08"/>
+		<path fill="#2C718D" d="M4.11,2v2.08H2.03V2H4.11 M6.11,0H0.03v6.08h6.08V0L6.11,0z"/>
 	</g>
 </g>
 </svg>

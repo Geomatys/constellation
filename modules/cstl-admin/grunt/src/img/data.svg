@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="65px" height="65px" viewBox="0 0 65 65" enable-background="new 0 0 65 65" xml:space="preserve">
 <g>
-	<path fill="#2E8BBF" d="M40.859,0.048H6.731v64.904h52.732V18.65L40.859,0.048z"/>
-	<rect x="14.908" y="32.5" fill="#F5F5F5" width="35.253" height="4.057"/>
-	<rect x="14.908" y="22.591" fill="#F5F5F5" width="20.145" height="4.051"/>
-	<rect x="14.908" y="42.414" fill="#F5F5F5" width="35.253" height="4.057"/>
-	<polyline fill="#1C79AD" points="40.859,0.048 40.859,18.633 59.463,18.65 	"/>
+	<path fill="#2E8BBF" d="M40.86,0.05H6.73v64.9h52.73v-46.3L40.86,0.05z"/>
+	<rect x="14.91" y="32.5" fill="#F5F5F5" width="35.25" height="4.06"/>
+	<rect x="14.91" y="22.59" fill="#F5F5F5" width="20.14" height="4.05"/>
+	<rect x="14.91" y="42.41" fill="#F5F5F5" width="35.25" height="4.06"/>
+	<polyline fill="#1C79AD" points="40.86,0.05 40.86,18.63 59.46,18.65 	"/>
 </g>
 </svg>

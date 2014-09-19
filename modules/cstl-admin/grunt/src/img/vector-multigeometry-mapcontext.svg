@@ -1,57 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="81px" height="81px" viewBox="0 0 81 81" enable-background="new 0 0 81 81" xml:space="preserve">
 <g>
-	<polyline fill="none" stroke="#93908D" stroke-width="4" points="3.552,67.561 25.173,49.766 45.915,76.98 54.346,63.866 	"/>
+	<polyline fill="none" stroke="#93908D" stroke-width="4" points="3.55,67.56 25.17,49.77 45.92,76.98 54.35,63.87 	"/>
 	<g>
-		<rect x="21.712" y="45.996" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.537" height="7.539"/>
-		<path fill="#93908D" d="M28.403,46.842v5.848h-5.847v-5.848H28.403 M31.096,44.148H19.865V55.38h11.231V44.148L31.096,44.148z"/>
+		<rect x="21.71" y="46" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+		<path fill="#93908D" d="M28.4,46.84v5.85h-5.85v-5.85H28.4 M31.1,44.15H19.87v11.23H31.1V44.15L31.1,44.15z"/>
 	</g>
 	<g>
-		<rect x="1.703" y="63.329" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.537" height="7.539"/>
-		<path fill="#93908D" d="M8.394,64.175v5.847H2.547v-5.847H8.394 M11.087,61.482H-0.144v11.23h11.231V61.482L11.087,61.482z"/>
+		<rect x="1.7" y="63.33" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+		<path fill="#93908D" d="M8.39,64.17v5.85H2.55v-5.85H8.39 M11.09,61.48H-0.14v11.23h11.23V61.48L11.09,61.48z"/>
 	</g>
 	<g>
-		<rect x="42.327" y="71.614" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.536" height="7.538"/>
-		<path fill="#93908D" d="M49.018,72.46v5.847h-5.846V72.46H49.018 M51.711,69.768H40.48V81h11.23L51.711,69.768L51.711,69.768z"/>
+		<rect x="42.33" y="71.61" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+		<path fill="#93908D" d="M49.02,72.46v5.85h-5.85v-5.85H49.02 M51.71,69.77H40.48V81h11.23L51.71,69.77L51.71,69.77z"/>
 	</g>
 	<g>
-		<rect x="51.711" y="57.229" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.536" height="7.539"/>
-		<path fill="#93908D" d="M58.4,58.074v5.847h-5.846v-5.847H58.4 M61.096,55.382H49.866v11.232h11.229V55.382L61.096,55.382z"/>
-	</g>
-</g>
-<g>
-	<rect x="5.472" y="5.415" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="29.393" height="29.393"/>
-	<rect x="5.472" y="5.415" fill="none" stroke="#93908D" stroke-width="4" width="29.393" height="29.395"/>
-	<g>
-		<rect x="31.096" y="31.042" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.537" height="7.539"/>
-		<path fill="#93908D" d="M37.788,31.887v5.846H31.94v-5.846H37.788 M40.48,29.194H29.25v11.233h11.23V29.194L40.48,29.194z"/>
-	</g>
-	<g>
-		<rect x="31.096" y="1.847" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.537" height="7.539"/>
-		<path fill="#93908D" d="M37.788,2.692v5.846H31.94V2.692H37.788 M40.48,0H29.25v11.233h11.23V0L40.48,0z"/>
-	</g>
-	<g>
-		<rect x="1.703" y="1.847" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.537" height="7.539"/>
-		<path fill="#93908D" d="M8.395,2.692v5.846H2.547V2.692H8.395 M11.087,0h-11.23v11.233h11.23V0L11.087,0z"/>
-	</g>
-	<g>
-		<rect x="1.703" y="31.039" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.537" height="7.539"/>
-		<path fill="#93908D" d="M8.395,31.884v5.846H2.547v-5.846H8.395 M11.087,29.192h-11.23v11.233h11.23V29.192L11.087,29.192z"/>
+		<rect x="51.71" y="57.23" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+		<path fill="#93908D" d="M58.4,58.07v5.85h-5.85v-5.85H58.4 M61.1,55.38H49.87v11.23H61.1V55.38L61.1,55.38z"/>
 	</g>
 </g>
 <g>
-	<rect x="64.977" y="4.513" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.537" height="7.539"/>
-	<path fill="#93908D" d="M71.667,5.358v5.847H65.82V5.358H71.667 M74.359,2.666h-11.23v11.232h11.23V2.666L74.359,2.666z"/>
+	<rect x="5.47" y="5.42" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="29.39" height="29.39"/>
+	<rect x="5.47" y="5.42" fill="none" stroke="#93908D" stroke-width="4" width="29.39" height="29.4"/>
+	<g>
+		<rect x="31.1" y="31.04" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+		<path fill="#93908D" d="M37.79,31.89v5.85h-5.85v-5.85H37.79 M40.48,29.19H29.25v11.23h11.23V29.19L40.48,29.19z"/>
+	</g>
+	<g>
+		<rect x="31.1" y="1.85" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+		<path fill="#93908D" d="M37.79,2.69v5.85h-5.85V2.69H37.79 M40.48,0H29.25v11.23h11.23V0L40.48,0z"/>
+	</g>
+	<g>
+		<rect x="1.7" y="1.85" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+		<path fill="#93908D" d="M8.4,2.69v5.85H2.55V2.69H8.4 M11.09,0H-0.14v11.23h11.23V0L11.09,0z"/>
+	</g>
+	<g>
+		<rect x="1.7" y="31.04" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+		<path fill="#93908D" d="M8.4,31.88v5.85H2.55v-5.85H8.4 M11.09,29.19H-0.14v11.23h11.23V29.19L11.09,29.19z"/>
+	</g>
 </g>
 <g>
-	<rect x="52.865" y="19.807" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.535" height="7.539"/>
-	<path fill="#93908D" d="M59.557,20.652v5.847h-5.848v-5.847H59.557 M62.249,17.959H51.018v11.232h11.231V17.959L62.249,17.959z"/>
+	<rect x="64.98" y="4.51" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+	<path fill="#93908D" d="M71.67,5.36v5.85h-5.85V5.36H71.67 M74.36,2.67H63.13V13.9h11.23V2.67L74.36,2.67z"/>
 </g>
 <g>
-	<rect x="71.616" y="29.192" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.536" height="7.539"/>
-	<path fill="#93908D" d="M78.307,30.038v5.847H72.46v-5.847H78.307 M81,27.345H69.77v11.232H81V27.345L81,27.345z"/>
+	<rect x="52.87" y="19.81" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+	<path fill="#93908D" d="M59.56,20.65v5.85h-5.85v-5.85H59.56 M62.25,17.96H51.02v11.23h11.23V17.96L62.25,17.96z"/>
+</g>
+<g>
+	<rect x="71.62" y="29.19" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="7.54" height="7.54"/>
+	<path fill="#93908D" d="M78.31,30.04v5.85h-5.85v-5.85H78.31 M81,27.35H69.77v11.23H81V27.35L81,27.35z"/>
 </g>
 </svg>

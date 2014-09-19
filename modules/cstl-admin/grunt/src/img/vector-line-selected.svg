@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="22px" height="22px" viewBox="0 0 22 22" enable-background="new 0 0 22 22" xml:space="preserve">
-<line fill="none" stroke="#FFFFFF" stroke-width="2" x1="4.041" y1="4.04" x2="17.959" y2="17.959"/>
+<line fill="none" stroke="#FFFFFF" stroke-width="2" x1="4.04" y1="4.04" x2="17.96" y2="17.96"/>
 <g>
 	<g>
-		<rect x="2" y="2" fill="#9FCCE0" width="4.082" height="4.08"/>
-		<path fill="#FFFFFF" d="M5.081,3v2.08H3V3H5.081 M7.082,1H1v6.08h6.082V1L7.082,1z"/>
+		<rect x="2" y="2" fill="#9FCCE0" width="4.08" height="4.08"/>
+		<path fill="#FFFFFF" d="M5.08,3v2.08H3V3H5.08 M7.08,1H1v6.08h6.08V1L7.08,1z"/>
 	</g>
 	<g>
-		<rect x="15.918" y="15.918" fill="#9FCCE0" width="4.082" height="4.082"/>
-		<path fill="#FFFFFF" d="M19,16.918V19h-2.082v-2.082H19 M21,14.918h-6.082V21H21V14.918L21,14.918z"/>
+		<rect x="15.92" y="15.92" fill="#9FCCE0" width="4.08" height="4.08"/>
+		<path fill="#FFFFFF" d="M19,16.92V19h-2.08v-2.08H19 M21,14.92h-6.08V21H21V14.92L21,14.92z"/>
 	</g>
 </g>
 </svg>
