@@ -35,6 +35,7 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
             mapcontext.listLayers({}, function(response) {//success
                 Dashboard($scope, response, true);
                 $scope.wrap.ordertype='name';
+                $scope.wrap.filtertext='';
             }, function() {//error
                 Growl('error','Error','Unable to show layers list!');
             });
@@ -45,6 +46,20 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
                     $scope.hideScroll = false;
                 }
                 $scope.$apply();
+            });
+        };
+
+        /**
+         * Reset filters for dashboard
+         */
+        $scope.resetFilters = function(){
+            mapcontext.listLayers({}, function(response) {//success
+                Dashboard($scope, response, true);
+                $scope.wrap.ordertype='name';
+                $scope.wrap.orderreverse=false;
+                $scope.wrap.filtertext='';
+            }, function() {//error
+                Growl('error','Error','Unable to show mapcontext list!');
             });
         };
 
@@ -86,6 +101,7 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
                 mapcontext.delete({id: $scope.selected.id}, function () {
                     Growl('success', 'Success', 'Map context ' + ctxtName + ' successfully removed');
                     $scope.init();
+                    $scope.selected=null;
                 }, function () {
                     Growl('error', 'Error', 'Unable to remove map context ' + ctxtName);
                 });
