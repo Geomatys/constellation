@@ -385,8 +385,11 @@ public class DataBusiness implements IDataBusiness {
             final DataBrief db = new DataBrief();
             db.setId(data.getId());
             final Optional<CstlUser> user = userRepository.findById(data.getOwner());
-            if (user.isPresent()) {
-                db.setOwner(user.get().getLogin());
+            if (user != null && user.isPresent()) {
+                final CstlUser cstlUser = user.get();
+                if(cstlUser!=null){
+                    db.setOwner(cstlUser.getLogin());
+                }
             }
             db.setName(data.getName());
             db.setNamespace(data.getNamespace());
@@ -405,7 +408,14 @@ public class DataBusiness implements IDataBusiness {
                 sb.setProvider(getProviderIdentifier(style.getProvider()));
                 sb.setDate(new Date(style.getDate()));
                 sb.setName(style.getName());
-                sb.setOwner(style.getOwner());
+
+                final Optional<CstlUser> userStyle = userRepository.findById(style.getOwner());
+                if (userStyle!=null && userStyle.isPresent()) {
+                    final CstlUser cstlUser = userStyle.get();
+                    if(cstlUser!=null){
+                        sb.setOwner(cstlUser.getLogin());
+                    }
+                }
                 styleBriefs.add(sb);
             }
             db.setTargetStyle(styleBriefs);

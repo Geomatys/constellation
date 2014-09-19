@@ -182,7 +182,13 @@ public final class StyleBusiness implements IStyleBusiness {
         brief.setTitle("TODO " + locale);
         brief.setDate(new Date(record.getDate()));
         brief.setType(record.getType());
-        brief.setOwner(record.getOwner());
+        final Optional<CstlUser> userStyle = userRepository.findById(record.getOwner());
+        if (userStyle!=null && userStyle.isPresent()) {
+            final CstlUser cstlUser = userStyle.get();
+            if(cstlUser!=null){
+                brief.setOwner(cstlUser.getLogin());
+            }
+        }
         return brief;
     }
 
@@ -226,7 +232,13 @@ public final class StyleBusiness implements IStyleBusiness {
             bean.setName(style.getName());
             bean.setProvider(provider.getIdentifier());
             bean.setType(style.getType());
-            bean.setOwner(style.getOwner());
+            final Optional<CstlUser> userStyle = userRepository.findById(style.getOwner());
+            if (userStyle!=null && userStyle.isPresent()) {
+                final CstlUser cstlUser = userStyle.get();
+                if(cstlUser!=null){
+                    bean.setOwner(cstlUser.getLogin());
+                }
+            }
             bean.setDate(new Date(style.getDate()));
             beans.add(bean);
         }
@@ -258,7 +270,13 @@ public final class StyleBusiness implements IStyleBusiness {
             bean.setName(style.getName());
             bean.setProvider(providerId);
             bean.setType(style.getType());
-            bean.setOwner(style.getOwner());
+            final Optional<CstlUser> userStyle = userRepository.findById(style.getOwner());
+            if (userStyle!=null && userStyle.isPresent()) {
+                final CstlUser cstlUser = userStyle.get();
+                if(cstlUser!=null){
+                    bean.setOwner(cstlUser.getLogin());
+                }
+            }
             bean.setDate(new Date(style.getDate()));
             beans.add(bean);
         }

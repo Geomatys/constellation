@@ -53,7 +53,7 @@ public final class StyleBrief implements Serializable {
     private String type;
 
     @XmlElement(name="Owner")
-    private Integer owner;
+    private String owner;
 
     public Integer getId() {
         return id;
@@ -103,11 +103,11 @@ public final class StyleBrief implements Serializable {
         this.type = type;
     }
 
-    public Integer getOwner() {
+    public String getOwner() {
         return owner;
     }
 
-    public void setOwner(final Integer owner) {
+    public void setOwner(final String owner) {
         this.owner = owner;
     }
 
