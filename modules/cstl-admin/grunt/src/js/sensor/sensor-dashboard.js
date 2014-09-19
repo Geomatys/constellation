@@ -152,11 +152,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
                 resolve: {
                     'dashboardName':function(){return 'sensor';},
                     'metadataValues':function(textService){
-                        //@TODO the server must provide the SensorML as json.
                         return textService.sensorMetadataJson(idToView,typeToSend,true);
-
-
-
                     }
                 }
             });
@@ -187,7 +183,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         function openModalEditor(id,type,template){
             $modal.open({
                 templateUrl: 'views/data/modalEditMetadata.html',
-                controller: 'EditMetadataModalController',
+                controller: 'EditSensorMLController',
                 resolve: {
                     'id':function(){return id;},
                     'type':function(){return type;},

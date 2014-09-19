@@ -20,4 +20,5 @@
 
 angular.module('cstl-sensor', ['cstl-sensor-dashboard',
                                'cstl-sensor-import',
-                               'cstl-sensor-view']);
+                               'cstl-sensor-view',
+                               'cstl-sensor-metadata']);
