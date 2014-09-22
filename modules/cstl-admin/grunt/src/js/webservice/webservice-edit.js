@@ -20,7 +20,10 @@
 
 angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('WebServiceEditController', function($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, Dashboard, Growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate, $window) {
+    .controller('WebServiceEditController', function($rootScope, $scope, $routeParams , webService, dataListing, provider,
+                                                     csw, sos, $modal, textService, Dashboard, Growl, $filter,
+                                                     DomainResource,StyleSharedService, style, $cookies, $translate,
+                                                     $window, cfpLoadingBar) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -424,10 +427,24 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 } else {
                     layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
                 }
+
+                //attach event loader in modal map viewer
+                layerData.events.register("loadstart", layerData, function() {
+                    $scope.$apply(function() {
+                        window.cfpLoadingBar_parentSelector = '#dataMap';
+                        cfpLoadingBar.start();
+                        cfpLoadingBar.inc();
+                    });
+                });
+                layerData.events.register("loadend", layerData, function() {
+                    cfpLoadingBar.complete();
+                    window.cfpLoadingBar_parentSelector = null;
+                });
+
                 DataViewer.layers = [layerData, layerBackground];
+                DataViewer.initMap('dataMap');
                 provider.dataDesc({},{values: {'providerId':providerId,'dataId':layerName}},
                     function(response) {//success
-                        DataViewer.initMap('dataMap');
                         var bbox = response.boundingBox;
                         if (bbox) {
                             var extent = new OpenLayers.Bounds(bbox[0],bbox[1],bbox[2],bbox[3]);
@@ -435,7 +452,6 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                         }
                     }, function() {//error
                         // failed to find a metadata, just load the full map
-                        DataViewer.initMap('dataMap');
                     }
                 );
             }
