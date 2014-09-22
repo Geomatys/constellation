@@ -551,7 +551,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final List<Field> fields;
             if (!currentFields.isEmpty()) {
                 fields = new ArrayList<>();
-                // we add the main field
+                // we add the main field TODO profiles???
                 if (timeField != null) {
                     fields.add(timeField);
                 }
@@ -618,7 +618,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final List<Field> fields;
             if (!currentFields.isEmpty()) {
                 fields = new ArrayList<>();
-                // we add the main field
+                // we add the main field TODO profiles???
                 final Field timeField = getTimeField(currentProcedure, c);
                 if (timeField != null) {
                     fields.add(timeField);
