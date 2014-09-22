@@ -611,6 +611,7 @@
     "metadata.edition.heading.type":"Metadata type :",
     "metadata.edition.dataset.vector":"Vector dataset",
     "metadata.edition.dataset.raster":"Raster dataset",
+    "metadata.edition.dataset.observation":"Observation data",
     "metadata.edition.heading.save":"Save modifications",
     "metadata.edition.heading.requiredFields":"(*) Required field",
     "metadata.edition.heading.scrolltotop":"Scroll to top",
