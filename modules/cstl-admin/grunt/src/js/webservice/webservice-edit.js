@@ -47,7 +47,11 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         });
 
         $scope.getCurrentLang = function() {
-            return $translate.use();
+            var lang = $translate.use();
+            if(!lang){
+                lang = 'en';
+            }
+            return lang;
         };
 
         webService.get({type: $scope.type, id: $routeParams.id, lang: $scope.getCurrentLang()}, function (service) {
@@ -143,6 +147,16 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     $scope.wrap.filtertype = "";
                 });
             }
+        };
+
+        /**
+         * Reset filters for dashboard
+         */
+        $scope.resetFilters = function(){
+            $scope.wrap.ordertype= ($scope.service && $scope.service.type && $scope.service.type.toLowerCase()==='sos') ? 'id' : ($scope.service && $scope.service.type && $scope.service.type.toLowerCase==='csw') ? 'title' : 'Name';
+            $scope.wrap.orderreverse=false;
+            $scope.wrap.filtertext='';
+            $scope.selected=null;
         };
 
         $scope.getVersionsForType = function() {

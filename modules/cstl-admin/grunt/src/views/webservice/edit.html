@@ -1,6 +1,7 @@
 <div class="logo-wrapper row">
     <div class="col-sm-12">
-        <h3 class="header-title" translate="page.header.title.edit.service">Edit Service</h3>
+        <h3 class="header-title"
+            translate="page.header.title.edit.service">Edit Service</h3>
     </div>
 </div>
 <div id="serviceDashboard" class="row frame dashboard">
@@ -8,97 +9,149 @@
         <div class="navbar-inner" style="box-shadow:none; webkit-box-shadow:none; border-bottom:none;">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <p style="cursor:default; padding:7px 20px 7px 0; font-weight: normal;  margin-left:0;" class="brand">{{service.identifier}} : {{service.name}}</p>
+                    <p style="cursor:default; padding:7px 20px 7px 0; font-weight: normal;  margin-left:0;"
+                       class="brand">{{service.identifier}} : {{service.name}}</p>
                 </div>
-
-                <div ng-init="showURL=false" style="float: left;"><button ng-click="showURL=!showURL" title="{{label.service.url}}" class="btn btn-default" ng-class="{active:showURL}"><span class="glyphicon glyphicon-link"></span></button></div>
-
-
+                <div ng-init="showURL=false" style="float: left;">
+                    <button ng-click="showURL=!showURL"
+                            title="{{label.service.url}}"
+                            class="btn btn-default"
+                            ng-class="{active:showURL}">
+                        <span class="glyphicon glyphicon-link"></span>
+                    </button>
+                </div>
                 <form class="navbar-form">
-                    <div class="btn-group service-item pull-right" style="margin-top: 2px; margin-bottom: 8px;">
-                        <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service)"
+                    <div class="btn-group service-item pull-right"
+                         style="margin-top: 2px; margin-bottom: 8px;">
+                        <button type="button"
+                                class="btn btn-default btn-sm"
+                                ng-click="showCapa(service)"
                                 ng-disabled="service.status!=='STARTED'">GetCapabilities</button>
-                        <button type="button" class="btn btn-default btn-sm"  ng-click="showLogs(service)">Logs</button>
-                        <button type="button" class="btn btn-default btn-sm btn-add" ng-click="reload(service)" translate="service.description.reload.button">Reload</button>
-                        <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='STARTED','stopped':service.status!='STARTED'}" ng-click="startOrStop(service)">
-                            <i class="fa" ng-class="{'fa-play':service.status!='STARTED','fa-stop':service.status=='STARTED'}"></i>
+                        <button type="button"
+                                class="btn btn-default btn-sm"
+                                ng-click="showLogs(service)">Logs</button>
+                        <button type="button"
+                                class="btn btn-default btn-sm btn-add"
+                                ng-click="reload(service)"
+                                translate="service.description.reload.button">Reload</button>
+                        <button type="button"
+                                class="btn btn-default btn-sm"
+                                ng-class="{'started':service.status=='STARTED','stopped':service.status!='STARTED'}"
+                                ng-click="startOrStop(service)">
+                            <i class="fa"
+                               ng-class="{'fa-play':service.status!='STARTED','fa-stop':service.status=='STARTED'}"></i>
                         </button>
                     </div>
                 </form>
-                <div class="navbar-left col-xs-12 col-sm-7 col-md-12" ng-show="showURL" style="margin-bottom: 6px; margin-left: 0px; padding-left: 0;">
-                    <input class="form-control service-link" style="display:inline" size="{{urlBoxSize}}"  value="{{url}}" readonly="readonly"/>
+                <div class="navbar-left col-xs-12 col-sm-7 col-md-12"
+                     ng-show="showURL"
+                     style="margin-bottom: 6px; margin-left: 0px; padding-left: 0;">
+                    <input class="form-control service-link"
+                           style="display:inline"
+                           size="{{urlBoxSize}}"
+                           value="{{url}}"
+                           readonly="readonly"/>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="bg-white" style="padding-bottom:30px;">
         <div class="col-sm-12">
             <ul class="nav nav-tabs">
                 <li id="dataTab" class="active">
-                    <a ng-click="selectTab('tabdata')" data-toggle="tab"><span translate="service.edit.dashboard.tabs.data">Data</span></a>
+                    <a ng-click="selectTab('tabdata')"
+                       data-toggle="tab">
+                        <span translate="service.edit.dashboard.tabs.data">Data</span>
+                    </a>
                 </li>
                 <li id="descriptionTab">
-                    <a ng-click="selectTab('tabdesc')" data-toggle="tab"><span translate="service.edit.dashboard.tabs.description">Service Description</span></a>
+                    <a ng-click="selectTab('tabdesc')"
+                       data-toggle="tab">
+                        <span translate="service.edit.dashboard.tabs.description">Service Description</span>
+                    </a>
                 </li>
                 <li id="metadataTab">
-                    <a ng-click="selectTab('tabmetadata')" data-toggle="tab"><span translate="service.edit.dashboard.tabs.metadata">Service Metadata</span></a>
+                    <a ng-click="selectTab('tabmetadata')"
+                       data-toggle="tab">
+                        <span translate="service.edit.dashboard.tabs.metadata">Service Metadata</span>
+                    </a>
                 </li>
                 <li id="rightsTab">
-                    <a ng-click="selectTab('tabrights')" data-toggle="tab"><span translate="service.edit.dashboard.tabs.rights">Service Rights</span></a>
+                    <a ng-click="selectTab('tabrights')"
+                       data-toggle="tab">
+                        <span translate="service.edit.dashboard.tabs.rights">Service Rights</span>
+                    </a>
                 </li>
             </ul>
-
             <div class="tab-content">
                 <div class="tab-pane" ng-class="{active:tabdata}" ng-show="tabdata">
                     <div class="row" ng-init="initScope()">
-                        <!-- Begin Dashboard -->
-
                         <div class="col-sm-8">
-
-                            <!--begin list -->
-
                             <div class="frame dashboard">
                                 <div class="navbar title">
                                     <div class="navbar-inner">
-                                        <div ng-if="type !== 'csw' && type !== 'sos'" class="brand" translate="service.edit.dashboard.layer.title">Layers list</div>
-                                        <div ng-if="type === 'csw'" class="brand" translate="service.edit.dashboard.metadata.title">Metadata list</div>
-                                        <div ng-if="type === 'sos'" class="brand" translate="service.edit.dashboard.sensors.list">Sensors list</div>
+                                        <div ng-if="type !== 'csw' && type !== 'sos'"
+                                             class="brand"
+                                             translate="service.edit.dashboard.layer.title">Layers list</div>
+                                        <div ng-if="type === 'csw'"
+                                             class="brand"
+                                             translate="service.edit.dashboard.metadata.title">Metadata list</div>
+                                        <div ng-if="type === 'sos'"
+                                             class="brand"
+                                             translate="service.edit.dashboard.sensors.list">Sensors list</div>
                                     </div>
                                 </div>
                                 <div class="navbar sort-navbar">
                                     <div class="navbar-inner">
                                         <ul class="nav nav-style">
-                                            <li ng-click="wrap.ordertype= (service && service.type && service.type.toLowerCase()==='sos') ? 'id' : (service && service.type && service.type.toLowerCase==='csw') ? 'title' : 'Name';wrap.orderreverse=false">
-                                                <a translate="service.edit.dashboard.header.title">
-                                                    Title<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                                            <li ng-click="wrap.ordertype=(service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase==='csw')?'title':'Name';wrap.orderreverse=!wrap.orderreverse">
+                                                <a>
+                                                    <span translate="service.edit.dashboard.header.title">Title</span>
+                                                    <i class="fa fa-caret-up"
+                                                       ng-if="wrap.ordertype ===((service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase==='csw')?'title':'Name') && wrap.orderreverse"></i>
+                                                    <i class="fa fa-caret-down"
+                                                       ng-if="wrap.ordertype ===((service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase==='csw')?'title':'Name') && !wrap.orderreverse"></i>
                                                 </a>
                                             </li>
                                             <li class="divider-vertical"></li>
-                                            <li ng-click="wrap.ordertype= (service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'createDate' : 'Date';wrap.orderreverse=true">
-                                                <a translate="service.edit.dashboard.header.date">
-                                                    Date<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                                            <li ng-click="wrap.ordertype=(service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'createDate' : 'Date';wrap.orderreverse=!wrap.orderreverse">
+                                                <a>
+                                                    <span translate="service.edit.dashboard.header.date">Date</span>
+                                                    <i class="fa fa-caret-up"
+                                                       ng-if="wrap.ordertype === ((service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'createDate' : 'Date') && wrap.orderreverse"></i>
+                                                    <i class="fa fa-caret-down"
+                                                       ng-if="wrap.ordertype === ((service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'createDate' : 'Date') && !wrap.orderreverse"></i>
                                                 </a>
                                             </li>
                                             <li class="divider-vertical"></li>
-                                            <li ng-click="wrap.ordertype=(service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'creator' : 'Owner';wrap.orderreverse=false">
-                                                <a translate="service.edit.dashboard.header.owner">
-                                                    Owner<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                                            <li ng-click="wrap.ordertype=(service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'creator' : 'Owner';wrap.orderreverse=!wrap.orderreverse">
+                                                <a>
+                                                    <span translate="service.edit.dashboard.header.owner">Owner</span>
+                                                    <i class="fa fa-caret-up"
+                                                       ng-if="wrap.ordertype === ((service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'creator' : 'Owner') && wrap.orderreverse"></i>
+                                                    <i class="fa fa-caret-down"
+                                                       ng-if="wrap.ordertype === ((service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'creator' : 'Owner') && !wrap.orderreverse"></i>
                                                 </a>
                                             </li>
                                             <li class="divider-vertical"></li>
-                                            <li ng-click="wrap.ordertype='Type';wrap.orderreverse=false">
-                                                <a translate="service.edit.dashboard.header.type">
-                                                    Type<i class="fa fa-caret-up"></i><i class="fa fa-caret-down"></i>
+                                            <li ng-click="wrap.ordertype='Type';wrap.orderreverse=!wrap.orderreverse">
+                                                <a>
+                                                    <span translate="service.edit.dashboard.header.type">Type</span>
+                                                    <i class="fa fa-caret-up"
+                                                       ng-if="wrap.ordertype==='Type' && wrap.orderreverse"></i>
+                                                    <i class="fa fa-caret-down"
+                                                       ng-if="wrap.ordertype==='Type' && !wrap.orderreverse"></i>
                                                 </a>
                                             </li>
                                             <li class="divider-vertical"></li>
                                         </ul>
                                         <button type="button"
-                                                ng-click="wrap.ordertype= (service && service.type && service.type.toLowerCase()==='sos') ? 'id' : (service && service.type && service.type.toLowerCase==='csw') ? 'title' : 'Name';wrap.orderreverse=false"
+                                                ng-click="resetFilters();"
                                                 ng-class="{'btn-csw':type==='csw','btn-sos':type==='sos'}"
                                                 title="{{'label.search.refresh' | translate }}"
-                                                class="btn  btn-data btn-xs btn-info"><i class="fa fa-times"></i></button>
+                                                class="btn  btn-data btn-xs btn-info">
+                                            <i class="fa fa-times"></i>
+                                        </button>
                                         <div class="pull-right">
                                             <div style="position:relative;">
                                                 <div class="ajax-loader" style="right:0;position:absolute;"></div>
