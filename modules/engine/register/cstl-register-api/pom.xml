@@ -43,7 +43,7 @@
       <plugin>
         <groupId>com.geomatys.maven</groupId>
         <artifactId>geomatys-sqlpojo-plugin</artifactId>
-        <version>0.0.4-SNAPSHOT</version>
+        <version>0.0.5-SNAPSHOT</version>
         <dependencies>
           <dependency>
             <groupId>org.constellation.engine</groupId>
