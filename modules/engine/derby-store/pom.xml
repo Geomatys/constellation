@@ -18,6 +18,16 @@
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
       <version>3.2.0</version>
+        <exclusions>
+            <exclusion>
+                <artifactId>jetty-servlet</artifactId>
+                <groupId>org.eclipse.jetty</groupId>
+            </exclusion>
+            <exclusion>
+                <artifactId>velocity</artifactId>
+                <groupId>org.apache.velocity</groupId>
+            </exclusion>
+        </exclusions>
     </dependency>
 
     <dependency>
