@@ -104,13 +104,13 @@
                                 <div class="navbar sort-navbar">
                                     <div class="navbar-inner">
                                         <ul class="nav nav-style">
-                                            <li ng-click="wrap.ordertype=(service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase==='csw')?'title':'Name';wrap.orderreverse=!wrap.orderreverse">
+                                            <li ng-click="wrap.ordertype=(service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase()==='csw')?'title':'Name';wrap.orderreverse=!wrap.orderreverse">
                                                 <a>
                                                     <span translate="service.edit.dashboard.header.title">Title</span>
                                                     <i class="fa fa-caret-up"
-                                                       ng-if="wrap.ordertype ===((service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase==='csw')?'title':'Name') && wrap.orderreverse"></i>
+                                                       ng-if="wrap.ordertype ===((service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase()==='csw')?'title':'Name') && wrap.orderreverse"></i>
                                                     <i class="fa fa-caret-down"
-                                                       ng-if="wrap.ordertype ===((service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase==='csw')?'title':'Name') && !wrap.orderreverse"></i>
+                                                       ng-if="wrap.ordertype ===((service && service.type && service.type.toLowerCase()==='sos')?'id':(service && service.type && service.type.toLowerCase()==='csw')?'title':'Name') && !wrap.orderreverse"></i>
                                                 </a>
                                             </li>
                                             <li class="divider-vertical"></li>
@@ -207,7 +207,7 @@
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
                                                 <div class="item"
                                                      ng-repeat="layer in wrap.dataList"
-                                                     ng-class="{selected:layer==selected,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}"
+                                                     ng-class="{selected:layer==selected,coverage:layer.Type.toLowerCase()==='coverage',vector:layer.Type.toLowerCase()==='observation-store' || layer.Type.toLowerCase()==='vector', 'col-xs-6':small==true}"
                                                      ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title"

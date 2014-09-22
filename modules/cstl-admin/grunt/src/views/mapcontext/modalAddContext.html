@@ -122,12 +122,15 @@
                                                             </button>
                                                         </div>
                                                         <div class="col-xs-8 no-padding" ng-click="selectItem(layerToAdd)">
-                                                            <div class="item layer compo" ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
+                                                            <div class="item layer compo"
+                                                                 ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toLowerCase()==='coverage',vector:layerToAdd.layer.Type.toLowerCase()==='observation-store' || layerToAdd.layer.Type.toLowerCase()==='vector'}">
                                                                 <div class="top edit-mapcontext-modale">
-                                                                    <span class="item-title" title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? truncate(mode.display,layerToAdd.layer.Name) : truncate(mode.display,layerToAdd.layer.externalLayer)}}</span>
+                                                                    <span class="item-title"
+                                                                          title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? truncate(mode.display,layerToAdd.layer.Name) : truncate(mode.display,layerToAdd.layer.externalLayer)}}</span>
                                                                 </div>
                                                                 <div class="bottom">
-                                                                            <span class="pull-right text-right item-list-style" style="margin-right: 7px;">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':(layerToAdd.layer.Type) ? layerToAdd.layer.Type : 'WMS'}}</span>
+                                                                            <span class="pull-right text-right item-list-style"
+                                                                                  style="margin-right: 7px;">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':(layerToAdd.layer.Type) ? layerToAdd.layer.Type : 'WMS'}}</span>
                                                                             <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd!=selected.item"
                                                                                  src="img/vector-multipoint-mapcontext.svg"
                                                                                  class="pull-right"
@@ -319,7 +322,10 @@
                                 <div class="dash-inner row" ng-init="small=false">
                                     <div data-role="list">
                                         <div class="item-list">
-                                            <div class="item" ng-repeat="layer in serviceLayers.layers" ng-class="{selected:layer==selected.layer,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer, serviceLayers)">
+                                            <div class="item"
+                                                 ng-repeat="layer in serviceLayers.layers"
+                                                 ng-class="{selected:layer==selected.layer,coverage:layer.Type.toLowerCase()==='coverage' || layer.Type.toLowerCase()==='raster',vector:layer.Type.toLowerCase()==='observation-store' || layer.Type.toLowerCase()==='vector', 'col-xs-6':small==true}"
+                                                 ng-click="select(layer, serviceLayers)">
                                                 <div class="top">
                                                     <span class="item-title" title="{{layer.Name}}">{{truncate(mode.display,layer.Name)}}</span>
                                                     <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
@@ -381,7 +387,8 @@
                                     <div class="block-header" ng-click="toggleUpDownSelected()">
                                         <strong class="item-title title-bloc-service" title="{{selected.layer.Name}}">{{selected.layer.Name}}</strong><i class="fa fa-chevron-down pull-right"></i>
                                     </div>
-                                    <div class="block-content" ng-class="{'block-vector':selected.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||selected.layer.Type.toUpperCase()==='vector'.toUpperCase(),'block-raster':selected.layer.Type.toUpperCase()==='coverage'.toUpperCase()||selected.layer.Type.toUpperCase()==='raster'.toUpperCase()}">
+                                    <div class="block-content"
+                                         ng-class="{'block-vector':selected.layer.Type.toLowerCase()==='observation-store' || selected.layer.Type.toLowerCase()==='vector','block-raster':selected.layer.Type.toLowerCase()==='coverage' || selected.layer.Type.toLowerCase()==='raster'}">
                                         <div class="row description-block">
                                             <div class="col-sm-3 col-md-2"><img src="img/block-content-service.svg" alt="" /></div>
                                             <div class="col-sm-9 col-md-10 description-text"><span>{{selected.service.name}}</span></div>
