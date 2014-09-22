@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.apache.sis.metadata.MetadataStandard;
-import org.apache.sis.metadata.ModifiableMetadata;
 import org.constellation.json.metadata.binding.RootObj;
 
 
@@ -223,13 +222,6 @@ public class Template {
      * @throws IOException if an error occurred while writing to {@code out}.
      */
     public void write(final Object metadata, final Appendable out, final boolean prune) throws IOException {
-        /*
-         * Empty nodes break the formatting in our current simple implementation.
-         * We should try to remove that hack after we migrate to a better library for reading/writing JSON.
-         */
-        if (metadata instanceof ModifiableMetadata) {
-            ((ModifiableMetadata) metadata).prune();
-        }
         root.write(metadata, out, prune, depth);
     }
 
