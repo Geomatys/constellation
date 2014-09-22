@@ -111,7 +111,7 @@
 								"multiplicity":1,
 								"help":"system.field.validTime.beginPosition_help",
 								"path":"member.realProcess.validTime.timePeriod.beginPosition",
-								"render":"date",
+								"render":"DATE.text",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -122,7 +122,7 @@
 								"multiplicity":1,
 								"help":"system.field.validTime.endPosition_help",
 								"path":"member.realProcess.validTime.timePeriod.endPosition",
-								"render":"date",
+								"render":"DATE.text",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
