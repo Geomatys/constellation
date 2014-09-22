@@ -388,6 +388,33 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             });
         };
 
+        /**
+         * Open metadata viewer popup and display metadata
+         * in appropriate template depending on data type property.
+         * this function is called from metadata dashboard.
+         */
+        $scope.displayMetadataFromCSW = function() {
+            var type = 'import';
+            console.debug($scope.selected);
+            console.debug($scope.selectedMetadataChild);
+            if($scope.selectedMetadataChild){
+                type = $scope.selectedMetadataChild.Type.toLowerCase();
+            }
+            if(type.toLowerCase() === 'coverage'){
+                type = 'raster';
+            }
+            $modal.open({
+                templateUrl: 'views/data/modalViewMetadata.html',
+                controller: 'ViewMetadataModalController',
+                resolve: {
+                    'dashboardName':function(){return 'dataset';},
+                    'metadataValues':function(textService){
+                        return textService.cswMetadataJson($scope.service.identifier,$scope.selected.identifier,type,true);
+                    }
+                }
+            });
+        };
+
         $scope.deleteMetadata = function() {
             if ($scope.selected && confirm("Are you sure?")) {
                 csw.delete({id: $scope.service.identifier, metaId: $scope.selected.identifier}, {},

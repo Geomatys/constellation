@@ -88,6 +88,11 @@
       <artifactId>cstl-store-metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.json-bindings</groupId>
+      <artifactId>cstl-json-metadata</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Geotoolkit dependencies -->
     <dependency>
       <groupId>org.geotoolkit</groupId>

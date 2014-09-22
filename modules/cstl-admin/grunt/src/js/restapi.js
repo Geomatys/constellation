@@ -206,12 +206,13 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
 
     .factory('csw', function($resource) {
         return $resource('@cstl/api/1/CSW', {}, {
-            'count':      {method: 'GET',       url: '@cstl/api/1/CSW/:id/records/count;jsessionid='},
-            'getRecords': {method: 'GET',       url: '@cstl/api/1/CSW/:id/records/:count-:startIndex;jsessionid='},
-            'getRecord':  {method: 'GET',       url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='},
-            'downloadMd': {method: 'GET',       url: '@cstl/api/1/CSW/:id/record/download/:metaId;jsessionid='},
-            'refresh':    {method: 'POST',      url: '@cstl/api/1/CSW/:id/index/refresh;jsessionid='},
-            'delete':     {method: 'DELETE',    url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='}
+            'count':            {method: 'GET',       url: '@cstl/api/1/CSW/:id/records/count;jsessionid='},
+            'getRecords':       {method: 'GET',       url: '@cstl/api/1/CSW/:id/records/:count-:startIndex;jsessionid='},
+            'getRecord':        {method: 'GET',       url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='},
+            'downloadMd':       {method: 'GET',       url: '@cstl/api/1/CSW/:id/record/download/:metaId;jsessionid='},
+            'refresh':          {method: 'POST',      url: '@cstl/api/1/CSW/:id/index/refresh;jsessionid='},
+            'delete':           {method: 'DELETE',    url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='},
+            'getJsonMetadata':  {method: 'GET',       url: '@cstl/api/1/CSW/:id/metadataJson/:metaId/:type/:prune;jsessionid='}
         });
     })
 
@@ -329,6 +330,17 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
                 });
                 promise.error(function(errorMsg) {
                     Growl('warning', 'Warning', 'Error while retrieving json metadata for data '+ data);
+                });
+                return promise;
+            },
+            cswMetadataJson : function(serviceId, recordId, type, prune){
+                var promise = $http({
+                    url: '@cstl/api/1/CSW/'+serviceId+'/metadataJson/'+ recordId+'/'+ type +'/'+ prune +';jsessionid=',
+                    method: "GET",
+                    headers: {'Accept': 'application/json'}
+                });
+                promise.error(function(errorMsg) {
+                    Growl('warning', 'Warning', 'Error cannot get metadata from csw '+serviceId+' for record '+recordId);
                 });
                 return promise;
             },

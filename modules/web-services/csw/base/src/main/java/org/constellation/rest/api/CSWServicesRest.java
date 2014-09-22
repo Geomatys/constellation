@@ -19,21 +19,22 @@
 
 package org.constellation.rest.api;
 
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.business.IServiceBusiness;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.BriefNode;
-import org.constellation.configuration.BriefNodeList;
-import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.configuration.StringList;
+import org.constellation.configuration.*;
 import org.constellation.dto.Details;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
+import org.constellation.json.metadata.Template;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.configuration.CSWConfigurer;
+import org.constellation.utils.ISOMarshallerPool;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
+import org.opengis.metadata.Metadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Node;
 
@@ -47,8 +48,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -64,6 +69,11 @@ public class CSWServicesRest {
 
     @Autowired
     protected IServiceBusiness serviceBusiness;
+
+    /**
+     * Used for debugging purposes.
+     */
+    private static final Logger LOGGER = Logging.getLogger(CSWServicesRest.class);
     
     @POST
     @Path("{id}/index/refresh")
@@ -177,7 +187,82 @@ public class CSWServicesRest {
         return ok(new AcknowlegementType("Success", "federated catalog added"));
     }
 
+    /**
+     * Returns applied template for metadata.
+     *
+     * @param id service identifier.
+     * @param metaID given record identifier.
+     * @param type sensor type system or component.
+     * @param prune flag that indicates if template result will clean empty children/block.
+     * @return {@code Response}
+     */
+    @GET
+    @Path("{id}/metadataJson/{metaID}/{type}/{prune}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getCSWMetadataJson(final @PathParam("id") String id,
+                                          final @PathParam("metaID") String metaID,
+                                          final @PathParam("type") String type,
+                                          final @PathParam("prune") boolean prune) {
+        try{
+            final Node node = getConfigurer().getMetadata(id, metaID);
+            if(node!=null){
+                final Metadata metadata = getMetadataFromNode(node);
+                if(metadata!=null){
+                    if(metadata instanceof DefaultMetadata){
+                        //prune the metadata
+                        ((DefaultMetadata)metadata).prune();
+                    }
+
+                    final StringBuilder buffer = new StringBuilder();
+                    final String templateName;
+                    if("vector".equalsIgnoreCase(type)){
+                        //vector template
+                        templateName="profile_default_vector";
+                    }else if ("raster".equalsIgnoreCase(type)){
+                        //raster template
+                        templateName="profile_default_raster";
+                    } else {
+                        //default template is import
+                        templateName="profile_import";
+                    }
+                    final Template template = Template.getInstance(templateName);
+                    template.write(metadata,buffer,prune);
+                    return Response.ok(buffer.toString()).build();
+                }
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "error while writing metadata to json.", ex);
+            return Response.status(500).entity("failed").build();
+        }
+        return Response.status(500).entity("Cannot get metadata for id "+metaID).build();
+    }
+
     private static CSWConfigurer getConfigurer() throws NotRunningServiceException {
         return (CSWConfigurer) ServiceConfigurer.newInstance(Specification.CSW);
     }
+
+
+    /**
+     * Convert {@code Metadata} to {@code Node} object.
+     *
+     * @param metadataNode given node object to convert.
+     * @return {@code Metadata}
+     * @throws ConfigurationException
+     */
+    private Metadata getMetadataFromNode(final Node metadataNode) throws ConfigurationException {
+        try {
+            final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
+            final Object obj = um.unmarshal(metadataNode);
+            ISOMarshallerPool.getInstance().recycle(um);
+            if (obj instanceof Metadata) {
+                return (Metadata) obj;
+            } else {
+                throw new TargetNotFoundException("Record is not a metadata object");
+            }
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("JAXB Exception while reading record", ex);
+        }
+    }
+
 }

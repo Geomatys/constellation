@@ -384,14 +384,14 @@
                             <div id="selection">
                                 <div class="alert alert-info alert-data"
                                      ng-class="{'alert-csw':type==='csw','alert-sos':type==='sos'}"
-                                     ng-show="selected == null">
+                                     ng-show="!selected">
                                     <h4 translate="label.no.selected.data">No selected data</h4>
                                     <p translate="msg.no.selected.data"
                                        style="font-weight:normal;">Click on a data to display more information</p>
                                 </div>
                                 <div class="selected-item"
                                      id="selected-item"
-                                     ng-hide="selected == null">
+                                     ng-show="selected">
                                     <div ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'sos'">
                                         <div class="block-header"
                                              ng-click="toggleUpDownSelected()">
@@ -571,7 +571,7 @@
                                             </div>
                                             <div class="block-content"
                                                  ng-class="{'block-vector':selectedMetadataChild.Type=='VECTOR','block-raster':selectedMetadataChild.Type=='COVERAGE'}"
-                                                 ng-if="selectedMetadataChild != null">
+                                                 ng-if="selectedMetadataChild">
                                                 <h6 translate="label.title">Title</h6>
                                                 <span>{{truncateTitleBlock(selectedMetadataChild.Name)}}</span>
                                                 <div class="row description-block"
@@ -596,6 +596,18 @@
                                         </div>
                                         <div class="block-action">
                                             <div class="row" style="padding-bottom: 5px">
+                                                <div class="col-sm-2">
+                                                    <span class="tooltipicon">
+                                                        <button type="button"
+                                                                id="seeMetadata"
+                                                                class="btn btn-csw"
+                                                                ng-click="displayMetadataFromCSW()"
+                                                                data-placement="bottom"
+                                                                title="{{'dataset.metadata.listing.selected.view.button' | translate }}" tooltip>
+                                                            <i class="glyphicon glyphicon-file"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
                                                 <div class="col-sm-2">
                                                     <span class="tooltipicon">
                                                         <a id="exportMD"
