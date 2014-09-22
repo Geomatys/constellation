@@ -32,7 +32,7 @@ import java.util.List;
  * @author Cédric Briançon (Geomatys)
  */
 public interface IDatasetBusiness {
-    Dataset createDataset(String identifier, int providerId, String metadataId, String metadataXml);
+    Dataset createDataset(String identifier, int providerId, String metadataId, String metadataXml, Integer owner);
 
     Dataset getDataset(String providerId, int domainId);
 

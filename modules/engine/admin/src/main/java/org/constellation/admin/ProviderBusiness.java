@@ -38,7 +38,6 @@ import org.constellation.provider.CoverageData;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.coverage.CoverageStoreFactory;
 import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.Pyramid;
@@ -98,22 +97,27 @@ public class ProviderBusiness implements IProviderBusiness {
     @Inject
     private org.constellation.security.SecurityManager securityManager;
 
+    @Override
     public List<Provider> getProviders() {
         return providerRepository.findAll();
     }
 
+    @Override
     public Provider getProvider(final String identifier) {
         return providerRepository.findByIdentifier(identifier);
     }
 
+    @Override
     public Provider getProvider(String providerIdentifier, int domainId) {
         return providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
     }
 
+    @Override
     public Provider getProvider(final int id) {
         return providerRepository.findOne(id);
     }
 
+    @Override
     public List<String> getProviderIds() {
         final List<String> ids = new ArrayList<>();
         final List<Provider> providers = providerRepository.findAll();
@@ -123,11 +127,13 @@ public class ProviderBusiness implements IProviderBusiness {
         return ids;
     }
 
+    @Override
     public void removeProvider(final String identifier) {
         datasetRepository.removeForProvider(identifier);
         providerRepository.deleteByIdentifier(identifier);
     }
 
+    @Override
     public void removeAll() {
         final List<Provider> providers = providerRepository.findAll();
         for (Provider p : providers) {
@@ -136,29 +142,35 @@ public class ProviderBusiness implements IProviderBusiness {
         }
     }
 
+    @Override
     public List<Provider> getProviderChildren(final String identifier) {
         return providerRepository.findChildren(identifier);
     }
 
+    @Override
     public List<Integer> getProviderIdsForDomain(int domainId) {
         return providerRepository.getProviderIdsForDomain(domainId);
     }
 
+    @Override
     public List<Data> getDatasFromProviderId(Integer id) {
         return providerRepository.findDatasByProviderId(id);
     }
 
+    @Override
     public void updateParent(String providerIdentifier, String newParentIdentifier) {
         final Provider provider = getProvider(providerIdentifier);
         provider.setParent(newParentIdentifier);
         providerRepository.update(provider);
     }
 
+    @Override
     public List<Style> getStylesFromProviderId(Integer providerId) {
         return providerRepository.findStylesByProviderId(providerId);
     }
 
 
+    @Override
     public Provider storeProvider(final String identifier, final String parent, final ProviderType type, final String serviceName,
                                   final GeneralParameterValue config) throws IOException {
         Provider provider = new Provider();
@@ -176,6 +188,7 @@ public class ProviderBusiness implements IProviderBusiness {
 
     }
 
+    @Override
     public Set<Name> test(final String providerIdentifier, final ProviderConfiguration configuration) throws DataStoreException {
         final String type = configuration.getType();
         final String subType = configuration.getSubType();
@@ -252,7 +265,7 @@ public class ProviderBusiness implements IProviderBusiness {
         final int provId = provider.getId();
 
         // for now we assume provider == dataset, so we create a dataset bound to the new provider.
-        final Dataset dataset = datasetBusiness.createDataset(id, provId, null, null);
+        final Dataset dataset = datasetBusiness.createDataset(id, provId, null, null, provider.getOwner());
         datasetBusiness.linkDataTodataset(dataset, getDatasFromProviderId(provId));
 
         LOGGER.info("Added " + count + " data to domain " + domainId);

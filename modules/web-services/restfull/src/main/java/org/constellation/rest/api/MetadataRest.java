@@ -32,7 +32,6 @@ import org.constellation.configuration.DataSetBrief;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.UserRepository;
 import org.w3c.dom.Node;
 
@@ -161,8 +160,7 @@ public class MetadataRest {
      */
     private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId){
         final Integer dataSetId = dataset.getId();
-        final Provider provider = providerBusiness.getProvider(dataset.getProviderId());
-        final Optional<CstlUser> optUser = userRepository.findById(provider.getOwner());
+        final Optional<CstlUser> optUser = userRepository.findById(dataset.getOwner());
         String owner = null;
         if(optUser!=null && optUser.isPresent()){
             final CstlUser user = optUser.get();

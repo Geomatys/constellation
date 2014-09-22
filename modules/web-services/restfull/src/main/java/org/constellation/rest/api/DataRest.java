@@ -59,9 +59,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import com.google.common.base.Optional;
-import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.geometry.GeneralDirectPosition;
-import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
@@ -138,7 +136,6 @@ import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.referencing.adapters.NetcdfCRS;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
 import org.geotoolkit.storage.DataFileStore;
 import org.geotoolkit.util.FileUtilities;
@@ -146,7 +143,6 @@ import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
-import org.opengis.feature.PropertyType;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
@@ -998,8 +994,7 @@ public class DataRest {
      */
     private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId){
         final Integer dataSetId = dataset.getId();
-        final Provider provider = providerBusiness.getProvider(dataset.getProviderId());
-        final Optional<CstlUser> optUser = userRepository.findById(provider.getOwner());
+        final Optional<CstlUser> optUser = userRepository.findById(dataset.getOwner());
         String owner = null;
         if(optUser!=null && optUser.isPresent()){
             final CstlUser user = optUser.get();
@@ -1007,6 +1002,7 @@ public class DataRest {
                 owner = user.getLogin();
             }
         }
+        final Provider provider = providerBusiness.getProvider(dataset.getProviderId());
         final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
         final DataSetBrief dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), provider.getType(), owner, dataBriefList);
         try{
