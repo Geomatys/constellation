@@ -51,6 +51,7 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
+import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
@@ -84,6 +85,7 @@ import org.opengis.coverage.Coverage;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -249,7 +251,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         final List<Layer> declaredLayers = getConfigurationLayers(userLogin);
 
-       for (final Layer configLayer : declaredLayers){
+       for (final Layer configLayer : declaredLayers) {
             final Data details = getLayerReference(userLogin, configLayer.getName());
            final String name;
            if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
@@ -403,15 +405,28 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     }
 
     /**
-     * Return CRS code name.
-     * @param candidate
-     * @return crs code
+     * Return CRS code name. As WMTS define only 2D CRS (additional dimensions are stored beside), we will extract
+     * horizontal CRS, and search for a standard EPSG identifier. If we cannot find it, we will just keep CRS initial
+     * code.
+     * @param candidate The system to analyse.
+     * @return An identifier for the horizontal part of input crs.
      */
     private String getCRSCode(CoordinateReferenceSystem candidate) {
-        // Workaround for normalize WGS84 that return "EPSG:WGS 84"
+        final SingleCRS horizontal = org.apache.sis.referencing.CRS.getHorizontalComponent(candidate);
+        // Workaround to normalize WGS84 that return "EPSG:WGS 84"
         // for IdentifiedObjects.getIdentifierOrName() call
-        if (CRS.equalsIgnoreMetadata(CommonCRS.WGS84.normalizedGeographic(), candidate)) {
+        if (CRS.equalsIgnoreMetadata(CommonCRS.WGS84.normalizedGeographic(), horizontal)) {
             return "CRS:84";
+        } else {
+            try {
+                final String identifier = org.geotoolkit.referencing.IdentifiedObjects.lookupIdentifier(
+                        Citations.EPSG, horizontal, true);
+                if (identifier != null) {
+                    return identifier;
+                }
+            } catch (FactoryException e) {
+                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            }
         }
         return IdentifiedObjects.getIdentifierOrName(candidate);
     }
