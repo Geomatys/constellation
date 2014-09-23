@@ -27,13 +27,7 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
         $scope.sensorType = type;
         $scope.template = template;
 
-        console.debug('sensorId = '+$scope.sensorId);
-        console.debug('sensorType = '+$scope.sensorType);
-        console.debug('template = '+$scope.template);
-
         $scope.typeLabelKey = "metadata.edition.sensor."+$scope.sensorType.toLowerCase();
-
-        console.debug('typeLabelKey = '+$scope.typeLabelKey);
 
         /**
          * Get metadata values
@@ -44,7 +38,6 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
         sensor.getJsonMetadata({'sensorId':$scope.sensorId,'type':$scope.sensorType,'prune':false},function(response){//success
                 if (response && response.root) {
                     $scope.metadataValues.push({"root":response.root});
-                    console.debug($scope.metadataValues);
                 }
             },
             function(response){//error
@@ -340,10 +333,10 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
          * @returns {string} the title value located in json model.
          */
         $scope.getMetadataTitle = function() {
-            /*if($scope.metadataValues && $scope.metadataValues.length>0){
+            if($scope.metadataValues && $scope.metadataValues.length>0){
                 //@FIXME get field with jsonPath
-                return $scope.metadataValues[0].root.children[0].superblock.children[0].block.children[0].field.value;
-            }*/
+                return $scope.metadataValues[0].root.children[0].superblock.children[0].block.children[2].field.value;
+            }
             return null;
         };
 
@@ -357,22 +350,23 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
         /**
          * Save for metadata in modal editor mode.
          */
-        $scope.save = function() {
-            /*if($scope.metadataValues && $scope.metadataValues.length>0){
+        $scope.save2 = function() {
+            if($scope.metadataValues && $scope.metadataValues.length>0){
                 //console.debug($scope.metadataValues[0]);
                 //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
-                dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.template},
-                    $scope.metadataValues[0],
+                sensor.saveSensorMLMetadata({'sensorId':$scope.sensorId,
+                                             'type':$scope.template},
+                                             $scope.metadataValues[0],
                     function(response) {//success
                         $scope.close();
-                        Growl('success','Success','Metadata saved with success!');
+                        Growl('success','Success','SensorML saved with success!');
                     },
                     function(response) {//error
                         $scope.close();
-                        Growl('error','Error','Failed to save metadata because the server returned an error!');
+                        Growl('error','Error','Failed to save sensorML because the server returned an error!');
                     }
                 );
-            }*/
+            }
         };
 
         /**
@@ -380,7 +374,11 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
          * For datepicker as locale.
          */
         $scope.getCurrentLang = function() {
-            return $translate.use();
+            var lang = $translate.use();
+            if(!lang){
+                lang = 'en';
+            }
+            return lang;
         };
 
     });
