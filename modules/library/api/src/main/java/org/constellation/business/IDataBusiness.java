@@ -38,6 +38,7 @@ import java.util.Map;
  * @author Cédric Briançon (Geomatys)
  */
 public interface IDataBusiness {
+    
     void deleteData(QName qName, String id);
 
     void create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, String subType, String metadataXml);

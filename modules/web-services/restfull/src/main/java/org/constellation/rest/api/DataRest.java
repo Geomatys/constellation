@@ -178,9 +178,6 @@ public class DataRest {
 
     @Inject
     private UserRepository userRepository;
-    
-    @Inject
-    private DataRepository dataRepository;
 
     @Inject
     private IDataBusiness dataBusiness;

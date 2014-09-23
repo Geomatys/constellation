@@ -75,6 +75,7 @@ import org.geotoolkit.data.FeatureStore;
 import org.opengis.feature.PropertyType;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -154,6 +155,7 @@ public class DataBusiness implements IDataBusiness {
      * @param dataId {@link Data} identifier
      * @return a {@linkplain Provider provider}
      */
+    @Override
     public Provider getProvider(int dataId) {
         final Data d = dataRepository.findById(dataId);
         return providerRepository.findOne(d.getProvider());
@@ -166,6 +168,7 @@ public class DataBusiness implements IDataBusiness {
      * @return {@link DefaultMetadata}
      * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
      */
+    @Override
     public DefaultMetadata loadIsoDataMetadata(final String providerId,
                                                final QName name) throws ConstellationException{
         DefaultMetadata metadata = null;
@@ -191,6 +194,7 @@ public class DataBusiness implements IDataBusiness {
      * @throws ConstellationException
      * @throws IOException
      */
+    @Override
     public List<Data> searchOnMetadata(final String queryString) throws IOException, ConstellationException {
         final List<Data> result = new ArrayList<>();
         final Set<Integer> ids;
@@ -241,6 +245,7 @@ public class DataBusiness implements IDataBusiness {
      * @return {@link CoverageMetadataBean}
      * @throws ConstellationException is thrown for JAXBException.
      */
+    @Override
     public CoverageMetadataBean loadDataMetadata(final String providerIdentifier,
                                                  final QName name,
                                                  final MarshallerPool pool) throws ConstellationException {
@@ -268,6 +273,7 @@ public class DataBusiness implements IDataBusiness {
      * @return {@link DataBrief}.
      * @throws ConstellationException is thrown if result fails.
      */
+    @Override
     public DataBrief getDataBrief(QName fullName,Integer providerId) throws ConstellationException {
         final Data data = dataRepository.findByNameAndNamespaceAndProviderId(fullName.getLocalPart(),fullName.getNamespaceURI(), providerId);
         final List<Data> datas = new ArrayList<>();
@@ -287,6 +293,7 @@ public class DataBusiness implements IDataBusiness {
      * @return {@link DataBrief}
      * @throws ConstellationException is thrown if result fails.
      */
+    @Override
     public DataBrief getDataBrief(final QName fullName,
                                   final String providerIdentifier) throws ConstellationException {
         final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(fullName.getLocalPart(), fullName.getNamespaceURI(), providerIdentifier);
@@ -305,6 +312,7 @@ public class DataBusiness implements IDataBusiness {
      * @param metadataId given metadata identifier.
      * @return list of {@link DataBrief}.
      */
+    @Override
     public List<DataBrief> getDataBriefsFromMetadataId(final String metadataId) {
         final List<Data> datas = findByMetadataId(metadataId);
         return getDataBriefFrom(datas);
@@ -318,6 +326,7 @@ public class DataBusiness implements IDataBusiness {
      * @return {@link DataBrief}.
      * @throws ConstellationException is thrown if result fails.
      */
+    @Override
     public DataBrief getDataLayer(final String layerAlias,
                                   final String dataProviderIdentifier) throws ConstellationException {
         final Data data = layerRepository.findDatasFromLayerAlias(layerAlias, dataProviderIdentifier);
@@ -346,6 +355,7 @@ public class DataBusiness implements IDataBusiness {
      * @param datasetId the given dataSet id.
      * @return the list of {@link DataBrief}.
      */
+    @Override
     public List<DataBrief> getDataBriefsFromDatasetId(final Integer datasetId) {
         final List<Data> dataList = findByDatasetId(datasetId);
         return getDataBriefFrom(dataList);
@@ -449,23 +459,25 @@ public class DataBusiness implements IDataBusiness {
      * @param name given data name.
      * @param providerIdentifier given provider identifier.
      */
+    @Override
     public void deleteData(final QName name, final String providerIdentifier) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
-            dataRepository.delete(name.getNamespaceURI(), name.getLocalPart(), provider.getId());
+            final Data d = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), provider.getId());
+            if (d != null) {
+                dataRepository.delete(d.getId());
+                // Relevant erase dataset when the is no more data in it. fr now we remove it
+                deleteDatasetIfEmpty(d.getDatasetId());
+            }
         }
     }
-
-    /**
-     * Proceed to remove data for provider identifier.
-     * @param providerIdentifier given provider identifier.
-     */
-    public void deleteDataForProvider(final String providerIdentifier) {
-        final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
-        if (provider != null) {
-            final List<Data> datas = dataRepository.findByProviderId(provider.getId());
-            for (final Data data : datas) {
-                dataRepository.delete(data.getId());
+    
+    @Transactional("txManager")
+    private void deleteDatasetIfEmpty(Integer datasetID) {
+        if (datasetID != null) {
+            List<Data> datas = dataRepository.findAllByDatasetId(datasetID);
+            if (datas.isEmpty()) {
+                datasetRepository.remove(datasetID);
             }
         }
     }
@@ -473,10 +485,13 @@ public class DataBusiness implements IDataBusiness {
     /**
      * Proceed to remove all data.
      */
+    @Override
     public void deleteAll() {
         final List<Data> datas = dataRepository.findAll();
         for (final Data data : datas) {
             dataRepository.delete(data.getId());
+            // Relevant erase dataset when the is no more data in it. fr now we remove it
+            deleteDatasetIfEmpty(data.getDatasetId());
         }
     }
 
@@ -490,6 +505,7 @@ public class DataBusiness implements IDataBusiness {
      * @param subType data subType.
      * @param metadata metadata of data.
      */
+    @Override
     public void create(final QName name, final String providerIdentifier,
                        final String type, final boolean sensorable,
                        final boolean visible, final String subType, final String metadata) {
@@ -519,6 +535,7 @@ public class DataBusiness implements IDataBusiness {
      * @param providerIdentifier provider identifier.
      * @param visibility value to set
      */
+    @Override
     public void updateDataVisibility(final QName name,
                                      final String providerIdentifier,
                                      boolean visibility) {
@@ -534,6 +551,7 @@ public class DataBusiness implements IDataBusiness {
      * @param dataId given data Id.
      * @param domainId given domain Id.
      */
+    @Override
     public void addDataToDomain(final int dataId, final int domainId) {
         domainRepository.addDataToDomain(dataId, domainId);
     }
@@ -546,6 +564,7 @@ public class DataBusiness implements IDataBusiness {
      * @throws CstlConfigurationRuntimeException
      */
     @Transactional("txManager")
+    @Override
     public synchronized void removeDataFromDomain(final int dataId,
                                                   final int domainId)throws CstlConfigurationRuntimeException {
         final List<Domain> findByLinkedService = domainRepository.findByLinkedData(dataId);
@@ -561,16 +580,20 @@ public class DataBusiness implements IDataBusiness {
      * @param providerID given provider identifier.
      */
     @Transactional("txManager")
+    @Override
     public synchronized void removeDataFromProvider(final String providerID) {
         final Provider p = providerRepository.findByIdentifier(providerID);
         if (p != null) {
             final List<Data> datas = dataRepository.findByProviderId(p.getId());
             for (final Data data : datas) {
                 dataRepository.delete(data.getId());
+                // Relevant erase dataset when the is no more data in it. fr now we remove it
+                deleteDatasetIfEmpty( data.getDatasetId());
             }
         }
     }
 
+    @Override
     public ParameterValues getVectorDataColumns(int id) throws DataStoreException {
         final Provider provider = getProvider(id);
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(provider.getIdentifier());
