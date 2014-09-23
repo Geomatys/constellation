@@ -470,7 +470,11 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          * For datepicker as locale.
          */
         $scope.getCurrentLang = function() {
-            return $translate.use();
+            var lang = $translate.use();
+            if(!lang){
+                lang = 'en';
+            }
+            return lang;
         };
 
         /**
