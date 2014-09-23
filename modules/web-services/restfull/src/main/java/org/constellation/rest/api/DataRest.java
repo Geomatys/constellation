@@ -929,9 +929,6 @@ public class DataRest {
             final Template template = Template.getInstance(templateName);
 
             try{
-                //uncomment for debugging purposes.
-                //final CharSequence[] lines = CharSequences.splitOnEOL(metadataValues);
-                //template.read(Arrays.asList(lines),metadata,false);
                 template.read(metadataValues,metadata,false);
             }catch(IOException ex){
                 LOGGER.log(Level.WARNING, "error while saving metadata.", ex);

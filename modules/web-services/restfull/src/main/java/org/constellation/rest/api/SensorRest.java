@@ -24,10 +24,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
-import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.XML;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.AcknowlegementType;
@@ -43,6 +41,7 @@ import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Sensor;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.json.metadata.Template;
+import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.provider.observationstore.ObservationStoreProvider;
@@ -221,6 +220,52 @@ public class SensorRest {
         } else {
             return Response.status(500).entity("There is no sensor for id "+sensorid).build();
         }
+    }
+
+    /**
+     * Proceed to save sensorML with given values from metadata editor.
+     *
+     * @param sensorid the data provider identifier
+     * @param type the data type.
+     * @param metadataValues the values of metadata editor.
+     * @return {@code Response}
+     */
+    @POST
+    @Path("metadata/save/{sensorid}/{type}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response saveSensorML(@PathParam("sensorid") final String sensorid,
+                                  @PathParam("type") final String type,
+                                  final RootObj metadataValues) {
+        try {
+            final Sensor record = sensorBusiness.getSensor(sensorid);
+            if (record != null) {
+                final AbstractSensorML sml = SOSUtils.unmarshallSensor(record.getMetadata());
+                if (sml != null) {
+                    //get template name
+                    final String templateName;
+                    if("system".equalsIgnoreCase(type)){
+                        templateName="profile_sensorml_system";
+                    }else if ("component".equalsIgnoreCase(type)){
+                        templateName="profile_sensorml_component";
+                    } else {
+                        templateName="profile_sensorml_system";
+                    }
+                    final Template template = Template.getInstance(templateName);
+                    template.read(metadataValues,sml,false);
+                    final String xml = marshallSensor(sml);
+                    record.setMetadata(xml);
+                    //Save sensorML
+                    sensorBusiness.update(record);
+                }
+            } else {
+                return Response.status(500).entity("There is no sensor for id "+sensorid).build();
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING,"Error while saving sensorML",ex);
+            return Response.status(500).entity("failed").build();
+        }
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     /**
