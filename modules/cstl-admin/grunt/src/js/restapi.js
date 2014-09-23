@@ -212,7 +212,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'downloadMd':       {method: 'GET',       url: '@cstl/api/1/CSW/:id/record/download/:metaId;jsessionid='},
             'refresh':          {method: 'POST',      url: '@cstl/api/1/CSW/:id/index/refresh;jsessionid='},
             'delete':           {method: 'DELETE',    url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='},
-            'getJsonMetadata':  {method: 'GET',       url: '@cstl/api/1/CSW/:id/metadataJson/:metaId/:type/:prune;jsessionid='}
+            'getJsonMetadata':  {method: 'GET',       url: '@cstl/api/1/CSW/:id/metadataJson/:metaId/:type/:prune;jsessionid='},
+            'saveMetadata':     {method: 'POST',      url: '@cstl/api/1/CSW/:id/metadata/save/:metaId/:type;jsessionid='}
         });
     })
 
