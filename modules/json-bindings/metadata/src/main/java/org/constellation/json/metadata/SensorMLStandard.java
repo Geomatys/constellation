@@ -38,8 +38,14 @@ final class SensorMLStandard extends MetadataStandard {
     /**
      * The singleton instance for system and component Sensor ML.
      */
-    static final MetadataStandard SYSTEM = new SensorMLStandard(true),
-            COMPONENT = new SensorMLStandard(false);
+    static final MetadataStandard SYSTEM, COMPONENT;
+    static {
+        final MetadataStandard swe = new SensorMLStandard("SWE", // A dependency of SensorML.
+                org.geotoolkit.sml.xml.AbstractPosition.class.getPackage(), false);
+        final Package pck = AbstractSensorML.class.getPackage();
+        SYSTEM    = new SensorMLStandard("System SML",    pck, true,  swe);
+        COMPONENT = new SensorMLStandard("Component SML", pck, false, swe);
+    }
 
     /**
      * The package name for the sensor ML version to implement.
@@ -64,8 +70,10 @@ final class SensorMLStandard extends MetadataStandard {
     /**
      * Constructor for the singleton instance.
      */
-    private SensorMLStandard(final boolean system) {
-        super(new DefaultCitation(system ? "System SML" : "Component SML"), AbstractSensorML.class.getPackage());
+    private SensorMLStandard(final String name, final Package pck, final boolean system,
+            final MetadataStandard... dependencies)
+    {
+        super(new DefaultCitation(name), pck, dependencies);
         this.system = system;
         factory = new MetadataFactory(this);
     }
