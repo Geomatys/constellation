@@ -395,8 +395,6 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
          */
         $scope.displayMetadataFromCSW = function() {
             var type = 'import';
-            console.debug($scope.selected);
-            console.debug($scope.selectedMetadataChild);
             if($scope.selectedMetadataChild){
                 type = $scope.selectedMetadataChild.Type.toLowerCase();
             }
@@ -414,6 +412,43 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 }
             });
         };
+
+        /**
+         * Open metadata editor in modal popup.
+         */
+        $scope.displayMetadataEditor = function() {
+            var typeToSend;
+            if($scope.selectedMetadataChild){
+                typeToSend = $scope.selectedMetadataChild.Type.toLowerCase();
+            }else {
+                typeToSend = 'import';
+            }
+            if(typeToSend.toLowerCase() === 'coverage'){
+                typeToSend = 'raster';
+            }
+            openModalEditor($scope.service.identifier,$scope.selected.identifier,typeToSend,typeToSend);
+        };
+
+        /**
+         * Open modal for metadata editor
+         * for given provider id, data type and template.
+         * @param serviceId
+         * @param recordId
+         * @param type
+         * @param template
+         */
+        function openModalEditor(serviceId,recordId,type,template){
+            $modal.open({
+                templateUrl: 'views/data/modalEditMetadata.html',
+                controller: 'EditCSWMetadataModalController',
+                resolve: {
+                    'serviceId':function(){return serviceId;},
+                    'recordId':function(){return recordId;},
+                    'type':function(){return type;},
+                    'template':function(){return template;}
+                }
+            });
+        }
 
         $scope.deleteMetadata = function() {
             if ($scope.selected && confirm("Are you sure?")) {
@@ -549,4 +584,54 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 }
             }
         };
+    })
+    .controller('EditCSWMetadataModalController', function($scope, $modalInstance, $controller,Growl,csw,serviceId,recordId,type,template) {
+        //$scope.provider = id;
+        $scope.serviceId = serviceId;
+        $scope.recordId = recordId;
+        $scope.type = type;
+        $scope.template = template;
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.loadMetadataValues = function(){
+            csw.getJsonMetadata({'id':$scope.serviceId,
+                                 'metaId':$scope.recordId,
+                                 'type':$scope.type,
+                                 'prune':false},
+                function(response){//success
+                    if (response && response.root) {
+                        $scope.metadataValues.push({"root":response.root});
+                    }
+                },
+                function(response){//error
+                    Growl('error','Error','The server returned an error!');
+                }
+            );
+        };
+
+        /**
+         * Save for metadata in modal editor mode.
+         */
+        $scope.save2 = function() {
+            if($scope.metadataValues && $scope.metadataValues.length>0){
+                //console.debug($scope.metadataValues[0]);
+                //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
+                csw.saveMetadata({'id':$scope.serviceId,'metaId':$scope.recordId,'type':$scope.template},
+                    $scope.metadataValues[0],
+                    function(response) {//success
+                        $scope.close();
+                        Growl('success','Success','Metadata saved with success!');
+                    },
+                    function(response) {//error
+                        $scope.close();
+                        Growl('error','Error','Failed to save metadata because the server returned an error!');
+                    }
+                );
+            }
+        };
+
+        $controller('EditMetadataController', {$scope: $scope});
+
     });
