@@ -163,7 +163,7 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
          */
         $scope.displayMetadataSensorMLEditor = function() {
             var sensorId,typeToSend;
-            if(($scope.sensorCtrl.selectedSensorsChild)){
+            if($scope.sensorCtrl.selectedSensorsChild){
                 sensorId = $scope.sensorCtrl.selectedSensorsChild.id;
                 typeToSend = $scope.sensorCtrl.selectedSensorsChild.type;
             }else {
