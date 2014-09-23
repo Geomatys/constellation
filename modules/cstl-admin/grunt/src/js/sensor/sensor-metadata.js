@@ -34,16 +34,19 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
          * @type {Array}
          */
         $scope.metadataValues = [];
-
-        sensor.getJsonMetadata({'sensorId':$scope.sensorId,'type':$scope.sensorType,'prune':false},function(response){//success
-                if (response && response.root) {
-                    $scope.metadataValues.push({"root":response.root});
+        $scope.loadMetadataValues = function(){
+            sensor.getJsonMetadata({'sensorId':$scope.sensorId,'type':$scope.sensorType,'prune':false},
+                function(response){//success
+                    if (response && response.root) {
+                        $scope.metadataValues.push({"root":response.root});
+                    }
+                },
+                function(response){//error
+                    Growl('error','Error','The server returned an error!');
                 }
-            },
-            function(response){//error
-                Growl('error','Error','The server returned an error!');
-            }
-        );
+            );
+        };
+        $scope.loadMetadataValues();
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
