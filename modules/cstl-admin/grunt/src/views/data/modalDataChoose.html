@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-dialog-resp-height">
+<div class="modal-dialog modal-dialog-resp-height" id="chooseDataModal">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
@@ -88,7 +88,8 @@
                                 <div class="item {{data.Type.toLowerCase()}}"
                                      ng-repeat="data in wrap.dataList"
                                      ng-class="{selected:isInSelected(data)}"
-                                     ng-click="dataInArray(data)">
+                                     ng-click="dataInArray(data)"
+                                        data-name="{{data.Provider+':'+data.Name}}">
                                     <div class="top">
                                         <span class="item-title title-modal">{{truncate(data.Name)}}</span>
                                         <span class="pull-right text-right item-list-style"
@@ -261,7 +262,8 @@
                     class="btn btn-default"
                     ng-click="close()"
                     translate="label.close">Close</button>
-            <button type="button"
+            <button id="chooseButton"
+                    type="button"
                     class="btn btn-add"
                     ng-click="choose()"
                     translate="data.modal.choose">Choose</button>

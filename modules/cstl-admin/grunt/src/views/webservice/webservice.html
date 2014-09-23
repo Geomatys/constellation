@@ -46,7 +46,7 @@
 
 
             <div class="row bg-white dash-inner" style="padding: 20px 15px;" id="list-services">
-                <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter">
+                <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter" data-name="{{service.name}}">
                     <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info service-name">{{service.name}} </h3></a>
                     <div class="well"
                          ng-class="{'started':service.status=='STARTED','stopped':service.status=='ERROR','not-started':service.status=='STOPPED'}"
@@ -62,16 +62,16 @@
                                     <i class="fa fa-refresh"></i>
                                 </a>
                                 <div style="margin-left: 15px;" class="dropdown pull-right">
-                                    <a data-toggle="dropdown" class="btn btn-sm btn-default dropdown-toggle">
+                                    <a data-toggle="dropdown" class="btn btn-sm btn-default dropdown-toggle" id="optionDropDown">
                                         <i class="fa fa-wrench"></i>
                                         <span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}" translate="service.menu.edit.label">Edit</a></li>
-                                        <li><a ng-click="showLogs(service)" translate="service.menu.log.label">View logs</a></li>
-                                        <li><a ng-click="showCapa(service)" ng-disabled="service.status!=='STARTED'" translate="service.menu.getcapabilities.label">GetCapabilities</a></li>
-                                        <li><a ng-click="deleteService(service)" translate="service.menu.delete.label">Delete</a></li>
-                                        <li ng-if="service.type.toLowerCase() === 'csw'"><a ng-click="refreshIndex(service)" translate="service.menu.refresh.label">Refresh</a></li>
+                                        <li><a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}" translate="service.menu.edit.label" id="editOption">Edit</a></li>
+                                        <li><a ng-click="showLogs(service)" translate="service.menu.log.label" id="logsOption">View logs</a></li>
+                                        <li><a ng-click="showCapa(service)" ng-disabled="service.status!=='STARTED'" translate="service.menu.getcapabilities.label" id="capabilitiesOption">GetCapabilities</a></li>
+                                        <li><a ng-click="deleteService(service)" translate="service.menu.delete.label" id="deleteOption">Delete</a></li>
+                                        <li ng-if="service.type.toLowerCase() === 'csw'"><a ng-click="refreshIndex(service)" translate="service.menu.refresh.label" id="refreshOption">Refresh</a></li>
                                     </ul>
                                 </div>
                                 <div class="pull-right service-published-data-nb" style="padding-top:2px;">
