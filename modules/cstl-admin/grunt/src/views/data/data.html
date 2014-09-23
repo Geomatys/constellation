@@ -326,8 +326,9 @@
                             <div class="item-list">
                                 <div class="item {{data.Type | lowercase}}"
                                      ng-repeat="data in wrap.dataList"
-                                     ng-class="{'selected':data.Id==selected.Id,'hide':(data.TargetService.length===0 && dataCtrl.published==true) || (data.TargetService.length>0 && dataCtrl.published==false) || (data.TargetSensor.length>0 && dataCtrl.observation==false) || (data.TargetSensor.length===0 && dataCtrl.observation==true),'col-xs-6':dataCtrl.smallMode}"
-                                     ng-click="select(data)">
+                                     ng-class="{'selected':selected && (data.Id==selected.Id),'hide':(data.TargetService.length===0 && dataCtrl.published==true) || (data.TargetService.length>0 && dataCtrl.published==false) || (data.TargetSensor.length>0 && dataCtrl.observation==false) || (data.TargetSensor.length===0 && dataCtrl.observation==true),'col-xs-6':dataCtrl.smallMode}"
+                                     ng-click="select(data)"
+                                     ng-cloak>
                                     <div class="top">
                                         <span class="item-title"
                                               title="{{getDisplayName(data.Provider,data.Name)}}">{{truncate(dataCtrl.smallMode,getDisplayName(data.Provider,data.Name))}}</span>

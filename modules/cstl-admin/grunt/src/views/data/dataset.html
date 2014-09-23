@@ -221,8 +221,9 @@
                              ng-class="{'col-xs-6':dataCtrl.smallMode}"
                              style="padding-left:0;">
                             <div class="item metadata"
-                                 ng-class="{'selected':dataset.id==selectedDS.id}"
-                                 ng-click="selectDS(dataset);selectDataSetChild(null);">
+                                 ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
+                                 ng-click="selectDS(dataset);selectDataSetChild(null);"
+                                 ng-cloak>
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{dataset.Name}}">{{truncate(dataCtrl.smallMode,dataset.Name)}}</span>
@@ -251,7 +252,8 @@
                                  ng-if="dataset.id==selectedDS.id"
                                  ng-repeat="relatedData in dataset.Children"
                                  ng-click="selectDataSetChild(relatedData)"
-                                 ng-class="{'selected':relatedData.Id==dataCtrl.selectedDataSetChild.Id,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':!dataCtrl.smallMode, 'col-xs-11':dataCtrl.smallMode, 'col-sm-offset-1':dataCtrl.smallMode}">
+                                 ng-cloak
+                                 ng-class="{'selected':dataCtrl.selectedDataSetChild && (relatedData.Id==dataCtrl.selectedDataSetChild.Id),'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':!dataCtrl.smallMode, 'col-xs-11':dataCtrl.smallMode, 'col-sm-offset-1':dataCtrl.smallMode}">
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{relatedData.Name}}">{{truncate(dataCtrl.smallMode,relatedData.Name)}}</span>

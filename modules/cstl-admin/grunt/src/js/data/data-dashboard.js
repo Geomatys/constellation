@@ -239,6 +239,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * main function of dashboard that loads the list of objects from server.
          */
         $scope.init = function() {
+            $scope.wrap.fullList = [];
             if($scope.dataCtrl.currentTab === 'tabdata'){
                 dataListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
