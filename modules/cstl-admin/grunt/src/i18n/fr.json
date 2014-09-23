@@ -688,6 +688,7 @@
     "metadata.edition.dataset.vector":"Données vecteur",
     "metadata.edition.dataset.raster":"Données raster",
     "metadata.edition.dataset.observation":"Données observation",
+    "metadata.edition.dataset.import":"Jeu de données",
     "metadata.edition.heading.save":"Enregistrer les modifications",
     "metadata.edition.heading.requiredFields":"(*) Champ obligatoire",
     "metadata.edition.heading.scrolltotop":"Retour en haut",
