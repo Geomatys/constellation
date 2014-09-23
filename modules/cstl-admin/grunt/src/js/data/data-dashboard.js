@@ -504,10 +504,10 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.displayMetadataEditor = function() {
             var type = 'import';
-            if($scope.selectedDS.Type){
-                type = $scope.selectedDS.Type.toLowerCase();
+            if($scope.selectedDS.Children && $scope.selectedDS.Children.length >0){
+                type = $scope.selectedDS.Children[0].Type.toLowerCase();
             }
-            if(type === 'coverage'){
+            if(type.toLowerCase() === 'coverage'){
                 type = 'raster';
             }
             var template = type;
