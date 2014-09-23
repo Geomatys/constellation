@@ -109,8 +109,10 @@ public class WebConfigurer implements ServletContextListener {
         compressingFilter.addMappingForUrlPatterns(disps, true, "*.json");
         compressingFilter.addMappingForUrlPatterns(disps, true, "*.html");
         compressingFilter.addMappingForUrlPatterns(disps, true, "*.js");
-        compressingFilter.addMappingForUrlPatterns(disps, true, "/app/rest/*");
-        compressingFilter.addMappingForUrlPatterns(disps, true, "/metrics/*");
+        compressingFilter.addMappingForUrlPatterns(disps, true, "*.svg");
+        //@TODO add gzip filter for cstl-services war and cstl-sdi
+        //compressingFilter.addMappingForUrlPatterns(disps, true, "/app/rest/*");
+        //compressingFilter.addMappingForUrlPatterns(disps, true, "/metrics/*");
 
         compressingFilter.setAsyncSupported(true);
     }
