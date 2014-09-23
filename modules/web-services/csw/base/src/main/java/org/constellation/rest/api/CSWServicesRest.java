@@ -52,10 +52,21 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import org.apache.sis.xml.XML;
+import org.constellation.jaxb.MarshallWarnings;
+import org.constellation.metadata.io.MetadataIoException;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.w3c.dom.Document;
 
 /**
  *
@@ -69,6 +80,8 @@ public class CSWServicesRest {
 
     @Autowired
     protected IServiceBusiness serviceBusiness;
+    
+    private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
 
     /**
      * Used for debugging purposes.
@@ -265,4 +278,31 @@ public class CSWServicesRest {
         }
     }
 
+    /**
+     * Convert geotk metadata string xml to w3c document.
+     *
+     * @param metadata the given metadata xml as string.
+     * 
+     * @return {@link Node} that represents the metadata in w3c document format.
+     * @throws MetadataIoException
+     */
+    protected Node getNodeFromGeotkMetadata(final Object metadata) throws MetadataIoException {
+        try {
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.newDocument();
+            final Marshaller marshaller = EBRIMMarshallerPool.getInstance().acquireMarshaller();
+            final MarshallWarnings warnings = new MarshallWarnings();
+            marshaller.setProperty(XML.CONVERTER, warnings);
+            marshaller.setProperty(XML.TIMEZONE, tz);
+            marshaller.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, true);
+            marshaller.setProperty(XML.GML_VERSION, LegacyNamespaces.VERSION_3_2_1);
+            marshaller.marshal(metadata, document);
+
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | JAXBException ex) {
+            throw new MetadataIoException(ex);
+        }
+    }
 }

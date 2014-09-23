@@ -68,6 +68,8 @@ import java.util.logging.Level;
  */
 public class CSWConfigurer extends OGCConfigurer {
 
+    protected final DocumentBuilderFactory dbf;
+    
     /**
      * A flag indicating if an indexation is going on.
      */
@@ -83,6 +85,8 @@ public class CSWConfigurer extends OGCConfigurer {
      */
     public CSWConfigurer() {
         indexing = false;
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
     }
 
     public AcknowlegementType refreshIndex(final String id, final boolean asynchrone, final boolean forced) throws ConfigurationException {
@@ -301,8 +305,6 @@ public class CSWConfigurer extends OGCConfigurer {
             }
             try {
 
-                final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                dbf.setNamespaceAware(true);
                 final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
                 for (File importedFile: files) {
                     if (importedFile != null) {
@@ -320,6 +322,23 @@ public class CSWConfigurer extends OGCConfigurer {
                 throw new ConfigurationException(ex);
             }
             return new AcknowlegementType("Error", "An error occurs during the process");
+        } finally {
+            if (indexer != null) {
+                indexer.destroy();
+            }
+        }
+    }
+    
+    public AcknowlegementType importRecord(final String id, final Node n) throws ConfigurationException {
+        LOGGER.info("Importing record");
+        final AbstractIndexer indexer = getIndexer(id, null);
+        try {
+            final MetadataWriter writer = getWriter(id, indexer);
+            writer.storeMetadata(n);
+            final String msg = "The specified record have been imported in the CSW";
+            return new AcknowlegementType("Success", msg);
+        } catch (MetadataIoException ex) {
+            throw new ConfigurationException(ex);
         } finally {
             if (indexer != null) {
                 indexer.destroy();
