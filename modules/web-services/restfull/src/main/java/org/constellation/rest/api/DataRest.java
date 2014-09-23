@@ -924,7 +924,7 @@ public class DataRest {
                 templateName = "profile_default_raster";
             }else {
                 //default template is import
-                templateName = "profile_default_raster";
+                templateName = "profile_import";
             }
             final Template template = Template.getInstance(templateName);
 
