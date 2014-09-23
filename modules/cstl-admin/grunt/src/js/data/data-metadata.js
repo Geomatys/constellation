@@ -115,18 +115,23 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          * @type {Array}
          */
         $scope.metadataValues = [];
-        dataListing.getDatasetMetadata({}, {values: {'providerId': $scope.provider,
-                'type':$scope.template,
-                'prune':false}},
-            function(response) {
-                if (response && response.root) {
-                    $scope.metadataValues.push({"root":response.root});
+
+        $scope.loadMetadataValues = $scope.loadMetadataValues || function(){
+            dataListing.getDatasetMetadata({}, {values: {'providerId': $scope.provider,
+                    'type':$scope.template,
+                    'prune':false}},
+                function(response) {
+                    if (response && response.root) {
+                        $scope.metadataValues.push({"root":response.root});
+                    }
+                },
+                function(response) {
+                    Growl('error','Error','The server returned an error!');
                 }
-            },
-            function(response) {
-                Growl('error','Error','The server returned an error!');
-            }
-        );
+            );
+        };
+
+        $scope.loadMetadataValues();
 
         $scope.isValidField = function(input){
             if(input){
@@ -447,7 +452,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
         /**
          * Save for metadata in modal editor mode.
          */
-        $scope.save2 = function() {
+        $scope.save2 = $scope.save2 || function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
                 //console.debug($scope.metadataValues[0]);
                 //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
