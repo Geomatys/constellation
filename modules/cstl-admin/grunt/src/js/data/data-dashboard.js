@@ -242,7 +242,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             if($scope.dataCtrl.currentTab === 'tabdata'){
                 dataListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
-                    $scope.wrap.filtertype = "";
+                    $scope.wrap.filtertype = undefined;
                     $scope.wrap.ordertype = "Name";
                     $scope.dataCtrl.searchTerm="";
                 }, function() {//error
@@ -251,7 +251,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
                 datasetListing.listAll({}, function(response){//success
                     Dashboard($scope, response, true);
-                    $scope.wrap.filtertype = "";
+                    $scope.wrap.filtertype = undefined;
                     $scope.wrap.ordertype = "Name";
 
                     if($scope.selected){//data is selected in data Dashboard
@@ -290,7 +290,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             if($scope.dataCtrl.currentTab === 'tabdata'){
                 dataListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
-                    $scope.wrap.filtertype = "";
+                    $scope.wrap.filtertype = undefined;
                     $scope.wrap.ordertype = "Name";
                     $scope.dataCtrl.searchTerm="";
                 }, function() {//error
@@ -299,7 +299,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
                 datasetListing.listAll({}, function(response){//success
                     Dashboard($scope, response, true);
-                    $scope.wrap.filtertype = "";
+                    $scope.wrap.filtertype = undefined;
                     $scope.wrap.ordertype = "Name";
                     $scope.dataCtrl.selectedDataSetChild = null;
                     $scope.selectedDS = null;
@@ -748,7 +748,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             if (service.type.toLowerCase() === 'wfs') {
                 return 'vector';
             }
-            return '';
+            return undefined;
         };
         $scope.wrap.nbbypage = 5;
         $scope.exclude = exclude;
