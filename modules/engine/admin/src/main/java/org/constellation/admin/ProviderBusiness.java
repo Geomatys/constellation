@@ -129,7 +129,6 @@ public class ProviderBusiness implements IProviderBusiness {
 
     @Override
     public void removeProvider(final String identifier) {
-        datasetRepository.removeForProvider(identifier);
         providerRepository.deleteByIdentifier(identifier);
     }
 
@@ -137,7 +136,6 @@ public class ProviderBusiness implements IProviderBusiness {
     public void removeAll() {
         final List<Provider> providers = providerRepository.findAll();
         for (Provider p : providers) {
-            datasetRepository.removeForProvider(p.getIdentifier());
             providerRepository.delete(p.getId());
         }
     }
@@ -265,7 +263,7 @@ public class ProviderBusiness implements IProviderBusiness {
         final int provId = provider.getId();
 
         // for now we assume provider == dataset, so we create a dataset bound to the new provider.
-        final Dataset dataset = datasetBusiness.createDataset(id, provId, null, null, provider.getOwner());
+        final Dataset dataset = datasetBusiness.createDataset(id, null, null, provider.getOwner());
         datasetBusiness.linkDataTodataset(dataset, getDatasFromProviderId(provId));
 
         LOGGER.info("Added " + count + " data to domain " + domainId);

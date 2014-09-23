@@ -137,9 +137,8 @@ public class DatasetBusiness implements IDatasetBusiness {
      * @return {@link Dataset}.
      */
     @Override
-    public Dataset createDataset(final String identifier, final int providerId,
-                                 final String metadataId, final String metadataXml, final Integer owner) {
-        final Dataset ds = new Dataset(identifier, providerId, metadataId, metadataXml, owner);
+    public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) {
+        final Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner);
         return datasetRepository.insert(ds);
     }
 

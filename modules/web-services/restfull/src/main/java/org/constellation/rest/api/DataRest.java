@@ -995,13 +995,12 @@ public class DataRest {
         String owner = null;
         if(optUser!=null && optUser.isPresent()){
             final CstlUser user = optUser.get();
-            if(user != null){
+            if (user != null) {
                 owner = user.getLogin();
             }
         }
-        final Provider provider = providerBusiness.getProvider(dataset.getProviderId());
         final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
-        final DataSetBrief dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), provider.getType(), owner, dataBriefList);
+        final DataSetBrief dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), null, owner, dataBriefList);
         try{
             final Node nodeMetadata = datasetBusiness.getMetadataNode(dataset.getIdentifier(),domainId);
             if(nodeMetadata!=null){

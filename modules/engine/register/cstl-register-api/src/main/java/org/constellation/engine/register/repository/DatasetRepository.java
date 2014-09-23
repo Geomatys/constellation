@@ -42,9 +42,5 @@ public interface DatasetRepository {
 
     Dataset findById(int datasetId);
     
-    List<Dataset> findByProviderIdentifier(String identifier);
-    
-    void removeForProvider(String providerIdentifier);
-    
     void remove(int id);
 }

@@ -43,9 +43,9 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     public Dataset insert(Dataset dataset) {
         DatasetRecord newRecord = dsl.newRecord(DATASET);
         newRecord.setIdentifier(dataset.getIdentifier());
-        newRecord.setProviderId(dataset.getProviderId());
         newRecord.setMetadataIso(dataset.getMetadataIso());
         newRecord.setMetadataId(dataset.getMetadataId());
+        newRecord.setOwner(dataset.getOwner());
         newRecord.store();
         return newRecord.into(Dataset.class);
     }
@@ -55,9 +55,9 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
         DatasetRecord datasetRecord = new DatasetRecord();
         datasetRecord.from(dataset);
         UpdateConditionStep<DatasetRecord> set = dsl.update(DATASET)
-                .set(DATASET.PROVIDER_ID, dataset.getProviderId())
                 .set(DATASET.IDENTIFIER, dataset.getIdentifier())
                 .set(DATASET.METADATA_ISO, dataset.getMetadataIso())
+                .set(DATASET.OWNER, dataset.getOwner())
                 .set(DATASET.METADATA_ID, dataset.getMetadataId())
                 .where(DATASET.ID.eq(dataset.getId()));
 
@@ -81,23 +81,10 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
     
     @Override
-    public List<Dataset> findByProviderIdentifier(String identifier) {
-        return dsl.select(DATASET.fields()).from(DATASET).join(PROVIDER).onKey().where(PROVIDER.IDENTIFIER.eq(identifier)).fetchInto(Dataset.class);
-    }
-    
-    @Override
     public Dataset findByIdentifierAndDomainId(String datasetIdentifier, Integer domainId) {
         // @FIXME binding domainId
         return dsl.select().from(DATASET).where(DATASET.IDENTIFIER.eq(datasetIdentifier)).fetchOneInto(Dataset.class);
 
-    }
-
-    @Override
-    public void removeForProvider(String providerIdentifier) {
-        final List<Dataset> sets = findByProviderIdentifier(providerIdentifier);
-        for (Dataset d : sets) {
-            remove(d.getId());
-        }
     }
 
     @Override

@@ -32,9 +32,9 @@ import java.util.List;
  * @author Cédric Briançon (Geomatys)
  */
 public interface IDatasetBusiness {
-    Dataset createDataset(String identifier, int providerId, String metadataId, String metadataXml, Integer owner);
+    Dataset createDataset(String identifier, String metadataId, String metadataXml, Integer owner);
 
-    Dataset getDataset(String providerId, int domainId);
+    Dataset getDataset(String datasetId, int domainId);
 
     void updateMetadata(final String datasetIdentifier, final Integer domainId,
                         final DefaultMetadata metadata) throws ConfigurationException;
