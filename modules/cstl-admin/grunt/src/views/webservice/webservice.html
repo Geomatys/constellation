@@ -48,7 +48,11 @@
             <div class="row bg-white dash-inner" style="padding: 20px 15px;" id="list-services">
                 <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter">
                     <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info service-name">{{service.name}} </h3></a>
-                    <div class="well" style="padding-bottom: 0;" ng-class="{'started':service.status=='STARTED','stopped':service.status=='ERROR','not-started':service.status=='STOPPED', 'serviceTypeCSW':service.type=='csw', 'serviceTypeWMS':service.type=='wms', 'serviceTypeWMTS':service.type=='wmts', 'serviceTypeSOS':service.type=='sos', 'serviceTypeWPS':service.type=='wps', 'serviceTypeWFS':service.type=='wfs', 'serviceTypeWCS':service.type=='wcs'}" data-state="wms-test">
+                    <div class="well"
+                         ng-class="{'started':service.status=='STARTED','stopped':service.status=='ERROR','not-started':service.status=='STOPPED'}"
+                         style="padding-bottom: 0; background-color:#f5f5f5;"
+                         data-state="wms-test">
+                        <div ng-class="{'serviceTypeCSW':service.type=='csw', 'serviceTypeWMS':service.type=='wms', 'serviceTypeWMTS':service.type=='wmts', 'serviceTypeSOS':service.type=='sos', 'serviceTypeWPS':service.type=='wps', 'serviceTypeWFS':service.type=='wfs', 'serviceTypeWCS':service.type=='wcs'}"></div>
                         <div class="row service-button">
                             <div class="pull-right col-xs-12">
                                 <a style="margin-left: 5px;" class="btn btn-sm btn-default pull-right" ng-class="{'started':service.status=='STARTED','stopped':service.status!='STARTED'}" ng-click="startOrStop(service)">
@@ -75,7 +79,6 @@
                                     <p tooltip-html-unsafe="{{'service.data.label.sos' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()==='sos'" ><span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{getLayersCount(service)}}</p>
                                 </div>
                             </div>
-
                         </div>
                         <div class="row" style="height: 120px;">
                             <div class="col-sm-12">
