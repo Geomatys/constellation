@@ -24,6 +24,7 @@ import java.util.List;
  * @author Cédric Briançon (Geomatys)
  */
 public interface IMetadataBusiness {
+    
     String searchMetadata(final String metadataId, final boolean includeService);
 
     boolean existInternalMetadata(final String metadataID, final boolean includeService);
@@ -31,4 +32,6 @@ public interface IMetadataBusiness {
     List<String> getInternalMetadataIds(final boolean includeService);
 
     List<String> getAllMetadata(final boolean includeService);
+    
+    boolean updateMetadata(final String metadataId, final String xml);
 }

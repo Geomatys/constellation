@@ -66,6 +66,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * @param includeService flag that indicates if service repository will be requested.
      * @return String representation of metadata in xml.
      */
+    @Override
     public String searchMetadata(final String metadataId, final boolean includeService)  {
         final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
         if (dataset != null) {
@@ -83,6 +84,29 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
+    
+    @Override
+    public boolean updateMetadata(final String metadataId, final String xml)  {
+        final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
+        if (dataset != null) {
+            dataset.setMetadataIso(xml);
+            datasetRepository.update(dataset);
+            return true;
+        }
+        final Data data = dataRepository.findByMetadataId(metadataId);
+        if (data != null) {
+            data.setMetadata(xml);
+            dataRepository.update(data);
+            return true;
+        }
+        final Service service = serviceRepository.findByMetadataId(metadataId);
+        if (service != null) {
+            service.setMetadataIso(xml);
+            serviceRepository.update(service);
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Returns {@code true} if the xml metadata exists for given metadata identifier.
@@ -91,6 +115,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * @param includeService flag that indicates if service repository will be requested.
      * @return boolean to indicates if metadata is present or not.
      */
+    @Override
     public boolean existInternalMetadata(final String metadataID, final boolean includeService) {
         return searchMetadata(metadataID, includeService) != null;
     }
@@ -101,6 +126,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * @param includeService flag that indicates if service repository will be requested.
      * @return List of string identifiers.
      */
+    @Override
     public List<String> getInternalMetadataIds(final boolean includeService) {
         final List<String> results = new ArrayList<>();
         final List<Dataset> datasets = datasetRepository.findAll();
@@ -132,6 +158,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * @param includeService given flag to include service's metadata
      * @return List of all metadata as string xml stored in database.
      */
+    @Override
     public List<String> getAllMetadata(final boolean includeService) {
         final List<String> results = new ArrayList<>();
         final List<String> allIdentifiers = getInternalMetadataIds(includeService);

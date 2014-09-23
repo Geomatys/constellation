@@ -48,6 +48,7 @@ import java.util.Map;
 import static org.constellation.generic.database.Automatic.BYID;
 import static org.constellation.generic.database.Automatic.DEFAULT;
 import static org.constellation.generic.database.Automatic.FILESYSTEM;
+import org.constellation.metadata.io.internal.InternalMetadataWriter;
 
 // J2SE dependencies
 // Constellation dependencies
@@ -87,7 +88,7 @@ public class InternalCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException {
-        return null;
+        return new InternalMetadataWriter(configuration, indexer, serviceID);
     }
     
     /**
