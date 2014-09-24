@@ -26,6 +26,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
+        $scope.wrap.matchExactly = true;
 
         $scope.dataCtrl = {
             cstlUrl : $cookies.cstlUrl,
@@ -131,6 +132,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * the result is stored with Dashboard service.
          */
         $scope.callSearch = function(){
+            $scope.wrap.filtertext='';
             if ($scope.dataCtrl.searchTerm){
                 dataListing.findData({values: {'search': $scope.dataCtrl.searchTerm}},
                     function(response) {
@@ -184,6 +186,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * the result is stored with Dashboard service.
          */
         $scope.callSearchMDForTerm = function(term){
+            $scope.wrap.filtertext='';
             if (term){
                 datasetListing.findDataset({values: {'search': term}},
                     function(response) {//success
@@ -240,21 +243,21 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.init = function() {
             $scope.wrap.fullList = [];
+            $scope.wrap.filtertext='';
+            $scope.wrap.filtertype = undefined;
             if($scope.dataCtrl.currentTab === 'tabdata'){
+                $scope.dataCtrl.searchTerm="";
                 dataListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
-                    $scope.wrap.filtertype = undefined;
                     $scope.wrap.ordertype = "Name";
-                    $scope.dataCtrl.searchTerm="";
                 }, function() {//error
                     Growl('error','Error','Unable to load list of data!');
                 });
             }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
+                $scope.dataCtrl.searchMetadataTerm="";
                 datasetListing.listAll({}, function(response){//success
                     Dashboard($scope, response, true);
-                    $scope.wrap.filtertype = undefined;
                     $scope.wrap.ordertype = "Name";
-
                     if($scope.selected){//data is selected in data Dashboard
                         //then we need to highlight the metadata associated in MD dashboard
                         $scope.dataCtrl.selectedDataSetChild = $scope.selected;
@@ -266,13 +269,12 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                                 break;
                             }
                         }
-                        $scope.callSearchMDForTerm(term);
+                        $scope.wrap.filtertext = term;
                     }else {
                         //otherwise reset selection
                         $scope.dataCtrl.selectedDataSetChild = null;
                         $scope.selectedDS = null;
                     }
-
                 }, function(response){//error
                     Growl('error','Error','Unable to load list of dataset!');
                 });
@@ -288,22 +290,24 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * Reset filters for dashboard
          */
         $scope.resetFilters = function(){
+            $scope.wrap.filtertext='';
+            $scope.wrap.filtertype = undefined;
             if($scope.dataCtrl.currentTab === 'tabdata'){
+                $scope.dataCtrl.searchTerm="";
+                $scope.selected=null;
                 dataListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
-                    $scope.wrap.filtertype = undefined;
                     $scope.wrap.ordertype = "Name";
-                    $scope.dataCtrl.searchTerm="";
                 }, function() {//error
                     Growl('error','Error','Unable to load list of data!');
                 });
             }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
+                $scope.dataCtrl.searchMetadataTerm="";
+                $scope.dataCtrl.selectedDataSetChild = null;
+                $scope.selectedDS = null;
                 datasetListing.listAll({}, function(response){//success
                     Dashboard($scope, response, true);
-                    $scope.wrap.filtertype = undefined;
                     $scope.wrap.ordertype = "Name";
-                    $scope.dataCtrl.selectedDataSetChild = null;
-                    $scope.selectedDS = null;
                 }, function(response){//error
                     Growl('error','Error','Unable to load list of dataset!');
                 });

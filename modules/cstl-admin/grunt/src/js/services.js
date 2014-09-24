@@ -280,6 +280,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             scope.service = scope.service || null;
             scope.wrap.fullList = fullList || [];
             scope.wrap.dataList = scope.wrap.dataList || [];
+            scope.wrap.matchExactly = scope.wrap.matchExactly || false;
             scope.wrap.filtertext = scope.wrap.filtertext || "";
             scope.wrap.filtertype = scope.wrap.filtertype || undefined;
             scope.wrap.ordertype = scope.wrap.ordertype || (scope.service && scope.service.type && scope.service.type.toLowerCase()==='sos') ? "id" : (scope.service && scope.service.type && scope.service.type.toLowerCase==='csw') ? "title" : "Name";
@@ -295,7 +296,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             scope.displayPage = function(page) {
                 var array;
                 if (filterOnType) {
-                    array = $filter('filter')(scope.wrap.fullList, {'Type':scope.wrap.filtertype, '$': scope.wrap.filtertext});
+                    array = $filter('filter')(scope.wrap.fullList, {'Type':scope.wrap.filtertype, '$': scope.wrap.filtertext},scope.wrap.matchExactly);
                 } else {
                     array = $filter('filter')(scope.wrap.fullList, {'$': scope.wrap.filtertext});
                 }
