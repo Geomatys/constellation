@@ -22,9 +22,11 @@ package org.constellation.rest.api;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.DefaultInternationalString;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.StyleBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
 import org.constellation.json.binding.InterpolationPoint;
@@ -83,6 +85,7 @@ import javax.xml.namespace.QName;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
@@ -104,6 +107,11 @@ public final class StyleRest {
     
     @Inject
     private IStyleBusiness styleBusiness;
+
+    /**
+     * Used for debugging purposes.
+     */
+    private static final Logger LOGGER = Logging.getLogger(StyleRest.class);
 
     /**
      * @FIXME remove this cache used for demo and add more generic cache management (Spring).
@@ -569,7 +577,11 @@ public final class StyleRest {
     @DELETE
     @Path("{id}/style/{styleId}")
     public Response deleteStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
-        styleBusiness.deleteStyle(id, styleId);
+        try{
+            styleBusiness.deleteStyle(id, styleId);
+        }catch(TargetNotFoundException ex){
+            LOGGER.info("Trying to delete nonexistent style "+styleId+". So it is ok.");
+        }
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully removed from provider with id \"" + id + "\"."));
     }
 

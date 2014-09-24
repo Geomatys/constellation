@@ -64,6 +64,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         function initOptionsSLD(){
             $scope.optionsSLD={
+                userStyleName:'default-sld',
+                temporaryStyleName:'',
                 enabledVectorChart:false,
                 enabledRasterChart:false,
                 autoPreview:true,
@@ -290,7 +292,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         function initSldPage() {
             //if we are in data dashboard
             if($scope.selectedLayer) {
-                $scope.sldName = $scope.selectedLayer.Name + '-sld';
+                var timestamp=new Date().getTime();
+                $scope.sldName = $scope.selectedLayer.Name + '-sld' + timestamp;
+                $scope.optionsSLD.userStyleName = $scope.selectedLayer.Name + '-sld';
+                $scope.optionsSLD.temporaryStyleName = $scope.sldName;
 
                 var layerName;
                 if ($scope.selectedLayer.Namespace) {
@@ -1885,10 +1890,14 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
 
 
         $scope.ok = function() {
+            //delete temporary style
+            style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
             $modalInstance.close($scope.selected);
         };
 
         $scope.close = function() {
+            //delete temporary style
+            style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
             $modalInstance.dismiss('close');
         };
 
@@ -1903,15 +1912,18 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 Growl('error', 'Error', 'Unable to update style ' + $scope.newStyle.name);
                 $modalInstance.close();
             });
+            //delete temporary style
+            style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
         };
 
         /**
          * Creates a new instance of style in server side by calling rest service.
          */
         $scope.createStyle = function() {
-            if ($scope.newStyle.name === "") {
+            if ($scope.optionsSLD.userStyleName === "") {
                 $scope.noName = true;
             } else {
+                $scope.newStyle.name = $scope.optionsSLD.userStyleName;
                 //write style in server side.
                 style.createjson({provider: 'sld'}, $scope.newStyle, function(response) {
                     Growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully created');
@@ -1920,6 +1932,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     Growl('error', 'Error', 'Unable to create style ' + $scope.newStyle.name);
                     $modalInstance.close();
                 });
+                //delete temporary style
+                style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
             }
         };
 
@@ -1956,7 +1970,9 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 });
             }else {
                 if ($scope.newStyle.name === "") {
-                    $scope.newStyle.name = 'default-sld';
+                    var timestamp=new Date().getTime();
+                    $scope.newStyle.name = 'default-sld-'+timestamp;
+                    $scope.optionsSLD.temporaryStyleName = $scope.newStyle.name;
                 }
 
                 //creates the current style in a temporary provider.
