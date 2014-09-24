@@ -18,9 +18,14 @@
  */
 package org.constellation.json.metadata;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.JAXBException;
 import org.geotoolkit.sml.xml.v101.*;
+import org.apache.sis.xml.MarshallerPool;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -76,5 +81,22 @@ public final strictfp class SensorTest {
         final SensorML metadata = new SensorML();
         Template.getInstance("profile_sensorml_system").read(readAllLines("sensor_prune.json"), metadata, true);
         assertEquals(expected, metadata);
+    }
+
+    /**
+     * Tests with a larger SensorML.
+     *
+     * @throws JAXBException if an error occurred while reading the XML file.
+     * @throws IOException if an error occurred while writing the test JSON file.
+     */
+    @Test
+    public void testFromXML() throws JAXBException, IOException {
+        final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance("org.geotoolkit.sml.xml.v101"), null);
+        final Unmarshaller m = pool.acquireUnmarshaller();
+        final Object metadata = m.unmarshal(SensorTest.class.getResource("sensorML.xml"));
+        pool.recycle(m);
+        final StringBuilder buffer = new StringBuilder(10000);
+        Template.getInstance("profile_sensorml_system").write(metadata, buffer, true);
+        // Current test just ensure that we didn't got any exception.
     }
 }

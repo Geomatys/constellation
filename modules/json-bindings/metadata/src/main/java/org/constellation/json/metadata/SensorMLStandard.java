@@ -41,7 +41,7 @@ final class SensorMLStandard extends MetadataStandard {
     static final MetadataStandard SYSTEM, COMPONENT;
     static {
         final MetadataStandard swe = new SensorMLStandard("SWE", // A dependency of SensorML.
-                org.geotoolkit.sml.xml.AbstractPosition.class.getPackage(), false);
+                org.geotoolkit.swe.xml.Position.class.getPackage(), false);
         final Package pck = AbstractSensorML.class.getPackage();
         SYSTEM    = new SensorMLStandard("System SML",    pck, true,  swe);
         COMPONENT = new SensorMLStandard("Component SML", pck, false, swe);
