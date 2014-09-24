@@ -32,6 +32,7 @@ import java.util.List;
  * @author Cédric Briançon (Geomatys)
  */
 public interface IDatasetBusiness {
+    
     Dataset createDataset(String identifier, String metadataId, String metadataXml, Integer owner);
 
     Dataset getDataset(String datasetId, int domainId);
@@ -41,7 +42,7 @@ public interface IDatasetBusiness {
 
     DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException;
 
-    Dataset getDataset(String providerId);
+    Dataset getDataset(String datasetId);
 
     List<Dataset> getAllDataset();
 
@@ -50,4 +51,7 @@ public interface IDatasetBusiness {
     void linkDataTodataset(Dataset dataset, List<Data> datasFromProviderId);
 
     List<Dataset> searchOnMetadata(String search) throws IOException, ConstellationException;
+    
+    void addProviderDataToDataset(final String datasetId, final String providerId) throws ConfigurationException;
+    
 }

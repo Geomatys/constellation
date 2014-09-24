@@ -41,8 +41,10 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
+import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.context.annotation.Primary;
@@ -81,6 +83,11 @@ public class DatasetBusiness implements IDatasetBusiness {
      */
     @Inject
     private DataRepository dataRepository;
+    /**
+     * Injected provider repository.
+     */
+    @Inject
+    private ProviderRepository providerRepository;
     /**
      * Injected lucene index engine.
      */
@@ -300,5 +307,24 @@ public class DatasetBusiness implements IDatasetBusiness {
             }
         }
         return result;
+    }
+
+    @Override
+    public void addProviderDataToDataset(final String datasetId, final String providerId) throws ConfigurationException {
+        final Dataset ds = datasetRepository.findByIdentifier(datasetId);
+        if (ds != null) {
+            final Provider p = providerRepository.findByIdentifier(providerId);
+            if (p != null) {
+                final List<Data> datas = dataRepository.findByProviderId(p.getId());
+                for (Data data : datas) {
+                    data.setDatasetId(ds.getId());
+                    dataRepository.update(data);
+                }
+            } else {
+                throw new TargetNotFoundException("Unable to find a profile: " + providerId);
+            }
+        } else {
+            throw new TargetNotFoundException("Unable to find a dataset: " + datasetId);
+        }
     }
 }

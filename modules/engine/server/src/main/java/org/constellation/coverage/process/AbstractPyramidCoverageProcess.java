@@ -32,6 +32,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import org.constellation.business.IDatasetBusiness;
 
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
@@ -40,8 +41,12 @@ import static org.geotoolkit.parameter.Parameters.value;
  * @author Quentin Boileau (Geomatys)
  */
 public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess {
+    
     @Autowired
     private DomainRepository domainRepository;
+    
+    @Autowired
+    private IDatasetBusiness datasetBusiness;
 
     private static final String TILE_FORMAT = "PNG";
     protected static final int TILE_SIZE = 256;
@@ -165,7 +170,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         return scales;
     }
 
-    protected DataProvider createProvider(String providerID, CoverageStore store, Integer domainId) throws ProcessException {
+    protected DataProvider createProvider(String providerID, CoverageStore store, Integer domainId, final String datasetName) throws ProcessException {
         final DataProvider outProvider;
         try {
             //get store configuration
@@ -189,6 +194,13 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             if (domainId != null) {
                 int count = domainRepository.addProviderDataToDomain(providerID, domainId);
                 LOGGER.info("Added " + count + " data to domain " + domainId);
+            }
+            
+            if (datasetName != null) {
+                if (datasetBusiness.getDataset(datasetName) == null) {
+                    datasetBusiness.createDataset(datasetName, null, null, null);
+                }
+                datasetBusiness.addProviderDataToDataset(datasetName, providerID);
             }
 
         } catch (Exception ex) {

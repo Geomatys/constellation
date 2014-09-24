@@ -175,7 +175,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
 
         //finally create provider from store configuration
         if (provider == null) {
-            provider = createProvider(providerID, outputCoverageStore, domainId);
+            provider = createProvider(providerID, outputCoverageStore, domainId, coverageBaseName);
         }
 
         getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(provider.getSource());
