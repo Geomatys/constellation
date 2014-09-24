@@ -108,7 +108,7 @@ public final class StyleRest {
     /**
      * @FIXME remove this cache used for demo and add more generic cache management (Spring).
      */
-    private final static Map<String,ParameterValueGroup> CACHE_HISTOGRAM = new HashMap<>();
+    private final static Map<String,ImageStatistics> CACHE_HISTOGRAM = new HashMap<>();
 
     /**
      * @see StyleBusiness#createStyle(String, MutableStyle)
@@ -735,10 +735,9 @@ public final class StyleRest {
    public Response getHistogram(final ParameterValues values) throws NoSuchIdentifierException, ProcessException, DataStoreException {
        final String id = values.get("dataProvider");
        final String dataId = values.get("dataId");
-       final ParameterValueGroup pvg = CACHE_HISTOGRAM.get(id+"_"+dataId);
-       if(pvg != null){
-           final ImageStatistics statistics = (ImageStatistics) pvg.parameter("outStatistic").getValue();
-           return ok(statistics);
+       final ImageStatistics cached = CACHE_HISTOGRAM.get(id+"_"+dataId);
+       if(cached != null){
+           return ok(cached);
        }
        final DataProvider provider = DataProviders.getInstance().getProvider(id);
        final DataStore store = provider.getMainStore();
@@ -757,8 +756,37 @@ public final class StyleRest {
            procparams.parameter("inCoverage").setValue(coverage);
            final org.geotoolkit.process.Process process = desc.createProcess(procparams);
            final ParameterValueGroup result = process.call();
-           CACHE_HISTOGRAM.put(id+"_"+dataId,result);
+
+           //sampling for repartition
            final ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
+           for(final ImageStatistics.Band band : statistics.getBands()){
+               if(band.getRepartition() instanceof TreeMap){
+                   final TreeMap<Double,Long> repartition = (TreeMap)band.getRepartition();
+                   TreeMap<Double,Long> newRepartition = new TreeMap<>();
+                   if(repartition.size()>1000){
+                       int step=0;
+                       long valSum = 0;
+                       Double middleKey=0d;
+                       for(final Map.Entry<Double,Long> entry : repartition.entrySet()){
+                           step++;
+                           if(step==20){
+                               middleKey = entry.getKey();
+                           }
+                           if(step >39){
+                               newRepartition.put(middleKey,valSum);
+                               step=0;
+                               middleKey=0d;
+                               valSum = 0;
+                           }else {
+                               valSum+=entry.getValue();
+                           }
+                       }
+                       band.setRepartition(newRepartition);
+                   }
+               }
+           }
+
+           CACHE_HISTOGRAM.put(id+"_"+dataId,statistics);
            return ok(statistics);
        }
        return ok(new AcknowlegementType("Failure", "datastore is not coverage store."));
