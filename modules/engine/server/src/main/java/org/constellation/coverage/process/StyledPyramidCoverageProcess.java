@@ -86,12 +86,12 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
      * @param domainId
      */
     public StyledPyramidCoverageProcess (final File pyramidFolder, final String providerID, final String imageFilePath, final String imageFileFormat,
-                                         final String coverageBaseName, final StyleReference styleRef, final Integer domainId) {
-        this(StyledPyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, imageFileFormat, coverageBaseName, styleRef, domainId));
+                                         final String coverageBaseName, final StyleReference styleRef, final Integer domainId, final String dataset) {
+        this(StyledPyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, imageFileFormat, coverageBaseName, styleRef, domainId, dataset));
     }
 
     private static ParameterValueGroup toParameters(final File pyramidFolder, final String providerID, final String imageFilePath, final String imageFileFormat,
-                                                    final String coverageBaseName, final StyleReference styleRef, final Integer domainId){
+                                                    final String coverageBaseName, final StyleReference styleRef, final Integer domainId, final String dataset){
         final ParameterValueGroup params = StyledPyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
         getOrCreate(StyledPyramidCoverageDescriptor.PROVIDER_OUT_ID, params).setValue(providerID);
         getOrCreate(StyledPyramidCoverageDescriptor.IMAGE_FILE_PATH, params).setValue(imageFilePath);
@@ -100,6 +100,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         getOrCreate(StyledPyramidCoverageDescriptor.PYRAMID_FOLDER, params).setValue(pyramidFolder);
         getOrCreate(StyledPyramidCoverageDescriptor.STYLE, params).setValue(styleRef);
         getOrCreate(StyledPyramidCoverageDescriptor.DOMAIN_ID, params).setValue(domainId);
+        getOrCreate(StyledPyramidCoverageDescriptor.DATASET_ID, params).setValue(dataset);
         return params;
     }
 
@@ -112,6 +113,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         final File pyramidFolder      = value(PYRAMID_FOLDER, inputParameters);
         final String coverageBaseName = value(COVERAGE_BASE_NAME, inputParameters);
         final Integer domainId        = value(DOMAIN_ID, inputParameters);
+        final String datasetName      = value(DATASET_ID, inputParameters);
 
         DataProvider provider = DataProviders.getInstance().getProvider(providerID);
         CoverageStore outputCoverageStore = null;
@@ -198,7 +200,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
 
         //finally create provider from store configuration
         if (provider == null) {
-            provider = createProvider(providerID, outputCoverageStore, domainId, coverageBaseName);
+            provider = createProvider(providerID, outputCoverageStore, domainId, datasetName);
         }
 
         getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(provider.getSource());

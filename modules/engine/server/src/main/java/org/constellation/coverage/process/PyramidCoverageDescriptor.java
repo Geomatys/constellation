@@ -61,9 +61,14 @@ public class PyramidCoverageDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptor<>(PYRAMID_FOLDER_NAME, PYRAMID_FOLDER_REMARKS, File.class, null, true);
 
     public static final String PROVIDER_OUT_ID_NAME = "output provider id";
-    private static final String PROVIDER_OUT_ID_REMARKS = "the  name of the output provider id.";
+    private static final String PROVIDER_OUT_ID_REMARKS = "The identifier of the output provider.";
     public static final ParameterDescriptor<String> PROVIDER_OUT_ID =
             new DefaultParameterDescriptor<>(PROVIDER_OUT_ID_NAME, PROVIDER_OUT_ID_REMARKS, String.class, null, true);
+    
+    public static final String DATASET_ID_NAME = "dataset_id";
+    private static final String DATASET_ID_REMARKS = "the name of the dataset where to add the datas.";
+    public static final ParameterDescriptor<String> DATASET_ID =
+            new DefaultParameterDescriptor<>(DATASET_ID_NAME, DATASET_ID_REMARKS, String.class, null, false);
 
     public static final String DOMAIN_ID_NAME = "domain-id";
     private static final String DOMAIN_ID_REMARKS = "Identifier of the domain to add data.";
@@ -72,7 +77,7 @@ public class PyramidCoverageDescriptor extends AbstractProcessDescriptor {
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{COVERAGE_BASE_NAME, IMAGE_FILE_PATH, IMAGE_FILE_FORMAT, PYRAMID_FOLDER, PROVIDER_OUT_ID, DOMAIN_ID});
+            new GeneralParameterDescriptor[]{COVERAGE_BASE_NAME, IMAGE_FILE_PATH, IMAGE_FILE_FORMAT, PYRAMID_FOLDER, PROVIDER_OUT_ID, DOMAIN_ID, DATASET_ID});
 
     
     public static final String PROVIDER_SOURCE_NAME = "provider_source";

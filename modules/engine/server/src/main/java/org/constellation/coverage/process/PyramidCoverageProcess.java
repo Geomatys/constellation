@@ -70,12 +70,12 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
      * @param domainId
      */
     public PyramidCoverageProcess (final File pyramidFolder, final String providerID, final String imageFilePath,
-                                   final String imageFileFormat, final String coverageBaseName, final Integer domainId) {
-        this(PyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, imageFileFormat, coverageBaseName, domainId));
+                                   final String imageFileFormat, final String coverageBaseName, final Integer domainId, final String dataset) {
+        this(PyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, imageFileFormat, coverageBaseName, domainId, dataset));
     }
 
     private static ParameterValueGroup toParameters(final File pyramidFolder, final String providerID, final String imageFilePath,
-                                                    final String imageFileFormat, final String coverageBaseName, final Integer domainId){
+                                                    final String imageFileFormat, final String coverageBaseName, final Integer domainId, final String dataset){
         final ParameterValueGroup params = PyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
         getOrCreate(PROVIDER_OUT_ID, params).setValue(providerID);
         getOrCreate(IMAGE_FILE_PATH, params).setValue(imageFilePath);
@@ -83,6 +83,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         getOrCreate(COVERAGE_BASE_NAME, params).setValue(coverageBaseName);
         getOrCreate(PYRAMID_FOLDER, params).setValue(pyramidFolder);
         getOrCreate(DOMAIN_ID, params).setValue(domainId);
+        getOrCreate(DATASET_ID, params).setValue(dataset);
         return params;
     }
 
@@ -94,6 +95,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         final String coverageBaseName = value(COVERAGE_BASE_NAME, inputParameters);
         final File pyramidFolder      = value(PYRAMID_FOLDER, inputParameters);
         final Integer domainId        = value(DOMAIN_ID, inputParameters);
+        final String datasetName      = value(DATASET_ID, inputParameters);
 
         DataProvider provider = DataProviders.getInstance().getProvider(providerID);
         CoverageStore outputCoverageStore = null;
@@ -175,7 +177,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
 
         //finally create provider from store configuration
         if (provider == null) {
-            provider = createProvider(providerID, outputCoverageStore, domainId, coverageBaseName);
+            provider = createProvider(providerID, outputCoverageStore, domainId, datasetName);
         }
 
         getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(provider.getSource());
