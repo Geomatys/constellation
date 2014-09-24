@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.9" author="Christophe">
+        <addColumn schemaName="admin" tableName="task_parameter">
+            <column name="trigger" type="CLOB(2147483647)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addUniqueConstraint columnNames="name, provider"
+                             constraintName="STYLE_NAME_PROVIDER_UQ" deferrable="false" disabled="false"
+                             initiallyDeferred="false" schemaName="admin" tableName="style" />
+    </changeSet>
+</databaseChangeLog>
