@@ -451,7 +451,6 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         $scope.setStyleChooser = function(choice) {
             $scope.stylechooser = choice;
             if(choice ==='existing'){
-                console.debug('22222222');
                 setTimeout(function(){$scope.displayCurrentStyle('styledMapWithSelectedStyle',null);},100);
             }else {
                 setTimeout(function(){$scope.displayCurrentStyle('styledMapOL',null);},100);
