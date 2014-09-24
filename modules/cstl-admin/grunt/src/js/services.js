@@ -296,7 +296,11 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             scope.displayPage = function(page) {
                 var array;
                 if (filterOnType) {
-                    array = $filter('filter')(scope.wrap.fullList, {'Type':scope.wrap.filtertype, '$': scope.wrap.filtertext},scope.wrap.matchExactly);
+                    var match = false;
+                    if(scope.wrap.filtertext){
+                        match=scope.wrap.matchExactly;
+                    }
+                    array = $filter('filter')(scope.wrap.fullList, {'Type':scope.wrap.filtertype, '$': scope.wrap.filtertext},match);
                 } else {
                     array = $filter('filter')(scope.wrap.fullList, {'$': scope.wrap.filtertext});
                 }
