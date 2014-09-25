@@ -23,7 +23,7 @@
 								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":"uniqueID",
-								"value":"My identifier"
+								"value":"uniqueID"
 							}
 						},{
 							"field":{
@@ -33,6 +33,37 @@
 								"path":"member[1].realProcess.identification[1].identifierList.identifier[1].term.value",
 								"render":"text",
 								"obligation":"M",
+								"defaultValue":null,
+								"value":"My unique ID"
+							}
+						}
+					]}
+				},{
+					"block":{
+						"name":"system.block.identification.identifier",
+						"multiplicity":62,
+						"help":"system.block.identification.identifier_help",
+						"path":"member[1].realProcess.identification[1].identifierList.identifier[2]",
+						"ignore":"1 0 1 0 1",
+						"children":[{
+							"field":{
+								"name":"system.field.identifier.name",
+								"multiplicity":1,
+								"help":"system.field.identifier.name_help",
+								"path":"member[1].realProcess.identification[1].identifierList.identifier[2].name",
+								"render":"text",
+								"obligation":"O",
+								"defaultValue":null,
+								"value":"My identifier"
+							}
+						},{
+							"field":{
+								"name":"system.field.identifier.value",
+								"multiplicity":1,
+								"help":"system.field.identifier.value_help",
+								"path":"member[1].realProcess.identification[1].identifierList.identifier[2].term.value",
+								"render":"text",
+								"obligation":"O",
 								"defaultValue":null,
 								"value":"My identifier term"
 							}

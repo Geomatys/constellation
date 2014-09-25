@@ -28,6 +28,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.constellation.json.metadata.TemplateTest.readAllLines;
 import static org.constellation.json.metadata.TemplateTest.assertJsonEquals;
@@ -46,13 +47,14 @@ public final strictfp class SensorTest {
         final SystemType process = new SystemType();
         process.setIdentification(singletonList(
             new Identification(
-                new IdentifierList(null, singletonList(
-                    new Identifier("My identifier",                     // member.process.identification.identifierList.identifier.name
-                    new Term("My identifier term", (URI) null)))))));   // member.process.identification.identifierList.identifier.term.value
+                new IdentifierList(null, asList(
+                    new Identifier("uniqueID",              // member.process.identification.identifierList.identifier.name
+                    new Term("My unique ID", (URI) null)),  // member.process.identification.identifierList.identifier.term.value
+                    new Identifier("My identifier",
+                    new Term("My identifier term", (URI) null)))))));
 
         final SensorML sensor = new SensorML();
         sensor.getMember().add(new SensorML.Member(process));
-
         return sensor;
     }
 
