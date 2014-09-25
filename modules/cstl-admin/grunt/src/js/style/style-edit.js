@@ -1888,16 +1888,27 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
             rule.symbolizers[0].colorMap = colorMap;
         };
 
+        /**
+         * Delete temporary style created with sld_temp provider.
+         */
+        $scope.deleteTempStyle = function(){
+            if($scope.optionsSLD.temporaryStyleName){
+                style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
+            }else if($scope.newStyle.name){
+                style.delete({provider: 'sld_temp', name: $scope.newStyle.name});
+            }
+        };
+
 
         $scope.ok = function() {
             //delete temporary style
-            style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
+            $scope.deleteTempStyle();
             $modalInstance.close($scope.selected);
         };
 
         $scope.close = function() {
             //delete temporary style
-            style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
+            $scope.deleteTempStyle();
             $modalInstance.dismiss('close');
         };
 
@@ -1913,7 +1924,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 $modalInstance.close();
             });
             //delete temporary style
-            style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
+            $scope.deleteTempStyle();
         };
 
         /**
@@ -1933,7 +1944,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     $modalInstance.close();
                 });
                 //delete temporary style
-                style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
+                $scope.deleteTempStyle();
             }
         };
 
