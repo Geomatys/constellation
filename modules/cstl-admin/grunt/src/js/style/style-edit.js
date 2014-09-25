@@ -1894,7 +1894,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         $scope.deleteTempStyle = function(){
             if($scope.optionsSLD.temporaryStyleName){
                 style.delete({provider: 'sld_temp', name: $scope.optionsSLD.temporaryStyleName});
-            }else if($scope.newStyle.name){
+            }
+            if($scope.newStyle.name){
                 style.delete({provider: 'sld_temp', name: $scope.newStyle.name});
             }
         };
