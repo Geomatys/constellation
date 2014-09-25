@@ -196,7 +196,6 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
             }
 
             data.forEach(function(d) {
-                console.debug(d);
                 if (measures.length === 1) {
                     d.time = parseDate(d.time);
                     d[measures[0]] = +d[measures[0]];
