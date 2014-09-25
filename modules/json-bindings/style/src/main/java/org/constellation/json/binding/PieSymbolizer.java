@@ -19,8 +19,13 @@
 package org.constellation.json.binding;
 
 
+import org.geotoolkit.cql.CQL;
+
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.FF;
 import static org.constellation.json.util.StyleUtilities.*;
 
@@ -29,11 +34,40 @@ import static org.constellation.json.util.StyleUtilities.*;
  */
 public class PieSymbolizer implements Symbolizer {
     private String name;
-    private String size;
+    private Integer size;
     private String group;
     private String value;
     private String quarter;
-    private List<ColorQuarter> colorQuarters;
+    private List<ColorQuarter> colorQuarters = new ArrayList<>();
+
+    public PieSymbolizer() {}
+
+    public PieSymbolizer(org.geotoolkit.display2d.ext.pie.PieSymbolizer symbolizer) {
+        ensureNonNull("symbolizer", symbolizer);
+        name = symbolizer.getName();
+        if (symbolizer.getSize() != null) {
+            size = symbolizer.getSize().evaluate(null, Integer.class);
+        }
+        if (symbolizer.getGroup() != null) {
+            group = CQL.write(symbolizer.getGroup());
+        }
+        if (symbolizer.getValue() != null) {
+            value = CQL.write(symbolizer.getValue());
+        }
+        if (symbolizer.getQuarter() != null) {
+            quarter = CQL.write(symbolizer.getQuarter());
+        }
+        if (symbolizer.getColorQuarters() != null) {
+            for (final org.geotoolkit.display2d.ext.pie.PieSymbolizer.ColorQuarter colorQuarter : symbolizer.getColorQuarters()) {
+                final ColorQuarter colorQuarterToAdd = new ColorQuarter();
+                final Color color = colorQuarter.getColor().evaluate(null, Color.class);
+                final String colorHex = String.format("#%06X", (0xFFFFFF & color.getRGB()));
+                colorQuarterToAdd.setColor(colorHex);
+                colorQuarterToAdd.setQuarter(CQL.write(colorQuarter.getQuarter()));
+                colorQuarters.add(colorQuarterToAdd);
+            }
+        }
+    }
 
     public String getName() {
         return name;
@@ -43,11 +77,11 @@ public class PieSymbolizer implements Symbolizer {
         this.name = name;
     }
 
-    public String getSize() {
+    public Integer getSize() {
         return size;
     }
 
-    public void setSize(String size) {
+    public void setSize(Integer size) {
         this.size = size;
     }
 

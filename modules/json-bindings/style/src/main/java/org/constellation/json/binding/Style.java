@@ -37,14 +37,14 @@ import static org.constellation.json.util.StyleUtilities.listType;
 public final class Style implements StyleElement<MutableStyle> {
 
     private String name;
-    private List<Rule> rules = new ArrayList<Rule>();
+    private List<Rule> rules = new ArrayList<>();
 
     public Style() {
     }
 
     public Style(final MutableStyle style) {
         ensureNonNull("style", style);
-        final List<MutableRule> mutableRules = new ArrayList<MutableRule>(0);
+        final List<MutableRule> mutableRules = new ArrayList<>(0);
         if (!style.featureTypeStyles().isEmpty()) {
             mutableRules.addAll(style.featureTypeStyles().get(0).rules());
         }
