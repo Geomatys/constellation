@@ -110,6 +110,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.logging.Level;
 
+import org.apache.sis.util.CharSequences;
 import static org.constellation.coverage.ws.WCSConstant.ASCII_GRID;
 import static org.constellation.coverage.ws.WCSConstant.GEOTIFF;
 import static org.constellation.coverage.ws.WCSConstant.INTERPOLATION_V100;
@@ -161,7 +162,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED
  * @since 0.3
  */
 public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
-    
+
 
     public DefaultWCSWorker(final String id) {
         super(id, ServiceDef.Specification.WCS);
@@ -205,10 +206,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             throw new CstlServiceException("The parameter IDENTIFIER must be specified",
                     MISSING_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
         }
-        
+
         final List<CoverageInfo> coverageOfferings = new ArrayList<>();
         for (String coverage : request.getIdentifier()) {
-            
+
             final Name tmpName = parseCoverageName(coverage);
             final Data layerRef = getLayerReference(userLogin, tmpName);
             if (layerRef.getType().equals(Data.TYPE.FEATURE)) {
@@ -220,13 +221,13 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
-            
+
             final CoverageData coverageRef = (CoverageData) layerRef;
             if (!coverageRef.isQueryable(ServiceDef.Query.WCS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
                         coverage + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
             }
-            
+
             final Layer configLayer = getConfigurationLayer(layerRef.getName(), userLogin);
             final Name fullCoverageName = coverageRef.getName();
             final String coverageName;
@@ -264,7 +265,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
         try {
             final GeographicBoundingBox inputGeoBox = coverageRef.getGeographicBoundingBox();
-        
+
             final LonLatEnvelopeType llenvelope;
             final EnvelopeType envelope;
             if (inputGeoBox != null) {
@@ -333,8 +334,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             final SupportedInterpolationsType supInt = INTERPOLATION_V100;
 
             //we build the coverage offering for this layer/coverage
+            CharSequence remarks = CharSequences.toASCII(coverageRef.getRemarks());
             return new CoverageOfferingType(null, coverageName,
-                    coverageName, StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
+                    coverageName, (remarks != null) ? remarks.toString() : null, llenvelope,
                     keywords, domainSet, rangeSet, supCRS, supForm, supInt);
         } catch (DataStoreException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
@@ -354,7 +356,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     private  CoverageInfo describeCoverage111(final String coverageName, final CoverageData coverageRef) throws CstlServiceException {
         try {
             final GeographicBoundingBox inputGeoBox = coverageRef.getGeographicBoundingBox();
-        
+
             WGS84BoundingBoxType outputBBox = null;
             if (inputGeoBox != null) {
                 outputBBox = new WGS84BoundingBoxType(inputGeoBox);
@@ -383,7 +385,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
             //general metadata
             final String title     = coverageName;
-            final String abstractt = StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks());
+            final CharSequence abstractt = CharSequences.toASCII(coverageRef.getRemarks());
             final List<String> keywords = Arrays.asList("WCS", coverageName);
 
             // temporal metadata
@@ -392,14 +394,16 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
             //supported interpolations
             final InterpolationMethods interpolations = INTERPOLATION_V111;
-            
-            final RangeType range = new RangeType(new FieldType(StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()),
+
+            final CharSequence thematic = CharSequences.toASCII(coverageRef.getThematic());
+            final RangeType range = new RangeType(new FieldType((thematic != null) ? thematic.toString() : null,
                     null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
 
             //supported CRS
             final List<String> supportedCRS = Arrays.asList("EPSG:4326");
 
-            return new CoverageDescriptionType(title, abstractt, keywords, coverageName, domain, range, supportedCRS, SUPPORTED_FORMATS_111);
+            return new CoverageDescriptionType(title, (abstractt != null) ? abstractt.toString() : null,
+                    keywords, coverageName, domain, range, supportedCRS, SUPPORTED_FORMATS_111);
         } catch (DataStoreException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -429,7 +433,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         if (returnUS) {
             return WCSXmlFactory.createCapabilitiesResponse(version, getCurrentUpdateSequence());
         }
-        
+
         /*
          * In WCS 1.0.0 the user can request only one section
          * ( or all by omitting the parameter section)
@@ -442,7 +446,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 }
             }
         }
-        
+
         // if the user have specified one format accepted (only one for now != spec)
         final String format;
         if (version.equals("1.1.1")) {
@@ -457,13 +461,13 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 }
             }
         }
-        
+
         // If the getCapabilities response is in cache, we just return it.
         final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache(version, null);
         if (cachedCapabilities != null) {
             return (GetCapabilitiesResponse) cachedCapabilities.applySections(sections);
         }
-        
+
         // We unmarshall the static capabilities document.
         final Details skeleton = getStaticCapabilitiesObject("WCS", null);
         final GetCapabilitiesResponse staticCapabilities = WCSConstant.createCapabilities(version, skeleton);
@@ -471,8 +475,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final AbstractServiceProvider sp        = staticCapabilities.getServiceProvider();
         final AbstractOperationsMetadata om     = getOperationMetadata(version);
         om.updateURL(getServiceUrl());
-        
-        
+
+
         final List<CoverageInfo> offBrief = new ArrayList<>();
         final List<Layer> layers = getConfigurationLayers(userLogin);
         try {
@@ -490,7 +494,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     // in the capabilities response.
                     continue;
                 }
-                
+
                 final CoverageInfo co;
                 if (version.equals("1.0.0")) {
                     co = getCoverageInfo100(layer, configLayer);
@@ -537,7 +541,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     private CoverageInfo getCoverageInfo100(final Data layer, final Layer configLayer) throws DataStoreException {
-        
+
         final Name fullLayerName = layer.getName();
         final String layerName;
         if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
@@ -581,7 +585,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws CstlServiceException
      */
     private CoverageInfo getCoverageInfo111(final Data layer, final Layer configLayer) throws DataStoreException {
-       
+
         final CoverageData coverageLayer = (CoverageData)layer;
         final String identifier;
         if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
@@ -589,16 +593,17 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         } else {
             identifier = coverageLayer.getName().getLocalPart();
         }
-         
+
         final String title      = coverageLayer.getName().getLocalPart();
-        final String remark     = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
+        final CharSequence remark = CharSequences.toASCII(coverageLayer.getRemarks());
 
         final GeographicBoundingBox inputGeoBox = coverageLayer.getGeographicBoundingBox();
         final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(inputGeoBox);
 
-        return WCSXmlFactory.createCoverageInfo("1.1.1", identifier, title, remark, outputBBox);
+        return WCSXmlFactory.createCoverageInfo("1.1.1", identifier, title,
+                (remark != null) ? remark.toString() : null, outputBBox);
     }
-    
+
 
     /**
      * Get the coverage values for a specific coverage specified.
@@ -662,7 +667,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         } catch (IllegalArgumentException ex) {
             throw new CstlServiceException(ex.getMessage(), INVALID_PARAMETER_VALUE, KEY_INTERPOLATION.toLowerCase());
         }
-        
+
 
         Envelope envelope;
         try {

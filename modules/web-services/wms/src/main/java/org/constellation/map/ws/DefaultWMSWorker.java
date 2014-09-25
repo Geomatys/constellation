@@ -150,6 +150,7 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.sis.util.CharSequences;
 import static org.constellation.api.CommonConstants.DEFAULT_CRS;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_BLANK;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_INIMAGE;
@@ -248,7 +249,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, null, ex);
-        } 
+        }
 
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
@@ -600,12 +601,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             final String legendUrlGif   = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
             final String legendUrlPng   = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
             final String queryable      = (layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) ? "1" : "0";
-            final String _abstract;
-            final String keyword;
+            final CharSequence _abstract;
+            final CharSequence keyword;
             if (layer instanceof CoverageData) {
                 final CoverageData coverageLayer = (CoverageData)layer;
-                _abstract = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
-                keyword   = StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic());
+                _abstract = CharSequences.toASCII(coverageLayer.getRemarks());
+                keyword   = CharSequences.toASCII(coverageLayer.getThematic());
             } else {
                 _abstract = "Vector data";
                 keyword   = "Vector data";
@@ -650,8 +651,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
             final AbstractGeographicBoundingBox bbox = createGeographicBoundingBox(queryVersion, inputGeoBox);
-            final AbstractLayer outputLayerO = createLayer(queryVersion, layerName,_abstract,keyword, DEFAULT_CRS,
-                            bbox, outputBBox, queryable, dimensions, styles);
+            final AbstractLayer outputLayerO = createLayer(queryVersion, layerName,
+                    (_abstract != null) ? _abstract.toString() : null,
+                    ( keyword  != null) ?  keyword .toString() : null,
+                    DEFAULT_CRS, bbox, outputBBox, queryable, dimensions, styles);
 
             final AbstractLayer outputLayer = customizeLayer(queryVersion, outputLayerO, configLayer, layer, legendUrlPng, legendUrlGif);
             outputLayers.add(outputLayer);

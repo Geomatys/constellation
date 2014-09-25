@@ -19,16 +19,18 @@
 
 package org.constellation.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.sis.util.CharSequences;
 import org.geotoolkit.util.StringUtilities;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -77,7 +79,7 @@ public class UtilTest {
     public void cleanSpecialCharacterTest() throws Exception {
 
         String dirty = "lé oiseaux chantè à l'aube OLÉÉÉÉÉÉÉ";
-        String result = StringUtilities.cleanSpecialCharacter(dirty);
+        String result = CharSequences.toASCII(dirty).toString();
         String expresult = "le oiseaux chante a l'aube OLEEEEEEE";
         assertEquals(expresult, result);
     }
@@ -306,7 +308,7 @@ public class UtilTest {
         assertFalse(StringUtilities.matchesStringfromList(list, "boulette"));
         assertFalse(StringUtilities.matchesStringfromList(list, "petit"));
     }
-    
+
     /**
      * @throws java.lang.Exception
      */
