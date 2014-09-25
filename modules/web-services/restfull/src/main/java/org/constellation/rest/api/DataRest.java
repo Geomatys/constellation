@@ -967,7 +967,7 @@ public class DataRest {
                 final List<DataSetBrief> datasetBriefs = new ArrayList<>();
                 final List<Dataset> datasetList = datasetBusiness.searchOnMetadata(search);
                 for (final Dataset ds : datasetList) {
-                    final DataSetBrief dsb = buildDatsetBrief(ds,domainId);
+                    final DataSetBrief dsb = buildDatsetBrief(ds,domainId,null);
                     datasetBriefs.add(dsb);
                 }
                 for(final DataSetBrief dsb : datasetBriefs){
@@ -986,7 +986,7 @@ public class DataRest {
      * @param domainId given domain id.
      * @return {@link DataSetBrief} built from the given dataset.
      */
-    private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId){
+    private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId, final List<DataBrief> children){
         final Integer dataSetId = dataset.getId();
         final Optional<CstlUser> optUser = userRepository.findById(dataset.getOwner());
         String owner = null;
@@ -996,8 +996,22 @@ public class DataRest {
                 owner = user.getLogin();
             }
         }
-        final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
-        final DataSetBrief dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), null, owner, dataBriefList);
+        final DataSetBrief dsb;
+        if(children==null){
+            final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
+            String type = null;
+            if(dataBriefList!=null && !dataBriefList.isEmpty()){
+                type = dataBriefList.get(0).getType();
+            }
+            dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), type, owner, dataBriefList);
+        }else {
+            String type = null;
+            if(!children.isEmpty()){
+                type = children.get(0).getType();
+            }
+            dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), type, owner, children);
+        }
+
         try{
             final Node nodeMetadata = datasetBusiness.getMetadataNode(dataset.getIdentifier(),domainId);
             if(nodeMetadata!=null){
@@ -1757,12 +1771,11 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/published/{published}/top")
+    @Path("/list/published/{published}/data")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getPublishedDataList(@PathParam("domainId") int domainId, @PathParam("published") boolean published) {
         final List<DataBrief> briefs = new ArrayList<>();
-
         final List<Integer> providerIds = providerBusiness.getProviderIdsForDomain(domainId);
         for (final Integer providerId : providerIds) {
             final Provider provider = providerBusiness.getProvider(providerId);
@@ -1789,7 +1802,39 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/observation/{sensorable}/top")
+    @Path("/list/published/{published}/dataset")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getPublishedDatasetList(@PathParam("domainId") int domainId, @PathParam("published") boolean published) {
+        final List<DataSetBrief> datasetBriefs = new ArrayList<>();
+        final List<Dataset> datasets = datasetBusiness.getAllDataset();
+        if(datasets!=null){
+            for(final Dataset ds : datasets){
+                final List<org.constellation.engine.register.Data> dataList = dataBusiness.findByDatasetId(ds.getId());
+                final List<DataBrief> briefs = new ArrayList<>();
+                for (final org.constellation.engine.register.Data data : dataList) {
+                    if (data.isVisible()) {
+                        final QName name = new QName(data.getNamespace(), data.getName());
+                        final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
+                        if ((published && (db.getTargetService() == null || db.getTargetService().size() == 0)) ||
+                                (!published && db.getTargetService() != null && db.getTargetService().size() > 0)) {
+                            continue;
+                        }
+                        briefs.add(db);
+                    }
+                }
+                if(briefs.isEmpty()){
+                    continue;
+                }
+                final DataSetBrief dsb = buildDatsetBrief(ds,domainId,briefs);
+                datasetBriefs.add(dsb);
+            }
+        }
+        return Response.ok(datasetBriefs).build();
+    }
+
+    @GET
+    @Path("/list/observation/{sensorable}/data")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getSensorableDataList(@PathParam("domainId") int domainId, @PathParam("sensorable") boolean sensorable) {
@@ -1819,6 +1864,38 @@ public class DataRest {
             }
         }
         return Response.ok(briefs).build();
+    }
+
+    @GET
+    @Path("/list/observation/{sensorable}/dataset")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getSensorableDatasetList(@PathParam("domainId") int domainId, @PathParam("sensorable") boolean sensorable) {
+        final List<DataSetBrief> datasetBriefs = new ArrayList<>();
+        final List<Dataset> datasets = datasetBusiness.getAllDataset();
+        if(datasets!=null){
+            for(final Dataset ds : datasets){
+                final List<org.constellation.engine.register.Data> dataList = dataBusiness.findByDatasetId(ds.getId());
+                final List<DataBrief> briefs = new ArrayList<>();
+                for (final org.constellation.engine.register.Data data : dataList) {
+                    if (data.isVisible()) {
+                        final QName name = new QName(data.getNamespace(), data.getName());
+                        final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
+                        if ((sensorable && (db.getTargetSensor() == null || db.getTargetSensor().size() == 0)) ||
+                            (!sensorable && db.getTargetSensor() != null && db.getTargetSensor().size() > 0)) {
+                            continue;
+                        }
+                        briefs.add(db);
+                    }
+                }
+                if(briefs.isEmpty()){
+                    continue;
+                }
+                final DataSetBrief dsb = buildDatsetBrief(ds,domainId,briefs);
+                datasetBriefs.add(dsb);
+            }
+        }
+        return Response.ok(datasetBriefs).build();
     }
 
     @DELETE

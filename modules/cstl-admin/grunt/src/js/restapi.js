@@ -130,8 +130,10 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     .factory('dataListing', function($resource) {
         return $resource('@cstl/api/1/domain/$domainId/data/list/top/:filter;jsessionid=', {}, {
             'listAll':              {method: 'GET',     isArray: true},
-            'listPublished':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/published/:published/top;jsessionid=', isArray: true},
-            'listSensorable':       {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/observation/:observation/top;jsessionid=', isArray: true},
+            'listPublished':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/published/:published/data;jsessionid=', isArray: true},
+            'listPublishedDS':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/published/:published/dataset;jsessionid=', isArray: true},
+            'listSensorable':       {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/observation/:observation/data;jsessionid=', isArray: true},
+            'listSensorableDS':     {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/observation/:observation/dataset;jsessionid=', isArray: true},
             'listData':             {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/provider;jsessionid='},
             'listDataForProv':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/provider/:providerId;jsessionid=', isArray: true},
             'listCoverage':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/coverage/list/;jsessionid='},
