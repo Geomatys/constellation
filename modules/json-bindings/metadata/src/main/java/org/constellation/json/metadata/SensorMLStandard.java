@@ -90,7 +90,7 @@ final class SensorMLStandard extends MetadataStandard {
         if (!type.isInterface()) {
             return null;
         }
-        final Class<?> impl;
+        Class<?> impl;
         if (type == SMLMember.class) {
             impl = SensorML.Member.class;
         } else if (type == AbstractProcess.class) {
@@ -106,7 +106,12 @@ final class SensorMLStandard extends MetadataStandard {
             try {
                 impl = Class.forName(implName.toString());
             } catch (ClassNotFoundException e) {
-                return null;
+                implName.append("PropertyType");
+                try {
+                    impl = Class.forName(implName.toString());
+                } catch (ClassNotFoundException e2) {
+                    return null;
+                }
             }
         }
         return impl.asSubclass(type);

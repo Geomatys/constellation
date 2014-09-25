@@ -13,7 +13,7 @@
 						"name":"system.block.identification.uniqueID",
 						"multiplicity":1,
 						"help":"system.block.identification.uniqueID_help",
-						"path":null,
+						"path":"member.realProcess.identification.identifierList.identifier",
 						"children":[{
 							"field":{
 								"name":"system.field.uniqueID.name",

@@ -18,7 +18,6 @@
  */
 package org.constellation.json.metadata;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import javax.xml.bind.JAXBContext;
@@ -81,6 +80,18 @@ public final strictfp class SensorTest {
         final SensorML metadata = new SensorML();
         Template.getInstance("profile_sensorml_system").read(readAllLines("sensor_prune.json"), metadata, true);
         assertEquals(expected, metadata);
+    }
+
+    /**
+     * Other read test.
+     *
+     * @throws IOException if an error occurred while reading the test JSON file.
+     */
+    @Test
+    public void testRead2() throws IOException {
+        final SensorML metadata = new SensorML();
+        Template.getInstance("profile_sensorml_system").read(readAllLines("sensor2.json"), metadata, true);
+        // Current test just ensure that we didn't got any exception.
     }
 
     /**

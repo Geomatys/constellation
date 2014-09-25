@@ -1,0 +1,220 @@
+{
+	"root": {
+		"name": "SensorML",
+		"multiplicity": 1,
+		"children": [{
+				"superblock": {
+					"name": "component.sblock.identification",
+					"multiplicity": 1,
+					"help": "component.sblock.identification_help",
+					"path": null,
+					"children": [{
+							"block": {
+								"name": "component.block.identification.uniqueID",
+								"multiplicity": 1,
+								"help": "component.block.identification.uniqueID_help",
+								"path": "member[1].realProcess.identification[1].identifierList.identifier[1]",
+								"children": [{
+										"field": {
+											"name": "component.field.uniqueID.name",
+											"multiplicity": 1,
+											"help": "component.field.uniqueID.name_help",
+											"path": "member[1].realProcess.identification[1].identifierList.identifier[1].name",
+											"render": "readonly",
+											"obligation": "M",
+											"defaultValue": "uniqueID",
+											"value": "uniqueID"
+										}
+									}, {
+										"field": {
+											"name": "component.field.uniqueID.definition",
+											"multiplicity": 1,
+											"help": "component.field.uniqueID.definition_help",
+											"path": "member[1].realProcess.identification[1].identifierList.identifier[1].term.definition",
+											"render": "readonly",
+											"obligation": "M",
+											"defaultValue": "urn:ogc:def:identifierType:OGC:uniqueID",
+											"value": "urn:ogc:def:identifierType:OGC:uniqueID"
+										}
+									}, {
+										"field": {
+											"name": "component.field.uniqueID.value",
+											"multiplicity": 1,
+											"help": "component.field.uniqueID.value_help",
+											"path": "member[1].realProcess.identification[1].identifierList.identifier[1].term.value",
+											"render": "text",
+											"obligation": "M",
+											"defaultValue": null,
+											"value": "urn:ogc:object:sensor:GEOM:2"
+										}
+									}
+								]
+							}
+						}, {
+							"block": {
+								"name": "component.block.identification.identifier",
+								"multiplicity": 62,
+								"help": "component.block.identification.identifier_help",
+								"path": "member[1].realProcess.identification[1].identifierList.identifier[2]",
+								"ignore": "1 0 1 0 1",
+								"children": [{
+										"field": {
+											"name": "component.field.identifier.name",
+											"multiplicity": 1,
+											"help": "component.field.identifier.name_help",
+											"path": "member[1].realProcess.identification[1].identifierList.identifier[2].name",
+											"render": "text",
+											"obligation": "O",
+											"defaultValue": null,
+											"value": "identifier value"
+										}
+									}, {
+										"field": {
+											"name": "component.field.identifier.definition",
+											"multiplicity": 1,
+											"help": "component.field.identifier.definition_help",
+											"path": "member[1].realProcess.identification[1].identifierList.identifier[2].term.definition",
+											"render": "text",
+											"obligation": "O",
+											"defaultValue": null,
+											"value": null
+										}
+									}, {
+										"field": {
+											"name": "component.field.identifier.value",
+											"multiplicity": 1,
+											"help": "component.field.identifier.value_help",
+											"path": "member[1].realProcess.identification[1].identifierList.identifier[2].term.value",
+											"render": "text",
+											"obligation": "O",
+											"defaultValue": null,
+											"value": null
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}, {
+				"superblock": {
+					"name": "component.sblock.validTime",
+					"multiplicity": 1,
+					"help": "component.sblock.validTime_help",
+					"path": null,
+					"children": [{
+							"block": {
+								"name": "component.block.validTime",
+								"multiplicity": 1,
+								"help": "component.block.validTime_help",
+								"path": null,
+								"children": [{
+										"field": {
+											"name": "component.field.validTime.beginPosition",
+											"multiplicity": 1,
+											"help": "component.field.validTime.beginPosition_help",
+											"path": "member[1].realProcess.validTime.timePeriod.beginPosition",
+											"render": "DATE.text",
+											"obligation": "M",
+											"defaultValue": null,
+											"value": null
+										}
+									}, {
+										"field": {
+											"name": "component.field.validTime.endPosition",
+											"multiplicity": 1,
+											"help": "component.field.validTime.endPosition_help",
+											"path": "member[1].realProcess.validTime.timePeriod.endPosition",
+											"render": "DATE.text",
+											"obligation": "M",
+											"defaultValue": null,
+											"value": null
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}, {
+				"superblock": {
+					"name": "component.sblock.position",
+					"multiplicity": 1,
+					"help": "component.sblock.position_help",
+					"path": null,
+					"children": [{
+							"block": {
+								"name": "component.block.position",
+								"multiplicity": 1,
+								"help": "component.block.position_help",
+								"path": null,
+								"children": [{
+										"field": {
+											"name": "component.field.position.name",
+											"multiplicity": 1,
+											"help": "component.field.position.name_help",
+											"path": "member[1].realProcess.position.name",
+											"render": "text",
+											"obligation": "M",
+											"defaultValue": "platform-location",
+											"value": "platform-location"
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}, {
+				"superblock": {
+					"name": "component.sblock.inOut",
+					"multiplicity": 1,
+					"help": "component.sblock.inOut_help",
+					"path": null,
+					"children": [{
+							"block": {
+								"name": "component.block.inputs",
+								"multiplicity": 62,
+								"help": "component.block.inputs_help",
+								"path": "member[1].realProcess.inputs.inputList.input[1]",
+								"children": [{
+										"field": {
+											"name": "component.field.input.name",
+											"multiplicity": 1,
+											"help": "component.field.input.name_help",
+											"path": "member[1].realProcess.inputs.inputList.input[1].name",
+											"render": "text",
+											"obligation": "M",
+											"defaultValue": null,
+											"value": "CNDC"
+										}
+									}
+								]
+							}
+						}, {
+							"block": {
+								"name": "component.block.outputs",
+								"multiplicity": 62,
+								"help": "component.block.outputs_help",
+								"path": "member[1].realProcess.outputs.outputList.output[1]",
+								"children": [{
+										"field": {
+											"name": "component.field.output.name",
+											"multiplicity": 1,
+											"help": "component.field.output.name_help",
+											"path": "member[1].realProcess.outputs.outputList.output[1].name",
+											"render": "text",
+											"obligation": "M",
+											"defaultValue": null,
+											"value": "CNDC"
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		]
+	}
+}
