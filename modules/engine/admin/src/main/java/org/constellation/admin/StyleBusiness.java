@@ -501,7 +501,7 @@ public final class StyleBusiness implements IStyleBusiness {
      * @throws ConfigurationException
      *             if the operation has failed for any reason
      */
-    private void createOrUpdateStyle(final String providerId, String styleName, final MutableStyle style) throws ConfigurationException {
+    private synchronized void createOrUpdateStyle(final String providerId, String styleName, final MutableStyle style) throws ConfigurationException {
 
         // Proceed style name.
         if (isBlank(styleName)) {

@@ -38,6 +38,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
+import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.FeatureStore;
@@ -134,10 +135,6 @@ public final class StyleRest {
     @PUT
     @Path("{id}/style/create")
     public Response createStyleJson(final @PathParam("id") String id, final Style style) throws Exception {
-        /*final MutableStyle mstyle = style.toType();
-        styleBusiness.createStyle(id, mstyle);
-        return ok(new Style(mstyle));*/
-
         styleBusiness.createStyle(id, style.toType());
         return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully added to provider with id \"" + id + "\"."));
     }
@@ -759,16 +756,21 @@ public final class StyleRest {
            final CoverageReference coverageReference = coverageStore.getCoverageReference(new DefaultName(qName));
            GridCoverageReadParam params = new GridCoverageReadParam();
            params.setDeferred(true);
-           final GridCoverage coverage = coverageReference.acquireReader().read(coverageReference.getImageIndex(), params);
-           //@TODO handle GridCoverageStack case
+           GridCoverageReader gridCoverageReader = coverageReference.acquireReader();
+           final ParameterValueGroup result;
+           try {
+               final GridCoverage coverage = gridCoverageReader.read(coverageReference.getImageIndex(), params);
+               //@TODO handle GridCoverageStack case
 
-           //call process to get Histograms
-           final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("coverage", "statistic");
-           final ParameterValueGroup procparams = desc.getInputDescriptor().createValue();
-           procparams.parameter("inCoverage").setValue(coverage);
-           final org.geotoolkit.process.Process process = desc.createProcess(procparams);
-           final ParameterValueGroup result = process.call();
-
+               //call process to get Histograms
+               final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("coverage", "statistic");
+               final ParameterValueGroup procparams = desc.getInputDescriptor().createValue();
+               procparams.parameter("inCoverage").setValue(coverage);
+               final org.geotoolkit.process.Process process = desc.createProcess(procparams);
+               result = process.call();
+           } finally {
+               gridCoverageReader.dispose();
+           }
            //sampling for repartition
            final ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
            for(final ImageStatistics.Band band : statistics.getBands()){
