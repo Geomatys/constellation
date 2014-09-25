@@ -34,7 +34,7 @@ import static org.constellation.json.util.StyleUtilities.*;
  */
 public class PieSymbolizer implements Symbolizer {
     private String name;
-    private Integer size;
+    private Double size;
     private String group;
     private String value;
     private String quarter;
@@ -46,7 +46,7 @@ public class PieSymbolizer implements Symbolizer {
         ensureNonNull("symbolizer", symbolizer);
         name = symbolizer.getName();
         if (symbolizer.getSize() != null) {
-            size = symbolizer.getSize().evaluate(null, Integer.class);
+            size = symbolizer.getSize().evaluate(null, Double.class);
         }
         if (symbolizer.getGroup() != null) {
             group = CQL.write(symbolizer.getGroup());
@@ -63,7 +63,7 @@ public class PieSymbolizer implements Symbolizer {
                 final Color color = colorQuarter.getColor().evaluate(null, Color.class);
                 final String colorHex = String.format("#%06X", (0xFFFFFF & color.getRGB()));
                 colorQuarterToAdd.setColor(colorHex);
-                colorQuarterToAdd.setQuarter(CQL.write(colorQuarter.getQuarter()));
+                colorQuarterToAdd.setQuarter(colorQuarter.getQuarter().evaluate(null, String.class));
                 colorQuarters.add(colorQuarterToAdd);
             }
         }
@@ -77,11 +77,11 @@ public class PieSymbolizer implements Symbolizer {
         this.name = name;
     }
 
-    public Integer getSize() {
+    public Double getSize() {
         return size;
     }
 
-    public void setSize(Integer size) {
+    public void setSize(Double size) {
         this.size = size;
     }
 
@@ -121,15 +121,15 @@ public class PieSymbolizer implements Symbolizer {
     public org.opengis.style.Symbolizer toType() {
         final org.geotoolkit.display2d.ext.pie.PieSymbolizer symb = new org.geotoolkit.display2d.ext.pie.PieSymbolizer();
         symb.setName(name);
-        symb.setSize(literal(size));
+        symb.setSize(FF.literal(size));
         symb.setGroup(FF.property(group));
         symb.setValue(FF.property(value));
         symb.setQuarter(FF.property(quarter));
         for (final ColorQuarter colorQuarter : colorQuarters) {
             final org.geotoolkit.display2d.ext.pie.PieSymbolizer.ColorQuarter colorQuart =
                     new org.geotoolkit.display2d.ext.pie.PieSymbolizer.ColorQuarter();
-            colorQuart.setQuarter(literal(colorQuarter.getQuarter()));
-            colorQuart.setColor(literal(colorQuarter.getColor()));
+            colorQuart.setQuarter(FF.literal(colorQuarter.getQuarter()));
+            colorQuart.setColor(FF.literal(colorQuarter.getColor()));
             symb.getColorQuarters().add(colorQuart);
         }
         return symb;
