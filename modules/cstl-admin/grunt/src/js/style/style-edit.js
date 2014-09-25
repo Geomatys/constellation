@@ -745,12 +745,14 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     if(!selectedBand){
                         selectedBand = 0;
                     }
-                    var repartitionBand = $scope.dataBandsRepartition[selectedBand].repartition;
                     var xArray=[],yArray=[];
-                    for(var key in repartitionBand){
-                        if(repartitionBand.hasOwnProperty(key)){
-                            xArray.push(key);
-                            yArray.push(repartitionBand[key]);
+                    if($scope.dataBandsRepartition[selectedBand]){
+                        var repartitionBand = $scope.dataBandsRepartition[selectedBand].repartition;
+                        for(var key in repartitionBand){
+                            if(repartitionBand.hasOwnProperty(key)){
+                                xArray.push(key);
+                                yArray.push(repartitionBand[key]);
+                            }
                         }
                     }
                     $scope.optionsSLD.rasterPalette.dataXArray = xArray;
@@ -1608,12 +1610,14 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                                         var loader = $('#chart_ajax_loader');
                                         loader.show();
                                         var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
-                                        var repartition = $scope.dataBandsRepartition[selectedBand].repartition;
                                         var xArray=[],yArray=[];
-                                        for(var key in repartition){
-                                            if(repartition.hasOwnProperty(key)){
-                                                xArray.push(key);
-                                                yArray.push(repartition[key]);
+                                        if($scope.dataBandsRepartition[selectedBand]){
+                                            var repartition = $scope.dataBandsRepartition[selectedBand].repartition;
+                                            for(var key in repartition){
+                                                if(repartition.hasOwnProperty(key)){
+                                                    xArray.push(key);
+                                                    yArray.push(repartition[key]);
+                                                }
                                             }
                                         }
                                         $scope.optionsSLD.rasterPalette.dataXArray = xArray;
@@ -2212,8 +2216,11 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                                     data1: yArray
                                 }
                             };
-                            //@TODO get first band name in response, the server side must fill this info.
-                            $scope.loadPlot(dataRes,'Band 0',
+                            var bandName='Band 0';
+                            if($scope.dataBands && $scope.dataBands.length>0){
+                                bandName =$scope.dataBands[0].name;
+                            }
+                            $scope.loadPlot(dataRes,bandName,
                                 true,460,205,'#chartRaster',{}
                             );
                             $('#chart_ajax_loader').hide();
