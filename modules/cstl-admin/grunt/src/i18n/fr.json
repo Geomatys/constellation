@@ -150,6 +150,7 @@
     "data.dashboard.metadata.title":"Métadonnées disponibles",
 
     "dataset.information.title":"Liste des métadonnées",
+    "dataset.header.information.title":"Jeux de données disponibles",
     "dataset.metadata.listing.selected.edit.button":"Éditer la métadonnée",
     "dataset.child.metadata.listing.selected.edit.button":"Éditer la métadonnée de la donnée",
     "dataset.metadata.listing.selected.export.button":"Exporter la métadonnée",

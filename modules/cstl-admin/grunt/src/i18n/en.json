@@ -150,6 +150,7 @@
     "data.dashboard.metadata.title":"Available metadata",
 
     "dataset.information.title":"Metadata list",
+    "dataset.header.information.title":"Available data set",
     "dataset.metadata.listing.selected.edit.button":"Edit dataset metadata",
     "dataset.child.metadata.listing.selected.edit.button":"Edit metadata",
     "dataset.metadata.listing.selected.export.button":"Export metadata",
