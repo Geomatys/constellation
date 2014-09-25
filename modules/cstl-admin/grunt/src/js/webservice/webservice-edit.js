@@ -539,11 +539,11 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         // Style methods
         $scope.showStyleList = function() {
-            StyleSharedService.showStyleList($scope);
+            StyleSharedService.showStyleList($scope,$scope.selected);
         };
 
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
-            StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
+            StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style, $scope.selected);
         };
 
         $scope.truncate = function(small, text){

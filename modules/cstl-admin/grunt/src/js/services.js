@@ -366,13 +366,13 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
 
     .factory('StyleSharedService', function($modal, style, webService, Growl) {
         return {
-            showStyleList : function($scope) {
+            showStyleList : function($scope,selected) {
                 var modal = $modal.open({
                     templateUrl: 'views/style/modalStyleChoose.html',
                     controller: 'StyleModalController',
                     resolve: {
-                        exclude: function() { return $scope.selected.TargetStyle; },
-                        selectedLayer: function() { return $scope.selected; },
+                        exclude: function() { return selected.TargetStyle; },
+                        selectedLayer: function() { return selected; },
                         selectedStyle: function() { return null; },
                         serviceName: function() {
                             if ($scope.service) {
@@ -391,11 +391,11 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     if (item) {
                         if ($scope.service) {
                             webService.updateLayerStyle({type: $scope.service.type, id: $scope.service.identifier},
-                                {values: {layerId: $scope.selected.Name, spId: 'sld', styleName: item.Name}},
+                                {values: {layerId: selected.Name, spId: 'sld', styleName: item.Name}},
                                 function() {
-                                    $scope.selected.TargetStyle.push(item);
-                                    Growl('success','Success','Style updated for layer '+ $scope.selected.Name);
-                                }, function() { Growl('error','Error','Unable to update style for layer '+ $scope.selected.Name); }
+                                    selected.TargetStyle.push(item);
+                                    Growl('success','Success','Style updated for layer '+ selected.Name);
+                                }, function() { Growl('error','Error','Unable to update style for layer '+ selected.Name); }
                             );
                         } else {
                             style.link({
@@ -403,46 +403,46 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                                 name: item.Name
                             }, {
                                 values: {
-                                    dataProvider: $scope.selected.Provider,
-                                    dataNamespace: $scope.selected.Namespace,
-                                    dataId: $scope.selected.Name
+                                    dataProvider: selected.Provider,
+                                    dataNamespace: selected.Namespace,
+                                    dataId: selected.Name
                                 }
                             }, function () {
-                                $scope.selected.TargetStyle.push(item);
+                                selected.TargetStyle.push(item);
                             });
                         }
                     }
                 });
             },
 
-            unlinkStyle : function($scope,providerName, styleName, dataProvider, dataId, style) {
+            unlinkStyle : function($scope,providerName, styleName, dataProvider, dataId, style, selected) {
                 if ($scope.service) {
                     webService.removeLayerStyle({type: $scope.service.type, id: $scope.service.identifier},
-                        {values: {layerId: $scope.selected.Name, spId: 'sld', styleName: styleName}},
+                        {values: {layerId: selected.Name, spId: 'sld', styleName: styleName}},
                         function() {
-                            for (var i=0; i<$scope.selected.TargetStyle.length; i++) {
-                                var s = $scope.selected.TargetStyle[i];
+                            for (var i=0; i<selected.TargetStyle.length; i++) {
+                                var s = selected.TargetStyle[i];
                                 if (s.Name === styleName) {
-                                    $scope.selected.TargetStyle.splice(i, 1);
+                                    selected.TargetStyle.splice(i, 1);
                                     break;
                                 }
                             }
-                        }, function() { Growl('error','Error','Unable to update style for layer '+ $scope.selected.Name); }
+                        }, function() { Growl('error','Error','Unable to update style for layer '+ selected.Name); }
                     );
                 } else {
                     var res = style.unlink({provider: providerName, name: styleName},
-                        {values: {dataProvider: dataProvider, dataNamespace: $scope.selected.Namespace, dataId: dataId}});
+                        {values: {dataProvider: dataProvider, dataNamespace: selected.Namespace, dataId: dataId}});
                     if (res) {
                         var index = -1;
-                        for (var i = 0; i < $scope.selected.TargetStyle.length; i++) {
-                            var item = $scope.selected.TargetStyle[i];
+                        for (var i = 0; i < selected.TargetStyle.length; i++) {
+                            var item = selected.TargetStyle[i];
                             if (item.Provider === providerName && item.Name === styleName) {
                                 index = i;
                                 break;
                             }
                         }
                         if (index >= 0) {
-                            $scope.selected.TargetStyle.splice(index, 1);
+                            selected.TargetStyle.splice(index, 1);
                         }
                     }
                 }

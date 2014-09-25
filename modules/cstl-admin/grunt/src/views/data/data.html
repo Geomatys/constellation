@@ -43,7 +43,7 @@
             <div class="frame dashboard">
                 <div class="navbar navbar-default" style="margin-bottom: 0px;">
                     <div class="navbar-header">
-                        <a class="navbar-brand" translate="data.information.title">Available data</a>
+                        <a class="navbar-brand" translate="dataset.header.information.title">Available dataset</a>
                     </div>
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-right">
@@ -281,14 +281,13 @@
                 </div>
                 <div class="dash-inner row" style="padding-bottom: 10pt;">
                     <div class="pull-left"
-                         style="width: 60%;
-                          margin-bottom: 5px;"
+                         style="width: 60%;margin-bottom: 5px;"
                          ng-init="dataCtrl.smallMode=false">
                         <div id="list" data-role="list">
                             <div class="pagination-wrapper pagination-data">
                                 <strong class="col-md-6">
                                     <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
-                                    <span class="nb-results" translate="label.count.data">available data</span>
+                                    <span class="nb-results" translate="label.count.dataset">available dataset</span>
                                 </strong>
                                 <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
                                     <button type="button"
@@ -324,78 +323,110 @@
                                 </div>
                             </div>
                             <div class="item-list">
-                                <div class="item {{data.Type | lowercase}}"
-                                     ng-repeat="data in wrap.dataList"
-                                     ng-class="{'selected':selected && (data.Id==selected.Id),'hide':(data.TargetService.length===0 && dataCtrl.published==true) || (data.TargetService.length>0 && dataCtrl.published==false) || (data.TargetSensor.length>0 && dataCtrl.observation==false) || (data.TargetSensor.length===0 && dataCtrl.observation==true),'col-xs-6':dataCtrl.smallMode}"
-                                     ng-click="select(data)"
-                                     ng-cloak 
-                                     data-name="{{data.Provider + ':' + data.Name}}">
-                                    <div class="top">
-                                        <span class="item-title"
-                                              title="{{getDisplayName(data.Provider,data.Name)}}">{{truncate(dataCtrl.smallMode,getDisplayName(data.Provider,data.Name))}}</span>
-                                        <span class="pull-right text-right item-list-style" >{{data.Type}}</span>
-                                        <span ng-if="data.Type=='COVERAGE' && data.subtype=='multiDimentions'"
-                                              class="pull-right coverage-type-nd item-list-style"
-                                              style="color:#30718c;">nD </span>
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data!=selected"
-                                             src="img/vector-multipoint.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px;" />
-                                        <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry' && data!=selected"
-                                             src="img/vector-multigeometry.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px; width:22px;" />
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data!=selected"
-                                             src="img/vector-poly.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px;" />
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data!=selected"
-                                             src="img/vector-polyline.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px;" />
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data==selected"
-                                             src="img/vector-multipoint-selected.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px;" />
-                                        <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry' && data==selected"
-                                             src="img/vector-multigeometry-selected.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px; width:22px;" />
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data==selected"
-                                             src="img/vector-poly-selected.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px;" />
-                                        <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data==selected"
-                                             src="img/vector-polyline-selected.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px;" />
+                                <div ng-repeat="dataset in wrap.dataList"
+                                     ng-class="{'col-xs-6':dataCtrl.smallMode}"
+                                     style="padding-left:0;">
+                                    <div class="item {{dataset.Type? ('dataset-data-'+dataset.Type | lowercase) : 'dataset-data'}}"
+                                         ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
+                                         ng-click="selectDS(dataset);selectDataSetChild(null);"
+                                         data-name="{{dataset.id}}"
+                                         ng-cloak>
+                                        <div class="top">
+                                            <span class="item-title"
+                                                  title="{{dataset.Name}}">{{truncate(dataCtrl.smallMode,dataset.Name)}}</span>
+                                            <span class="pull-right text-right item-list-style">{{'dataset.label' | translate}}</span>
+                                        </div>
+                                        <div class="bottom">
+                                            <div class="block">
+                                                <i class="fa fa-calendar"></i>{{dataset.Date | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="fa fa-user"></i>{{dataset.Owner}}
+                                            </div>
+                                            <div class="block pull-right">
+                                                <i class="fa fa-paperclip"></i>
+                                                <span ng-if="dataset.Children.length == 0"
+                                                      translate="md.listing.no.data">No</span>
+                                                <span ng-if="dataset.Children.length > 0">{{dataset.Children.length}}</span>
+                                                <span ng-class="{'hide':dataCtrl.smallMode}"
+                                                      translate="md.listing.data.associated">associated data</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="bottom">
-                                        <div class="block">
-                                            <i class="fa fa-calendar"></i>{{data.Date | date:'yyyy-MM-dd'}}
+                                    <div class="item {{data.Type | lowercase}}"
+                                         ng-if="dataset.id==selectedDS.id"
+                                         ng-repeat="data in dataset.Children"
+                                         ng-class="{'selected':dataCtrl.selectedDataSetChild && (data.Id==dataCtrl.selectedDataSetChild.Id),'col-xs-11':dataCtrl.smallMode,'child':!dataCtrl.smallMode,'col-sm-offset-1':dataCtrl.smallMode}"
+                                         ng-click="selectDataSetChild(data)"
+                                         ng-cloak
+                                         data-name="{{data.Id}}">
+                                        <div class="top">
+                                            <span class="item-title"
+                                                  title="{{data.Name}}">{{truncate(dataCtrl.smallMode,data.Name)}}</span>
+                                            <span class="pull-right text-right item-list-style" >{{data.Type}}</span>
+                                            <span ng-if="data.Type=='COVERAGE' && data.subtype=='multiDimentions'"
+                                                  class="pull-right coverage-type-nd item-list-style"
+                                                  style="color:#30718c;">nD </span>
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data.Id!=dataCtrl.selectedDataSetChild.Id"
+                                                 src="img/vector-multipoint.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry' && data.Id!=dataCtrl.selectedDataSetChild.Id"
+                                                 src="img/vector-multigeometry.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px; width:22px;" />
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data.Id!=dataCtrl.selectedDataSetChild.Id"
+                                                 src="img/vector-poly.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data.Id!=dataCtrl.selectedDataSetChild.Id"
+                                                 src="img/vector-polyline.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data.Id==dataCtrl.selectedDataSetChild.Id"
+                                                 src="img/vector-multipoint-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry' && data.Id==dataCtrl.selectedDataSetChild.Id"
+                                                 src="img/vector-multigeometry-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px; width:22px;" />
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data.Id==dataCtrl.selectedDataSetChild.Id"
+                                                 src="img/vector-poly-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data.Id==dataCtrl.selectedDataSetChild.Id"
+                                                 src="img/vector-polyline-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
                                         </div>
-                                        <div class="block">
-                                            <i class="fa fa-user"></i>{{data.Owner}}
+                                        <div class="bottom">
+                                            <div class="block">
+                                                <i class="fa fa-calendar"></i>{{data.Date | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="fa fa-user"></i>{{data.Owner}}
+                                            </div>
+                                            <img ng-if="data.Sensorable===true && data.TargetSensor.length === 0"
+                                                 src="img/icon-sensor-non-active.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <div ng-if="data.TargetSensor.length > 0"
+                                                 class="pull-right"
+                                                 style="text-shadow:none;">
+                                                <a ng-href="#/sensors/{{data.TargetSensor[0]}}"
+                                                   tooltip-html-unsafe="{{'data.listing.selected.goto.sensor' | translate}}"
+                                                   tooltip-placement="right">
+                                                    <img src="img/icon-sensor-active.svg"
+                                                         style="margin-top:0; margin-right:10px;" />
+                                                </a>
+                                            </div>
+                                            <span ng-if="data.TargetSensor.length > 0"
+                                                  ng-class="{'blanc':data.Id==dataCtrl.selectedDataSetChild.Id, 'hide':dataCtrl.smallMode}"
+                                                  class="pull-right text-right item-list-style"
+                                                  style="margin-right:10px; font-weight:bold;"
+                                                  translate="sensor.observation" >Sensor observation</span>
                                         </div>
-                                        <img ng-if="data.Sensorable===true && data.TargetSensor.length === 0"
-                                             src="img/icon-sensor-non-active.svg"
-                                             class="pull-right"
-                                             style="margin-top:6px; margin-right:10px;" />
-                                        <div ng-if="data.TargetSensor.length > 0"
-                                             class="pull-right"
-                                             style="text-shadow:none;">
-                                            <a ng-href="#/sensors/{{data.TargetSensor[0]}}"
-                                               tooltip-html-unsafe="{{'data.listing.selected.goto.sensor' | translate}}"
-                                               tooltip-placement="right">
-                                                <img src="img/icon-sensor-active.svg"
-                                                     style="margin-top:0; margin-right:10px;" />
-                                            </a>
-                                        </div>
-                                        <span ng-if="data.TargetSensor.length > 0"
-                                              ng-class="{'blanc':data==selected, 'hide':dataCtrl.smallMode}"
-                                              class="pull-right text-right item-list-style"
-                                              style="margin-right:10px; font-weight:bold;"
-                                              translate="sensor.observation" >Sensor observation</span>
                                     </div>
                                 </div>
                             </div>
@@ -403,28 +434,47 @@
                     </div>
                     <div class="pull-left" style="width: 40%;">
                         <div id="selection">
-                            <div class="alert alert-info alert-data" ng-class="{'hide': selected}">
+                            <div class="alert alert-info alert-data"
+                                 ng-if="!selectedDS">
                                 <h4 translate="label.no.selected.data">No selected data</h4>
                                 <p translate="msg.no.selected.data"
                                    style="font-weight:normal;">Click on a data to display more information</p>
                             </div>
-                            <div class="selected-item" id="selected-item" ng-class="{'hide': !selected}">
+                            <div id="selected-item"
+                                 class="selected-item"
+                                 ng-if="selectedDS">
                                 <div class="block-header" ng-click="toggleUpDownSelected()">
                                     <strong class="item-title title-bloc"
-                                            title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
+                                            title="{{selectedDS.Name}}">{{truncateTitleBlock(selectedDS.Name)}}</strong>
                                     <i class="fa fa-chevron-down pull-right"></i>
                                 </div>
-
-                                <div class="block-content" ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
-                                    <div class="row description-block">
-                                        <div class="col-sm-3 col-md-2"><img src="img/block-content-owner.svg" alt="" /></div>
-                                        <div class="col-sm-9 col-md-10 description-text"><span>{{selected.Owner}}</span></div>
+                                <div>
+                                    <div class="block-content">
+                                        <div class="row description-block">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-owner.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{selectedDS.Owner}}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="row description-block">
-                                        <div class="col-sm-3 col-md-2"><img src="img/block-content-date.svg" alt="" /></div>
-                                        <div class="col-sm-9 col-md-10 description-text"><span>{{selected.Date | date:'yyyy-MM-dd'}}</span></div>
+                                    <div class="block-content"
+                                         ng-class="{'block-vector':dataCtrl.selectedDataSetChild.Type=='VECTOR','block-raster':dataCtrl.selectedDataSetChild.Type=='COVERAGE'}"
+                                         ng-if="dataCtrl.selectedDataSetChild">
+                                        <h6 translate="label.title">Title</h6>
+                                        <span>{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</span>
+                                        <div class="row description-block">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-date.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{dataCtrl.selectedDataSetChild.Date | date:'yyyy-MM-dd'}}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <div ng-if="dataCtrl.selectedDataSetChild">
                                 <div class="block-action">
                                     <div class="row">
                                         <div class="col-sm-2">
@@ -454,7 +504,7 @@
                                         <div class="col-sm-2">
                                             <span class="tooltipicon">
                                                 <a id="exportMD" class="btn btn-info "
-                                                   ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/export/{{selected.Provider}}/{{selected.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
+                                                   ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/export/{{dataCtrl.selectedDataSetChild.Provider}}/{{dataCtrl.selectedDataSetChild.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
                                                    tooltip-placement="bottom"
                                                    tooltip-html-unsafe="{{'layer.listing.selected.export.button' | translate }}">
                                                         <i class="fa fa-download"></i>
@@ -487,7 +537,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class=" row block-association"
+                                <div class="row block-association"
                                      ng-init="assocStyle=false; assocService=false; assocSensor=false">
                                     <div class="col-sm-4"
                                          ng-click="assocStyle=!assocStyle; assocService=false; assocSensor=false">
@@ -495,7 +545,7 @@
                                              class="block-associated block-associated-style">
                                             <div class="block-associated-title"
                                                  translate="label.related.style">Associated Styles</div>
-                                            <div>{{selected.TargetStyle.length}}</div>
+                                            <div>{{dataCtrl.selectedDataSetChild.TargetStyle.length}}</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-4"
@@ -504,7 +554,7 @@
                                              class="block-associated block-associated-services">
                                             <div class="block-associated-title"
                                                  translate="label.related.service">Associated Styles</div>
-                                            <div>{{selected.TargetService.length}}</div>
+                                            <div>{{dataCtrl.selectedDataSetChild.TargetService.length}}</div>
                                         </div>
                                     </div>
                                     <div class="col-sm-4"
@@ -513,7 +563,7 @@
                                              class="block-associated block-associated-sensor">
                                             <div class="block-associated-title"
                                                  translate="label.related.sensors">Associated Styles</div>
-                                            <div>{{selected.TargetSensor.length}}</div>
+                                            <div>{{dataCtrl.selectedDataSetChild.TargetSensor.length}}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -524,19 +574,19 @@
                                         </strong>
                                     </div>
                                     <div id="linkedList" class="block-content" >
-                                        <span ng-show="selected.TargetStyle.length == 0"
+                                        <span ng-show="dataCtrl.selectedDataSetChild.TargetStyle.length == 0"
                                               translate="label.no.association">No association</span>
-                                        <div ng-show="selected.TargetStyle.length > 0"
+                                        <div ng-show="dataCtrl.selectedDataSetChild.TargetStyle.length > 0"
                                              class="style"
-                                             ng-repeat="style in selected.TargetStyle"
+                                             ng-repeat="style in dataCtrl.selectedDataSetChild.TargetStyle"
                                              style="margin-bottom:5px;">
                                             <button type="button"
-                                                    ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
+                                                    ng-click="unlinkStyle(style.Provider, style.Name, dataCtrl.selectedDataSetChild.Provider, dataCtrl.selectedDataSetChild.Name);"
                                                     class="btn btn-small">
                                                 <i class="glyphicon glyphicon-trash"></i>
                                             </button>
                                             <button type="button"
-                                                    ng-click="editLinkedStyle(style.Provider, style.Name, selected);"
+                                                    ng-click="editLinkedStyle(style.Provider, style.Name, dataCtrl.selectedDataSetChild);"
                                                     class="btn btn-small">
                                                 <i class="glyphicon glyphicon-pencil"></i>
                                             </button>
@@ -562,11 +612,11 @@
                                         </strong>
                                     </div>
                                     <div id="linkedServiceList" class="block-content" >
-                                        <span ng-show="selected.TargetService.length == 0"
+                                        <span ng-show="dataCtrl.selectedDataSetChild.TargetService.length == 0"
                                               translate="label.no.association">No association</span>
-                                        <div ng-show="selected.TargetService.length > 0"
+                                        <div ng-show="dataCtrl.selectedDataSetChild.TargetService.length > 0"
                                              class="style"
-                                             ng-repeat="service in selected.TargetService"
+                                             ng-repeat="service in dataCtrl.selectedDataSetChild.TargetService"
                                              style="line-height:30px;">
                                             {{truncateTitleBlock(service.name)}}
                                         </div>
@@ -579,11 +629,11 @@
                                         </strong>
                                     </div>
                                     <div id="linkedSensorList" class="block-content" >
-                                        <span ng-show="selected.TargetSensor.length === 0"
+                                        <span ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
                                               translate="label.no.association">No association</span>
-                                        <div ng-show="selected.TargetSensor.length > 0"
+                                        <div ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length > 0"
                                              class="style"
-                                             ng-repeat="sensorId in selected.TargetSensor"
+                                             ng-repeat="sensorId in dataCtrl.selectedDataSetChild.TargetSensor"
                                              style="margin-bottom:5px;">
                                             <button type="button" ng-click="unlinkSensor(sensorId)"
                                                     class="btn btn-small">
@@ -594,7 +644,7 @@
                                         <div class="row">
                                             <div class="col-xs-12">
                                                 <button type="button"
-                                                        ng-show="selected.TargetSensor.length === 0"
+                                                        ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
                                                         ng-click="showSensorsList();"
                                                         class="btn btn-sm pull-right">
                                                     <i class="glyphicon glyphicon-plus"></i>
@@ -605,36 +655,36 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Modal -->
-                                <div id="viewerData"
-                                     class="modal fade"
-                                     tabindex="-1"
-                                     role="dialog"
-                                     aria-labelledby="myModalLabel"
-                                     aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-resp-height">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <button type="button"
-                                                        class="close"
-                                                        data-dismiss="modal"
-                                                        aria-hidden="true">×</button>
-                                                <h4 class="modal-title"
-                                                    translate="layer.listing.modal.dataviewer">Data Viewer</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div id="dataMap" style="height: 400px; width:740px"></div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button"
-                                                        class="btn btn-default"
-                                                        data-dismiss="modal"
-                                                        aria-hidden="true">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="viewerData"
+                 class="modal fade"
+                 tabindex="-1"
+                 role="dialog"
+                 aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-resp-height">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button"
+                                    class="close"
+                                    data-dismiss="modal"
+                                    aria-hidden="true">×</button>
+                            <h4 class="modal-title"
+                                translate="layer.listing.modal.dataviewer">Data Viewer</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div id="dataMap" style="height: 400px; width:740px"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-default"
+                                    data-dismiss="modal"
+                                    aria-hidden="true">Close</button>
                         </div>
                     </div>
                 </div>

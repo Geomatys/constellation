@@ -68,18 +68,6 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         };
 
         /**
-         * Override the select function to togle item selection from data dashboard.
-         * @param item
-         */
-        $scope.select = function(item) {
-            if (item && $scope.selected &&$scope.selected.Id === item.Id) {
-                $scope.selected = null;
-            } else {
-                $scope.selected = item;
-            }
-        };
-
-        /**
          * Toggle advanced data search view panel.
          */
         $scope.toggleAdvancedDataSearch = function(){
@@ -134,7 +122,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         $scope.callSearch = function(){
             $scope.wrap.filtertext='';
             if ($scope.dataCtrl.searchTerm){
-                dataListing.findData({values: {'search': $scope.dataCtrl.searchTerm}},
+                datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchTerm}},
                     function(response) {
                         Dashboard($scope, response, true);
                     },
@@ -167,14 +155,14 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     if ($scope.search.area){
                         searchString += " area:"+$scope.search.area;
                     }
-                    dataListing.findData({values: {'search': searchString}},function(response) {
+                    datasetListing.findDataset({values: {'search': searchString}},function(response) {
                         Dashboard($scope, response, true);
                     }, function(response){
                         console.error(response);
                         Growl('error','Error','Search failed:'+ response.data);
                     });
                 } else {
-                    dataListing.listAll({}, function(response) {
+                    datasetListing.listAll({}, function(response) {
                         Dashboard($scope, response, true);
                     });
                 }
@@ -247,7 +235,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             $scope.wrap.filtertype = undefined;
             if($scope.dataCtrl.currentTab === 'tabdata'){
                 $scope.dataCtrl.searchTerm="";
-                dataListing.listAll({}, function(response) {//success
+                datasetListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
                     $scope.wrap.ordertype = "Name";
                 }, function() {//error
@@ -258,17 +246,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 datasetListing.listAll({}, function(response){//success
                     Dashboard($scope, response, true);
                     $scope.wrap.ordertype = "Name";
-                    if($scope.selected){//data is selected in data Dashboard
+                    if($scope.selectedDS){
                         //then we need to highlight the metadata associated in MD dashboard
-                        $scope.dataCtrl.selectedDataSetChild = $scope.selected;
-                        var term = "";
-                        for(var i =0;i<response.length;i++){
-                            if($scope.containsRefData(response[i])){
-                                $scope.selectedDS = response[i];
-                                term = response[i].Name;
-                                break;
-                            }
-                        }
+                        var term = $scope.selectedDS.Name;
                         $scope.wrap.filtertext = term;
                     }else {
                         //otherwise reset selection
@@ -294,8 +274,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             $scope.wrap.filtertype = undefined;
             if($scope.dataCtrl.currentTab === 'tabdata'){
                 $scope.dataCtrl.searchTerm="";
-                $scope.selected=null;
-                dataListing.listAll({}, function(response) {//success
+                $scope.dataCtrl.selectedDataSetChild = null;
+                $scope.selectedDS = null;
+                datasetListing.listAll({}, function(response) {//success
                     Dashboard($scope, response, true);
                     $scope.wrap.ordertype = "Name";
                 }, function() {//error
@@ -321,7 +302,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.showPublished = function(published){
             $scope.dataCtrl.published=published;
-            dataListing.listPublished({published:published}, function(response) {//success
+            dataListing.listPublishedDS({published:published}, function(response) {//success
                 Dashboard($scope, response, true);
             }, function() { //error
                 Growl('error','Error','Unable to show published data!');
@@ -335,7 +316,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.showSensorable = function(observation){
             $scope.dataCtrl.observation=observation;
-            dataListing.listSensorable({observation:observation},
+            dataListing.listSensorableDS({observation:observation},
                 function(response) {//success
                     Dashboard($scope, response, true);
                 }, function() {//error
@@ -361,19 +342,19 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         $scope.showData = function() {
             $('#viewerData').modal("show");
             var layerName;
-            if ($scope.selected.Namespace) {
-                layerName = '{' + $scope.selected.Namespace + '}' + $scope.selected.Name;
+            if ($scope.dataCtrl.selectedDataSetChild && $scope.dataCtrl.selectedDataSetChild.Namespace) {
+                layerName = '{' + $scope.dataCtrl.selectedDataSetChild.Namespace + '}' + $scope.dataCtrl.selectedDataSetChild.Name;
             } else {
-                layerName = $scope.selected.Name;
+                layerName = $scope.dataCtrl.selectedDataSetChild.Name;
             }
 
-            var providerId = $scope.selected.Provider;
+            var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
             var layerData;
-            if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
+            if ($scope.dataCtrl.selectedDataSetChild.TargetStyle && $scope.dataCtrl.selectedDataSetChild.TargetStyle.length > 0) {
                 layerData = DataViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,
                     layerName,
                     providerId,
-                    $scope.selected.TargetStyle[0].Name);
+                    $scope.dataCtrl.selectedDataSetChild.TargetStyle[0].Name);
             } else {
                 layerData = DataViewer.createLayer($scope.dataCtrl.cstlUrl, layerName, providerId);
             }
@@ -417,33 +398,33 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
 
         $scope.deleteData = function() {
             if (confirm("Are you sure?")) {
-                var layerName = $scope.selected.Name;
-                var providerId = $scope.selected.Provider;
+                var layerName = $scope.dataCtrl.selectedDataSetChild.Name;
+                var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
 
                 // Remove layer on that data before
-                if ($scope.selected.TargetService && $scope.selected.TargetService.length > 0) {
-                    for (var i = 0; i < $scope.selected.TargetService.length; i++) {
-                        var servId = $scope.selected.TargetService[i].name;
-                        var servType = $scope.selected.TargetService[i].protocol[0];
+                if ($scope.dataCtrl.selectedDataSetChild.TargetService && $scope.dataCtrl.selectedDataSetChild.TargetService.length > 0) {
+                    for (var i = 0; i < $scope.dataCtrl.selectedDataSetChild.TargetService.length; i++) {
+                        var servId = $scope.dataCtrl.selectedDataSetChild.TargetService[i].name;
+                        var servType = $scope.dataCtrl.selectedDataSetChild.TargetService[i].protocol[0];
                         webService.deleteLayer({type : servType, id: servId, layerid : layerName});
                     }
                 }
 
-                dataListing.hideData({providerid: providerId, dataid: layerName}, {value : $scope.selected.Namespace},
+                dataListing.hideData({providerid: providerId, dataid: layerName}, {value : $scope.dataCtrl.selectedDataSetChild.Namespace},
                     function() {//success
                         Growl('success','Success','Data '+ layerName +' successfully deleted');
                         dataListing.listDataForProv({providerId: providerId}, function(response) {
                             if (response.length === 0) {
                                 provider.delete({id: providerId}, function() {
-                                    dataListing.listAll({}, function(response) {
+                                    datasetListing.listAll({}, function(response) {
                                         Dashboard($scope, response, true);
-                                        $scope.selected=null;
+                                        $scope.dataCtrl.selectedDataSetChild=null;
                                     });
                                 });
                             } else {
-                                dataListing.listAll({}, function(response) {
+                                datasetListing.listAll({}, function(response) {
                                     Dashboard($scope, response, true);
-                                    $scope.selected=null;
+                                    $scope.dataCtrl.selectedDataSetChild=null;
                                 });
                             }
                         });
@@ -461,7 +442,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * this function is called from data dashboard.
          */
         $scope.displayMetadataFromDD = function() {
-            var type = $scope.selected.Type.toLowerCase();
+            var type = $scope.dataCtrl.selectedDataSetChild.Type.toLowerCase();
             if(type.toLowerCase() === 'coverage'){
                 type = 'raster';
             }
@@ -471,8 +452,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 resolve: {
                     'dashboardName':function(){return 'data';},
                     'metadataValues':function(textService){
-                        return textService.metadataJson($scope.selected.Provider,
-                            $scope.selected.Name, type, true);
+                        return textService.metadataJson($scope.dataCtrl.selectedDataSetChild.Provider,
+                            $scope.dataCtrl.selectedDataSetChild.Name, type, true);
                     }
                 }
             });
@@ -552,32 +533,13 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             $location.path('/editmetadata/'+template+'/'+type+'/'+$scope.selectedDS.Name);
         };
 
-        /**
-         * Returns true if the given dataset have children which was selected in data dashboard.
-         * @param dataset
-         * @returns {boolean}
-         */
-        $scope.containsRefData = function(dataset) {
-            if($scope.selected){
-                var idToMatch = $scope.selected.Id;
-                if(dataset && dataset.Children){
-                    for(var i=0;i<dataset.Children.length;i++){
-                        if(idToMatch === dataset.Children[i].Id){
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        };
-
         // Style methods
         $scope.showStyleList = function() {
-            StyleSharedService.showStyleList($scope);
+            StyleSharedService.showStyleList($scope, $scope.dataCtrl.selectedDataSetChild);
         };
 
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
-            StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
+            StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style,$scope.dataCtrl.selectedDataSetChild);
         };
 
         $scope.editLinkedStyle = function(styleProvider, styleName, selectedData) {
@@ -591,18 +553,18 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 templateUrl: 'views/sensor/modalSensorChoose.html',
                 controller: 'SensorModalChooseController',
                 resolve: {
-                    'selectedData': function() { return $scope.selected; }
+                    'selectedData': function() { return $scope.dataCtrl.selectedDataSetChild; }
                 }
             });
         };
 
         $scope.unlinkSensor = function(sensorId) {
-            dataListing.unlinkSensor({providerId: $scope.selected.Provider,
-                    dataId: $scope.selected.Name,
+            dataListing.unlinkSensor({providerId: $scope.dataCtrl.selectedDataSetChild.Provider,
+                    dataId: $scope.dataCtrl.selectedDataSetChild.Name,
                     sensorId: sensorId},
-                {value: $scope.selected.Namespace},
+                {value: $scope.dataCtrl.selectedDataSetChild.Namespace},
                 function(response) {//success
-                    $scope.selected.TargetSensor.splice(0, 1);
+                    $scope.dataCtrl.selectedDataSetChild.TargetSensor.splice(0, 1);
                 });
         };
 
@@ -690,8 +652,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 templateUrl: 'views/data/linkedDomains.html',
                 controller: 'ModalDataLinkedDomainsController',
                 resolve: {
-                    'domains': function() {return dataListing.domains({dataId: $scope.selected.Id}).$promise;},
-                    'dataId': function(){return $scope.selected.Id;}
+                    'domains': function() {return dataListing.domains({dataId: $scope.dataCtrl.selectedDataSetChild.Id}).$promise;},
+                    'dataId': function(){return $scope.dataCtrl.selectedDataSetChild.Id;}
                 }
             });
         };
