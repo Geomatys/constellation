@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.*;
-import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.PROVIDER_SOURCE;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 
@@ -108,10 +107,16 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
 
             outputCoverageStore = (CoverageStore) mainStore;
             final ParameterValueGroup configuration = outputCoverageStore.getConfiguration();
-            final String namespace = value(AbstractCoverageStoreFactory.NAMESPACE, configuration);
+            String namespace = value(AbstractCoverageStoreFactory.NAMESPACE, configuration);
+            
+            // to avoid error on comparison
+            if (namespace!= null && namespace.equals("no namespace")) {
+                namespace = null;
+            }
 
             try {
                 final Set<Name> names = outputCoverageStore.getNames();
+                
                 referenceName = new DefaultName(namespace, coverageBaseName);
 
                 final CoverageReference coverageReference;

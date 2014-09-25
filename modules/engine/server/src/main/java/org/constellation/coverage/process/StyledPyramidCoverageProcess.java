@@ -126,7 +126,12 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
 
             outputCoverageStore = (CoverageStore) mainStore;
             final ParameterValueGroup configuration = outputCoverageStore.getConfiguration();
-            final String namespace = value(AbstractCoverageStoreFactory.NAMESPACE, configuration);
+            String namespace = value(AbstractCoverageStoreFactory.NAMESPACE, configuration);
+            
+            // to avoid error on comparison
+            if (namespace!= null && namespace.equals("no namespace")) {
+                namespace = null;
+            }
 
             try {
                 final Set<Name> names = outputCoverageStore.getNames();
