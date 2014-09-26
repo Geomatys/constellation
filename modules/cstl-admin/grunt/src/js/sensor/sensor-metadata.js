@@ -29,6 +29,8 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
 
         $scope.typeLabelKey = "metadata.edition.sensor."+$scope.sensorType.toLowerCase();
 
+        $scope.theme = 'sensor';
+
         /**
          * Get metadata values
          * @type {Array}

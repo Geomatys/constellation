@@ -591,6 +591,8 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         $scope.recordId = recordId;
         $scope.type = type;
         $scope.template = template;
+        $scope.theme = 'csw';
+
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };

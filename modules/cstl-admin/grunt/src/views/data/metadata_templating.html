@@ -8,7 +8,7 @@
 <div ng-if="superblockObj.superblock && blockObj == null && fieldObj == null">
     <div class="row-fluid">
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 small-block">
-            <h3 class="heading-block clickable">
+            <h3 class="heading-block {{theme=='data'?'block-info':theme=='csw'?'block-csw':theme=='sensor'?'block-sos':'block-info'}} clickable">
                 {{superblockObj.superblock.name | translate}}
                 <i class="data-icon fa fa-angle-up"></i>
             </h3>

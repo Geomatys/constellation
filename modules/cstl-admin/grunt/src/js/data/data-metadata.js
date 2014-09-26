@@ -29,6 +29,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
         }
         $scope.template = $scope.template || $routeParams.template || 'import';
         $scope.typeLabelKey = "metadata.edition.dataset."+$scope.type;
+        $scope.theme = $scope.theme || 'data';
 
         /**
          * Get all codelists for metadata editor
@@ -577,12 +578,13 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
 
     })
 
-    .controller('EditMetadataModalController', function($scope, $modalInstance, $controller,provider,identifier,type,template) {
+    .controller('EditMetadataModalController', function($scope, $modalInstance, $controller,provider,identifier,type,template,theme) {
         $scope.provider = provider;
         $scope.identifier = identifier;
         $scope.type = type;
         $scope.template = template;
         $scope.current = {};
+        $scope.theme = theme;
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };

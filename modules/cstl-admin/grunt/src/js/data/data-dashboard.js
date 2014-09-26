@@ -519,9 +519,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             if($scope.dataCtrl.selectedDataSetChild){
                 openModalEditor($scope.dataCtrl.selectedDataSetChild.Provider,
                                 $scope.dataCtrl.selectedDataSetChild.Name,
-                                type,template);
+                                type,template,'csw');
             }else {
-                openModalEditor(null,$scope.selectedDS.Name,type,template);
+                openModalEditor(null,$scope.selectedDS.Name,type,template,'csw');
             }
         };
 
@@ -532,8 +532,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * @param identifier
          * @param type
          * @param template
+         * @param theme
          */
-        function openModalEditor(provider,identifier,type,template){
+        function openModalEditor(provider,identifier,type,template,theme){
             $modal.open({
                 templateUrl: 'views/data/modalEditMetadata.html',
                 controller: 'EditMetadataModalController',
@@ -541,7 +542,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     'provider':function(){return provider;},
                     'identifier':function(){return identifier;},
                     'type':function(){return type;},
-                    'template':function(){return template;}
+                    'template':function(){return template;},
+                    'theme':function(){return theme;}
                 }
             });
         }
@@ -621,7 +623,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $scope.init(); //needed after import
-                        openModalEditor(null,result.file,result.type,"import");
+                        openModalEditor(null,result.file,result.type,"import",'data');
 
                     }, function () {
                         Growl('error', 'Error', 'Unable to prepare metadata for next step!');
@@ -644,7 +646,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $scope.init(); //needed after import
-                        openModalEditor(null,result.file,result.type,"import");
+                        openModalEditor(null,result.file,result.type,"import",'data');
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
@@ -666,7 +668,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 }else {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $scope.init(); //needed after import
-                        openModalEditor(null,result.file,result.type,"import");
+                        openModalEditor(null,result.file,result.type,"import",'data');
                     }, function () {
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
