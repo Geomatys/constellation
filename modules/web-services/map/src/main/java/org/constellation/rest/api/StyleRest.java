@@ -577,7 +577,7 @@ public final class StyleRest {
         try{
             styleBusiness.deleteStyle(id, styleId);
         }catch(TargetNotFoundException ex){
-            LOGGER.info("Trying to delete nonexistent style "+styleId+". So it is ok.");
+            LOGGER.finer("Trying to delete nonexistent style "+styleId+". So it is ok.");
         }
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully removed from provider with id \"" + id + "\"."));
     }
