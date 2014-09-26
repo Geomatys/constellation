@@ -18,12 +18,14 @@
  */
 package org.constellation.json.metadata;
 
+import java.util.Arrays;
 import java.io.IOException;
 import java.net.URI;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import org.geotoolkit.sml.xml.v101.*;
+import org.apache.sis.util.CharSequences;
 import org.apache.sis.xml.MarshallerPool;
 import org.junit.Test;
 
@@ -108,8 +110,13 @@ public final strictfp class SensorTest {
         final Unmarshaller m = pool.acquireUnmarshaller();
         final Object metadata = m.unmarshal(SensorTest.class.getResource("sensorML.xml"));
         pool.recycle(m);
+
         final StringBuilder buffer = new StringBuilder(10000);
-        Template.getInstance("profile_sensorml_system").write(metadata, buffer, true);
+        final Template template = Template.getInstance("profile_sensorml_system");
+        template.write(metadata, buffer, true);
+
+        final Object back = new SensorML();
+        template.read(Arrays.asList(CharSequences.splitOnEOL(buffer)), back, true);
         // Current test just ensure that we didn't got any exception.
     }
 }

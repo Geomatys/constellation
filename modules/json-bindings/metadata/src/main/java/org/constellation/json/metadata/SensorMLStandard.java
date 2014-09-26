@@ -106,11 +106,18 @@ final class SensorMLStandard extends MetadataStandard {
             try {
                 impl = Class.forName(implName.toString());
             } catch (ClassNotFoundException e) {
+                final int end = implName.length();
                 implName.append("PropertyType");
                 try {
                     impl = Class.forName(implName.toString());
                 } catch (ClassNotFoundException e2) {
-                    return null;
+                    implName.setLength(end);
+                    implName.append("Type");
+                    try {
+                        impl = Class.forName(implName.toString());
+                    } catch (ClassNotFoundException e3) {
+                        return null;
+                    }
                 }
             }
         }
