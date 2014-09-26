@@ -67,7 +67,7 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.csw.xml.v202.UpdateType;
 import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
-import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
+import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
@@ -154,7 +154,7 @@ import static org.junit.Assert.fail;
 public class CSWworkerTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -167,7 +167,7 @@ public class CSWworkerTest implements ApplicationContextAware {
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
 
     protected boolean typeCheckUpdate = true;
-    
+
     protected static boolean onlyIso = false;
 
     public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
@@ -1455,7 +1455,7 @@ public class CSWworkerTest implements ApplicationContextAware {
             ExtrinsicObjectType expEoResult =  ((JAXBElement<ExtrinsicObjectType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"))).getValue();
             assertEquals(eoResult, expEoResult);
         }
-        
+
         /*
          *  TEST 2 : getRecords with RESULTS- Ebrim mode (FULL) - Filter: rim:ExtrinsicObject/@minorVersion <= 1
          */
