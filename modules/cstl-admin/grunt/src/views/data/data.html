@@ -279,7 +279,7 @@
                          </div>
                     </form>
                 </div>
-                <div class="dash-inner row" style="padding-bottom: 10pt;">
+                <div class="dash-inner row" style="padding-bottom: 10pt;"  ng-init="selectall=false">
                     <div class="pull-left"
                          style="width: 60%;margin-bottom: 5px;"
                          ng-init="dataCtrl.smallMode=false">
@@ -320,6 +320,12 @@
                                         <option value="50">50</option>
                                         <option value="100">100</option>
                                     </select>
+                                    <button type="button"
+                                            ng-click="selectall=!selectall"
+                                            class="pull-right btn btn-xs btn-info btn-data btn-selectall"
+                                            ng-class="{'btn-small-selected':selectall==true}">
+                                        <div ng-class="{'selectall-normal':selectall==false, 'selectall-selected':selectall==true}"></div>
+                                    </button>
                                 </div>
                             </div>
                             <div class="item-list">
