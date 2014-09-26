@@ -21,7 +21,8 @@
 angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('EditMetadataController', function ($scope, $routeParams,dataListing, $location, $translate, Growl) {
-        $scope.provider = $scope.provider || $routeParams.id;
+        $scope.provider = $scope.provider || $routeParams.provider;
+        $scope.identifier = $scope.identifier || $routeParams.identifier;
         $scope.type = $scope.type || $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
         if($scope.type.toLowerCase() === 'coverage'){
             $scope.type = 'raster';
@@ -117,18 +118,34 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
         $scope.metadataValues = [];
 
         $scope.loadMetadataValues = $scope.loadMetadataValues || function(){
-            dataListing.getDatasetMetadata({}, {values: {'providerId': $scope.provider,
-                    'type':$scope.template,
-                    'prune':false}},
-                function(response) {
-                    if (response && response.root) {
-                        $scope.metadataValues.push({"root":response.root});
+            if($scope.provider){//for data
+                dataListing.getDataMetadata({}, {values: {'provider':$scope.provider,
+                                                          'identifier': $scope.identifier,
+                                                          'type':$scope.template,
+                                                          'prune':false}},
+                    function(response) {
+                        if (response && response.root) {
+                            $scope.metadataValues.push({"root":response.root});
+                        }
+                    },
+                    function(response) {
+                        Growl('error','Error','The server returned an error!');
                     }
-                },
-                function(response) {
-                    Growl('error','Error','The server returned an error!');
-                }
-            );
+                );
+            }else {//for dataset
+                dataListing.getDatasetMetadata({}, {values: {'identifier': $scope.identifier,
+                                                             'type':$scope.template,
+                                                             'prune':false}},
+                    function(response) {
+                        if (response && response.root) {
+                            $scope.metadataValues.push({"root":response.root});
+                        }
+                    },
+                    function(response) {
+                        Growl('error','Error','The server returned an error!');
+                    }
+                );
+            }
         };
 
         $scope.loadMetadataValues();
@@ -437,16 +454,29 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             if($scope.metadataValues && $scope.metadataValues.length>0){
                 //console.debug($scope.metadataValues[0]);
                 //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
-                dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.template},
-                    $scope.metadataValues[0],
-                    function(response) {
-                        $location.path('/data'); //redirect to data dashboard page
-                        Growl('success','Success','Metadata saved with success!');
-                    },
-                    function(response) {
-                        Growl('error','Error','Failed to save metadata because the server returned an error!');
-                    }
-                );
+                if($scope.provider){//for data
+                    dataListing.mergeMetadata({'provider':$scope.provider,'identifier':$scope.identifier,'type':$scope.template},
+                        $scope.metadataValues[0],
+                        function(response) {
+                            $location.path('/data'); //redirect to data dashboard page
+                            Growl('success','Success','Metadata saved with success!');
+                        },
+                        function(response) {
+                            Growl('error','Error','Failed to save metadata because the server returned an error!');
+                        }
+                    );
+                }else {//for dataset
+                    dataListing.mergeMetadataDS({'identifier':$scope.identifier,'type':$scope.template},
+                        $scope.metadataValues[0],
+                        function(response) {
+                            $location.path('/data'); //redirect to data dashboard page
+                            Growl('success','Success','Metadata saved with success!');
+                        },
+                        function(response) {
+                            Growl('error','Error','Failed to save metadata because the server returned an error!');
+                        }
+                    );
+                }
             }
         };
         /**
@@ -456,17 +486,31 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             if($scope.metadataValues && $scope.metadataValues.length>0){
                 //console.debug($scope.metadataValues[0]);
                 //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
-                dataListing.mergeMetadata({'providerId':$scope.provider,'type':$scope.template},
-                    $scope.metadataValues[0],
-                    function(response) {//success
-                        $scope.close();
-                        Growl('success','Success','Metadata saved with success!');
-                    },
-                    function(response) {//error
-                        $scope.close();
-                        Growl('error','Error','Failed to save metadata because the server returned an error!');
-                    }
-                );
+                if($scope.provider){//for data
+                    dataListing.mergeMetadata({'provider':$scope.provider,'identifier':$scope.identifier,'type':$scope.template},
+                        $scope.metadataValues[0],
+                        function(response) {
+                            $scope.close();
+                            Growl('success','Success','Metadata saved with success!');
+                        },
+                        function(response) {
+                            $scope.close();
+                            Growl('error','Error','Failed to save metadata because the server returned an error!');
+                        }
+                    );
+                }else {//for dataset
+                    dataListing.mergeMetadataDS({'identifier':$scope.identifier,'type':$scope.template},
+                        $scope.metadataValues[0],
+                        function(response) {
+                            $scope.close();
+                            Growl('success','Success','Metadata saved with success!');
+                        },
+                        function(response) {
+                            $scope.close();
+                            Growl('error','Error','Failed to save metadata because the server returned an error!');
+                        }
+                    );
+                }
             }
         };
 
@@ -533,8 +577,9 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
 
     })
 
-    .controller('EditMetadataModalController', function($scope, $modalInstance, $controller,id,type,template) {
-        $scope.provider = id;
+    .controller('EditMetadataModalController', function($scope, $modalInstance, $controller,provider,identifier,type,template) {
+        $scope.provider = provider;
+        $scope.identifier = identifier;
         $scope.type = type;
         $scope.template = template;
         $scope.current = {};

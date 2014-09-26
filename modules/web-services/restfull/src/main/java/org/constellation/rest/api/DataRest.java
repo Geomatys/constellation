@@ -794,38 +794,69 @@ public class DataRest {
     @Path("metadata/dataset")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDatasetMetadata(final ParameterValues values) throws ConfigurationException {
-        final String providerId         = values.getValues().get("providerId");
+    public Response getDatasetMetadata(final ParameterValues values) {
+        final String identifier         = values.getValues().get("identifier");
         final String dataType           = values.getValues().get("type");
-        final DefaultMetadata metadata  =  datasetBusiness.getMetadata(providerId, -1);
-            
-        if (metadata != null) {
-            //get template name
-            final String templateName;
-            if("vector".equalsIgnoreCase(dataType)){
-                //vector template
-                templateName="profile_default_vector";
-            }else if("raster".equalsIgnoreCase(dataType)){
-                //raster template
-                templateName="profile_default_raster";
-            }else {
-                //default template is import
-                templateName="profile_import";
-            }
-            final Template template = Template.getInstance(templateName);
-            final StringBuilder buffer = new StringBuilder();
-            try{
+        final StringBuilder buffer = new StringBuilder();
+        try{
+            final DefaultMetadata metadata  =  datasetBusiness.getMetadata(identifier, -1);
+            if (metadata != null) {
+                //get template name
+                final String templateName;
+                if("vector".equalsIgnoreCase(dataType)){
+                    //vector template
+                    templateName="profile_default_vector";
+                }else if("raster".equalsIgnoreCase(dataType)){
+                    //raster template
+                    templateName="profile_default_raster";
+                }else {
+                    //default template is import
+                    templateName="profile_import";
+                }
+                final Template template = Template.getInstance(templateName);
                 template.write(metadata,buffer,false);
-            }catch(IOException ex){
-                LOGGER.log(Level.WARNING, "error while generating metadata json.", ex);
-                return Response.status(500).entity("failed").build();
             }
-            return Response.ok(buffer.toString()).build();
-
-        } else {
-            LOGGER.log(Level.WARNING, "Metadata is null for providerId:{0}", providerId);
-            return Response.status(500).entity("failed").build();
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "error cannot get dataset Metadata.", ex);
         }
+        return Response.ok(buffer.toString()).build();
+    }
+
+    @POST
+    @Path("metadata/data")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getDataMetadata(final ParameterValues values) throws ConfigurationException {
+        final String provider           = values.getValues().get("provider");
+        final String identifier         = values.getValues().get("identifier");
+        final String dataType           = values.getValues().get("type");
+        final StringBuilder buffer = new StringBuilder();
+        try{
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider, Util.parseQName(identifier));
+            if(metadata == null){
+                //try to get dataset metadata.
+                metadata = datasetBusiness.getMetadata(provider,-1);
+            }
+            if (metadata != null) {
+                //get template name
+                final String templateName;
+                if("vector".equalsIgnoreCase(dataType)){
+                    //vector template
+                    templateName="profile_default_vector";
+                }else if("raster".equalsIgnoreCase(dataType)){
+                    //raster template
+                    templateName="profile_default_raster";
+                }else {
+                    //default template is import
+                    templateName="profile_import";
+                }
+                final Template template = Template.getInstance(templateName);
+                template.write(metadata,buffer,false);
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "error cannot get dataset Metadata.", ex);
+        }
+        return Response.ok(buffer.toString()).build();
     }
 
     /**
@@ -842,8 +873,10 @@ public class DataRest {
     @Path("metadataJson/iso/{providerId}/{dataId}/{type}/{prune}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getIsoMetadataJson(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId,
-                                       final @PathParam("type") String type, final @PathParam("prune") boolean prune) {
+    public Response getIsoMetadataJson(final @PathParam("providerId") String providerId,
+                                       final @PathParam("dataId") String dataId,
+                                       final @PathParam("type") String type,
+                                       final @PathParam("prune") boolean prune) {
         final StringBuilder buffer = new StringBuilder();
         try{
             DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
@@ -895,7 +928,7 @@ public class DataRest {
     @Path("metadataJson/dataset/iso/{datasetIdentifier}/{type}/{prune}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getIsoMetadataJson(final @PathParam("datasetIdentifier") String datasetIdentifier,
+    public Response getIsoMetadataJsonDS(final @PathParam("datasetIdentifier") String datasetIdentifier,
                                        final @PathParam("type") String type,
                                        final @PathParam("prune") boolean prune) {
         final StringBuilder buffer = new StringBuilder();
@@ -934,23 +967,27 @@ public class DataRest {
     /**
      * Proceed to merge saved metadata with given values from metadata editor.
      *
-     * @param providerId the data provider identifier
+     * @param provider the data provider identifier.
+     * @param identifier the resource identifier.
      * @param type the data type.
      * @param metadataValues the values of metadata editor.
      * @return {@code Response}
      */
     @POST
-    @Path("metadata/merge/{providerId}/{type}")
+    @Path("metadata/merge/{provider}/{identifier}/{type}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response mergeMetadata(@PathParam("providerId") final String providerId,
+    public Response mergeMetadata(@PathParam("provider") final String provider,
+                                  @PathParam("identifier") final String identifier,
                                   @PathParam("type") final String type,
                                   final RootObj metadataValues) {
-        // for now assume that providerID == datasetID
         try {
-
-            // Get previously saved metadata for the current data
-            final DefaultMetadata metadata = datasetBusiness.getMetadata(providerId, -1);
+            // Get previously saved metadata
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider, Util.parseQName(identifier));
+            if(metadata == null){
+                //try to get dataset metadata.
+                metadata = datasetBusiness.getMetadata(provider,-1);
+            }
 
             //get template name
             final String templateName;
@@ -974,7 +1011,48 @@ public class DataRest {
             }
 
             //Save metadata
-            datasetBusiness.updateMetadata(providerId, -1, metadata);
+            datasetBusiness.updateMetadata(provider, -1, metadata);
+        } catch (ConfigurationException ex) {
+            LOGGER.warning("Error while saving dataset metadata");
+            throw new ConstellationException(ex);
+        }
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    @POST
+    @Path("metadata/dataset/merge/{identifier}/{type}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response mergeMetadataDS(@PathParam("identifier") final String identifier,
+                                  @PathParam("type") final String type,
+                                  final RootObj metadataValues) {
+        try {
+            // Get previously saved metadata
+            final DefaultMetadata metadata = datasetBusiness.getMetadata(identifier, -1);
+
+            //get template name
+            final String templateName;
+            if ("vector".equalsIgnoreCase(type)) {
+                //vector template
+                templateName = "profile_default_vector";
+            } else if ("raster".equalsIgnoreCase(type)){
+                //raster template
+                templateName = "profile_default_raster";
+            }else {
+                //default template is import
+                templateName = "profile_import";
+            }
+            final Template template = Template.getInstance(templateName);
+
+            try{
+                template.read(metadataValues,metadata,false);
+            }catch(IOException ex){
+                LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
+                return Response.status(500).entity("failed").build();
+            }
+
+            //Save metadata
+            datasetBusiness.updateMetadata(identifier, -1, metadata);
         } catch (ConfigurationException ex) {
             LOGGER.warning("Error while saving dataset metadata");
             throw new ConstellationException(ex);

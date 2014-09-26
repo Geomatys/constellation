@@ -5,7 +5,9 @@
             <h4 class="modal-title" translate="data.information.page.title.edition">Metadata edition</h4>
         </div>
         <div class="modal-body" style="height: 575px;overflow-y: auto;">
-            <div ng-include="'views/data/metadata_fragment.html'"></div>
+            <div ng-if="metadataValues.length>0">
+                <div ng-include="'views/data/metadata_fragment.html'"></div>
+            </div>
         </div>
         <div class="modal-footer">
             <button type="button"
@@ -13,6 +15,7 @@
                     ng-click="close()"
                     translate="data.modal.cancel">Cancel</button>
             <button type="button"
+                    ng-if="metadataValues.length>0"
                     class="btn btn-info"
                     ng-click="save2()" id="saveMetadataModification">
                 <span translate="metadata.edition.heading.save">Save modifications</span>
