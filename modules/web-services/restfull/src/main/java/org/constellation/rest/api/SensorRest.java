@@ -348,6 +348,13 @@ public class SensorRest {
             prop.put("latitude",   process.spatialBound.miny);
         }
         prop.put("phenomenon", process.fields);
+        
+        Sensor sensor = sensorBusiness.getSensor(process.id);
+        if (sensor == null) {
+            sensor = sensorBusiness.create(process.id, process.type, parentID, null);
+
+        }
+        
         final List<String> component = new ArrayList<>();
         for (ProcedureTree child : process.children) {
             component.add(child.id);
@@ -356,11 +363,9 @@ public class SensorRest {
         prop.put("component", component);
         final String sml = SensorMLGenerator.getTemplateSensorMLString(prop, process.type);
         
-        Sensor sensor = sensorBusiness.getSensor(process.id);
-        if (sensor == null) {
-            sensor = sensorBusiness.create(process.id, process.type, parentID, sml);
-
-        }
+        // update sml
+        sensor.setMetadata(sml);
+        sensorBusiness.update(sensor);
         sensorBusiness.linkDataToSensor(dataID, providerID, sensor.getIdentifier());
     }
 
