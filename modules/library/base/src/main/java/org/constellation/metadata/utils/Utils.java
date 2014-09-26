@@ -461,16 +461,8 @@ public final class Utils {
         }
 
     }
-
-    /**
-     * This method try to find an identifier for this Document Node.
-     *
-     * @param obj the object for which we want a identifier.
-     *
-     * @return the founded identifier or UNKNOW_IDENTIFIER
-     */
-    private static String findIdentifierNode(final Node node) {
-
+    
+    public static String findIdentifierNode(final Node node) {
         final List<String> paths = new ArrayList<>();
         paths.add("MD_Metadata/fileIdentifier/CharacterString");
         paths.add("MI_Metadata/fileIdentifier/CharacterString");
@@ -480,6 +472,18 @@ public final class Utils {
         paths.add("SensorML/member/System/@gml:id");
         paths.add("SensorML/member/Component/@gml:id");
         paths.add("*/@id");
+        return findIdentifierNode(node, paths);
+    }
+
+    /**
+     * This method try to find an identifier for this Document Node.
+     *
+     * @param node the node object for which we want a identifier.
+     * @param paths
+     *
+     * @return the founded identifier or UNKNOW_IDENTIFIER
+     */
+    public static String findIdentifierNode(final Node node, final List<String> paths) {
 
         for (String path : paths) {
             final String[] parts = path.split("/");

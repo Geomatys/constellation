@@ -49,12 +49,12 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
     private final boolean displayServiceMetadata = false;
     
     @Inject
-    private IMetadataBusiness metadataBusiness;
+    protected IMetadataBusiness metadataBusiness;
     
     /**
      * An indexer lucene to add object into the index.
      */
-    private final AbstractIndexer indexer;
+    protected final AbstractIndexer indexer;
     
     public InternalMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException {
         SpringHelper.injectDependencies(this);
