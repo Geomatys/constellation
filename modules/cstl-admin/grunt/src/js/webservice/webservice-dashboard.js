@@ -114,17 +114,26 @@ angular.module('cstl-webservice-dashboard', ['cstl-restapi', 'cstl-services', 'p
         };
 
         $scope.deleteService = function(service) {
-            if (confirm("Are you sure?")) {
-                if (service.type.toLowerCase() === 'sos') {
-                    // A provider has been created for this SOS service, so remove it
-                    provider.delete({id: service.identifier +"-om2"});
+            var dlg = $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    'keyMsg':function(){return "dialog.message.confirm.delete.service";}
                 }
-                webService.delete({type: service.type, id: service.identifier}, {} ,
-                    function() { Growl('success','Success','Service '+ service.name +' successfully deleted');
-                        $scope.services = webService.listAll({lang: $scope.getCurrentLang()}); },
-                    function() { Growl('error','Error','Service '+ service.name +' deletion failed'); }
-                );
-            }
+            });
+            dlg.result.then(function(cfrm){
+                if(cfrm){
+                    if (service.type.toLowerCase() === 'sos') {
+                        // A provider has been created for this SOS service, so remove it
+                        provider.delete({id: service.identifier +"-om2"});
+                    }
+                    webService.delete({type: service.type, id: service.identifier}, {} ,
+                        function() { Growl('success','Success','Service '+ service.name +' successfully deleted');
+                            $scope.services = webService.listAll({lang: $scope.getCurrentLang()}); },
+                        function() { Growl('error','Error','Service '+ service.name +' deletion failed'); }
+                    );
+                }
+            });
         };
 
         $scope.refreshIndex = function(service) {

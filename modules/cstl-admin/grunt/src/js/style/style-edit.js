@@ -17,7 +17,7 @@
 angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('StyleModalController', function($scope, Dashboard, $modalInstance, style, $cookies, dataListing, provider, Growl,
-                                                 textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout,stylechooser) {
+                                                 textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout,stylechooser,$modal) {
 
         /**
          * To fix angular bug with nested scope.
@@ -657,12 +657,23 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * Remove the selected rule from the current style's rules array.
          */
         $scope.deleteSelectedRule = function (){
-            if ($scope.optionsSLD.selectedRule && confirm("Are you sure?")) {
-                var indexToRemove = $scope.newStyle.rules.indexOf($scope.optionsSLD.selectedRule);
-                if(indexToRemove>-1){
-                    $scope.newStyle.rules.splice(indexToRemove, 1);
-                    $scope.optionsSLD.selectedRule = null;
-                }
+            if ($scope.optionsSLD.selectedRule) {
+                var dlg = $modal.open({
+                    templateUrl: 'views/modal-confirm.html',
+                    controller: 'ModalConfirmController',
+                    resolve: {
+                        'keyMsg':function(){return "dialog.message.confirm.delete.rule";}
+                    }
+                });
+                dlg.result.then(function(cfrm){
+                    if(cfrm){
+                        var indexToRemove = $scope.newStyle.rules.indexOf($scope.optionsSLD.selectedRule);
+                        if(indexToRemove>-1){
+                            $scope.newStyle.rules.splice(indexToRemove, 1);
+                            $scope.optionsSLD.selectedRule = null;
+                        }
+                    }
+                });
             }
         };
 
@@ -670,9 +681,20 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * Remove all rules from the current style and set selected rule to null.
          */
         $scope.deleteAllRules = function (){
-            if ($scope.newStyle.rules.length >0 && confirm("Are you sure?")) {
-                $scope.newStyle.rules= [];
-                $scope.optionsSLD.selectedRule = null;
+            if ($scope.newStyle.rules.length >0) {
+                var dlg = $modal.open({
+                    templateUrl: 'views/modal-confirm.html',
+                    controller: 'ModalConfirmController',
+                    resolve: {
+                        'keyMsg':function(){return "dialog.message.confirm.delete.allrules";}
+                    }
+                });
+                dlg.result.then(function(cfrm){
+                    if(cfrm){
+                        $scope.newStyle.rules= [];
+                        $scope.optionsSLD.selectedRule = null;
+                    }
+                });
             }
         };
 
@@ -943,12 +965,21 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * @param symbolizer
          */
         $scope.removeSymbolizer = function(symbolizer) {
-            if(confirm("Are you sure?")){
-                var indexToRemove = $scope.optionsSLD.selectedRule.symbolizers.indexOf(symbolizer);
-                if(indexToRemove>-1){
-                    $scope.optionsSLD.selectedRule.symbolizers.splice(indexToRemove, 1);
+            var dlg = $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    'keyMsg':function(){return "dialog.message.confirm.delete.symbolizer";}
                 }
-            }
+            });
+            dlg.result.then(function(cfrm){
+                if(cfrm){
+                    var indexToRemove = $scope.optionsSLD.selectedRule.symbolizers.indexOf(symbolizer);
+                    if(indexToRemove>-1){
+                        $scope.optionsSLD.selectedRule.symbolizers.splice(indexToRemove, 1);
+                    }
+                }
+            });
         };
 
         /**
@@ -1655,22 +1686,33 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * @param point
          */
         $scope.removeRepartitionEntry = function(point){
-            if ($scope.optionsSLD.rasterPalette.repartition && confirm("Are you sure?")) {
-                var indexToRemove = $scope.optionsSLD.rasterPalette.repartition.indexOf(point);
-                if(indexToRemove>-1){
-                    $scope.optionsSLD.rasterPalette.repartition.splice(indexToRemove, 1);
-                }
-            }
-            //remove threshold vertical line on graph.
-            if(point.data){
-                for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
-                    if($scope.optionsSLD.rasterPalette.dataXArray[j] >= point.data){
-                        window.c3chart.xgrids.remove({value:j});
-                        break;
+            if ($scope.optionsSLD.rasterPalette.repartition) {
+                var dlg = $modal.open({
+                    templateUrl: 'views/modal-confirm.html',
+                    controller: 'ModalConfirmController',
+                    resolve: {
+                        'keyMsg':function(){return "dialog.message.confirm.delete.repartitionEntry";}
                     }
-                }
-            }else {
-                $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.nanColor = null;
+                });
+                dlg.result.then(function(cfrm){
+                    if(cfrm){
+                        var indexToRemove = $scope.optionsSLD.rasterPalette.repartition.indexOf(point);
+                        if(indexToRemove>-1){
+                            $scope.optionsSLD.rasterPalette.repartition.splice(indexToRemove, 1);
+                        }
+                        //remove threshold vertical line on graph.
+                        if(point.data){
+                            for(var j=0;j<$scope.optionsSLD.rasterPalette.dataXArray.length;j++){
+                                if($scope.optionsSLD.rasterPalette.dataXArray[j] >= point.data){
+                                    window.c3chart.xgrids.remove({value:j});
+                                    break;
+                                }
+                            }
+                        }else {
+                            $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.nanColor = null;
+                        }
+                    }
+                });
             }
         };
 

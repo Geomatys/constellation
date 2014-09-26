@@ -397,43 +397,71 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         };
 
         $scope.deleteData = function() {
-            if (confirm("Are you sure?")) {
-                var layerName = $scope.dataCtrl.selectedDataSetChild.Name;
-                var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
-
-                // Remove layer on that data before
-                if ($scope.dataCtrl.selectedDataSetChild.TargetService && $scope.dataCtrl.selectedDataSetChild.TargetService.length > 0) {
-                    for (var i = 0; i < $scope.dataCtrl.selectedDataSetChild.TargetService.length; i++) {
-                        var servId = $scope.dataCtrl.selectedDataSetChild.TargetService[i].name;
-                        var servType = $scope.dataCtrl.selectedDataSetChild.TargetService[i].protocol[0];
-                        webService.deleteLayer({type : servType, id: servId, layerid : layerName});
-                    }
+            var dlg = $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    'keyMsg':function(){return "dialog.message.confirm.delete.data";}
                 }
-
-                dataListing.hideData({providerid: providerId, dataid: layerName}, {value : $scope.dataCtrl.selectedDataSetChild.Namespace},
-                    function() {//success
-                        Growl('success','Success','Data '+ layerName +' successfully deleted');
-                        dataListing.listDataForProv({providerId: providerId}, function(response) {
-                            if (response.length === 0) {
-                                provider.delete({id: providerId}, function() {
+            });
+            dlg.result.then(function(cfrm){
+                if(cfrm){
+                    var layerName = $scope.dataCtrl.selectedDataSetChild.Name;
+                    var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
+                    // Remove layer on that data before
+                    if ($scope.dataCtrl.selectedDataSetChild.TargetService &&
+                        $scope.dataCtrl.selectedDataSetChild.TargetService.length > 0) {
+                        for (var i = 0; i < $scope.dataCtrl.selectedDataSetChild.TargetService.length; i++) {
+                            var servId = $scope.dataCtrl.selectedDataSetChild.TargetService[i].name;
+                            var servType = $scope.dataCtrl.selectedDataSetChild.TargetService[i].protocol[0];
+                            webService.deleteLayer({type : servType, id: servId, layerid : layerName});
+                        }
+                    }
+                    dataListing.hideData({providerid: providerId, dataid: layerName},
+                        {value : $scope.dataCtrl.selectedDataSetChild.Namespace},
+                        function() {//success
+                            Growl('success','Success','Data '+ layerName +' successfully deleted');
+                            dataListing.listDataForProv({providerId: providerId}, function(response) {
+                                if (response.length === 0) {
+                                    provider.delete({id: providerId}, function() {
+                                        datasetListing.listAll({}, function(response) {
+                                            Dashboard($scope, response, true);
+                                            $scope.dataCtrl.selectedDataSetChild=null;
+                                        });
+                                    });
+                                } else {
                                     datasetListing.listAll({}, function(response) {
                                         Dashboard($scope, response, true);
                                         $scope.dataCtrl.selectedDataSetChild=null;
                                     });
-                                });
-                            } else {
-                                datasetListing.listAll({}, function(response) {
-                                    Dashboard($scope, response, true);
-                                    $scope.dataCtrl.selectedDataSetChild=null;
-                                });
-                            }
-                        });
-                    },
-                    function() {//error
-                        Growl('error','Error','Data '+ layerName +' deletion failed');
-                    }
-                );
-            }
+                                }
+                            });
+                        },
+                        function() {//error
+                            Growl('error','Error','Data '+ layerName +' deletion failed');
+                        }
+                    );
+                }
+            });
+        };
+
+        /**
+         * Delete selected dataset.
+         */
+        $scope.deleteDataset = function() {
+            var dlg = $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    'keyMsg':function(){return "dialog.message.confirm.delete.dataset";}
+                }
+            });
+            dlg.result.then(function(cfrm){
+                if(cfrm){
+                    console.debug('do something!');
+                    //@TODO implements rest api to delete a dataset.
+                }
+            });
         };
 
         /**

@@ -1,0 +1,21 @@
+<div class="modal-dialog" style="margin-top: 50pt;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="$close()">×</button>
+            <h4 class="modal-title" translate="label.confirmation">Please confirm</h4>
+        </div>
+        <div class="modal-body">
+            <span translate="{{keyMsg}}">Are you sure ?</span>
+        </div>
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-info"
+                    ng-click="$close(true)"
+                    translate="label.yes">Yes</button>
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="$close(false)"
+                    translate="label.no">No</button>
+        </div>
+    </div>
+</div>

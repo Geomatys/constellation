@@ -349,34 +349,48 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.deleteLayer = function() {
-            var txt = ($scope.service.type.toLowerCase() === 'wmts') ? 'Are you sure? This will also delete the generated tiles for this layer.' : 'Are you sure?';
-            if ($scope.selected && confirm(txt)) {
-                if ($scope.service.type.toLowerCase() === 'sos') {
-                    var idToDel = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
-                    sos.removeSensor({id: $scope.service.identifier, sensor: idToDel}, function() {
-                        Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed from service ' + $scope.service.name);
-                        $scope.initScope();
-                    },function () {
-                        Growl('error', 'Error', 'Unable to remove sensor ' + idToDel + ' from service ' + $scope.service.name);
-                    });
-                } else {
-                    webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name}, {value: $scope.selected.Namespace},
-                        function () {
-                            if ($scope.service.type.toLowerCase() === 'wmts' || $scope.service.type.toLowerCase() === 'wms') {
-                                $scope.deleteTiledData($scope.service, $scope.selected.Name, $scope.selected.Provider);
-                            }
-
-                            Growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully deleted from service ' + $scope.service.name);
-                            $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
-                                Dashboard($scope, response, true);
-                                $scope.selected=null;
+            var keymsg = ($scope.service.type.toLowerCase() === 'wmts') ? "dialog.message.confirm.delete.tiledLayer" : "dialog.message.confirm.delete.layer";
+            if ($scope.selected) {
+                var dlg = $modal.open({
+                    templateUrl: 'views/modal-confirm.html',
+                    controller: 'ModalConfirmController',
+                    resolve: {
+                        'keyMsg':function(){return keymsg;}
+                    }
+                });
+                dlg.result.then(function(cfrm){
+                    if(cfrm){
+                        if ($scope.service.type.toLowerCase() === 'sos') {
+                            var idToDel = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+                            sos.removeSensor({id: $scope.service.identifier, sensor: idToDel},
+                              function() {
+                                Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed from service ' + $scope.service.name);
+                                $scope.initScope();
+                            },function () {
+                                Growl('error', 'Error', 'Unable to remove sensor ' + idToDel + ' from service ' + $scope.service.name);
                             });
-                        },
-                        function () {
-                            Growl('error', 'Error', 'Layer ' + $scope.selected.Name + ' failed to be deleted from service ' + $scope.service.name);
+                        } else {
+                            webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name},
+                                                   {value: $scope.selected.Namespace},
+                                function () {
+                                    if ($scope.service.type.toLowerCase() === 'wmts' ||
+                                        $scope.service.type.toLowerCase() === 'wms') {
+                                        $scope.deleteTiledData($scope.service, $scope.selected.Name, $scope.selected.Provider);
+                                    }
+                                    Growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully deleted from service ' + $scope.service.name);
+                                    $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {},
+                                    function (response) {
+                                        Dashboard($scope, response, true);
+                                        $scope.selected=null;
+                                    });
+                                },
+                                function () {
+                                    Growl('error', 'Error', 'Layer ' + $scope.selected.Name + ' failed to be deleted from service ' + $scope.service.name);
+                                }
+                            );
                         }
-                    );
-                }
+                    }
+                });
             }
         };
 
@@ -451,18 +465,29 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         }
 
         $scope.deleteMetadata = function() {
-            if ($scope.selected && confirm("Are you sure?")) {
-                csw.delete({id: $scope.service.identifier, metaId: $scope.selected.identifier}, {},
-                    function() {
-                        Growl('success','Success','Metadata deleted');
-                        csw.count({id: $routeParams.id}, {}, function(max) {
-                            csw.getRecords({id: $routeParams.id, count: max.value, startIndex: 0}, {}, function(response) {
-                                Dashboard($scope, response.BriefNode, false);
-                                $scope.wrap.filtertype = "";
-                            });
-                        });
-                    }, function() { Growl('error','Error','Failed to delete metadata'); }
-                );
+            if ($scope.selected) {
+                var dlg = $modal.open({
+                    templateUrl: 'views/modal-confirm.html',
+                    controller: 'ModalConfirmController',
+                    resolve: {
+                        'keyMsg':function(){return "dialog.message.confirm.delete.metadata";}
+                    }
+                });
+                dlg.result.then(function(cfrm){
+                    if(cfrm){
+                        csw.delete({id: $scope.service.identifier, metaId: $scope.selected.identifier}, {},
+                            function() {
+                                Growl('success','Success','Metadata deleted');
+                                csw.count({id: $routeParams.id}, {}, function(max) {
+                                    csw.getRecords({id: $routeParams.id, count: max.value, startIndex: 0}, {}, function(response) {
+                                        Dashboard($scope, response.BriefNode, false);
+                                        $scope.wrap.filtertype = "";
+                                    });
+                                });
+                            }, function() { Growl('error','Error','Failed to delete metadata'); }
+                        );
+                    }
+                });
             }
         };
 

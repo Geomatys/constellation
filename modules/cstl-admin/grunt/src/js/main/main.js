@@ -83,6 +83,10 @@ angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pasc
 
     })
 
+    .controller('ModalConfirmController', function($scope,keyMsg) {
+        $scope.keyMsg = keyMsg;
+    })
+
     .controller('LoginController', function($scope, $location, AuthService) {
         $scope.rememberMe = true;
         $scope.login = function () {

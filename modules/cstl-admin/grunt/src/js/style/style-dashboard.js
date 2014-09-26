@@ -65,21 +65,31 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
          * Proceed to remove the selected styles from dashboard.
          */
         $scope.deleteStyle = function() {
-            if (confirm("Are you sure?")) {
-                var styleName = $scope.selected.Name;
-                var providerId = $scope.selected.Provider;
-                style.delete({provider: providerId, name: styleName}, {},
-                    function() {
-                        Growl('success', 'Success', 'Style ' + styleName + ' successfully deleted');
-                        style.listAll({provider: 'sld'}, function(response) {
-                            Dashboard($scope, response.styles, true);
-                            $scope.selected=null;
-                        });
-                    },
-                    function() {
-                        Growl('error', 'Error', 'Style ' + styleName + ' deletion failed');
-                    });
-            }
+            var dlg = $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    'keyMsg':function(){return "dialog.message.confirm.delete.style";}
+                }
+            });
+            dlg.result.then(function(cfrm){
+                if(cfrm){
+                    var styleName = $scope.selected.Name;
+                    var providerId = $scope.selected.Provider;
+                    style.delete({provider: providerId, name: styleName}, {},
+                        function() {
+                            Growl('success', 'Success', 'Style ' + styleName + ' successfully deleted');
+                            style.listAll({provider: 'sld'}, function(response) {
+                                Dashboard($scope, response.styles, true);
+                                $scope.selected=null;
+                            });
+                        },
+                        function() {
+                            Growl('error', 'Error', 'Style ' + styleName + ' deletion failed');
+                        }
+                    );
+                }
+            });
         };
 
         /**

@@ -96,16 +96,25 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
         };
 
         $scope.deleteMapContext = function() {
-            if (confirm("Are you sure?")) {
-                var ctxtName = $scope.selected.name;
-                mapcontext.delete({id: $scope.selected.id}, function () {
-                    Growl('success', 'Success', 'Map context ' + ctxtName + ' successfully removed');
-                    $scope.init();
-                    $scope.selected=null;
-                }, function () {
-                    Growl('error', 'Error', 'Unable to remove map context ' + ctxtName);
-                });
-            }
+            var dlg = $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    'keyMsg':function(){return "dialog.message.confirm.delete.mapcontext";}
+                }
+            });
+            dlg.result.then(function(cfrm){
+                if(cfrm){
+                    var ctxtName = $scope.selected.name;
+                    mapcontext.delete({id: $scope.selected.id}, function () {
+                        Growl('success', 'Success', 'Map context ' + ctxtName + ' successfully removed');
+                        $scope.init();
+                        $scope.selected=null;
+                    }, function () {
+                        Growl('error', 'Error', 'Unable to remove map context ' + ctxtName);
+                    });
+                }
+            });
         };
 
         $scope.editMapContext = function() {

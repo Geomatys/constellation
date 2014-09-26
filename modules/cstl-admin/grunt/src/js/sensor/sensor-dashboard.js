@@ -118,19 +118,28 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         };
 
         $scope.deleteSensor = function() {
-            if (confirm("Are you sure?")) {
-                var idToDel = ($scope.sensorCtrl.selectedSensorsChild) ? $scope.sensorCtrl.selectedSensorsChild.id : $scope.sensorCtrl.selectedSensor.id;
-                sensor.delete({sensor: idToDel}, function () {
-                    Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed');
-                    sensor.list({}, function(response) {
-                        Dashboard($scope, response.children, false);
-                        $scope.sensorCtrl.selectedSensor = null;
-                        $scope.sensorCtrl.selectedSensorsChild = null;
+            var dlg = $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    'keyMsg':function(){return "dialog.message.confirm.delete.sensor";}
+                }
+            });
+            dlg.result.then(function(cfrm){
+                if(cfrm){
+                    var idToDel = ($scope.sensorCtrl.selectedSensorsChild) ? $scope.sensorCtrl.selectedSensorsChild.id : $scope.sensorCtrl.selectedSensor.id;
+                    sensor.delete({sensor: idToDel}, function () {
+                        Growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed');
+                        sensor.list({}, function(response) {
+                            Dashboard($scope, response.children, false);
+                            $scope.sensorCtrl.selectedSensor = null;
+                            $scope.sensorCtrl.selectedSensorsChild = null;
+                        });
+                    }, function () {
+                        Growl('error', 'Error', 'Unable to remove sensor ' + idToDel);
                     });
-                }, function () {
-                    Growl('error', 'Error', 'Unable to remove sensor ' + idToDel);
-                });
-            }
+                }
+            });
         };
 
         /**
