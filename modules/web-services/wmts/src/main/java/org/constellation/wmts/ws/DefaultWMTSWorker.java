@@ -51,7 +51,7 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
-import org.geotoolkit.metadata.iso.citation.Citations;
+import org.geotoolkit.metadata.Citations;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
