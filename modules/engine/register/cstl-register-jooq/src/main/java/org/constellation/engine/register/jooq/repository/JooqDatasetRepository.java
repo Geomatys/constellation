@@ -18,9 +18,7 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import java.util.List;
 import org.constellation.engine.register.Dataset;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import static org.constellation.engine.register.jooq.Tables.DATASET;
 import org.constellation.engine.register.jooq.tables.records.DatasetRecord;
 import org.constellation.engine.register.repository.DatasetRepository;
@@ -74,6 +72,11 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     public Dataset findByIdentifier(String identifier) {
         return dsl.select().from(DATASET).where(DATASET.IDENTIFIER.eq(identifier)).fetchOneInto(Dataset.class);
     }
+    
+    @Override
+    public Dataset findByIdentifierWithEmptyMetadata(String identifier) {
+        return dsl.select().from(DATASET).where(DATASET.IDENTIFIER.eq(identifier)).and(DATASET.METADATA_ID.isNull()).and(DATASET.METADATA_ISO.isNull()).fetchOneInto(Dataset.class);
+    }
 
     @Override
     public Dataset findById(int id) {
@@ -91,4 +94,5 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     public void remove(int id) {
         dsl.delete(DATASET).where(DATASET.ID.eq(id)).execute();
     }
+
 }

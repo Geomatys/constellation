@@ -95,7 +95,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         final Data data = dataRepository.findByMetadataId(metadataId);
         if (data != null) {
-            data.setMetadata(xml);
+            data.setIsoMetadata(xml);
             dataRepository.update(data);
             return true;
         }
@@ -105,6 +105,26 @@ public class MetadataBusiness implements IMetadataBusiness {
             serviceRepository.update(service);
             return true;
         }
+        
+        // if the metadata is not yet present look for empty metadata object
+        final Dataset dataset2 = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
+        if (dataset2 != null) {
+            dataset2.setMetadataIso(xml);
+            dataset2.setMetadataId(metadataId);
+            datasetRepository.update(dataset2);
+            return true;
+        }
+        
+        // unsafe but no better way for now
+        final Data data2 = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
+        if (data2 != null) {
+            data2.setIsoMetadata(xml);
+            data2.setMetadataId(metadataId);
+            dataRepository.update(data2);
+            return true;
+        }
+        
+        // no possible for service
         return false;
     }
 

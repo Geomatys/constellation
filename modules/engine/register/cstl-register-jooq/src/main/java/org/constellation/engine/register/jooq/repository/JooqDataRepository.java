@@ -192,4 +192,9 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
         return result;
     }
 
+    @Override
+    public Data findByIdentifierWithEmptyMetadata(String localPart) {
+        return dsl.select().from(DATA).where(DATA.NAME.eq(localPart)).and(DATA.METADATA_ID.isNull()).and(DATA.ISO_METADATA.isNull()).fetchOneInto(Data.class);
+    }
+
 }

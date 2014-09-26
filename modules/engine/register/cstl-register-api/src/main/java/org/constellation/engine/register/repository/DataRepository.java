@@ -59,6 +59,8 @@ public interface DataRepository {
     void update(Data data);
 
     Map<Domain, Boolean> getLinkedDomains(int dataId);
+    
+    Data findByIdentifierWithEmptyMetadata(String localPart);
 
     
 }

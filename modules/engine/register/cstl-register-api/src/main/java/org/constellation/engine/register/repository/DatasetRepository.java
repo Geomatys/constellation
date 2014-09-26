@@ -39,6 +39,8 @@ public interface DatasetRepository {
     Dataset findByIdentifierAndDomainId(String datasetIdentifier, Integer domainId);
     
     Dataset findByIdentifier(String datasetIdentifier);
+    
+    Dataset findByIdentifierWithEmptyMetadata(String datasetIdentifier);
 
     Dataset findById(int datasetId);
     
