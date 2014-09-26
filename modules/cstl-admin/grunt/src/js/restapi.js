@@ -337,6 +337,17 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
                 });
                 return promise;
             },
+            metadataJsonDS : function(datasetIdentifier, type, prune){
+                var promise = $http({
+                    url: '@cstl/api/1/domain/$domainId/data/metadataJson/dataset/iso/'+ datasetIdentifier+'/'+ type +'/'+ prune +';jsessionid=',
+                    method: "GET",
+                    headers: {'Accept': 'application/json'}
+                });
+                promise.error(function(errorMsg) {
+                    Growl('warning', 'Warning', 'Error while retrieving json metadata for dataset '+ datasetIdentifier);
+                });
+                return promise;
+            },
             cswMetadataJson : function(serviceId, recordId, type, prune){
                 var promise = $http({
                     url: '@cstl/api/1/CSW/'+serviceId+'/metadataJson/'+ recordId+'/'+ type +'/'+ prune +';jsessionid=',

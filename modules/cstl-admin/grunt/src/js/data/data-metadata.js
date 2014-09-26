@@ -549,6 +549,12 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
     .controller('ViewMetadataModalController', function($scope, $modalInstance, $http, metadataValues, dashboardName) {
         $scope.metadataValues = [];
         $scope.metadataValues.push(metadataValues.data);
+
+        $scope.existsMetadata=false;
+        if(metadataValues.data){
+            $scope.existsMetadata=true;
+        }
+
         $scope.theme = {
             "isDataDashboard": dashboardName === 'data' || false,
             "isDatasetDashboard": dashboardName === 'dataset' || false,

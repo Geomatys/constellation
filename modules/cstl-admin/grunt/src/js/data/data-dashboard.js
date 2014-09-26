@@ -442,7 +442,12 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          * this function is called from data dashboard.
          */
         $scope.displayMetadataFromDD = function() {
-            var type = $scope.dataCtrl.selectedDataSetChild.Type.toLowerCase();
+            var type = 'import';
+            if($scope.dataCtrl.selectedDataSetChild){
+                type = $scope.dataCtrl.selectedDataSetChild.Type.toLowerCase();
+            }else if($scope.selectedDS.Type){
+                type = $scope.selectedDS.Type.toLowerCase();
+            }
             if(type.toLowerCase() === 'coverage'){
                 type = 'raster';
             }
@@ -452,8 +457,13 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 resolve: {
                     'dashboardName':function(){return 'data';},
                     'metadataValues':function(textService){
-                        return textService.metadataJson($scope.dataCtrl.selectedDataSetChild.Provider,
-                            $scope.dataCtrl.selectedDataSetChild.Name, type, true);
+                        if($scope.dataCtrl.selectedDataSetChild){
+                            return textService.metadataJson($scope.dataCtrl.selectedDataSetChild.Provider,
+                                                            $scope.dataCtrl.selectedDataSetChild.Name,
+                                                            type,true);
+                        }else {
+                            return textService.metadataJsonDS($scope.selectedDS.Name,type,true);
+                        }
                     }
                 }
             });
@@ -466,8 +476,10 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
          */
         $scope.displayMetadataFromMD = function() {
             var type = 'import';
-            if($scope.selectedDS.Children && $scope.selectedDS.Children.length >0){
-                type = $scope.selectedDS.Children[0].Type.toLowerCase();
+            if($scope.dataCtrl.selectedDataSetChild){
+                type = $scope.dataCtrl.selectedDataSetChild.Type.toLowerCase();
+            }else if($scope.selectedDS.Type){
+                type = $scope.selectedDS.Type.toLowerCase();
             }
             if(type.toLowerCase() === 'coverage'){
                 type = 'raster';
@@ -478,8 +490,13 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 resolve: {
                     'dashboardName':function(){return 'dataset';},
                     'metadataValues':function(textService){
-                        return textService.metadataJson($scope.selectedDS.Name,
-                            $scope.selectedDS.Name, type, true);
+                        if($scope.dataCtrl.selectedDataSetChild){
+                            return textService.metadataJson($scope.dataCtrl.selectedDataSetChild.Provider,
+                                $scope.dataCtrl.selectedDataSetChild.Name,
+                                type,true);
+                        }else {
+                            return textService.metadataJsonDS($scope.selectedDS.Name,type,true);
+                        }
                     }
                 }
             });

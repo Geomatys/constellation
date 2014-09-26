@@ -1,3 +1,9 @@
+<div ng-if="!existsMetadata">
+    <div class="row alert alert-warning" style="margin:0;">
+        <span translate="metadata.not.found">No metadata found.</span>
+    </div>
+</div>
+<div ng-if="existsMetadata">
 <div id="advancedViewMetadata" ng-init="initMetadataViewer()">
     <h3 class="expand-all-btn"
         ng-class="{'datasetTheme':theme.isDatasetDashboard,'sensorTheme':theme.isSensorDashboard}">
@@ -71,4 +77,5 @@
     <div ng-repeat="jsonObject in metadataValues" ng-include="'node_renderer.html'"></div>
 
 
+</div>
 </div>

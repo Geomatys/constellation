@@ -829,7 +829,7 @@ public class DataRest {
     }
 
     /**
-     * Returns applied template for metadata for read mode only like metadata viewer.
+     * For data, returns applied template for metadata for read mode only like metadata viewer.
      * for reference (consult) purposes only.
      *
      * @param providerId given dataset identifier which is provider identifier.
@@ -844,48 +844,89 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getIsoMetadataJson(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId,
                                        final @PathParam("type") String type, final @PathParam("prune") boolean prune) {
-
-        //@TODO get dataset or data metadata when dashboard will be added.
-        // meanwhile we returns the dataset metadata and if not exists we returns the data metadata.
-        //final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
-        DefaultMetadata metadata;
-        try{
-            metadata = datasetBusiness.getMetadata(providerId,-1);
-        }catch(Exception ex){
-            metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
-        }
-
         final StringBuilder buffer = new StringBuilder();
-        if (metadata != null) {
-            //prune the metadata
-            metadata.prune();
+        try{
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+            if(metadata == null){
+                //try to get dataset metadata.
+                metadata = datasetBusiness.getMetadata(providerId,-1);
+            }
+            if (metadata != null) {
+                metadata.prune();
 
-            //for debugging purposes
+                //for debugging purposes
+                    /*try{
+                        System.out.println(XML.marshal(metadata));
+                    }catch(Exception ex){
+                        LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+                    }*/
+
+                //get template name
+                final String templateName;
+                if("vector".equalsIgnoreCase(type)){
+                    //vector template
+                    templateName="profile_default_vector";
+                }else if ("raster".equalsIgnoreCase(type)){
+                    //raster template
+                    templateName="profile_default_raster";
+                } else {
+                    //default template is import
+                    templateName="profile_import";
+                }
+                final Template template = Template.getInstance(templateName);
+                template.write(metadata,buffer,prune);
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
+        }
+        return Response.ok(buffer.toString()).build();
+    }
+
+    /**
+     * for Dataset, returns applied template for metadata for read mode only like metadata viewer.
+     * for reference (consult) purposes only.
+     *
+     * @param datasetIdentifier given dataset identifier.
+     * @param type data type
+     * @param prune flag that indicates if template result will clean empty children/block.
+     * @return {@code Response}
+     */
+    @GET
+    @Path("metadataJson/dataset/iso/{datasetIdentifier}/{type}/{prune}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getIsoMetadataJson(final @PathParam("datasetIdentifier") String datasetIdentifier,
+                                       final @PathParam("type") String type,
+                                       final @PathParam("prune") boolean prune) {
+        final StringBuilder buffer = new StringBuilder();
+        try{
+            final DefaultMetadata metadata = datasetBusiness.getMetadata(datasetIdentifier,-1);
+            if (metadata != null) {
+                metadata.prune();
+                //for debugging purposes
                 /*try{
                     System.out.println(XML.marshal(metadata));
                 }catch(Exception ex){
                     LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
                 }*/
 
-            //get template name
-            final String templateName;
-            if("vector".equalsIgnoreCase(type)){
-                //vector template
-                templateName="profile_default_vector";
-            }else if ("raster".equalsIgnoreCase(type)){
-                //raster template
-                templateName="profile_default_raster";
-            } else {
-                //default template is import
-                templateName="profile_import";
-            }
-            final Template template = Template.getInstance(templateName);
-            try{
+                //get template name
+                final String templateName;
+                if("vector".equalsIgnoreCase(type)){
+                    //vector template
+                    templateName="profile_default_vector";
+                }else if ("raster".equalsIgnoreCase(type)){
+                    //raster template
+                    templateName="profile_default_raster";
+                } else {
+                    //default template is import
+                    templateName="profile_import";
+                }
+                final Template template = Template.getInstance(templateName);
                 template.write(metadata,buffer,prune);
-            }catch(IOException ex){
-                LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
-                return Response.status(500).entity("failed").build();
             }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
         }
         return Response.ok(buffer.toString()).build();
     }
