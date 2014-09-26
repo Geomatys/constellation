@@ -326,4 +326,12 @@ public class DatasetBusiness implements IDatasetBusiness {
             throw new TargetNotFoundException("Unable to find a dataset: " + datasetId);
         }
     }
+
+    @Override
+    public void removeDataset(String datasetIdentifier, int domainId) {
+        final Dataset ds = datasetRepository.findByIdentifier(datasetIdentifier);
+        if (ds != null) {
+            datasetRepository.remove(ds.getId());
+        }
+    }
 }
