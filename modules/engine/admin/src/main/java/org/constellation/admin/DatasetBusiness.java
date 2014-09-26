@@ -137,7 +137,6 @@ public class DatasetBusiness implements IDatasetBusiness {
     /**
      * Create and insert then returns a new dataset for given parameters.
      * @param identifier dataset identifier.
-     * @param providerId provider id.
      * @param metadataId metadata identifier.
      * @param metadataXml metadata content as xml string.
      * @param owner
@@ -145,7 +144,7 @@ public class DatasetBusiness implements IDatasetBusiness {
      */
     @Override
     public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) {
-        final Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner);
+        final Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner, System.currentTimeMillis(), null);
         return datasetRepository.insert(ds);
     }
 

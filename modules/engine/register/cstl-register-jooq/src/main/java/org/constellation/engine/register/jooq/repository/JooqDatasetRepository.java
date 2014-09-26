@@ -44,6 +44,8 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
         newRecord.setMetadataIso(dataset.getMetadataIso());
         newRecord.setMetadataId(dataset.getMetadataId());
         newRecord.setOwner(dataset.getOwner());
+        newRecord.setDate(dataset.getDate());
+        newRecord.setFeatureCatalog(dataset.getFeatureCatalog());
         newRecord.store();
         return newRecord.into(Dataset.class);
     }
@@ -57,6 +59,8 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
                 .set(DATASET.METADATA_ISO, dataset.getMetadataIso())
                 .set(DATASET.OWNER, dataset.getOwner())
                 .set(DATASET.METADATA_ID, dataset.getMetadataId())
+                .set(DATASET.DATE, dataset.getDate())
+                .set(DATASET.FEATURE_CATALOG, dataset.getFeatureCatalog())
                 .where(DATASET.ID.eq(dataset.getId()));
 
         return set.execute();
