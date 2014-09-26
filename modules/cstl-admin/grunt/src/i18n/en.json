@@ -161,7 +161,8 @@
     "sensor.metadata.listing.selected.export.button":"Export metadata",
     "data.listing.selected.goto.sensor":"Go to sensor page",
     "sensor.listing.selected.delete.button":"Delete sensor",
-    "data.listing.selectAllChild":"Select all data of dataset",
+    "data.listing.selectAllChild":"Select all data in dataset",
+    "metadata.not.found":"Metadata not found!",
 
     "disclaimer.cstl.website":"Constellation-SDI website",
     "disclaimer.cstl.github":"Constellation-SDI github",
