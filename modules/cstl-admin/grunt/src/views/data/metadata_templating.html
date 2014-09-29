@@ -82,7 +82,8 @@
            ng-model="fieldObj.field.value"
            ng-required="fieldObj.field.obligation === 'M'"
            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
-           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"/>
+           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
+           debounce="200"/>
     <textarea ng-if="fieldObj.field.render === 'textarea'"
               class="form-control form-control-fix"
               ng-model="fieldObj.field.value"
@@ -90,7 +91,8 @@
               ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
               dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
               rows="6"
-              cols="33"></textarea>
+              cols="33"
+              debounce="200"></textarea>
     <div ng-if="fieldObj.field.render === 'DATE.text'"
          class="col-xs-5 col-sm-5 col-md-5 col-lg-5 input-group date"
          style="padding-left:0;"
@@ -186,7 +188,8 @@
         <input type="text"
                class="form-control form-control-fix"
                placeholder="{{fieldObj.field.name | translate}}"
-               ng-model="fieldObj.field.value"/>
+               ng-model="fieldObj.field.value"
+               debounce="200"/>
     </div>
     <select ng-if="fieldObj.field.render === 'DistributionFormat.codelist'"
             class="form-control form-control-fix"
@@ -253,7 +256,8 @@
            ng-model="fieldObj.field.value"
            ng-required="fieldObj.field.obligation === 'M'"
            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
-           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"/>
+           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
+           debounce="200"/>
     <input ng-if="fieldObj.field.render === 'integer'"
            type="number"
            class="form-control form-control-fix"
@@ -261,7 +265,8 @@
            ng-model="fieldObj.field.value"
            ng-required="fieldObj.field.obligation === 'M'"
            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
-           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"/>
+           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
+           debounce="200"/>
     <input ng-if="fieldObj.field.render === 'web'"
            type="url"
            class="form-control form-control-fix"
@@ -269,7 +274,8 @@
            ng-model="fieldObj.field.value"
            ng-required="fieldObj.field.obligation === 'M'"
            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
-           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"/>
+           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
+           debounce="200"/>
     <input ng-if="fieldObj.field.render === 'mail'"
            type="email"
            class="form-control form-control-fix"
@@ -277,7 +283,8 @@
            ng-model="fieldObj.field.value"
            ng-required="fieldObj.field.obligation === 'M'"
            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
-           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"/>
+           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
+           debounce="200"/>
     <span ng-if="fieldObj.field.render === 'readonly'"
           class="data"
           style="word-wrap: break-word;">{{fieldObj.field.value}}</span>

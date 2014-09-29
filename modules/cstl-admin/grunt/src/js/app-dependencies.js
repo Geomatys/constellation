@@ -19,6 +19,7 @@ angular.module('CstlAdminDep', [
     'ngResource',
     'ngRoute',
     'ngAnimate',
+    'debounce',
     // Libraries modules.
     'base64',
     'hljs',
