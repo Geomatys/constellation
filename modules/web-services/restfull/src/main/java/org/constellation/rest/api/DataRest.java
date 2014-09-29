@@ -1123,13 +1123,13 @@ public class DataRest {
             if(dataBriefList!=null && !dataBriefList.isEmpty()){
                 type = dataBriefList.get(0).getType();
             }
-            dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), type, owner, dataBriefList);
+            dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), type, owner, dataBriefList,dataset.getDate());
         }else {
             String type = null;
             if(!children.isEmpty()){
                 type = children.get(0).getType();
             }
-            dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), type, owner, children);
+            dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), type, owner, children, dataset.getDate());
         }
 
         try{

@@ -50,17 +50,19 @@ public class DataSetBrief implements Serializable {
     private List<String> keywords = new ArrayList<>();
     @XmlElement(name="Resume")
     private String resume;
-    @XmlElement(name="DateStamp")
-    private String dateStamp;
+    @XmlElement(name="Date")
+    private long date;
 
     public DataSetBrief() {}
 
-    public DataSetBrief(final Integer id, final String name, final String type, final String owner, final List<DataBrief> children) {
+    public DataSetBrief(final Integer id, final String name, final String type, final String owner,
+                        final List<DataBrief> children, final long date) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.owner = owner;
         this.children = children;
+        this.date = date;
     }
 
     public String getName() {
@@ -111,12 +113,12 @@ public class DataSetBrief implements Serializable {
         this.resume = resume;
     }
 
-    public String getDateStamp() {
-        return dateStamp;
+    public long getDate() {
+        return date;
     }
 
-    public void setDateStamp(String dateStamp) {
-        this.dateStamp = dateStamp;
+    public void setDate(long date) {
+        this.date = date;
     }
 
     public Integer getId() {
@@ -137,7 +139,7 @@ public class DataSetBrief implements Serializable {
                 ", children=" + children +
                 ", keywords=" + keywords +
                 ", resume=" + resume +
-                ", datestamp=" + dateStamp +
+                ", date=" + date +
                 '}';
     }
 }
