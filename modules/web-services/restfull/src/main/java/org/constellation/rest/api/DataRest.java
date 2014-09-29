@@ -67,6 +67,7 @@ import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
@@ -2064,6 +2065,36 @@ public class DataRest {
             metadata.prune(); 
         }
         return Response.ok(metadata).build();
+    }
+
+    /**
+     * Return as an attachment file the metadata of data in xml format.
+     * @param providerId given data provider identifier.
+     * @param dataId data Id.
+     * @return the xml file
+     */
+    @GET
+    @Path("metadata/iso/download/{providerId}/{dataId}")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response downloadMetadataForData(final @PathParam("providerId") String providerId,
+                                            final @PathParam("dataId") String dataId) {
+        try{
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+            if(metadata == null){
+                //try to get dataset metadata.
+                metadata = datasetBusiness.getMetadata(providerId,-1);
+            }
+            if (metadata != null) {
+                metadata.prune();
+                final String xmlStr = XML.marshal(metadata);
+                return Response.ok(xmlStr, MediaType.APPLICATION_XML_TYPE)
+                        .header("Content-Disposition", "attachment; filename=\"" + providerId + ".xml\"").build();
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "Failed to get xml metadata for data with provider identifier "+providerId+" dataId = "+dataId,ex);
+        }
+        return Response.ok("<empty></empty>", MediaType.APPLICATION_XML_TYPE)
+                .header("Content-Disposition", "attachment; filename=\"" + providerId + ".xml\"").build();
     }
 
     @GET

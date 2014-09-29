@@ -136,13 +136,16 @@ public class MetadataRest {
                                                @PathParam("datasetIdentifier") final String datasetIdentifier) {
         try{
             final DefaultMetadata metadata  =  datasetBusiness.getMetadata(datasetIdentifier, domainId);
-            final String xmlStr = XML.marshal(metadata);
-            return Response.ok(xmlStr, MediaType.APPLICATION_XML_TYPE)
-                    .header("Content-Disposition", "attachment; filename=\"" + datasetIdentifier + ".xml\"").build();
+            if (metadata != null) {
+                metadata.prune();final String xmlStr = XML.marshal(metadata);
+                return Response.ok(xmlStr, MediaType.APPLICATION_XML_TYPE)
+                        .header("Content-Disposition", "attachment; filename=\"" + datasetIdentifier + ".xml\"").build();
+            }
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "Failed to get xml metadata for dataset with identifier "+datasetIdentifier,ex);
-            return Response.status(500).entity("failed").build();
         }
+        return Response.ok("<empty></empty>", MediaType.APPLICATION_XML_TYPE)
+                .header("Content-Disposition", "attachment; filename=\"" + datasetIdentifier + ".xml\"").build();
     }
 
     /**

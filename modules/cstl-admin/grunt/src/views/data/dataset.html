@@ -341,11 +341,22 @@
                                         </button>
                                     </span>
                                 </div>
-                                <div class="col-sm-2">
+                                <div class="col-sm-2" ng-if="!dataCtrl.selectedDataSetChild">
                                     <span class="tooltipicon">
                                         <a id="exportMD"
                                            class="btn btn-csw"
                                            ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selectedDS.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
+                                           data-placement="bottom"
+                                           title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
+                                            <i class="fa fa-download"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                                <div class="col-sm-2" ng-if="dataCtrl.selectedDataSetChild">
+                                    <span class="tooltipicon">
+                                        <a id="exportMDChild"
+                                           class="btn btn-csw"
+                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/metadata/iso/download/{{dataCtrl.selectedDataSetChild.Provider}}/{{dataCtrl.selectedDataSetChild.Id}};jsessionid={{dataCtrl.cstlSessionId}}"
                                            data-placement="bottom"
                                            title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
                                             <i class="fa fa-download"></i>

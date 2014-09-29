@@ -152,6 +152,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'mergeMetadata':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/merge/:provider/:identifier/:type;jsessionid='},
             'mergeMetadataDS':      {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/dataset/merge/:identifier/:type;jsessionid='},
             'metadata':             {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/metadata/iso/:providerId/:dataId;jsessionid='},
+            'downloadMetadata':     {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/metadata/iso/download/:providerId/:dataId;jsessionid='},
             'dataForMetadata':      {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/associated;jsessionid='},
             'getDatasetMetadata':   {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/dataset;jsessionid='},
             'getDataMetadata':      {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/data;jsessionid='},
