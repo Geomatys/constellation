@@ -458,8 +458,16 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             });
             dlg.result.then(function(cfrm){
                 if(cfrm){
-                    console.debug('do something!');
-                    //@TODO implements rest api to delete a dataset.
+                    datasetListing.deleteDataset({"datasetIdentifier":$scope.selectedDS.Name},function(response){//success
+                        Growl('success','Success','Data set '+ $scope.selectedDS.Name +' successfully deleted');
+                        datasetListing.listAll({}, function(response) {
+                            Dashboard($scope, response, true);
+                            $scope.dataCtrl.selectedDataSetChild=null;
+                            $scope.selectedDS = null;
+                        });
+                    },function(response){//error
+                        Growl('error','Error','Dataset '+ $scope.selectedDS.Name +' deletion failed');
+                    });
                 }
             });
         };

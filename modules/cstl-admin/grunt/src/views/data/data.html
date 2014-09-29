@@ -466,6 +466,22 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="block-action">
+                                        <div class="row">
+                                            <div class="col-sm-2">
+                                                <span class="tooltipicon">
+                                                    <button type="button"
+                                                            id="deleteDataset"
+                                                            class="btn btn-danger"
+                                                            ng-click="deleteDataset();"
+                                                            tooltip-placement="bottom"
+                                                            tooltip-html-unsafe="{{'layer.listing.selected.delete.button' | translate }}">
+                                                        <i class="glyphicon glyphicon-trash"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="block-content"
                                          ng-class="{'block-vector':dataCtrl.selectedDataSetChild.Type=='VECTOR','block-raster':dataCtrl.selectedDataSetChild.Type=='COVERAGE'}"
                                          ng-if="dataCtrl.selectedDataSetChild">

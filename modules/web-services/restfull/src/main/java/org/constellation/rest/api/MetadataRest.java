@@ -86,13 +86,19 @@ public class MetadataRest {
     @Inject
     private UserRepository userRepository;
 
+    /**
+     * Proceed to remove a dataset
+     * @param domainId
+     * @param datasetIdentifier
+     * @return
+     */
     @DELETE
     @Path("dataset/{datasetIdentifier}")
     public Response removeDataSet(@PathParam("domainId") final int domainId,
                                   @PathParam("datasetIdentifier") final String datasetIdentifier) {
         try{
             datasetBusiness.removeDataset(datasetIdentifier, domainId);
-            return Response.ok().build();
+            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "Failed to remove dataset with identifier "+datasetIdentifier,ex);
             return Response.status(500).entity("failed").build();
