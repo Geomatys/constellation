@@ -329,7 +329,7 @@
                                     <div class="item {{dataset.Type? ('dataset-data-'+dataset.Type | lowercase) : 'dataset-data'}}"
                                          ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
                                          ng-click="selectDS(dataset);selectDataSetChild(null);"
-                                         data-name="{{dataset.id}}"
+                                         data-name="{{dataset.Name}}"
                                          ng-cloak>
                                         <div class="top">
                                             <span class="item-title"
@@ -366,7 +366,7 @@
                                          ng-class="{'selected':dataCtrl.selectedDataSetChild && (data.Id==dataCtrl.selectedDataSetChild.Id),'col-xs-11':dataCtrl.smallMode,'child':!dataCtrl.smallMode,'col-sm-offset-1':dataCtrl.smallMode}"
                                          ng-click="selectDataSetChild(data)"
                                          ng-cloak
-                                         data-name="{{data.Id}}">
+                                         data-name="{{dataset.Name+':'+data.Name}}">
                                         <div class="top">
                                             <span class="item-title"
                                                   title="{{data.Name}}">{{truncate(dataCtrl.smallMode,data.Name)}}</span>
