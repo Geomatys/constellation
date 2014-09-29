@@ -20,6 +20,7 @@ package org.constellation.engine.register.jooq.repository;
 
 import org.constellation.engine.register.Dataset;
 import static org.constellation.engine.register.jooq.Tables.DATASET;
+import static org.constellation.engine.register.jooq.Tables.DATA;
 import org.constellation.engine.register.jooq.tables.records.DatasetRecord;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.jooq.UpdateConditionStep;

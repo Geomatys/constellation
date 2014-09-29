@@ -21,6 +21,7 @@ package org.constellation.admin;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -331,6 +332,29 @@ public class DatasetBusiness implements IDatasetBusiness {
     public void removeDataset(String datasetIdentifier, int domainId) {
         final Dataset ds = datasetRepository.findByIdentifier(datasetIdentifier);
         if (ds != null) {
+            final Set<Integer> involvedProvider = new HashSet<>();
+            
+            // 1. hide data
+            for (Data data : dataRepository.findAllByDatasetId(ds.getId())) {
+                data.setVisible(false);
+                data.setDatasetId(null);
+                dataRepository.update(data);
+                involvedProvider.add(data.getProvider());
+            }
+            
+            // 2. cleanup provider if empty
+            for (Integer providerID : involvedProvider) {
+                boolean remove = true;
+                for (Data data : dataRepository.findByProviderId(providerID)) {
+                    if (data.isVisible()) {
+                        remove = false;
+                        break;
+                    }
+                }
+                if (remove) {
+                    providerRepository.delete(providerID);
+                }
+            }
             datasetRepository.remove(ds.getId());
         }
     }
