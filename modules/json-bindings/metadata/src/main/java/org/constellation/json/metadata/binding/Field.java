@@ -37,6 +37,7 @@ public class Field implements Serializable {
     private String defaultValue;
     private String value;
     private String obligation;
+    private String ignore;
 
     public Field() {
 
@@ -104,5 +105,13 @@ public class Field implements Serializable {
 
     public void setObligation(String obligation) {
         this.obligation = obligation;
+    }
+
+    public String getIgnore() {
+        return ignore;
+    }
+
+    public void setIgnore(String ignore) {
+        this.ignore = ignore;
     }
 }
