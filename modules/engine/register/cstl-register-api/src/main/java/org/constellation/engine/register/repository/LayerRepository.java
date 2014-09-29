@@ -31,6 +31,8 @@ public interface LayerRepository {
     Layer findById(Integer layerId);
     
     List<Layer> findByServiceId(int serviceId);
+    
+    List<Layer> findByDataId(int dataId);
 
     int deleteServiceLayer(Service service);
 

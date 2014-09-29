@@ -56,6 +56,7 @@ import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
@@ -544,6 +545,23 @@ public class DataBusiness implements IDataBusiness {
                 providerIdentifier);
         data.setVisible(visibility);
         dataRepository.update(data);
+        
+        // 1. remove layer involving the data
+        for (Layer layer : layerRepository.findByDataId(data.getId())) {
+            layerRepository.delete(layer.getId());
+        }
+        
+        // 2. cleanup provider if empty
+        boolean remove = true;
+        for (Data pdata : dataRepository.findByProviderId(data.getProvider())) {
+            if (pdata.isVisible()) {
+                remove = false;
+                break;
+            }
+        }
+        if (remove) {
+            providerRepository.delete(data.getProvider());
+        }
     }
 
     /**

@@ -94,6 +94,11 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     public List<Layer> findByServiceId(int serviceId) {
         return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).fetchInto(Layer.class);
     }
+    
+    @Override
+    public List<Layer> findByDataId(int dataId) {
+        return dsl.select().from(LAYER).where(LAYER.DATA.eq(dataId)).fetchInto(Layer.class);
+    }
 
     @Override
     public Layer findByServiceIdAndLayerName(int serviceId, String layerName) {

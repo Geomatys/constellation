@@ -408,33 +408,14 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(cfrm){
                     var layerName = $scope.dataCtrl.selectedDataSetChild.Name;
                     var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
-                    // Remove layer on that data before
-                    if ($scope.dataCtrl.selectedDataSetChild.TargetService &&
-                        $scope.dataCtrl.selectedDataSetChild.TargetService.length > 0) {
-                        for (var i = 0; i < $scope.dataCtrl.selectedDataSetChild.TargetService.length; i++) {
-                            var servId = $scope.dataCtrl.selectedDataSetChild.TargetService[i].name;
-                            var servType = $scope.dataCtrl.selectedDataSetChild.TargetService[i].protocol[0];
-                            webService.deleteLayer({type : servType, id: servId, layerid : layerName});
-                        }
-                    }
+                    
                     dataListing.hideData({providerid: providerId, dataid: layerName},
                         {value : $scope.dataCtrl.selectedDataSetChild.Namespace},
                         function() {//success
                             Growl('success','Success','Data '+ layerName +' successfully deleted');
-                            dataListing.listDataForProv({providerId: providerId}, function(response) {
-                                if (response.length === 0) {
-                                    provider.delete({id: providerId}, function() {
-                                        datasetListing.listAll({}, function(response) {
-                                            Dashboard($scope, response, true);
-                                            $scope.dataCtrl.selectedDataSetChild=null;
-                                        });
-                                    });
-                                } else {
-                                    datasetListing.listAll({}, function(response) {
-                                        Dashboard($scope, response, true);
-                                        $scope.dataCtrl.selectedDataSetChild=null;
-                                    });
-                                }
+                            datasetListing.listAll({}, function(response) {
+                                Dashboard($scope, response, true);
+                                $scope.dataCtrl.selectedDataSetChild=null;
                             });
                         },
                         function() {//error
