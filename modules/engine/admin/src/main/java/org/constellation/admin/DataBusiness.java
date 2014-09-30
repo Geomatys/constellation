@@ -75,8 +75,8 @@ import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.data.FeatureStore;
 import org.opengis.feature.PropertyType;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -87,6 +87,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 0.9
  */
 
+@Profile("standard")
 @Component
 @Primary
 public class DataBusiness implements IDataBusiness {
@@ -174,7 +175,7 @@ public class DataBusiness implements IDataBusiness {
                                                final QName name) throws ConstellationException{
         DefaultMetadata metadata = null;
         final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
-        final MarshallerPool pool = ISOMarshallerPool.getInstance();
+        final MarshallerPool pool = getMarshallerPool();
         try {
             if (data != null && data.getIsoMetadata() != null) {
                 final InputStream sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
@@ -225,8 +226,9 @@ public class DataBusiness implements IDataBusiness {
                              final DefaultMetadata metadata) throws ConstellationException {
         final StringWriter sw = new StringWriter();
         try {
-            final Marshaller marshaller = ISOMarshallerPool.getInstance().acquireMarshaller();
+            final Marshaller marshaller = getMarshallerPool().acquireMarshaller();
             marshaller.marshal(metadata, sw);
+            getMarshallerPool().recycle(marshaller);
         } catch (JAXBException ex) {
             throw new ConstellationException(ex);
         }
@@ -634,5 +636,9 @@ public class DataBusiness implements IDataBusiness {
         }
         values.setValues(mapVals);
         return values;
+    }
+    
+    protected MarshallerPool getMarshallerPool() {
+        return ISOMarshallerPool.getInstance();
     }
 }
