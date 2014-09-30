@@ -286,8 +286,14 @@ public final class MetadataUtilities {
      * @throws DataStoreException
      */
     public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider) throws DataStoreException {
-    	final DataStore dataStore = dataProvider.getMainStore();
-    	final CoverageStore coverageStore = (CoverageStore) dataStore;
+
+        final DataStore dataStore = dataProvider.getMainStore();
+        final CoverageStore coverageStore = (CoverageStore) dataStore;
+        DefaultMetadata coverageMetadata =  (DefaultMetadata) coverageStore.getMetadata();
+        if(coverageMetadata!=null)return coverageMetadata;
+
+        //if the coverage metadata still null that means it is not implemented yet
+        // so we return the metadata iso from the reader
         final Set<Name> names= coverageStore.getNames();
         DefaultMetadata metadata = new DefaultMetadata();
         if(names != null){
