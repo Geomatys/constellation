@@ -252,7 +252,7 @@ public class SensorRest {
                         templateName="profile_sensorml_system";
                     }
                     final Template template = Template.getInstance(templateName);
-                    template.read(metadataValues,sml,false);
+                    template.read(metadataValues,sml,true);//@TODO use read with false to remove the prune when saving sensorML.
                     final String xml = marshallSensor(sml);
                     record.setMetadata(xml);
                     //Save sensorML
