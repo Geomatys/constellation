@@ -177,7 +177,7 @@ public class DataBusiness implements IDataBusiness {
     public DefaultMetadata loadIsoDataMetadata(final String providerId,
                                                final QName name) throws ConstellationException{
         DefaultMetadata metadata = null;
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
+        final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         final MarshallerPool pool = getMarshallerPool();
         try {
             if (data != null && data.getIsoMetadata() != null) {
@@ -194,7 +194,7 @@ public class DataBusiness implements IDataBusiness {
     
     @Override
     public Dataset getDatasetForData(final String providerId, final QName name) throws ConstellationException{
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
+        final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         if (data != null) {
             return datasetRepository.findById(data.getDatasetId());
         }
@@ -244,7 +244,7 @@ public class DataBusiness implements IDataBusiness {
         } catch (JAXBException ex) {
             throw new ConstellationException(ex);
         }
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
+        final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         data.setIsoMetadata(sw.toString());
         data.setMetadataId(metadata.getFileIdentifier());
         dataRepository.update(data);
@@ -265,7 +265,7 @@ public class DataBusiness implements IDataBusiness {
                                                  final QName name,
                                                  final MarshallerPool pool) throws ConstellationException {
         try {
-            final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
+            final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerIdentifier);
             if (data != null && data.getMetadata() != null) {
                 final InputStream sr = new ByteArrayInputStream(data.getMetadata().getBytes());
                 final Unmarshaller m = pool.acquireUnmarshaller();
@@ -311,7 +311,7 @@ public class DataBusiness implements IDataBusiness {
     @Override
     public DataBrief getDataBrief(final QName fullName,
                                   final String providerIdentifier) throws ConstellationException {
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(fullName.getLocalPart(), fullName.getNamespaceURI(), providerIdentifier);
+        final Data data = dataRepository.findDataFromProvider(fullName.getNamespaceURI(), fullName.getLocalPart(), providerIdentifier);
         final List<Data> datas = new ArrayList<>();
         datas.add(data);
         final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
@@ -554,9 +554,7 @@ public class DataBusiness implements IDataBusiness {
     public void updateDataVisibility(final QName name,
                                      final String providerIdentifier,
                                      boolean visibility) {
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(),
-                name.getNamespaceURI(),
-                providerIdentifier);
+        final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerIdentifier);
         data.setVisible(visibility);
         dataRepository.update(data);
         
@@ -664,7 +662,7 @@ public class DataBusiness implements IDataBusiness {
             throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
         }
         
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataName.getLocalPart(), dataName.getNamespaceURI(), providerId);
+        final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
             data.setIsoMetadata(metadataString);
             data.setMetadataId(metadata.getFileIdentifier());

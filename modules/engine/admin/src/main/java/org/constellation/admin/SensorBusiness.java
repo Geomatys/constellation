@@ -75,7 +75,7 @@ public class SensorBusiness implements ISensorBusiness {
 
     public void linkDataToSensor(QName dataName, String providerId, String sensorIdentifier) {
 
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataName.getLocalPart(), dataName.getNamespaceURI(), providerId);
+        final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         final Sensor sensor = sensorRepository.findByIdentifier(sensorIdentifier);
         sensorRepository.linkDataToSensor(data.getId(),sensor.getId());
 
@@ -91,9 +91,9 @@ public class SensorBusiness implements ISensorBusiness {
     public void unlinkDataToSensor(final QName dataName,
                                    final String providerId,
                                    final String sensorIdentifier) throws TargetNotFoundException {
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(
-                dataName.getLocalPart(),
+        final Data data = dataRepository.findDataFromProvider(
                 dataName.getNamespaceURI(),
+                dataName.getLocalPart(),
                 providerId);
         final Sensor sensor = sensorRepository.findByIdentifier(sensorIdentifier);
         if(data == null){

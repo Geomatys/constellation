@@ -29,8 +29,6 @@ public interface DataRepository {
 
     List<Data> findAll();
     
-    Data findByNameAndNamespaceAndProviderIdentifier(String name, String namespace, String providerIdentifier);
-
     Data fromLayer(String layerAlias, String providerId);
     
     Data findById(int dataId);
