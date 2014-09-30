@@ -188,6 +188,15 @@ public class DataBusiness implements IDataBusiness {
         }
         return metadata;
     }
+    
+    @Override
+    public Dataset getDatasetForData(final String providerId, final QName name) throws ConstellationException{
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
+        if (data != null) {
+            return datasetRepository.findById(data.getDatasetId());
+        }
+        return null;
+    }
 
     /**
      * Search and returns result as list of {@link Data} for given query string.

@@ -89,7 +89,6 @@ import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.json.metadata.Template;
@@ -880,10 +879,14 @@ public class DataRest {
                                        final @PathParam("prune") boolean prune) {
         final StringBuilder buffer = new StringBuilder();
         try{
-            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
+            final QName dataName = Util.parseQName(dataId);
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, dataName);
             if(metadata == null){
                 //try to get dataset metadata.
-                metadata = datasetBusiness.getMetadata(providerId,-1);
+                final Dataset dataset = dataBusiness.getDatasetForData(providerId, dataName);
+                if (dataset != null) {
+                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                }
             }
             if (metadata != null) {
                 metadata.prune();

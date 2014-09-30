@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.constellation.engine.register.Dataset;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -49,7 +50,9 @@ public interface IDataBusiness {
 
     DataBrief getDataBrief(QName fullName, String providerIdentifier) throws ConstellationException;
 
-    DefaultMetadata loadIsoDataMetadata(String identifier, QName qName) throws ConstellationException;
+    DefaultMetadata loadIsoDataMetadata(String providerID, QName qName)  throws ConstellationException;
+    
+    Dataset getDatasetForData(String providerID, QName qName) throws ConstellationException;
 
     void deleteAll();
 
