@@ -222,7 +222,8 @@
                              style="padding-left:0;">
                             <div class="item metadata"
                                  ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
-                                 ng-click="selectDS(dataset);selectDataSetChild(null);"
+                                 ng-click="selectDS(dataset);selectDataSetChild(null,null);"
+                                 ng-show="dataset.Children.length!=1"
                                  ng-cloak>
                                 <div class="top">
                                     <span class="item-title csw-title"
@@ -248,12 +249,18 @@
                                 </div>
                             </div>
                             <div class="item"
-                                 style="margin-top:0;"
-                                 ng-if="dataset.id==selectedDS.id"
+                                 ng-style="dataset.Children.length==1?'':'margin-top:0;'"
+                                 ng-if="dataset.id==selectedDS.id || dataset.Children.length==1"
                                  ng-repeat="relatedData in dataset.Children"
-                                 ng-click="selectDataSetChild(relatedData)"
+                                 ng-click="selectDataSetChild(relatedData,dataset)"
                                  ng-cloak
-                                 ng-class="{'selected':dataCtrl.selectedDataSetChild && (relatedData.Id==dataCtrl.selectedDataSetChild.Id),'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':!dataCtrl.smallMode, 'col-xs-11':dataCtrl.smallMode, 'col-sm-offset-1':dataCtrl.smallMode}">
+                                 ng-class="{'selected':dataCtrl.selectedDataSetChild && (relatedData.Id==dataCtrl.selectedDataSetChild.Id),
+                                            'metadata-product-vector':relatedData.Type.toLowerCase()=='vector',
+                                            'metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage',
+                                            'metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor',
+                                            'child':!dataCtrl.smallMode && dataset.Children.length>1,
+                                            'col-xs-11':dataCtrl.smallMode && dataset.Children.length>1,
+                                            'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1}">
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{relatedData.Name}}">{{truncate(dataCtrl.smallMode,relatedData.Name)}}</span>
@@ -276,22 +283,31 @@
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-left: 0;">
                 <div id="selection">
                     <div class="alert alert-info alert-csw"
-                         ng-if="!selectedDS">
+                         ng-if="!selectedDS && !dataCtrl.selectedDataSetChild">
                         <h4 translate="label.no.selected.metadata">No selected metadata</h4>
                         <p style="font-weight:normal;"
                            translate="msg.no.selected.metadata">Click on a metadata to display more information</p>
                     </div>
                     <div id="selected-item"
                          class="selected-item"
-                         ng-if="selectedDS">
+                         ng-if="selectedDS || dataCtrl.selectedDataSetChild">
                         <div class="block-header block-header-md"
-                             ng-click="toggleUpDownSelectedMD()">
+                             ng-click="toggleUpDownSelectedMD()"
+                             ng-if="selectedDS">
                             <strong class="item-title title-bloc"
                                     title="{{selectedDS.Name}}">{{truncateTitleBlock(selectedDS.Name)}}</strong>
                             <i class="fa fa-chevron-up pull-right"></i>
                         </div>
+                        <div class="block-header block-header-md"
+                             ng-click="toggleUpDownSelectedMD()"
+                             ng-if="!selectedDS && dataCtrl.selectedDataSetChild">
+                            <strong class="item-title title-bloc"
+                                    title="{{dataCtrl.selectedDataSetChild.Name}}">{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</strong>
+                            <i class="fa fa-chevron-down pull-right"></i>
+                        </div>
                         <div>
-                            <div class="block-content">
+                            <div class="block-content"
+                                 ng-if="selectedDS">
                                 <div class="row description-block">
                                     <div class="col-sm-3 col-md-2">
                                         <img src="img/block-content-owner.svg" alt="" />
@@ -341,7 +357,7 @@
                                         </button>
                                     </span>
                                 </div>
-                                <div class="col-sm-2" ng-if="!dataCtrl.selectedDataSetChild">
+                                <div class="col-sm-2" ng-if="selectedDS && !dataCtrl.selectedDataSetChild">
                                     <span class="tooltipicon">
                                         <a id="exportMD"
                                            class="btn btn-csw"

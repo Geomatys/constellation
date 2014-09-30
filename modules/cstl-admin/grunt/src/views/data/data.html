@@ -328,8 +328,9 @@
                                      style="padding-left:0;">
                                     <div class="item {{dataset.Type? ('dataset-data-'+dataset.Type | lowercase) : 'dataset-data'}}"
                                          ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
-                                         ng-click="selectDS(dataset);selectDataSetChild(null);"
+                                         ng-click="selectDS(dataset);selectDataSetChild(null,null);"
                                          data-name="{{dataset.Name}}"
+                                         ng-show="dataset.Children.length!=1"
                                          ng-cloak>
                                         <div class="top">
                                             <span class="item-title"
@@ -343,12 +344,12 @@
                                             <div class="block">
                                                 <i class="fa fa-user"></i>{{dataset.Owner}}
                                             </div>
-                                            <a ng-if="selectedDS && (dataset.id==selectedDS.id)"
+                                            <!--a ng-if="selectedDS && (dataset.id==selectedDS.id)"
                                                ng-click="selectall=!selectall"
                                                class="pull-right"
                                                ng-class="{'selectall-normal':selectall==false, 'selectall-selected':selectall==true}"
                                                tooltip-html-unsafe="{{'data.listing.selectAllChild' | translate}}"
-                                               tooltip-placement="right"></a>
+                                               tooltip-placement="right"></a-->
                                             <div class="block pull-right">
                                                 <i class="fa fa-paperclip"></i>
                                                 <span ng-if="dataset.Children.length == 0"
@@ -360,11 +361,14 @@
                                         </div>
                                     </div>
                                     <div class="item {{data.Type | lowercase}}"
-                                         style="margin-top:0;"
-                                         ng-if="dataset.id==selectedDS.id"
+                                         ng-style="dataset.Children.length==1?'':'margin-top:0;'"
+                                         ng-if="dataset.id==selectedDS.id || dataset.Children.length==1"
                                          ng-repeat="data in dataset.Children"
-                                         ng-class="{'selected':dataCtrl.selectedDataSetChild && (data.Id==dataCtrl.selectedDataSetChild.Id),'col-xs-11':dataCtrl.smallMode,'child':!dataCtrl.smallMode,'col-sm-offset-1':dataCtrl.smallMode}"
-                                         ng-click="selectDataSetChild(data)"
+                                         ng-class="{'selected':dataCtrl.selectedDataSetChild && (data.Id==dataCtrl.selectedDataSetChild.Id),
+                                                    'col-xs-11':dataCtrl.smallMode && dataset.Children.length>1,
+                                                    'child':!dataCtrl.smallMode && dataset.Children.length>1,
+                                                    'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1}"
+                                         ng-click="selectDataSetChild(data,dataset)"
                                          ng-cloak
                                          data-name="{{dataset.Name+':'+data.Name}}">
                                         <div class="top">
@@ -442,21 +446,31 @@
                     <div class="pull-left" style="width: 40%;">
                         <div id="selection">
                             <div class="alert alert-info alert-data"
-                                 ng-if="!selectedDS">
+                                 ng-if="!selectedDS && !dataCtrl.selectedDataSetChild">
                                 <h4 translate="label.no.selected.data">No selected data</h4>
                                 <p translate="msg.no.selected.data"
                                    style="font-weight:normal;">Click on a data to display more information</p>
                             </div>
                             <div id="selected-item"
                                  class="selected-item"
-                                 ng-if="selectedDS">
-                                <div class="block-header" ng-click="toggleUpDownSelected()">
+                                 ng-if="selectedDS || dataCtrl.selectedDataSetChild">
+                                <div class="block-header"
+                                     ng-click="toggleUpDownSelected()"
+                                     ng-if="selectedDS">
                                     <strong class="item-title title-bloc"
                                             title="{{selectedDS.Name}}">{{truncateTitleBlock(selectedDS.Name)}}</strong>
                                     <i class="fa fa-chevron-down pull-right"></i>
                                 </div>
+                                <div class="block-header"
+                                     ng-click="toggleUpDownSelected()"
+                                     ng-if="!selectedDS && dataCtrl.selectedDataSetChild">
+                                    <strong class="item-title title-bloc"
+                                            title="{{dataCtrl.selectedDataSetChild.Name}}">{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</strong>
+                                    <i class="fa fa-chevron-down pull-right"></i>
+                                </div>
                                 <div>
-                                    <div class="block-content">
+                                    <div class="block-content"
+                                         ng-if="selectedDS">
                                         <div class="row description-block">
                                             <div class="col-sm-3 col-md-2">
                                                 <img src="img/block-content-owner.svg" alt="" />
@@ -466,7 +480,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="block-action">
+                                    <div class="block-action"
+                                         ng-if="selectedDS">
                                         <div class="row">
                                             <div class="col-sm-2">
                                                 <span class="tooltipicon">
