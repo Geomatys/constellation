@@ -39,7 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamException;
 
 import com.google.common.base.Optional;
-import org.constellation.admin.ProcessBusiness;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -50,7 +50,7 @@ import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.TaskParameterWithOwnerName;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.scheduler.CstlScheduler;
+
 import org.constellation.scheduler.Task;
 import org.constellation.scheduler.TaskState;
 import org.constellation.scheduler.Tasks;
@@ -96,19 +96,20 @@ public final class TaskRest {
     @Path("listTasks")
     public Response listTasks() {
         
-        final CstlScheduler scheduler = CstlScheduler.getInstance();
-        final List<Task> tasks = scheduler.listTasks();
+
+        final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks();
         
         final Map<String, TaskStatus> lst = new HashMap<>();
         
-        for(Task t : tasks){
-            final TaskState state = scheduler.getaskState(t.getId());
+        for(org.constellation.engine.register.Task t : tasks){
+            final TaskState state = processBusiness.geTaskState(t.getIdentifier());
             final TaskStatus status = new TaskStatus();
-            status.setId(t.getId());
+            status.setId(t.getIdentifier());
             status.setMessage(state.getMessage());
             status.setPercent(state.getPercent());
             status.setStatus(state.getStatus().name());
-            status.setTitle(t.getTitle());
+            //TODO verify correct information provided
+            status.setTitle(t.getMessage());
             lst.put(status.getId(), status);
         }
                 
@@ -162,7 +163,7 @@ public final class TaskRest {
     @GET
     @Path("{id}")
     public Response getTaskParameters(final @PathParam("id") String id) throws ConfigurationException {
-        final Task task = CstlScheduler.getInstance().getTask(id);
+        final Task task = processBusiness.getProcessTask(id);
 
         if(task == null){
             return Response.ok(new AcknowlegementType("Failure", "Could not find task for given id.")).build();
@@ -223,8 +224,8 @@ public final class TaskRest {
         task.setDetail(detail);
         
         try{
-            CstlScheduler.getInstance().addTask(task);
-        }catch(ConfigurationException ex){
+            processBusiness.addTask(task);
+        }catch(ConstellationException ex){
             return new AcknowlegementType("Failure", "Failed to create task : "+ex.getMessage());
         }
 
@@ -275,12 +276,12 @@ public final class TaskRest {
         task.setDetail(detail);
 
         try{
-            if(CstlScheduler.getInstance().updateTask(task)){
+            if(processBusiness.updateTask(task)){
                 return new AcknowlegementType("Success", "The task has been updated.");
             }else{
                 return new AcknowlegementType("Failure", "Could not find task for given id.");
             }
-        }catch(ConfigurationException ex){
+        }catch(ConstellationException ex){
             return new AcknowlegementType("Failure", "Could not find task for given id : "+ex.getMessage());
         }
     }
@@ -289,12 +290,9 @@ public final class TaskRest {
     @Path("{id}")
     public Object deleteTask(final @PathParam("id") String id) {
         try{
-            if( CstlScheduler.getInstance().removeTask(id)){
-                return new AcknowlegementType("Success", "The task has been deleted");
-            }else{
-                return new AcknowlegementType("Failure", "Could not find task for given id.");
-            }
-        }catch(ConfigurationException ex){
+            processBusiness.removeTask(id);
+            return new AcknowlegementType("Success", "The task has been deleted");
+        }catch(ConstellationException ex){
             return new AcknowlegementType("Failure", "Could not find task for given id : "+ex.getMessage());
         }
     }
@@ -363,7 +361,12 @@ public final class TaskRest {
     @GET
     @Path("params/execute/{id}")
     @RolesAllowed("cstl-admin")
-    public AcknowlegementType executeParamsTask(final @PathParam("id") Integer id) throws ConfigurationException {
+    public AcknowlegementType executeParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req) throws ConfigurationException {
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+
+        if (!cstlUser.isPresent()) {
+            throw new ConstellationException("operation not allowed without login");
+        }
         final TaskParameter taskParameter = taskParameterRepository.get(id);
 
         final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
@@ -386,12 +389,12 @@ public final class TaskRest {
             orig.values().addAll(params.values());
 
             String title = taskParameter.getName()+" "+TASK_DATE.format(new Date());
-            CstlScheduler.getInstance().runOnce(title, processDesc.createProcess(orig));
+            processBusiness.runOnce(title, processDesc.createProcess(orig),taskParameter.getId(), cstlUser.get().getId());
         } catch (NoSuchIdentifierException ex) {
             return new AcknowlegementType("Failure", "No process for given id.");
         }  catch (InvalidParameterValueException ex) {
             throw new ConfigurationException(ex);
-        } catch (SchedulerException ex) {
+        } catch (ConstellationException ex) {
             return new AcknowlegementType("Failure", "Failed to create task : "+ex.getMessage());
         }
 

@@ -18,16 +18,9 @@
  */
 package org.constellation.coverage;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.Date;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.TaskState;
-import org.constellation.business.ITaskBusiness;
+import org.constellation.business.IProcessBusiness;
 import org.constellation.engine.register.Task;
 import org.constellation.provider.DataProviders;
 import org.geotoolkit.parameter.ParameterGroup;
@@ -36,6 +29,14 @@ import org.geotoolkit.process.ProcessListener;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.Date;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Listener for Pyramidal process loaded via {@link PyramidCoverageHelper}
@@ -55,7 +56,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     private final String identifier;
 
     @Autowired
-    private ITaskBusiness taskBusiness;
+    private IProcessBusiness processBusiness;
     
     public PyramidCoverageProcessListener(final Integer userId, final String path, final String identifier) {
         SpringHelper.injectDependencies(this);
@@ -68,7 +69,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     public void started(final ProcessEvent processEvent) {
         //Create task on database (state : pending)
         uuidTask = UUID.randomUUID().toString();
-        taskBusiness.writeTask(uuidTask, "pyramid", userId, System.currentTimeMillis());
+//        processBusiness.writeTask(uuidTask, "pyramid", userId, System.currentTimeMillis());
     }
 
     @Override
@@ -89,9 +90,9 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     @Override
     public void completed(final ProcessEvent processEvent) {
         //Update state (pass to completed) on database
-        final Task pyramidTask = taskBusiness.getTask(uuidTask);
+        final Task pyramidTask = processBusiness.getTask(uuidTask);
         pyramidTask.setState(TaskState.SUCCEED.name());
-        taskBusiness.update(pyramidTask);
+        processBusiness.update(pyramidTask);
 
         //update provider
         updateProvider();
@@ -125,8 +126,8 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     @Override
     public void failed(final ProcessEvent processEvent) {
         //Update state (pass to failed) on database
-        final Task pyramidTask = taskBusiness.getTask(uuidTask);
+        final Task pyramidTask = processBusiness.getTask(uuidTask);
         pyramidTask.setState(TaskState.FAILED.name());
-        taskBusiness.update(pyramidTask);
+        processBusiness.update(pyramidTask);
     }
 }

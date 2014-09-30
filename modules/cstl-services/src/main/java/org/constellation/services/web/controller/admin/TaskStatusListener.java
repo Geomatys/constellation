@@ -18,49 +18,49 @@
  */
 package org.constellation.services.web.controller.admin;
 
+import org.constellation.business.IProcessBusiness;
 import org.constellation.dto.TaskStatus;
-import org.constellation.scheduler.CstlScheduler;
 import org.constellation.scheduler.CstlSchedulerListener;
 import org.constellation.scheduler.TaskState;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.logging.Logger;
 
-@Component
+@Named
+@Singleton
 public class TaskStatusListener {
 
-    @Autowired
+    @Inject
     private SimpMessagingTemplate template;
+
+    @Inject
+    private IProcessBusiness processBusiness;
+
+    private static final Logger LOGGER = Logger.getLogger(TaskStatusListener.class.getName());
 
     @PostConstruct
     public void init() {
-    
-        CstlScheduler.getInstance().addListener(new CstlSchedulerListener() {
-            
-            @Override
-            public void taskUpdated(TaskState taskState) {
-                TaskStatus taskStatus = new TaskStatus();
-                taskStatus.setId(taskState.getTask().getId());
-                taskStatus.setMessage(taskState.getMessage());
-                taskStatus.setPercent(taskState.getPercent());
-                taskStatus.setStatus(taskState.getStatus().name());
-                template.convertAndSend("/topic/taskevents", taskStatus);                
-            }
-        });
+
+
+
+       processBusiness.addListenerOnRunningTasks(new CstlSchedulerListener() {
+
+           @Override
+           public void taskUpdated(TaskState taskState) {
+               TaskStatus taskStatus = new TaskStatus();
+               taskStatus.setId(taskState.getTask().getId());
+               taskStatus.setMessage(taskState.getMessage());
+               taskStatus.setPercent(taskState.getPercent());
+               taskStatus.setStatus(taskState.getStatus().name());
+               template.convertAndSend("/topic/taskevents", taskStatus);
+           }
+       });
         
     }
     
 
-//    @Scheduled(fixedDelay=3000)
-//    public void greet() {
-//        TaskStatus taskStatus = new TaskStatus();
-//        taskStatus.setId("task_id");
-//        taskStatus.setMessage("task_message");
-//        taskStatus.setPercent(System.currentTimeMillis()%100);
-//        taskStatus.setStatus("task_status");
-//        template.convertAndSend("/topic/taskevents", taskStatus);                
-//    }
-    
 }

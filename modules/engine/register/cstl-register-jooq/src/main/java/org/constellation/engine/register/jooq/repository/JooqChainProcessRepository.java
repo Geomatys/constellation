@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
  * @author Guilhem Legal (Geomatys)
  */
 @Component
+
 public class JooqChainProcessRepository extends AbstractJooqRespository<ChainProcessRecord, ChainProcess> implements ChainProcessRepository {
     
     public JooqChainProcessRepository() {

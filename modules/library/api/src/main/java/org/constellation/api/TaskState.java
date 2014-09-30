@@ -22,10 +22,13 @@ package org.constellation.api;
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author christophem (Geomatys)
  */
 public enum TaskState {
  
     PENDING,
+    RUNNING,
     SUCCEED,
-    FAILED
+    FAILED,
+    CANCELLED
 }

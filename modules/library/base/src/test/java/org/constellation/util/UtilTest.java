@@ -74,7 +74,7 @@ public class UtilTest {
 
     /**
      * @throws java.lang.Exception
-     */
+     *//*
     @Test
     public void cleanSpecialCharacterTest() throws Exception {
 
@@ -82,7 +82,7 @@ public class UtilTest {
         String result = CharSequences.toASCII(dirty).toString();
         String expresult = "le oiseaux chante a l'aube OLEEEEEEE";
         assertEquals(expresult, result);
-    }
+    }*/
 
     /**
      * @throws java.lang.Exception

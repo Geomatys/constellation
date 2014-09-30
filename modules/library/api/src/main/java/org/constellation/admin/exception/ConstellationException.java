@@ -37,4 +37,8 @@ public class ConstellationException extends RuntimeException {
         super(msg);
     }
 
+
+    public ConstellationException(String msg,Exception e) {
+        super(msg,e);
+    }
 }

@@ -19,6 +19,9 @@
 
 package org.constellation.scheduler;
 
+import org.constellation.api.*;
+import org.constellation.api.TaskState;
+import org.constellation.business.IProcessBusiness;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.process.quartz.ProcessJob;
@@ -29,16 +32,25 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Quartz Job listener attaching a listener on geotoolkit processes to track their state.
  * 
  * @author Johann Sorel (Geomatys)
+ * @author Christophe Mourette (Geomatys)
  */
 public class QuartzJobListener implements JobListener {
 
     public static final String PROPERTY_TASK = "task";
-    
-    
+    private final IProcessBusiness processBusiness;
+
+    public QuartzJobListener(IProcessBusiness processBusiness) {
+        this.processBusiness = processBusiness;
+     }
+
+
     ////////////////////////////////////////////////////////////////////////////
     // Quartz listener /////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -57,10 +69,10 @@ public class QuartzJobListener implements JobListener {
         final ProcessJob pj = (ProcessJob) job;
         final ProcessJobDetail detail = (ProcessJobDetail) jec.getJobDetail();
         final Task task = (Task) detail.getJobDataMap().get(QuartzJobListener.PROPERTY_TASK);
-        final String taskId = task.getId();        
-        final TaskState state = CstlScheduler.getInstance().getaskState(taskId);
+        final String taskId = task.getId();
+
         
-        final ProcessListener listener = new StateListener(state);
+        final ProcessListener listener = new StateListener(taskId,processBusiness);
         pj.addListener(listener);
     }
 
@@ -82,59 +94,55 @@ public class QuartzJobListener implements JobListener {
      */
     private static class StateListener implements ProcessListener{
     
-        private final TaskState state;
+        private final String taskId;
+        private final IProcessBusiness processBusiness;
+        private final org.constellation.engine.register.Task taskEntity;
 
-        public StateListener(TaskState state) {
-            this.state = state;
+        public StateListener(String taskId, IProcessBusiness processBusiness) {
+            this.taskId = taskId;
+            this.processBusiness = processBusiness;
+            taskEntity = processBusiness.getTask(taskId);
         }
         
         @Override
         public void started(ProcessEvent event) {
-            state.setStatus(TaskState.Status.RUN);
-            state.setMessage(toString(event.getTask()));
-            state.setPercent(event.getProgress());
-            CstlScheduler.getInstance().fireTaskUpdate(state);
+            taskEntity.setState(org.constellation.api.TaskState.RUNNING.name());
+            taskEntity.setStart(System.currentTimeMillis());
+            taskEntity.setMessage(toString(event.getTask()));
+            processBusiness.update(taskEntity);
         }
 
         @Override
         public void progressing(ProcessEvent event) {
-            state.setStatus(TaskState.Status.RUN);
-            state.setMessage(toString(event.getTask()));
-            state.setPercent(event.getProgress());
-            CstlScheduler.getInstance().fireTaskUpdate(state);
+            //
         }
 
         @Override
         public void paused(ProcessEvent event) {
-            state.setStatus(TaskState.Status.PAUSE);
-            state.setMessage(toString(event.getTask()));
-            state.setPercent(event.getProgress());
-            CstlScheduler.getInstance().fireTaskUpdate(state);
+            //Not yet implemented
         }
 
         @Override
         public void resumed(ProcessEvent event) {
-            state.setStatus(TaskState.Status.RUN);
-            state.setMessage(toString(event.getTask()));
-            state.setPercent(event.getProgress());
-            CstlScheduler.getInstance().fireTaskUpdate(state);
+            //Not yet implemented
         }
 
         @Override
         public void completed(ProcessEvent event) {
-            state.setStatus(TaskState.Status.FINISH);
-            state.setMessage(toString(event.getTask()));
-            state.setPercent(event.getProgress());
-            CstlScheduler.getInstance().fireTaskUpdate(state);
+            taskEntity.setState(TaskState.SUCCEED.name());
+            taskEntity.setMessage(toString(event.getTask()));
+            taskEntity.setEnd(System.currentTimeMillis());
+            processBusiness.update(taskEntity);
         }
 
         @Override
         public void failed(ProcessEvent event) {
-            state.setStatus(TaskState.Status.FAIL);
-            state.setMessage(toString(event.getTask()));
-            state.setPercent(event.getProgress());
-            state.setLastException(event.getException());
-            CstlScheduler.getInstance().fireTaskUpdate(state);
+            taskEntity.setState(TaskState.FAILED.name());
+            taskEntity.setEnd(System.currentTimeMillis());
+            StringWriter errors = new StringWriter();
+            event.getException().printStackTrace(new PrintWriter(errors));
+            taskEntity.setMessage(toString(event.getTask())+ " cause : "+errors.toString());
+            processBusiness.update(taskEntity);
         }
         
         private String toString(InternationalString str){

@@ -1,6 +1,7 @@
 package org.constellation.engine.register.jooq.repository;
 
 import org.constellation.engine.register.TaskParameter;
+import org.constellation.engine.register.helper.TaskParameterHelper;
 import org.constellation.engine.register.jooq.tables.records.TaskParameterRecord;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.jooq.Tables;
@@ -20,10 +21,10 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
     }
 
     @Override
-    public void create(TaskParameter task) {
-        dsl.insertInto(Tables.TASK_PARAMETER, Tables.TASK_PARAMETER.NAME, Tables.TASK_PARAMETER.OWNER, Tables.TASK_PARAMETER.DATE, Tables.TASK_PARAMETER.PROCESS_AUTHORITY, Tables.TASK_PARAMETER.PROCESS_CODE, Tables.TASK_PARAMETER.INPUTS)
-                .values(task.getName(), task.getOwner(), new Date().getTime(), task.getProcessAuthority(), task.getProcessCode(), task.getInputs())
-                .execute();
+    public TaskParameter create(TaskParameter task) {
+        TaskParameterRecord newRecord = TaskParameterHelper.copy(task, dsl.newRecord(Tables.TASK_PARAMETER));
+        newRecord.store();
+        return newRecord.into(TaskParameter.class);
     }
 
     @Override
@@ -46,5 +47,10 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
                 .set(Tables.TASK_PARAMETER.INPUTS, task.getInputs())
                 .where(Tables.TASK_PARAMETER.ID.eq(task.getId()))
                 .execute();
+    }
+
+    @Override
+    public List<? extends TaskParameter> findProgrammedTasks() {
+        return dsl.select().from(Tables.TASK_PARAMETER).where(Tables.TASK_PARAMETER.TRIGGER.isNotNull()).fetch().into(TaskParameter.class);
     }
 }

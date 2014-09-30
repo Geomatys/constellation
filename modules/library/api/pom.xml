@@ -52,6 +52,11 @@
           <artifactId>cstl-register-api</artifactId>
           <version>${project.version}</version>
       </dependency>
+      <!--<dependency>
+          <groupId>org.constellation.engine</groupId>
+          <artifactId>cstl-engine-scheduler</artifactId>
+          <version>${project.version}</version>
+      </dependency>-->
       <dependency>
           <groupId>org.geotoolkit</groupId>
           <artifactId>geotk-style</artifactId>

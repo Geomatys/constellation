@@ -18,10 +18,17 @@
  */
 package org.constellation.business;
 
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.ChainProcess;
-import org.geotoolkit.process.ProcessDescriptor;
+import org.constellation.engine.register.Task;
+import org.constellation.engine.register.TaskParameter;
+import org.constellation.scheduler.CstlSchedulerListener;
+import org.constellation.scheduler.TaskState;
+import org.geotoolkit.process.*;
+import org.geotoolkit.process.Process;
 import org.geotoolkit.process.chain.model.Chain;
+import org.quartz.SchedulerException;
 
 import java.util.List;
 
@@ -29,11 +36,35 @@ import java.util.List;
  * @author Cédric Briançon (Geomatys)
  */
 public interface IProcessBusiness {
-    List<ProcessDescriptor> getChainDescriptors() throws ConfigurationException;
+    List<ProcessDescriptor> getChainDescriptors() throws ConstellationException;
 
-    void createChainProcess(final Chain chain) throws ConfigurationException;
+    void createChainProcess(final Chain chain) throws ConstellationException;
 
     boolean deleteChainProcess(final String auth, final String code);
 
     ChainProcess getChainProcess(final String auth, final String code);
+
+//    void writeTask(String uuidTask, String pyramid, Integer userId, final long start);
+
+    void update(Task task);
+
+    Task getTask(String uuid);
+
+    List<Task> listRunningTasks();
+
+    void runOnce(String title, Process process, Integer taskParameterId, Integer userId) throws ConstellationException;
+
+    void removeTask(String id) throws ConstellationException;
+
+    TaskState geTaskState(String id);
+
+    org.constellation.scheduler.Task getProcessTask(String id);
+
+    void addListenerOnRunningTasks(CstlSchedulerListener cstlSchedulerListener);
+
+    void addTask(org.constellation.scheduler.Task task) throws ConstellationException;
+
+    boolean updateTask(org.constellation.scheduler.Task task) throws ConstellationException;
+
+    TaskParameter addTaskParameter(TaskParameter taskParameter);
 }

@@ -16,13 +16,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.scheduler.configuration;
+package org.constellation.scheduler.configuration.file;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.scheduler.Task;
 import org.constellation.scheduler.TaskConfigurator;
+import org.constellation.scheduler.configuration.XMLTasksReader;
+import org.constellation.scheduler.configuration.XMLTasksWriter;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -47,6 +49,7 @@ public class XMLTaskConfigurator implements TaskConfigurator {
     @Override
     public List<Task> getTasksConfiguration() throws ConfigurationException {
         //open configuration file
+        //TODO Change for store and read from database
         final File configDir = ConfigDirectory.getConfigDirectory();
         final File taskFile = new File(configDir, TASK_FILE);
         if(!taskFile.exists()){

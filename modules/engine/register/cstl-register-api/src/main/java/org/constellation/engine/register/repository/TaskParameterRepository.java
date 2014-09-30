@@ -26,11 +26,13 @@ public interface TaskParameterRepository {
 
     List<? extends TaskParameter> findAll();
 
-    void create(TaskParameter task);
+    TaskParameter create(TaskParameter task);
 
     TaskParameter get(Integer uuid);
 
     void delete(TaskParameter task);
     
     void update(TaskParameter task);
+
+    List<? extends TaskParameter> findProgrammedTasks();
 }

@@ -25,9 +25,11 @@ import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.engine.register.Provider;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.process.*;
 import org.geotoolkit.storage.DataStoreFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.quartz.SchedulerException;
 
 import java.io.IOException;
 import java.util.List;
@@ -111,4 +113,5 @@ public interface IProviderBusiness {
     List<Provider> getProviderChildren(String id);
 
     ProviderPyramidChoiceList listPyramids(final String id, final String layerName) throws DataStoreException;
+
 }

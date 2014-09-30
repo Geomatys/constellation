@@ -20,7 +20,7 @@ package org.constellation.scheduler;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.scheduler.configuration.XMLTaskConfigurator;
+import org.constellation.scheduler.configuration.file.XMLTaskConfigurator;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListenerAdapter;
@@ -173,7 +173,7 @@ public final class CstlScheduler {
         } catch (SchedulerException ex) {
             LOGGER.log(Level.WARNING, "Failed to register task :"+task.getId()+","+task.getTitle()+" in scheduler.",ex);
         }
-                
+
         getConfigurator().addTaskConfiguration(task);
     }
     

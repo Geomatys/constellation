@@ -31,4 +31,7 @@ public interface TaskRepository {
     Task get(String uuid);
     
     void update(Task task);
+
+    List<Task> findRunningTasks();
+
 }

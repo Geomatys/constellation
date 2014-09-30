@@ -33,9 +33,9 @@
         <listener-class>org.constellation.management.SetupMBean</listener-class>
     </listener>
 
-    <listener>
+    <!--<listener>
         <listener-class>org.constellation.scheduler.CstlSchedulerSetup</listener-class>
-    </listener>
+    </listener>-->
 
 	<listener>
         <listener-class>org.constellation.admin.SessionListener</listener-class>
