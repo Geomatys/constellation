@@ -147,7 +147,6 @@ public final strictfp class SensorTest {
      * @throws IOException if an error occurred while writing the test JSON file.
      */
     @Test
-    @Ignore("Need the fix for longitude/latitude writing")
     public void testReadWriteComponent() throws IOException {
         final SensorML metadata = createSensorML();
         final StringBuilder buffer = new StringBuilder(15000);

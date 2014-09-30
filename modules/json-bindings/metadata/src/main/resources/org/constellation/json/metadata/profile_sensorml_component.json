@@ -177,56 +177,55 @@
 								"value":null
 							}
 						},{
-                            "field":{
-                                "name":"component.field.latitude.name",
-                                "multiplicity":1,
-                                "help":"component.field.latitude.name_help",
-                                "path":"member.realProcess.position.position.location.vector.coordinate.name",
-                                "render":"readonly",
-                                "obligation":"M",
-                                "defaultValue":"latitude",
-                                "value":null
-                            }
-                        },{
-                            "field":{
-                                "name":"component.field.latitude.definition",
-                                "multiplicity":1,
-                                "help":"component.field.latitude.definition_help",
-                                "path":"member.realProcess.position.position.location.vector.coordinate.quantity.definition",
-                                "render":"readonly",
-                                "obligation":"M",
-                                "defaultValue":"urn:ogc:def:phenomenon:latitude",
-                                "value":null
-                            }
-                        },{
-                            "field":{
-                                "name":"component.field.latitude.uom",
-                                "multiplicity":1,
-                                "help":"component.field.latitude.uom_help",
-                                "path":"member.realProcess.position.position.location.vector.coordinate.quantity.uom.code",
-                                "render":"text",
-                                "obligation":"M",
-                                "defaultValue":"degree",
-                                "value":null
-                            }
-                        },{
-                            "field":{
-                                "name":"component.field.latitude.value",
-                                "multiplicity":1,
-                                "help":"component.field.latitude.value_help",
-                                "path":"member.realProcess.position.position.location.vector.coordinate.quantity.value",
-                                "render":"decimal",
-                                "obligation":"M",
-                                "defaultValue":null,
-                                "value":null
-                            }
-                        },{
+							"field":{
+								"name":"component.field.latitude.name",
+								"multiplicity":1,
+								"help":"component.field.latitude.name_help",
+								"path":"member.realProcess.position.position.location.vector.latitude.name",
+								"render":"readonly",
+								"obligation":"M",
+								"defaultValue":"latitude",
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"component.field.latitude.definition",
+								"multiplicity":1,
+								"help":"component.field.latitude.definition_help",
+								"path":"member.realProcess.position.position.location.vector.latitude.quantity.definition",
+								"render":"readonly",
+								"obligation":"M",
+								"defaultValue":"urn:ogc:def:phenomenon:latitude",
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"component.field.latitude.uom",
+								"multiplicity":1,
+								"help":"component.field.latitude.uom_help",
+								"path":"member.realProcess.position.position.location.vector.latitude.quantity.uom.code",
+								"render":"text",
+								"obligation":"M",
+								"defaultValue":"degree",
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"component.field.latitude.value",
+								"multiplicity":1,
+								"help":"component.field.latitude.value_help",
+								"path":"member.realProcess.position.position.location.vector.latitude.quantity.value",
+								"render":"decimal",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":null
+							}
+						},{
 							"field":{
 								"name":"component.field.longitude.name",
 								"multiplicity":1,
-                                "ignore":"1 0 0 0 0 0 1 0",
 								"help":"component.field.longitude.name_help",
-								"path":"member.realProcess.position.position.location.vector.coordinate.name",
+								"path":"member.realProcess.position.position.location.vector.longitude.name",
 								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":"longitude",
@@ -236,9 +235,8 @@
 							"field":{
 								"name":"component.field.longitude.definition",
 								"multiplicity":1,
-                                "ignore":"1 0 0 0 0 0 1 0 0",
 								"help":"component.field.longitude.definition_help",
-								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.definition",
+								"path":"member.realProcess.position.position.location.vector.longitude.quantity.definition",
 								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":"urn:ogc:def:phenomenon:longitude",
@@ -248,9 +246,8 @@
 							"field":{
 								"name":"component.field.longitude.uom",
 								"multiplicity":1,
-                                "ignore":"1 0 0 0 0 0 1 0 0 0",
 								"help":"component.field.longitude.uom_help",
-								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.uom.code",
+								"path":"member.realProcess.position.position.location.vector.longitude.quantity.uom.code",
 								"render":"text",
 								"obligation":"M",
 								"defaultValue":"degree",
@@ -260,9 +257,8 @@
 							"field":{
 								"name":"component.field.longitude.value",
 								"multiplicity":1,
-                                "ignore":"1 0 0 0 0 0 1 0 0",
 								"help":"component.field.longitude.value_help",
-								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.value",
+								"path":"member.realProcess.position.position.location.vector.longitude.quantity.value",
 								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":null,

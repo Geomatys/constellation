@@ -181,7 +181,7 @@
 								"name":"system.field.latitude.name",
 								"multiplicity":1,
 								"help":"system.field.latitude.name_help",
-								"path":"member.realProcess.position.position.location.vector.coordinate.name",
+								"path":"member.realProcess.position.position.location.vector.latitude.name",
 								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":"latitude",
@@ -192,7 +192,7 @@
 								"name":"system.field.latitude.definition",
 								"multiplicity":1,
 								"help":"system.field.latitude.definition_help",
-								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.definition",
+								"path":"member.realProcess.position.position.location.vector.latitude.quantity.definition",
 								"render":"readonly",
 								"obligation":"M",
 								"defaultValue":"urn:ogc:def:phenomenon:latitude",
@@ -203,7 +203,7 @@
 								"name":"system.field.latitude.uom",
 								"multiplicity":1,
 								"help":"system.field.latitude.uom_help",
-								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.uom.code",
+								"path":"member.realProcess.position.position.location.vector.latitude.quantity.uom.code",
 								"render":"text",
 								"obligation":"M",
 								"defaultValue":"degree",
@@ -214,61 +214,57 @@
 								"name":"system.field.latitude.value",
 								"multiplicity":1,
 								"help":"system.field.latitude.value_help",
-								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.value",
+								"path":"member.realProcess.position.position.location.vector.latitude.quantity.value",
 								"render":"decimal",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
 							}
 						},{
-                            "field":{
-                                "name":"system.field.longitude.name",
-                                "multiplicity":1,
-								"ignore":"1 0 0 0 0 0 1 0",
-                                "help":"system.field.longitude.name_help",
-                                "path":"member.realProcess.position.position.location.vector.coordinate.name",
-                                "render":"readonly",
-                                "obligation":"M",
-                                "defaultValue":"longitude",
-                                "value":null
-                            }
-                        },{
-                            "field":{
-                                "name":"system.field.longitude.definition",
-                                "multiplicity":1,
-								"ignore":"1 0 0 0 0 0 1 0 0",
-                                "help":"system.field.longitude.definition_help",
-                                "path":"member.realProcess.position.position.location.vector.coordinate.quantity.definition",
-                                "render":"readonly",
-                                "obligation":"M",
-                                "defaultValue":"urn:ogc:def:phenomenon:longitude",
-                                "value":null
-                            }
-                        },{
-                            "field":{
-                                "name":"system.field.longitude.uom",
-                                "multiplicity":1,
-								"ignore":"1 0 0 0 0 0 1 0 0 0",
-                                "help":"system.field.longitude.uom_help",
-                                "path":"member.realProcess.position.position.location.vector.coordinate.quantity.uom.code",
-                                "render":"text",
-                                "obligation":"M",
-                                "defaultValue":"degree",
-                                "value":null
-                            }
-                        },{
-                            "field":{
-                                "name":"system.field.longitude.value",
-                                "multiplicity":1,
-								"ignore":"1 0 0 0 0 0 1 0 0",
-                                "help":"system.field.longitude.value_help",
-                                "path":"member.realProcess.position.position.location.vector.coordinate.quantity.value",
-                                "render":"decimal",
-                                "obligation":"M",
-                                "defaultValue":null,
-                                "value":null
-                            }
-                        }
+							"field":{
+								"name":"system.field.longitude.name",
+								"multiplicity":1,
+								"help":"system.field.longitude.name_help",
+								"path":"member.realProcess.position.position.location.vector.longitude.name",
+								"render":"readonly",
+								"obligation":"M",
+								"defaultValue":"longitude",
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"system.field.longitude.definition",
+								"multiplicity":1,
+								"help":"system.field.longitude.definition_help",
+								"path":"member.realProcess.position.position.location.vector.longitude.quantity.definition",
+								"render":"readonly",
+								"obligation":"M",
+								"defaultValue":"urn:ogc:def:phenomenon:longitude",
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"system.field.longitude.uom",
+								"multiplicity":1,
+								"help":"system.field.longitude.uom_help",
+								"path":"member.realProcess.position.position.location.vector.longitude.quantity.uom.code",
+								"render":"text",
+								"obligation":"M",
+								"defaultValue":"degree",
+								"value":null
+							}
+						},{
+							"field":{
+								"name":"system.field.longitude.value",
+								"multiplicity":1,
+								"help":"system.field.longitude.value_help",
+								"path":"member.realProcess.position.position.location.vector.longitude.quantity.value",
+								"render":"decimal",
+								"obligation":"M",
+								"defaultValue":null,
+								"value":null
+							}
+						}
 					]}
 				}
 			]}
