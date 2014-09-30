@@ -72,6 +72,7 @@ import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IProcessBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.*;
@@ -89,6 +90,7 @@ import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.json.metadata.Template;
@@ -102,8 +104,8 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.constellation.scheduler.CstlScheduler;
 import org.constellation.security.SecurityManagerHolder;
+import org.constellation.util.ParamUtilities;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
@@ -191,6 +193,10 @@ public class DataRest {
 
     @Inject
     private ISensorBusiness sensorBusiness;
+
+    @Inject
+    private IProcessBusiness processBusiness;
+
 
 
     /**
@@ -1320,8 +1326,13 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response createTiledProvider(
-            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId) {
+            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId, @Context HttpServletRequest req) {
 
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+
+        if (!cstlUser.isPresent()) {
+            throw new ConstellationException("operation not allowed without login");
+        }
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
         if (inProvider == null) {
@@ -1471,8 +1482,20 @@ public class DataRest {
             input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
             input.parameter("resolution_per_envelope").setValue(resolutionPerEnvelope);
             final org.geotoolkit.process.Process p = desc.createProcess(input);
-            CstlScheduler.getInstance().runOnce("Create conform pyramid for "+providerId+":"+dataId, p);
-        } catch (SchedulerException e) {
+
+
+            String title = "Create conform pyramid for " + providerId + ":" + dataId;
+//            processBusiness.runOnce("Create conform pyramid for " + providerId + ":" + dataId, p);
+            TaskParameter taskParameter = new TaskParameter();
+            taskParameter.setProcessAuthority(desc.getIdentifier().getAuthority().toString());
+            taskParameter.setProcessCode(desc.getIdentifier().getCode());
+            taskParameter.setDate(System.currentTimeMillis());
+            taskParameter.setInputs(ParamUtilities.writeParameter(input));
+            taskParameter.setOwner(cstlUser.get().getId());
+            taskParameter.setName("Create conform pyramid for " + providerId + ":" + dataId);
+            taskParameter = processBusiness.addTaskParameter(taskParameter);
+            processBusiness.runOnce("Create conform pyramid for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
+        } catch ( IOException e) {
             LOGGER.log(Level.WARNING, "Unable to run pyramid process on scheduler");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -1499,8 +1522,12 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response createTiledProvider(
-            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId, final PyramidParams params) {
-        
+            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId, final PyramidParams params, @Context HttpServletRequest req) {
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+
+        if (!cstlUser.isPresent()) {
+            throw new ConstellationException("operation not allowed without login");
+        }
         String tileFormat = params.getTileFormat();
         String crs = params.getCrs();
         double[] scales = params.getScales();
@@ -1649,12 +1676,22 @@ public class DataRest {
             final org.geotoolkit.process.Process p = desc.createProcess(input);
 
             //add task in scheduler
-            CstlScheduler.getInstance().runOnce("Create pyramid " + crs + " for " + providerId + ":" + dataId, p);
+            TaskParameter taskParameter = new TaskParameter();
+            taskParameter.setProcessAuthority(desc.getIdentifier().getAuthority().toString());
+            taskParameter.setProcessCode(desc.getIdentifier().getCode());
+            taskParameter.setDate(System.currentTimeMillis());
+            taskParameter.setInputs(ParamUtilities.writeParameter(input));
+            taskParameter.setOwner(cstlUser.get().getId());
+            taskParameter.setName("Create pyramid " + crs + " for " + providerId + ":" + dataId);
+            taskParameter = processBusiness.addTaskParameter(taskParameter);
+            //add task in scheduler
+            processBusiness.runOnce("Create pyramid " + crs + " for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
+
 
         } catch (NoSuchIdentifierException ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Process engine2d.mapcontextpyramid not found " + ex.getMessage()).build();
-        } catch (SchedulerException e) {
+        } catch (ConstellationException e) {
             LOGGER.log(Level.WARNING, "Unable to run pyramid process on scheduler");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } catch (Exception ex) {

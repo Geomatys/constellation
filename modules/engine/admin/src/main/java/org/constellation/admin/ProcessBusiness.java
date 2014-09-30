@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -373,6 +374,7 @@ public class ProcessBusiness implements IProcessBusiness {
         taskEntity.setIdentifier(task.getId());
         taskEntity.setState(org.constellation.api.TaskState.PENDING.name());
         taskEntity.setOwner(userId);
+        taskEntity.setTaskParameterId(taskParameterId);
         //TODO ???
         taskEntity.setType("");
         taskRepository.create(taskEntity);
@@ -454,5 +456,17 @@ public class ProcessBusiness implements IProcessBusiness {
         taskRepository.update(task);
         //TODO verify why returning false before refactoring
 
+    }
+
+    @PreDestroy
+    public void stop() {
+        LOGGER.log(Level.INFO, "=== Stopping Scheduler ===");
+        try {
+            quartzScheduler.shutdown();
+        } catch (SchedulerException ex) {
+            LOGGER.log(Level.SEVERE, "=== Failed to stop quartz scheduler ===");
+            return;
+        }
+        LOGGER.log(Level.INFO, "=== Scheduler sucessfully stopped ===");
     }
 }

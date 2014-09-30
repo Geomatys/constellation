@@ -322,7 +322,7 @@
     "homepage.statistics.services":"Active services",
     "homepage.statistics.data":"Integrated data",
     "homepage.statistics.users": "Created users",
-    "homepage.statistics.process": "Process",
+    "homepage.statistics.process": "Available process",
     "homepage.text.intro":"<b>Constellation-SDI</b> is the perfect solution to easily set up your Spatial Data Infrastructure.",
     "homepage.text.services":"You can create a <b>new service</b> and after, add data on it",
     "homepage.text.data":"You can create new <b>data</b>",

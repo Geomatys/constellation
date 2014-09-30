@@ -44,6 +44,7 @@ import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
+import org.constellation.configuration.StringMap;
 import org.constellation.dto.TaskStatus;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.TaskParameter;
@@ -128,6 +129,18 @@ public final class TaskRest {
             lst.getList().add(DefaultName.toJCRExtendedForm(n));
         }
         return Response.ok(lst).build();
+    }
+
+    /**
+     * Returns a list of all process available in the current factories.
+     */
+    @GET
+    @Path("countProcesses")
+    public Response countAvailableProcess(){
+        final List<Name> names = Tasks.listProcess();
+        StringMap stringMap = new StringMap();
+        stringMap.getMap().put("value",""+names.size());
+        return Response.ok(stringMap).build();
     }
     
     /**

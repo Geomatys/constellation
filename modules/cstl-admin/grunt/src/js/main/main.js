@@ -54,8 +54,8 @@ angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pasc
                 Growl('error', 'Error', 'Unable to count data');
             });
 
-            TaskService.listTasks({}, function(taskList) {
-                $scope.nbprocess = Object.keys(taskList).length;
+            TaskService.countProcess({}, function(response) {
+                $scope.nbprocess = response.map.value;
             }, function() {
                 $scope.nbprocess = 0;
                 Growl('error', 'Error', 'Unable to count process');

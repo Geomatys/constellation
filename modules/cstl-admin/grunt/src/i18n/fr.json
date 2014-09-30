@@ -368,7 +368,7 @@
     "homepage.statistics.services":"Services actifs",
     "homepage.statistics.data":"Données intégrées",
     "homepage.statistics.users": "Utilisateurs créés",
-    "homepage.statistics.process": "Processus",
+    "homepage.statistics.process": "Processus disponibles",
     "homepage.text.intro":"<b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.",
     "homepage.text.services":"Vous pouvez créer des <b>services web</b> pour ensuite y ajouter des données",
     "homepage.text.data":"Vous pouvez gérer vos <b>données</b>",

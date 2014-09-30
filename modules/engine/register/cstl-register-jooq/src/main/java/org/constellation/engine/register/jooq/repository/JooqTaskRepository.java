@@ -61,7 +61,7 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
                 .set(Tables.TASK.END, task.getEnd())
                 .set(Tables.TASK.MESSAGE, task.getMessage())
                 .set(Tables.TASK.OWNER, task.getOwner())
-                .where(Tables.TASK.IDENTIFIER.eq(task.getIdentifier()));
+                .where(Tables.TASK.IDENTIFIER.eq(task.getIdentifier())).execute();
     }
 
     @Override

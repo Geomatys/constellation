@@ -280,6 +280,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         return $resource('@cstl/api/1/task', {}, {
             'listTasks':             {method: 'GET',    url: '@cstl/api/1/task/listTasks;jsessionid=',                           isArray: false },
             'listProcess':           {method: 'GET',    url: '@cstl/api/1/task/listProcesses;jsessionid=',                       isArray: false },
+            'countProcess':           {method: 'GET',    url: '@cstl/api/1/task/countProcesses;jsessionid=' },
             'listProcessForFactory': {method: 'GET',    url: '@cstl/api/1/task/process/factory/:authorityCode;jsessionid=',      isArray: false },
             'listParamsTask':        {method: 'GET',    url: '@cstl/api/1/task/params/list;jsessionid=',                         isArray: true },
 //            Use textService for getProcessDescriptor and get XML response
