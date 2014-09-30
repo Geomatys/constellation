@@ -180,7 +180,6 @@
                             "field":{
                                 "name":"component.field.latitude.name",
                                 "multiplicity":1,
-                                "ignore":"1 0 0 0 0 0 1 0",
                                 "help":"component.field.latitude.name_help",
                                 "path":"member.realProcess.position.position.location.vector.coordinate.name",
                                 "render":"readonly",
@@ -192,7 +191,6 @@
                             "field":{
                                 "name":"component.field.latitude.definition",
                                 "multiplicity":1,
-                                "ignore":"1 0 0 0 0 0 1 0 0",
                                 "help":"component.field.latitude.definition_help",
                                 "path":"member.realProcess.position.position.location.vector.coordinate.quantity.definition",
                                 "render":"readonly",
@@ -204,7 +202,6 @@
                             "field":{
                                 "name":"component.field.latitude.uom",
                                 "multiplicity":1,
-                                "ignore":"1 0 0 0 0 0 1 0 0 0",
                                 "help":"component.field.latitude.uom_help",
                                 "path":"member.realProcess.position.position.location.vector.coordinate.quantity.uom.code",
                                 "render":"text",
@@ -216,7 +213,6 @@
                             "field":{
                                 "name":"component.field.latitude.value",
                                 "multiplicity":1,
-                                "ignore":"1 0 0 0 0 0 1 0 0",
                                 "help":"component.field.latitude.value_help",
                                 "path":"member.realProcess.position.position.location.vector.coordinate.quantity.value",
                                 "render":"decimal",
@@ -228,6 +224,7 @@
 							"field":{
 								"name":"component.field.longitude.name",
 								"multiplicity":1,
+                                "ignore":"1 0 0 0 0 0 1 0",
 								"help":"component.field.longitude.name_help",
 								"path":"member.realProcess.position.position.location.vector.coordinate.name",
 								"render":"readonly",
@@ -239,6 +236,7 @@
 							"field":{
 								"name":"component.field.longitude.definition",
 								"multiplicity":1,
+                                "ignore":"1 0 0 0 0 0 1 0 0",
 								"help":"component.field.longitude.definition_help",
 								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.definition",
 								"render":"readonly",
@@ -250,6 +248,7 @@
 							"field":{
 								"name":"component.field.longitude.uom",
 								"multiplicity":1,
+                                "ignore":"1 0 0 0 0 0 1 0 0 0",
 								"help":"component.field.longitude.uom_help",
 								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.uom.code",
 								"render":"text",
@@ -261,6 +260,7 @@
 							"field":{
 								"name":"component.field.longitude.value",
 								"multiplicity":1,
+                                "ignore":"1 0 0 0 0 0 1 0 0",
 								"help":"component.field.longitude.value_help",
 								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.value",
 								"render":"decimal",

@@ -180,7 +180,6 @@
 							"field":{
 								"name":"system.field.latitude.name",
 								"multiplicity":1,
-								"ignore":"1 0 0 0 0 0 1 0",
 								"help":"system.field.latitude.name_help",
 								"path":"member.realProcess.position.position.location.vector.coordinate.name",
 								"render":"readonly",
@@ -192,7 +191,6 @@
 							"field":{
 								"name":"system.field.latitude.definition",
 								"multiplicity":1,
-								"ignore":"1 0 0 0 0 0 1 0 0",
 								"help":"system.field.latitude.definition_help",
 								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.definition",
 								"render":"readonly",
@@ -204,7 +202,6 @@
 							"field":{
 								"name":"system.field.latitude.uom",
 								"multiplicity":1,
-								"ignore":"1 0 0 0 0 0 1 0 0 0",
 								"help":"system.field.latitude.uom_help",
 								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.uom.code",
 								"render":"text",
@@ -216,7 +213,6 @@
 							"field":{
 								"name":"system.field.latitude.value",
 								"multiplicity":1,
-								"ignore":"1 0 0 0 0 0 1 0 0",
 								"help":"system.field.latitude.value_help",
 								"path":"member.realProcess.position.position.location.vector.coordinate.quantity.value",
 								"render":"decimal",
@@ -228,6 +224,7 @@
                             "field":{
                                 "name":"system.field.longitude.name",
                                 "multiplicity":1,
+								"ignore":"1 0 0 0 0 0 1 0",
                                 "help":"system.field.longitude.name_help",
                                 "path":"member.realProcess.position.position.location.vector.coordinate.name",
                                 "render":"readonly",
@@ -239,6 +236,7 @@
                             "field":{
                                 "name":"system.field.longitude.definition",
                                 "multiplicity":1,
+								"ignore":"1 0 0 0 0 0 1 0 0",
                                 "help":"system.field.longitude.definition_help",
                                 "path":"member.realProcess.position.position.location.vector.coordinate.quantity.definition",
                                 "render":"readonly",
@@ -250,6 +248,7 @@
                             "field":{
                                 "name":"system.field.longitude.uom",
                                 "multiplicity":1,
+								"ignore":"1 0 0 0 0 0 1 0 0 0",
                                 "help":"system.field.longitude.uom_help",
                                 "path":"member.realProcess.position.position.location.vector.coordinate.quantity.uom.code",
                                 "render":"text",
@@ -261,6 +260,7 @@
                             "field":{
                                 "name":"system.field.longitude.value",
                                 "multiplicity":1,
+								"ignore":"1 0 0 0 0 0 1 0 0",
                                 "help":"system.field.longitude.value_help",
                                 "path":"member.realProcess.position.position.location.vector.coordinate.quantity.value",
                                 "render":"decimal",
@@ -362,13 +362,13 @@
 						"name":"system.block.components",
 						"multiplicity":62,
 						"help":"system.block.components_help",
-						"path":"member.realProcess.inputs.componentList.component",
+						"path":"member.realProcess.components.componentList.component",
 						"children":[{
 							"field":{
 								"name":"system.field.component.name",
 								"multiplicity":1,
 								"help":"system.field.component.name_help",
-								"path":"member.realProcess.inputs.componentList.component.name",
+								"path":"member.realProcess.components.componentList.component.name",
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
@@ -379,7 +379,7 @@
 								"name":"system.field.component.href",
 								"multiplicity":1,
 								"help":"system.field.component.href_help",
-								"path":"member.realProcess.inputs.componentList.component.href",
+								"path":"member.realProcess.components.componentList.component.href",
 								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,

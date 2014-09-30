@@ -41,6 +41,7 @@ import org.opengis.metadata.quality.Result;
 import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.metadata.spatial.VectorSpatialRepresentation;
 import org.opengis.referencing.ReferenceSystem;
+import org.opengis.temporal.Period;
 import org.opengis.util.CodeList;
 import org.opengis.util.FactoryException;
 import org.apache.sis.util.iso.Types;
@@ -54,6 +55,8 @@ import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
 import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.xml.NilReason;
+import org.geotoolkit.sml.xml.v101.ValidTime;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
 
 
 /**
@@ -169,6 +172,10 @@ final class MetadataUpdater {
                 } else {
                     existingChildren = Collections.emptyIterator();
                     final Class<?> type = specialize(getType(metadata, identifier));
+                    if (type == null) {
+                        throw new ParseException("Can not find " +
+                                metadata.getClass().getSimpleName() + '.' + identifier + " property.");
+                    }
                     if (specialMetadataCases(type, metadata, identifier)) {
                         continue;
                     }
@@ -335,6 +342,36 @@ final class MetadataUpdater {
             }
             if (moved) {
                 ((DefaultTemporalExtent) metadata).setBounds(beginPosition, endPosition);
+                return true;
+            }
+        } else if (metadata instanceof ValidTime && identifier.equals("timePeriod")) {
+            /*
+             * Properties:
+             *   - member.realProcess.validTime.timePeriod.beginPosition
+             *   - member.realProcess.validTime.timePeriod.endPosition
+             */
+            boolean moved = false;
+            Date beginPosition = null, endPosition = null;
+            while (np.path.length >= 2 && np.path[np.path.length - 2].equals("timePeriod")) {
+                final Date t = toDate(value);
+                switch (np.path[np.path.length - 1]) {
+                    case "beginPosition": beginPosition = t; break;
+                    case "endPosition":   endPosition   = t; break;
+                    default: throw new ParseException("Unsupported property: \"" + np + "\".");
+                }
+                moved = true;
+                if (!next()) break;
+            }
+            if (moved) {
+                final TimePeriodType period;
+                if (beginPosition != null || endPosition != null) {
+                    period = new TimePeriodType((Period) null);
+                    period.setBeginPosition(beginPosition);
+                    period.setEndPosition(endPosition);
+                } else {
+                    period = null;
+                }
+                ((ValidTime) metadata).setTimePeriod(period);
                 return true;
             }
         } else if (ReferenceSystem.class.isAssignableFrom(type) && identifier.equals("referenceSystemInfo")) {

@@ -27,6 +27,7 @@ import javax.xml.bind.JAXBException;
 import org.geotoolkit.sml.xml.v101.*;
 import org.apache.sis.util.CharSequences;
 import org.apache.sis.xml.MarshallerPool;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -61,12 +62,12 @@ public final strictfp class SensorTest {
     }
 
     /**
-     * Test writing of a simple metadata while pruning the empty nodes.
+     * Tests writing the metadata produced by {@link #createSensorML()}.
      *
      * @throws IOException if an error occurred while applying the template.
      */
     @Test
-    public void testWritePrune() throws IOException {
+    public void testWrite() throws IOException {
         final SensorML metadata = createSensorML();
         final StringBuilder buffer = new StringBuilder(10000);
         Template.getInstance("profile_sensorml_system").write(metadata, buffer, true);
@@ -74,7 +75,8 @@ public final strictfp class SensorTest {
     }
 
     /**
-     * Tests {@link Template#read(Iterable, Object)} when storing in an initially empty {@link SensorML}.
+     * Tests {@link Template#read(Iterable, Object)} with the JSon produced by {@link #testWrite()}.
+     * The result is stored in an initially empty {@link SensorML}.
      *
      * @throws IOException if an error occurred while reading the test JSON file.
      */
@@ -87,36 +89,72 @@ public final strictfp class SensorTest {
     }
 
     /**
-     * Other read test.
+     * Tests reading a larger, arbitrary SensorML file.
      *
      * @throws IOException if an error occurred while reading the test JSON file.
      */
     @Test
-    public void testRead2() throws IOException {
+    public void testReadLarger() throws IOException {
         final SensorML metadata = new SensorML();
-        Template.getInstance("profile_sensorml_system").read(readAllLines("sensor2.json"), metadata, true);
+        Template.getInstance("profile_sensorml_system").read(readAllLines("sensor_larger.json"), metadata, true);
         // Current test just ensure that we didn't got any exception.
     }
 
     /**
-     * Tests with a larger SensorML.
+     * Tests reading and writing with a larger SensorML.
      *
      * @throws JAXBException if an error occurred while reading the XML file.
      * @throws IOException if an error occurred while writing the test JSON file.
      */
     @Test
-    public void testFromXML() throws JAXBException, IOException {
+    public void testReadWriteFromXML() throws JAXBException, IOException {
+        testReadWriteFromXML(true);
+    }
+
+    /**
+     * Same test than {@link #testReadWriteFromXML()}, but without pruning.
+     * This is the mode used when we plan to let the user edit the SensorML.
+     *
+     * @throws JAXBException if an error occurred while reading the XML file.
+     * @throws IOException if an error occurred while writing the test JSON file.
+     */
+    @Test
+    public void testReadWriteEditable() throws JAXBException, IOException {
+        testReadWriteFromXML(false);
+    }
+
+    /**
+     * Implementation of {@code testReadWrite()}.
+     */
+    private void testReadWriteFromXML(final boolean prune) throws JAXBException, IOException {
         final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance("org.geotoolkit.sml.xml.v101"), null);
         final Unmarshaller m = pool.acquireUnmarshaller();
         final Object metadata = m.unmarshal(SensorTest.class.getResource("sensorML.xml"));
         pool.recycle(m);
 
-        final StringBuilder buffer = new StringBuilder(10000);
+        final StringBuilder buffer = new StringBuilder(15000);
         final Template template = Template.getInstance("profile_sensorml_system");
-        template.write(metadata, buffer, true);
+        template.write(metadata, buffer, prune);
 
         final Object back = new SensorML();
-        template.read(Arrays.asList(CharSequences.splitOnEOL(buffer)), back, true);
+        template.read(Arrays.asList(CharSequences.splitOnEOL(buffer)), back, prune);
         // Current test just ensure that we didn't got any exception.
+    }
+
+    /**
+     * Tests the {@code "profile_sensorml_component"} profile.
+     *
+     * @throws IOException if an error occurred while writing the test JSON file.
+     */
+    @Test
+    @Ignore("Need the fix for longitude/latitude writing")
+    public void testReadWriteComponent() throws IOException {
+        final SensorML metadata = createSensorML();
+        final StringBuilder buffer = new StringBuilder(15000);
+        final Template template = Template.getInstance("profile_sensorml_component");
+        template.write(metadata, buffer, false);
+
+        final Object back = new SensorML();
+        template.read(Arrays.asList(CharSequences.splitOnEOL(buffer)), back, false);
     }
 }

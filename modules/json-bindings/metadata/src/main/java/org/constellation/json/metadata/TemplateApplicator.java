@@ -153,7 +153,7 @@ final class TemplateApplicator {
      *         written), or {@code null} if none. The array may contain null elements, which shall be ignored.
      */
     final ValueNode[] createValueTree(final TemplateNode template, final Object metadata) throws ParseException {
-        return createValueTree(template, metadata, 0);
+        return createValueTree(template, null, metadata, 0);
     }
 
     /**
@@ -170,20 +170,26 @@ final class TemplateApplicator {
      *
      * <p>This method invokes itself recursively.</p>
      *
+     * @param  sibling    The node just before this one, or {@code null} if none.
      * @param  metadata   The metadata from which to get the values, or the expected base {@code Class}, or {@code null}.
      * @param  pathOffset Index of the first {@link #path} element to use.
      * @return The roots of tree nodes created by this method (not necessarily the root of the whole tree to be
      *         written), or {@code null} if none. The array may contain null elements, which shall be ignored.
      */
-    private ValueNode[] createValueTree(final TemplateNode template, final Object metadata, int pathOffset) throws ParseException {
+    private ValueNode[] createValueTree(final TemplateNode template, ValueNode sibling,
+            final Object metadata, int pathOffset) throws ParseException
+    {
         if (template.path == null) {
             /*
              * If this node does not declare any path, we can not get a metadata value for this node.
              * However maybe some chidren may have a path allowing them to fetch metadata values.
              */
+            sibling = null;
             ValueNode node = null;
             for (final TemplateNode child : template.children) {
-                node = addTo(template, node, createValueTree(child, metadata, pathOffset));
+                final ValueNode[] tree = createValueTree(child, sibling, metadata, pathOffset);
+                node = addTo(template, node, tree);
+                sibling = last(tree);
             }
             return (node != null) ? new ValueNode[] {node} : null;
         }
@@ -201,8 +207,7 @@ final class TemplateApplicator {
                 template.appendPath(pathOffset, buffer);
                 throw new ParseException(buffer.append('.').toString(), e);
             }
-            filterNewValues(template);
-            filterIgnoredValues(template.ignore);
+            filterIgnoredValues(template);
         }
         /*
          * If there is no value and the user asked us to prune empty nodes,
@@ -218,8 +223,15 @@ final class TemplateApplicator {
              * new node for default values, we will need to add the "[1]" indice in the JSON path
              * when the expected type is a collection.
              */
+            final int incrementFrom;
             final int pathEnd = template.path.length;
-            Arrays.fill(indices, pathOffset, pathEnd, 0); // Initialize to "not a collection".
+            if (sibling != null && Arrays.equals(template.path, sibling.template.path)) {
+                System.arraycopy(sibling.indices, pathOffset, indices, pathOffset, pathEnd);
+                incrementFrom = pathEnd - 1; // 'do … while' below will increment only the last indice.
+            } else {
+                Arrays.fill(indices, pathOffset, pathEnd, 0); // Initialize to "not a collection".
+                incrementFrom = pathOffset;
+            }
             Class<?> type = null;
             if (metadata != null) {
                 type = isMetadataInstance ? metadata.getClass() : (Class<?>) metadata; // See method javadoc.
@@ -240,7 +252,9 @@ final class TemplateApplicator {
                         break;
                     }
                     if (Collection.class.isAssignableFrom(propertyType)) {
-                        indices[pathOffset] = 1;
+                        if (pathOffset >= incrementFrom) {
+                            indices[pathOffset]++;
+                        }
                         type = getType(template, type, TypeValuePolicy.ELEMENT_TYPE, identifier);
                     } else {
                         type = propertyType; // Should be equivalent to a call to 'getType(…)', but much cheaper.
@@ -251,9 +265,12 @@ final class TemplateApplicator {
                 nodes.add(new ValueNode(template, indices, template.defaultValue));
                 // To be formatted below like ordinary values.
             } else {
+                sibling = null;
                 ValueNode node = null;
                 for (final TemplateNode child : template.children) {
-                    node = addTo(template, node, createValueTree(child, type, pathEnd));
+                    final ValueNode[] tree = createValueTree(child, sibling, type, pathEnd);
+                    node = addTo(template, node, tree);
+                    sibling = last(tree);
                 }
                 return new ValueNode[] {node}; // Unlikely to be null, but still allowed.
             }
@@ -268,15 +285,31 @@ final class TemplateApplicator {
         if (!template.isField()) {
             pathOffset = template.path.length;
             for (int i=0; i<na.length; i++) {
+                sibling = null;
                 ValueNode node = na[i];
                 System.arraycopy(node.indices, 0, indices, 0, node.indices.length);
                 for (final TemplateNode child : template.children) {
-                    node = addTo(template, node, createValueTree(child, node.value, pathOffset));
+                    final ValueNode[] tree = createValueTree(child, sibling, node.value, pathOffset);
+                    node = addTo(template, node, tree);
+                    sibling = last(tree);
                 }
                 na[i] = node; // As a matter of principle, but the reference should be the same.
             }
         }
         return na;
+    }
+
+    /**
+     * Returns the last element of the given tree, or {@code null} if none.
+     */
+    private static ValueNode last(final ValueNode[] tree) {
+        if (tree != null) {
+            for (int i=tree.length; --i>=0;) {
+                final ValueNode node = tree[i];
+                if (node != null) return node;
+            }
+        }
+        return null;
     }
 
     /**
@@ -343,18 +376,13 @@ final class TemplateApplicator {
      * <p>The current version only ensures that the number of elements is not greater than {@link TemplateNode#maxOccurs}.
      * However if we want to apply a more sophisticated filter in a future version, it could be applied here.</p>
      */
-    private void filterNewValues(final TemplateNode template) {
+    private void filterIgnoredValues(final TemplateNode template) {
         final int size      = nodes.size();
         final int maxOccurs = template.maxOccurs;
         if (size > maxOccurs) {
             nodes.subList(maxOccurs, size).clear();
         }
-    }
-
-    /**
-     * Removes all nodes to ignore.
-     */
-    private void filterIgnoredValues(final NumerotedPath ignore) {
+        final NumerotedPath ignore = template.ignore;
         if (ignore != null) {
             final Iterator<ValueNode> it = nodes.iterator();
             while (it.hasNext()) {
