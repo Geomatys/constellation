@@ -160,7 +160,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     @Override
     public DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException {
         final Dataset dataset = getDataset(datasetIdentifier, domainId);
-        final MarshallerPool pool = ISOMarshallerPool.getInstance();
+        final MarshallerPool pool = getMarshallerPool();
         try {
             final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
             final String metadataStr = dataset.getMetadataIso();
@@ -229,10 +229,11 @@ public class DatasetBusiness implements IDatasetBusiness {
                                final DefaultMetadata metadata) throws ConfigurationException {
         String metadataString = null;
         try {
-            final MarshallerPool pool = ISOMarshallerPool.getInstance();
+            final MarshallerPool pool = getMarshallerPool();
             final Marshaller marshaller = pool.acquireMarshaller();
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             marshaller.marshal(metadata, outputStream);
+            pool.recycle(marshaller);
             metadataString = outputStream.toString();
         } catch (JAXBException ex) {
             throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
@@ -357,5 +358,9 @@ public class DatasetBusiness implements IDatasetBusiness {
             }
             datasetRepository.remove(ds.getId());
         }
+    }
+    
+    protected MarshallerPool getMarshallerPool() {
+        return ISOMarshallerPool.getInstance();
     }
 }

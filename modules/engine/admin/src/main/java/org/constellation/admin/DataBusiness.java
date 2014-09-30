@@ -21,6 +21,7 @@ package org.constellation.admin;
 
 import com.google.common.base.Optional;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -46,10 +47,12 @@ import org.constellation.ServiceDef;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
 import org.constellation.business.IDataBusiness;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.StyleBrief;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.CstlUser;
@@ -645,6 +648,31 @@ public class DataBusiness implements IDataBusiness {
         }
         values.setValues(mapVals);
         return values;
+    }
+    
+    @Override
+    public void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException {
+        String metadataString = null;
+        try {
+            final MarshallerPool pool = getMarshallerPool();
+            final Marshaller marshaller = pool.acquireMarshaller();
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            marshaller.marshal(metadata, outputStream);
+            pool.recycle(marshaller);
+            metadataString = outputStream.toString();
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
+        }
+        
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataName.getLocalPart(), dataName.getNamespaceURI(), providerId);
+        if (data != null) {
+            data.setMetadata(metadataString);
+            data.setMetadataId(metadata.getFileIdentifier());
+            dataRepository.update(data);
+            indexEngine.addMetadataToIndexForData(metadata, data.getId());
+        } else {
+            throw new TargetNotFoundException("Data :" + dataName + " in provider:" + providerId +  " not found");
+        }
     }
     
     protected MarshallerPool getMarshallerPool() {

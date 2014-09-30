@@ -827,15 +827,19 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getDataMetadata(final ParameterValues values) throws ConfigurationException {
-        final String provider           = values.getValues().get("provider");
+        final String providerId         = values.getValues().get("provider");
         final String identifier         = values.getValues().get("identifier");
         final String dataType           = values.getValues().get("type");
         final StringBuilder buffer = new StringBuilder();
         try{
-            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider, Util.parseQName(identifier));
+            final QName dataName = Util.parseQName(identifier);
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, dataName);
             if(metadata == null){
                 //try to get dataset metadata.
-                metadata = datasetBusiness.getMetadata(provider,-1);
+                final Dataset dataset = dataBusiness.getDatasetForData(providerId, dataName);
+                if (dataset != null) {
+                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                }
             }
             if (metadata != null) {
                 //get template name
@@ -987,10 +991,15 @@ public class DataRest {
                                   final RootObj metadataValues) {
         try {
             // Get previously saved metadata
-            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider, Util.parseQName(identifier));
+            boolean dataset = false;
+            final QName dataName = Util.parseQName(identifier);
+            final Dataset ds = dataBusiness.getDatasetForData(provider, dataName);
+            
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider, dataName);
             if(metadata == null){
                 //try to get dataset metadata.
-                metadata = datasetBusiness.getMetadata(provider,-1);
+                metadata = datasetBusiness.getMetadata(ds.getIdentifier(),-1);
+                dataset = true;
             }
 
             //get template name
@@ -1015,7 +1024,11 @@ public class DataRest {
             }
 
             //Save metadata
-            datasetBusiness.updateMetadata(provider, -1, metadata);
+            if (dataset) {
+                datasetBusiness.updateMetadata(ds.getIdentifier(), -1, metadata);
+            } else {
+                dataBusiness.updateMetadata(provider, dataName, -1, metadata);
+            }
         } catch (ConfigurationException ex) {
             LOGGER.warning("Error while saving dataset metadata");
             throw new ConstellationException(ex);
@@ -1162,7 +1175,7 @@ public class DataRest {
         final String dataType           = values.getValues().get("dataType");
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
         
-        DefaultMetadata extractedMetadata = null;
+        DefaultMetadata extractedMetadata;
         switch (dataType) {
             case "raster":
                 try {
@@ -2004,8 +2017,8 @@ public class DataRest {
                     if (data.isVisible()) {
                         final QName name = new QName(data.getNamespace(), data.getName());
                         final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
-                        if ((sensorable && (db.getTargetSensor() == null || db.getTargetSensor().size() == 0)) ||
-                            (!sensorable && db.getTargetSensor() != null && db.getTargetSensor().size() > 0)) {
+                        if ((sensorable && (db.getTargetSensor() == null ||  db.getTargetSensor().isEmpty())) ||
+                            (!sensorable && db.getTargetSensor() != null && !db.getTargetSensor().isEmpty())) {
                             continue;
                         }
                         briefs.add(db);
@@ -2081,11 +2094,15 @@ public class DataRest {
     @Produces(MediaType.APPLICATION_XML)
     public Response downloadMetadataForData(final @PathParam("providerId") String providerId,
                                             final @PathParam("dataId") String dataId) {
-        try{
-            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
-            if(metadata == null){
+        try {
+            final QName dataName = Util.parseQName(dataId);
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, dataName);
+            if (metadata == null) {
                 //try to get dataset metadata.
-                metadata = datasetBusiness.getMetadata(providerId,-1);
+                final Dataset dataset = dataBusiness.getDatasetForData(providerId, dataName);
+                if (dataset != null) {
+                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                }
             }
             if (metadata != null) {
                 metadata.prune();
@@ -2143,7 +2160,7 @@ public class DataRest {
                 nameSpatialMetadataMap.put(dataId, cmb);
                 information.setCoveragesMetadata(nameSpatialMetadataMap);
                 fcr.recycle(reader);
-            } catch (Exception ex) {
+            } catch (CoverageStoreException | NoSuchIdentifierException | ProcessException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
                 return Response.status(500).entity("failed").build();
             }

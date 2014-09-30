@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.Dataset;
 
 /**
@@ -77,4 +78,6 @@ public interface IDataBusiness {
     ParameterValues getVectorDataColumns(int id) throws DataStoreException;
 
     List<Data> findByDatasetId(final Integer datasetId);
+
+    void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException;
 }
