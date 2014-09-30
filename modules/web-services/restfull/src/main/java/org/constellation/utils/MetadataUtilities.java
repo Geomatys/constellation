@@ -55,6 +55,7 @@ import org.geotoolkit.process.metadata.merge.MergeDescriptor;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.geometry.Envelope;
+import org.opengis.metadata.Metadata;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
@@ -74,14 +75,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -284,12 +278,33 @@ public final class MetadataUtilities {
         }
         return null;
     }
-    
-    public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider) throws DataStoreException {
 
+    /**
+     * Returns the raster metadata for entire dataset referenced by given provider.
+     * @param dataProvider the given data provider
+     * @return {@code DefaultMetadata}
+     * @throws DataStoreException
+     */
+    public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider) throws DataStoreException {
     	final DataStore dataStore = dataProvider.getMainStore();
     	final CoverageStore coverageStore = (CoverageStore) dataStore;
-        return (DefaultMetadata) coverageStore.getMetadata();
+        final Set<Name> names= coverageStore.getNames();
+        DefaultMetadata metadata = new DefaultMetadata();
+        if(names != null){
+            for(final Name n : names){
+                final CoverageReference cr = coverageStore.getCoverageReference(n);
+                final GridCoverageReader reader = cr.acquireReader();
+                try {
+                    final Metadata meta = reader.getMetadata();
+                    metadata = mergeTemplate(metadata,(DefaultMetadata)meta);
+                }catch(Exception ex){
+                    LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+                } finally{
+                    cr.recycle(reader);
+                }
+            }
+        }
+        return metadata;
     }
 
     /**
