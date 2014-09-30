@@ -56,6 +56,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.springframework.context.annotation.Profile;
 
 /**
  *
@@ -65,6 +66,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
+@Profile("standard")
 @Component
 @Primary
 public class DatasetBusiness implements IDatasetBusiness {
