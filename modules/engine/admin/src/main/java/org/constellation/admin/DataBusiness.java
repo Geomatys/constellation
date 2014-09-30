@@ -666,7 +666,7 @@ public class DataBusiness implements IDataBusiness {
         
         final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataName.getLocalPart(), dataName.getNamespaceURI(), providerId);
         if (data != null) {
-            data.setMetadata(metadataString);
+            data.setIsoMetadata(metadataString);
             data.setMetadataId(metadata.getFileIdentifier());
             dataRepository.update(data);
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
