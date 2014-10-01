@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.apache.sis.metadata.MetadataStandard;
+import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.constellation.json.metadata.binding.RootObj;
 
 

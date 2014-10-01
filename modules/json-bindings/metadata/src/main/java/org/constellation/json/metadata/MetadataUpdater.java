@@ -56,6 +56,7 @@ import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.xml.NilReason;
 import org.geotoolkit.sml.xml.v101.ValidTime;
+import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 
 
@@ -70,7 +71,10 @@ final class MetadataUpdater {
     /**
      * The metadata factory to use for creating new instances of ISO 19115 objects.
      */
-    private static final MetadataFactory FACTORY = new MetadataFactory();
+    private static final MetadataFactory
+            DEFAULT   = new MetadataFactory(),
+            SYSTEM    = new MetadataFactory(SensorMLStandard.SYSTEM),
+            COMPONENT = new MetadataFactory(SensorMLStandard.COMPONENT);
 
     /**
      * The metadata standard.
@@ -104,7 +108,13 @@ final class MetadataUpdater {
      */
     MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values) {
         this.standard = standard;
-        factory = (standard instanceof SensorMLStandard) ? ((SensorMLStandard) standard).factory : FACTORY;
+        if (standard == SensorMLStandard.SYSTEM) {
+            factory = SYSTEM;
+        } else if (standard == SensorMLStandard.COMPONENT) {
+            factory = COMPONENT;
+        } else {
+            factory = DEFAULT;
+        }
         it = values.entrySet().iterator();
         next();
     }

@@ -27,7 +27,6 @@ import javax.xml.bind.JAXBException;
 import org.geotoolkit.sml.xml.v101.*;
 import org.apache.sis.util.CharSequences;
 import org.apache.sis.xml.MarshallerPool;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

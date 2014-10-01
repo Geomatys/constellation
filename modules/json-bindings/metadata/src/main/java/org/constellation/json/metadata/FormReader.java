@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.io.IOException;
 import org.opengis.util.FactoryException;
+import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.util.CharSequences;
 import org.apache.sis.metadata.MetadataStandard;
 import org.constellation.json.metadata.binding.*;
@@ -222,6 +223,9 @@ final class FormReader {
                 System.arraycopy(updater.np.indices, 0, indices, 0, updater.np.indices.length);
                 throw new ParseException(formatPath("Can not store value at path \"", updater.np.path, "\"."), e);
             }
+        }
+        if (destination instanceof AbstractMetadata) {
+            ((AbstractMetadata) destination).prune();
         }
     }
 
