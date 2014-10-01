@@ -889,43 +889,6 @@
             	<artifactId>groovy-all</artifactId>
             	<version>2.2.2</version>
             </dependency>
-            <!--dependency>
-                <groupId>org.juzu</groupId>
-                <artifactId>juzu-core</artifactId>
-                <version>${juzu.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.juzu</groupId>
-                <artifactId>juzu-bom-core</artifactId>
-                <version>${juzu.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.juzu</groupId>
-                <artifactId>juzu-plugins-servlet</artifactId>
-                <version>${juzu.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.juzu</groupId>
-                <artifactId>juzu-plugins-less</artifactId>
-                <version>${juzu.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.juzu</groupId>
-                <artifactId>juzu-plugins-upload</artifactId>
-                <version>${juzu.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.juzu</groupId>
-                <artifactId>juzu-bom-arquillian</artifactId>
-                <version>${juzu.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.juzu</groupId>
-                <artifactId>juzu-bom-arquillian-tomcat7</artifactId>
-                <version>${juzu.version}</version>
-                <scope>test</scope>
-            </dependency-->
             <!--
         Database drivers. They are usually needed only for testing purpose (see
         http://jira.geotoolkit.org/browse/GEOTK-35 for an explanation about why
