@@ -73,7 +73,7 @@
 								"multiplicity":1,
 								"help":"component.field.identifier.definition_help",
 								"path":"member.realProcess.identification.identifierList.identifier.term.definition",
-								"render":"text",
+								"render":"uri",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -297,7 +297,7 @@
 								"multiplicity":1,
 								"help":"component.field.input.definition_help",
 								"path":"member.realProcess.inputs.inputList.input.observableProperty.definition",
-								"render":"text",
+								"render":"uri",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null
@@ -327,7 +327,7 @@
 								"multiplicity":1,
 								"help":"component.field.output.definition_help",
 								"path":"member.realProcess.outputs.outputList.output.quantity.definition",
-								"render":"text",
+								"render":"uri",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":null

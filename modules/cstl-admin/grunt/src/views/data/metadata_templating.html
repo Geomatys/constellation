@@ -285,6 +285,16 @@
            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
            dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
            debounce="200"/>
+    <input ng-if="fieldObj.field.render === 'uri'"
+           type="text"
+           class="form-control form-control-fix"
+           placeholder="{{'metadata.edition.placeholder.uri' | translate}}"
+           ng-pattern="uriRegExp"
+           ng-model="fieldObj.field.value"
+           ng-required="fieldObj.field.obligation === 'M'"
+           ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
+           dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
+           debounce="200"/>
     <span ng-if="fieldObj.field.render === 'readonly'"
           class="data"
           style="word-wrap: break-word;">{{fieldObj.field.value}}</span>
@@ -320,6 +330,8 @@
               translate="metadata.edition.validation.email">Invalid E-mail format</span>
         <span ng-if="!isValidNumber(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index])"
               translate="metadata.edition.validation.number">Invalid number value</span>
+        <span ng-if="!isValidUri(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index])"
+              translate="metadata.edition.validation.uri">Invalid URI format</span>
     </div>
 </li>
 </div>

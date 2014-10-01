@@ -712,7 +712,8 @@
     "metadata.edition.heading.requiredFields":"(*) Champ obligatoire",
     "metadata.edition.heading.scrolltotop":"Retour en haut",
     "metadata.edition.validation.required":"Ce champ est obligatoire",
-    "metadata.edition.validation.url":"Format URL non valide ",
+    "metadata.edition.validation.url":"Format URL non valide",
+    "metadata.edition.validation.uri":"Format URI non valide",
     "metadata.edition.validation.email":"Format E-mail non valide",
     "metadata.edition.validation.number":"Nombre non valide",
     "metadata.edition.heading.check.validation":"Vérifier la validation",
@@ -724,6 +725,7 @@
     "metadata.edition.occurrence.block.remove":"Retirer l'occurrence de block",
     "metadata.edition.sensor.component":"Capteur composant",
     "metadata.edition.sensor.system":"Capteur système",
+    "metadata.edition.placeholder.uri":"Example urn:ogc:def:identifierType:OGC:value",
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",
     "metrics.jvm.gc.marksweepcount": "Total de \"Mark Sweep\"",

@@ -636,6 +636,7 @@
     "metadata.edition.heading.scrolltotop":"Scroll to top",
     "metadata.edition.validation.required":"This field is required",
     "metadata.edition.validation.url":"Invalid URL format",
+    "metadata.edition.validation.uri":"Invalid URI format",
     "metadata.edition.validation.email":"Invalid E-mail format",
     "metadata.edition.validation.number":"Invalid number value",
     "metadata.edition.heading.check.validation":"Check validation",
@@ -647,6 +648,7 @@
     "metadata.edition.occurrence.block.remove":"Remove block occurrence",
     "metadata.edition.sensor.component":"Sensor component",
     "metadata.edition.sensor.system":"Sensor system",
+    "metadata.edition.placeholder.uri":"Example urn:ogc:def:identifierType:OGC:value",
 
     "msg.add.data.style.association": "Associate a style to the selected data",
     "msg.add.data.mapcontext.association": "Associate a mapcontext to the selected data.",
