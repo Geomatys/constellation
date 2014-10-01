@@ -191,10 +191,43 @@ public class DataBusiness implements IDataBusiness {
         }
         return metadata;
     }
+
+    /**
+     * Returns {@link DefaultMetadata} for given dataId.
+     * @param dataId given data id.
+     * @return {@link DefaultMetadata}
+     * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
+     */
+    @Override
+    public DefaultMetadata loadIsoDataMetadata(final int dataId) throws ConstellationException{
+        DefaultMetadata metadata = null;
+        final Data data = dataRepository.findById(dataId);
+        final MarshallerPool pool = getMarshallerPool();
+        try {
+            if (data != null && data.getIsoMetadata() != null) {
+                final InputStream sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
+                final Unmarshaller m = pool.acquireUnmarshaller();
+                metadata = (DefaultMetadata) m.unmarshal(sr);
+                pool.recycle(m);
+            }
+        } catch (UnsupportedEncodingException | JAXBException e) {
+            throw new ConstellationException(e);
+        }
+        return metadata;
+    }
     
     @Override
     public Dataset getDatasetForData(final String providerId, final QName name) throws ConstellationException{
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
+        if (data != null) {
+            return datasetRepository.findById(data.getDatasetId());
+        }
+        return null;
+    }
+
+    @Override
+    public Dataset getDatasetForData(final int dataId) throws ConstellationException{
+        final Data data = dataRepository.findById(dataId);
         if (data != null) {
             return datasetRepository.findById(data.getDatasetId());
         }

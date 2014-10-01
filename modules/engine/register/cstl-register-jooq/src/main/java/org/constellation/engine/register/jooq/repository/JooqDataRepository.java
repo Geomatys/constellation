@@ -97,7 +97,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     private Condition buildWhereClause(String namespaceURI, String localPart, String providerId) {
         Condition whereClause = Tables.PROVIDER.IDENTIFIER.eq(providerId).and(DATA.NAME.eq(localPart));
-        if (namespaceURI != null) {
+        if (namespaceURI != null && ! namespaceURI.isEmpty()) {
             return whereClause.and(DATA.NAMESPACE.eq(namespaceURI));
         }
         return whereClause;

@@ -2093,13 +2093,12 @@ public class DataRest {
     @Path("metadata/iso/download/{providerId}/{dataId}")
     @Produces(MediaType.APPLICATION_XML)
     public Response downloadMetadataForData(final @PathParam("providerId") String providerId,
-                                            final @PathParam("dataId") String dataId) {
+                                            final @PathParam("dataId") int dataId) {
         try {
-            final QName dataName = Util.parseQName(dataId);
-            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, dataName);
+            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(dataId);
             if (metadata == null) {
                 //try to get dataset metadata.
-                final Dataset dataset = dataBusiness.getDatasetForData(providerId, dataName);
+                final Dataset dataset = dataBusiness.getDatasetForData(dataId);
                 if (dataset != null) {
                     metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
                 }

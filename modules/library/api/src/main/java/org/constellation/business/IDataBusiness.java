@@ -32,7 +32,6 @@ import org.constellation.engine.register.Provider;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.Dataset;
 
@@ -52,8 +51,12 @@ public interface IDataBusiness {
     DataBrief getDataBrief(QName fullName, String providerIdentifier) throws ConstellationException;
 
     DefaultMetadata loadIsoDataMetadata(String providerID, QName qName)  throws ConstellationException;
+
+    DefaultMetadata loadIsoDataMetadata(int dataId) throws ConstellationException;
     
     Dataset getDatasetForData(String providerID, QName qName) throws ConstellationException;
+
+    Dataset getDatasetForData(int dataId) throws ConstellationException;
 
     void deleteAll();
 
