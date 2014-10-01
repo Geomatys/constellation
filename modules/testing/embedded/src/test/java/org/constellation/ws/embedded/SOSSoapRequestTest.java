@@ -57,6 +57,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import static org.junit.Assume.assumeNoException;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  *
@@ -64,6 +65,7 @@ import static org.junit.Assume.assumeNoException;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class SOSSoapRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

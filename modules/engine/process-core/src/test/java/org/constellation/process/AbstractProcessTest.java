@@ -35,6 +35,7 @@ import javax.annotation.PostConstruct;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertNotNull;
+import org.springframework.test.context.ActiveProfiles;
 /**
  * Abstract test base for all engine process tests. 
  * 
@@ -42,6 +43,7 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public abstract class AbstractProcessTest implements ApplicationContextAware {
 
     protected static final Logger LOGGER = Logging.getLogger(AbstractProcessTest.class);

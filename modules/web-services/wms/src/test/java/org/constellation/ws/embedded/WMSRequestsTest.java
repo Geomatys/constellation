@@ -106,6 +106,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import org.junit.BeforeClass;
+import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
 
@@ -120,6 +121,7 @@ import org.junit.BeforeClass;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class WMSRequestsTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

@@ -43,6 +43,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Date: 18/09/14
@@ -52,6 +53,7 @@ import java.net.URL;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class ProviderBusinessTest implements ApplicationContextAware {
 
     @Autowired

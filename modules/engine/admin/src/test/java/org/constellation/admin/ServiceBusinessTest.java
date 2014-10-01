@@ -32,9 +32,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
+import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class ServiceBusinessTest {
 
     @Autowired

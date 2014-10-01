@@ -54,6 +54,7 @@ import java.util.logging.Level;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
 
@@ -64,6 +65,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class CSWorkerInitialisationTest implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;

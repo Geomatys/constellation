@@ -170,6 +170,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 
@@ -179,6 +180,7 @@ import org.springframework.test.context.ContextConfiguration;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class WFS2WorkerTest implements ApplicationContextAware {
 
     private static final Logger LOGGER = Logging.getLogger(WFS2WorkerTest.class);

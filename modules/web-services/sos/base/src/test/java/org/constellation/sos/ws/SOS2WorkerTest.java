@@ -99,6 +99,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
 
@@ -107,6 +108,7 @@ import static org.junit.Assert.assertTrue;
  * @author Guilhem Legal (Geomatys)
  */
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public abstract class SOS2WorkerTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

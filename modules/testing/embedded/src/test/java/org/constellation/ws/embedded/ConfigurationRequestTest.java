@@ -67,6 +67,7 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  *
@@ -74,6 +75,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class ConfigurationRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

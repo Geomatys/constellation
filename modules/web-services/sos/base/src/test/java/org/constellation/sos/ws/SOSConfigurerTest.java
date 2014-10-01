@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -32,6 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Guilhem Legal (Geomatys)
  */
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public abstract class SOSConfigurerTest  implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

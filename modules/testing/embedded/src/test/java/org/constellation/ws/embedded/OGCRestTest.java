@@ -73,6 +73,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.w3c.dom.Node;
 
@@ -84,6 +85,7 @@ import org.w3c.dom.Node;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

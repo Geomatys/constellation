@@ -61,6 +61,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
+import org.springframework.test.context.ActiveProfiles;
 
 
 /**
@@ -73,6 +74,7 @@ import static org.junit.Assume.assumeTrue;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class WCSWorkerOutputTest extends WCSWorkerInit {
     /**
      * Ensures that a PostGRID layer preconfigured is found in the GetCapabilities document

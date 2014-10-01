@@ -52,6 +52,7 @@ import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFi
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  *
@@ -60,6 +61,7 @@ import static org.junit.Assert.assertTrue;
 @Ignore //issue with Spring security filter and grizzly
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class ConstellationServerTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

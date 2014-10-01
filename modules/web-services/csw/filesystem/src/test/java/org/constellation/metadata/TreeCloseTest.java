@@ -59,6 +59,7 @@ import static org.constellation.metadata.FileSystemCSWworkerTest.writeDataFile;
 import static org.geotoolkit.csw.xml.TypeNames.RECORD_QNAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * The purpose of this test is to run a "discovery" CSW and launch a spatial request on it.
@@ -67,6 +68,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class TreeCloseTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

@@ -53,6 +53,7 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNoException;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  *
@@ -60,6 +61,7 @@ import static org.junit.Assume.assumeNoException;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class WPSSoapRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

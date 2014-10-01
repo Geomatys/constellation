@@ -77,6 +77,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
+import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
 
@@ -87,6 +88,7 @@ import static org.junit.Assume.assumeTrue;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class WFSCustomSQLTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

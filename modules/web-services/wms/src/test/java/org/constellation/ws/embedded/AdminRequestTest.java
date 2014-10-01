@@ -68,6 +68,7 @@ import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
+import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
 
@@ -77,6 +78,7 @@ import org.junit.BeforeClass;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class AdminRequestTest extends AbstractGrizzlyServer  implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

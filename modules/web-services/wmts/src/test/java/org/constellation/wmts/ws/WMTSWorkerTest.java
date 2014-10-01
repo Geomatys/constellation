@@ -55,6 +55,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import org.springframework.test.context.ActiveProfiles;
 
 
 /**
@@ -63,6 +64,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class WMTSWorkerTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

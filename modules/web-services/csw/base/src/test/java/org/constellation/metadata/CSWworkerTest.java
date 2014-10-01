@@ -137,6 +137,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.springframework.test.context.ActiveProfiles;
 
 // JAXB dependencies
 // constellation dependencies
@@ -151,6 +152,7 @@ import static org.junit.Assert.fail;
  */
 @Ignore
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ActiveProfiles("standard")
 public class CSWworkerTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

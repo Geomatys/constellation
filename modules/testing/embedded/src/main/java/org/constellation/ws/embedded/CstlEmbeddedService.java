@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.core.env.AbstractEnvironment;
 
 /**
  * An Abstract class to run the web service in an embedded container.
@@ -249,6 +250,10 @@ public class CstlEmbeddedService extends CommandLine {
             working = true;
             try {
                 final ResourceConfig config = ResourceConfig.forApplication(new CstlApplication());
+                System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, "standard");
+                System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "standard");
+//                grizzlyWebContainerProperties.put(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, "standard");
+//                grizzlyWebContainerProperties.put(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "standard");
                 config.addProperties(grizzlyWebContainerProperties);
                 config.register(JacksonFeature.class);
                 config.register(MultiPartFeature.class);
