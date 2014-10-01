@@ -51,12 +51,12 @@ public class DataSetBrief implements Serializable {
     @XmlElement(name="Resume")
     private String resume;
     @XmlElement(name="Date")
-    private long date;
+    private Long date;
 
     public DataSetBrief() {}
 
     public DataSetBrief(final Integer id, final String name, final String type, final String owner,
-                        final List<DataBrief> children, final long date) {
+                        final List<DataBrief> children, final Long date) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -113,11 +113,11 @@ public class DataSetBrief implements Serializable {
         this.resume = resume;
     }
 
-    public long getDate() {
+    public Long getDate() {
         return date;
     }
 
-    public void setDate(long date) {
+    public void setDate(Long date) {
         this.date = date;
     }
 
