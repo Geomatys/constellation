@@ -19,8 +19,7 @@
 
 package org.constellation.scheduler;
 
-import org.constellation.api.*;
-import org.constellation.api.TaskState;
+
 import org.constellation.business.IProcessBusiness;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
@@ -106,7 +105,7 @@ public class QuartzJobListener implements JobListener {
         
         @Override
         public void started(ProcessEvent event) {
-            taskEntity.setState(org.constellation.api.TaskState.RUNNING.name());
+            taskEntity.setState(TaskState.Status.RUNNING.name());
             taskEntity.setStart(System.currentTimeMillis());
             taskEntity.setMessage(toString(event.getTask()));
             processBusiness.update(taskEntity);
@@ -129,7 +128,7 @@ public class QuartzJobListener implements JobListener {
 
         @Override
         public void completed(ProcessEvent event) {
-            taskEntity.setState(TaskState.SUCCEED.name());
+            taskEntity.setState(TaskState.Status.SUCCEED.name());
             taskEntity.setMessage(toString(event.getTask()));
             taskEntity.setEnd(System.currentTimeMillis());
             processBusiness.update(taskEntity);
@@ -137,7 +136,7 @@ public class QuartzJobListener implements JobListener {
 
         @Override
         public void failed(ProcessEvent event) {
-            taskEntity.setState(TaskState.FAILED.name());
+            taskEntity.setState(TaskState.Status.FAILED.name());
             taskEntity.setEnd(System.currentTimeMillis());
             StringWriter errors = new StringWriter();
             event.getException().printStackTrace(new PrintWriter(errors));

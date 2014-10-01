@@ -149,18 +149,32 @@ public class ProcessBusiness implements IProcessBusiness {
      * @return TaskState, null if no task exist for this id.
      */
     public TaskState geTaskState(final String id){
-        //TODO a faire
-        return  null;
-        /*TaskState state = statuses.get(id);
-        if(state==null){
-            final Task task = getTask(id);
-            if(task==null){
-                return null;
-            }
-            state = new TaskState(task);
-            statuses.put(id, state);
+        final org.constellation.engine.register.Task taskEntity = taskRepository.get(id);
+        TaskParameter taskParameter = taskParameterRepository.get(taskEntity.getTaskParameterId());
+        org.constellation.scheduler.Task task = new org.constellation.scheduler.Task();
+        final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+
+        final ParameterValueGroup params;
+        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
+        try {
+            reader.setInput(taskParameter.getInputs());
+            params = (ParameterValueGroup) reader.read();
+            reader.dispose();
+        } catch (XMLStreamException | IOException ex) {
+            throw new ConstellationException(ex);
         }
-        return state;*/
+        ProcessJobDetail processJobDetails = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(),params );
+        task.setDetail(processJobDetails);
+        task.setTitle(taskParameter.getName());
+        TaskState taskState = new TaskState(task);
+        taskState.setStatus(TaskState.Status.valueOf(taskEntity.getState()));
+        taskState.setTitle(taskParameter.getName());
+        taskState.setMessage(taskEntity.getMessage());
+        //TODO percent not set cause not know
+        taskState.setPercent(0);
+        //TODO exception if exist stored in string message atribute from taskEntity
+//        taskState.setLastException(");
+        return taskState;
     }
 
     @Override
@@ -372,7 +386,7 @@ public class ProcessBusiness implements IProcessBusiness {
         task.setTrigger((SimpleTrigger)trigger);
         final org.constellation.engine.register.Task taskEntity = new org.constellation.engine.register.Task();
         taskEntity.setIdentifier(task.getId());
-        taskEntity.setState(org.constellation.api.TaskState.PENDING.name());
+        taskEntity.setState(TaskState.Status.PENDING.name());
         taskEntity.setOwner(userId);
         taskEntity.setTaskParameterId(taskParameterId);
         //TODO ???
@@ -384,14 +398,14 @@ public class ProcessBusiness implements IProcessBusiness {
 
             @Override
             public void started(final ProcessEvent event) {
-                taskEntity.setState(org.constellation.api.TaskState.RUNNING.name());
+                taskEntity.setState(TaskState.Status.RUNNING.name());
                 taskEntity.setMessage(toString(event.getTask()));
                 taskEntity.setStart(System.currentTimeMillis());
                 taskRepository.update(taskEntity);
             }
             @Override
             public void failed(ProcessEvent event) {
-                taskEntity.setState(org.constellation.api.TaskState.FAILED.name());
+                taskEntity.setState(TaskState.Status.FAILED.name());
                 StringWriter errors = new StringWriter();
                 event.getException().printStackTrace(new PrintWriter(errors));
                 taskEntity.setMessage(toString(event.getTask())+ " cause : " + errors.toString());
@@ -400,7 +414,7 @@ public class ProcessBusiness implements IProcessBusiness {
             }
             @Override
             public void completed(ProcessEvent event) {
-                taskEntity.setState(org.constellation.api.TaskState.SUCCEED.name());
+                taskEntity.setState(TaskState.Status.SUCCEED.name());
                 taskEntity.setMessage(toString(event.getTask()));
                 taskEntity.setEnd(System.currentTimeMillis());
                 taskRepository.update(taskEntity);
@@ -452,7 +466,7 @@ public class ProcessBusiness implements IProcessBusiness {
             throw new ConstellationException("cannot unregister from scheduler", e);
         }
 
-        task.setState(org.constellation.api.TaskState.CANCELLED.name());
+        task.setState(TaskState.Status.CANCELLED.name());
         taskRepository.update(task);
         //TODO verify why returning false before refactoring
 

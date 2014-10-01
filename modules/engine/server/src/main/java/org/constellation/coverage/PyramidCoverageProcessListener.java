@@ -19,10 +19,10 @@
 package org.constellation.coverage;
 
 import org.constellation.admin.SpringHelper;
-import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.engine.register.Task;
 import org.constellation.provider.DataProviders;
+import org.constellation.scheduler.TaskState;
 import org.geotoolkit.parameter.ParameterGroup;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
@@ -91,7 +91,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     public void completed(final ProcessEvent processEvent) {
         //Update state (pass to completed) on database
         final Task pyramidTask = processBusiness.getTask(uuidTask);
-        pyramidTask.setState(TaskState.SUCCEED.name());
+        pyramidTask.setState(TaskState.Status.SUCCEED.name());
         processBusiness.update(pyramidTask);
 
         //update provider
@@ -127,7 +127,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     public void failed(final ProcessEvent processEvent) {
         //Update state (pass to failed) on database
         final Task pyramidTask = processBusiness.getTask(uuidTask);
-        pyramidTask.setState(TaskState.FAILED.name());
+        pyramidTask.setState(TaskState.Status.FAILED.name());
         processBusiness.update(pyramidTask);
     }
 }

@@ -24,21 +24,24 @@ package org.constellation.scheduler;
  * @author Johann Sorel (Geomatys)
  */
 public class TaskState {
-    
+
+
+
     public static enum Status{
-        NONE,
-        RUN,
-        PAUSE,
-        FINISH,
-        FAIL
+        PENDING,
+        RUNNING,
+        SUCCEED,
+        FAILED,
+        CANCELLED
     };
-    
+
     private final Task task;
 
-    private Status status = Status.NONE;
+    private Status status = Status.CANCELLED;
     private String message;
     private float percent;
     private Exception lastException;
+    private String title;
     
     public TaskState(Task task) {
         this.task = task;
@@ -78,6 +81,14 @@ public class TaskState {
 
     public void setLastException(Exception lastException) {
         this.lastException = lastException;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
     
 }
