@@ -2043,7 +2043,7 @@ public class DataRest {
 
     @POST
     @Path("{providerid}/{dataid}/visible")
-    public Response visibleData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
+    public Response visibleData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) throws ConfigurationException {
 
         dataBusiness.updateDataVisibility(new QName("", dataid), providerid, true);
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -2051,7 +2051,7 @@ public class DataRest {
 
     @POST
     @Path("{providerid}/{dataid}/hidden")
-    public Response hideData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid, final SimpleValue dataNmsp) {
+    public Response hideData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid, final SimpleValue dataNmsp) throws ConfigurationException {
         final QName dataName;
         if (dataNmsp != null) {
             dataName = new QName(dataNmsp.getValue(), dataid);

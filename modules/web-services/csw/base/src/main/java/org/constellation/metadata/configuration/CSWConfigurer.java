@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
+import org.constellation.ws.ICSWConfigurer;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for CSW service.
@@ -66,7 +67,7 @@ import java.util.logging.Level;
  * @version 0.9
  * @since 0.9
  */
-public class CSWConfigurer extends OGCConfigurer {
+public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
 
     protected final DocumentBuilderFactory dbf;
     
@@ -89,6 +90,7 @@ public class CSWConfigurer extends OGCConfigurer {
         dbf.setNamespaceAware(true);
     }
 
+    @Override
     public AcknowlegementType refreshIndex(final String id, final boolean asynchrone, final boolean forced) throws ConfigurationException {
         if (isIndexing(id) && !forced) {
             final AcknowlegementType refused = new AcknowlegementType("Failure",
@@ -191,6 +193,7 @@ public class CSWConfigurer extends OGCConfigurer {
      * @return
      * @throws ConfigurationException
      */
+    @Override
     public AcknowlegementType addToIndex(final String id, final String identifierList) throws ConfigurationException {
         LOGGER.info("Add to index requested");
         final List<String> identifiers = StringUtilities.toStringList(identifierList);
@@ -242,6 +245,7 @@ public class CSWConfigurer extends OGCConfigurer {
      * @return
      * @throws ConfigurationException
      */
+    @Override
     public AcknowlegementType removeFromIndex(final String id, final String identifierList) throws ConfigurationException {
         LOGGER.info("Remove from index requested");
         final List<String> identifiers = StringUtilities.toStringList(identifierList);
@@ -274,6 +278,7 @@ public class CSWConfigurer extends OGCConfigurer {
      * @param id identifier of the CSW service.
      * @return an Acknowledgment.
      */
+    @Override
     public AcknowlegementType stopIndexation(final String id) {
         LOGGER.info("\n stop indexation requested \n");
         if (isIndexing(id)) {
@@ -284,6 +289,7 @@ public class CSWConfigurer extends OGCConfigurer {
         }
     }
 
+    @Override
     public AcknowlegementType importRecords(final String id, final File f, final String fileName) throws ConfigurationException {
         LOGGER.info("Importing record");
         final AbstractIndexer indexer = getIndexer(id, null);
@@ -329,6 +335,7 @@ public class CSWConfigurer extends OGCConfigurer {
         }
     }
     
+    @Override
     public AcknowlegementType importRecord(final String id, final Node n) throws ConfigurationException {
         LOGGER.info("Importing record");
         final AbstractIndexer indexer = getIndexer(id, null);
@@ -347,6 +354,7 @@ public class CSWConfigurer extends OGCConfigurer {
     }
 
    
+    @Override
     public AcknowlegementType removeRecords(final String id, final String identifierList) throws ConfigurationException {
         final AbstractIndexer indexer = getIndexer(id, null);
         try {
@@ -370,6 +378,7 @@ public class CSWConfigurer extends OGCConfigurer {
         }
     }
     
+    @Override
     public AcknowlegementType removeAllRecords(final String id) throws ConfigurationException {
         final CSWMetadataReader reader = getReader(id);
         final AbstractIndexer indexer  = getIndexer(id, reader);
@@ -393,6 +402,7 @@ public class CSWConfigurer extends OGCConfigurer {
         }
     }
 
+    @Override
     public AcknowlegementType metadataExist(final String id, final String metadataName) throws ConfigurationException {
         final CSWMetadataReader reader = getReader(id);
         try {
@@ -409,6 +419,7 @@ public class CSWConfigurer extends OGCConfigurer {
         }
     }
 
+    @Override
     public List<BriefNode> getMetadataList(final String id, final int count, final int startIndex) throws ConfigurationException {
         final CSWMetadataReader reader = getReader(id);
         try {
@@ -427,6 +438,7 @@ public class CSWConfigurer extends OGCConfigurer {
         }
     }
 
+    @Override
     public Node getMetadata(final String id, final String metadataName) throws ConfigurationException {
         final CSWMetadataReader reader = getReader(id);
         try {
@@ -436,6 +448,7 @@ public class CSWConfigurer extends OGCConfigurer {
         }
     }
     
+    @Override
     public int getMetadataCount(final String id) throws ConfigurationException {
         final CSWMetadataReader reader = getReader(id);
         try {
@@ -445,6 +458,7 @@ public class CSWConfigurer extends OGCConfigurer {
         }
     }
 
+    @Override
     public StringList getAvailableCSWDataSourceType() {
         final List<DataSourceType> sources = new ArrayList<>();
         final Iterator<AbstractCSWFactory> ite = ServiceRegistry.lookupProviders(AbstractCSWFactory.class);

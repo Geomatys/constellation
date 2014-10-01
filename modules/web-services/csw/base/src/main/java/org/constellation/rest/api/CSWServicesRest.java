@@ -157,7 +157,7 @@ public class CSWServicesRest {
     public Response clearCache(final @PathParam("id") String id) throws Exception {
         final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", id);
         if (worker != null) {
-            worker.clearCache();
+            worker.refresh();
             return ok(AcknowlegementType.success("The CSW cache has been cleared"));
         }
         return ok(AcknowlegementType.failure("Unable to find a csw service " + id));

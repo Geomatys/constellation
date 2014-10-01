@@ -69,7 +69,6 @@ import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.SensorRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.DataProvider;
@@ -93,11 +92,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Profile("standard")
 @Component
 @Primary
-public class DataBusiness implements IDataBusiness {
+public class DataBusiness extends InternalCSWSynchronizer implements IDataBusiness {
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(DataBusiness.class);
+    protected static final Logger LOGGER = Logging.getLogger(DataBusiness.class);
     /**
      * Injected user repository.
      */
@@ -128,11 +127,6 @@ public class DataBusiness implements IDataBusiness {
      */
     @Inject
     private StyleRepository styleRepository;
-    /**
-     * Injected service repository.
-     */
-    @Inject
-    private ServiceRepository serviceRepository;
     /**
      * Injected provider repository.
      */
@@ -582,11 +576,12 @@ public class DataBusiness implements IDataBusiness {
      * @param name data name.
      * @param providerIdentifier provider identifier.
      * @param visibility value to set
+     * @throws org.constellation.configuration.ConfigurationException
      */
     @Override
     public void updateDataVisibility(final QName name,
                                      final String providerIdentifier,
-                                     boolean visibility) {
+                                     boolean visibility) throws ConfigurationException {
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerIdentifier);
         data.setVisible(visibility);
         dataRepository.update(data);
@@ -608,6 +603,9 @@ public class DataBusiness implements IDataBusiness {
             if (remove) {
                 providerRepository.delete(data.getProvider());
             }
+            
+            // update internal CSW index
+            updateInternalCSWIndex(data.getMetadataId(), 1, false); // TODO DOMAIN ID
         }
     }
 
@@ -703,6 +701,8 @@ public class DataBusiness implements IDataBusiness {
             data.setMetadataId(metadata.getFileIdentifier());
             dataRepository.update(data);
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
+            // update internal CSW index
+            updateInternalCSWIndex(metadata.getFileIdentifier(), domainId, true);
         } else {
             throw new TargetNotFoundException("Data :" + dataName + " in provider:" + providerId +  " not found");
         }

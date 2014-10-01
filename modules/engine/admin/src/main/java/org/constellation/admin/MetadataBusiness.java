@@ -73,7 +73,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             return dataset.getMetadataIso();
         }
         final Data data = dataRepository.findByMetadataId(metadataId);
-        if (data != null) {
+        if (data != null && data.isVisible()) {
             return data.getIsoMetadata();
         }
         if (includeService) {

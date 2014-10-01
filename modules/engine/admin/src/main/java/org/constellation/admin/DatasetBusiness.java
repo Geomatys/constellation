@@ -46,7 +46,6 @@ import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -55,7 +54,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import org.springframework.context.annotation.Profile;
 
 /**
@@ -69,7 +67,7 @@ import org.springframework.context.annotation.Profile;
 @Profile("standard")
 @Component
 @Primary
-public class DatasetBusiness implements IDatasetBusiness {
+public class DatasetBusiness extends InternalCSWSynchronizer implements IDatasetBusiness {
 
     /**
      * w3c document builder factory.
@@ -190,11 +188,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     @Override
     public Node getMetadataNode(final String datasetIdentifier, int domainId) throws ConfigurationException {
         final Dataset dataset = getDataset(datasetIdentifier, domainId);
-        try {
-            return getNodeFromString(dataset.getMetadataIso());
-        } catch (MetadataIoException ex) {
-            throw new ConfigurationException("Unable to get w3c node for metadata of dataset!", ex);
-        }
+        return getNodeFromString(dataset.getMetadataIso());
     }
 
     /**
@@ -202,9 +196,9 @@ public class DatasetBusiness implements IDatasetBusiness {
      *
      * @param metadataStr the given metadata xml as string.
      * @return {@link Node} that represents the metadata in w3c document format.
-     * @throws MetadataIoException
+     * @throws ConfigurationException
      */
-    protected Node getNodeFromString(final String metadataStr) throws MetadataIoException {
+    protected Node getNodeFromString(final String metadataStr) throws ConfigurationException {
         if(metadataStr == null) {
             return null;
         }
@@ -214,7 +208,7 @@ public class DatasetBusiness implements IDatasetBusiness {
             final Document document = docBuilder.parse(source);
             return document.getDocumentElement();
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            throw new MetadataIoException("unable to parse the metadata", ex, NO_APPLICABLE_CODE);
+            throw new ConfigurationException("Unable to get w3c node for metadata of dataset!", ex);
         }
     }
 
@@ -247,6 +241,8 @@ public class DatasetBusiness implements IDatasetBusiness {
             dataset.setMetadataId(metadata.getFileIdentifier());
             datasetRepository.update(dataset);
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
+            // update internal CSW index
+            updateInternalCSWIndex(metadata.getFileIdentifier(), domainId, true);
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
@@ -332,7 +328,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     @Override
-    public void removeDataset(String datasetIdentifier, int domainId) {
+    public void removeDataset(String datasetIdentifier, int domainId) throws ConfigurationException {
         final Dataset ds = datasetRepository.findByIdentifier(datasetIdentifier);
         if (ds != null) {
             final Set<Integer> involvedProvider = new HashSet<>();
@@ -343,6 +339,7 @@ public class DatasetBusiness implements IDatasetBusiness {
                 data.setDatasetId(null);
                 dataRepository.update(data);
                 involvedProvider.add(data.getProvider());
+                updateInternalCSWIndex(data.getMetadataId(), domainId, false);
             }
             
             // 2. cleanup provider if empty
@@ -359,6 +356,9 @@ public class DatasetBusiness implements IDatasetBusiness {
                 }
             }
             datasetRepository.remove(ds.getId());
+            
+            // update internal CSW index
+            updateInternalCSWIndex(ds.getMetadataId(), domainId, false);
         }
     }
     

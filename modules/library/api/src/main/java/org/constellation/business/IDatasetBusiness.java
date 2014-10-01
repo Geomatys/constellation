@@ -42,7 +42,7 @@ public interface IDatasetBusiness {
 
     DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException;
     
-    void removeDataset(final String datasetIdentifier, final int domainId);
+    void removeDataset(final String datasetIdentifier, final int domainId) throws ConfigurationException;
 
     Dataset getDataset(String datasetId);
 

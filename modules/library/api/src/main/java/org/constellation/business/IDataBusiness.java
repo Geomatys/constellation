@@ -62,7 +62,7 @@ public interface IDataBusiness {
 
     List<Data> searchOnMetadata(String search) throws IOException, ConstellationException;
 
-    void updateDataVisibility(QName name, String providerIdentifier, boolean visibility);
+    void updateDataVisibility(QName name, String providerIdentifier, boolean visibility) throws ConfigurationException;
 
     DataBrief getDataLayer(String layerAlias, String providerid);
 

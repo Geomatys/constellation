@@ -150,6 +150,7 @@ import static org.constellation.metadata.CSWConstants.TRANSACTION_TYPE;
 import static org.constellation.metadata.CSWConstants.TYPENAMES;
 import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
 import static org.constellation.metadata.CSWQueryable.ISO_QUERYABLE;
+import org.constellation.ws.Refreshable;
 import static org.geotoolkit.csw.xml.TypeNames.CAPABILITIES_QNAME;
 import static org.geotoolkit.csw.xml.TypeNames.DC_TYPE_NAMES;
 import static org.geotoolkit.csw.xml.TypeNames.EBRIM25_TYPE_NAMES;
@@ -182,7 +183,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED
  */
 @Named
 @Scope("prototype")
-public class CSWworker extends AbstractWorker {
+public class CSWworker extends AbstractWorker implements Refreshable {
 
     /**
      * A Database reader.
@@ -1799,7 +1800,8 @@ public class CSWworker extends AbstractWorker {
         return CSWMarshallerPool.getInstanceCswOnly();
     }
     
-    public void clearCache() throws CstlServiceException {
+    @Override
+    public void refresh() throws CstlServiceException {
         try {
             indexSearcher.refresh();
             mdReader.clearCache();
