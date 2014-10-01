@@ -112,7 +112,7 @@ public class DataBusiness implements IDataBusiness {
      * Injected data repository.
      */
     @Inject
-    private DataRepository dataRepository;
+    protected DataRepository dataRepository;
     /**
      * Injected layer repository.
      */
@@ -591,21 +591,23 @@ public class DataBusiness implements IDataBusiness {
         data.setVisible(visibility);
         dataRepository.update(data);
         
-        // 1. remove layer involving the data
-        for (Layer layer : layerRepository.findByDataId(data.getId())) {
-            layerRepository.delete(layer.getId());
-        }
-        
-        // 2. cleanup provider if empty
-        boolean remove = true;
-        for (Data pdata : dataRepository.findByProviderId(data.getProvider())) {
-            if (pdata.isVisible()) {
-                remove = false;
-                break;
+        if (!visibility) {
+            // 1. remove layer involving the data
+            for (Layer layer : layerRepository.findByDataId(data.getId())) {
+                layerRepository.delete(layer.getId());
             }
-        }
-        if (remove) {
-            providerRepository.delete(data.getProvider());
+
+            // 2. cleanup provider if empty
+            boolean remove = true;
+            for (Data pdata : dataRepository.findByProviderId(data.getProvider())) {
+                if (pdata.isVisible()) {
+                    remove = false;
+                    break;
+                }
+            }
+            if (remove) {
+                providerRepository.delete(data.getProvider());
+            }
         }
     }
 

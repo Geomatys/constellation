@@ -80,12 +80,12 @@ public class DatasetBusiness implements IDatasetBusiness {
      * Injected dataset repository.
      */
     @Inject
-    private DatasetRepository datasetRepository;
+    protected DatasetRepository datasetRepository;
     /**
      * Injected data repository.
      */
     @Inject
-    private DataRepository dataRepository;
+    protected DataRepository dataRepository;
     /**
      * Injected provider repository.
      */
