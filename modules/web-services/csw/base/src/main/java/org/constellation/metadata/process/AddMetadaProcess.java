@@ -30,6 +30,9 @@ import org.opengis.parameter.ParameterValueGroup;
 import java.io.File;
 
 import static org.constellation.metadata.process.AddMetadataDescriptor.*;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.Refreshable;
+import org.constellation.ws.WSEngine;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 
@@ -68,8 +71,11 @@ public class AddMetadaProcess extends AbstractCstlProcess {
                 throw new ProcessException("The metadata is already present in CSW", this, null);
             } else {
                 configurer.importRecords(serviceID, metadataFile, metadataFile.getName());
+                final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", serviceID);
+                worker.refresh();
+                
             }
-        } catch (ConfigurationException ex) {
+        } catch (ConfigurationException | CstlServiceException ex) {
             throw new ProcessException(null, this, ex);
         }
     }
