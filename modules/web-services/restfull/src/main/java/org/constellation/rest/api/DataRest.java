@@ -1185,10 +1185,12 @@ public class DataRest {
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
         
         DefaultMetadata extractedMetadata;
+        String crsName = null;
         switch (dataType) {
             case "raster":
                 try {
                     extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider);
+                    crsName = MetadataUtilities.getRasterCRSName(dataProvider);
                 } catch (DataStoreException e) {
                     LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
                     extractedMetadata = new DefaultMetadata();
@@ -1197,6 +1199,7 @@ public class DataRest {
             case "vector":
                 try {                
                     extractedMetadata = MetadataUtilities.getVectorMetadata(dataProvider);
+                    crsName = MetadataUtilities.getVectorCRSName(dataProvider);
                 } catch (DataStoreException e) {
                     LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
                     extractedMetadata = new DefaultMetadata();
@@ -1218,6 +1221,10 @@ public class DataRest {
             prop.put("dataType", "grid");
         }else if("vector".equalsIgnoreCase(dataType)){
             prop.put("dataType", "vector");
+        }
+
+        if(crsName != null){
+            prop.put("srs", crsName);
         }
 
         // get current user name and email and store into metadata contact.

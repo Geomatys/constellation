@@ -40,6 +40,7 @@ import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
@@ -53,10 +54,12 @@ import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
 import org.geotoolkit.process.metadata.merge.MergeDescriptor;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.Metadata;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.ReferenceSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
@@ -312,6 +315,62 @@ public final class MetadataUtilities {
             }
         }
         return metadata;
+    }
+
+    /**
+     * Returns crs name if possible for raster data.
+     * @param dataProvider
+     * @return
+     * @throws DataStoreException
+     */
+    public static String getRasterCRSName(final DataProvider dataProvider) throws DataStoreException {
+        final DataStore dataStore = dataProvider.getMainStore();
+        final CoverageStore coverageStore = (CoverageStore) dataStore;
+        final Set<Name> names= coverageStore.getNames();
+        if(names != null){
+            for(final Name n : names){
+                try{
+                    final CoverageReference cr = coverageStore.getCoverageReference(n);
+                    final GridCoverageReader reader = cr.acquireReader();
+                    final GeneralGridGeometry gridGeom = reader.getGridGeometry(cr.getImageIndex());
+                    final CoordinateReferenceSystem crs = gridGeom.getCoordinateReferenceSystem();
+                    final String crsIdentifier = IdentifiedObjects.lookupIdentifier(crs,true);
+                    if(crsIdentifier != null){
+                        return crsIdentifier;
+                    }
+                }catch(Exception ex){
+                    LOGGER.finer(ex.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns crs name for vector data if possible.
+     * @param dataProvider
+     * @return
+     * @throws DataStoreException
+     */
+    public static String getVectorCRSName(final DataProvider dataProvider) throws DataStoreException {
+        final DataStore dataStore = dataProvider.getMainStore();
+        final FeatureStore featureStore = (FeatureStore) dataStore;
+        for (Name dataName : featureStore.getNames()) {
+            Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
+            if (env == null) {
+                continue;
+            }
+            final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
+            try{
+                final String crsIdentifier = IdentifiedObjects.lookupIdentifier(crs,true);
+                if(crsIdentifier != null){
+                    return crsIdentifier;
+                }
+            }catch(Exception ex){
+                LOGGER.finer(ex.getMessage());
+            }
+        }
+        return null;
     }
 
     /**
