@@ -28,7 +28,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -60,11 +59,9 @@ public class CorsFilter implements Filter {
         httpServletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type");
         httpServletResponse.addHeader("Access-Control-Allow-Credentials", "true");
 
-        //Test for IE with regular Expression
-        String userAgent = httpServletRequest.getHeader("User-Agent");
-        Pattern pattern = Pattern.compile("(?:\\b(MS)?IE\\s+|\\bTrident.*\\s+rv:)(\\d+)");
-        Matcher matcher = pattern.matcher(userAgent);
-        if(matcher.find()){
+        //Test to desable cache for Ajax call
+        String xRequest = httpServletRequest.getHeader("X-Requested-With");
+        if(xRequest!=null && xRequest.equalsIgnoreCase("XMLHttpRequest")){
             httpServletResponse.setHeader("Cache-Control", "no-cache");
             httpServletResponse.setDateHeader("Expires", 0);
             httpServletResponse.setHeader("Pragma", "No-cache");
