@@ -429,7 +429,7 @@ public class DataRest {
             }
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            return Response.status(500).entity("failed").build();
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
         return Response.ok(hashMap).build();
     }
@@ -485,7 +485,7 @@ public class DataRest {
                     }
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                    return Response.status(500).entity("failed").build();
+                    return Response.status(500).entity(ex.getLocalizedMessage()).build();
                 }
             }
         }
@@ -596,8 +596,8 @@ public class DataRest {
 
             return Response.ok(importedData).build();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Bad configuration for data Integrated directory", e);
-            return Response.status(500).entity("failed").build();
+            LOGGER.log(Level.WARNING, "Bad configuration for data Integrated directory", e);
+            return Response.status(500).entity(e.getLocalizedMessage()).build();
         }
     }
 
@@ -623,7 +623,7 @@ public class DataRest {
     public Response deletePyramidFolder(@PathParam("id") final String providerId) {
         final DataStore ds = DataProviders.getInstance().getProvider(providerId).getMainStore();
         if (!(ds instanceof XMLCoverageStore)) {
-            return Response.status(500).entity("failed").build();
+            return Response.status(500).entity("Datastore is not instance of XMLCoverageStore").build();
         }
 
         final XMLCoverageStore xmlCoverageStore = (XMLCoverageStore)ds;
@@ -633,8 +633,8 @@ public class DataRest {
                 final File dataFolder = new File(((URL)paramVal.getValue()).toURI());
                 recursiveDelete(dataFolder);
             } catch (Exception ex) {
-                LOGGER.log(Level.SEVERE, "Unable to delete folder "+ paramVal.getValue(), ex);
-                return Response.status(500).entity("failed").build();
+                LOGGER.log(Level.WARNING, "Unable to delete folder "+ paramVal.getValue(), ex);
+                return Response.status(500).entity(ex.getLocalizedMessage()).build();
             }
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -761,11 +761,11 @@ public class DataRest {
                 pool.recycle(unmarsh);
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
-                return Response.status(500).entity("failed").build();
+                return Response.status(500).entity(ex.getLocalizedMessage()).build();
             }
 
             if (!(obj instanceof DefaultMetadata)) {
-                return Response.status(500).entity("failed").build();
+                return Response.status(500).entity("Cannot save uploaded metadata because it is not recognized as a valid file!").build();
             }
 
             final DefaultMetadata metadata = (DefaultMetadata) obj;
@@ -1021,7 +1021,7 @@ public class DataRest {
                     template.read(metadataValues,metadata,false);
                 }catch(IOException ex){
                     LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
-                    return Response.status(500).entity("failed").build();
+                    return Response.status(500).entity(ex.getLocalizedMessage()).build();
                 }
 
                 //update dateStamp for metadata
@@ -1070,7 +1070,7 @@ public class DataRest {
                     template.read(metadataValues,metadata,false);
                 }catch(IOException ex){
                     LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
-                    return Response.status(500).entity("failed").build();
+                    return Response.status(500).entity(ex.getLocalizedMessage()).build();
                 }
 
                 //update dateStamp for metadata
@@ -2190,11 +2190,11 @@ public class DataRest {
                 fcr.recycle(reader);
             } catch (CoverageStoreException | NoSuchIdentifierException | ProcessException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                return Response.status(500).entity("failed").build();
+                return Response.status(500).entity(ex.getLocalizedMessage()).build();
             }
         } else {
             LOGGER.log(Level.INFO, "Type unknown to found metadata");
-            return Response.status(500).entity("failed").build();
+            return Response.status(500).entity("Type unknown to found metadata").build();
         }
 
         information.setName(dataId);
@@ -2283,12 +2283,12 @@ public class DataRest {
             filesToSend = fileStore.getDataFiles();
         } catch (DataStoreException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            return Response.status(500).entity("failed").build();
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
 
         if (filesToSend.length == 0) {
             LOGGER.info("No files for this data to export!");
-            return Response.status(500).entity("failed").build();
+            return Response.status(500).entity("No files for this data to export!").build();
         }
 
         if (filesToSend.length == 1 && !filesToSend[0].isDirectory()) {
@@ -2318,7 +2318,7 @@ public class DataRest {
             }
         } catch (IOException ex) {
             LOGGER.info("Error while zipping data");
-            return Response.status(500).entity("failed").build();
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
         return Response.ok(zip).header("content-disposition", "attachment; filename=" + zip.getName()).build();
     }
@@ -2354,7 +2354,7 @@ public class DataRest {
             sensorBusiness.unlinkDataToSensor(name, providerId, sensorId);
         }catch(TargetNotFoundException ex){
             LOGGER.log(Level.WARNING,ex.getMessage(),ex);
-            return Response.status(500).entity("failed").build();
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
