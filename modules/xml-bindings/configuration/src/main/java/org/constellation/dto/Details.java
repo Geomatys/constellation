@@ -21,6 +21,7 @@ package org.constellation.dto;
 
 //import juzu.Mapped;
 
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
@@ -133,6 +134,9 @@ public class Details {
     }
 
     public List<String> getVersions() {
+        if (versions == null) {
+            versions = new ArrayList<>();
+        }
         return versions;
     }
 

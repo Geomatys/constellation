@@ -340,10 +340,12 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                                   final String providerIdentifier) throws ConstellationException {
         final Data data = dataRepository.findDataFromProvider(fullName.getNamespaceURI(), fullName.getLocalPart(), providerIdentifier);
         final List<Data> datas = new ArrayList<>();
-        datas.add(data);
-        final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
-        if (dataBriefs != null && dataBriefs.size() == 1) {
-            return dataBriefs.get(0);
+        if (data != null) {
+            datas.add(data);
+            final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
+            if (dataBriefs != null && dataBriefs.size() == 1) {
+                return dataBriefs.get(0);
+            }
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));
     }
@@ -603,6 +605,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             if (remove) {
                 providerRepository.delete(data.getProvider());
             }
+            
+            // Relevant erase dataset when the is no more data in it. fr now we remove it
+            deleteDatasetIfEmpty(data.getDatasetId());
             
             // update internal CSW index
             updateInternalCSWIndex(data.getMetadataId(), 1, false); // TODO DOMAIN ID
