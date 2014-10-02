@@ -73,6 +73,11 @@
                                 <gco:CharacterString>${param.country}</gco:CharacterString>
                             </gmd:country>
                             <%}%>
+                            <% if (param.contactEmail != null){%>
+                            <gmd:electronicMailAddress>
+                                <gco:CharacterString>${param.contactEmail}</gco:CharacterString>
+                            </gmd:electronicMailAddress>
+                            <%}%>
                         </gmd:CI_Address>
                     </gmd:address>
                 </gmd:CI_Contact>
@@ -260,6 +265,11 @@
                                             <gmd:country>
                                                 <gco:CharacterString>${param.country}</gco:CharacterString>
                                             </gmd:country>
+                                            <%}%>
+                                            <% if (param.contactEmail != null){%>
+                                            <gmd:electronicMailAddress>
+                                                <gco:CharacterString>${param.contactEmail}</gco:CharacterString>
+                                            </gmd:electronicMailAddress>
                                             <%}%>
                                         </gmd:CI_Address>
                                     </gmd:address>

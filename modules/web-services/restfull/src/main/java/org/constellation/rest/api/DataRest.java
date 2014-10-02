@@ -138,6 +138,7 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
 import org.geotoolkit.storage.DataFileStore;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -1202,6 +1203,21 @@ public class DataRest {
         prop.put("fileId", metadataID);
         prop.put("dataTitle", metadataID);
         prop.put("dataAbstract", "");
+        final String dateIso = TemporalUtilities.toISO8601(new Date());
+        prop.put("isoCreationDate", dateIso);
+        prop.put("creationDate", dateIso);
+
+        // get current user name and email and store into metadata contact.
+        final String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
+        final Optional<CstlUser> optUser = userRepository.findOne(login);
+        if(optUser!=null && optUser.isPresent()){
+            final CstlUser user = optUser.get();
+            if (user != null) {
+                prop.put("contactName", user.getFirstname()+" "+user.getLastname());
+                prop.put("contactEmail", user.getEmail());
+            }
+        }
+
         final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
 
         DefaultMetadata mergedMetadata;

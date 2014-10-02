@@ -57,6 +57,7 @@ import org.geotoolkit.util.FileUtilities;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.Metadata;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.ReferenceSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.referencing.operation.TransformException;
@@ -356,11 +357,10 @@ public final class MetadataUtilities {
         for (Name dataName : featureStore.getNames()) {
             Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
             if (env == null) {
-                return md;
+                continue;
             }
-
-            env = CRS.transform(env, CommonCRS.WGS84.normalizedGeographic());
-            final DefaultGeographicBoundingBox databbox = new DefaultGeographicBoundingBox(env.getMinimum(0), env.getMaximum(0), env.getMinimum(1), env.getMaximum(1));
+            final DefaultGeographicBoundingBox databbox = new DefaultGeographicBoundingBox();
+            databbox.setBounds(env);
             if (bbox == null) {
                 bbox = databbox;
             } else {
