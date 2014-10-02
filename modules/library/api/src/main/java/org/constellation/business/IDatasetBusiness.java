@@ -34,6 +34,8 @@ import java.util.List;
 public interface IDatasetBusiness {
     
     Dataset createDataset(String identifier, String metadataId, String metadataXml, Integer owner);
+    
+    Dataset createDataset(String identifier, DefaultMetadata metadataXml, Integer owner) throws ConfigurationException;
 
     Dataset getDataset(String datasetId, int domainId);
 

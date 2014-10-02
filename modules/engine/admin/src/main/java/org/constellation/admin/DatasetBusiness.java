@@ -149,6 +149,25 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         return datasetRepository.insert(ds);
     }
 
+    @Override
+    public Dataset createDataset(String identifier, DefaultMetadata metadata, Integer owner) throws ConfigurationException {
+        String metadataString = null;
+        String metadataId = null;
+        if (metadata != null) {
+            metadataId = metadata.getFileIdentifier();
+            try {
+                final MarshallerPool pool = getMarshallerPool();
+                final Marshaller marshaller = pool.acquireMarshaller();
+                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                marshaller.marshal(metadata, outputStream);
+                pool.recycle(marshaller);
+                metadataString = outputStream.toString();
+            } catch (JAXBException ex) {
+                throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
+            }
+        }
+        return createDataset(identifier, metadataId, metadataString, owner);
+    }
     /**
      * Get metadata for given dataset identifier and domain id.
      *
