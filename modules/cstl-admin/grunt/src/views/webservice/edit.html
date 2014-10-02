@@ -313,7 +313,7 @@
                                                      ng-class="{'col-xs-6':small==true}"
                                                      style="padding-left:0;">
                                                     <div class="item"
-                                                         ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}"
+                                                         ng-class="{'sensor-sos-service':sosdata.type!=='System','sensor-system-service':sosdata.type==='System','selected':sosdata==selected}"
                                                          ng-click="select(sosdata);selectSensorsChild(null);">
                                                         <div class="top">
                                                             <span class="item-title"
@@ -341,7 +341,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="item sensor-sos"
+                                                    <div class="item sensor-sos-service"
                                                          style="margin-top:0;"
                                                          ng-if="sosdata==selected"
                                                          ng-repeat="soschild in sosdata.children"
