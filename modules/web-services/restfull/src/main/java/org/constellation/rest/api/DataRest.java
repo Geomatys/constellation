@@ -1002,33 +1002,37 @@ public class DataRest {
                 metadata = datasetBusiness.getMetadata(ds.getIdentifier(),-1);
                 dataset = true;
             }
+            if(metadata != null) {
+                //get template name
+                final String templateName;
+                if ("vector".equalsIgnoreCase(type)) {
+                    //vector template
+                    templateName = "profile_default_vector";
+                } else if ("raster".equalsIgnoreCase(type)){
+                    //raster template
+                    templateName = "profile_default_raster";
+                }else {
+                    //default template is import
+                    templateName = "profile_import";
+                }
+                final Template template = Template.getInstance(templateName);
 
-            //get template name
-            final String templateName;
-            if ("vector".equalsIgnoreCase(type)) {
-                //vector template
-                templateName = "profile_default_vector";
-            } else if ("raster".equalsIgnoreCase(type)){
-                //raster template
-                templateName = "profile_default_raster";
-            }else {
-                //default template is import
-                templateName = "profile_import";
-            }
-            final Template template = Template.getInstance(templateName);
+                try{
+                    template.read(metadataValues,metadata,false);
+                }catch(IOException ex){
+                    LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
+                    return Response.status(500).entity("failed").build();
+                }
 
-            try{
-                template.read(metadataValues,metadata,false);
-            }catch(IOException ex){
-                LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
-                return Response.status(500).entity("failed").build();
-            }
+                //update dateStamp for metadata
+                metadata.setDateStamp(new Date());
 
-            //Save metadata
-            if (dataset) {
-                datasetBusiness.updateMetadata(ds.getIdentifier(), -1, metadata);
-            } else {
-                dataBusiness.updateMetadata(provider, dataName, -1, metadata);
+                //Save metadata
+                if (dataset) {
+                    datasetBusiness.updateMetadata(ds.getIdentifier(), -1, metadata);
+                } else {
+                    dataBusiness.updateMetadata(provider, dataName, -1, metadata);
+                }
             }
         } catch (ConfigurationException ex) {
             LOGGER.warning("Error while saving dataset metadata");
@@ -1047,30 +1051,34 @@ public class DataRest {
         try {
             // Get previously saved metadata
             final DefaultMetadata metadata = datasetBusiness.getMetadata(identifier, -1);
+            if(metadata != null) {
+                //get template name
+                final String templateName;
+                if ("vector".equalsIgnoreCase(type)) {
+                    //vector template
+                    templateName = "profile_default_vector";
+                } else if ("raster".equalsIgnoreCase(type)){
+                    //raster template
+                    templateName = "profile_default_raster";
+                }else {
+                    //default template is import
+                    templateName = "profile_import";
+                }
+                final Template template = Template.getInstance(templateName);
 
-            //get template name
-            final String templateName;
-            if ("vector".equalsIgnoreCase(type)) {
-                //vector template
-                templateName = "profile_default_vector";
-            } else if ("raster".equalsIgnoreCase(type)){
-                //raster template
-                templateName = "profile_default_raster";
-            }else {
-                //default template is import
-                templateName = "profile_import";
+                try{
+                    template.read(metadataValues,metadata,false);
+                }catch(IOException ex){
+                    LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
+                    return Response.status(500).entity("failed").build();
+                }
+
+                //update dateStamp for metadata
+                metadata.setDateStamp(new Date());
+
+                //Save metadata
+                datasetBusiness.updateMetadata(identifier, -1, metadata);
             }
-            final Template template = Template.getInstance(templateName);
-
-            try{
-                template.read(metadataValues,metadata,false);
-            }catch(IOException ex){
-                LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
-                return Response.status(500).entity("failed").build();
-            }
-
-            //Save metadata
-            datasetBusiness.updateMetadata(identifier, -1, metadata);
         } catch (ConfigurationException ex) {
             LOGGER.warning("Error while saving dataset metadata");
             throw new ConstellationException(ex);
