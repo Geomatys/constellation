@@ -1214,6 +1214,11 @@ public class DataRest {
         final String dateIso = TemporalUtilities.toISO8601(new Date());
         prop.put("isoCreationDate", dateIso);
         prop.put("creationDate", dateIso);
+        if("raster".equalsIgnoreCase(dataType)){
+            prop.put("dataType", "grid");
+        }else if("vector".equalsIgnoreCase(dataType)){
+            prop.put("dataType", "vector");
+        }
 
         // get current user name and email and store into metadata contact.
         final String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();

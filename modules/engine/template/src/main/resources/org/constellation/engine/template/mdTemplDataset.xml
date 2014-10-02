@@ -172,6 +172,15 @@
                     <%}%>
               </gmd:MD_Keywords>
             </gmd:descriptiveKeywords>
+            <% if (param.dataType!= null){ if("grid".equals(param.dataType)){%>
+            <gmd:spatialRepresentationType>
+                <gmd:MD_SpatialRepresentationTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid">Grid</gmd:MD_SpatialRepresentationTypeCode>
+            </gmd:spatialRepresentationType>
+            <%} else if("vector".equals(param.dataType)){%>
+            <gmd:spatialRepresentationType>
+                <gmd:MD_SpatialRepresentationTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="vector">Vector</gmd:MD_SpatialRepresentationTypeCode>
+            </gmd:spatialRepresentationType>
+            <%}}%>
              <% if (param.groundResolution!= null){%>
             <gmd:spatialResolution>
                 <gmd:MD_Resolution>

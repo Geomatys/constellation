@@ -124,6 +124,25 @@
 						}
 					]}
 				},{
+                    "block":{
+                        "name":"metadata.block.spatialRepresentation",
+                        "multiplicity":1,
+                        "help":"metadata.block.spatialRepresentation_help",
+                        "path":null,
+                        "children":[{
+                            "field":{
+                                "name":"metadata.field.type",
+                                "multiplicity":1,
+                                "help":"metadata.field.type_help",
+                                "path":"identificationInfo.spatialRepresentationType",
+                                "render":"CODELIST.readonly",
+                                "obligation":"M",
+                                "defaultValue":"MD_SpatialRepresentationTypeCode.grid",
+                                "value":null
+                            }
+                        }
+                    ]}
+                },{
 					"block":{
 						"name":"metadata.block.geographicExtension",
 						"multiplicity":1,
