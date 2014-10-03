@@ -126,9 +126,9 @@ public final class ProviderRest {
     public Response create(final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration config) {
         try {
             providerBusiness.create(domainId, id, config);
-        } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-            return Response.status(500).build();
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
 
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
