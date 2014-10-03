@@ -14,10 +14,16 @@
             <div class="dash-inner row">
                 <div class="col-md-12 contact-form" style="margin-bottom:0;">
                     <form class="form-horizontal" role="form">
+                        <div class="row profile-picture">
+                            <label class="control-label" translate="settings.form.picture">Profile picture</label>
+                            <img src="img/block-content-owner.svg" alt=""/>
+                            <button class="btn btn-default btn-md" translate="settings.form.picture.change">Change picture</button>
+                        </div>
+
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" translate="name">Nom</label>
+                                    <label class="col-sm-4 control-label" translate="name">Name</label>
                                     <div class="col-sm-8">
                                         <input class="form-control" type="text" ng-model="cstlSession.lastname"/>
                                     </div>
@@ -25,13 +31,52 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" translate="settings.form.firstname">Prenom</label>
+                                    <label class="col-sm-4 control-label" translate="settings.form.firstname">First name</label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" ng-model="cstlSession.firstname"/>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="address">Adress</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="email"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="zip">CP</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="email"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="city">City</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="email"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="country">Country</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="email"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
@@ -41,7 +86,45 @@
                                     </div>
                                 </div>
                             </div>
-                        </div> 
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="phone">Phone</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="email"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-bottom: 10px;">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="metadata.field.linkage">Web site</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="email"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row registration-organization">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="organization">Organization</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="email"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.function">Function</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="email"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -109,7 +192,10 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-add pull-right" ng-click="save()"
+        <button type="submit"
+                class="btn btn-add pull-right"
+                style="margin-bottom: 15px;"
+                ng-click="save()"
                 translate="save">Save</button>
     </div>
 </div>
