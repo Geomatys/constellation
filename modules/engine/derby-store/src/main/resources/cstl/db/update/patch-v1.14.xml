@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.13" author="Glegal">
+        <addPrimaryKey columnNames="csw_id, dataset_id"
+                       constraintName="CSW_X_DATASET_PK"
+                       schemaName="admin"
+                       tableName="dataset_x_csw"/>
+        <addPrimaryKey columnNames="csw_id, data_id"
+                       constraintName="CSW_X_DATA_PK"
+                       schemaName="admin"
+                       tableName="data_x_csw"/>
+        
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -18,9 +18,6 @@
  */
 package org.constellation.metadata.io.internal;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import javax.inject.Inject;
@@ -56,9 +53,17 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
      */
     protected final AbstractIndexer indexer;
     
+    protected boolean partial = false;
+    
+    protected final String id;
+    
     public InternalMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException {
         SpringHelper.injectDependencies(this);
         this.indexer = indexer;
+        if (configuration.getCustomparameters().containsKey("partial")) {
+            this.partial = Boolean.parseBoolean(configuration.getParameter("partial"));
+        }
+        this.id = serviceID;
     }
     
     @Override
@@ -77,7 +82,9 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
                 indexer.removeDocument(identifier);
                 indexer.indexDocument(original);
             }
-            
+            if (partial) {
+                metadataBusiness.linkMetadataIDToCSW(identifier, id);
+            }
             return metadataBusiness.updateMetadata(identifier, sw.toString());
         } catch (TransformerException ex) {
             throw new MetadataIoException("Unable to write the file.", ex, NO_APPLICABLE_CODE);
@@ -86,7 +93,12 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
 
     @Override
     public boolean deleteMetadata(String metadataID) throws MetadataIoException {
-        throw new MetadataIoException("The delete is not supported in internal metadata.");
+        if (partial) {
+            metadataBusiness.unlinkMetadataIDToCSW(metadataID, id);
+            return true;
+        } else {
+            throw new MetadataIoException("The delete is not supported in internal metadata.");
+        }
     }
 
     @Override

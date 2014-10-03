@@ -48,4 +48,8 @@ public interface DatasetRepository {
     void remove(int id);
     
     List<DatasetXCsw> getCswLinkedDataset(final int cswId);
+    
+    DatasetXCsw addDatasetToCSW(final int serviceID, final int datasetID, final boolean allData);
+    
+    void removeDatasetFromCSW(final int serviceID, final int datasetID);
 }

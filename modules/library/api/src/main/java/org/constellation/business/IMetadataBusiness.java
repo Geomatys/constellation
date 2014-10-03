@@ -36,4 +36,8 @@ public interface IMetadataBusiness {
     boolean updateMetadata(final String metadataId, final String xml);
     
     List<String> getLinkedMetadataIDs(final String cswIdentifier);
+    
+    void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
+    
+    void unlinkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
 }

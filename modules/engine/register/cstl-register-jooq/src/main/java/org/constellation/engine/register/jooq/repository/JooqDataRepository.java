@@ -39,11 +39,13 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.constellation.engine.register.DataXCsw;
 
 import static org.constellation.engine.register.jooq.Tables.DATA;
 import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
 import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.DATA_X_CSW;
+import org.constellation.engine.register.jooq.tables.records.DataXCswRecord;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
@@ -194,5 +196,19 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     @Override
     public List<Data> getCswLinkedData(final int cswId) {
         return dsl.select(DATA.fields()).from(DATA).join(DATA_X_CSW).onKey(DATA_X_CSW.DATA_ID).where(DATA_X_CSW.CSW_ID.eq(cswId)).fetchInto(Data.class);
+    }
+    
+    @Override
+    public DataXCsw addDataToCSW(final int serviceID, final int dataID) {
+        DataXCswRecord newRecord = dsl.newRecord(DATA_X_CSW);
+        newRecord.setCswId(serviceID);
+        newRecord.setDataId(dataID);
+        newRecord.store();
+        return newRecord.into(DataXCsw.class);
+    }
+
+    @Override
+    public void removeDataFromCSW(int serviceID, int dataID) {
+        dsl.delete(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).and(DATA_X_CSW.DATA_ID.eq(dataID)).execute();
     }
 }
