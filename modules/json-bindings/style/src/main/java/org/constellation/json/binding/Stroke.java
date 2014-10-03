@@ -55,7 +55,11 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         lineJoin = stroke.getLineJoin().evaluate(null, String.class);
         lineCap = stroke.getLineCap().evaluate(null, String.class);
         dashArray = stroke.getDashArray();
-        dashOffset = Double.parseDouble(stroke.getDashOffset().evaluate(null, String.class));
+        try{
+            dashOffset = Double.parseDouble(stroke.getDashOffset().evaluate(null, String.class));
+        }catch(Exception ex){
+            //do nothing
+        }
     }
 
     public String getColor() {
@@ -99,7 +103,11 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
     }
 
     public void setDashOffset(String dashOffset) {
-        this.dashOffset = Double.parseDouble(dashOffset);
+        try{
+            this.dashOffset = Double.parseDouble(dashOffset);
+        }catch(Exception ex){
+            //do nothing
+        }
     }
 
     public String getLineJoin() {
