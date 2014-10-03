@@ -21,6 +21,7 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.DatasetXCsw;
 
 /**
  *
@@ -45,4 +46,6 @@ public interface DatasetRepository {
     Dataset findById(int datasetId);
     
     void remove(int id);
+    
+    List<DatasetXCsw> getCswLinkedDataset(final int cswId);
 }

@@ -18,9 +18,11 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import java.util.List;
 import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.DatasetXCsw;
 import static org.constellation.engine.register.jooq.Tables.DATASET;
-import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATASET_X_CSW;
 import org.constellation.engine.register.jooq.tables.records.DatasetRecord;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.jooq.UpdateConditionStep;
@@ -100,4 +102,8 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
         dsl.delete(DATASET).where(DATASET.ID.eq(id)).execute();
     }
 
+    @Override
+    public List<DatasetXCsw> getCswLinkedDataset(final int cswId) {
+        return dsl.select().from(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(cswId)).fetchInto(DatasetXCsw.class);
+    }
 }

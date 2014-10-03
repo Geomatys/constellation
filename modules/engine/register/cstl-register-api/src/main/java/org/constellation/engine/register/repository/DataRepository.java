@@ -60,5 +60,5 @@ public interface DataRepository {
     
     Data findByIdentifierWithEmptyMetadata(String localPart);
 
-    
+    List<Data> getCswLinkedData(final int cswId);
 }

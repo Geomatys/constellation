@@ -34,4 +34,6 @@ public interface IMetadataBusiness {
     List<String> getAllMetadata(final boolean includeService);
     
     boolean updateMetadata(final String metadataId, final String xml);
+    
+    List<String> getLinkedMetadataIDs(final String cswIdentifier);
 }

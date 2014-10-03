@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.DatasetXCsw;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
@@ -185,6 +186,35 @@ public class MetadataBusiness implements IMetadataBusiness {
         for(final String identifier : allIdentifiers){
             final String metadataStr = searchMetadata(identifier, includeService);
             results.add(metadataStr);
+        }
+        return results;
+    }
+    
+    public List<String> getLinkedMetadataIDs(final String cswIdentifier) {
+        final List<String> results = new ArrayList<>();
+        final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
+        if (service != null) {
+            final List<Data> datas    = dataRepository.getCswLinkedData(service.getId());
+            for (Data data : datas) {
+                if (data.getMetadataId() != null) {
+                    results.add(data.getMetadataId());
+                }
+            }
+            
+            for (DatasetXCsw dxc : datasetRepository.getCswLinkedDataset(service.getId())) {
+                final Dataset ds = datasetRepository.findById(dxc.getDatasetId());
+                if (ds.getMetadataId() != null) {
+                    results.add(ds.getMetadataId());
+                }
+                if (dxc.isAllData()) {
+                    final List<Data> subDatas = dataRepository.findByDatasetId(dxc.getDatasetId());
+                    for (Data data : subDatas) {
+                        if (data.getMetadataId() != null) {
+                            results.add(data.getMetadataId());
+                        }
+                    }
+                }
+            }
         }
         return results;
     }

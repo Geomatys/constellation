@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.6" author="GLegal">
+        
+        <createTable schemaName="admin" tableName="dataset_x_csw">
+            <column name="csw_id" type="INTEGER" >
+                <constraints nullable="false" />
+            </column>
+            <column name="dataset_id" type="INTEGER" >
+                <constraints nullable="false" />
+            </column>
+            <column defaultValueBoolean="true" name="all_data" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint
+            baseTableSchemaName="admin" referencedTableSchemaName="admin"
+            constraintName="dataset_csw_cross_id_fk"
+            baseTableName="dataset_x_csw" baseColumnNames="dataset_id"
+            referencedTableName="dataset" referencedColumnNames="id"
+            onDelete="NO ACTION" />
+        
+        <addForeignKeyConstraint
+            baseTableSchemaName="admin" referencedTableSchemaName="admin"
+            constraintName="csw_dataset_cross_id_fk"
+            baseTableName="dataset_x_csw" baseColumnNames="csw_id"
+            referencedTableName="service" referencedColumnNames="id"
+            onDelete="NO ACTION" />
+        
+        <createTable schemaName="admin" tableName="data_x_csw">
+            <column name="csw_id" type="INTEGER" >
+                <constraints nullable="false" />
+            </column>
+            <column name="data_id" type="INTEGER" >
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint
+            baseTableSchemaName="admin" referencedTableSchemaName="admin"
+            constraintName="data_csw_cross_id_fk"
+            baseTableName="data_x_csw" baseColumnNames="data_id"
+            referencedTableName="data" referencedColumnNames="id"
+            onDelete="NO ACTION" />
+        
+        <addForeignKeyConstraint
+            baseTableSchemaName="admin" referencedTableSchemaName="admin"
+            constraintName="csw_data_cross_id_fk"
+            baseTableName="data_x_csw" baseColumnNames="csw_id"
+            referencedTableName="service" referencedColumnNames="id"
+            onDelete="NO ACTION" />
+        
+        
+    </changeSet>
+</databaseChangeLog>

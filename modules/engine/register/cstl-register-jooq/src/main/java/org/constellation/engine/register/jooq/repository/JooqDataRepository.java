@@ -43,7 +43,7 @@ import java.util.Map;
 import static org.constellation.engine.register.jooq.Tables.DATA;
 import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
 import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_CSW;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
@@ -191,4 +191,8 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
         return dsl.select().from(DATA).where(DATA.NAME.eq(localPart)).and(DATA.METADATA_ID.isNull()).and(DATA.ISO_METADATA.isNull()).fetchOneInto(Data.class);
     }
 
+    @Override
+    public List<Data> getCswLinkedData(final int cswId) {
+        return dsl.select(DATA.fields()).from(DATA).join(DATA_X_CSW).onKey(DATA_X_CSW.DATA_ID).where(DATA_X_CSW.CSW_ID.eq(cswId)).fetchInto(Data.class);
+    }
 }

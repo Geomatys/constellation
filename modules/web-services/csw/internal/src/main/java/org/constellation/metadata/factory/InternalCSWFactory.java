@@ -80,7 +80,7 @@ public class InternalCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public CSWMetadataReader getMetadataReader(final Automatic configuration, final String serviceID) throws MetadataIoException {
-        return new InternalMetadataReader(configuration);
+        return new InternalMetadataReader(configuration, serviceID);
     }
     
     /**
