@@ -302,7 +302,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
         $scope.save = function(){
             var roleIds = [];
             for(var i in $scope.user.domainRoles){
-                if($scope.user.domainrole.hasOwnProperty(i)){
+                if($scope.user.domainRoles.hasOwnProperty(i)){
                     roleIds[roleIds.length] = $scope.user.domainRoles[i].id;
                 }
             }
