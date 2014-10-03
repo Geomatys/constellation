@@ -100,6 +100,18 @@
             </roles>
             <timezone>+1</timezone>
         </developer>
+
+        <developer>
+            <id>msidhoum</id>
+            <name>Mehdi Sidhoum</name>
+            <email>mehdi.sidhoum@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.com/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
 

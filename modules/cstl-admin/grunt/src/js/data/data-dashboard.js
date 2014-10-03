@@ -283,6 +283,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             datasetListing.listAll({}, function(response) {//success
                 Dashboard($scope, response, true);
                 $scope.wrap.ordertype = "Date";
+                $scope.wrap.orderreverse=true;
             }, function() {//error
                 Growl('error','Error','Unable to load list of dataset!');
             });
