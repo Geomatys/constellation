@@ -52,6 +52,7 @@ public class CorsFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 
+        //for websocket uses only, if request is from websocket we need to avoid the header allow-origin=*
         if (EXCUSION_PATTERN == null || !EXCUSION_PATTERN.matcher(httpServletRequest.getRequestURI()).matches())
             httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
 
@@ -59,7 +60,7 @@ public class CorsFilter implements Filter {
         httpServletResponse.addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         httpServletResponse.addHeader("Access-Control-Allow-Credentials", "true");
 
-        //Test to desable cache for Ajax call
+        //Test to disable cache for Ajax call
         String xRequest = httpServletRequest.getHeader("X-Requested-With");
         if(xRequest!=null && xRequest.equalsIgnoreCase("XMLHttpRequest")){
             httpServletResponse.setHeader("Cache-Control", "no-cache");
