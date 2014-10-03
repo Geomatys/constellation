@@ -56,7 +56,7 @@ public class CorsFilter implements Filter {
             httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
 
         httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        httpServletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type");
+        httpServletResponse.addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         httpServletResponse.addHeader("Access-Control-Allow-Credentials", "true");
 
         //Test to desable cache for Ajax call
