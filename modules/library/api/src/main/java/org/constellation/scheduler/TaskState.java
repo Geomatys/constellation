@@ -42,6 +42,10 @@ public class TaskState {
     private float percent;
     private Exception lastException;
     private String title;
+
+    public TaskState(){
+        this.task = null;
+    }
     
     public TaskState(Task task) {
         this.task = task;

@@ -20,6 +20,7 @@
                 baseTableName="task" baseColumnNames="task_parameter_id"
                 referencedTableName="task_parameter" referencedColumnNames="id"
                 onDelete="NO ACTION"/>
+        <dropIndex tableName="task_parameter" indexName="TASK_PARAMETER_IDX" schemaName="admin" />
 
     </changeSet>
 </databaseChangeLog>

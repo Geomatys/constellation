@@ -151,22 +151,7 @@ public class ProcessBusiness implements IProcessBusiness {
     public TaskState geTaskState(final String id){
         final org.constellation.engine.register.Task taskEntity = taskRepository.get(id);
         TaskParameter taskParameter = taskParameterRepository.get(taskEntity.getTaskParameterId());
-        org.constellation.scheduler.Task task = new org.constellation.scheduler.Task();
-        final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
-
-        final ParameterValueGroup params;
-        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
-        try {
-            reader.setInput(taskParameter.getInputs());
-            params = (ParameterValueGroup) reader.read();
-            reader.dispose();
-        } catch (XMLStreamException | IOException ex) {
-            throw new ConstellationException(ex);
-        }
-        ProcessJobDetail processJobDetails = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(),params );
-        task.setDetail(processJobDetails);
-        task.setTitle(taskParameter.getName());
-        TaskState taskState = new TaskState(task);
+        TaskState taskState = new TaskState();
         taskState.setStatus(TaskState.Status.valueOf(taskEntity.getState()));
         taskState.setTitle(taskParameter.getName());
         taskState.setMessage(taskEntity.getMessage());
@@ -388,6 +373,7 @@ public class ProcessBusiness implements IProcessBusiness {
         taskEntity.setIdentifier(task.getId());
         taskEntity.setState(TaskState.Status.PENDING.name());
         taskEntity.setOwner(userId);
+
         taskEntity.setTaskParameterId(taskParameterId);
         //TODO ???
         taskEntity.setType("");

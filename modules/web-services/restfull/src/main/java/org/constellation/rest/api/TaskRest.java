@@ -109,7 +109,6 @@ public final class TaskRest {
             status.setMessage(state.getMessage());
             status.setPercent(state.getPercent());
             status.setStatus(state.getStatus().name());
-            //TODO verify correct information provided
             status.setTitle(state.getTitle());
             lst.put(status.getId(), status);
         }
