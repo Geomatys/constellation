@@ -193,7 +193,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             }
             $scope.task.inputs += '</input>';
 
-            if ($scope.task.id !== 0){
+            if ($scope.task.id != null){
                 TaskService.updateParamsTask($scope.task).$promise
                     .then(function(response) {
                         Growl('success', 'Success', 'The task is correctly save');

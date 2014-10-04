@@ -362,7 +362,6 @@ public final class TaskRest {
 
         if (cstlUser.isPresent()) {
             taskParameter.setOwner(cstlUser.get().getId());
-
             taskParameterRepository.create(taskParameter);
             return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         } else {

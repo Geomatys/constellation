@@ -80,7 +80,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
 
         // Open the add task modal
         $scope.showAddTaskPopup = function(idTask) {
-            var id = idTask || 0;
+            var id = idTask;
 
             var modal = $modal.open({
                 templateUrl: 'views/tasks/modalAddTask.html',
@@ -88,11 +88,11 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                 resolve : {
                     'processes' : function(){return TaskService.listProcess().$promise;},
                     'task'      : function(){
-                        if (idTask){
+                        if (idTask>=0){
                             return TaskService.getParamsTask({id:idTask}).$promise;
                         } else {
                             return {
-                                'id' : 0,
+                                'id' : null,
                                 'name' : ""
                             };
                         }

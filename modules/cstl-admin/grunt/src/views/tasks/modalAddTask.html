@@ -23,8 +23,8 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="selectProcessAuthority" translate="tasks.modal.authority">Authority</label>
-                            <p class="form-control-static" ng-if="task.id!=0">{{task.processAuthority}}</p>
-                            <select id="selectProcessAuthority" ng-if="task.id==0" ng-model="option.authIndex" class="form-control">
+                            <p class="form-control-static" ng-if="task.id != null">{{task.processAuthority}}</p>
+                            <select id="selectProcessAuthority" ng-if="task.id == null" ng-model="option.authIndex" class="form-control">
                                 <option ng-repeat="auth in processes track by $index" ng-selected="$index==option.authIndex" value="{{$index}}">{{auth.auth}}</option>
                             </select>
                         </div>
@@ -32,8 +32,8 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="selectProcessCode" translate="tasks.modal.process">Process</label>
-                            <p class="form-control-static" ng-if="task.id!=0">{{task.processCode}}</p>
-                            <select id="selectProcessCode" ng-if="task.id==0" ng-model="option.processIndex" class="form-control">
+                            <p class="form-control-static" ng-if="task.id != null">{{task.processCode}}</p>
+                            <select id="selectProcessCode" ng-if="task.id == null" ng-model="option.processIndex" class="form-control">
                                 <option ng-repeat="process in processes[option.authIndex].processes track by $index" ng-selected="$index==option.processIndex" value="{{$index}}">{{process}}</option>
                             </select>
                         </div>
