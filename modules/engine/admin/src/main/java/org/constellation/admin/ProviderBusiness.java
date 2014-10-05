@@ -54,7 +54,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.ReferenceIdentifier;
+import org.opengis.metadata.Identifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -440,7 +440,7 @@ public class ProviderBusiness implements IProviderBusiness {
                 //TODO what do we do if there are more then one pyramid ?
                 //it the current state of constellation there is only one pyramid
                 final Pyramid pyramid = pyramids.iterator().next();
-                final ReferenceIdentifier crsid = pyramid.getCoordinateReferenceSystem().getIdentifiers().iterator().next();
+                final Identifier crsid = pyramid.getCoordinateReferenceSystem().getIdentifiers().iterator().next();
 
                 final ProviderPyramidChoiceList.CachePyramid cache = new ProviderPyramidChoiceList.CachePyramid();
                 cache.setCrs(crsid.getCode());

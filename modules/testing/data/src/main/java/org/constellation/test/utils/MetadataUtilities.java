@@ -65,7 +65,7 @@ import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.spatial.Georectified;
 import org.opengis.metadata.spatial.SpatialRepresentation;
-import org.opengis.referencing.ReferenceIdentifier;
+import org.opengis.metadata.Identifier;
 
 import javax.xml.bind.JAXBElement;
 import java.util.Collection;
@@ -554,8 +554,8 @@ public final class MetadataUtilities {
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
-                        final ReferenceIdentifier expName = expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName();
-                        final ReferenceIdentifier resName = resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName();
+                        final Identifier expName = expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName();
+                        final Identifier resName = resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName();
                         assertEquals(expName, resName);
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
