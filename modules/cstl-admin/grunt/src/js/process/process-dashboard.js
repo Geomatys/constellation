@@ -72,6 +72,14 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
             });
         };
 
+        $scope.duplicateTask = function(idTask) {
+            TaskService.duplicateParamsTask({id:idTask}).$promise.then(function(){
+                Growl('success', 'Success', 'The task is currently duplicated');
+            }).catch(function(){
+                Growl('error', 'Error', "Can't duplicate this task");
+            });
+        };
+
         $scope.toggleUpDownSelected = function() {
             var $header = $('#ProcessDashboard').find('.selected-item').find('.block-header');
             $header.next().slideToggle(200);

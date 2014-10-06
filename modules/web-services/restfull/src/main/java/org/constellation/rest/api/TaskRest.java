@@ -370,6 +370,24 @@ public final class TaskRest {
     }
 
     @GET
+    @Path("params/duplicate/{id}")
+    @RolesAllowed("cstl-admin")
+    public Response duplicateParamsTask(final @PathParam("id") Integer taskParameterIdForTemplate, @Context HttpServletRequest req) throws ConfigurationException {
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+
+        if (cstlUser.isPresent()) {
+            final TaskParameter taskParameter = taskParameterRepository.get(taskParameterIdForTemplate);
+            taskParameter.setId(null);
+            taskParameter.setName(taskParameter.getName()+"(COPY)");
+            taskParameter.setOwner(cstlUser.get().getId());
+            taskParameterRepository.create(taskParameter);
+            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+        } else {
+            return Response.status(Response.Status.EXPECTATION_FAILED).build();
+        }
+    }
+
+    @GET
     @Path("params/execute/{id}")
     @RolesAllowed("cstl-admin")
     public AcknowlegementType executeParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req) throws ConfigurationException {

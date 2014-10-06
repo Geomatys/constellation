@@ -22,23 +22,12 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
     }
 
     @Override
-    public TaskParameter create(TaskParameter task) {
+    public TaskParameter create(TaskParameter task ) {
 
-        TaskParameter taskParameter = dsl.select().from(Tables.TASK_PARAMETER).where((Tables.TASK_PARAMETER.PROCESS_AUTHORITY.eq(task.getProcessAuthority()))
-                .and(Tables.TASK_PARAMETER.PROCESS_CODE.eq(task.getProcessCode()))
-                .and(Tables.TASK_PARAMETER.OWNER.eq(task.getOwner())))
-                .fetchOneInto(TaskParameter.class);
-        if ( taskParameter !=null  && taskParameter.getInputs().equalsIgnoreCase(task.getInputs())){
-            taskParameter.setName(task.getName());
-            taskParameter.setDate(task.getDate());
-            taskParameter.setTrigger(task.getTrigger());
-            update(taskParameter);
-            return taskParameter;
-        } else {
-            TaskParameterRecord newRecord = TaskParameterHelper.copy(task, dsl.newRecord(Tables.TASK_PARAMETER));
-            newRecord.store();
-            return newRecord.into(TaskParameter.class);
-        }
+                TaskParameterRecord newRecord = TaskParameterHelper.copy(task, dsl.newRecord(Tables.TASK_PARAMETER));
+                newRecord.store();
+                return newRecord.into(TaskParameter.class);
+
     }
 
     @Override

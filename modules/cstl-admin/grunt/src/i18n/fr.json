@@ -1095,6 +1095,7 @@
 
     "tasks.information.edit":"Éditer le traitement",
     "tasks.information.execute":"Executer le traitement",
+    "tasks.information.duplicate":"Dupliquer le traitement",
     "tasks.information.delete":"Supprimer le traitement",
     "tasks.information.title":"Traitements disponibles",
     "tasks.notask":"Pas de traitement en cours d'execution",
