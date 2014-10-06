@@ -305,8 +305,9 @@ public class ProviderBusiness implements IProviderBusiness {
                 boolean foundProvider = false;
                 try {
                     final String filePath = inParams.get("path");
+                    URL url = null;
                     if (filePath != null && !filePath.isEmpty()) {
-                        final URL url = new URL("file:" + filePath);
+                        url = new URL("file:" + filePath);
                         final File folder = new File(filePath);
                         final File[] candidates;
                         if (folder.isDirectory()) {
@@ -326,9 +327,9 @@ public class ProviderBusiness implements IProviderBusiness {
                                 if (factory instanceof FileFeatureStoreFactory) {
                                     final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
                                     for (String tempExtension : fileFactory.getFileExtensions()) {
-                                        //we do not want shapefiles or dbf types, a folder provider will be created in those cases
                                         if (candidateName.endsWith(tempExtension)) {
-                                            if (!tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf") && candidates.length > 1) {
+                                            if (!tempExtension.endsWith("mif") && !tempExtension.endsWith("mid") &&
+                                                !tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf") && candidates.length > 1) {
                                                 //found a factory which can handle it
                                                 final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
                                                         factory.getParametersDescriptor().getName().getCode());
@@ -358,26 +359,26 @@ public class ProviderBusiness implements IProviderBusiness {
                                             //but the web interfaces do not handle that yet, so we limit to one for now.
                                             break search;
                                         }
-
                                     } catch (Exception ex) {
                                         //parameter might not exist
                                     }
-
                                 }
                             }
                         }
                     }
 
+                    if (!foundProvider && subType!=null && !subType.isEmpty()) {
+                        if (url != null) {
+                            inParams.put("url",url.toString());
+                        }
+                        final FeatureStoreFactory featureFactory = FeatureStoreFinder.getFactoryById(subType);
+                        final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
+                        final ParameterValueGroup choice =
+                                sources.groups("choice").get(0).addGroup(cvgConfig.getDescriptor().getName().getCode());
+                        Parameters.copy(cvgConfig, choice);
+                    }
                 } catch (MalformedURLException e) {
                     LOGGER.log(Level.WARNING, "unable to create url from path", e);
-                }
-
-                if (!foundProvider) {
-                    final FeatureStoreFactory featureFactory = FeatureStoreFinder.getFactoryById(subType);
-                    final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
-                    final ParameterValueGroup choice =
-                            sources.groups("choice").get(0).addGroup(cvgConfig.getDescriptor().getName().getCode());
-                    Parameters.copy(cvgConfig, choice);
                 }
                 break;
 

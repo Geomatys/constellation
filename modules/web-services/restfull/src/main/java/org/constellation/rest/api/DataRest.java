@@ -674,12 +674,13 @@ public class DataRest {
             final String providerIdentifier = dataName;
 
             if("vector".equalsIgnoreCase(uploadType)) {
-                //@FIXME why we need a subtype here? remove this ugly check.
                 final String subType;
                 if ("shp".equalsIgnoreCase(fileExtension)) {
-                    subType = "";
-                } else {
                     subType = "shapefile";
+                } else if("mif".equalsIgnoreCase(fileExtension)){
+                    subType = "MIF-MID";
+                } else {
+                    subType = null;
                 }
                 //create provider
                 final ProviderConfiguration config = new ProviderConfiguration();
