@@ -41,6 +41,8 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
             <button class="btn btn-primary" id="mapcontext">mapcontext</button>
             <button class="btn btn-primary" id="mapcontext_styled_layer">mapcontext_styled_layer</button>
             <button class="btn btn-primary" id="chain_process">chain_process</button>
+            <button class="btn btn-primary" id="data_x_csw">data_x_csw</button>
+            <button class="btn btn-primary" id="dataset_x_csw">dataset_x_csw</button>
         </div>
     </div>
     <div class="row">
@@ -165,6 +167,14 @@ result :
         });
         $("#chain_process").on("click", function(){
             $("#query").val('select * from admin.chain_process');
+            $("#sqlForm").submit();
+        });
+        $("#data_x_csw").on("click", function(){
+            $("#query").val('select * from admin.data_x_csw');
+            $("#sqlForm").submit();
+        });
+        $("#dataset_x_csw").on("click", function(){
+            $("#query").val('select * from admin.dataset_x_csw');
             $("#sqlForm").submit();
         });
     })

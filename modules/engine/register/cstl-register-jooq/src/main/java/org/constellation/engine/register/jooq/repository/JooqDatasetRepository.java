@@ -110,12 +110,16 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     
     @Override
     public DatasetXCsw addDatasetToCSW(final int serviceID, final int datasetID, final boolean allData) {
-        DatasetXCswRecord newRecord = dsl.newRecord(DATASET_X_CSW);
-        newRecord.setAllData(allData);
-        newRecord.setCswId(serviceID);
-        newRecord.setDatasetId(datasetID);
-        newRecord.store();
-        return newRecord.into(DatasetXCsw.class);
+        final DatasetXCsw dxc = dsl.select().from(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(serviceID)).and(DATASET_X_CSW.DATASET_ID.eq(datasetID)).fetchOneInto(DatasetXCsw.class);
+        if (dxc == null) {
+            DatasetXCswRecord newRecord = dsl.newRecord(DATASET_X_CSW);
+            newRecord.setAllData(allData);
+            newRecord.setCswId(serviceID);
+            newRecord.setDatasetId(datasetID);
+            newRecord.store();
+            return newRecord.into(DatasetXCsw.class);
+        }
+        return dxc;
     }
 
     @Override

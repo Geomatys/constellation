@@ -200,11 +200,15 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     
     @Override
     public DataXCsw addDataToCSW(final int serviceID, final int dataID) {
-        DataXCswRecord newRecord = dsl.newRecord(DATA_X_CSW);
-        newRecord.setCswId(serviceID);
-        newRecord.setDataId(dataID);
-        newRecord.store();
-        return newRecord.into(DataXCsw.class);
+        final DataXCsw dxc = dsl.select().from(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).and(DATA_X_CSW.DATA_ID.eq(dataID)).fetchOneInto(DataXCsw.class);
+        if (dxc == null) {
+            DataXCswRecord newRecord = dsl.newRecord(DATA_X_CSW);
+            newRecord.setCswId(serviceID);
+            newRecord.setDataId(dataID);
+            newRecord.store();
+            return newRecord.into(DataXCsw.class);
+        }
+        return dxc;
     }
 
     @Override
