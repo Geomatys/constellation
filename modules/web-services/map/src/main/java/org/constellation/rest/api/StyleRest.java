@@ -661,13 +661,14 @@ public final class StyleRest {
 
             if(result.isNumberField()){
                 final Set<Double> values = new HashSet<>();
-
                 final FeatureIterator it = featureCollection.iterator();
                 while(it.hasNext()){
                     final Feature feature = it.next();
                     final Number number = property.evaluate(feature, Number.class);
-                    final Double value = number.doubleValue();
-                    values.add(value);
+                    if(number != null) {
+                        final Double value = number.doubleValue();
+                        values.add(value);
+                    }
                 }
                 it.close();
                 final Double[] allValues = values.toArray(new Double[values.size()]);
