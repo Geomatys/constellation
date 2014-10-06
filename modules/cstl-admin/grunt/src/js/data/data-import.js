@@ -97,164 +97,80 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                     fileName = fileName.substring(0, fileName.lastIndexOf("."));
                     fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
                 }
-                dataListing.importData({values: {'dataPath': $scope.import.dataPath,
-                                                 'metadataFilePath': $scope.import.mdPath,
-                                                 dataType: $scope.import.uploadType,
-                                                 dataName: $scope.import.dataName,
-                                                 fsServer: $scope.import.fsserver }},
+                dataListing.importDataFull({values: {"dataPath": $scope.import.dataPath,
+                                                 "metadataFilePath": $scope.import.mdPath,
+                                                 "dataType": $scope.import.uploadType,
+                                                 "dataName": $scope.import.dataName,
+                                                 "extension": fileExtension,
+                                                 "fsServer": $scope.import.fsserver }},
                     function(response) {//success
-                    var importedData = response.dataFile;
-                    var importedMetaData = response.metadataFile;
-                    $scope.import.metadata = importedMetaData;
-
-                    dataListing.findDataType({values: {'filePath':importedData,
-                                                       'extension': fileExtension,
-                                                        dataType: $scope.import.uploadType}},
-                        function(selectedExtension) {//success
-                        // Store the providerId for further calls
-                        $scope.import.providerId = $scope.import.dataName;
-                        $scope.import.uploadType = selectedExtension.dataType;
-                        if ($scope.import.uploadType === "vector") {
-                            var subType;
-                            if (fileExtension==="shp" || fileExtension==="SHP") {
-                                subType = "";
-                            } else {
-                                subType = "shapefile";
+                        if(response){
+                            var importedMetaData = response.metadataFile;
+                            $scope.import.metadata = importedMetaData;
+                            $scope.import.providerId = $scope.import.dataName;
+                            $scope.import.uploadType = response.dataType;
+                            if ($scope.import.uploadType === "vector") {
+                                if('success' === response.verifyCRS){
+                                    UploadFiles.files = {
+                                        file: $scope.import.providerId,
+                                        mdFile: importedMetaData,
+                                        providerId: $scope.import.providerId
+                                    };
+                                    Growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
+                                    if ($scope.sensor.checked) {
+                                        $scope.showAssociate();
+                                    } else {
+                                        $modalInstance.close({type: $scope.import.uploadType,
+                                            file: $scope.import.providerId});
+                                    }
+                                }else if('error' === response.verifyCRS) {
+                                    Growl('warning','CRS','Data '+ $scope.import.providerId +' without Projection');
+                                    $scope.import.allowSubmit = false;
+                                    //TODO div select EPSG
+                                    $scope.import.enableSelectEPSGCode = true;
+                                    if(response.codes){
+                                        $scope.epsgList = response.codes;
+                                        $scope.import.fileName = $scope.import.providerId;
+                                    }else {
+                                        Growl('error','Error','Impossible to get all EPSG codes');
+                                    }
+                                }
+                            }else if ($scope.import.uploadType === "raster") {
+                                if('success' === response.verifyCRS){
+                                    UploadFiles.files = {
+                                        file: $scope.import.providerId,
+                                        mdFile: importedMetaData,
+                                        providerId: $scope.import.providerId
+                                    };
+                                    if (!fileExtension || fileExtension !== "nc") {
+                                        Growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
+                                        $modalInstance.close({type: $scope.import.uploadType,file: $scope.import.providerId});
+                                    } else {
+                                        $scope.showAssociate();
+                                        // todo: displayNetCDF(fileName);
+                                    }
+                                }else if('error' === response.verifyCRS) {
+                                    Growl('warning','CRS','Data '+ $scope.import.providerId +' without Projection');
+                                    $scope.import.allowSubmit = false;
+                                    $scope.import.enableSelectEPSGCode = true;
+                                    if(response.codes){
+                                        $scope.epsgList = response.codes;
+                                        $scope.import.fileName = $scope.import.providerId;
+                                    } else {
+                                        Growl('error','Error','Impossible to get all EPSG codes');
+                                    }
+                                }
+                            }else if ($scope.import.uploadType === "observation" && fileExtension === "xml") {
+                                Growl('success','Success','Observation data '+ fileName +' successfully added');
+                                $scope.showAssociate();
+                            } else if ($scope.import.uploadType === "observation") {
+                                Growl('success','Success','Observation data '+ fileName +' successfully added');
+                                $scope.showAssociate();
                             }
-                            provider.create({id: $scope.import.providerId},
-                                {type: "feature-store",
-                                 subType: subType,
-                                 parameters: {
-                                    path: importedData
-                                 }
-                                },
-                                function() {//success
-                                provider.verifyCRS({ id: $scope.import.providerId},
-                                    function() {//success
-                                        if (importedMetaData || $scope.import.dataName) {
-                                            dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId,
-                                                                                'mdPath': importedMetaData,
-                                                                                dataName: $scope.import.dataName}});
-                                        }
-                                        //update data & metadata files reminder for further use
-                                        UploadFiles.files = {
-                                            file: $scope.import.providerId,
-                                            mdFile: importedMetaData,
-                                            providerId: $scope.import.providerId
-                                        };
-                                        Growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
-                                        if ($scope.sensor.checked) {
-                                            $scope.showAssociate();
-                                        } else {
-                                            $modalInstance.close({type: $scope.import.uploadType,
-                                                                  file: $scope.import.providerId});
-                                        }
-                                    }, function() {//failure
-                                        Growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
-                                        $scope.import.allowSubmit = false;
-                                        //TODO div select EPSG
-                                        $scope.import.enableSelectEPSGCode = true;
-                                        provider.getAllCodeEPSG({ id: $scope.import.providerId},
-                                            function(response){//success
-                                                $scope.epsgList = response.list;
-                                                $scope.import.fileName = $scope.import.providerId;
-
-                                            },
-                                            function(){//error
-                                                Growl('error','Error','Impossible to get all EPSG code');
-                                            }
-                                        );
-                                    }
-                                );
-                            }, function(){//failure for provider.create
-                                Growl('error','Error','Impossible to create dataSet');
-                            });
-                        } else if ($scope.import.uploadType === "raster") {
-                            provider.create({id: $scope.import.providerId}, {
-                                type: "coverage-store",
-                                subType: "coverage-file",
-                                parameters: {
-                                    path: importedData
-                                }
-                            }, function() {//success
-                                provider.verifyCRS({ id: $scope.import.providerId},
-                                    function() {//success
-                                        if (importedMetaData) {
-                                            dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId,
-                                                                                'mdPath': importedMetaData}});
-                                        }
-                                        //update data & metadata files reminder for further use
-                                        UploadFiles.files = {file: $scope.import.providerId,
-                                                             mdFile: importedMetaData,
-                                                             providerId: $scope.import.providerId};
-                                        if (!fileExtension || fileExtension !== "nc") {
-                                            Growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
-                                            $modalInstance.close({type: $scope.import.uploadType,
-                                                                  file: $scope.import.providerId});
-                                        } else {
-                                            $scope.showAssociate();
-                                            // todo: displayNetCDF(fileName);
-                                        }
-                                    }, function() {//failure
-                                        Growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
-                                        $scope.import.allowSubmit = false;
-                                        //TODO div select EPSG
-                                        $scope.import.enableSelectEPSGCode = true;
-                                        provider.getAllCodeEPSG({id: $scope.import.providerId},
-                                            function(response){//success
-                                                $scope.epsgList = response.list;
-                                                $scope.import.fileName = $scope.import.providerId;
-                                            },
-                                            function(){//error
-                                                Growl('error','Error','Impossible to get all EPSG code');
-                                            });
-                                        //provider.delete({id: fileName});
-                                    }
-                                );
-                            } , function(){//failure of provider.create
-                                Growl('error','Error','Impossible to create dataSet');
-                            });
-                        } else if ($scope.import.uploadType === "observation" && fileExtension === "xml") {
-                            provider.create({id: $scope.import.providerId},{
-                                type: "observation-store",
-                                subType: "observation-xml",
-                                parameters: {
-                                    path: importedData
-                                }
-                            }, function() {//success
-                                if (importedMetaData) {
-                                    dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId,
-                                                                        'mdPath': importedMetaData}});
-                                }
-                                Growl('success','Success','Observation data '+ fileName +' successfully added');
-                                $scope.showAssociate();
-                            }, function(){//failure
-                                Growl('error','Error','Impossible to create dataSet');
-                            });
-                        } else if ($scope.import.uploadType === "observation") {
-                            provider.create({
-                                id: $scope.import.providerId
-                            }, {
-                                type: "observation-store",
-                                subType: "observation-file",
-                                parameters: {
-                                    path: importedData
-                                }
-                            }, function() {//success
-                                if (importedMetaData) {
-                                    dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId,
-                                                                        'mdPath': importedMetaData}});
-                                }
-                                Growl('success','Success','Observation data '+ fileName +' successfully added');
-                                $scope.showAssociate();
-                            }, function(){//failure
-                                Growl('error','Error','Impossible to create dataSet');
-                            });
-                        } else {
-                            Growl('warning','Warning','Not implemented choice');
-                            $modalInstance.close();
                         }
-                    });
+                    },function(response){//error
+                        Growl('error','Error','Data import failed');
+                        $modalInstance.close();
                 });
             } else {
                 Growl('error','Error','Data import failed');
@@ -271,8 +187,10 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.addProjection = function (){
-            console.log($scope.import.epsgSelected);
-            var codeEpsg = $scope.import.epsgSelected.substr(0,$scope.import.epsgSelected.indexOf(" "));
+            var codeEpsg = $scope.import.epsgSelected.trim();
+            if(codeEpsg.indexOf(' ')!== -1){
+                codeEpsg = codeEpsg.substring(0,codeEpsg.indexOf(' '));
+            }
             provider.createPRJ({id: $scope.import.fileName },{codeEpsg: codeEpsg},
                 function(){//success
                     UploadFiles.files = {
@@ -283,8 +201,12 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                     $modalInstance.close({type: $scope.import.uploadType,
                                           file: $scope.import.providerId});
                 },
-                function(){//error
-                    Growl('error','Error','Impossible to set projection for data '+ $scope.import.fileName );
+                function(response){//error
+                    var msgError = '';
+                    if(response && response.data && response.data.message) {
+                        msgError = response.data.message;
+                    }
+                    Growl('error','Error','Impossible to set projection : '+msgError);
                 }
             );
         };

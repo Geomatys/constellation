@@ -658,6 +658,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 }
             });
             modal.result.then(function(result) {
+                if(!result){
+                    return;
+                }
                 if(!result.file){
                     return;
                 }else {
@@ -681,6 +684,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 }
             });
             modal.result.then(function(result) {
+                if(!result){
+                    return;
+                }
                 if(!result.file){
                     return;
                 }else {
@@ -703,6 +709,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 }
             });
             modal.result.then(function(result) {
+                if(!result){
+                    return;
+                }
                 if(!result.file){
                     return;
                 }else {

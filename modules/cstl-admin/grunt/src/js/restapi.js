@@ -144,6 +144,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'dataFolder':           {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/datapath/true;jsessionid=', isArray: true},
             'metadataFolder':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadatapath/true;jsessionid=', isArray: true},
             'importData':           {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/import;jsessionid='},
+            'importDataFull':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/import/full;jsessionid='},
             'loadData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/load;jsessionid='},
             'extension':            {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/testextension;jsessionid='},
             'hideData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/:providerid/:dataid/hidden;jsessionid='},

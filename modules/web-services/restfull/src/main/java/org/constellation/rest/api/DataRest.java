@@ -155,12 +155,13 @@ import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
-import org.quartz.SchedulerException;
 import org.w3c.dom.Node;
 
 /**
@@ -540,9 +541,8 @@ public class DataRest {
         return hashMap;
     }
 
-
     /**
-     * Import data from upload Directory to integrated directory 
+     * Import data from upload Directory to integrated directory
      * - change file location from upload to integrated
      *
      * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
@@ -605,6 +605,185 @@ public class DataRest {
             LOGGER.log(Level.WARNING, "Bad configuration for data Integrated directory", e);
             return Response.status(500).entity(e.getLocalizedMessage()).build();
         }
+    }
+
+
+    /**
+     * Import data from upload Directory to integrated directory 
+     * - change file location from upload to integrated
+     * this method do all chain: init provider and metadata.
+     *
+     * @param domainId given domain identifier.
+     * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
+     * @return a {@link javax.ws.rs.core.Response}
+     */
+    @POST
+    @Path("import/full")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response proceedToImport(final @PathParam("domainId") int domainId,
+                               final ParameterValues values) {
+        String filePath = values.getValues().get("dataPath");
+        final String metadataFilePath = values.getValues().get("metadataFilePath");
+        final String dataType = values.getValues().get("dataType");
+        final String dataName= values.getValues().get("dataName");
+        final String fileExtension = values.getValues().get("extension");
+        final String fsServer = values.getValues().get("fsServer");
+        final ImportedData importedDataReport = new ImportedData();
+        try{
+            final File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
+            final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
+            if (fsServer != null && fsServer.equalsIgnoreCase("true")) {
+                importedDataReport.setDataFile(filePath);
+            } else {
+                if (filePath != null) {
+                    filePath = renameDataFile(dataName, filePath);
+                    if (filePath.toLowerCase().endsWith(".zip")) {
+                        final File zipFile = new File(filePath);
+                        final File zipDir = new File(dataIntegratedDirectory, dataName);
+                        if (zipDir.exists()) {
+                            recursiveDelete(zipDir);
+                        }
+                        FileUtilities.unzip(zipFile, zipDir, new CRC32());
+                        filePath = zipDir.getAbsolutePath();
+                    }
+                    if (filePath.startsWith(uploadFolder.getAbsolutePath())) {
+                        final File destFile = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName());
+                        Files.move(Paths.get(filePath), Paths.get(destFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+                        importedDataReport.setDataFile(destFile.getAbsolutePath());
+                    } else {
+                        importedDataReport.setDataFile(filePath);
+                    }
+                }
+            }
+            if (metadataFilePath != null){
+                if (metadataFilePath.startsWith(uploadFolder.getAbsolutePath())) {
+                    final File destMd = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName());
+                    Files.move(Paths.get(metadataFilePath), Paths.get(destMd.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+                    importedDataReport.setMetadataFile(destMd.getAbsolutePath());
+                } else {
+                    importedDataReport.setMetadataFile(metadataFilePath);
+                }
+            }
+
+            final String dataFile = importedDataReport.getDataFile();
+            final String importedMetaData = importedDataReport.getMetadataFile();
+            final SelectedExtension selectedExtension = findDataType(dataFile,fileExtension,dataType);
+            final String uploadType = selectedExtension.getDataType();
+            importedDataReport.setDataType(uploadType);
+            final String providerIdentifier = dataName;
+
+            if("vector".equalsIgnoreCase(uploadType)) {
+                //@FIXME why we need a subtype here? remove this ugly check.
+                final String subType;
+                if ("shp".equalsIgnoreCase(fileExtension)) {
+                    subType = "";
+                } else {
+                    subType = "shapefile";
+                }
+                //create provider
+                final ProviderConfiguration config = new ProviderConfiguration();
+                config.setType("feature-store");
+                config.setSubType(subType);
+                config.getParameters().put("path",dataFile);
+                providerBusiness.create(domainId, providerIdentifier, config);
+
+                //set up user metadata
+                if (importedMetaData != null && !importedMetaData.isEmpty()) {
+                    proceedToSaveUploadedMetadata(providerIdentifier, importedMetaData);
+                }
+
+                //verify CRS
+                try {
+                    final Map<Name, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
+                    for(final CoordinateReferenceSystem crs : nameCoordinateReferenceSystemHashMap.values()){
+                        if (crs == null || crs instanceof ImageCRS) {
+                            throw new DataStoreException("CRS is null or is instance of ImageCRS");
+                        }
+                    }
+                    importedDataReport.setVerifyCRS("success");
+                } catch (DataStoreException e) {
+                    importedDataReport.setVerifyCRS("error");
+                    LOGGER.log(Level.INFO, "Cannot get CRS for provider "+providerIdentifier+" for domain "+domainId);
+                    //get a list of EPSG codes
+                    importedDataReport.setCodes(getAllEpsgCodes());
+                }
+            }else if("raster".equalsIgnoreCase(uploadType)) {
+                //create provider
+                final ProviderConfiguration config = new ProviderConfiguration();
+                config.setType("coverage-store");
+                config.setSubType("coverage-file");
+                config.getParameters().put("path",dataFile);
+                providerBusiness.create(domainId, providerIdentifier, config);
+
+                //set up user metadata
+                if (importedMetaData != null && !importedMetaData.isEmpty()) {
+                    proceedToSaveUploadedMetadata(providerIdentifier, importedMetaData);
+                }
+
+                //verify CRS
+                try {
+                    final Map<Name, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
+                    for(final CoordinateReferenceSystem crs : nameCoordinateReferenceSystemHashMap.values()){
+                        if (crs == null || crs instanceof ImageCRS) {
+                            throw new DataStoreException("CRS is null or is instance of ImageCRS");
+                        }
+                    }
+                    importedDataReport.setVerifyCRS("success");
+                } catch (DataStoreException e) {
+                    importedDataReport.setVerifyCRS("error");
+                    LOGGER.log(Level.INFO, "Cannot get CRS for provider "+providerIdentifier+" for domain "+domainId);
+                    //get a list of EPSG codes
+                    importedDataReport.setCodes(getAllEpsgCodes());
+                }
+            }else if("observation".equalsIgnoreCase(uploadType) && "xml".equalsIgnoreCase(fileExtension)) {
+                //create provider
+                final ProviderConfiguration config = new ProviderConfiguration();
+                config.setType("observation-store");
+                config.setSubType("observation-xml");
+                config.getParameters().put("path",dataFile);
+                providerBusiness.create(domainId, providerIdentifier, config);
+
+                //set up user metadata
+                if (importedMetaData != null && !importedMetaData.isEmpty()) {
+                    proceedToSaveUploadedMetadata(providerIdentifier, importedMetaData);
+                }
+            } else if("observation".equals(uploadType)){
+                //create provider
+                final ProviderConfiguration config = new ProviderConfiguration();
+                config.setType("observation-store");
+                config.setSubType("observation-file");
+                config.getParameters().put("path",dataFile);
+                providerBusiness.create(domainId, providerIdentifier, config);
+
+                //set up user metadata
+                if (importedMetaData != null && !importedMetaData.isEmpty()) {
+                    proceedToSaveUploadedMetadata(providerIdentifier, importedMetaData);
+                }
+            }else {
+                //not supported
+                throw new UnsupportedOperationException("The uploaded file is not recognized or not supported by the application. file:"+uploadType);
+            }
+            return Response.ok(importedDataReport).build();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            return Response.status(500).entity(e.getLocalizedMessage()).build();
+        }
+    }
+
+    private List<String> getAllEpsgCodes() {
+        final List<String> codes = new ArrayList<>();
+        try{
+            final CRSAuthorityFactory factory = CRS.getAuthorityFactory(Boolean.FALSE);
+            final Set<String> authorityCodes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+            for (String code : authorityCodes){
+                code += " - " + factory.getDescriptionText(code).toString();
+                codes.add(code);
+            }
+        }catch(FactoryException ex){
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(),ex);
+        }
+        return codes;
     }
 
     private String renameDataFile(String dataName, String filePath) throws IOException {
@@ -757,7 +936,16 @@ public class DataRest {
     public Response saveUploadedMetadata(final ParameterValues values) {
         final String providerId         = values.getValues().get("providerId");
         final String mdPath             = values.getValues().get("mdPath");
+        try{
+            proceedToSaveUploadedMetadata(providerId, mdPath);
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "Error when saving uploaded metadata", ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
+        }
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
 
+    private void proceedToSaveUploadedMetadata(final String providerId, final String mdPath) throws ConstellationException {
         if (mdPath != null && mdPath.length()>0) {
             final Object obj;
             try {
@@ -766,26 +954,19 @@ public class DataRest {
                 obj = unmarsh.unmarshal(new File(mdPath));
                 pool.recycle(unmarsh);
             } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
-                return Response.status(500).entity(ex.getLocalizedMessage()).build();
+                throw new ConstellationException("Error when trying to unmarshal metadata "+ex.getMessage());
             }
-
             if (!(obj instanceof DefaultMetadata)) {
-                return Response.status(500).entity("Cannot save uploaded metadata because it is not recognized as a valid file!").build();
+                throw new ConstellationException("Cannot save uploaded metadata because it is not recognized as a valid file!");
             }
-
             final DefaultMetadata metadata = (DefaultMetadata) obj;
-
             // for now we assume datasetID == providerID
             try {
                 datasetBusiness.updateMetadata(providerId, -1, metadata);
             } catch (ConfigurationException ex) {
-                LOGGER.warning("Error while saving dataset metadata");
-                throw new ConstellationException(ex);
+                throw new ConstellationException("Error while saving dataset metadata, "+ex.getMessage());
             }
         }
-
-        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     /**
@@ -2284,27 +2465,30 @@ public class DataRest {
         final String filePath     = values.getValues().get("filePath");
         final String extension    = values.getValues().get("extension");
         final String selectedType = values.getValues().get("dataType");
-        final SelectedExtension r = new SelectedExtension();
-        r.setExtension(extension);
-        r.setDataType(selectedType);
-        
+        final SelectedExtension result = findDataType(filePath,extension,selectedType);
+        return result;
+    }
+
+    private SelectedExtension findDataType(final String filePath,final String extension,final String selectedType) {
+        final SelectedExtension result = new SelectedExtension();
+        result.setExtension(extension);
+        result.setDataType(selectedType);
         // look for observation netcdf
         if ("nc".equals(extension) && NetCDFExtractor.isObservationFile(filePath)) {
-            r.setDataType("observation");
+            result.setDataType("observation");
         }
         // look for SML file (available for data import ?)
         if ("xml".equals(extension)) {
             try {
                 String rootMark = getXmlDocumentRoot(filePath);
                 if (rootMark.equals("SensorML")) {
-                    r.setDataType("observation");
+                    result.setDataType("observation");
                 }
             } catch (IOException | XMLStreamException ex) {
                 LOGGER.log(Level.WARNING, "error while reading xml file", ex);
             }
-            
         }
-        return r;
+        return result;
     }
 
     @GET
