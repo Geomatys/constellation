@@ -262,4 +262,8 @@ public class Template {
         r.read(json);
         r.writeToMetadata(root.standard, destination);
     }
+    
+    public static void addTemplate(final String name, Template t) {
+        INSTANCES.put(name, t);
+    }
 }

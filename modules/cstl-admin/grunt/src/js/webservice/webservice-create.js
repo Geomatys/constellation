@@ -164,7 +164,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
 
         $scope.initSource = function() {
             if ($scope.type === 'csw') {
-                $scope.source = {'automatic': {'@format': null}};
+                $scope.source = {'automatic': {'@format': null, 'customparameters' : [{entry: {key:"partial", value:false}}]}};
             } else if ($scope.type === 'sos') {
                 $scope.source = {'constellation-config.SOSConfiguration': {
                     'profile': 'discovery',
