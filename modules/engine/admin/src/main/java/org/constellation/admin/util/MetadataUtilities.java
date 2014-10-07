@@ -327,6 +327,7 @@ public final class MetadataUtilities {
         final DataStore dataStore = dataProvider.getMainStore();
         final CoverageStore coverageStore = (CoverageStore) dataStore;
         final Set<Name> names= coverageStore.getNames();
+        CoordinateReferenceSystem candidat = null;
         if(names != null){
             for(final Name n : names){
                 try{
@@ -334,6 +335,9 @@ public final class MetadataUtilities {
                     final GridCoverageReader reader = cr.acquireReader();
                     final GeneralGridGeometry gridGeom = reader.getGridGeometry(cr.getImageIndex());
                     final CoordinateReferenceSystem crs = gridGeom.getCoordinateReferenceSystem();
+                    if(candidat == null && crs != null){
+                        candidat = crs;
+                    }
                     final String crsIdentifier = IdentifiedObjects.lookupIdentifier(crs,true);
                     if(crsIdentifier != null){
                         return crsIdentifier;
@@ -342,6 +346,9 @@ public final class MetadataUtilities {
                     LOGGER.finer(ex.getMessage());
                 }
             }
+        }
+        if(candidat != null && candidat.getName() != null){
+            return candidat.getName().toString();
         }
         return null;
     }
@@ -355,12 +362,16 @@ public final class MetadataUtilities {
     public static String getVectorCRSName(final DataProvider dataProvider) throws DataStoreException {
         final DataStore dataStore = dataProvider.getMainStore();
         final FeatureStore featureStore = (FeatureStore) dataStore;
+        CoordinateReferenceSystem candidat = null;
         for (Name dataName : featureStore.getNames()) {
             Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
             if (env == null) {
                 continue;
             }
             final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
+            if(candidat == null && crs != null){
+                candidat = crs;
+            }
             try{
                 final String crsIdentifier = IdentifiedObjects.lookupIdentifier(crs,true);
                 if(crsIdentifier != null){
@@ -369,6 +380,9 @@ public final class MetadataUtilities {
             }catch(Exception ex){
                 LOGGER.finer(ex.getMessage());
             }
+        }
+        if(candidat != null && candidat.getName() != null){
+            return candidat.getName().toString();
         }
         return null;
     }
