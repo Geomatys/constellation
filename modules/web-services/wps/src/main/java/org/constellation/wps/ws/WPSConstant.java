@@ -133,29 +133,45 @@ public final class WPSConstant {
         final Contact currentContact = metadata.getServiceContact();
         final AccessConstraint constraint = metadata.getServiceConstraints();
 
-        final AbstractServiceIdentification servIdent = OWSXmlFactory.buildServiceIdentification("1.1.0",
-                                                                                                 metadata.getName(),
-                                                                                                 metadata.getDescription(),
-                                                                                                 metadata.getKeywords(),
-                                                                                                 WPS_SERVICE,
-                                                                                                 metadata.getVersions(),
-                                                                                                 constraint.getFees(),
-                                                                                                 Arrays.asList(constraint.getAccessConstraint()));
+        final AbstractServiceIdentification servIdent;
+        if (constraint == null) {
+            servIdent = OWSXmlFactory.buildServiceIdentification("1.1.0",
+                    metadata.getName(),
+                    metadata.getDescription(),
+                    metadata.getKeywords(),
+                    WPS_SERVICE,
+                    metadata.getVersions(),
+                    null, new ArrayList<String>());
+        } else {
+            servIdent = OWSXmlFactory.buildServiceIdentification("1.1.0",
+                    metadata.getName(),
+                    metadata.getDescription(),
+                    metadata.getKeywords(),
+                    WPS_SERVICE,
+                    metadata.getVersions(),
+                    constraint.getFees(),
+                    Arrays.asList(constraint.getAccessConstraint()));
+        }
 
         // Create provider part.
-        final AbstractContact contact = OWSXmlFactory.buildContact("1.1.0", currentContact.getPhone(), currentContact.getFax(),
-                currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
-
-        final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
-
-
+        AbstractContact contact = null;
         AbstractOnlineResourceType orgUrl = null;
-        if (currentContact.getUrl() != null) {
-            orgUrl = OWSXmlFactory.buildOnlineResource("1.1.0", currentContact.getUrl());
-        }
-        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), orgUrl, responsible);
+        final AbstractResponsiblePartySubset responsible;
+        final AbstractServiceProvider servProv;
+        if (currentContact != null) {
+            contact = OWSXmlFactory.buildContact("1.1.0", currentContact.getPhone(), currentContact.getFax(),
+                    currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
+                    currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
+            responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
+            if (currentContact.getUrl() != null) {
+                orgUrl = OWSXmlFactory.buildOnlineResource("1.1.0", currentContact.getUrl());
+            }
+            servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), orgUrl, responsible);
+        } else {
+            responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", null, null, null, null);
+            servProv = OWSXmlFactory.buildServiceProvider("1.1.0", null, orgUrl, responsible);
+        }
 
         // Create capabilities base.
         return WPSXmlFactory.buildWPSCapabilities(version, servIdent, servProv, null, null, null, null);
