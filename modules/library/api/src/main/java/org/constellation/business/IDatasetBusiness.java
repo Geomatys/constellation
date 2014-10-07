@@ -43,6 +43,8 @@ public interface IDatasetBusiness {
                         final DefaultMetadata metadata) throws ConfigurationException;
 
     DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException;
+
+    void saveMetadata(final String providerIdentifier, final String dataType) throws ConfigurationException;
     
     void removeDataset(final String datasetIdentifier, final int domainId) throws ConfigurationException;
 

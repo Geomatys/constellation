@@ -20,10 +20,9 @@
 package org.constellation.admin;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -32,21 +31,35 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.google.common.base.Optional;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
+import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
+import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviders;
+import org.constellation.security.SecurityManagerHolder;
+import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.ISOMarshallerPool;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -70,9 +83,20 @@ import org.springframework.context.annotation.Profile;
 public class DatasetBusiness extends InternalCSWSynchronizer implements IDatasetBusiness {
 
     /**
+     * Used for debugging purposes.
+     */
+    protected static final Logger LOGGER = Logging.getLogger(DatasetBusiness.class);
+
+    /**
      * w3c document builder factory.
      */
     protected final DocumentBuilderFactory dbf;
+
+    /**
+     * Injected user repository.
+     */
+    @Inject
+    private UserRepository userRepository;
 
     /**
      * Injected dataset repository.
@@ -286,6 +310,89 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
+    }
+
+    /**
+     * Proceed to extract metadata from reader and fill additional info
+     * then save metadata in dataset.
+     *
+     * @param providerId given provider identifier.
+     * @param dataType data type vector or raster.
+     * @throws ConfigurationException
+     */
+    public void saveMetadata(final String providerId, final String dataType) throws ConfigurationException {
+        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
+        DefaultMetadata extractedMetadata;
+        String crsName = null;
+        switch (dataType) {
+            case "raster":
+                try {
+                    extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider);
+                    crsName = MetadataUtilities.getRasterCRSName(dataProvider);
+                } catch (DataStoreException e) {
+                    LOGGER.log(Level.WARNING, "Error when trying to get raster metadata", e);
+                    extractedMetadata = new DefaultMetadata();
+                }
+                break;
+            case "vector":
+                try {
+                    extractedMetadata = MetadataUtilities.getVectorMetadata(dataProvider);
+                    crsName = MetadataUtilities.getVectorCRSName(dataProvider);
+                } catch (DataStoreException | TransformException e) {
+                    LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
+                    extractedMetadata = new DefaultMetadata();
+                }
+                break;
+            default:
+                extractedMetadata = new DefaultMetadata();
+        }
+        //Update metadata
+        final Properties prop = ConfigurationBusiness.getMetadataTemplateProperties();
+        final String metadataID = CstlMetadatas.getMetadataIdForDataset(providerId);
+        prop.put("fileId", metadataID);
+        prop.put("dataTitle", metadataID);
+        prop.put("dataAbstract", "");
+        final String dateIso = TemporalUtilities.toISO8601(new Date());
+        prop.put("isoCreationDate", dateIso);
+        prop.put("creationDate", dateIso);
+        if("raster".equalsIgnoreCase(dataType)){
+            prop.put("dataType", "grid");
+        }else if("vector".equalsIgnoreCase(dataType)){
+            prop.put("dataType", "vector");
+        }
+
+        if(crsName != null){
+            prop.put("srs", crsName);
+        }
+
+        // get current user name and email and store into metadata contact.
+        final String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
+        final Optional<CstlUser> optUser = userRepository.findOne(login);
+        if(optUser!=null && optUser.isPresent()){
+            final CstlUser user = optUser.get();
+            if (user != null) {
+                prop.put("contactName", user.getFirstname()+" "+user.getLastname());
+                prop.put("contactEmail", user.getEmail());
+            }
+        }
+
+        final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
+
+        DefaultMetadata mergedMetadata;
+        if (extractedMetadata != null) {
+            mergedMetadata = new DefaultMetadata();
+            try {
+                mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, extractedMetadata);
+            } catch (NoSuchIdentifierException | ProcessException ex) {
+                LOGGER.log(Level.WARNING, "error while merging metadata", ex);
+            }
+        } else {
+            mergedMetadata = templateMetadata;
+        }
+        mergedMetadata.prune();
+
+        //Save metadata
+        updateMetadata(providerId, -1, mergedMetadata);
     }
 
     /**

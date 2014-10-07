@@ -68,7 +68,6 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
-import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
@@ -108,11 +107,10 @@ import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.ParamUtilities;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
-import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.ISOMarshallerPool;
 import org.constellation.utils.MetadataFeeder;
-import org.constellation.utils.MetadataUtilities;
+import org.constellation.admin.util.MetadataUtilities;
 import org.geotoolkit.coverage.*;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.ViewType;
@@ -140,7 +138,6 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
 import org.geotoolkit.storage.DataFileStore;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -1367,88 +1364,10 @@ public class DataRest {
     @Path("metadata")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response saveMetadata(final ParameterValues values) throws TransformException {
+    public Response saveMetadata(final ParameterValues values) throws ConfigurationException {
         final String providerId         = values.getValues().get("providerId");
         final String dataType           = values.getValues().get("dataType");
-        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
-        
-        DefaultMetadata extractedMetadata;
-        String crsName = null;
-        switch (dataType) {
-            case "raster":
-                try {
-                    extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider);
-                    crsName = MetadataUtilities.getRasterCRSName(dataProvider);
-                } catch (DataStoreException e) {
-                    LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
-                    extractedMetadata = new DefaultMetadata();
-                }
-                break;
-            case "vector":
-                try {                
-                    extractedMetadata = MetadataUtilities.getVectorMetadata(dataProvider);
-                    crsName = MetadataUtilities.getVectorCRSName(dataProvider);
-                } catch (DataStoreException e) {
-                    LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
-                    extractedMetadata = new DefaultMetadata();
-                }
-                break;
-            default:
-                extractedMetadata = new DefaultMetadata();
-        }
-        //Update metadata
-        final Properties prop = ConfigurationBusiness.getMetadataTemplateProperties();
-        final String metadataID = CstlMetadatas.getMetadataIdForDataset(providerId);
-        prop.put("fileId", metadataID);
-        prop.put("dataTitle", metadataID);
-        prop.put("dataAbstract", "");
-        final String dateIso = TemporalUtilities.toISO8601(new Date());
-        prop.put("isoCreationDate", dateIso);
-        prop.put("creationDate", dateIso);
-        if("raster".equalsIgnoreCase(dataType)){
-            prop.put("dataType", "grid");
-        }else if("vector".equalsIgnoreCase(dataType)){
-            prop.put("dataType", "vector");
-        }
-
-        if(crsName != null){
-            prop.put("srs", crsName);
-        }
-
-        // get current user name and email and store into metadata contact.
-        final String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
-        final Optional<CstlUser> optUser = userRepository.findOne(login);
-        if(optUser!=null && optUser.isPresent()){
-            final CstlUser user = optUser.get();
-            if (user != null) {
-                prop.put("contactName", user.getFirstname()+" "+user.getLastname());
-                prop.put("contactEmail", user.getEmail());
-            }
-        }
-
-        final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
-
-        DefaultMetadata mergedMetadata;
-        if (extractedMetadata != null) {
-            mergedMetadata = new DefaultMetadata();
-            try {
-                mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, extractedMetadata);
-            } catch (NoSuchIdentifierException | ProcessException ex) {
-                LOGGER.log(Level.WARNING, "error while merging metadata", ex);
-            }
-        } else {
-            mergedMetadata = templateMetadata;
-        }
-        mergedMetadata.prune();
-
-        try {
-            //Save metadata
-            datasetBusiness.updateMetadata(providerId, -1, mergedMetadata);
-        } catch (ConfigurationException ex) {
-            LOGGER.warning("Error while saving dataset metadata");
-            throw new ConstellationException(ex);
-        }
-        
+        datasetBusiness.saveMetadata(providerId, dataType);
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
