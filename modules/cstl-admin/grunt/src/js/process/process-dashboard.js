@@ -75,6 +75,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         $scope.duplicateTask = function(idTask) {
             TaskService.duplicateParamsTask({id:idTask}).$promise.then(function(){
                 Growl('success', 'Success', 'The task is currently duplicated');
+                $scope.init();
             }).catch(function(){
                 Growl('error', 'Error', "Can't duplicate this task");
             });
