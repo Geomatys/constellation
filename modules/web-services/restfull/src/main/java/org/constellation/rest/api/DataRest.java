@@ -147,6 +147,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.constraint.Classification;
+import org.opengis.metadata.identification.KeywordType;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.spatial.GeometricObjectType;
@@ -219,6 +220,17 @@ public class DataRest {
         }
         Collections.sort(roleCodes);
         mdList.setRoleCodes(roleCodes);
+
+        //for keyword type codes
+        final List<String> keywordTypesCodes = new LinkedList<>();
+        for (final KeywordType ktype : KeywordType.values()) {
+            final String standardName = Types.getStandardName(ktype.getClass());
+            final String code = ktype.identifier()!=null?ktype.identifier():ktype.name();
+            final String codeListName = standardName+"."+code;
+            keywordTypesCodes.add(codeListName);
+        }
+        Collections.sort(keywordTypesCodes);
+        mdList.setKeywordTypeCodes(keywordTypesCodes);
 
         //for locale codes
         final List<String> localeCodes = new LinkedList<>();

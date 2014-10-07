@@ -40,6 +40,7 @@ public class MetadataLists implements Serializable {
     private List<String> geometricObjectTypeCodes;
     private List<String> classificationCodes;
     private List<String> characterSetCodes;
+    private List<String> keywordTypeCodes;
 
     public MetadataLists() {
     }
@@ -106,5 +107,13 @@ public class MetadataLists implements Serializable {
 
     public void setCharacterSetCodes(List<String> characterSetCodes) {
         this.characterSetCodes = characterSetCodes;
+    }
+
+    public List<String> getKeywordTypeCodes() {
+        return keywordTypeCodes;
+    }
+
+    public void setKeywordTypeCodes(List<String> keywordTypeCodes) {
+        this.keywordTypeCodes = keywordTypeCodes;
     }
 }

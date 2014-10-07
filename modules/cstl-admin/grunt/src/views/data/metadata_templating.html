@@ -173,6 +173,14 @@
             style="width:auto;min-width:165pt;height:30px;">
         <option value="">-----</option>
     </select>
+    <select ng-if="fieldObj.field.render === 'KeywordType.codelist'"
+            class="form-control form-control-fix"
+            ng-model="fieldObj.field.value"
+            ng-class="{'col-xs-8-important':fieldObj.field.multiplicity>1}"
+            ng-options="(code | translate) for code in codeLists.keywordTypeCodes | orderBy: 'toString() | translate'"
+            style="width:auto;min-width:165pt;height:30px;">
+        <option value="">-----</option>
+    </select>
     <select ng-if="fieldObj.field.render === 'ReferenceSystemIdentifier.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
