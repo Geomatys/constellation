@@ -1069,7 +1069,11 @@ public class DataRest {
                                        final @PathParam("prune") boolean prune) {
         final StringBuilder buffer = new StringBuilder();
         try{
-            final QName dataName = Util.parseQName(dataId);
+            String dataIdStr = dataId;
+            if(dataIdStr != null) {
+                dataIdStr = dataIdStr.replaceAll(" ","%20");
+            }
+            final QName dataName = Util.parseQName(dataIdStr);
             DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, dataName);
             if(metadata == null){
                 //try to get dataset metadata.
