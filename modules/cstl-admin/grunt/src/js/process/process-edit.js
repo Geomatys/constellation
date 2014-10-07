@@ -271,8 +271,8 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                             'mandatory' : true,
                             'name': element.attr("name"),
                             'default' : element.attr("default") || "",
-                            'minOccurs' : element.attr("minOccurs") || "1",
-                            'maxOccurs' : element.attr("maxOccurs") || "1",
+                            'minOccurs' : parseInt(element.attr("minOccurs") || "1"),
+                            'maxOccurs' : parseInt(element.attr("maxOccurs") || "1"),
                             'annotation' : getAnnotationFor(element),
                             'restriction' : getRestrictionFor(element),
                             'save' : []
