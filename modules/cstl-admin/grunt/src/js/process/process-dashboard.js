@@ -81,6 +81,30 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
             });
         };
 
+        $scope.showPlanningTaskPopup = function(idTask) {
+            var id = idTask;
+
+            var modal = $modal.open({
+                templateUrl: 'views/tasks/modalPlanningTask.html',
+                controller: 'ModalPlanTaskController',
+                resolve : {
+                    'task'      : function(){
+                        if (idTask>=0){
+                            return TaskService.getParamsTask({id:idTask}).$promise;
+                        } else {
+                            return {
+                                'id' : null,
+                                'name' : ""
+                            };
+                        }
+                    }
+                }
+            });
+            modal.result.then(function(){
+                $scope.init();
+            });
+        };
+
         $scope.toggleUpDownSelected = function() {
             var $header = $('#ProcessDashboard').find('.selected-item').find('.block-header');
             $header.next().slideToggle(200);

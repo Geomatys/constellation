@@ -2,7 +2,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title" translate="tasks.modal.title">Add new task</h4>
+            <h4 class="modal-title" translate="{{task.id === null ?'tasks.modal.title':'tasks.information.edit'}}">Add new task</h4>
         </div>
         <div class="modal-body modal-body-style" style="padding-top: 15px; overflow-y: auto;">
             <!-- WRITE CONTENT HERE -->

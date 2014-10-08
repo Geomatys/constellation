@@ -396,6 +396,8 @@
     "label.data.virtual.sensor": "Capteurs virtuels",
     "label.database": "Base de données",
     "label.date": "Date",
+    "label.hour": "Heure",
+    "label.minute": "Minute",
     "label.delete": "Supprimer",
     "label.description": "Description",
     "label.east": "Est",
@@ -1097,6 +1099,7 @@
     "tasks.information.edit":"Éditer le traitement",
     "tasks.information.execute":"Executer le traitement",
     "tasks.information.duplicate":"Dupliquer le traitement",
+    "tasks.information.planning":"Planifier une exécution",
     "tasks.information.delete":"Supprimer le traitement",
     "tasks.information.title":"Traitements disponibles",
     "tasks.notask":"Pas de traitement en cours d'execution",
@@ -1104,6 +1107,9 @@
     "tasks.modal.process":"Nom du processus",
     "tasks.modal.title":"Ajouter un nouveau traitement",
     "tasks.modal.name":"Nom de la tâche *",
+    "tasks.plan.label.repeat":"Répétition",
+    "tasks.plan.label.folder":"Dossier a surveiller",
+
 
     "mapcontext.information.title":"Compositions cartographiques disponibles",
 

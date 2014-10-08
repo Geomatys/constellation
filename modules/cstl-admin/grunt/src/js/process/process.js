@@ -19,4 +19,5 @@
  */
 
 angular.module('cstl-process', ['cstl-process-dashboard',
-                                'cstl-process-edit']);
+                                'cstl-process-edit',
+                                'cstl-process-plan']);

@@ -101,8 +101,7 @@
                 <div class="pull-left" style="width: 40%;">
                     <div id="selection">
                         <div class="alert alert-task alert-info alert-data" ng-class="{hide: selected != null}">
-                            <h4 translate="label.no.selected.task">No selected sensor</h4>
-
+                            <h4 translate="label.no.selected.task">No selected task</h4>
                             <p translate="msg.no.selected.task" style="font-weight:normal;">Click on a data to display more information</p>
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
@@ -130,6 +129,14 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
+                                            <button type="button" class="btn btn-process" ng-click="duplicateTask(selected.id);"
+                                                    data-placement="bottom" title="{{'tasks.information.duplicate' | translate }}" tooltip>
+                                                <i class="fa fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
                                             <button type="button" class="btn btn-process" ng-click="deleteTask(selected.id);"
                                                     data-placement="bottom" title="{{'tasks.information.delete' | translate }}" tooltip>
                                                 <i class="glyphicon glyphicon-trash"></i>
@@ -146,9 +153,9 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
-                                            <button type="button" class="btn btn-process" ng-click="duplicateTask(selected.id);"
-                                                    data-placement="bottom" title="{{'tasks.information.duplicate' | translate }}" tooltip>
-                                                <i class="fa fa-copy"></i>
+                                            <button type="button" class="btn btn-process" ng-click="showPlanningTaskPopup(selected.id);"
+                                                    data-placement="bottom" title="{{'tasks.information.planning' | translate }}" tooltip>
+                                                <i class="fa fa-clock-o"></i>
                                             </button>
                                         </span>
                                     </div>

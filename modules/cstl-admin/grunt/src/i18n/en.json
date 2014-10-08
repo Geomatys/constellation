@@ -350,6 +350,8 @@
     "label.data.virtual.sensor ": "Virtual sensors",
     "label.database": "Database",
     "label.date": "Date",
+    "label.hour": "Hour",
+    "label.minute": "Minute",
     "label.delete": "Delete",
     "label.description": "Description",
     "label.east": "East",
@@ -1120,6 +1122,7 @@
     "tasks.information.edit":"Edit task",
     "tasks.information.execute":"Execute task",
     "tasks.information.duplicate":"Duplicate task",
+    "tasks.information.planning":"Plan execution",
     "tasks.information.delete":"Delete task",
     "tasks.information.title":"Available tasks",
     "tasks.notask":"No current process",
@@ -1127,6 +1130,8 @@
     "tasks.modal.process":"Process",
     "tasks.modal.title":"Add new task",
     "tasks.modal.name":"Task name *",
+    "tasks.plan.label.repeat":"Repeat",
+    "tasks.plan.label.folder":"Folder to watch",
 
     "mapcontext.information.title":"Available map context",
 
