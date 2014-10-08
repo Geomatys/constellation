@@ -460,9 +460,28 @@ public final class LayerProviders {
 
         // Bands description.
         if (dims != null) {
+            int i=0;
+            Map<String, Object> map = null;
             for (final GridSampleDimension dim : dims) {
                 final String dimName = dim.getDescription().toString();
-                description.getBands().add(new BandDescription(dimName, dim.getMinimumValue(), dim.getMaximumValue(), dim.getNoDataValues()));
+                double min = dim.getMinimumValue();
+                double max = dim.getMaximumValue();
+                //in case of min or max are infinite we need to calculate by using StatisticOp.analyze
+                if(Double.isInfinite(min) || Double.isInfinite(max)) {
+                    if(map == null) {
+                        map = StatisticOp.analyze(reader, ref.getImageIndex());
+                    }
+                    if(map != null){
+                        double[] minArr = (double[]) map.get("min");
+                        double[] maxArr = (double[]) map.get("max");
+                        if(minArr.length>i && maxArr.length>i) {
+                            min = minArr[i];
+                            max = maxArr[i];
+                        }
+                    }
+                }
+                description.getBands().add(new BandDescription(dimName, min, max, dim.getNoDataValues()));
+                i++;
             }
         } else {
             Map<String, Object> map = StatisticOp.analyze(reader, ref.getImageIndex());
