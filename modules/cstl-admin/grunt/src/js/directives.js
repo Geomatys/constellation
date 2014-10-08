@@ -120,7 +120,8 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                         format:      newVal.format,
                         weekStart:   newVal.weekStart,
                         viewMode:    newVal.viewMode,
-                        minViewMode: newVal.minViewMode
+                        minViewMode: newVal.minViewMode,
+                        autoclose: true
                     });
                 }
             }
