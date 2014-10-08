@@ -471,19 +471,19 @@ public class DataRest {
                                @Context HttpServletRequest request) {
     	final String sessionId = request.getSession(false).getId();
         final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
-        HashMap<String,String> hashMap = new HashMap<>();
-        if (identifier!=null && identifier.length()>0){
-            //dataName = identifier + addExtentionIfExist(fileDetail.getFileName());
+        Map<String,String> hashMap = new HashMap<>();
+        if (identifier != null && ! identifier.isEmpty()){
             hashMap.put("dataName", identifier);
         } else {
             if (serverMetadataPath !=null && serverMetadataPath.length()>0){
                 hashMap.put("metadataPath", serverMetadataPath);
                 try {
-                    hashMap = extractIdentifierFromMetadataFile(hashMap,new File(serverMetadataPath));
+                    extractIdentifierFromMetadataFile(hashMap,new File(serverMetadataPath));
                 }catch (ConstellationException ex){
-                    return Response.status(500).entity(hashMap.put("msg", ex.getMessage())).build();
+                    hashMap.put("msg", ex.getLocalizedMessage());
+                    return Response.status(500).entity(hashMap).build();
                 }
-            } else  if (fileMetaDetail.getFileName().length() > 0) {
+            } else  if (! fileMetaDetail.getFileName().isEmpty()) {
                 final File newFileMetaData = new File(uploadDirectory, fileMetaDetail.getFileName());
                 try {
                     if (mdFileIs != null) {
@@ -496,7 +496,8 @@ public class DataRest {
                         try {
                             extractIdentifierFromMetadataFile(hashMap, newFileMetaData);
                         }catch (ConstellationException ex){
-                            return Response.status(500).entity(hashMap.put("msg", ex.getMessage())).build();
+                            hashMap.put("msg", ex.getLocalizedMessage());
+                            return Response.status(500).entity(hashMap).build();
                         }
                     }
                 } catch (IOException ex) {
@@ -516,7 +517,8 @@ public class DataRest {
         return Response.status(200).entity(hashMap).build();
     }
 
-    private HashMap extractIdentifierFromMetadataFile(HashMap<String, String> hashMap, File newFileMetaData) {
+    private void extractIdentifierFromMetadataFile(final Map<String,String> hashMap,
+                                                      final File newFileMetaData) throws ConstellationException{
         Object obj;
         try {
             final MarshallerPool pool = CSWMarshallerPool.getInstance();
@@ -526,28 +528,23 @@ public class DataRest {
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
             throw new ConstellationException("metadata file is incorrect");
-
         }
-
         if (!(obj instanceof DefaultMetadata)) {
             throw new ConstellationException("metadata file is incorrect");
         }
-
-
         final DefaultMetadata metadata = (DefaultMetadata)obj;
-        final String metaIdentifier = new MetadataFeeder(metadata).getIdentifier();
-        if (metaIdentifier!=null && metaIdentifier.length()>0) {
-            //dataName = metaIdentifier + addExtentionIfExist(fileDetail.getFileName());
+        final String metaIdentifier = metadata.getFileIdentifier();
+        if (metaIdentifier!=null && ! metaIdentifier.isEmpty()) {
             hashMap.put("dataName", metaIdentifier);
+        }else {
+            throw new ConstellationException("metadata does not contains any identifier," +
+                    " please check the fileIdentifier in your metadata.");
         }
-
-
         hashMap.put("metadataPath",newFileMetaData.getAbsolutePath());
-
-        final String title = new MetadataFeeder(metadata).getTitle();
+        final MetadataFeeder mdPojo = new MetadataFeeder(metadata);
+        final String title = mdPojo.getTitle();
         hashMap.put("metatitle",title);
         hashMap.put("metaIdentifier", metaIdentifier);
-        return hashMap;
     }
 
     /**
@@ -557,6 +554,8 @@ public class DataRest {
      * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
      * @param request
      * @return a {@link javax.ws.rs.core.Response}
+     *
+     * @Deprecated this is deprecated since we are using the method proceedToImport.
      */
     @POST
     @Path("import")
@@ -635,13 +634,24 @@ public class DataRest {
         String filePath = values.getValues().get("dataPath");
         final String metadataFilePath = values.getValues().get("metadataFilePath");
         final String dataType = values.getValues().get("dataType");
-        final String dataName= values.getValues().get("dataName");
+        String dataName= values.getValues().get("dataName");
         final String fileExtension = values.getValues().get("extension");
         final String fsServer = values.getValues().get("fsServer");
         final ImportedData importedDataReport = new ImportedData();
         try{
             final File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
             final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
+
+            if (metadataFilePath != null) {
+                if (metadataFilePath.startsWith(uploadFolder.getAbsolutePath())) {
+                    final File destMd = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName());
+                    Files.move(Paths.get(metadataFilePath), Paths.get(destMd.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+                    importedDataReport.setMetadataFile(destMd.getAbsolutePath());
+                } else {
+                    importedDataReport.setMetadataFile(metadataFilePath);
+                }
+            }
+
             if (fsServer != null && fsServer.equalsIgnoreCase("true")) {
                 importedDataReport.setDataFile(filePath);
             } else {
@@ -663,15 +673,6 @@ public class DataRest {
                     } else {
                         importedDataReport.setDataFile(filePath);
                     }
-                }
-            }
-            if (metadataFilePath != null){
-                if (metadataFilePath.startsWith(uploadFolder.getAbsolutePath())) {
-                    final File destMd = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName());
-                    Files.move(Paths.get(metadataFilePath), Paths.get(destMd.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
-                    importedDataReport.setMetadataFile(destMd.getAbsolutePath());
-                } else {
-                    importedDataReport.setMetadataFile(metadataFilePath);
                 }
             }
 
@@ -956,16 +957,8 @@ public class DataRest {
     }
 
     private void proceedToSaveUploadedMetadata(final String providerId, final String mdPath) throws ConstellationException {
-        if (mdPath != null && mdPath.length()>0) {
-            final Object obj;
-            try {
-                final MarshallerPool pool = CSWMarshallerPool.getInstance();
-                final Unmarshaller unmarsh = pool.acquireUnmarshaller();
-                obj = unmarsh.unmarshal(new File(mdPath));
-                pool.recycle(unmarsh);
-            } catch (JAXBException ex) {
-                throw new ConstellationException("Error when trying to unmarshal metadata "+ex.getMessage());
-            }
+        if (mdPath != null && !mdPath.isEmpty()) {
+            final Object obj = unmarshallMetadata(mdPath);
             if (!(obj instanceof DefaultMetadata)) {
                 throw new ConstellationException("Cannot save uploaded metadata because it is not recognized as a valid file!");
             }
@@ -977,6 +970,19 @@ public class DataRest {
                 throw new ConstellationException("Error while saving dataset metadata, "+ex.getMessage());
             }
         }
+    }
+
+    private Object unmarshallMetadata(final String mdPath) throws ConstellationException {
+        final Object obj;
+        try {
+            final MarshallerPool pool = CSWMarshallerPool.getInstance();
+            final Unmarshaller unmarsh = pool.acquireUnmarshaller();
+            obj = unmarsh.unmarshal(new File(mdPath));
+            pool.recycle(unmarsh);
+        } catch (JAXBException ex) {
+            throw new ConstellationException("Error when trying to unmarshal metadata "+ex.getMessage());
+        }
+        return obj;
     }
 
     /**
