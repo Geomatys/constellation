@@ -22,7 +22,7 @@
 
 
 
-  <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+  <bean id="database-initer" class="liquibase.integration.spring.SpringLiquibase">
     <property name="dataSource" ref="dataSource" />
     <property name="changeLog" value="classpath:/cstl/db/db-changelog.xml" />
 
