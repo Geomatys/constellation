@@ -1,7 +1,7 @@
 <div id="part2Metadata" ng-controller="ModalImportDataStep2MetadataController">
     <form id="uploadMetadataForm">
         <label translate="data.modal.metadata">Metadata</label>
-        <div ng-if="import.fsserver">
+        <div ng-if="import.fsserver" style="margin-bottom: 10px;">
             <ul class="breadcrumb col-sm-12 row" style="margin-left: 0;margin-right: 0;">
                 <label class="col-sm-7"
                        translate="data.modal.import.server.label">Fill the server Path</label>
@@ -9,11 +9,11 @@
                     <span type="button"
                           class="glyphicon glyphicon-info-sign"
                           tooltip data-placement="right"
-                          title="{{'tooltip.data.add.choicedata' | translate }}" ></span>
+                          title="{{'tooltip.data.add.choicemetadata.server' | translate }}" ></span>
                 </div>
                 <input type="text"
                        name="serverMetadataPath"
-                       placeholder="{{'data.modal.import.server.label'| translate}}"
+                       placeholder="{{'data.modal.import.server.label' | translate}}"
                        ng-model="currentPath" size="70"
                        class="form-control form-control-fix"
                        style="float: left;margin-right: 10px;width: 66%;"/>
@@ -37,7 +37,10 @@
                 </div>
             </div>
         </div>
-        <div ng-if="!import.fsserver" class="fileinput fileinput-new" data-provides="fileinput">
+        <div ng-if="!import.fsserver"
+             class="fileinput fileinput-new"
+             data-provides="fileinput"
+             style="margin-bottom: 0;">
             <div class="form-group">
                 <div class="input-group">
                     <div class="form-control uneditable-input" data-trigger="fileinput">
@@ -54,6 +57,13 @@
                     <a class="input-group-addon btn btn-default fileinput-exists"
                        data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
                 </div>
+            </div>
+        </div>
+        <div class="col-xs-12" style="border-top:solid 1px #ddd;padding-left:0;padding-right:0;margin-bottom: 10px;">
+            <div class="form-group" style="padding: 10px 0 12px 17px; margin-bottom: 0; background-color: #E9E9E9;">
+                <input type="checkbox"
+                       ng-model="import.fillMetadata"/>
+                <span translate="data.modal.import.metadata.askforfill">Complete automatically my metadata with information from the data</span>
             </div>
         </div>
         <div class="form-group" style="color:#808080;">

@@ -382,12 +382,22 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         if (extractedMetadata != null) {
             mergedMetadata = new DefaultMetadata();
             try {
-                mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, extractedMetadata);
+                mergedMetadata = MetadataUtilities.mergeMetadata(templateMetadata, extractedMetadata);
             } catch (NoSuchIdentifierException | ProcessException ex) {
                 LOGGER.log(Level.WARNING, "error while merging metadata", ex);
             }
         } else {
             mergedMetadata = templateMetadata;
+        }
+
+        //merge with uploaded metadata
+        final DefaultMetadata uploadedMetadata = getMetadata(providerId,-1);
+        if(uploadedMetadata != null){
+            try {
+                mergedMetadata = MetadataUtilities.mergeMetadata(uploadedMetadata,mergedMetadata);
+            } catch (NoSuchIdentifierException | ProcessException ex) {
+                LOGGER.log(Level.WARNING, "error while merging built metadata with uploaded metadata!", ex);
+            }
         }
         mergedMetadata.prune();
 

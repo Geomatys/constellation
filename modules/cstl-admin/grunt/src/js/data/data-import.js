@@ -25,6 +25,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             currentStep: firstStep,
             dataPath: null,
             mdPath: null,
+            fillMetadata:false,
             uploadType: null,
             allowNext: true,
             allowSubmit: false,
@@ -45,7 +46,8 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
         $scope.close = function() {
             $modalInstance.close({type: $scope.import.uploadType,
-                                  file: $scope.import.providerId});
+                                  file: $scope.import.providerId,
+                                  completeMetadata:$scope.import.fillMetadata});
         };
 
         $scope.showAssociate = function() {
@@ -74,7 +76,8 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 }
                 Growl('success','Success','Postgis database successfully added');
                 $modalInstance.close({type: "vector",
-                                      file: $scope.import.identifier});
+                                      file: $scope.import.identifier,
+                                      completeMetadata:$scope.import.fillMetadata});
             });
         };
 
@@ -121,7 +124,8 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                                         $scope.showAssociate();
                                     } else {
                                         $modalInstance.close({type: $scope.import.uploadType,
-                                            file: $scope.import.providerId});
+                                                              file: $scope.import.providerId,
+                                                              completeMetadata:$scope.import.fillMetadata});
                                     }
                                 }else if('error' === response.verifyCRS) {
                                     Growl('warning','CRS','Data '+ $scope.import.providerId +' without Projection');
@@ -144,7 +148,9 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                                     };
                                     if (!fileExtension || fileExtension !== "nc") {
                                         Growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
-                                        $modalInstance.close({type: $scope.import.uploadType,file: $scope.import.providerId});
+                                        $modalInstance.close({type: $scope.import.uploadType,
+                                                              file: $scope.import.providerId,
+                                                              completeMetadata:$scope.import.fillMetadata});
                                     } else {
                                         $scope.showAssociate();
                                         // todo: displayNetCDF(fileName);
@@ -199,7 +205,8 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                         providerId: $scope.import.providerId
                     };
                     $modalInstance.close({type: $scope.import.uploadType,
-                                          file: $scope.import.providerId});
+                                          file: $scope.import.providerId,
+                                          completeMetadata:$scope.import.fillMetadata});
                 },
                 function(response){//error
                     var msgError = '';
@@ -358,10 +365,18 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         $scope.load = function(){
             $scope.import.allowNext = false;
             var path = $scope.currentPath;
-            dataListing.metadataFolder({}, path, function(files) {//success
-                $scope.currentPath = files[0].parentPath;
-                $scope.columns = files;
-            });
+            dataListing.metadataFolder({}, path,
+                function(files) {//success
+                    $scope.currentPath = files[0].parentPath;
+                    $scope.columns = files;
+                },
+                function(resp){//error
+                    var msg = 'The file path is invalid';
+                    if(resp.data && resp.data.msg){
+                        msg = resp.data.msg;
+                    }
+                    Growl('error','Error',msg);
+                });
         };
 
         $scope.open = function(path, depth) {

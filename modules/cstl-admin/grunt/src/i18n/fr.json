@@ -144,6 +144,7 @@
     "data.modal.import.server.label": "Saisir le répertoire Serveur à parcourir",
     "data.modal.import.server.label.list": "Lister les fichiers",
     "data.modal.import.metadata.info":"S'il n'y a pas de fichier de métadonnées existantes, le système va vous permettre d'entrer vos métadonnées plus tard.",
+    "data.modal.import.metadata.askforfill":"Complèter automatiquement ma métadonnée avec les informations de la donnée",
 
     "data.dashboard.tab.data":"Données",
     "data.dashboard.tab.metadata":"Métadonnées",
@@ -1080,8 +1081,9 @@
     "tooltip.service.source.url":"Renseignez uniquement le nom de domaine",
     "tooltip.service.source.connexion":"Connexion entre plusieurs bases",
     "tooltip.service.source.sensormlfolder":"TODO",
-    "tooltip.data.add.choicedata.local":"Formats supportés :<br/>Shape (dans un fichier zip)<br/>NetCDF<br/>TIF (GeoTIFF)",
+    "tooltip.data.add.choicedata.local":"Formats supportés :<br/>Donnée shape ou mif-mid (archive zip)<br/>NetCDF<br/>TIF (GeoTIFF)",
     "tooltip.data.add.choicedata.server":"Formats couramment supportés : shp, NetCDF, tif",
+    "tooltip.data.add.choicemetadata.server":"Formats de métadonnée attendu : XML",
     "tooltip.sensor.add":"Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
     "tooltip.style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé.",
     "tooltip.domain.user.add":"Ajouter cet utilisateur",

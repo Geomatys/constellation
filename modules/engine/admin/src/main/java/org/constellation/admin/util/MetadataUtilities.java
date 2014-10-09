@@ -189,7 +189,7 @@ public final class MetadataUtilities {
             DefaultMetadata finalMetadata = null;
             
             if (metadata != null) {
-                finalMetadata = (DefaultMetadata) mergeTemplate(fileMetadata, metadata);
+                finalMetadata = (DefaultMetadata) mergeMetadata(fileMetadata, metadata);
             }
 
             final TreeTable.Node rootNode;
@@ -306,7 +306,7 @@ public final class MetadataUtilities {
                 final GridCoverageReader reader = cr.acquireReader();
                 try {
                     final Metadata meta = reader.getMetadata();
-                    metadata = mergeTemplate(metadata,(DefaultMetadata)meta);
+                    metadata = mergeMetadata(metadata,(DefaultMetadata)meta);
                 }catch(Exception ex){
                     LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
                 } finally{
@@ -452,9 +452,7 @@ public final class MetadataUtilities {
      * @throws NoSuchIdentifierException
      * @throws ProcessException
      */
-    public static DefaultMetadata mergeTemplate(final DefaultMetadata fileMetadata, final DefaultMetadata metadataToMerge) throws NoSuchIdentifierException, ProcessException {
-        // unmarshall metadataFile Template
-
+    public static DefaultMetadata mergeMetadata(final DefaultMetadata fileMetadata, final DefaultMetadata metadataToMerge) throws NoSuchIdentifierException, ProcessException {
         // call Merge Process
         DefaultMetadata resultMetadata;
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(MetadataProcessingRegistry.NAME, MergeDescriptor.NAME);

@@ -144,6 +144,7 @@
     "data.modal.import.server.label": "Fill the path of file to import",
     "data.modal.import.server.label.list": "List Files",
     "data.modal.import.metadata.info":"If there is no existing metadata file, the system will allows to you to creates one later.",
+    "data.modal.import.metadata.askforfill":"Complete automatically my metadata with information from the data",
 
     "data.dashboard.tab.data":"Data",
     "data.dashboard.tab.metadata":"Metadata",
@@ -1105,6 +1106,7 @@
     "tooltip.service.source.sensormlfolder":"TODO",
     "tooltip.data.add.choicedata.local":"Supported formats:<br/> Shape (in a zip file)<br/>NetCDF<br/>TIF (GeoTIFF)",
     "tooltip.data.add.choicedata.server":"Most supported formats: shp, NetCDF, tif",
+    "tooltip.data.add.choicemetadata.server":"Metadata format : XML",
     "tooltip.sensor.add":"Supported formats: a sensorML file (*.xml) or a zip file.",
     "tooltip.style.create":"You must select a data to associate the style created.",
     "tooltip.domain.user.add":"Add this user",
