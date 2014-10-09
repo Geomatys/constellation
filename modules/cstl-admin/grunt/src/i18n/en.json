@@ -1135,6 +1135,12 @@
     "tasks.modal.name":"Task name *",
     "tasks.plan.label.repeat":"Repeat",
     "tasks.plan.label.folder":"Folder to watch",
+    "tasks.plan.label.once":"Only once",
+    "tasks.plan.label.everyMinute":"Every minute",
+    "tasks.plan.label.everyHour":"Every hour",
+    "tasks.plan.label.everyDay":"Every day",
+    "tasks.plan.label.everyMonth":"Every month",
+    "tasks.plan.label.everyWeek":"Every week",
 
     "mapcontext.information.title":"Available map context",
 

@@ -85,10 +85,29 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
             return candidate;
         }
 
+        function init() {
+            $scope.plan.triggerType = $scope.task.triggerType;
+            if ($scope.task.triggerType === $scope.cronTrigger) {
+                parseCronExpression($scope.task.trigger);
+            } else if ($scope.task.triggerType === $scope.folderTrigger) {
+                $scope.plan.folder = $scope.task.trigger;
+            }
+        }
+
         // Scope variables
         $scope.task = task;
 
-        $scope.repeatValues = ['once', 'everyMinute', 'everyHour', 'everyDay', 'everyMonth', 'everyWeek'];
+        $scope.repeatValues = [
+            'tasks.plan.label.once',
+            'tasks.plan.label.everyMinute',
+            'tasks.plan.label.everyHour',
+            'tasks.plan.label.everyDay',
+            'tasks.plan.label.everyMonth',
+            'tasks.plan.label.everyWeek'];
+
+        $scope.cronTrigger = 'CRON';
+        $scope.folderTrigger = 'FOLDER';
+
         $scope.plan = {
                 date : null,
                 time : null,
@@ -108,10 +127,10 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
             }
 
             console.log($scope.plan);
-            //$scope.task.triggerType = $scope.plan.triggerType;
-            if ($scope.plan.triggerType === 'cron') {
+            $scope.task.triggerType = $scope.plan.triggerType;
+            if ($scope.plan.triggerType === $scope.cronTrigger) {
                 $scope.task.trigger = generateCronExpression();
-            } else if ($scope.plan.triggerType === 'folder'){
+            } else if ($scope.plan.triggerType === $scope.folderTrigger){
                 $scope.task.trigger = $scope.plan.folder;
             } else {
                 $scope.task.trigger = null;
@@ -130,5 +149,9 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
         $scope.isValid = function(elementName) {
             return !jQuery("#"+elementName).hasClass("ng-invalid");
         };
+
+        $scope.$watch('describeProcess', function(newValue, oldValue) {
+            init();
+        }, true);
 
     });

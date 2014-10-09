@@ -1112,6 +1112,12 @@
     "tasks.modal.name":"Nom de la tâche *",
     "tasks.plan.label.repeat":"Répétition",
     "tasks.plan.label.folder":"Dossier a surveiller",
+    "tasks.plan.label.once":"Une seul fois",
+    "tasks.plan.label.everyMinute":"Toutes les minutes",
+    "tasks.plan.label.everyHour":"Toutes les minutes",
+    "tasks.plan.label.everyDay":"Touts les jours",
+    "tasks.plan.label.everyMonth":"Touts les mois",
+    "tasks.plan.label.everyWeek":"Toutes les semaines",
 
 
     "mapcontext.information.title":"Compositions cartographiques disponibles",

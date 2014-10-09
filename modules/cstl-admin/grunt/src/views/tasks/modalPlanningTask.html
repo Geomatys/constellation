@@ -10,7 +10,7 @@
 
                 <div class="row">
                     <div class="col-sm-1">
-                        <input type="radio" name="trigger" ng-model="plan.triggerType" value="cron" style="margin-top: 30px"/>
+                        <input type="radio" name="trigger" ng-model="plan.triggerType" value="{{cronTrigger}}" style="margin-top: 30px"/>
                     </div>
                     <div class="col-sm-11">
                         <div class="row">
@@ -20,7 +20,7 @@
                                      datepicker="{language:getCurrentLang(),format:'yyyy-mm-dd '}"
                                      ng-disabled="triggerType !== 'date'">
 
-                                    <input type="text" id="inputPlanDate" class="form-control" ng-model="plan.date" ng-disabled="plan.triggerType !== 'cron'"/>
+                                    <input type="text" id="inputPlanDate" class="form-control" ng-model="plan.date" ng-disabled="plan.triggerType !== cronTrigger"/>
                                     <span class="input-group-addon">
                                         <i class="fa fa-calendar"></i>
                                     </span>
@@ -29,13 +29,13 @@
 
                             <div class="form-group col-sm-4" ng-class="{'has-error':!isValid('inputPlanHour')}">
                                 <label for="inputPlanHour" translate="label.hour">Hour</label>
-                                <input type="time" id="inputPlanHour" class="form-control" ng-model="plan.time" ng-disabled="plan.triggerType !== 'cron'"/>
+                                <input type="time" id="inputPlanHour" class="form-control" ng-model="plan.time" ng-disabled="plan.triggerType !== cronTrigger"/>
                             </div>
 
                             <div class="form-group col-sm-4" ng-class="{'has-error':!isValid('inputPlanMinute')}">
                                 <label for="inputPlanRepeat" translate="tasks.plan.label.repeat">Repeat</label>
                                 <select id="inputPlanRepeat" ng-model="plan.repeat" class="form-control"
-                                        ng-options="repeat as repeat for repeat in repeatValues" ng-disabled="plan.triggerType !== 'cron'">
+                                        ng-options="(repeat | translate) for repeat in repeatValues" ng-disabled="plan.triggerType !== cronTrigger">
                                 </select>
                             </div>
                         </div>
@@ -44,12 +44,12 @@
                 <hr>
                 <div class="row">
                     <div class="col-sm-1">
-                        <input type="radio" name="trigger" ng-model="plan.triggerType" value="folder" style="margin-top: 30px"/>
+                        <input type="radio" name="trigger" ng-model="plan.triggerType" value="{{folderTrigger}}" style="margin-top: 30px"/>
                     </div>
                     <div class="col-sm-11">
                         <div class="form-group" ng-class="{'has-error':!isValid('inputPlanHour')}">
                             <label for="inputPlanFolder" translate="tasks.plan.label.folder">Folder to watch</label>
-                            <input type="text" id="inputPlanFolder" class="form-control" ng-model="plan.folder" ng-disabled="plan.triggerType !== 'folder'"/>
+                            <input type="text" id="inputPlanFolder" class="form-control" ng-model="plan.folder" ng-disabled="plan.triggerType !== folderTrigger"/>
                         </div>
                     </div>
                 </div>
