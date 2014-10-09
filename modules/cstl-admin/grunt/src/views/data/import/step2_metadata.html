@@ -14,13 +14,13 @@
                 <input type="text"
                        name="serverMetadataPath"
                        placeholder="{{'data.modal.import.server.label' | translate}}"
-                       ng-model="currentPath" size="70"
+                       ng-model="import.currentMDPath" size="70"
                        class="form-control form-control-fix"
                        style="float: left;margin-right: 10px;width: 66%;"/>
                 <button class="btn btn-add ng-scope"
                         role="button"
                         ng-click="load()"
-                        ng-if="currentPath"
+                        ng-if="import.currentMDPath"
                         translate="data.modal.import.server.label.list">List files</button>
             </ul>
             <div class="row" style="margin: 0;">

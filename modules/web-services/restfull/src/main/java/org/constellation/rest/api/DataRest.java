@@ -336,7 +336,7 @@ public class DataRest {
             final File nextRoot = new File(path);
             children = nextRoot.listFiles();
         }else{
-            HashMap hashMap = new HashMap();
+            Map<String,String> hashMap = new HashMap<>();
             hashMap.put("msg", "invalid path");
             return Response.status(500).entity(hashMap).build();
         }
@@ -344,7 +344,10 @@ public class DataRest {
         //loop on subfiles/folders to create bean
         if (children != null) {
             for (File child : children) {
-                final FileBean bean = new FileBean(child.getName(), child.isDirectory(), child.getAbsolutePath(), child.getParentFile().getAbsolutePath());
+                final FileBean bean = new FileBean(child.getName(),
+                                                   child.isDirectory(),
+                                                   child.getAbsolutePath(),
+                                                   child.getParentFile().getAbsolutePath());
 
                 if (!child.isDirectory() || !filtered) {
                     final int lastIndexPoint = child.getName().lastIndexOf('.');
@@ -382,7 +385,7 @@ public class DataRest {
             final File nextRoot = new File(path);
             children = nextRoot.listFiles();
         }else{
-            HashMap hashMap = new HashMap();
+            Map<String,String> hashMap = new HashMap<>();
             hashMap.put("msg", "invalid path");
             return Response.status(500).entity(hashMap).build();
         }
@@ -390,7 +393,10 @@ public class DataRest {
         //loop on subfiles/folders to create bean
         if (children != null) {
             for (File child : children) {
-                final FileBean bean = new FileBean(child.getName(), child.isDirectory(), child.getAbsolutePath(), child.getParentFile().getAbsolutePath());
+                final FileBean bean = new FileBean(child.getName(),
+                                                   child.isDirectory(),
+                                                   child.getAbsolutePath(),
+                                                   child.getParentFile().getAbsolutePath());
 
                 if (!child.isDirectory() || !filtered) {
                     final int lastIndexPoint = child.getName().lastIndexOf('.');

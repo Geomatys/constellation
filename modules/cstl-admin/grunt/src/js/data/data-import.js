@@ -35,7 +35,9 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             metadata: null,
             providerId: null,
             layer: null,
-            db: {}
+            db: {},
+            currentPath:null,
+            currentMDPath:null
         };
         $scope.enableSelectEPSGCode = false;
 
@@ -273,7 +275,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
     })
 
-    .controller('ModalImportDataStep1ServerController', function($scope, dataListing) {
+    .controller('ModalImportDataStep1ServerController', function($scope, dataListing, Growl) {
         $scope.import.allowNext = false;
         $scope.import.fsserver = true;
 
@@ -281,11 +283,21 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
         $scope.load = function(){
             $scope.import.allowNext = false;
-            var path = $scope.currentPath;
-            dataListing.dataFolder({}, path, function(files) {
-                $scope.currentPath = files[0].parentPath;
-                $scope.columns = files;
-            });
+            var path = $scope.import.currentPath;
+            dataListing.dataFolder({}, path,
+                function(files) {
+                    if(files.length>0) {
+                        $scope.import.currentPath = files[0].parentPath;
+                    }
+                    $scope.columns = files;
+                },
+                function(resp){//error
+                    var msg = 'The file path is invalid';
+                    if(resp.data && resp.data.msg){
+                        msg = resp.data.msg;
+                    }
+                    Growl('error','Error',msg);
+                });
         };
 
         $scope.open = function(path, depth) {
@@ -293,7 +305,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.select = function(item) {
-            $scope.currentPath = item.path;
+            $scope.import.currentPath = item.path;
             if (!item.folder) {
                 $scope.import.allowNext = true;
             }else{
@@ -303,13 +315,13 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.startWith = function(path) {
-            return $scope.currentPath.indexOf(path) === 0;
+            return $scope.import.currentPath.indexOf(path) === 0;
         };
 
 
         $scope.import.next = function() {
-            var lastPointIndex = $scope.currentPath.lastIndexOf(".");
-            var extension = $scope.currentPath.substring(lastPointIndex+1, $scope.currentPath.length);
+            var lastPointIndex = $scope.import.currentPath.lastIndexOf(".");
+            var extension = $scope.import.currentPath.substring(lastPointIndex+1, $scope.import.currentPath.length);
             dataListing.extension({}, {value: extension},
                 function(response) {//success
                     if (response.dataType) {
@@ -318,7 +330,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 });
 
             // Use selected data
-            $scope.import.dataPath = $scope.currentPath;
+            $scope.import.dataPath = $scope.import.currentPath;
             $scope.import.currentStep = 'step2Metadata';
             $scope.import.allowNext = true;
         };
@@ -364,10 +376,12 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
         $scope.load = function(){
             $scope.import.allowNext = false;
-            var path = $scope.currentPath;
+            var path = $scope.import.currentMDPath;
             dataListing.metadataFolder({}, path,
                 function(files) {//success
-                    $scope.currentPath = files[0].parentPath;
+                    if(files.length>0) {
+                        $scope.import.currentMDPath = files[0].parentPath;
+                    }
                     $scope.columns = files;
                 },
                 function(resp){//error
@@ -387,18 +401,18 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
             if (!item.folder) {
                 $scope.import.metadata = item.path;
-                $scope.currentPath = item.path;
+                $scope.import.currentMDPath = item.path;
                 $scope.import.identifier = null;
                 $scope.verifyAllowNext();
             }else{
-                $scope.currentPath = item.path;
+                $scope.import.currentMDPath = item.path;
                 $scope.load();
             }
 
         };
 
         $scope.startWith = function(path) {
-            return $scope.currentPath.indexOf(path) === 0;
+            return $scope.import.currentMDPath.indexOf(path) === 0;
         };
 
         $scope.import.allowNext = false;
