@@ -25,17 +25,16 @@ package org.constellation.scheduler;
  */
 public class TaskState {
 
-
-
     public static enum Status{
         PENDING,
         RUNNING,
         SUCCEED,
         FAILED,
-        CANCELLED
+        CANCELLED,
+        PAUSED
     };
 
-    private final Task task;
+    private final QuartzTask quartzTask;
 
     private Status status = Status.CANCELLED;
     private String message;
@@ -44,15 +43,15 @@ public class TaskState {
     private String title;
 
     public TaskState(){
-        this.task = null;
+        this.quartzTask = null;
     }
     
-    public TaskState(Task task) {
-        this.task = task;
+    public TaskState(QuartzTask quartzTask) {
+        this.quartzTask = quartzTask;
     }
 
-    public Task getTask() {
-        return task;
+    public QuartzTask getQuartzTask() {
+        return quartzTask;
     }
 
     public Status getStatus() {

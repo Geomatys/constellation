@@ -25,8 +25,8 @@ import java.util.List;
 public interface TaskRepository {
 
     List<? extends Task> findAll();
-    
-    void create(Task task);
+
+    Task create(Task task);
     
     Task get(String uuid);
     
@@ -34,4 +34,5 @@ public interface TaskRepository {
 
     List<Task> findRunningTasks();
 
+    List<Task> findRunningTasks(Integer id);
 }

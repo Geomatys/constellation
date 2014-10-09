@@ -33,6 +33,7 @@ import org.quartz.JobListener;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.UUID;
 
 /**
  * Quartz Job listener attaching a listener on geotoolkit processes to track their state.
@@ -67,11 +68,18 @@ public class QuartzJobListener implements JobListener {
         //attach a listener on the process
         final ProcessJob pj = (ProcessJob) job;
         final ProcessJobDetail detail = (ProcessJobDetail) jec.getJobDetail();
-        final Task task = (Task) detail.getJobDataMap().get(QuartzJobListener.PROPERTY_TASK);
-        final String taskId = task.getId();
+        final QuartzTask quartzTask = (QuartzTask) detail.getJobDataMap().get(QuartzJobListener.PROPERTY_TASK);
+        final String quartzTaskId = quartzTask.getId();
 
-        
-        final ProcessListener listener = new StateListener(taskId,processBusiness);
+        final org.constellation.engine.register.Task taskEntity = new org.constellation.engine.register.Task();
+        taskEntity.setIdentifier(UUID.randomUUID().toString());
+        taskEntity.setState(TaskState.Status.PENDING.name());
+        taskEntity.setTaskParameterId(quartzTask.getTaskParameterId());
+        taskEntity.setOwner(quartzTask.getUserId());
+        taskEntity.setType(""); // TODO
+        processBusiness.addTask(taskEntity);
+
+        final ProcessListener listener = new StateListener(taskEntity.getIdentifier(), processBusiness);
         pj.addListener(listener);
     }
 
@@ -107,31 +115,32 @@ public class QuartzJobListener implements JobListener {
         public void started(ProcessEvent event) {
             taskEntity.setState(TaskState.Status.RUNNING.name());
             taskEntity.setStart(System.currentTimeMillis());
-            taskEntity.setMessage(toString(event.getTask()));
-            processBusiness.update(taskEntity);
+            updateTask(event);
         }
 
         @Override
         public void progressing(ProcessEvent event) {
-            //
+            taskEntity.setState(TaskState.Status.RUNNING.name());
+            updateTask(event);
         }
 
         @Override
         public void paused(ProcessEvent event) {
-            //Not yet implemented
+            taskEntity.setState(TaskState.Status.PAUSED.name());
+            updateTask(event);
         }
 
         @Override
         public void resumed(ProcessEvent event) {
-            //Not yet implemented
+            taskEntity.setState(TaskState.Status.RUNNING.name());
+            updateTask(event);
         }
 
         @Override
         public void completed(ProcessEvent event) {
             taskEntity.setState(TaskState.Status.SUCCEED.name());
-            taskEntity.setMessage(toString(event.getTask()));
             taskEntity.setEnd(System.currentTimeMillis());
-            processBusiness.update(taskEntity);
+            updateTask(event);
         }
 
         @Override
@@ -140,10 +149,17 @@ public class QuartzJobListener implements JobListener {
             taskEntity.setEnd(System.currentTimeMillis());
             StringWriter errors = new StringWriter();
             event.getException().printStackTrace(new PrintWriter(errors));
-            taskEntity.setMessage(toString(event.getTask())+ " cause : "+errors.toString());
-            processBusiness.update(taskEntity);
+            taskEntity.setMessage(toString(event.getTask()) + " cause : " + errors.toString());
+            taskEntity.setProgress((double) event.getProgress());
+            processBusiness.updateTask(taskEntity);
         }
-        
+
+        private void updateTask(ProcessEvent event) {
+            taskEntity.setMessage(toString(event.getTask()));
+            taskEntity.setProgress((double) event.getProgress());
+            processBusiness.updateTask(taskEntity);
+        }
+
         private String toString(InternationalString str){
             if(str==null){
                 return "";
@@ -151,7 +167,5 @@ public class QuartzJobListener implements JobListener {
                 return str.toString();
             }
         }
-
     }
-
 }

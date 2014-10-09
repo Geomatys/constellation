@@ -24,18 +24,23 @@ import org.constellation.engine.register.ChainProcess;
 import org.constellation.engine.register.Task;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.scheduler.CstlSchedulerListener;
+import org.constellation.scheduler.QuartzTask;
 import org.constellation.scheduler.TaskState;
 import org.geotoolkit.process.*;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.chain.model.Chain;
-import org.quartz.SchedulerException;
 
 import java.util.List;
 
 /**
+ *
+ * @author Guilhem Legal (Geomatys)
  * @author Cédric Briançon (Geomatys)
+ * @author Christophe Mourette (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 public interface IProcessBusiness {
+
     List<ProcessDescriptor> getChainDescriptors() throws ConstellationException;
 
     void createChainProcess(final Chain chain) throws ConstellationException;
@@ -44,27 +49,59 @@ public interface IProcessBusiness {
 
     ChainProcess getChainProcess(final String auth, final String code);
 
-//    void writeTask(String uuidTask, String pyramid, Integer userId, final long start);
-
-    void update(Task task);
-
     Task getTask(String uuid);
+
+    Task addTask(org.constellation.engine.register.Task task) throws ConstellationException;
+
+    void updateTask(org.constellation.engine.register.Task task) throws ConstellationException;
 
     List<Task> listRunningTasks();
 
-    void runOnce(String title, Process process, Integer taskParameterId, Integer userId) throws ConstellationException;
+    /**
+     * List all task for a TaskParameter id
+     * @param id TaskParameter
+     * @return
+     */
+    List<Task> listRunningTasks(Integer id);
+
+    /**
+     * Run an instantiated geotk process on scheduler only once.
+     *
+     * @param title
+     * @param process
+     * @param taskParameterId
+     * @param userId
+     * @throws ConstellationException
+     */
+    void runProcess(String title, Process process, Integer taskParameterId, Integer userId) throws ConstellationException;
+
+    /**
+     * Instantiate and run once a TaskParameter
+     *
+     * @param task
+     * @param title
+     * @param userId
+     * @throws ConstellationException
+     * @throws ConfigurationException
+     */
+    void executeTaskParameter (TaskParameter task, String title, Integer userId) throws ConstellationException, ConfigurationException;
+
+    /**
+     * Add a TaskParameter with trigger on scheduler.
+     *
+     * @param task
+     * @param title
+     * @param userId
+     * @throws ConstellationException
+     * @throws ConfigurationException
+     */
+    void scheduleTaskParameter (TaskParameter task, String title, Integer userId) throws ConstellationException, ConfigurationException;
 
     void removeTask(String id) throws ConstellationException;
 
-    TaskState geTaskState(String id);
-
-    org.constellation.scheduler.Task getProcessTask(String id);
+    QuartzTask getProcessTask(String id);
 
     void addListenerOnRunningTasks(CstlSchedulerListener cstlSchedulerListener);
-
-    void addTask(org.constellation.scheduler.Task task) throws ConstellationException;
-
-    boolean updateTask(org.constellation.scheduler.Task task) throws ConstellationException;
 
     TaskParameter addTaskParameter(TaskParameter taskParameter);
 }

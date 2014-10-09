@@ -27,9 +27,9 @@ import java.util.UUID;
 /**
  *
  * @author Johann Sorel (Geomatys)
- * @module pending
+ * @author Quentin Boileau (Geomatys)
  */
-public class Task {
+public class QuartzTask {
         
     private String id;
     private String title;
@@ -37,12 +37,14 @@ public class Task {
     private SimpleTrigger trigger = null;
     private Date lastExecutionDate = null;
     private Exception lastFailedException = null;
-    
-    public Task(){
+    private Integer userId = null;
+    private Integer taskParameterId = null;
+
+    public QuartzTask(){
         this((String)null);
     }
     
-    public Task(final String id){
+    public QuartzTask(final String id){
         this.id = id;
         if(this.id == null){
             //generate one
@@ -50,7 +52,7 @@ public class Task {
         }
     }
     
-    public Task(final Task t){
+    public QuartzTask(final QuartzTask t){
         this.id = t.id;
         this.title = t.title;
         this.detail = t.detail;
@@ -101,6 +103,22 @@ public class Task {
 
     public void setTrigger(final SimpleTrigger trigger) {
         this.trigger = trigger;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getTaskParameterId() {
+        return taskParameterId;
+    }
+
+    public void setTaskParameterId(Integer taskParameterId) {
+        this.taskParameterId = taskParameterId;
     }
 
     @Override

@@ -92,7 +92,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
         //Update state (pass to completed) on database
         final Task pyramidTask = processBusiness.getTask(uuidTask);
         pyramidTask.setState(TaskState.Status.SUCCEED.name());
-        processBusiness.update(pyramidTask);
+        processBusiness.updateTask(pyramidTask);
 
         //update provider
         updateProvider();
@@ -128,6 +128,6 @@ public class PyramidCoverageProcessListener implements ProcessListener {
         //Update state (pass to failed) on database
         final Task pyramidTask = processBusiness.getTask(uuidTask);
         pyramidTask.setState(TaskState.Status.FAILED.name());
-        processBusiness.update(pyramidTask);
+        processBusiness.updateTask(pyramidTask);
     }
 }

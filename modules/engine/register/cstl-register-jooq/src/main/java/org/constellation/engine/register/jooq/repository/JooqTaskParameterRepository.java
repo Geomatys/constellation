@@ -1,6 +1,23 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ * Copyright 2014 Geomatys.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.constellation.engine.register.jooq.repository;
 
-import org.constellation.engine.register.Task;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.helper.TaskParameterHelper;
 import org.constellation.engine.register.jooq.tables.records.TaskParameterRecord;
@@ -12,7 +29,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author Thomas Rouby (Geomatys))
+ * @author Thomas Rouby (Geomatys)
+ * @author Christophe Mourette (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 @Component
 public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskParameterRecord, TaskParameter> implements TaskParameterRepository {
@@ -23,11 +42,9 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
 
     @Override
     public TaskParameter create(TaskParameter task ) {
-
-                TaskParameterRecord newRecord = TaskParameterHelper.copy(task, dsl.newRecord(Tables.TASK_PARAMETER));
-                newRecord.store();
-                return newRecord.into(TaskParameter.class);
-
+        TaskParameterRecord newRecord = TaskParameterHelper.copy(task, dsl.newRecord(Tables.TASK_PARAMETER));
+        newRecord.store();
+        return newRecord.into(TaskParameter.class);
     }
 
     @Override
@@ -48,6 +65,8 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
                 .set(Tables.TASK_PARAMETER.PROCESS_AUTHORITY, task.getProcessAuthority())
                 .set(Tables.TASK_PARAMETER.PROCESS_CODE, task.getProcessCode())
                 .set(Tables.TASK_PARAMETER.INPUTS, task.getInputs())
+                .set(Tables.TASK_PARAMETER.TRIGGER_TYPE, task.getTriggerType())
+                .set(Tables.TASK_PARAMETER.TRIGGER, task.getTrigger())
                 .where(Tables.TASK_PARAMETER.ID.eq(task.getId()))
                 .execute();
     }

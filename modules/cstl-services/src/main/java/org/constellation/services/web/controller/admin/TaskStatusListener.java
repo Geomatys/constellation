@@ -44,15 +44,12 @@ public class TaskStatusListener {
 
     @PostConstruct
     public void init() {
-
-
-
        processBusiness.addListenerOnRunningTasks(new CstlSchedulerListener() {
 
            @Override
            public void taskUpdated(TaskState taskState) {
                TaskStatus taskStatus = new TaskStatus();
-               taskStatus.setId(taskState.getTask().getId());
+               taskStatus.setId(taskState.getQuartzTask().getId());
                taskStatus.setMessage(taskState.getMessage());
                taskStatus.setPercent(taskState.getPercent());
                taskStatus.setStatus(taskState.getStatus().name());

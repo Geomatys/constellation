@@ -18,8 +18,8 @@
  */
 package org.constellation.admin;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.*;
@@ -41,20 +41,19 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.ChainProcess;
+import org.constellation.engine.register.Task;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.repository.ChainProcessRepository;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.TaskRepository;
 import org.constellation.scheduler.CstlSchedulerListener;
 import org.constellation.scheduler.QuartzJobListener;
-import org.constellation.scheduler.Task;
+import org.constellation.scheduler.QuartzTask;
 import org.constellation.scheduler.TaskState;
+import org.geotoolkit.io.DirectoryWatcher;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
+import org.geotoolkit.process.*;
 import org.geotoolkit.process.Process;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessEvent;
-import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.process.ProcessListenerAdapter;
 import org.geotoolkit.process.chain.ChainProcessDescriptor;
 import org.geotoolkit.process.chain.model.Chain;
 import org.geotoolkit.process.chain.model.ChainMarshallerPool;
@@ -66,15 +65,9 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
 
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
+import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
@@ -83,7 +76,10 @@ import org.springframework.stereotype.Component;
 import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 
 /**
- * 
+ *
+ * @author Cédric Briançon (Geomatys)
+ * @author Christophe Mourette (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
 @Component
@@ -91,15 +87,13 @@ import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 @DependsOn("database-initer")
 public class ProcessBusiness implements IProcessBusiness {
 
-
-//    //execute once tasks
-//    private final List<Task> once = new ArrayList<>();
-
     private static final Logger LOGGER = Logging.getLogger(ProcessBusiness.class);
 
     private final QuartzJobListener quartzListener = new QuartzJobListener(this);
 
     private Scheduler quartzScheduler;
+
+    private DirectoryWatcher directoryWatcher;
 
     @Inject
     private TaskParameterRepository taskParameterRepository;
@@ -113,13 +107,9 @@ public class ProcessBusiness implements IProcessBusiness {
     @PostConstruct
     public void init(){
         LOGGER.log(Level.INFO, "=== Starting Constellation Scheduler ===");
-        List<org.constellation.scheduler.Task> tasks = new ArrayList<>();
-        try {
-            tasks = loadProgrammedTasks();
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "=== Failed to read tasks ===\n"+ex.getLocalizedMessage(), ex);
-        }
-
+        /*
+            Quartz scheduler
+         */
         final SchedulerFactory schedFact = new StdSchedulerFactory();
         try {
             quartzScheduler = schedFact.getScheduler();
@@ -132,39 +122,36 @@ public class ProcessBusiness implements IProcessBusiness {
             LOGGER.log(Level.SEVERE, "=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);
             return;
         }
-        LOGGER.log(Level.INFO, "=== Constellation Scheduler sucessfully started ===");
+        LOGGER.log(Level.INFO, "=== Constellation Scheduler successfully started ===");
 
-        for(org.constellation.scheduler.Task t : tasks){
+        /*
+            DirectoryWatcher
+         */
+        LOGGER.log(Level.INFO, "=== Starting directory watcher ===");
+        try {
+            directoryWatcher = new DirectoryWatcher(true);
+            directoryWatcher.start();
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "=== Failed to start directory watcher ===\n"+ex.getLocalizedMessage(), ex);
+            return;
+        }
+        LOGGER.log(Level.INFO, "=== Directory watcher successfully started ===");
+
+        /*
+          Re-programme taskParameters with trigger in scheduler.
+         */
+        List<? extends TaskParameter> programmedTasks = taskParameterRepository.findProgrammedTasks();
+        for (TaskParameter taskParameter : programmedTasks) {
             try {
-                registerTaskInScheduler(t);
+                scheduleTaskParameter(taskParameter, taskParameter.getName(), taskParameter.getOwner());
             } catch (ConstellationException ex) {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             }
         }
     }
 
-    /**
-     * Get task status.
-     * @param id, must be a valid id. Illegal
-     * @return TaskState, null if no task exist for this id.
-     */
-    public TaskState geTaskState(final String id){
-        final org.constellation.engine.register.Task taskEntity = taskRepository.get(id);
-        TaskParameter taskParameter = taskParameterRepository.get(taskEntity.getTaskParameterId());
-        TaskState taskState = new TaskState();
-        taskState.setStatus(TaskState.Status.valueOf(taskEntity.getState()));
-        taskState.setTitle(taskParameter.getName());
-        taskState.setMessage(taskEntity.getMessage());
-        //TODO percent not set cause not know
-        taskState.setPercent(0);
-        //TODO exception if exist stored in string message atribute from taskEntity
-//        taskState.setLastException(");
-        return taskState;
-    }
-
     @Override
-    public Task getProcessTask(String id) {
-
+    public QuartzTask getProcessTask(String id) {
         //TODO a faire si utile
         return null;
     }
@@ -172,19 +159,6 @@ public class ProcessBusiness implements IProcessBusiness {
     @Override
     public void addListenerOnRunningTasks(CstlSchedulerListener cstlSchedulerListener) {
         //TODO a faire si utile
-
-    }
-
-    @Override
-    public void addTask(Task task) throws ConstellationException {
-        //TODO a faire si utile
-
-    }
-
-    @Override
-    public boolean updateTask(Task task) throws ConstellationException {
-        //TODO a faire si utile
-        return false;
     }
 
     @Override
@@ -217,11 +191,11 @@ public class ProcessBusiness implements IProcessBusiness {
     /**
      * Load tasks defined as programmed in the system
      */
-    private synchronized List<Task> loadProgrammedTasks() throws Exception{
-        List<org.constellation.scheduler.Task> tasks = new ArrayList<>();
+    private synchronized List<QuartzTask> loadProgrammedTasks() throws Exception{
+        List<QuartzTask> quartzTasks = new ArrayList<>();
         final List<? extends TaskParameter> programmedTasks = taskParameterRepository.findProgrammedTasks();
         for( TaskParameter taskParameter : programmedTasks){
-            org.constellation.scheduler.Task task = new org.constellation.scheduler.Task();
+            final QuartzTask quartzTask = new QuartzTask();
             final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
 
             final ParameterValueGroup params;
@@ -234,32 +208,32 @@ public class ProcessBusiness implements IProcessBusiness {
                 throw new ConfigurationException(ex);
             }
             ProcessJobDetail processJobDetails = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(),params );
-            task.setDetail(processJobDetails);
-            task.setTitle(taskParameter.getName());
-            tasks.add(task);
+            quartzTask.setDetail(processJobDetails);
+            quartzTask.setTitle(taskParameter.getName());
+            quartzTasks.add(quartzTask);
         }
 
-        return tasks;
+        return quartzTasks;
     }
 
     /**
      * Add the given task in the scheduler.
      */
-    private void registerTaskInScheduler(final org.constellation.scheduler.Task task) throws ConstellationException{
+    private void registerTaskInScheduler(final QuartzTask quartzTask) throws ConstellationException{
         //ensure the job detail contain the task in the datamap, this is used in the
         //job listener to track back the task
-        task.getDetail().getJobDataMap().put(QuartzJobListener.PROPERTY_TASK, task);
+        quartzTask.getDetail().getJobDataMap().put(QuartzJobListener.PROPERTY_TASK, quartzTask);
 
         try {
-            quartzScheduler.scheduleJob(task.getDetail(), task.getTrigger());
+            quartzScheduler.scheduleJob(quartzTask.getDetail(), quartzTask.getTrigger());
         } catch (SchedulerException e) {
             throw new ConstellationException(e);
         }
         LOGGER.log(Level.INFO, "Scheduler task added : {0}, {1}   type : {2}.{3}", new Object[]{
-                task.getId(),
-                task.getTitle(),
-                task.getDetail().getFactoryIdentifier(),
-                task.getDetail().getProcessIdentifier()});
+                quartzTask.getId(),
+                quartzTask.getTitle(),
+                quartzTask.getDetail().getFactoryIdentifier(),
+                quartzTask.getDetail().getProcessIdentifier()});
     }
 
     /**
@@ -277,35 +251,37 @@ public class ProcessBusiness implements IProcessBusiness {
 
     }
 
-
-
-    /*public void writeTask(String uuidTask, String pyramid, Integer userId, final long start) {
-        final org.constellation.engine.register.Task t = new org.constellation.engine.register.Task(uuidTask, "PENDING", "TODO-TYPE", start, null, userId,null);
-        taskRepository.create(t);
-    }*/
-
     /**
-     * get specific task from task journal (running or finished)
+     * Get specific task from task journal (running or finished)
      * @param uuid task id
      * @return task object
      */
+    @Override
     public org.constellation.engine.register.Task getTask(String uuid) {
         return taskRepository.get(uuid);
     }
 
     @Override
-    public List<org.constellation.engine.register.Task> listRunningTasks() {
-        List<org.constellation.engine.register.Task> result = new ArrayList<>();
-        result = taskRepository.findRunningTasks();
-        return result;
+    public Task addTask(org.constellation.engine.register.Task task) throws ConstellationException {
+        return taskRepository.create(task);
     }
 
-
-
-    public void update(org.constellation.engine.register.Task task) {
+    @Override
+    public void updateTask(org.constellation.engine.register.Task task) throws ConstellationException {
         taskRepository.update(task);
     }
-     
+
+    @Override
+    public List<org.constellation.engine.register.Task> listRunningTasks() {
+        return taskRepository.findRunningTasks();
+    }
+
+    @Override
+    public List<org.constellation.engine.register.Task> listRunningTasks(Integer id) {
+        return taskRepository.findRunningTasks(id);
+    }
+
+    @Override
     public List<ProcessDescriptor> getChainDescriptors() throws ConstellationException {
         final List<ProcessDescriptor> result = new ArrayList<>();
         final List<ChainProcess> chains = chainRepository.findAll();
@@ -331,7 +307,8 @@ public class ProcessBusiness implements IProcessBusiness {
         ident.setCitation(citation);
         return ident;
     }
-    
+
+    @Override
     public void createChainProcess(final Chain chain) throws ConstellationException {
         final String code = chain.getName();
         String config = null;
@@ -347,7 +324,8 @@ public class ProcessBusiness implements IProcessBusiness {
         final ChainProcess process = new ChainProcess("constellation", code, config);
         chainRepository.create(process);
     }
-    
+
+    @Override
     public boolean deleteChainProcess(final String auth, final String code) {
         final ChainProcess chain = chainRepository.findOne(auth, code);
         if (chain != null) {
@@ -356,83 +334,99 @@ public class ProcessBusiness implements IProcessBusiness {
         }
         return false;
     }
-    
+
+    @Override
     public ChainProcess getChainProcess(final String auth, final String code) {
         return chainRepository.findOne(auth, code);
     }
 
-    public void runOnce(String title, Process process, Integer taskParameterId, Integer userId) throws ConstellationException {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void runProcess(String title, Process process, Integer taskParameterId, Integer userId) throws ConstellationException {
         final TriggerBuilder tb = TriggerBuilder.newTrigger();
         final Trigger trigger = tb.startNow().build();
-
-        final Task task = new Task(UUID.randomUUID().toString());
         final ProcessJobDetail detail = new ProcessJobDetail(process);
-        task.setDetail(detail);
-        task.setTitle(title);
-        task.setTrigger((SimpleTrigger)trigger);
-        final org.constellation.engine.register.Task taskEntity = new org.constellation.engine.register.Task();
-        taskEntity.setIdentifier(task.getId());
-        taskEntity.setState(TaskState.Status.PENDING.name());
-        taskEntity.setOwner(userId);
 
-        taskEntity.setTaskParameterId(taskParameterId);
-        //TODO ???
-        taskEntity.setType("");
-        taskRepository.create(taskEntity);
+        final QuartzTask quartzTask = new QuartzTask(UUID.randomUUID().toString());
+        quartzTask.setDetail(detail);
+        quartzTask.setTitle(title);
+        quartzTask.setTrigger((SimpleTrigger) trigger);
+        quartzTask.setTaskParameterId(taskParameterId);
+        quartzTask.setUserId(userId);
 
-        //add listener on this task to remove it from the list once finished
-        process.addListener(new ProcessListenerAdapter(){
-
-            @Override
-            public void started(final ProcessEvent event) {
-                taskEntity.setState(TaskState.Status.RUNNING.name());
-                taskEntity.setMessage(toString(event.getTask()));
-                taskEntity.setStart(System.currentTimeMillis());
-                taskRepository.update(taskEntity);
-            }
-            @Override
-            public void failed(ProcessEvent event) {
-                taskEntity.setState(TaskState.Status.FAILED.name());
-                StringWriter errors = new StringWriter();
-                event.getException().printStackTrace(new PrintWriter(errors));
-                taskEntity.setMessage(toString(event.getTask())+ " cause : " + errors.toString());
-                taskEntity.setEnd(System.currentTimeMillis());
-                taskRepository.update(taskEntity);
-            }
-            @Override
-            public void completed(ProcessEvent event) {
-                taskEntity.setState(TaskState.Status.SUCCEED.name());
-                taskEntity.setMessage(toString(event.getTask()));
-                taskEntity.setEnd(System.currentTimeMillis());
-                taskRepository.update(taskEntity);
-            }
-
-            private String toString(InternationalString str){
-                if(str==null){
-                    return "";
-                }else{
-                    return str.toString();
-                }
-            }
-
-        });
-
-        registerTaskInScheduler(task);
+        registerTaskInScheduler(quartzTask);
     }
 
     /**
-     * remove task from quartz scheduler and update record in database
+     * {@inheritDoc}
+     */
+    @Override
+    public void executeTaskParameter (TaskParameter taskParameter, String title, Integer userId)
+            throws ConstellationException, ConfigurationException {
+
+        final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+
+        final ParameterValueGroup params;
+        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
+        try {
+            reader.setInput(taskParameter.getInputs());
+            params = (ParameterValueGroup) reader.read();
+            reader.dispose();
+        } catch (XMLStreamException | IOException ex) {
+            throw new ConfigurationException(ex);
+        }
+
+        //rebuild original values since we have changed the namespace
+        try {
+            final ProcessDescriptor processDesc = ProcessFinder.getProcessDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+            final ParameterDescriptorGroup originalDesc = processDesc.getInputDescriptor();
+            final ParameterValueGroup orig = originalDesc.createValue();
+            orig.values().addAll(params.values());
+            final Process process = processDesc.createProcess(orig);
+
+            runProcess(title, process, taskParameter.getId(), userId);
+        } catch (NoSuchIdentifierException ex) {
+            throw new ConstellationException("No process for given id.", ex);
+        }  catch (InvalidParameterValueException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void scheduleTaskParameter (TaskParameter task, String title, Integer userId) throws ConstellationException {
+        if (task.getTriggerType() != null && task.getTrigger() != null) {
+
+            if ("CRON".equalsIgnoreCase(task.getTriggerType())) {
+                // TODO
+
+            } else if ("FOLDER".equalsIgnoreCase(task.getTriggerType())) {
+                File folder = new File(task.getTrigger());
+                if (folder.exists() && folder.isDirectory()) {
+                    // TODO
+                } else {
+                    throw new ConstellationException("Invalid folder trigger : "+task.getTrigger());
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove task from quartz scheduler and update record in database
      * @param uuidTask
      * @return true if
      * @throws ConstellationException
      */
-
     @Override
     public void removeTask(String uuidTask) throws ConstellationException {
         //TODO a tester
         org.constellation.engine.register.Task task = taskRepository.get(uuidTask);
         final TaskParameter taskParameter = taskParameterRepository.get(task.getTaskParameterId());
-        Task scheduledTask = new Task();
+        QuartzTask scheduledQuartzTask = new QuartzTask();
         final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
 
         final ParameterValueGroup params;
@@ -445,7 +439,7 @@ public class ProcessBusiness implements IProcessBusiness {
             throw new ConstellationException(ex);
         }
         ProcessJobDetail processJobDetails = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(),params );
-        scheduledTask.setDetail(processJobDetails);
+        scheduledQuartzTask.setDetail(processJobDetails);
 
         try {
             unregisterTaskInScheduler(processJobDetails, uuidTask);
@@ -468,6 +462,15 @@ public class ProcessBusiness implements IProcessBusiness {
             LOGGER.log(Level.SEVERE, "=== Failed to stop quartz scheduler ===");
             return;
         }
-        LOGGER.log(Level.INFO, "=== Scheduler sucessfully stopped ===");
+        LOGGER.log(Level.INFO, "=== Scheduler successfully stopped ===");
+
+        LOGGER.log(Level.INFO, "=== Stopping directory watcher ===");
+        try {
+            directoryWatcher.close();
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "=== Failed to stop directory watcher ===");
+            return;
+        }
+        LOGGER.log(Level.INFO, "=== Directory watcher successfully stopped ===");
     }
 }

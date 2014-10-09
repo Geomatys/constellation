@@ -1625,7 +1625,7 @@ public class DataRest {
 
 
             String title = "Create conform pyramid for " + providerId + ":" + dataId;
-//            processBusiness.runOnce("Create conform pyramid for " + providerId + ":" + dataId, p);
+//            processBusiness.runProcess("Create conform pyramid for " + providerId + ":" + dataId, p);
             TaskParameter taskParameter = new TaskParameter();
             taskParameter.setProcessAuthority(desc.getIdentifier().getAuthority().toString());
             taskParameter.setProcessCode(desc.getIdentifier().getCode());
@@ -1634,7 +1634,7 @@ public class DataRest {
             taskParameter.setOwner(cstlUser.get().getId());
             taskParameter.setName("Create conform pyramid for " + providerId + ":" + dataId);
             taskParameter = processBusiness.addTaskParameter(taskParameter);
-            processBusiness.runOnce("Create conform pyramid for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
+            processBusiness.runProcess("Create conform pyramid for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
         } catch ( IOException e) {
             LOGGER.log(Level.WARNING, "Unable to run pyramid process on scheduler");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -1825,7 +1825,7 @@ public class DataRest {
             taskParameter.setName("Create pyramid " + crs + " for " + providerId + ":" + dataId);
             taskParameter = processBusiness.addTaskParameter(taskParameter);
             //add task in scheduler
-            processBusiness.runOnce("Create pyramid " + crs + " for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
+            processBusiness.runProcess("Create pyramid " + crs + " for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
 
 
         } catch (NoSuchIdentifierException ex) {
