@@ -664,7 +664,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    if(result.completeMetadata){
+                    if(result.completeMetadata || !result.metadataFile){
                         dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}},
                            function () {//success
                             $scope.initAfterImport();
@@ -696,7 +696,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    if(result.completeMetadata){
+                    if(result.completeMetadata || !result.metadataFile){
                         dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                             $scope.initAfterImport();
                             openModalEditor(null,result.file,result.type,"import",'data');
@@ -726,7 +726,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    if(result.completeMetadata){
+                    if(result.completeMetadata || !result.metadataFile){
                         dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                             $scope.initAfterImport();
                             openModalEditor(null,result.file,result.type,"import",'data');

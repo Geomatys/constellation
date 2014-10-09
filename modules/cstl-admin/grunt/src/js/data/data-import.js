@@ -49,6 +49,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         $scope.close = function() {
             $modalInstance.close({type: $scope.import.uploadType,
                                   file: $scope.import.providerId,
+                                  metadataFile:$scope.import.metadata,
                                   completeMetadata:$scope.import.fillMetadata});
         };
 
@@ -79,6 +80,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 Growl('success','Success','Postgis database successfully added');
                 $modalInstance.close({type: "vector",
                                       file: $scope.import.identifier,
+                                      metadataFile:$scope.import.metadata,
                                       completeMetadata:$scope.import.fillMetadata});
             });
         };
@@ -127,6 +129,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                                     } else {
                                         $modalInstance.close({type: $scope.import.uploadType,
                                                               file: $scope.import.providerId,
+                                                              metadataFile:$scope.import.metadata,
                                                               completeMetadata:$scope.import.fillMetadata});
                                     }
                                 }else if('error' === response.verifyCRS) {
@@ -152,6 +155,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                                         Growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
                                         $modalInstance.close({type: $scope.import.uploadType,
                                                               file: $scope.import.providerId,
+                                                              metadataFile:$scope.import.metadata,
                                                               completeMetadata:$scope.import.fillMetadata});
                                     } else {
                                         $scope.showAssociate();
@@ -208,6 +212,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                     };
                     $modalInstance.close({type: $scope.import.uploadType,
                                           file: $scope.import.providerId,
+                                          metadataFile:$scope.import.metadata,
                                           completeMetadata:$scope.import.fillMetadata});
                 },
                 function(response){//error
