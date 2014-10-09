@@ -1393,8 +1393,19 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveMetadata(final ParameterValues values) throws ConfigurationException {
-        final String providerId         = values.getValues().get("providerId");
-        final String dataType           = values.getValues().get("dataType");
+        final String providerId          = values.getValues().get("providerId");
+        final String dataType            = values.getValues().get("dataType");
+        final String mergeWithUploadedMD = values.getValues().get("mergeWithUploadedMD");
+        DefaultMetadata uploadedMetadata;
+        try{
+            uploadedMetadata = datasetBusiness.getMetadata(providerId,-1);
+        }catch(Exception ex){
+            uploadedMetadata = null;
+        }
+        if(uploadedMetadata!=null && (mergeWithUploadedMD == null || mergeWithUploadedMD.equalsIgnoreCase("false"))){
+            //skip if there is uploaded metadata and user want to keep this original metadata.
+            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         datasetBusiness.saveMetadata(providerId, dataType);
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }

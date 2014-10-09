@@ -664,19 +664,15 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    if(result.completeMetadata || !result.metadataFile){
-                        dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}},
-                           function () {//success
-                            $scope.initAfterImport();
-                            openModalEditor(null,result.file,result.type,"import",'data');
-
-                        }, function () {//error
-                            Growl('error', 'Error', 'Unable to prepare metadata for next step!');
-                        });
-                    }else {
+                    dataListing.setMetadata({}, {values: {"providerId": result.file,
+                                                          "dataType": result.type,
+                                                          "mergeWithUploadedMD":result.completeMetadata}},
+                       function () {//success
                         $scope.initAfterImport();
                         openModalEditor(null,result.file,result.type,"import",'data');
-                    }
+                    }, function () {//error
+                        Growl('error', 'Error', 'Unable to prepare metadata for next step!');
+                    });
                 }
             });
         };
@@ -696,17 +692,15 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    if(result.completeMetadata || !result.metadataFile){
-                        dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                            $scope.initAfterImport();
-                            openModalEditor(null,result.file,result.type,"import",'data');
-                        }, function () {
-                            Growl('error', 'Error', 'Unable to save metadata');
-                        });
-                    }else {
+                    dataListing.setMetadata({}, {values: {"providerId": result.file,
+                                                          "dataType": result.type,
+                                                          "mergeWithUploadedMD":result.completeMetadata}},
+                       function () {//success
                         $scope.initAfterImport();
                         openModalEditor(null,result.file,result.type,"import",'data');
-                    }
+                    }, function () {//error
+                        Growl('error', 'Error', 'Unable to save metadata');
+                    });
                 }
             });
         };
@@ -726,17 +720,15 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    if(result.completeMetadata || !result.metadataFile){
-                        dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
-                            $scope.initAfterImport();
-                            openModalEditor(null,result.file,result.type,"import",'data');
-                        }, function () {
-                            Growl('error', 'Error', 'Unable to save metadata');
-                        });
-                    }else {
+                    dataListing.setMetadata({}, {values: {"providerId": result.file,
+                                                          "dataType": result.type,
+                                                          "mergeWithUploadedMD":result.completeMetadata}},
+                       function () {//success
                         $scope.initAfterImport();
                         openModalEditor(null,result.file,result.type,"import",'data');
-                    }
+                    }, function () {//error
+                        Growl('error', 'Error', 'Unable to save metadata');
+                    });
                 }
             });
         };

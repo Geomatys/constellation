@@ -302,7 +302,8 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                         msg = resp.data.msg;
                     }
                     Growl('error','Error',msg);
-                });
+                }
+            );
         };
 
         $scope.open = function(path, depth) {
