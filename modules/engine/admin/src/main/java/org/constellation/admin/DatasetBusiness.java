@@ -391,7 +391,12 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         }
 
         //merge with uploaded metadata
-        final DefaultMetadata uploadedMetadata = getMetadata(providerId,-1);
+        DefaultMetadata uploadedMetadata;
+        try{
+            uploadedMetadata = getMetadata(providerId,-1);
+        }catch(Exception ex){
+            uploadedMetadata = null;
+        }
         if(uploadedMetadata != null){
             try {
                 mergedMetadata = MetadataUtilities.mergeMetadata(uploadedMetadata,mergedMetadata);
