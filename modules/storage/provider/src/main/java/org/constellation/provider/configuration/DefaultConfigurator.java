@@ -251,7 +251,9 @@ public final class DefaultConfigurator implements Configurator {
                             }
                         }
                     }
-                    dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
+                    //dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
+                    //do not save the coverage metadata in database, this metadata is obsolete, the full iso metadata is stored later.
+                    dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, null);
                 }
             }
         } else {
