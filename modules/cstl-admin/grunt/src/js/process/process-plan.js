@@ -222,6 +222,8 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 Growl('error', 'Error', 'Form is invalid');
                 return false;
             }
+            var oldTriggerType = $scope.task.triggerType;
+            var oldTrigger =  $scope.task.trigger;
 
             $scope.task.triggerType = $scope.plan.triggerType;
             if ($scope.plan.triggerType === $scope.cronTrigger) {
@@ -232,14 +234,35 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 $scope.task.trigger = null;
             }
 
-            //Update task
-            TaskService.updateParamsTask($scope.task).$promise
-            .then(function(response) {
-                Growl('success', 'Success', 'The task is correctly save');
-                $modalInstance.close();
-            }).catch(function(){
-                Growl('error', 'Error', 'Error to save the task');
-            });
+            // no need to re-schedule if trigger unchanged
+            if ($scope.task.triggerType !== oldTriggerType || $scope.task.trigger !== oldTrigger) {
+                //Update task
+                TaskService.updateParamsTask($scope.task).$promise
+                    .then(function(response) {
+                        Growl('success', 'Success', 'The task is correctly saved');
+
+                        if ($scope.task.triggerType !== null) {
+                            TaskService.startScheduleParamsTask($scope.task).$promise
+                                .then(function (response) {
+                                    Growl('success', 'Success', 'The task successfully scheduled');
+                                }).catch(function () {
+                                    Growl('error', 'Error', 'Error to schedule the task');
+                                });
+                        } else {
+                            //no triggerType -> stop task scheduling
+                            TaskService.stopScheduleParamsTask($scope.task).$promise
+                                .then(function (response) {
+                                    Growl('success', 'Success', 'The task successfully removed from scheduler');
+                                }).catch(function () {
+                                    Growl('error', 'Error', 'Error to un-schedule the task');
+                                });
+                        }
+                    }).catch(function(){
+                        Growl('error', 'Error', 'Error to save the task');
+                    });
+            }
+
+            $modalInstance.close();
         };
 
         $scope.reset = function() {

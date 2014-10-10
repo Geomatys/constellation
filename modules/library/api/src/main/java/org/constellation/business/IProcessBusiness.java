@@ -97,7 +97,14 @@ public interface IProcessBusiness {
      */
     void scheduleTaskParameter (TaskParameter task, String title, Integer userId) throws ConstellationException, ConfigurationException;
 
-    void removeTask(String id) throws ConstellationException;
+    /**
+     * Remove TaskParameter from scheduler.
+     * @param task
+     * @param userId
+     * @throws ConstellationException
+     * @throws ConfigurationException
+     */
+    void stopScheduleTaskParameter (TaskParameter task, Integer userId) throws ConstellationException, ConfigurationException;
 
     QuartzTask getProcessTask(String id);
 

@@ -22,6 +22,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,6 +56,8 @@ import org.constellation.scheduler.QuartzJobListener;
 import org.constellation.scheduler.QuartzTask;
 import org.constellation.scheduler.TaskState;
 import org.geotoolkit.io.DirectoryWatcher;
+import org.geotoolkit.io.PathChangeListener;
+import org.geotoolkit.io.PathChangedEvent;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.*;
 import org.geotoolkit.process.Process;
@@ -87,13 +94,10 @@ import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 @DependsOn("database-initer")
 public class ProcessBusiness implements IProcessBusiness {
 
+    private static final DateFormat TASK_DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm");
     private static final Logger LOGGER = Logging.getLogger(ProcessBusiness.class);
 
     private final QuartzJobListener quartzListener = new QuartzJobListener(this);
-
-    private Scheduler quartzScheduler;
-
-    private DirectoryWatcher directoryWatcher;
 
     @Inject
     private TaskParameterRepository taskParameterRepository;
@@ -103,6 +107,12 @@ public class ProcessBusiness implements IProcessBusiness {
 
     @Inject
     private ChainProcessRepository chainRepository;
+
+    private Scheduler quartzScheduler;
+
+    private DirectoryWatcher directoryWatcher;
+
+    private Map<Integer, Object> scheduledTasks = new HashMap<>();
 
     @PostConstruct
     public void init(){
@@ -131,6 +141,27 @@ public class ProcessBusiness implements IProcessBusiness {
         try {
             directoryWatcher = new DirectoryWatcher(true);
             directoryWatcher.start();
+
+            final PathChangeListener pathListener = new PathChangeListener() {
+                @Override
+                public void pathChanged(PathChangedEvent event) {
+                    Path target = event.target;
+
+                    for (Map.Entry<Integer, Object> sTask : scheduledTasks.entrySet()) {
+                        if (sTask.getValue() instanceof Path && target.startsWith((Path) sTask.getValue())) {
+                            final Integer taskId = sTask.getKey();
+                            final TaskParameter taskParameter = taskParameterRepository.get(taskId);
+                            try {
+                                executeTaskParameter(taskParameter, null, taskParameter.getOwner());
+                            } catch (ConfigurationException ex) {
+                                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                            }
+                        }
+                    }
+                }
+            };
+            directoryWatcher.addPathChangeListener(pathListener);
+
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "=== Failed to start directory watcher ===\n"+ex.getLocalizedMessage(), ex);
             return;
@@ -166,8 +197,7 @@ public class ProcessBusiness implements IProcessBusiness {
         return taskParameterRepository.create(taskParameter);
     }
 
-
-    private ParameterDescriptorGroup getDescriptor(final String authority, final String code) throws ConstellationException {
+    private ProcessDescriptor getDescriptor(final String authority, final String code) {
         final ProcessDescriptor desc;
         try {
             desc = ProcessFinder.getProcessDescriptor(authority, code);
@@ -179,14 +209,28 @@ public class ProcessBusiness implements IProcessBusiness {
         if(desc == null){
             throw new ConstellationException("No Process for id : {" + authority + "}"+code+" has been found");
         }
+        return desc;
+    }
+
+    private ParameterValueGroup readTaskParameters(final TaskParameter taskParameter, final ProcessDescriptor processDesc) {
 
         //change the description, always encapsulate in the same namespace and name
         //jaxb object factory can not reconize changing names without a namespace
-        ParameterDescriptorGroup idesc = desc.getInputDescriptor();
-        idesc = new DefaultParameterDescriptorGroup("input", idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
-        return idesc;
-    }
+        final ParameterDescriptorGroup idesc = processDesc.getInputDescriptor();
+        final GeneralParameterDescriptor retypedDesc =
+                new DefaultParameterDescriptorGroup("input", idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
 
+        final ParameterValueGroup params;
+        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
+        try {
+            reader.setInput(taskParameter.getInputs());
+            params = (ParameterValueGroup) reader.read();
+            reader.dispose();
+        } catch (XMLStreamException | IOException ex) {
+            throw new ConstellationException(ex);
+        }
+        return params;
+    }
 
     /**
      * Load tasks defined as programmed in the system
@@ -196,24 +240,52 @@ public class ProcessBusiness implements IProcessBusiness {
         final List<? extends TaskParameter> programmedTasks = taskParameterRepository.findProgrammedTasks();
         for( TaskParameter taskParameter : programmedTasks){
             final QuartzTask quartzTask = new QuartzTask();
-            final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
 
-            final ParameterValueGroup params;
-            final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
-            try {
-                reader.setInput(taskParameter.getInputs());
-                params = (ParameterValueGroup) reader.read();
-                reader.dispose();
-            } catch (XMLStreamException | IOException ex) {
-                throw new ConfigurationException(ex);
-            }
-            ProcessJobDetail processJobDetails = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(),params );
+            final ProcessDescriptor desc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+            final ParameterValueGroup params = readTaskParameters(taskParameter, desc);
+
+            final ProcessJobDetail processJobDetails = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(),params );
             quartzTask.setDetail(processJobDetails);
             quartzTask.setTitle(taskParameter.getName());
             quartzTasks.add(quartzTask);
         }
 
         return quartzTasks;
+    }
+
+    private void registerJobInScheduler(String title, Integer taskParameterId, Integer userId, Trigger trigger, ProcessJobDetail detail) {
+        final QuartzTask quartzTask = new QuartzTask(UUID.randomUUID().toString());
+        quartzTask.setDetail(detail);
+        quartzTask.setTitle(title);
+        quartzTask.setTrigger(trigger);
+        quartzTask.setTaskParameterId(taskParameterId);
+        quartzTask.setUserId(userId);
+
+        registerTaskInScheduler(quartzTask);
+    }
+
+    /**
+     * Read TaskParameter process description and inputs to create a ProcessJobDetail for quartz scheduler.
+     *
+     * @param task TaskParameter
+     * @param createProcess flag that specified if the process is instantiated in ProcessJobDetails or
+     *                      ProcessJobDetails create it-self a new instance each time is executed.
+     * @return ProcessJobDetails
+     */
+    private ProcessJobDetail createJobDetailFromTaskParameter(final TaskParameter task, final boolean createProcess) {
+
+        final ProcessDescriptor processDesc = getDescriptor(task.getProcessAuthority(), task.getProcessCode());
+        final ParameterValueGroup params = readTaskParameters(task, processDesc);
+
+        if (createProcess) {
+            final ParameterDescriptorGroup originalDesc = processDesc.getInputDescriptor();
+            final ParameterValueGroup orig = originalDesc.createValue();
+            orig.values().addAll(params.values());
+            final Process process = processDesc.createProcess(orig);
+            return new ProcessJobDetail(process);
+        } else {
+            return new ProcessJobDetail(task.getProcessAuthority(), task.getProcessCode(), params);
+        }
     }
 
     /**
@@ -239,14 +311,14 @@ public class ProcessBusiness implements IProcessBusiness {
     /**
      * unregister the given task in the scheduler.
      */
-    private void unregisterTaskInScheduler(final ProcessJobDetail processJobDetail, final String uuidTask) throws SchedulerException{
-        quartzScheduler.interrupt(processJobDetail.getKey());
-        final boolean removed = quartzScheduler.deleteJob(processJobDetail.getKey());
+    private void unregisterTaskInScheduler(final JobKey key) throws SchedulerException{
+        quartzScheduler.interrupt(key);
+        final boolean removed = quartzScheduler.deleteJob(key);
 
         if(removed){
-            LOGGER.log(Level.INFO, "Scheduler task removed : "+uuidTask);
+            LOGGER.log(Level.INFO, "Scheduler task removed : "+key);
         }else{
-            LOGGER.log(Level.WARNING, "Scheduler failed to remove task : "+uuidTask);
+            LOGGER.log(Level.WARNING, "Scheduler failed to remove task : "+key);
         }
 
     }
@@ -344,113 +416,120 @@ public class ProcessBusiness implements IProcessBusiness {
      * {@inheritDoc}
      */
     @Override
-    public void runProcess(String title, Process process, Integer taskParameterId, Integer userId) throws ConstellationException {
+    public void runProcess(final String title, final Process process, final Integer taskParameterId, final Integer userId)
+            throws ConstellationException {
+
         final TriggerBuilder tb = TriggerBuilder.newTrigger();
         final Trigger trigger = tb.startNow().build();
         final ProcessJobDetail detail = new ProcessJobDetail(process);
 
-        final QuartzTask quartzTask = new QuartzTask(UUID.randomUUID().toString());
-        quartzTask.setDetail(detail);
-        quartzTask.setTitle(title);
-        quartzTask.setTrigger((SimpleTrigger) trigger);
-        quartzTask.setTaskParameterId(taskParameterId);
-        quartzTask.setUserId(userId);
-
-        registerTaskInScheduler(quartzTask);
+        registerJobInScheduler(title, taskParameterId, userId, trigger, detail);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void executeTaskParameter (TaskParameter taskParameter, String title, Integer userId)
+    public void executeTaskParameter (final TaskParameter taskParameter, String title, final Integer userId)
             throws ConstellationException, ConfigurationException {
 
-        final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+        final TriggerBuilder tb = TriggerBuilder.newTrigger();
+        final Trigger trigger = tb.startNow().build();
+        final ProcessJobDetail jobDetail = createJobDetailFromTaskParameter(taskParameter, true);
 
-        final ParameterValueGroup params;
-        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
-        try {
-            reader.setInput(taskParameter.getInputs());
-            params = (ParameterValueGroup) reader.read();
-            reader.dispose();
-        } catch (XMLStreamException | IOException ex) {
-            throw new ConfigurationException(ex);
+        if (title == null) {
+            title = taskParameter.getName()+TASK_DATE.format(new Date());
         }
 
-        //rebuild original values since we have changed the namespace
-        try {
-            final ProcessDescriptor processDesc = ProcessFinder.getProcessDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
-            final ParameterDescriptorGroup originalDesc = processDesc.getInputDescriptor();
-            final ParameterValueGroup orig = originalDesc.createValue();
-            orig.values().addAll(params.values());
-            final Process process = processDesc.createProcess(orig);
-
-            runProcess(title, process, taskParameter.getId(), userId);
-        } catch (NoSuchIdentifierException ex) {
-            throw new ConstellationException("No process for given id.", ex);
-        }  catch (InvalidParameterValueException ex) {
-            throw new ConfigurationException(ex);
-        }
+        registerJobInScheduler(title, taskParameter.getId(), userId, trigger, jobDetail);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void scheduleTaskParameter (TaskParameter task, String title, Integer userId) throws ConstellationException {
-        if (task.getTriggerType() != null && task.getTrigger() != null) {
+    public void scheduleTaskParameter (final TaskParameter task, final String title, final Integer userId)
+            throws ConstellationException {
+
+        // Stop previous scheduling first.
+        if (scheduledTasks.containsKey(task.getId())) {
+            try {
+                stopScheduleTaskParameter(task, userId);
+            } catch (ConfigurationException e) {
+                throw new ConstellationException("Unable to re-schedule task.", e);
+            }
+        }
+
+        String trigger = task.getTrigger();
+        if (task.getTriggerType() != null && trigger != null) {
 
             if ("CRON".equalsIgnoreCase(task.getTriggerType())) {
-                // TODO
+
+                try {
+                    // HACK for Quartz to prevent ParseException :
+                    // "Support for specifying both a day-of-week AND a day-of-month parameter is not implemented."
+                    // in this case replace the last '*' by '?'
+                    if (trigger.matches("([0-9]\\d{0,1}|\\*) ([0-9]\\d{0,1}|\\*) ([0-9]\\d{0,1}|\\*) \\* ([0-9]\\d{0,1}|\\*) \\*")) {
+                        trigger = trigger.substring(0, trigger.length()-1)+ "?";
+                    }
+
+                    final TriggerBuilder tb = TriggerBuilder.newTrigger();
+                    final CronScheduleBuilder cronSchedule = CronScheduleBuilder.cronSchedule(trigger);
+                    final Trigger cronTrigger = tb.withSchedule(cronSchedule).build();
+
+                    final ProcessJobDetail jobDetail = createJobDetailFromTaskParameter(task, false);
+                    final JobKey key = jobDetail.getKey();
+
+                    registerJobInScheduler(task.getName(), task.getId(), userId, cronTrigger, jobDetail);
+                    scheduledTasks.put(task.getId(), key);
+
+                } catch (ParseException e) {
+                    throw new ConstellationException(e.getMessage(), e);
+                }
 
             } else if ("FOLDER".equalsIgnoreCase(task.getTriggerType())) {
-                File folder = new File(task.getTrigger());
-                if (folder.exists() && folder.isDirectory()) {
-                    // TODO
-                } else {
-                    throw new ConstellationException("Invalid folder trigger : "+task.getTrigger());
+                try {
+                    File folder = new File(trigger);
+                    if (folder.exists() && folder.isDirectory()) {
+                        final Path path = folder.toPath();
+                        directoryWatcher.register(path);
+                        scheduledTasks.put(task.getId(), path);
+                    } else {
+                        throw new ConstellationException("Invalid folder trigger : " + trigger);
+                    }
+                } catch (IOException e) {
+                    throw new ConstellationException(e.getMessage(), e);
                 }
             }
         }
     }
 
-    /**
-     * Remove task from quartz scheduler and update record in database
-     * @param uuidTask
-     * @return true if
-     * @throws ConstellationException
-     */
     @Override
-    public void removeTask(String uuidTask) throws ConstellationException {
-        //TODO a tester
-        org.constellation.engine.register.Task task = taskRepository.get(uuidTask);
-        final TaskParameter taskParameter = taskParameterRepository.get(task.getTaskParameterId());
-        QuartzTask scheduledQuartzTask = new QuartzTask();
-        final GeneralParameterDescriptor retypedDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+    public void stopScheduleTaskParameter(final TaskParameter task, final Integer userId)
+            throws ConstellationException, ConfigurationException {
 
-        final ParameterValueGroup params;
-        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
-        try {
-            reader.setInput(taskParameter.getInputs());
-            params = (ParameterValueGroup) reader.read();
-            reader.dispose();
-        } catch (XMLStreamException | IOException ex) {
-            throw new ConstellationException(ex);
-        }
-        ProcessJobDetail processJobDetails = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(),params );
-        scheduledQuartzTask.setDetail(processJobDetails);
-
-        try {
-            unregisterTaskInScheduler(processJobDetails, uuidTask);
-        } catch (SchedulerException e) {
-            throw new ConstellationException("cannot unregister from scheduler", e);
+        if (!scheduledTasks.containsKey(task.getId())) {
+            throw new ConstellationException("Task "+task.getName()+" wasn't scheduled.");
         }
 
-        task.setState(TaskState.Status.CANCELLED.name());
-        taskRepository.update(task);
-        //TODO verify why returning false before refactoring
+        final Object obj = scheduledTasks.get(task.getId());
 
+        //scheduled task
+        if (obj instanceof JobKey) {
+            try {
+                unregisterTaskInScheduler((JobKey) obj);
+                scheduledTasks.remove(task.getId());
+            } catch (SchedulerException e) {
+                throw new ConstellationException(e.getMessage(), e);
+            }
+
+        } else if (obj instanceof Path) {
+            //directory watched task
+            directoryWatcher.unregister((Path) obj);
+            scheduledTasks.remove(task.getId());
+        } else {
+            throw new ConstellationException("Unable to stop scheduled task " + task.getName());
+        }
     }
 
     @PreDestroy

@@ -20,6 +20,7 @@
 package org.constellation.scheduler;
 
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.business.IProcessBusiness;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
@@ -34,6 +35,8 @@ import org.quartz.JobListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Quartz Job listener attaching a listener on geotoolkit processes to track their state.
@@ -43,6 +46,7 @@ import java.util.UUID;
  */
 public class QuartzJobListener implements JobListener {
 
+    private static final Logger LOGGER = Logging.getLogger(QuartzJobListener.class);
     public static final String PROPERTY_TASK = "task";
     private final IProcessBusiness processBusiness;
 
@@ -81,6 +85,7 @@ public class QuartzJobListener implements JobListener {
 
         final ProcessListener listener = new StateListener(taskEntity.getIdentifier(), processBusiness);
         pj.addListener(listener);
+        LOGGER.log(Level.INFO, "Run task "+taskEntity.getIdentifier());
     }
 
     @Override

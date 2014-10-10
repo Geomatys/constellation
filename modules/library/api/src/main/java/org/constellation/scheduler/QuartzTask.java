@@ -20,6 +20,7 @@ package org.constellation.scheduler;
 
 import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 
 import java.util.Date;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class QuartzTask {
     private String id;
     private String title;
     private ProcessJobDetail detail = null;
-    private SimpleTrigger trigger = null;
+    private Trigger trigger = null;
     private Date lastExecutionDate = null;
     private Exception lastFailedException = null;
     private Integer userId = null;
@@ -97,11 +98,11 @@ public class QuartzTask {
         this.lastFailedException = lastFailedException;
     }
     
-    public SimpleTrigger getTrigger() {
+    public Trigger getTrigger() {
         return trigger;
     }
 
-    public void setTrigger(final SimpleTrigger trigger) {
+    public void setTrigger(final Trigger trigger) {
         this.trigger = trigger;
     }
 

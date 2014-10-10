@@ -170,11 +170,12 @@ public final class TaskRest {
     
     @DELETE
     @Path("chain/{authority}/{code}")
-    public AcknowlegementType deleteChain(final @PathParam("authority") String authority, final @PathParam("code") String code) {
+    public Response deleteChain(final @PathParam("authority") String authority, final @PathParam("code") String code) {
         if (processBusiness.deleteChainProcess(authority, code)) {
-            return new AcknowlegementType("Success", "The chain has been deleted");
+            return Response.ok(new AcknowlegementType("Success", "The chain has been deleted")).build();
         } else {
-            return new AcknowlegementType("Failure", "Could not find chain for given authority/code.");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new AcknowlegementType("Failure", "Could not find chain for given authority/code.")).build();
         }
     }
     // </editor-fold>
@@ -247,7 +248,9 @@ public final class TaskRest {
     @GET
     @Path("params/execute/{id}")
     @RolesAllowed("cstl-admin")
-    public AcknowlegementType executeParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req) throws ConfigurationException {
+    public Response executeParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req)
+            throws ConfigurationException {
+
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 
         if (!cstlUser.isPresent()) {
@@ -259,10 +262,53 @@ public final class TaskRest {
         try {
             processBusiness.executeTaskParameter(taskParameter, title, cstlUser.get().getId());
         } catch (ConstellationException ex) {
-            return new AcknowlegementType("Failure", "Failed to run task : "+ex.getMessage());
+            final AcknowlegementType failure = new AcknowlegementType("Failure", "Failed to run task : " + ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(failure).build();
         }
 
-        return new AcknowlegementType("Success", "The task has been created");
+        return Response.ok("The task has been created").build();
+    }
+
+    @GET
+    @Path("params/schedule/start/{id}")
+    @RolesAllowed("cstl-admin")
+    public Response startScheduleParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req) throws ConfigurationException {
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+
+        if (!cstlUser.isPresent()) {
+            throw new ConstellationException("operation not allowed without login");
+        }
+        final TaskParameter taskParameter = taskParameterRepository.get(id);
+        final String title = taskParameter.getName()+" "+TASK_DATE.format(new Date());
+
+        try {
+            processBusiness.scheduleTaskParameter(taskParameter, title, cstlUser.get().getId());
+        } catch (ConstellationException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new AcknowlegementType("Failure", "Failed to schedule task : "+ex.getMessage())).build();
+        }
+        return Response.ok(new AcknowlegementType("Success", "The task has been schedule")).build();
+    }
+
+    @GET
+    @Path("params/schedule/stop/{id}")
+    @RolesAllowed("cstl-admin")
+    public Response stopScheduleParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req) throws ConfigurationException {
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+
+        if (!cstlUser.isPresent()) {
+            throw new ConstellationException("operation not allowed without login");
+        }
+        final TaskParameter taskParameter = taskParameterRepository.get(id);
+
+        try {
+            processBusiness.stopScheduleTaskParameter(taskParameter, cstlUser.get().getId());
+        } catch (ConstellationException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new AcknowlegementType("Failure", "Failed to un-schedule  task: "+ex.getMessage())).build();
+        }
+
+        return Response.ok(new AcknowlegementType("Success", "The task has been un-schedule")).build();
     }
 
     @GET
