@@ -71,6 +71,7 @@ import javax.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -215,8 +216,8 @@ public final class MetadataUtilities {
         assertEquals(expResult.getCharacterSet(), result.getCharacterSet());
         assertEquals(expResult.getContacts().size(), result.getContacts().size());
         if (expResult.getContacts().size() > 0) {
-            ResponsibleParty expResp = expResult.getContacts().iterator().next();
-            ResponsibleParty resResp = result.getContacts().iterator().next();
+            ResponsibleParty expResp = DefaultResponsibleParty.castOrCopy(expResult.getContacts().iterator().next());
+            ResponsibleParty resResp = DefaultResponsibleParty.castOrCopy(result.getContacts().iterator().next());
 
             assertEquals(expResp.getIndividualName(), resResp.getIndividualName());
             assertEquals(expResp.getOrganisationName(), resResp.getOrganisationName());

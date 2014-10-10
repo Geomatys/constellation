@@ -129,9 +129,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     private final boolean usePathAsIdentifier;
 
     private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
-    
+
     private Locale locale = null;
-    
+
     /**
      * Build a new CSW NetCDF File Reader.
      *
@@ -563,14 +563,14 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
 
             // TODO multiple
             SimpleLiteral distributor = null;
-            final Distribution distribution = metadata.getDistributionInfo();
-            if (distribution != null) {
+            for (final Distribution distribution : metadata.getDistributionInfo()) {
                 for (Distributor dis :distribution.getDistributors()) {
                     final ResponsibleParty disRP = (ResponsibleParty) dis.getDistributorContact();
                     if (disRP != null) {
                         InternationalString name = disRP.getOrganisationName();
                         if (name != null) {
                             distributor = new SimpleLiteral(name.toString());
+                            break;
                         }
                     }
                 }

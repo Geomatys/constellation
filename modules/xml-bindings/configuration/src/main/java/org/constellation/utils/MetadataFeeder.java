@@ -141,7 +141,7 @@ public class MetadataFeeder {
             boolean hasAddress = false;
             final DefaultAddress adr = new DefaultAddress();
             if (contact.getAddress() != null && !contact.getAddress().isEmpty()) {
-                adr.setDeliveryPoints(Arrays.asList(contact.getAddress()));
+                adr.setDeliveryPoints(Arrays.asList(new SimpleInternationalString(contact.getAddress())));
                 hasAddress = true;
             }
             if (contact.getCity()!= null && !contact.getCity().isEmpty()) {
@@ -619,7 +619,7 @@ public class MetadataFeeder {
 
     protected String getOrganisationName() {
         if (!eater.getContacts().isEmpty()) {
-            final InternationalString is = eater.getContacts().iterator().next().getOrganisationName();
+            final InternationalString is = DefaultResponsibleParty.castOrCopy(eater.getContacts().iterator().next()).getOrganisationName();
             if (is != null) {
                 return is.toString();
             }
@@ -629,7 +629,7 @@ public class MetadataFeeder {
 
     protected String getIndividualName() {
         if (!eater.getContacts().isEmpty()) {
-            return eater.getContacts().iterator().next().getIndividualName();
+            return DefaultResponsibleParty.castOrCopy(eater.getContacts().iterator().next()).getIndividualName();
         }
         return null;
     }
@@ -708,10 +708,13 @@ public class MetadataFeeder {
         servIdent.setContainsOperations(getOperation(serviceType, url));
 
         try {
-            Distribution dist = eater.getDistributionInfo();
-            if (dist == null) {
+            Distribution dist = null;
+            Collection<? extends Distribution> dists = eater.getDistributionInfo();
+            if (dists.isEmpty()) {
                 dist = new DefaultDistribution();
-                eater.setDistributionInfo(dist);
+                eater.setDistributionInfo(Collections.singleton(dist));
+            } else {
+                dist = dists.iterator().next();
             }
 
             DefaultDigitalTransferOptions dto = new DefaultDigitalTransferOptions();
@@ -742,9 +745,9 @@ public class MetadataFeeder {
                 }
             }
         }
-        Distribution dist = eater.getDistributionInfo();
-        if (dist != null) {
-            for (DigitalTransferOptions dto : dist.getTransferOptions()) {
+        Collection<? extends Distribution> dist = eater.getDistributionInfo();
+        if (!dist.isEmpty()) {
+            for (DigitalTransferOptions dto : dist.iterator().next().getTransferOptions()) {
                 for (OnlineResource or : dto.getOnLines()) {
                     final DefaultOnlineResource resource = (DefaultOnlineResource) or;
                     try {

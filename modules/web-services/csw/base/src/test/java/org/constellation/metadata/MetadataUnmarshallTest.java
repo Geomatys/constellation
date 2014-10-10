@@ -106,6 +106,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -767,7 +768,7 @@ public class MetadataUnmarshallTest extends DefaultMetadataTest {
         set.add(digiTrans);
         distributionInfo.setTransferOptions(set);
 
-        metadata.setDistributionInfo(distributionInfo);
+        metadata.setDistributionInfo(Collections.singleton(distributionInfo));
 
         StringWriter sw = new StringWriter();
         marshaller = testPool.acquireMarshaller();
