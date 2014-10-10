@@ -496,6 +496,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                     providerRepository.delete(providerID);
                 }
             }
+            indexEngine.removeDatasetMetadataFromIndex(ds.getId());
             datasetRepository.remove(ds.getId());
             
             // update internal CSW index

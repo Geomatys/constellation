@@ -27,6 +27,7 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -60,8 +61,7 @@ import java.util.logging.Logger;
  * Implementation of {@link IndexEngine} with Lucene.
  *
  * @author Christophe Mourette (Geomatys).
- * @author Christophe Mourette (Geomatys).
- * @since 0.9
+ * @author Mehdi Sidhoum (Geomatys).
  */
 @Component
 public class LuceneIndexEngine implements IndexEngine {
@@ -130,9 +130,41 @@ public class LuceneIndexEngine implements IndexEngine {
         addDocument(metadataFeeder, doc);
     }
 
+    /**
+     * Remove document dataset from index for given dataset Id
+     * @param datasetId given dataset Id.
+     * @throws ConstellationException
+     *
+     * @FIXME delete is not working, the document still present in index after calling deleteDocuments.
+     */
+    public void removeDatasetMetadataFromIndex(final Integer datasetId) throws ConstellationException {
+        try {
+            indexWriter.deleteDocuments(new Term("datasetId", String.valueOf(datasetId)));
+            indexWriter.commit();
+        }catch(Exception ex){
+            throw new ConstellationException(ex);
+        }
+    }
+
+    /**
+     * Remove document data from index for given data id
+     * @param dataId given data Id.
+     * @throws ConstellationException
+     *
+     * * @FIXME delete is not working, the document still present in index after calling deleteDocuments.
+     */
+    public void removeDataMetadataFromIndex(final Integer dataId) throws ConstellationException {
+        try {
+            indexWriter.deleteDocuments(new Term("dataId", String.valueOf(dataId)));
+            indexWriter.commit();
+        }catch(IOException ex){
+            throw new ConstellationException(ex);
+        }
+    }
+
     private void addDocument(final MetadataFeeder metadataFeeder,final Document doc) throws ConstellationException {
         try {
-            final String keywords = StringUtils.join(metadataFeeder.getKeywordsNoType(), " ");
+            final String keywords = StringUtils.join(metadataFeeder.getKeywords(), " ");
             if (keywords!=null && keywords.length()>0) {
                 doc.add(new TextField("keywords", keywords, Field.Store.NO));
             }

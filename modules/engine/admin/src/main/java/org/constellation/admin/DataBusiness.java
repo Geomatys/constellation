@@ -509,6 +509,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         if (provider != null) {
             final Data d = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), provider.getId());
             if (d != null) {
+                indexEngine.removeDataMetadataFromIndex(d.getId());
                 dataRepository.delete(d.getId());
                 // Relevant erase dataset when the is no more data in it. fr now we remove it
                 deleteDatasetIfEmpty(d.getDatasetId());
@@ -521,6 +522,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         if (datasetID != null) {
             List<Data> datas = dataRepository.findAllByDatasetId(datasetID);
             if (datas.isEmpty()) {
+                indexEngine.removeDatasetMetadataFromIndex(datasetID);
                 datasetRepository.remove(datasetID);
             }
         }
@@ -533,6 +535,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public void deleteAll() {
         final List<Data> datas = dataRepository.findAll();
         for (final Data data : datas) {
+            indexEngine.removeDataMetadataFromIndex(data.getId());
             dataRepository.delete(data.getId());
             // Relevant erase dataset when the is no more data in it. fr now we remove it
             deleteDatasetIfEmpty(data.getDatasetId());
@@ -606,7 +609,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 providerRepository.delete(data.getProvider());
             }
             
-            // Relevant erase dataset when the is no more data in it. fr now we remove it
+            // Relevant erase dataset when there is no more data in it. for now we remove it
             deleteDatasetIfEmpty(data.getDatasetId());
             
             // update internal CSW index
@@ -654,6 +657,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         if (p != null) {
             final List<Data> datas = dataRepository.findByProviderId(p.getId());
             for (final Data data : datas) {
+                indexEngine.removeDataMetadataFromIndex(data.getId());
                 dataRepository.delete(data.getId());
                 // Relevant erase dataset when the is no more data in it. fr now we remove it
                 deleteDatasetIfEmpty( data.getDatasetId());

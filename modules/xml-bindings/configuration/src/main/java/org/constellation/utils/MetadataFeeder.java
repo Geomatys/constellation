@@ -419,6 +419,24 @@ public class MetadataFeeder {
         identification.setAbstract(internationalizeAbstract);
     }
 
+    /**
+     * Returns all keywords of metadata.
+     * called by lucene indexer to index all metadata keywords.
+     * @return {@code List} of string keywords.
+     */
+    public final List<String> getKeywords() {
+        final List<String> keywords = new ArrayList<>();
+        final AbstractIdentification ident = (AbstractIdentification) getIdentification(eater);
+        if(ident != null) {
+            for (final Keywords descKeywords : ident.getDescriptiveKeywords()) {
+                for (final InternationalString is : descKeywords.getKeywords()) {
+                    keywords.add(is.toString());
+                }
+            }
+        }
+        return keywords;
+    }
+
     public final List<String> getKeywordsNoType() {
         final List<String> keywords = new ArrayList<>();
         final AbstractIdentification ident = (AbstractIdentification) getIdentification(eater);
