@@ -56,6 +56,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.apache.lucene.search.NumericRangeQuery;
 
 /**
  * Implementation of {@link IndexEngine} with Lucene.
@@ -109,6 +110,7 @@ public class LuceneIndexEngine implements IndexEngine {
      * @param metadata given metadata object to index.
      * @param dataId data Id.
      */
+    @Override
     public void addMetadataToIndexForData(final DefaultMetadata metadata,final Integer dataId) throws ConstellationException {
         final MetadataFeeder metadataFeeder = new MetadataFeeder(metadata);
         final Document doc = new Document();
@@ -123,6 +125,7 @@ public class LuceneIndexEngine implements IndexEngine {
      * @param datasetId dataset Id.
      * @throws ConstellationException
      */
+    @Override
     public void addMetadataToIndexForDataset(final DefaultMetadata metadata,final Integer datasetId) throws ConstellationException {
         final MetadataFeeder metadataFeeder = new MetadataFeeder(metadata);
         final Document doc = new Document();
@@ -137,9 +140,10 @@ public class LuceneIndexEngine implements IndexEngine {
      *
      * @FIXME delete is not working, the document still present in index after calling deleteDocuments.
      */
+    @Override
     public void removeDatasetMetadataFromIndex(final Integer datasetId) throws ConstellationException {
         try {
-            indexWriter.deleteDocuments(new Term("datasetId", String.valueOf(datasetId)));
+            indexWriter.deleteDocuments(NumericRangeQuery.newIntRange("datasetId", datasetId, datasetId, true, true));
             indexWriter.commit();
         }catch(Exception ex){
             throw new ConstellationException(ex);
@@ -153,9 +157,10 @@ public class LuceneIndexEngine implements IndexEngine {
      *
      * * @FIXME delete is not working, the document still present in index after calling deleteDocuments.
      */
+    @Override
     public void removeDataMetadataFromIndex(final Integer dataId) throws ConstellationException {
         try {
-            indexWriter.deleteDocuments(new Term("dataId", String.valueOf(dataId)));
+            indexWriter.deleteDocuments(NumericRangeQuery.newIntRange("dataId", dataId, dataId, true, true));
             indexWriter.commit();
         }catch(IOException ex){
             throw new ConstellationException(ex);
@@ -209,6 +214,7 @@ public class LuceneIndexEngine implements IndexEngine {
      * @throws ParseException
      * @throws IOException
      */
+    @Override
     public Set<Integer> searchOnMetadata(final String queryString, final String attributeId) throws ParseException, IOException {
         final Set<Integer> result = new HashSet<>();
         initIndexSearcher();
