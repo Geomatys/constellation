@@ -242,6 +242,16 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
             });
         };
 
+        $scope.reset = function() {
+            $scope.plan = {
+                date : null,
+                time : null,
+                repeat : $scope.repeatValues[0],
+                folder : null,
+                triggerType : null
+            };
+        };
+
         $scope.isValid = function(elementName) {
             return !jQuery("#"+elementName).hasClass("ng-invalid");
         };

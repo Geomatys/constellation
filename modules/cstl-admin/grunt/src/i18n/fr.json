@@ -488,6 +488,7 @@
     "label.lauchedby":"Lancé par",
     "label.help":"Aide",
     "label.confirmation":"Confirmation",
+    "label.reinitialize":"Réinitialiser",
     "dialog.message.confirm.delete.dataset":"Êtes vous sûre de vouloir supprimer le jeu de données ?",
     "dialog.message.confirm.delete.data":"Êtes vous sûre de vouloir supprimer la donnée ?",
     "dialog.message.confirm.delete.mapcontext":"Êtes vous sûre de vouloir supprimer la composition cartographique ?",

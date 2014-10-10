@@ -7,14 +7,18 @@
         <div class="modal-body modal-body-style" style="padding-top: 15px; overflow-y: auto;">
             <!-- WRITE CONTENT HERE -->
             <form id="formModalPlanTask" role="form">
-
+                <div class="text-right">
+                    <button type="button" id="razButton" class="btn btn-default" ng-click="reset()"
+                            translate="label.reinitialize"
+                            ng-disabled="plan.triggerType === null">Reset</button>
+                </div>
                 <div class="row">
                     <div class="col-sm-1">
                         <input type="radio" name="trigger" ng-model="plan.triggerType" value="{{cronTrigger}}" style="margin-top: 30px"/>
                     </div>
                     <div class="col-sm-11">
                         <div class="row">
-                            <div class="form-group col-sm-4" ng-class="{'has-error':!isValid('inputPlanDate')}">
+                            <div class="form-group col-sm-5" ng-class="{'has-error':!isValid('inputPlanDate')}">
                                 <label for="inputPlanDate" translate="label.date">Date</label>
                                 <div class="input-group date"
                                      datepicker="{language:getCurrentLang(),format:'yyyy-mm-dd '}"
@@ -27,7 +31,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-sm-4" ng-class="{'has-error':!isValid('inputPlanHour')}">
+                            <div class="form-group col-sm-3" ng-class="{'has-error':!isValid('inputPlanHour')}">
                                 <label for="inputPlanHour" translate="label.hour">Hour</label>
                                 <input type="time" id="inputPlanHour" class="form-control" ng-model="plan.time" ng-disabled="plan.triggerType !== cronTrigger"/>
                             </div>

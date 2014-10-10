@@ -442,6 +442,7 @@
     "label.lauchedby":"Launched by",
     "label.help":"Getting started",
     "label.confirmation":"Please confirm",
+    "label.reinitialize":"Reset",
     "dialog.message.confirm.delete.dataset":"Are you sure to delete the selected dataset?",
     "dialog.message.confirm.delete.data":"Are you sure to delete the selected data?",
     "dialog.message.confirm.delete.mapcontext":"Are you sure to delete the selected map context?",
