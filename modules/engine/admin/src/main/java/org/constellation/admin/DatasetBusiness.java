@@ -376,6 +376,24 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             }
         }
 
+        //fill in keywords all data name of dataset children.
+        final Dataset dataset = getDataset(providerId);
+        if(dataset!= null){
+            final List<Data> dataList = dataRepository.findAllByDatasetId(dataset.getId());
+            if(dataList != null){
+                final List<String> keywords = new ArrayList<>();
+                for(final Data d : dataList){
+                    final String dataName = d.getName();
+                    if(!keywords.contains(dataName)){
+                        keywords.add(dataName);
+                    }
+                }
+                if(!keywords.isEmpty()){
+                    prop.put("keywords",keywords);
+                }
+            }
+        }
+
         final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
 
         DefaultMetadata mergedMetadata;

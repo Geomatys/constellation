@@ -125,7 +125,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         $scope.callSearch = function(){
             $scope.wrap.filtertext='';
             if ($scope.dataCtrl.searchTerm){
-                datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchTerm}},
+                datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchTerm+'*'}},
                     function(response) {
                         Dashboard($scope, response, true);
                     },
@@ -138,25 +138,25 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if (!$.isEmptyObject($scope.search)){
                     var searchString = "";
                     if ($scope.search.title){
-                        searchString += " title:"+$scope.search.title;
+                        searchString += " title:"+$scope.search.title+'*';
                     }
                     if ($scope.search.abstract){
-                        searchString += " abstract:"+$scope.search.abstract;
+                        searchString += " abstract:"+$scope.search.abstract+'*';
                     }
                     if ($scope.search.keywords){
-                        searchString += " keywords:"+$scope.search.keywords;
+                        searchString += " keywords:"+$scope.search.keywords+'*';
                     }
                     if ($scope.search.topic){
-                        searchString += " topic:"+$scope.search.topic;
+                        searchString += " topic:"+$scope.search.topic+'*';
                     }
                     if ($scope.search.data){
-                        searchString += " data:"+$scope.search.data;
+                        searchString += " data:"+$scope.search.data+'*';
                     }
                     if ($scope.search.level){
-                        searchString += " level:"+$scope.search.level;
+                        searchString += " level:"+$scope.search.level+'*';
                     }
                     if ($scope.search.area){
-                        searchString += " area:"+$scope.search.area;
+                        searchString += " area:"+$scope.search.area+'*';
                     }
                     datasetListing.findDataset({values: {'search': searchString}},function(response) {
                         Dashboard($scope, response, true);
@@ -179,7 +179,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         $scope.callSearchMDForTerm = function(term){
             $scope.wrap.filtertext='';
             if (term){
-                datasetListing.findDataset({values: {'search': term}},
+                datasetListing.findDataset({values: {'search': term+'*'}},
                     function(response) {//success
                         Dashboard($scope, response, true);
                     },
@@ -191,25 +191,25 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if (!$.isEmptyObject($scope.searchMD)){
                     var searchString = "";
                     if ($scope.searchMD.title){
-                        searchString += " title:"+$scope.searchMD.title;
+                        searchString += " title:"+$scope.searchMD.title+'*';
                     }
                     if ($scope.searchMD.abstract){
-                        searchString += " abstract:"+$scope.searchMD.abstract;
+                        searchString += " abstract:"+$scope.searchMD.abstract+'*';
                     }
                     if ($scope.searchMD.keywords){
-                        searchString += " keywords:"+$scope.searchMD.keywords;
+                        searchString += " keywords:"+$scope.searchMD.keywords+'*';
                     }
                     if ($scope.searchMD.topic){
-                        searchString += " topic:"+$scope.searchMD.topic;
+                        searchString += " topic:"+$scope.searchMD.topic+'*';
                     }
                     if ($scope.searchMD.data){
-                        searchString += " data:"+$scope.searchMD.data;
+                        searchString += " data:"+$scope.searchMD.data+'*';
                     }
                     if ($scope.searchMD.level){
-                        searchString += " level:"+$scope.searchMD.level;
+                        searchString += " level:"+$scope.searchMD.level+'*';
                     }
                     if ($scope.searchMD.area){
-                        searchString += " area:"+$scope.searchMD.area;
+                        searchString += " area:"+$scope.searchMD.area+'*';
                     }
                     datasetListing.findDataset({values: {'search': searchString}},
                         function(response) {//success

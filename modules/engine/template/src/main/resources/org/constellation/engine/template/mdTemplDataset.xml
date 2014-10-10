@@ -163,6 +163,7 @@
             <gmd:abstract>
                 <gco:CharacterString>${param.dataAbstract}</gco:CharacterString>
             </gmd:abstract>
+            <% if (param.keywords != null){%>
             <gmd:descriptiveKeywords >
                 <gmd:MD_Keywords>
                     <% for (String kw : param.keywords){%>
@@ -172,6 +173,7 @@
                     <%}%>
               </gmd:MD_Keywords>
             </gmd:descriptiveKeywords>
+            <%}%>
             <% if (param.dataType!= null){ if("grid".equals(param.dataType)){%>
             <gmd:spatialRepresentationType>
                 <gmd:MD_SpatialRepresentationTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid">Grid</gmd:MD_SpatialRepresentationTypeCode>
