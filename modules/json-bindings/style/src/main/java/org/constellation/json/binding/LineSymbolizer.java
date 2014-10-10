@@ -21,6 +21,7 @@ package org.constellation.json.binding;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
+import static org.constellation.json.util.StyleUtilities.literal;
 import static org.constellation.json.util.StyleUtilities.type;
 
 /**
@@ -32,6 +33,7 @@ public final class LineSymbolizer implements Symbolizer {
 
     private String name;
     private Stroke stroke = new Stroke();
+    private double perpendicularOffset;
 
     public LineSymbolizer() {
     }
@@ -41,6 +43,11 @@ public final class LineSymbolizer implements Symbolizer {
         name = symbolizer.getName();
         if (symbolizer.getStroke() != null) {
             stroke = new Stroke(symbolizer.getStroke());
+        }
+        try{
+            perpendicularOffset = Double.parseDouble(symbolizer.getPerpendicularOffset().evaluate(null, String.class));
+        }catch(Exception ex){
+            //do nothing
         }
     }
 
@@ -60,8 +67,20 @@ public final class LineSymbolizer implements Symbolizer {
         this.stroke = stroke;
     }
 
+    public double getPerpendicularOffset() {
+        return perpendicularOffset;
+    }
+
+    public void setPerpendicularOffset(String perpendicularOffset) {
+        try{
+            this.perpendicularOffset = Double.parseDouble(perpendicularOffset);
+        }catch(Exception ex){
+            //do nothing
+        }
+    }
+
     @Override
     public org.opengis.style.Symbolizer toType() {
-        return SF.lineSymbolizer(name, (String)null, null, null, type(stroke), null);
+        return SF.lineSymbolizer(name, (String)null, null, null, type(stroke), literal(this.perpendicularOffset));
     }
 }

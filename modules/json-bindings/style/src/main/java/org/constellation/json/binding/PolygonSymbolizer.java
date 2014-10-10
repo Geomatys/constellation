@@ -21,6 +21,7 @@ package org.constellation.json.binding;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
+import static org.constellation.json.util.StyleUtilities.literal;
 import static org.constellation.json.util.StyleUtilities.type;
 
 /**
@@ -32,6 +33,7 @@ public final class PolygonSymbolizer implements Symbolizer {
     private String name;
     private Stroke stroke = new Stroke();
     private Fill fill     = new Fill();
+    private double perpendicularOffset;
 
     public PolygonSymbolizer() {
     }
@@ -44,6 +46,11 @@ public final class PolygonSymbolizer implements Symbolizer {
         }
         if (symbolizer.getFill() != null) {
             fill = new Fill(symbolizer.getFill());
+        };
+        try{
+            perpendicularOffset = Double.parseDouble(symbolizer.getPerpendicularOffset().evaluate(null, String.class));
+        }catch(Exception ex){
+            //do nothing
         }
     }
 
@@ -71,8 +78,27 @@ public final class PolygonSymbolizer implements Symbolizer {
         this.fill = fill;
     }
 
+    public double getPerpendicularOffset() {
+        return perpendicularOffset;
+    }
+
+    public void setPerpendicularOffset(String perpendicularOffset) {
+        try{
+            this.perpendicularOffset = Double.parseDouble(perpendicularOffset);
+        }catch(Exception ex){
+            //do nothing
+        }
+    }
+
     @Override
     public org.opengis.style.Symbolizer toType() {
-        return SF.polygonSymbolizer(name, (String)null, null, null, type(stroke), type(fill), null, null);
+        return SF.polygonSymbolizer(name,
+                (String)null,
+                null,
+                null,
+                type(stroke),
+                type(fill),
+                null,
+                literal(this.perpendicularOffset));
     }
 }

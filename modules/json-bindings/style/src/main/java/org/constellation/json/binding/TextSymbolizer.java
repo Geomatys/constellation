@@ -34,6 +34,7 @@ public final class TextSymbolizer implements Symbolizer {
     private String label = null;
     private Font font    = new Font();
     private Fill fill    = new Fill();
+    private Halo halo    = new Halo();
 
     public TextSymbolizer() {
     }
@@ -49,6 +50,9 @@ public final class TextSymbolizer implements Symbolizer {
         }
         if (symbolizer.getFill() != null) {
             this.fill = new Fill(symbolizer.getFill());
+        }
+        if (symbolizer.getHalo() != null) {
+            this.halo = new Halo(symbolizer.getHalo());
         }
     }
 
@@ -84,8 +88,24 @@ public final class TextSymbolizer implements Symbolizer {
         this.fill = fill;
     }
 
+    public Halo getHalo() {
+        return halo;
+    }
+
+    public void setHalo(Halo halo) {
+        this.halo = halo;
+    }
+
     @Override
     public org.opengis.style.Symbolizer toType() {
-        return SF.textSymbolizer(name, (String)null, null, null, expression(label), type(font), null, null, type(fill));
+        return SF.textSymbolizer(name,
+                (String)null,
+                null,
+                null,
+                expression(label),
+                type(font),
+                null,
+                type(halo),
+                type(fill));
     }
 }

@@ -1070,6 +1070,7 @@
     "sldeditor.edition.intervals":"Intervals",
     "sldeditor.edition.intervalsCount":"Intervals count",
     "sldeditor.edition.field":"Attribute field",
+    "sldeditor.edition.radius":"Radius",
     "sldeditor.button.cancel":"Cancel",
     "sldeditor.button.validate":"Validate",
     "sldeditor.button.validateandsave":"Save and validate",

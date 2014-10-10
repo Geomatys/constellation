@@ -1046,6 +1046,7 @@
     "sldeditor.edition.method":"Méthode de quantification",
     "sldeditor.edition.intervals":"Intervalles",
     "sldeditor.edition.intervalsCount":"Nombre d'intervalles",
+    "sldeditor.edition.radius":"Rayon",
     "sldeditor.button.cancel":"Annuler",
     "sldeditor.button.validate":"Valider",
     "sldeditor.button.validateandsave":"Enregistrer et valider",

@@ -916,7 +916,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             "lineJoin":"bevel",
                             "opacity":1,
                             "width":1
-                        }
+                        },
+                        "perpendicularOffset":0
                     };
                 }else if($scope.optionsSLD.selectedSymbolizerType === 'polygon'){
                     symbol={
@@ -935,7 +936,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             "lineJoin":"bevel",
                             "opacity":1,
                             "width":1
-                        }
+                        },
+                        "perpendicularOffset":0
                     };
                 }else if($scope.optionsSLD.selectedSymbolizerType === 'text'){
                     symbol={
@@ -951,6 +953,13 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         "fill":{
                             "color":"#000000",
                             "opacity":1
+                        },
+                        "halo":{
+                            "radius":1,
+                            "fill":{
+                                "color":"#FFFFFF",
+                                "opacity":1.0
+                            }
                         }
                     };
                 }

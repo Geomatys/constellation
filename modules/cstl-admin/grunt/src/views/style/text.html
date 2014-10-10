@@ -83,4 +83,26 @@
                    ng-model="symbolizer.fill.color"/>
         </div>
     </div>
+    <hr/>
+    <div class="row">
+        <div class="col-xs-10">
+            <strong style="font-size: 13px;">Halo</strong>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.color">Color</label>
+        <div class="col-sm-3">
+            <input type='text'
+                   name="picker"
+                   class="picker"
+                   spectrum oncolorchanged="affectAlpha(value, symbolizer.halo.fill)"
+                   ng-model="symbolizer.halo.fill.color"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.radius">Radius</label>
+        <div class="col-sm-4 col-md-3">
+            <input type="number" class="form-control" ng-model="symbolizer.halo.radius"/>
+        </div>
+    </div>
 </form>
