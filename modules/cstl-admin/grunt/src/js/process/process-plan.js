@@ -26,45 +26,142 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
         function generateCronExpression() {
             var cron = ['0', '0', '0', '0', '0', '0']; //seconds, minutes, hours, dayOfMonth, month, dayOfWeek
 
-            if ($scope.plan.time !== null && $scope.plan.date !== null) {
+            if ($scope.plan.time !== null) {
                 var timeParts = $scope.plan.time.split(':');
                 cron[1] = trimZero(timeParts[1]); //minutes
                 cron[2] = trimZero(timeParts[0]); //hours
+            }
 
+            if ($scope.plan.date !== null) {
                 var date = new Date($scope.plan.date);
-                cron[3] = date.getDate(); //day of month
-                cron[4] = date.getMonth() + 1; //month
-                cron[5] = date.getDay() + 1; //day of week
+                cron[3] = date.getDate();       //day of month
+                cron[4] = date.getMonth() + 1;  //month
+                cron[5] = date.getDay();        //day of week
             }
 
             //repeat
             var repeatIdx = $scope.repeatValues.indexOf($scope.plan.repeat);
+
             //exclude once
             if (repeatIdx !== 0) {
-                cron[repeatIdx] = '*';
+
+                //special case for weekly periodicity
+                if (repeatIdx === 5) {
+                    cron[3] = cron[4] = '*';
+                } else {
+                    //standard case (minutely, hourly, daily, monthly)
+                    for (var i = repeatIdx; i < 6; i++) {
+                        cron[i] = '*';
+                    }
+                }
             }
             
             return cron.join(' ');
         }
 
+        /**
+         * This parser doesn't support range (/) or L, W and # characters
+         * in cron expression.
+         * @param cronExpression
+         */
         function parseCronExpression(cronExpression) {
+
+            var minutely = isEveryMinutes(cronExpression);
+            var hourly  = isEveryHour(cronExpression);
+            var daily   = isEveryDay(cronExpression);
+            var monthly = isEveryMonth(cronExpression);
+            var weekly  = isEveryWeek(cronExpression);
+
+            if (minutely){ $scope.plan.repeat = $scope.repeatValues[1]; }
+            if (hourly)  { $scope.plan.repeat = $scope.repeatValues[2]; }
+            if (daily)   { $scope.plan.repeat = $scope.repeatValues[3]; }
+            if (monthly) { $scope.plan.repeat = $scope.repeatValues[4]; }
+            if (weekly)  { $scope.plan.repeat = $scope.repeatValues[5]; }
+
             var cronParts = cronExpression.split(' ');
 
-            var repeatIdx = cronParts.indexOf('*');
-            if (repeatIdx !== -1) {
-                $scope.plan.repeat = $scope.repeatValues[repeatIdx];
+            //parse time
+            var minute = null;
+            var hour = null;
+
+            if (!minutely) {
+                minute = addZero(parseInt(cronParts[1]));
+                if (!hourly) {
+                    hour = addZero(parseInt(cronParts[2]));
+                }
             }
 
-            var now = new Date();
-            var year = now.getFullYear();
-            var month = cronParts[4] === '*' ? now.getMonth() : parseInt(cronParts[4]);
-            var day = cronParts[3] === '*' ? now.getDate() : parseInt(cronParts[3]);
-            var hour = cronParts[2] === '*' ? '--' : addZero(parseInt(cronParts[2]));
-            var minute = cronParts[1] === '*' ? '--' : addZero(parseInt(cronParts[1]));
+            if (hour === null && minute === null) {
+                $scope.plan.time = null;
+            } else {
+                if (hour === null) {
+                    hour = '00';
+                }
+                if (minute === null) {
+                    minute = '00';
+                }
+                $scope.plan.time = hour + ':' + minute;
+            }
 
-            $scope.plan.date = year+"-"+addZero(month+1)+'-'+addZero(day+1);
-            $scope.plan.time = hour+':'+minute;
+            //no need to parse date if periodicity is minutely or hourly or daily
+            if (!minutely && !hourly && !daily) {
+                //parse date
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = null;
+                var day = null;
 
+                if (weekly) {
+                    var dayOfWeek = parseInt(cronParts[5]);
+                    month = '01';
+
+                    //find in first month the first day with the same dayOfWeek
+                    var d = 1;
+                    var tmpDate = new Date();
+                    do  {
+                        tmpDate = new Date(year, 0, d, 0, 0, 0, 0);
+                        d++;
+                    } while (tmpDate.getDay() !== dayOfWeek);
+
+                    day = addZero(tmpDate.getDate());
+
+                } else {
+                    month = cronParts[4] === '*' ? null : addZero(parseInt(cronParts[4]));
+                    day = cronParts[3] === '*' ? null : addZero(parseInt(cronParts[3]));
+                }
+
+                if (month === null && day === null) {
+                    $scope.plan.date = null;
+                } else {
+                    if (month === null) {
+                        month = '01';
+                    }
+                    if (day === null) {
+                        day = '01';
+                    }
+                    $scope.plan.date = year + "-" + month + '-' +day;
+                }
+            }
+        }
+
+        function isEveryMinutes(exp) {
+            return exp.search(/[0-9]\d{0,1} \* \* \* \* \*/i) === 0;
+        }
+
+        function isEveryHour(exp) {
+            return exp.search(/[[0-9]\d{0,1} [0-9]\d{0,1} \* \* \* \*/i) === 0;
+        }
+
+        function isEveryDay(exp) {
+            return exp.search(/[0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} \* \* \*/i) === 0;
+        }
+
+        function isEveryWeek(exp) {
+            return exp.search(/[0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} \* \* [0-6]/i) === 0;
+        }
+
+        function isEveryMonth(exp) {
+            return exp.search(/[0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} \* \*/i) === 0;
         }
 
         function trimZero(candidate) {
@@ -126,7 +223,6 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 return false;
             }
 
-            console.log($scope.plan);
             $scope.task.triggerType = $scope.plan.triggerType;
             if ($scope.plan.triggerType === $scope.cronTrigger) {
                 $scope.task.trigger = generateCronExpression();
