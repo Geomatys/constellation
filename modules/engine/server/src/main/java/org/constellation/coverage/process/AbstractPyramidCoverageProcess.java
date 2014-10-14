@@ -27,15 +27,19 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.geotoolkit.internal.coverage.CoverageUtilities;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import org.apache.sis.measure.NumberRange;
 import org.constellation.business.IDatasetBusiness;
 
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
+import org.geotoolkit.referencing.OutOfDomainOfValidityException;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * @author Quentin Boileau (Geomatys)
@@ -122,7 +126,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
      * @throws FactoryException
      */
     protected double[] getPyramidScales(GridCoverage2D inputCoverage, PyramidalCoverageReference pyramidRef)
-            throws DataStoreException, FactoryException {
+            throws DataStoreException, FactoryException, TransformException, OutOfDomainOfValidityException {
         final CoordinateReferenceSystem pyramidCRS = getPyramidCRS();
 
         final PyramidSet pyramidSet = pyramidRef.getPyramidSet();
@@ -144,15 +148,22 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         return scales;
     }
 
-    private double[] computeScales(GridCoverage2D coverage) {
-        final Envelope coverageEnv = coverage.getEnvelope();
-        final GridGeometry2D gg = coverage.getGridGeometry();
-        int gridspan = gg.getExtent2D().getSpan(0);
+    private double[] computeScales(GridCoverage2D coverage) throws TransformException, OutOfDomainOfValidityException {
+        final Envelope env = getPyramidWorldEnvelope();
+        final double spanX = env.getSpan(0);
 
-        //calculate scales
-        final double spanX = coverageEnv.getSpan(0);
-        final double baseScale = spanX / gridspan;
+        final GridGeometry2D gg = coverage.getGridGeometry();
+        final Envelope covEnv   = CRS.transform(gg.getEnvelope(), env.getCoordinateReferenceSystem());
+        
+        
+        final double baseScale = covEnv.getSpan(0) / gg.getExtent2D().getSpan(0);
         double scale = spanX / TILE_SIZE;
+        
+        return (double[]) CoverageUtilities.toWellKnownScale(env, new NumberRange(Double.class, baseScale, true, scale, true)).getValue();
+        
+        
+        /*calculate scales
+        
         double[] scales = new double[0];
         while (true) {
             if (scale <= baseScale) {
@@ -167,7 +178,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             }
             scale = scale / 2;
         }
-        return scales;
+        return scales;*/
     }
 
     protected DataProvider createProvider(String providerID, CoverageStore store, Integer domainId, final String datasetName) throws ProcessException {

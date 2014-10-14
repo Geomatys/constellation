@@ -48,6 +48,7 @@ import java.util.Set;
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
+import org.geotoolkit.referencing.OutOfDomainOfValidityException;
 
 /**
  *
@@ -176,7 +177,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
                 map.put(pyramidEnv, scales);
                 builder.create(ref, outputCoverageStore, referenceName, map, null, null, null);
             }
-        } catch (DataStoreException | FactoryException | TransformException e) {
+        } catch (DataStoreException | FactoryException | TransformException | OutOfDomainOfValidityException e) {
             throw new ProcessException(e.getMessage(), this, e);
         }
 

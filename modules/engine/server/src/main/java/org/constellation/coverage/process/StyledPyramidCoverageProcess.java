@@ -58,6 +58,8 @@ import static org.constellation.coverage.process.PyramidCoverageDescriptor.IMAGE
 import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
+import org.geotoolkit.referencing.OutOfDomainOfValidityException;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  *
@@ -199,7 +201,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                 final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef);
                 pyramidStyledData((GridCoverage2D) coverage, pyramidEnv, scales, coverageBaseName, outCovRef, style);
             }
-        } catch (DataStoreException | FactoryException e) {
+        } catch (DataStoreException | FactoryException | OutOfDomainOfValidityException | TransformException e) {
             throw new ProcessException(e.getMessage(), this, e);
         }
 
