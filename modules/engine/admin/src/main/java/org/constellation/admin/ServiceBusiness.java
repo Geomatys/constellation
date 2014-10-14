@@ -54,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.DatasetRepository;
 
 @Component
 @Primary
@@ -70,6 +72,12 @@ public class ServiceBusiness implements IServiceBusiness {
 
     @Inject
     private ServiceRepository serviceRepository;
+    
+    @Inject
+    private DataRepository dataRepository;
+    
+    @Inject
+    private DatasetRepository datasetRepository;
 
     @Inject
     private LayerRepository layerRepository;
@@ -335,6 +343,11 @@ public class ServiceBusiness implements IServiceBusiness {
                 WSEngine.shutdownInstance(serviceType, identifier);
             }
 
+            if (serviceType.equalsIgnoreCase("csw")) {
+                dataRepository.removeAllDataFromCSW(service.getId());
+                datasetRepository.removeAllDatasetFromCSW(service.getId());
+            }
+            
             // delete from database
             serviceRepository.delete(service.getId());
             // delete folder

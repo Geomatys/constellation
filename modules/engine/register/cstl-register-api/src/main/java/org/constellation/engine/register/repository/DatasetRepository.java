@@ -52,4 +52,8 @@ public interface DatasetRepository {
     DatasetXCsw addDatasetToCSW(final int serviceID, final int datasetID, final boolean allData);
     
     void removeDatasetFromCSW(final int serviceID, final int datasetID);
+    
+    void removeDatasetFromAllCSW(final int datasetID);
+    
+    void removeAllDatasetFromCSW(final int serviceID);
 }

@@ -48,14 +48,14 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
     @Autowired
     private IDatasetBusiness datasetBusiness;
 
-    private static final String TILE_FORMAT = "PNG";
+    protected static final String TILE_FORMAT = "PNG";
     protected static final int TILE_SIZE = 256;
 
     public AbstractPyramidCoverageProcess(ProcessDescriptor desc, ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
-    protected CoverageStore createXMLCoverageStore(final File pyramidFolder, final Name layerName)
+    protected CoverageStore createXMLCoverageStore(final File pyramidFolder, final Name layerName, String tileFormat)
             throws DataStoreException, ProcessException, MalformedURLException {
 
         final ParameterValueGroup storeParams = XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
@@ -70,7 +70,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
 
         final XMLCoverageReference covRef = (XMLCoverageReference)store.create(layerName);
         covRef.setPackMode(ViewType.RENDERED);
-        covRef.setPreferredFormat(TILE_FORMAT);
+        covRef.setPreferredFormat(tileFormat);
         return store;
     }
 

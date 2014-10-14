@@ -139,7 +139,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
             try {
                 final File finalPyramidFolder = new File(pyramidFolder, coverageBaseName);
                 referenceName = new DefaultName(coverageBaseName);
-                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName);
+                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, "tif");
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
             }

@@ -126,5 +126,15 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     public void removeDatasetFromCSW(int serviceID, int datasetID) {
         dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(serviceID)).and(DATASET_X_CSW.DATASET_ID.eq(datasetID)).execute();
     }
+
+    @Override
+    public void removeDatasetFromAllCSW(int datasetID) {
+        dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.DATASET_ID.eq(datasetID)).execute();
+    }
+
+    @Override
+    public void removeAllDatasetFromCSW(int serviceID) {
+        dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(serviceID)).execute();
+    }
     
 }

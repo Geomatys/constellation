@@ -66,4 +66,8 @@ public interface DataRepository {
     DataXCsw addDataToCSW(final int serviceID, final int dataID);
     
     void removeDataFromCSW(final int serviceID, final int dataID);
+    
+    void removeDataFromAllCSW(final int dataID);
+    
+    void removeAllDataFromCSW(final int serviceID);
 }

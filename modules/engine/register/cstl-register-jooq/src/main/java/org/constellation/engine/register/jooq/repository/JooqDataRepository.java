@@ -215,4 +215,14 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     public void removeDataFromCSW(int serviceID, int dataID) {
         dsl.delete(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).and(DATA_X_CSW.DATA_ID.eq(dataID)).execute();
     }
+
+    @Override
+    public void removeDataFromAllCSW(int dataID) {
+        dsl.delete(DATA_X_CSW).where(DATA_X_CSW.DATA_ID.eq(dataID)).execute();
+    }
+
+    @Override
+    public void removeAllDataFromCSW(int serviceID) {
+        dsl.delete(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).execute();
+    }
 }

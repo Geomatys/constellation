@@ -102,6 +102,7 @@ import java.util.Map;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
@@ -163,9 +164,9 @@ public final class LayerProviders {
                 return getCoverageDataDescription(layer);
             }
         } catch (DataStoreException ex) {
-            throw new CstlServiceException("An error occurred while trying get/open datastore for provider with id \"" + providerId + "\".");
+            throw new CstlServiceException("An error occurred while trying get/open datastore for provider with id \"" + providerId + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            throw new CstlServiceException("An error occurred while trying get data for provider with id \"" + providerId + "\".");
+            throw new CstlServiceException("An error occurred while trying get data for provider with id \"" + providerId + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
         }
     }
 

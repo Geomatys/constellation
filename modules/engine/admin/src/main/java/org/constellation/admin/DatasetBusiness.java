@@ -499,6 +499,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 dataRepository.update(data);
                 involvedProvider.add(data.getProvider());
                 updateInternalCSWIndex(data.getMetadataId(), domainId, false);
+                dataRepository.removeDataFromAllCSW(data.getId());
             }
             
             // 2. cleanup provider if empty
@@ -514,6 +515,10 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                     providerRepository.delete(providerID);
                 }
             }
+            // 3. remove internal csw link
+            datasetRepository.removeDatasetFromAllCSW(ds.getId());
+            
+            // 4. remove dataset
             indexEngine.removeDatasetMetadataFromIndex(ds.getId());
             datasetRepository.remove(ds.getId());
             

@@ -157,7 +157,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
             try {
                 final File finalPyramidFolder = new File(pyramidFolder, coverageBaseName);
                 referenceName = new DefaultName(coverageBaseName);
-                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName);
+                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, super.TILE_FORMAT);
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
             }

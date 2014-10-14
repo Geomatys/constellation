@@ -197,7 +197,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (service != null) {
             final List<Data> datas    = dataRepository.getCswLinkedData(service.getId());
             for (Data data : datas) {
-                if (data.getMetadataId() != null) {
+                if (data.getMetadataId() != null && data.isVisible()) {
                     results.add(data.getMetadataId());
                 }
             }
@@ -210,7 +210,7 @@ public class MetadataBusiness implements IMetadataBusiness {
                 if (dxc.isAllData()) {
                     final List<Data> subDatas = dataRepository.findByDatasetId(dxc.getDatasetId());
                     for (Data data : subDatas) {
-                        if (data.getMetadataId() != null) {
+                        if (data.getMetadataId() != null && data.isVisible()) {
                             results.add(data.getMetadataId());
                         }
                     }
