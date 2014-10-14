@@ -70,15 +70,15 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static File dataDirectory;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
-        
+
         final File configDir = ConfigDirectory.setupTestEnvironement("NCCSWWorkerTest");
-            
+
         File CSWDirectory  = new File(configDir, "CSW");
         CSWDirectory.mkdir();
         final File instDirectory = new File(CSWDirectory, "default");
@@ -88,9 +88,9 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         dataDirectory = new File(instDirectory, "data");
         dataDirectory.mkdir();
         writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
-            
+
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -167,12 +167,12 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
             fail("unexpected record type:" + obj);
         }
 
-        
+
 
 /*        Marshaller marshaller = pool.acquireMarshaller();
         marshaller.marshal(obj, new File("test.xml"));*/
 
-      
+
 
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).
