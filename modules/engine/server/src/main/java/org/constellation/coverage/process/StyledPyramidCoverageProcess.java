@@ -199,7 +199,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                 }
 
                 final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef);
-                pyramidStyledData((GridCoverage2D) coverage, pyramidEnv, scales, coverageBaseName, outCovRef, style);
+                pyramidStyledData(ref, pyramidEnv, scales, coverageBaseName, outCovRef, style);
             }
         } catch (DataStoreException | FactoryException | OutOfDomainOfValidityException | TransformException e) {
             throw new ProcessException(e.getMessage(), this, e);
@@ -215,7 +215,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
 
     /**
      * Create a mapcontext with our input coverage and pyramid it into output Pyramidal CoverageStore
-     * @param coverage
+     * @param reference
      * @param dataEnv
      * @param scales
      * @param coverageBaseName
@@ -223,10 +223,10 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
      * @param style
      * @throws ProcessException
      */
-    private void pyramidStyledData(GridCoverage2D coverage, Envelope dataEnv, double[] scales, String coverageBaseName,
+    private void pyramidStyledData(CoverageReference reference, Envelope dataEnv, double[] scales, String coverageBaseName,
                                    PyramidalCoverageReference outputRef, MutableStyle style) throws ProcessException {
         final MapContext context = MapBuilder.createContext();
-        final CoverageMapLayer layer = MapBuilder.createCoverageLayer(coverage, style, coverageBaseName);
+        final CoverageMapLayer layer = MapBuilder.createCoverageLayer(reference, style);
         context.items().add(layer);
 
         final ProcessDescriptor desc;
