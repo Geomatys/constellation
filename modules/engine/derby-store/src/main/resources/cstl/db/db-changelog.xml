@@ -23,4 +23,5 @@
   <include file="cstl/db/update/patch-v1.14.xml"/>
   <include file="cstl/db/update/patch-v1.15.xml"/>
   <include file="cstl/db/update/patch-v1.16.xml"/>
+  <include file="cstl/db/update/patch-v1.17.xml"/>
 </databaseChangeLog>
