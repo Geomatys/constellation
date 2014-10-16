@@ -303,15 +303,16 @@ public final class DefaultConfigurator implements Configurator {
     @Override
     public void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
         final org.constellation.engine.register.Provider pr = providerBusiness.getProvider(providerId);
-        try {
-            final String configString = ParamUtilities.writeParameter(config);
-            pr.setConfig(configString);
-            checkDataUpdate(pr);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (pr != null) {
+            try {
+                final String configString = ParamUtilities.writeParameter(config);
+                pr.setConfig(configString);
+                checkDataUpdate(pr);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
-
+        //TODO throw exception ? log message ? create new provider ? do nothing ?
     }
 
     @Override
