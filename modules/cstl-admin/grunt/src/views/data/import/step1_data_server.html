@@ -19,6 +19,7 @@
                        placeholder="{{'data.modal.import.server.label'| translate}}"
                        ng-model="import.currentPath"
                        size="70"
+                       id="currentPath"
                        class="form-control form-control-fix"/>
             </div>
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
@@ -26,6 +27,7 @@
                         role="button"
                         translate="data.modal.import.server.label.list"
                         ng-click="load()"
+                        id="buttonCurrentPath"
                         ng-if="import.currentPath">List files</button>
             </div>
         </div>
