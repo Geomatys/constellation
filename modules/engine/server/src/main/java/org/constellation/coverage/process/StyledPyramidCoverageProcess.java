@@ -30,6 +30,7 @@ import org.constellation.provider.Providers;
 import org.constellation.util.StyleReference;
 import org.geotoolkit.coverage.*;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.feature.type.DefaultName;
@@ -159,7 +160,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
             try {
                 final File finalPyramidFolder = new File(pyramidFolder, coverageBaseName);
                 referenceName = new DefaultName(coverageBaseName);
-                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, super.TILE_FORMAT);
+                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, PNG_FORMAT,  ViewType.RENDERED);
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
             }

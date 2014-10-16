@@ -25,6 +25,7 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.geotoolkit.coverage.*;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.feature.type.DefaultName;
@@ -140,7 +141,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
             try {
                 final File finalPyramidFolder = new File(pyramidFolder, coverageBaseName);
                 referenceName = new DefaultName(coverageBaseName);
-                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, "tif");
+                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, TIFF_FORMAT, ViewType.GEOPHYSICS);
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
             }
