@@ -770,7 +770,7 @@ public final class StyleRest {
                final org.geotoolkit.process.Process process = desc.createProcess(procparams);
                result = process.call();
            } finally {
-               gridCoverageReader.dispose();
+               coverageReference.recycle(gridCoverageReader);
            }
            //sampling for repartition
            final ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
