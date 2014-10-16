@@ -61,7 +61,7 @@ import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
-import org.geotoolkit.process.coverage.copy.StatisticOp;
+import org.geotoolkit.process.coverage.statistics.StatisticOp;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sld.xml.Specification;
