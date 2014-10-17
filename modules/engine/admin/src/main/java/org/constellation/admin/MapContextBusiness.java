@@ -24,6 +24,7 @@ import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.business.IDataBusiness;
+import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IMapContextBusiness;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.ParameterValues;
@@ -60,6 +61,9 @@ public class MapContextBusiness implements IMapContextBusiness {
 
     @Inject
     private IDataBusiness dataBusiness;
+
+    @Inject
+    private IDatasetBusiness datasetBusiness;
 
     @Inject
     private ProviderRepository providerRepository;
@@ -215,7 +219,8 @@ public class MapContextBusiness implements IMapContextBusiness {
         return values;
     }
 
-    private GeneralEnvelope getEnvelopeForLayers(final List<MapcontextStyledLayer> styledLayers, final GeneralEnvelope ctxtEnv) throws FactoryException {
+    private GeneralEnvelope getEnvelopeForLayers(final List<MapcontextStyledLayer> styledLayers,
+                                                 final GeneralEnvelope ctxtEnv) throws FactoryException {
         GeneralEnvelope env = ctxtEnv;
         for (final MapcontextStyledLayer styledLayer : styledLayers) {
             if (!styledLayer.isLayerVisible()) {
@@ -227,7 +232,20 @@ public class MapContextBusiness implements IMapContextBusiness {
                 final Data data = dataRepository.findById(layerRecord.getData());
                 final Provider provider = providerRepository.findOne(data.getProvider());
 
-                final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider.getIdentifier(), Util.parseQName(data.getName()));
+                final QName dataName = Util.parseQName(data.getName());
+                DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider.getIdentifier(), dataName);
+                if(metadata == null){
+                    //try to get dataset metadata.
+                    final Dataset dataset = dataBusiness.getDatasetForData(provider.getIdentifier(), dataName);
+                    if (dataset != null) {
+                        try{
+                            metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                        }catch(Exception ex){
+                            //skip for this layer
+                            continue;
+                        }
+                    }
+                }
                 if (metadata == null || metadata.getIdentificationInfo() == null || metadata.getIdentificationInfo().isEmpty()) {
                     continue;
                 }
