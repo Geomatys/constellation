@@ -654,7 +654,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 templateUrl: 'views/data/modalImportData.html',
                 controller: 'ModalImportDataController',
                 resolve: {
-                    'firstStep': function() { return 'step1DataLocal'; }
+                    'firstStep': function() { return 'step1DataLocal'; },
+                    'importType': function() { return 'local'; }
                 }
             });
             modal.result.then(function(result) {
@@ -682,7 +683,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 templateUrl: 'views/data/modalImportData.html',
                 controller: 'ModalImportDataController',
                 resolve: {
-                    'firstStep': function() { return 'step1DataServer'; }
+                    'firstStep': function() { return 'step1DataServer'; },
+                    'importType': function() { return 'server'; }
                 }
             });
             modal.result.then(function(result) {
@@ -710,7 +712,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 templateUrl: 'views/data/modalImportData.html',
                 controller: 'ModalImportDataController',
                 resolve: {
-                    'firstStep': function() { return 'step1Database'; }
+                    'firstStep': function() { return 'step1Database'; },
+                    'importType': function() { return 'database'; }
                 }
             });
             modal.result.then(function(result) {
@@ -729,6 +732,34 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     }, function () {//error
                         Growl('error', 'Error', 'Unable to save metadata');
                     });
+                }
+            });
+        };
+
+        $scope.showEmptyDataSetPopup = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/data/modalImportData.html',
+                controller: 'ModalImportDataController',
+                resolve: {
+                    'firstStep': function() { return 'step2Metadata'; },
+                    'importType': function() { return 'empty'; }
+                }
+            });
+            modal.result.then(function(result) {
+                if(!result){
+                    return;
+                }
+                if(!result.file){
+                    return;
+                }else {
+                    dataListing.setMetadata({}, {values: {"providerId": result.file,
+                                                          "dataType": result.type}},
+                        function () {//success
+                            $scope.initAfterImport();
+                            openModalEditor(null,result.file,result.type,"import",'data');
+                        }, function () {//error
+                            Growl('error', 'Error', 'Unable to save metadata');
+                        });
                 }
             });
         };

@@ -175,6 +175,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'listAll':              {method: 'GET',    isArray: true },
             'downloadMetadata':     {method: 'GET',    url: '@cstl/api/1/domain/$domainId/metadata/dataset/:datasetIdentifier;jsessionid='},
             'deleteDataset':        {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/metadata/dataset/:datasetIdentifier;jsessionid='},
+            'createDataset':        {method: 'POST',   url: '@cstl/api/1/domain/$domainId/metadata/dataset/create;jsessionid='},
             'findDataset':          {method: 'POST',   url: '@cstl/api/1/domain/$domainId/metadata/dataset/find;jsessionid=', isArray: true}
         });
     })

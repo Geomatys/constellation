@@ -20,8 +20,9 @@
 
 angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('ModalImportDataController', function($scope, $modalInstance, dataListing, provider, firstStep, UploadFiles, Growl) {
+    .controller('ModalImportDataController', function($scope, $modalInstance, dataListing, datasetListing, provider, firstStep, importType, UploadFiles, Growl) {
         $scope.import = {
+            importType: importType,
             currentStep: firstStep,
             dataPath: null,
             mdPath: null,
@@ -86,7 +87,19 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.uploaded = function() {
-            if ($scope.import.dataPath && $scope.import.dataPath.indexOf('failed') === -1) {
+            if ($scope.import.importType === 'empty' && $scope.import.dataName) {
+                //empty dataset case
+                datasetListing.createDataset({values: {"datasetIdentifier":$scope.import.dataName}},function(response){//success
+                    Growl('success','Success','Data set '+ $scope.import.dataName +' successfully created');
+                    $modalInstance.close({file: $scope.import.dataName,
+                                          type: "import"});
+                },function(response){//error
+                    Growl('error','Error','Fail to create dataset '+ $scope.import.dataName);
+                    $modalInstance.close();
+                });
+
+            } else if ($scope.import.dataPath && $scope.import.dataPath.indexOf('failed') === -1) {
+                // dataset creation with data
                 var upFile = $scope.import.dataPath;
                 var upMdFile = null;
                 if ($scope.import.mdPath && $scope.import.mdPath.indexOf('failed') === -1) {
@@ -191,7 +204,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.import.finish = function() {
-            if ($scope.import.uploadType) {
+            if ($scope.import.uploadType || $scope.import.importType === 'empty') {
                 $scope.uploaded();
             } else {
                 Growl('error','Error','Select Data Type');
@@ -231,6 +244,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             upload: false
         };
 
+        $scope.import.allowNext = false;
         $scope.import.next = function() {
             $scope.uploadData();
         };
@@ -382,6 +396,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
         $scope.load = function(){
             $scope.import.allowNext = false;
+            $scope.import.allowSubmit = false;
             var path = $scope.import.currentMDPath;
             dataListing.metadataFolder({}, path,
                 function(files) {//success
@@ -426,23 +441,32 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             $scope.import.identifier = $scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').substr(0,$scope.import.dataPath.replace(/^.*(\\|\/|\:)/, '').lastIndexOf('.'));
         }
         if ($scope.import.identifier && $scope.import.identifier.length > 0) {
-            $scope.import.allowNext = true;
+
+            //final step if empty dataset creation is selected
+            if ($scope.import.importType === 'empty') {
+                $scope.import.allowSubmit = true;
+            } else {
+                $scope.import.allowNext = true;
+            }
         }
 
         $scope.verifyAllowNext = function(){
+                $scope.import.allowNext = false;
+                $scope.import.allowSubmit = false;
                 if (($scope.import.identifier && $scope.import.identifier.length > 0) ) {
                     var letters = /^[A-Za-zàèìòùáéíóúäëïöüñãõåæøâêîôû0-9\-_]+$/;
                     var id = $scope.import.identifier;
                     if(!id.match(letters)) {
-                        $scope.import.allowNext = false;
                         Growl('error','Error','fill identifier without special chars like space');
                     }else {
-                        $scope.import.allowNext = true;
+                        if ($scope.import.importType === 'empty') {
+                            $scope.import.allowSubmit = true;
+                        } else {
+                            $scope.import.allowNext = true;
+                        }
                     }
                 }else if ($scope.import.metadata && $scope.import.metadata.length > 0) {
-                    $scope.import.allowNext = true;
-                } else {
-                    $scope.import.allowNext = false;
+                    $scope.import.allowSubmit = true;
                 }
         };
 
@@ -452,13 +476,23 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             } else {
                 $scope.selectType();
             }
+        };
 
+        $scope.import.finish = function() {
+            if ($scope.import.metadata || $scope.import.identifier) {
+                $scope.uploadMetadata();
+            } else {
+                $scope.finish();
+            }
         };
 
         $scope.selectType = function(){
             $scope.import.allowNext = false;
             if ($scope.import.db.url) {
                 $scope.importDb();
+            } else if ($scope.import.importType === 'empty') {
+                //skip datatype fragment when we're on empty dataset creation.
+                $scope.uploaded();
             } else if (!$scope.import.uploadType) {
                 $scope.import.currentStep = 'step3Type';
                 $scope.import.allowSubmit = true;

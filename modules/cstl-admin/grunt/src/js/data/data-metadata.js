@@ -23,12 +23,15 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
     .controller('EditMetadataController', function ($scope, $routeParams,dataListing, $location, $translate, Growl) {
         $scope.provider = $scope.provider || $routeParams.provider;
         $scope.identifier = $scope.identifier || $routeParams.identifier;
+
+        $scope.typeLabelKey = "metadata.edition.dataset.import";
         $scope.type = $scope.type || $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
-        if($scope.type.toLowerCase() === 'coverage'){
-            $scope.type = 'raster';
+        if ($scope.type !== null) {
+            $scope.type = $scope.type.toLowerCase();
+            $scope.typeLabelKey = "metadata.edition.dataset." + $scope.type;
         }
+
         $scope.template = $scope.template || $routeParams.template || 'import';
-        $scope.typeLabelKey = "metadata.edition.dataset."+$scope.type;
         $scope.theme = $scope.theme || 'data';
 
         $scope.uriRegExp=/^([a-z][a-z0-9+.-]*):(?:\/\/((?:(?=((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*))(\3)@)?(?=(\[[0-9A-F:.]{2,}\]|(?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*))\5(?::(?=(\d*))\6)?)(\/(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*))\8)?|(\/?(?!\/)(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*))\10)?)(?:\?(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/?]|%[0-9A-F]{2})*))\11)?(?:#(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/?]|%[0-9A-F]{2})*))\12)?$/i;

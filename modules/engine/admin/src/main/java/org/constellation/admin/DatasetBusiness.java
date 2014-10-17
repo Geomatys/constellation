@@ -41,6 +41,7 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
 import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.business.IDatasetBusiness;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.CstlUser;
@@ -169,7 +170,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      */
     @Override
     public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) {
-        final Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner, System.currentTimeMillis(), null);
+        Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner, System.currentTimeMillis(), null);
         return datasetRepository.insert(ds);
     }
 
@@ -324,27 +325,31 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
         DefaultMetadata extractedMetadata;
         String crsName = null;
-        switch (dataType) {
-            case "raster":
-                try {
-                    extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider);
-                    crsName = MetadataUtilities.getRasterCRSName(dataProvider);
-                } catch (DataStoreException e) {
-                    LOGGER.log(Level.WARNING, "Error when trying to get raster metadata", e);
+        if (dataType != null) {
+            switch (dataType) {
+                case "raster":
+                    try {
+                        extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider);
+                        crsName = MetadataUtilities.getRasterCRSName(dataProvider);
+                    } catch (DataStoreException e) {
+                        LOGGER.log(Level.WARNING, "Error when trying to get raster metadata", e);
+                        extractedMetadata = new DefaultMetadata();
+                    }
+                    break;
+                case "vector":
+                    try {
+                        extractedMetadata = MetadataUtilities.getVectorMetadata(dataProvider);
+                        crsName = MetadataUtilities.getVectorCRSName(dataProvider);
+                    } catch (DataStoreException | TransformException e) {
+                        LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
+                        extractedMetadata = new DefaultMetadata();
+                    }
+                    break;
+                default:
                     extractedMetadata = new DefaultMetadata();
-                }
-                break;
-            case "vector":
-                try {
-                    extractedMetadata = MetadataUtilities.getVectorMetadata(dataProvider);
-                    crsName = MetadataUtilities.getVectorCRSName(dataProvider);
-                } catch (DataStoreException | TransformException e) {
-                    LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
-                    extractedMetadata = new DefaultMetadata();
-                }
-                break;
-            default:
-                extractedMetadata = new DefaultMetadata();
+            }
+        } else {
+            extractedMetadata = new DefaultMetadata();
         }
         //Update metadata
         final Properties prop = ConfigurationBusiness.getMetadataTemplateProperties();
@@ -491,9 +496,23 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         final Dataset ds = datasetRepository.findByIdentifier(datasetIdentifier);
         if (ds != null) {
             final Set<Integer> involvedProvider = new HashSet<>();
-            
+            final Set<Data> linkedData = new HashSet<>();
+
             // 1. hide data
-            for (Data data : dataRepository.findAllByDatasetId(ds.getId())) {
+            linkedData.addAll(dataRepository.findAllByDatasetId(ds.getId()));
+
+            //find provider with same identifier as dataset
+            final Provider linkedProvider = providerRepository.findByIdentifier(ds.getIdentifier());
+            if (linkedProvider != null) {
+                final List<Data> providerData = dataRepository.findByProviderId(linkedProvider.getId());
+                linkedData.addAll(providerData);
+                if (providerData.isEmpty()) {
+                    //handle empty provider
+                    involvedProvider.add(linkedProvider.getId());
+                }
+            }
+
+            for (Data data : linkedData) {
                 data.setVisible(false);
                 data.setDatasetId(null);
                 dataRepository.update(data);
@@ -501,7 +520,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 updateInternalCSWIndex(data.getMetadataId(), domainId, false);
                 dataRepository.removeDataFromAllCSW(data.getId());
             }
-            
+
             // 2. cleanup provider if empty
             for (Integer providerID : involvedProvider) {
                 boolean remove = true;

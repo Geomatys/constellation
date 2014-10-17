@@ -27,6 +27,7 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.dto.ParameterValues;
@@ -39,6 +40,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +89,12 @@ public class MetadataRest {
     private UserRepository userRepository;
 
     /**
+     * Injected security manager
+     */
+    @Inject
+    private org.constellation.security.SecurityManager securityManager;
+
+    /**
      * Proceed to remove a dataset
      * @param domainId
      * @param datasetIdentifier
@@ -104,6 +112,39 @@ public class MetadataRest {
             return Response.status(500).entity("failed").build();
         }
     }
+
+    @POST
+    @Path("dataset/create")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response createDataset(@PathParam("domainId") final int domainId,
+                                  final ParameterValues values) {
+
+        final String datasetIdentifier = values.getValues().get("datasetIdentifier");
+        if (datasetIdentifier != null && !datasetIdentifier.isEmpty()) {
+            try {
+                Dataset dataset = datasetBusiness.getDataset(datasetIdentifier);
+                if (dataset != null) {
+                    LOGGER.log(Level.WARNING, "Dataset with identifier " + datasetIdentifier + " already exist");
+                    return Response.status(Response.Status.CONFLICT).entity("failed").build();
+                }
+
+                Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+                Dataset dataSet = datasetBusiness.createDataset(datasetIdentifier, null, null, user.get().getId());
+                return Response.ok().status(Response.Status.CREATED)
+                        .type(MediaType.APPLICATION_JSON)
+                        .entity(dataSet)
+                        .build();
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, "Failed to create dataset with identifier " + datasetIdentifier, ex);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("failed").build();
+            }
+        } else {
+            LOGGER.log(Level.WARNING, "Can't create dataset with empty identifier");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("failed").build();
+        }
+    }
+
     /**
      * Returns all dataset in brief format with its own list of data in brief format.
      *
