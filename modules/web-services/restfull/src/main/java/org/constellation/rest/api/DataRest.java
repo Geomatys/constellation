@@ -1012,18 +1012,8 @@ public class DataRest {
             final DefaultMetadata metadata  =  datasetBusiness.getMetadata(identifier, -1);
             if (metadata != null) {
                 //get template name
-                final String templateName;
-                if("vector".equalsIgnoreCase(dataType)){
-                    //vector template
-                    templateName="profile_default_vector";
-                }else if("raster".equalsIgnoreCase(dataType)){
-                    //raster template
-                    templateName="profile_default_raster";
-                }else {
-                    //default template is import
-                    templateName="profile_import";
-                }
-                final Template template = Template.getInstance(templateName);
+                final String templateName = datasetBusiness.getTemplate(identifier, dataType);
+                final Template template   = Template.getInstance(templateName);
                 template.write(metadata,buffer,false);
             }
         }catch(Exception ex){
@@ -1044,25 +1034,22 @@ public class DataRest {
         try{
             final QName dataName = Util.parseQName(identifier);
             DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, dataName);
+            String datasetId = null;
             if(metadata == null){
                 //try to get dataset metadata.
                 final Dataset dataset = dataBusiness.getDatasetForData(providerId, dataName);
                 if (dataset != null) {
                     metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                    datasetId = dataset.getIdentifier();
                 }
             }
             if (metadata != null) {
                 //get template name
                 final String templateName;
-                if("vector".equalsIgnoreCase(dataType)){
-                    //vector template
-                    templateName="profile_default_vector";
-                }else if("raster".equalsIgnoreCase(dataType)){
-                    //raster template
-                    templateName="profile_default_raster";
-                }else {
-                    //default template is import
-                    templateName="profile_import";
+                if (datasetId != null) {
+                    templateName = datasetBusiness.getTemplate(datasetId, dataType);
+                } else {
+                    templateName = dataBusiness.getTemplate(dataName, dataType);
                 }
                 final Template template = Template.getInstance(templateName);
                 template.write(metadata,buffer,false);
@@ -1097,13 +1084,15 @@ public class DataRest {
             if(dataIdStr != null) {
                 dataIdStr = dataIdStr.replaceAll(" ","%20");
             }
-            final QName dataName = Util.parseQName(dataIdStr);
+            final QName dataName     = Util.parseQName(dataIdStr);
             DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, dataName);
-            if(metadata == null){
+            String datasetId         = null;
+            if (metadata == null) {
                 //try to get dataset metadata.
                 final Dataset dataset = dataBusiness.getDatasetForData(providerId, dataName);
                 if (dataset != null) {
                     metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                    datasetId = dataset.getIdentifier();
                 }
             }
             if (metadata != null) {
@@ -1118,15 +1107,10 @@ public class DataRest {
 
                 //get template name
                 final String templateName;
-                if("vector".equalsIgnoreCase(type)){
-                    //vector template
-                    templateName="profile_default_vector";
-                }else if ("raster".equalsIgnoreCase(type)){
-                    //raster template
-                    templateName="profile_default_raster";
+                if (datasetId != null) {
+                    templateName = datasetBusiness.getTemplate(datasetId, type);
                 } else {
-                    //default template is import
-                    templateName="profile_import";
+                    templateName = dataBusiness.getTemplate(dataName, type);
                 }
                 final Template template = Template.getInstance(templateName);
                 template.write(metadata,buffer,prune);
@@ -1166,18 +1150,8 @@ public class DataRest {
                 }*/
 
                 //get template name
-                final String templateName;
-                if("vector".equalsIgnoreCase(type)){
-                    //vector template
-                    templateName="profile_default_vector";
-                }else if ("raster".equalsIgnoreCase(type)){
-                    //raster template
-                    templateName="profile_default_raster";
-                } else {
-                    //default template is import
-                    templateName="profile_import";
-                }
-                final Template template = Template.getInstance(templateName);
+                final String templateName = datasetBusiness.getTemplate(datasetIdentifier, type);
+                final Template template   = Template.getInstance(templateName);
                 template.write(metadata,buffer,prune);
             }
         }catch(Exception ex){
@@ -1209,24 +1183,21 @@ public class DataRest {
             final QName dataName = Util.parseQName(identifier);
             final Dataset ds = dataBusiness.getDatasetForData(provider, dataName);
             
+            String datasetId         = null;
             DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider, dataName);
             if(metadata == null){
                 //try to get dataset metadata.
                 metadata = datasetBusiness.getMetadata(ds.getIdentifier(),-1);
                 dataset = true;
+                datasetId = ds.getIdentifier();
             }
             if(metadata != null) {
                 //get template name
                 final String templateName;
-                if ("vector".equalsIgnoreCase(type)) {
-                    //vector template
-                    templateName = "profile_default_vector";
-                } else if ("raster".equalsIgnoreCase(type)){
-                    //raster template
-                    templateName = "profile_default_raster";
-                }else {
-                    //default template is import
-                    templateName = "profile_import";
+                if (datasetId != null) {
+                    templateName = datasetBusiness.getTemplate(datasetId, type);
+                } else {
+                    templateName = dataBusiness.getTemplate(dataName, type);
                 }
                 final Template template = Template.getInstance(templateName);
 
@@ -1266,17 +1237,7 @@ public class DataRest {
             final DefaultMetadata metadata = datasetBusiness.getMetadata(identifier, -1);
             if(metadata != null) {
                 //get template name
-                final String templateName;
-                if ("vector".equalsIgnoreCase(type)) {
-                    //vector template
-                    templateName = "profile_default_vector";
-                } else if ("raster".equalsIgnoreCase(type)){
-                    //raster template
-                    templateName = "profile_default_raster";
-                }else {
-                    //default template is import
-                    templateName = "profile_import";
-                }
+                final String templateName = datasetBusiness.getTemplate(identifier, type);
                 final Template template = Template.getInstance(templateName);
 
                 try{

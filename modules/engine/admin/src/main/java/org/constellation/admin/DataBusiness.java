@@ -717,6 +717,22 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
     }
     
+    @Override
+    public String getTemplate(final QName dataName, final String dataType) throws ConfigurationException {
+        final String templateName;
+        if ("vector".equalsIgnoreCase(dataType)) {
+            //vector template
+            templateName = "profile_default_vector";
+        } else if ("raster".equalsIgnoreCase(dataType)) {
+            //raster template
+            templateName = "profile_default_raster";
+        } else {
+            //default template is import
+            templateName = "profile_import";
+        }
+        return templateName;
+    }
+    
     protected MarshallerPool getMarshallerPool() {
         return ISOMarshallerPool.getInstance();
     }
