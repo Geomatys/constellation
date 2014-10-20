@@ -72,13 +72,7 @@ module.exports = function(grunt) {
                         expand: true
                     },
                     {
-                        src: ['i18n/*.json'],
-                        cwd: '<%= src_dir %>/',
-                        dest: '<%= target_dir %>/',
-                        expand: true
-                    },
-                    {
-                        src: ['metadata/*.json'],
+                        src: ['i18n/**'],
                         cwd: '<%= src_dir %>/',
                         dest: '<%= target_dir %>/',
                         expand: true
