@@ -479,10 +479,24 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.import.finish = function() {
-            if ($scope.import.metadata || $scope.import.identifier) {
-                $scope.uploadMetadata();
+
+            var finishUpload = false;
+            if ($scope.import.importType === 'empty') {
+                if ($scope.import.metadata || $scope.import.identifier) {
+                    $scope.uploadMetadata();
+                } else {
+                    finishUpload = true;
+                }
             } else {
-                $scope.finish();
+                if ($scope.import.uploadType) {
+                    finishUpload = true;
+                } else {
+                    Growl('error', 'Error', 'Select Data Type');
+                }
+            }
+
+            if (finishUpload) {
+                $scope.uploaded();
             }
         };
 
