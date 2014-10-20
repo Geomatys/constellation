@@ -23,8 +23,8 @@ var cstlAdminApp = angular.module('CstlAdminApp', ['CstlAdminDep']);
 
 
 cstlAdminApp
-    .config(['$routeProvider', '$httpProvider', '$translateProvider',
-        function ($routeProvider, $httpProvider, $translateProvider) {
+    .config(['$routeProvider', '$httpProvider', '$translateProvider', '$translatePartialLoaderProvider',
+        function ($routeProvider, $httpProvider, $translateProvider, $translatePartialLoaderProvider) {
     	 $httpProvider.defaults.useXDomain = true;
 
          $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
@@ -168,10 +168,11 @@ cstlAdminApp
                 });
 
             // Initialize angular-translate
-            $translateProvider.useStaticFilesLoader({
-                prefix: 'i18n/',
-                suffix: '.json'
+            $translateProvider.useLoader('$translatePartialLoader', {
+                urlTemplate: 'i18n/{lang}/{part}.json'
             });
+            $translatePartialLoaderProvider.addPart('ui');
+            $translatePartialLoaderProvider.addPart('metadata');
 
             $translateProvider.preferredLanguage('en');
 

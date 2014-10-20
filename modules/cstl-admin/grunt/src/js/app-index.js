@@ -33,7 +33,7 @@ angular.module('CstlIndexApp', [
     //  Configuration
     // -------------------------------------------------------------------------
     
-    .config(function($routeProvider, $httpProvider, $translateProvider) {
+    .config(function($routeProvider, $httpProvider, $translateProvider, $translatePartialLoaderProvider) {
         
         // Configure routes.
         $routeProvider
@@ -55,10 +55,11 @@ angular.module('CstlIndexApp', [
         $httpProvider.interceptors.push('AuthInterceptor');
     
         // Configure $translate service.
-        $translateProvider.useStaticFilesLoader({
-            prefix: 'i18n/',
-            suffix: '.json'
+        $translateProvider.useLoader('$translatePartialLoader', {
+            urlTemplate: 'i18n/{lang}/{part}.json'
         });
+        $translatePartialLoaderProvider.addPart('ui');
+
         $translateProvider.preferredLanguage('en');
         $translateProvider.useCookieStorage();
     })
