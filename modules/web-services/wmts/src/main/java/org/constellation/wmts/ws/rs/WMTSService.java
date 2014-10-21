@@ -263,7 +263,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         getTile.setTileRow(Integer.valueOf(getParameter("TileRow", true)));
         getTile.setTileMatrix(getParameter("TileMatrix", true));
         getTile.setTileMatrixSet(getParameter("TileMatrixSet", true));
-        // Optionnal parameters
+        // Optional parameters
         getTile.setStyle(getParameter("style", false));
         return getTile;
     }
