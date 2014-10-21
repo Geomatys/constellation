@@ -148,7 +148,6 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                                 }else if('error' === response.verifyCRS) {
                                     Growl('warning','CRS','Data '+ $scope.import.providerId +' without Projection');
                                     $scope.import.allowSubmit = false;
-                                    //TODO div select EPSG
                                     $scope.import.enableSelectEPSGCode = true;
                                     if(response.codes){
                                         $scope.epsgList = response.codes;
@@ -172,7 +171,6 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                                                               completeMetadata:$scope.import.fillMetadata});
                                     } else {
                                         $scope.showAssociate();
-                                        // todo: displayNetCDF(fileName);
                                     }
                                 }else if('error' === response.verifyCRS) {
                                     Growl('warning','CRS','Data '+ $scope.import.providerId +' without Projection');
@@ -666,32 +664,5 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             }, function() {
                 Growl('error','Error','Unable to import sensor');
             });
-        }
-    })
-
-    .controller('ModalImportDataStep4SNetcdfController', function($scope, dataListing, Growl, $cookies) {
-        function displayNetCDF(providerId) {
-            $scope.import.currentStep = 'step4Netcdf';
-            $scope.import.allowNext = false;
-            $scope.import.allowSensorChoose = false;
-            $scope.import.allowSubmit = false;
-
-            $scope.coveragesData = dataListing.listCoverage({}, {value: providerId},
-                function(response) {//success
-                    for (var key in response.values) {
-                        if(response.values.hasOwnProperty(key)){
-                            displayLayer(response.values[key]);
-                            break;
-                        }
-                    }
-            });
-        }
-
-        function displayLayer(layer) {
-            $scope.import.layer = layer;
-            var layerData = DataViewer.createLayer($cookies.cstlUrl, layer, $scope.import.providerId);
-            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-            DataViewer.layers = [layerData, layerBackground];
-            DataViewer.initMap('dataPreviewMap');
         }
     });
