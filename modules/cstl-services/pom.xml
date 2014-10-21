@@ -11,10 +11,7 @@
     <version>0.9-SNAPSHOT</version>
   </parent>
 
-
-
   <!-- Module description. -->
-  <groupId>org.constellation</groupId>
   <artifactId>cstl-services</artifactId>
   <packaging>war</packaging>
   <name>Constellation (services)</name>
@@ -23,51 +20,49 @@
   <properties>
     <conf>dev</conf>
     <codahale.metrics.version>3.0.1</codahale.metrics.version>
-
   </properties>
 
-
-  <!-- Developers and contributors. -->
-  <developers>
-    <developer>
-      <id>glegal</id>
-      <name>Guilhem Legal</name>
-      <email>guilhem.legal@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>cedricbr</id>
-      <name>Cédric Briançon</name>
-      <email>cedric.briancon@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
-
-
-  <!-- By default, build all webservices. Several profiles are defined to 
+   <!-- By default, build all webservices. Several profiles are defined to 
     specifically build a webservice. -->
   <profiles>
+    <profile>
+      <!--
+      WARNING:  If this profile is activated, it will disable the "all" profile,
+       you probably need to activate the "all" profile explicitly -->
+      <id>no-drivers</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.derby</groupId>
+          <artifactId>derby</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.derby</groupId>
+          <artifactId>derbyLocale_fr</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+        <profile>
+      <!--
+      WARNING:  If this profile is activated, it will disable the "all" profile,
+       you probably need to activate the "all" profile explicitly -->
+      <id>no-jai</id>
+      <dependencies>
+        <dependency>
+          <groupId>javax.media</groupId>
+          <artifactId>jai_core</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.media</groupId>
+          <artifactId>jai_codec</artifactId>
+          <scope>test</scope>
+          <version>1.1.4</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    
     <profile>
       <id>all</id>
       <activation>
@@ -220,6 +215,15 @@
               <artifactId>commons-logging</artifactId>
             </exclusion>
           </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>javax.media</groupId>
+          <artifactId>jai_core</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>javax.media</groupId>
+          <artifactId>jai_codec</artifactId>
+          <version>1.1.4</version>
         </dependency>
       </dependencies>
     </profile>
@@ -476,14 +480,14 @@
       </dependencies>
     </profile>
     <profile>
-        <id>orfeo</id>
-        <dependencies>
-            <dependency>
-                <groupId>org.geotoolkit</groupId>
-                <artifactId>geotk-processing-orfeo</artifactId>
-                <version>1.0-GEOTK-4-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
+      <id>orfeo</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.geotoolkit</groupId>
+          <artifactId>geotk-processing-orfeo</artifactId>
+          <version>1.0-GEOTK-4-SNAPSHOT</version>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 
@@ -491,6 +495,12 @@
   <!-- Dependencies required only for compilation. These dependencies will 
     be included in the JARs' list for which Maven will move into "target/binaries". -->
   <dependencies>
+  
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+  
     <dependency>
       <groupId>org.constellation.web-services-rest</groupId>
       <artifactId>cstl-web-restfull</artifactId>
@@ -523,20 +533,20 @@
     </dependency>
 
     <!-- Spring framework -->
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-messaging</artifactId>
       <version>${spring.version}</version>
     </dependency>
-    
-    
+
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-websocket</artifactId>
       <version>${spring.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
@@ -767,6 +777,45 @@
       </plugin>
     </plugins>
   </build>
+  
+  
+   <!-- Developers and contributors. -->
+  <developers>
+    <developer>
+      <id>glegal</id>
+      <name>Guilhem Legal</name>
+      <email>guilhem.legal@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>desruisseaux</id>
+      <name>Martin Desruisseaux</name>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>cedricbr</id>
+      <name>Cédric Briançon</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  
 
 </project>
 

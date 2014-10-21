@@ -25,7 +25,12 @@
     The testing part of the Engine of the Constellation server.
   </description>
 
-
+  <dependencies>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_core</artifactId>
+    </dependency>
+  </dependencies>
 
   <!--  Developers and contributors.  -->
   <developers>
