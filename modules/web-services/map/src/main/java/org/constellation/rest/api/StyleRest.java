@@ -775,8 +775,8 @@ public final class StyleRest {
            //sampling for repartition
            final ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
            for(final ImageStatistics.Band band : statistics.getBands()){
-               if(band.getRepartition() instanceof TreeMap){
-                   final TreeMap<Double,Long> repartition = (TreeMap)band.getRepartition();
+               if(band.getFullDistribution() instanceof TreeMap){
+                   final TreeMap<Double,Long> repartition = (TreeMap)band.getFullDistribution();
                    TreeMap<Double,Long> newRepartition = new TreeMap<>();
                    if(repartition.size()>1000){
                        int step=0;
@@ -796,7 +796,7 @@ public final class StyleRest {
                                valSum+=entry.getValue();
                            }
                        }
-                       band.setRepartition(newRepartition);
+                       band.setFullDistribution(newRepartition);
                    }
                }
            }
