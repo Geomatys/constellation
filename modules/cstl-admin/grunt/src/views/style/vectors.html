@@ -326,9 +326,8 @@
                                                         <select class="form-control form-control-fix"
                                                                 ng-init="loadDataProperties();"
                                                                 ng-model="filter.attribute"
+                                                                ng-options="dp.name as dp.name for dp in $parent.attributesExcludeGeometry"
                                                                 ng-change="applyFilter();">
-                                                            <option ng-value="dp.name"
-                                                                    ng-repeat="dp in $parent.attributesExcludeGeometry">{{dp.name}}</option>
                                                         </select>
                                                     </td>
                                                     <td>
