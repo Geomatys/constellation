@@ -273,8 +273,12 @@ scan:   while (position < upper) {
      * Returns the current line (in full, not only the current portion) without the trailing "null".
      */
     String fullLineWithoutNull() throws ParseException {
-        if (trailingComma != null) throw new ParseException("Value shall be the last entry in a field.");
-        if (getValue()    != null) throw new ParseException("Value of \"value\" shall be null.");
+        if (trailingComma != null) {
+            throw new ParseException("Value shall be the last entry in a field.");
+        }
+        if (getValue() != null) {
+            throw new ParseException("Value of \"value\" shall be null.");
+        }
         return sharedLine(line.substring(0, length - NULL.length()));
     }
 
