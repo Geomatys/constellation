@@ -184,7 +184,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
-            if (!requestCapabilities.getService().equals("WMTS")) {
+            if (!requestCapabilities.getService().equalsIgnoreCase("WMTS")) {
                 throw new CstlServiceException("service must be \"WMTS\"!",
                                                  INVALID_PARAMETER_VALUE, "service");
             }
@@ -368,7 +368,9 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
                         // Fill dimensions
                         for (Map.Entry<Integer, CoordinateReferenceSystem> entry : splittedCRS.entrySet()) {
+                            String strValue = null;
                             // For temporal values, we convert it into timestamp, then to an ISO 8601 date.
+                            final List<String> currentDimValues = dims.get(entry.getKey()).getValue();
                             if (entry.getValue() instanceof TemporalCRS) {
                                 double value = upperLeft.getOrdinate(entry.getKey());
                                 if (!CRS.equalsApproximatively(JAVA_TIME, entry.getValue())) {
@@ -376,10 +378,15 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                     CRS.findMathTransform(entry.getValue(), JAVA_TIME).transform(tmpArray, 0, tmpArray, 0, 1);
                                     value = tmpArray[0];
                                 }
-                                dims.get(entry.getKey()).getValue().add(ISO_8601_FORMATTER.format(new Date((long)value)));
+
+                                strValue = ISO_8601_FORMATTER.format(new Date((long) value));
 
                             } else {
-                                dims.get(entry.getKey()).getValue().add(""+upperLeft.getOrdinate(entry.getKey()));
+                                strValue = String.valueOf(upperLeft.getOrdinate(entry.getKey()));
+                            }
+
+                            if (strValue != null && !currentDimValues.contains(strValue)) {
+                                currentDimValues.add(strValue);
                             }
                         }
                     }
@@ -419,10 +426,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             return "CRS:84";
         } else {
             try {
-                final String identifier = org.geotoolkit.referencing.IdentifiedObjects.lookupIdentifier(
-                        Citations.EPSG, horizontal, true);
+                final Integer identifier = org.geotoolkit.referencing.IdentifiedObjects.lookupEpsgCode(
+                        horizontal, true);
                 if (identifier != null) {
-                    return identifier;
+                    return "EPSG:"+identifier;
                 }
             } catch (FactoryException e) {
                 LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
