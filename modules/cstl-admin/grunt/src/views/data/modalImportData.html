@@ -22,9 +22,6 @@
                 <h4 ng-if="import.currentStep === 'step4Sensor'"
                     class="modal-title"
                     translate="data.modal.choose.sensor">Associate sensor</h4>
-                <h4 ng-if="import.currentStep === 'step4Netcdf'"
-                    class="modal-title"
-                    translate="data.modal.netcdf">NetCDF File</h4>
             </div>
             <div class="modal-body" ng-class="{'modal-body-list-data':import.currentStep === 'step3Type'}">
                 <div ng-if="import.currentStep === 'step1DataLocal'">
@@ -44,9 +41,6 @@
                 </div>
                 <div ng-if="import.currentStep === 'step4Sensor'">
                     <div ng-include="'views/data/import/step4_sensor.html'"></div>
-                </div>
-                <div ng-if="import.currentStep === 'step4Netcdf'">
-                    <div ng-include="'views/data/import/step4_netcdf.html'"></div>
                 </div>
             </div>
             <div class="modal-footer" ng-class="{'modal-footer-list-data':import.currentStep === 'step3Type'}">
