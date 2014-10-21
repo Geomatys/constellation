@@ -20,7 +20,7 @@
 
 angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('DataController', function($scope, $location, Dashboard, webService, dataListing, datasetListing, DomainResource,
+    .controller('DataController', function($scope, $routeParams, $location, Dashboard, webService, dataListing, datasetListing, DomainResource,
                                             provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookies, cfpLoadingBar) {
         /**
          * To fix angular bug with nested scope.
@@ -37,7 +37,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             searchTerm : "",
             searchMetadataTerm : "",
             hideScroll : true,
-            currentTab : 'tabdata',
+            currentTab : $routeParams.tabindex || 'tabdata',
             alphaPattern : /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/,
             published : null,
             observation : null,

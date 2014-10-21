@@ -129,7 +129,7 @@ cstlAdminApp
                     templateUrl: 'views/data/description.html',
                     controller: 'EditMetadataController'
                 })
-                .when('/data', {
+                .when('/data/:tabindex?', {
                     templateUrl: 'views/data/data.html',
                     controller: 'DataController'
                 })
