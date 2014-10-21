@@ -105,6 +105,9 @@ public class MapConfigurer extends OGCConfigurer {
     @Inject
     ILayerBusiness layerBusiness;
 
+    @Inject
+    LayerProviders layerProviders;
+
     /**
      * Returns a Constellation {@link ProcessDescriptor} from its name.
      *
@@ -146,7 +149,7 @@ public class MapConfigurer extends OGCConfigurer {
         // Set style provider reference.
         DataReference styleProviderReference;
         try {
-            final DataDescription dataDescription = LayerProviders.getDataDescription(addLayerData.getProviderId(), addLayerData.getLayerId());
+            final DataDescription dataDescription = layerProviders.getDataDescription(addLayerData.getProviderId(), addLayerData.getLayerId());
             if (dataDescription instanceof FeatureDataDescription) {
                 final PropertyDescription geometryProp = ((FeatureDataDescription) dataDescription).getGeometryProperty();
                 if (Polygon.class.isAssignableFrom(geometryProp.getType()) || MultiPolygon.class.isAssignableFrom(geometryProp.getType())) {

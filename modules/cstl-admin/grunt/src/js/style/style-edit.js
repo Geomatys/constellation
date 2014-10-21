@@ -2252,7 +2252,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     function(response){
                         if(response.bands && response.bands.length>0){
                             $scope.dataBandsRepartition = response.bands;
-                            var repartition = response.bands[0].repartition;
+                            var repartition = response.bands[0].fullDistribution;
                             var xArray=[],yArray=[];
                             for(var key in repartition){
                                 if(repartition.hasOwnProperty(key)){

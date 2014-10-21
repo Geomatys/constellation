@@ -24,8 +24,13 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.DefaultInternationalString;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.StyleBusiness;
+import org.constellation.api.DataType;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.IDataCoverageJob;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
@@ -33,12 +38,12 @@ import org.constellation.json.binding.InterpolationPoint;
 import org.constellation.json.binding.Style;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.constellation.rest.dto.*;
+import org.constellation.rest.dto.AutoIntervalValuesDTO;
+import org.constellation.rest.dto.AutoUniqueValuesDTO;
+import org.constellation.rest.dto.ChartDataModelDTO;
+import org.constellation.rest.dto.RepartitionDTO;
+import org.constellation.rest.dto.WrapperIntervalDTO;
 import org.constellation.util.Util;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.io.GridCoverageReadParam;
-import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.FeatureStore;
@@ -48,25 +53,36 @@ import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
-import org.geotoolkit.style.*;
+import org.geotoolkit.style.DefaultDescription;
+import org.geotoolkit.style.DefaultLineSymbolizer;
+import org.geotoolkit.style.DefaultMutableStyle;
+import org.geotoolkit.style.DefaultPointSymbolizer;
+import org.geotoolkit.style.DefaultPolygonSymbolizer;
+import org.geotoolkit.style.MutableRule;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.function.Categorize;
 import org.geotoolkit.style.function.Interpolate;
 import org.geotoolkit.style.interval.DefaultIntervalPalette;
 import org.geotoolkit.style.interval.IntervalPalette;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.feature.AttributeType;
 import org.opengis.feature.PropertyType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.PropertyName;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.style.*;
+import org.opengis.style.Fill;
+import org.opengis.style.Graphic;
+import org.opengis.style.GraphicalSymbol;
+import org.opengis.style.LineSymbolizer;
+import org.opengis.style.Mark;
+import org.opengis.style.PointSymbolizer;
+import org.opengis.style.PolygonSymbolizer;
 import org.opengis.style.Stroke;
+import org.opengis.style.Symbolizer;
 import org.opengis.util.NoSuchIdentifierException;
 
 import javax.inject.Inject;
@@ -84,8 +100,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -108,6 +133,15 @@ public final class StyleRest {
     
     @Inject
     private IStyleBusiness styleBusiness;
+
+    @Inject
+    private IDataBusiness dataBusiness;
+
+    /**
+     * Injected data coverage job
+     */
+    @Inject
+    private IDataCoverageJob dataCoverageJob;
 
     /**
      * Used for debugging purposes.
@@ -742,67 +776,16 @@ public final class StyleRest {
 
    @POST
    @Path("statistics")
-   public Response getHistogram(final ParameterValues values) throws NoSuchIdentifierException, ProcessException, DataStoreException {
+   public Response getHistogram(final ParameterValues values)
+           throws NoSuchIdentifierException, ProcessException, DataStoreException, ConfigurationException {
        final String id = values.get("dataProvider");
        final String dataId = values.get("dataId");
-       final ImageStatistics cached = CACHE_HISTOGRAM.get(id+"_"+dataId);
-       if(cached != null){
-           return ok(cached);
-       }
-       final DataProvider provider = DataProviders.getInstance().getProvider(id);
-       final DataStore store = provider.getMainStore();
-       if(store instanceof CoverageStore){
-           final CoverageStore coverageStore = (CoverageStore) store;
-           final QName qName = Util.parseQName(dataId);
-           final CoverageReference coverageReference = coverageStore.getCoverageReference(new DefaultName(qName));
-           GridCoverageReadParam params = new GridCoverageReadParam();
-           params.setDeferred(true);
-           GridCoverageReader gridCoverageReader = coverageReference.acquireReader();
-           final ParameterValueGroup result;
-           try {
-               final GridCoverage coverage = gridCoverageReader.read(coverageReference.getImageIndex(), params);
-               //@TODO handle GridCoverageStack case
+       final QName qName = Util.parseQName(dataId);
+       DataBrief dataBrief = dataBusiness.getDataBrief(qName, id);
 
-               //call process to get Histograms
-               final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("coverage", "statistic");
-               final ParameterValueGroup procparams = desc.getInputDescriptor().createValue();
-               procparams.parameter("inCoverage").setValue(coverage);
-               final org.geotoolkit.process.Process process = desc.createProcess(procparams);
-               result = process.call();
-           } finally {
-               coverageReference.recycle(gridCoverageReader);
-           }
-           //sampling for repartition
-           final ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
-           for(final ImageStatistics.Band band : statistics.getBands()){
-               if(band.getFullDistribution() instanceof TreeMap){
-                   final TreeMap<Double,Long> repartition = (TreeMap)band.getFullDistribution();
-                   TreeMap<Double,Long> newRepartition = new TreeMap<>();
-                   if(repartition.size()>1000){
-                       int step=0;
-                       long valSum = 0;
-                       Double middleKey=0d;
-                       for(final Map.Entry<Double,Long> entry : repartition.entrySet()){
-                           step++;
-                           if(step==20){
-                               middleKey = entry.getKey();
-                           }
-                           if(step >39){
-                               newRepartition.put(middleKey,valSum);
-                               step=0;
-                               middleKey=0d;
-                               valSum = 0;
-                           }else {
-                               valSum+=entry.getValue();
-                           }
-                       }
-                       band.setFullDistribution(newRepartition);
-                   }
-               }
-           }
-
-           CACHE_HISTOGRAM.put(id+"_"+dataId,statistics);
-           return ok(statistics);
+       if (DataType.COVERAGE.name().equals(dataBrief.getType())) {
+           final ImageStatistics stats = dataBusiness.getDataStatistics(dataBrief.getId());
+           return ok(stats);
        }
        return ok(new AcknowlegementType("Failure", "datastore is not coverage store."));
    }

@@ -81,7 +81,9 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="TargetSensor")
     private List<String> targetSensor = new ArrayList<>(0);
 
-    
+    @XmlElement(name="Stats")
+    private String stats;
+
     public Integer getId() {
         return id;
     }
@@ -194,6 +196,14 @@ public final class DataBrief implements Serializable {
         this.targetSensor = targetSensor;
     }
 
+    public String getStats() {
+        return stats;
+    }
+
+    public void setStats(String stats) {
+        this.stats = stats;
+    }
+
     @Override
     public String toString() {
         return "DataBrief{" +
@@ -210,6 +220,7 @@ public final class DataBrief implements Serializable {
                 ", targetStyle=" + targetStyle +
                 ", targetService=" + targetService +
                 ", targetSensor=" + targetSensor +
+                ", stats=" + stats +
                 '}';
     }
 

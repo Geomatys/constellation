@@ -36,9 +36,11 @@ import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.exception.ConstellationException;
+import org.constellation.api.DataType;
 import org.constellation.api.ProviderType;
 import org.constellation.api.StyleType;
 import org.constellation.business.IDataBusiness;
+import org.constellation.business.IDataCoverageJob;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigurationException;
@@ -87,6 +89,9 @@ public final class DefaultConfigurator implements Configurator {
 
     @Autowired
     private IStyleBusiness styleBusiness;
+
+    @Autowired
+    private IDataCoverageJob dataCoverageJob;
     
     public DefaultConfigurator() {
         SpringHelper.injectDependencies(this);
@@ -253,7 +258,14 @@ public final class DefaultConfigurator implements Configurator {
                     }
                     //dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
                     //do not save the coverage metadata in database, this metadata is obsolete, the full iso metadata is stored later.
-                    dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, null);
+                    org.constellation.engine.register.Data data = dataBusiness.create(
+                            name, pr.getIdentifier(), provider.getDataType().name(),
+                            provider.isSensorAffectable(), visible, subType, null);
+
+                    //analyse coverage image (min/max/ histogram) with an asynchronous method
+                    if (DataType.COVERAGE.equals(provider.getDataType())) {
+                        dataCoverageJob.asyncUpdateDataStatistics(data.getId());
+                    }
                 }
             }
         } else {

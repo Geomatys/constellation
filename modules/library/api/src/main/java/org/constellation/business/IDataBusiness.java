@@ -32,8 +32,11 @@ import org.constellation.engine.register.Provider;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Future;
+
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.Dataset;
+import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -42,7 +45,7 @@ public interface IDataBusiness {
     
     void deleteData(QName qName, String id);
 
-    void create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, String subType, String metadataXml);
+    Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, String subType, String metadataXml);
 
     void removeDataFromProvider(String providerId);
 
@@ -85,4 +88,18 @@ public interface IDataBusiness {
     void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException;
     
     String getTemplate(final QName dataName, final String dataType) throws ConfigurationException;
+
+    /**
+     * Get and parse data statistics.
+     * @param dataId
+     * @return ImageStatistics object or null if data is not a coverage or if Statistics were not computed.
+     * @throws ConfigurationException
+     */
+    ImageStatistics getDataStatistics(final int dataId) throws ConfigurationException;
+
+    /**
+     * Run {@link org.constellation.business.IDataCoverageJob#asyncUpdateDataStatistics(int)}
+     * on each coverage type data without computed statistics.
+     */
+    void computeEmptyDataStatistics();
 }

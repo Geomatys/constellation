@@ -19,25 +19,9 @@
 
 package org.constellation.admin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
@@ -46,40 +30,40 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
+import org.constellation.admin.util.ImageStatisticDeserializer;
+import org.constellation.api.DataType;
 import org.constellation.business.IDataBusiness;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.CstlConfigurationRuntimeException;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.ServiceProtocol;
-import org.constellation.configuration.StyleBrief;
-import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.business.IDataCoverageJob;
+import org.constellation.configuration.*;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.*;
 import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.Style;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.engine.register.repository.LayerRepository;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.engine.register.repository.SensorRepository;
-import org.constellation.engine.register.repository.StyleRepository;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.engine.register.repository.*;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.opengis.feature.PropertyType;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * Business facade for data.
@@ -147,6 +131,12 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Inject
     private IndexEngine indexEngine;
+
+    /**
+     * Injected data coverage job
+     */
+    @Inject
+    private IDataCoverageJob dataCoverageJob;
 
     /**
      * Return the {@linkplain Provider provider} for the given {@linkplain Data data} identifier.
@@ -453,6 +443,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setSubtype(data.getSubtype());
             db.setSensorable(data.isSensorable());
             db.setTargetSensor(sensorRepository.getLinkedSensors(data));
+            db.setStats(data.getStats());
 
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
             for (final Style style : styles) {
@@ -553,7 +544,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param metadata metadata of data.
      */
     @Override
-    public void create(final QName name, final String providerIdentifier,
+    public Data create(final QName name, final String providerIdentifier,
                        final String type, final boolean sensorable,
                        final boolean visible, final String subType, final String metadata) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
@@ -572,8 +563,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             data.setSubtype(subType);
             data.setVisible(visible);
             data.setMetadata(metadata);
-            dataRepository.create(data);
+            return dataRepository.create(data);
         }
+        return null;
     }
 
     /**
@@ -732,7 +724,51 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         return templateName;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ImageStatistics getDataStatistics(final int dataId) throws ConfigurationException {
+
+        final Data data = dataRepository.findById(dataId);
+        if (data != null && DataType.COVERAGE.name().equals(data.getType())) {
+            try {
+                final String stats = data.getStats();
+                if (stats != null && !stats.equalsIgnoreCase("PENDING")) {
+                    final ObjectMapper mapper = new ObjectMapper();
+                    final SimpleModule module = new SimpleModule();
+                    module.addDeserializer(ImageStatistics.class, new ImageStatisticDeserializer()); //custom deserializer
+                    mapper.registerModule(module);
+                    return mapper.readValue(stats, ImageStatistics.class);
+                } else {
+                    Future<ImageStatistics> futureStats = dataCoverageJob.asyncUpdateDataStatistics(data.getId());
+                    return futureStats.get();
+                }
+            } catch (IOException | InterruptedException | ExecutionException e) {
+                throw new ConfigurationException("Invalid statistic JSON format for data : "+dataId, e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Run at spring context initialization.
+     */
+    @Override
+    @PostConstruct
+    public void computeEmptyDataStatistics() {
+        final List<Data> dataList = dataRepository.findAll();
+        for (Data data : dataList) {
+            String stats = data.getStats();
+            if (DataType.COVERAGE.name().equals(data.getType()) &&
+                    (stats == null || stats.isEmpty() || stats.equalsIgnoreCase("PENDING") )) {
+                dataCoverageJob.asyncUpdateDataStatistics(data.getId());
+            }
+        }
+    }
+
     protected MarshallerPool getMarshallerPool() {
         return ISOMarshallerPool.getInstance();
     }

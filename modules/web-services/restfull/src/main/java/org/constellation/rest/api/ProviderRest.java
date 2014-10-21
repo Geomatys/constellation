@@ -90,6 +90,9 @@ public final class ProviderRest {
     @Inject
     private IDatasetBusiness datasetBusiness;
 
+    @Inject
+    private LayerProviders layerProviders;
+
     /**
      * @FIXME remove this cache used for demo and add more generic cache management (Spring).
      */
@@ -221,7 +224,7 @@ public final class ProviderRest {
                     CACHE_DATA_DESC.getOrCreate(cacheKey, new Callable<DataDescription>() {
                         @Override
                         public DataDescription call() throws Exception {
-                            return LayerProviders.getDataDescription(id, layerName);
+                            return layerProviders.getDataDescription(id, layerName);
                         }
                     })
             ).build();

@@ -22,7 +22,10 @@ package org.constellation.ws.rs;
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.business.IDataBusiness;
 import org.constellation.business.IStyleBusiness;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
@@ -36,6 +39,7 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.ObservationData;
+import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
@@ -61,6 +65,7 @@ import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
+import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.geotoolkit.process.coverage.statistics.StatisticOp;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
@@ -91,6 +96,7 @@ import javax.inject.Inject;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
@@ -122,6 +128,10 @@ public final class LayerProviders {
     @Inject
     IStyleBusiness styleBusiness;
 
+
+    @Inject
+    IDataBusiness dataBusiness;
+
     /**
      * Default rendering options.
      */
@@ -149,24 +159,28 @@ public final class LayerProviders {
      * @return the {@link DataDescription} instance
      * @throws CstlServiceException if failed to extracts the data description for any reason
      */
-    public static DataDescription getDataDescription(final String providerId, final String layerName) throws CstlServiceException {
+    public DataDescription getDataDescription(final String providerId, final String layerName) throws CstlServiceException {
         ensureNonNull("providerId", providerId);
         ensureNonNull("layerName", layerName);
 
         // Get the layer.
         final Data layer = getLayer(providerId, layerName);
+        final QName qName = Util.parseQName(layerName);
+        final DataBrief dataBrief = dataBusiness.getDataBrief(qName, providerId);
 
         // Try to extract layer data info.
         try {
             if (layer instanceof FeatureData) {
-                return getFeatureDataDescription((FeatureData) layer);
+                return getFeatureDataDescription((FeatureData) layer, dataBrief.getId());
             } else {
-                return getCoverageDataDescription(layer);
+                return getCoverageDataDescription(layer, dataBrief.getId());
             }
         } catch (DataStoreException ex) {
             throw new CstlServiceException("An error occurred while trying get/open datastore for provider with id \"" + providerId + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
         } catch (IOException ex) {
             throw new CstlServiceException("An error occurred while trying get data for provider with id \"" + providerId + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
+        } catch (ConfigurationException ex) {
+            throw new CstlServiceException("An error occurred while trying read statistics from data id \"" + dataBrief.getId() + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
         }
     }
 
@@ -452,47 +466,23 @@ public final class LayerProviders {
      * @throws IOException        if an error occurred while trying to read the coverage
      * @throws DataStoreException if an error occurred during coverage store operations
      */
-    private static CoverageDataDescription getCoverageDataDescription(final Data layer) throws IOException, DataStoreException {
+    private CoverageDataDescription getCoverageDataDescription(final Data layer, final int dataId)
+            throws IOException, DataStoreException, ConfigurationException {
+
         final CoverageDataDescription description = new CoverageDataDescription();
+        final ImageStatistics stats = dataBusiness.getDataStatistics(dataId);
 
         final CoverageReference ref = (CoverageReference)layer.getOrigin();
         final GridCoverageReader reader = ref.acquireReader();
-        final List<GridSampleDimension> dims = reader.getSampleDimensions(ref.getImageIndex());
 
         // Bands description.
-        if (dims != null) {
-            int i=0;
-            Map<String, Object> map = null;
-            for (final GridSampleDimension dim : dims) {
-                final String dimName = dim.getDescription().toString();
-                double min = dim.getMinimumValue();
-                double max = dim.getMaximumValue();
-                //in case of min or max are infinite we need to calculate by using StatisticOp.analyze
-                if(Double.isInfinite(min) || Double.isInfinite(max)) {
-                    if(map == null) {
-                        map = StatisticOp.analyze(reader, ref.getImageIndex());
-                    }
-                    if(map != null){
-                        double[] minArr = (double[]) map.get("min");
-                        double[] maxArr = (double[]) map.get("max");
-                        if(minArr.length>i && maxArr.length>i) {
-                            min = minArr[i];
-                            max = maxArr[i];
-                        }
-                    }
-                }
-                description.getBands().add(new BandDescription(dimName, min, max, dim.getNoDataValues()));
-                i++;
-            }
-        } else {
-            Map<String, Object> map = StatisticOp.analyze(reader, ref.getImageIndex());
-            double[] min = (double[]) map.get("min");
-            double[] max = (double[]) map.get("max");
-            if (min != null && min.length > 0) {
-                for (int i=0; i<min.length; i++) {
-                    description.getBands().add(new BandDescription(String.valueOf(i), min[i], max[i], null));
-                }
-            }
+        for (int i=0; i<stats.getBands().length; i++) {
+            final ImageStatistics.Band band = stats.getBand(i);
+            final String bandName = String.valueOf(i);
+            final double min = band.getMin();
+            final double max = band.getMax();
+            double[] noData = band.getNoData();
+            description.getBands().add(new BandDescription(bandName, min, max, noData));
         }
 
         // Geographic extent description.
@@ -511,7 +501,7 @@ public final class LayerProviders {
      * @return the {@link FeatureDataDescription} instance
      * @throws DataStoreException if an error occurred during feature store operations
      */
-    private static FeatureDataDescription getFeatureDataDescription(final FeatureData layer) throws DataStoreException {
+    private FeatureDataDescription getFeatureDataDescription(final FeatureData layer, final int dataId) throws DataStoreException {
         final FeatureDataDescription description = new FeatureDataDescription();
 
         // Acquire data feature type.

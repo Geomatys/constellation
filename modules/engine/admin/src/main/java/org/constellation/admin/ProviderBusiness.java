@@ -1,21 +1,6 @@
 package org.constellation.admin;
 
 import com.google.common.base.Optional;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
@@ -25,11 +10,7 @@ import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Style;
+import org.constellation.engine.register.*;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -50,13 +31,22 @@ import org.geotoolkit.observation.ObservationStoreFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.storage.DataStoreFactory;
+import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.metadata.Identifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Component
 @Primary
