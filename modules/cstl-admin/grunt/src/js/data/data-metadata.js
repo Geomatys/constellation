@@ -219,6 +219,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
         $scope.showValidationPopup = function(form) {
             var validationPopup = $('#validationPopup');
             validationPopup.modal("show");
+            validationPopup.off('shown.bs.modal');
             validationPopup.on('shown.bs.modal', function (e) {
                 validationPopup.blur(); //fix bug for safari
             });
