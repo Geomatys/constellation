@@ -37,6 +37,7 @@ import org.constellation.provider.DataProviders;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.geotoolkit.process.coverage.statistics.Statistics;
@@ -97,7 +98,13 @@ public class DataCoverageJob implements IDataCoverageJob {
                 final DataStore store = dataProvider.getMainStore();
                 if (store instanceof CoverageStore) {
                     final CoverageStore coverageStore = (CoverageStore) store;
-                    final CoverageReference covRef = coverageStore.getCoverageReference(new DefaultName(data.getNamespace(), data.getName()));
+
+                    Name name = new DefaultName(data.getNamespace(), data.getName());
+                    if (data.getNamespace() == null || data.getNamespace().isEmpty()) {
+                        name = new DefaultName(data.getName());
+                    }
+                    final CoverageReference covRef = coverageStore.getCoverageReference(name);
+
                     final ImageStatistics analyse = Statistics.analyse(covRef, false);
                     final ObjectMapper mapper = new ObjectMapper();
                     final SimpleModule module = new SimpleModule();
