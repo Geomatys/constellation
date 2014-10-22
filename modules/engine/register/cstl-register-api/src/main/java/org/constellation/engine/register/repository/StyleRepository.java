@@ -41,6 +41,8 @@ public interface StyleRepository {
     
     Style findById(int id);
 
+    List<Style> findByName(final String name);
+
     List<Style> findByData(Data data);
     
     List<Style> findByLayer(Layer layer);

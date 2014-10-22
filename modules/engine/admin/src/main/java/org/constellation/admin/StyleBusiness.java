@@ -91,7 +91,7 @@ import com.google.common.base.Optional;
  */
 @Component
 @Primary
-public final class StyleBusiness implements IStyleBusiness {
+public class StyleBusiness implements IStyleBusiness {
 
     @Inject
     UserRepository userRepository;
