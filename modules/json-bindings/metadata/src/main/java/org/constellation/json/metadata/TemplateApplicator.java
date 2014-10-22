@@ -115,7 +115,11 @@ final class TemplateApplicator {
     /**
      * A path to be handled in a special way.
      */
-    private static final String[] REFERENCE_SYSTEM = {"referenceSystemIdentifier", "code"};
+    private static final String[] REFERENCE_SYSTEM_CODE = {"referenceSystemIdentifier", "code"};
+    
+    private static final String[] REFERENCE_SYSTEM_CODESPACE = {"referenceSystemIdentifier", "codeSpace"};
+    
+    private static final String[] REFERENCE_SYSTEM_VERSION = {"referenceSystemIdentifier", "version"};
 
     /**
      * {@code true} for omitting empty nodes.
@@ -329,9 +333,20 @@ final class TemplateApplicator {
         Objects.requireNonNull(metadata);
         Object value;
         do {
+            if (pathOffset >= template.path.length) {
+                final StringBuilder paths = new StringBuilder();
+                for (String p : template.path) {
+                    paths.append('\n').append(p);
+                }
+                throw new ParseException("Path offset out of band :" + paths);
+            }
             final String identifier = template.path[pathOffset];
-            if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM) && metadata instanceof Metadata) {
-                value = referenceSystem((Metadata) metadata); // Special case.
+            if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_CODE) && metadata instanceof Metadata) {
+                value = referenceSystemCode((Metadata) metadata); // Special case.
+            } else if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_CODESPACE) && metadata instanceof Metadata) {
+                value = referenceSystemCodeSpace((Metadata) metadata); // Special case.
+            } else if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_VERSION) && metadata instanceof Metadata) {
+                value = referenceSystemVersion((Metadata) metadata); // Special case.
             } else if (metadata instanceof TemporalPrimitive) {
                 value = extent((TemporalPrimitive) metadata, identifier); // Special case.
             } else {
@@ -434,12 +449,38 @@ final class TemplateApplicator {
     }
 
     /**
-     * Special case for {@link #REFERENCE_SYSTEM}.
+     * Special case for {@link #REFERENCE_SYSTEM_CODE}.
      */
-    private static String referenceSystem(final Metadata metadata) {
+    private static String referenceSystemCode(final Metadata metadata) {
         for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
             for (final Identifier id : r.getIdentifiers()) {
                 final String code = id.getCode();
+                if (code != null) return code;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Special case for {@link #REFERENCE_SYSTEM_CODESPACE}.
+     */
+    private static String referenceSystemCodeSpace(final Metadata metadata) {
+        for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
+            for (final Identifier id : r.getIdentifiers()) {
+                final String code = id.getCodeSpace();
+                if (code != null) return code;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Special case for {@link #REFERENCE_SYSTEM_VERSION}.
+     */
+    private static String referenceSystemVersion(final Metadata metadata) {
+        for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
+            for (final Identifier id : r.getIdentifiers()) {
+                final String code = id.getVersion();
                 if (code != null) return code;
             }
         }
