@@ -46,6 +46,7 @@ import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.opengis.feature.PropertyType;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -75,6 +76,7 @@ import java.util.logging.Logger;
 
 @Profile("standard")
 @Component
+@DependsOn("database-initer")
 @Primary
 public class DataBusiness extends InternalCSWSynchronizer implements IDataBusiness {
     /**
