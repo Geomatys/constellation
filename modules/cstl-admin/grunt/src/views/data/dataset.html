@@ -220,7 +220,8 @@
                         <div ng-repeat="dataset in wrap.dataList"
                              ng-class="{'col-xs-6':dataCtrl.smallMode}"
                              style="padding-left:0;">
-                            <div class="item metadata"
+                            <div data-name="{{dataset.Name}}"
+                                 class="item metadata"
                                  ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
                                  ng-click="selectDS(dataset);selectDataSetChild(null,null);"
                                  ng-show="dataset.Children.length!=1"
@@ -248,7 +249,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="item"
+                            <div data-name="{{dataset.Name}}:{{relatedData.Name}}"
+                                 class="item"
                                  ng-style="dataset.Children.length==1?'':'margin-top:0;'"
                                  ng-if="dataset.id==selectedDS.id || dataset.Children.length==1"
                                  ng-repeat="relatedData in dataset.Children"
