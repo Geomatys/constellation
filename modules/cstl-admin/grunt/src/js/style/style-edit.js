@@ -1069,7 +1069,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     cql = cql.replace(re, "''");
                 }
 
-                var format = new OpenLayers.Format.CQL();
+                //@TODO ol3 does not have any cql formatter, so needs to write one. good luck.
+                var format = new olext.Format.CQL();
                 var olfilter;
                 try {
                     olfilter = format.read(cql);
@@ -1106,7 +1107,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         var convertOLFilterToArray = function(olfilter){
             var resultArray = [];
-            if(olfilter.CLASS_NAME ==='OpenLayers.Filter.Comparison'){
+            if(olfilter.CLASS_NAME ==='olext.Filter.Comparison'){
                 var comparator = convertOLComparatorToCQL(olfilter.type);
                 var value;
                 if(comparator === 'BETWEEN'){
@@ -1121,7 +1122,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     "operator":''
                 };
                 resultArray.push(q);
-            }else if(olfilter.CLASS_NAME ==='OpenLayers.Filter.Logical'){
+            }else if(olfilter.CLASS_NAME ==='olext.Filter.Logical'){
                 recursiveResolveFilter(olfilter,resultArray);
             }
             return resultArray;
@@ -1133,10 +1134,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * @param arrayRes
          */
         var recursiveResolveFilter = function(obj,arrayRes){
-            if(obj.CLASS_NAME ==='OpenLayers.Filter.Logical'){
+            if(obj.CLASS_NAME ==='olext.Filter.Logical'){
                 if(obj.filters && obj.filters.length===2){
-                    if(obj.filters[0].CLASS_NAME === 'OpenLayers.Filter.Comparison' &&
-                        obj.filters[1].CLASS_NAME === 'OpenLayers.Filter.Comparison'){
+                    if(obj.filters[0].CLASS_NAME === 'olext.Filter.Comparison' &&
+                        obj.filters[1].CLASS_NAME === 'olext.Filter.Comparison'){
                         var comparator1 = convertOLComparatorToCQL(obj.filters[0].type);
                         var value1;
                         if(comparator1 === 'BETWEEN'){
@@ -1164,8 +1165,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             "value":value2,
                             "operator":''
                         });
-                    }else if(obj.filters[0].CLASS_NAME === 'OpenLayers.Filter.Logical' &&
-                        obj.filters[1].CLASS_NAME === 'OpenLayers.Filter.Comparison'){
+                    }else if(obj.filters[0].CLASS_NAME === 'olext.Filter.Logical' &&
+                        obj.filters[1].CLASS_NAME === 'olext.Filter.Comparison'){
                         recursiveResolveFilter(obj.filters[0],arrayRes);
                         var op = convertOLOperatorToCQL(obj.type);
                         arrayRes[arrayRes.length-1].operator = op;
@@ -1192,15 +1193,15 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          *
          * This is the list of type of the comparison in OpenLayers
          *
-         OpenLayers.Filter.Comparison.EQUAL_TO = “==”;
-         OpenLayers.Filter.Comparison.NOT_EQUAL_TO = “!=”;
-         OpenLayers.Filter.Comparison.LESS_THAN = “<”;
-         OpenLayers.Filter.Comparison.GREATER_THAN = “>”;
-         OpenLayers.Filter.Comparison.LESS_THAN_OR_EQUAL_TO = “<=”;
-         OpenLayers.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO = “>=”;
-         OpenLayers.Filter.Comparison.BETWEEN = “..”;
-         OpenLayers.Filter.Comparison.LIKE = “~”;
-         OpenLayers.Filter.Comparison.IS_NULL = “NULL”;
+         olext.Filter.Comparison.EQUAL_TO = “==”;
+         olext.Filter.Comparison.NOT_EQUAL_TO = “!=”;
+         olext.Filter.Comparison.LESS_THAN = “<”;
+         olext.Filter.Comparison.GREATER_THAN = “>”;
+         olext.Filter.Comparison.LESS_THAN_OR_EQUAL_TO = “<=”;
+         olext.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO = “>=”;
+         olext.Filter.Comparison.BETWEEN = “..”;
+         olext.Filter.Comparison.LIKE = “~”;
+         olext.Filter.Comparison.IS_NULL = “NULL”;
          */
         var convertOLComparatorToCQL = function(olType){
             var comparator;
@@ -2025,15 +2026,15 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
                 }
                 //to force the browser cache reloading styled layer.
-                layerData.mergeNewParams({ts:new Date().getTime()});
+                layerData.get('params').ts=new Date().getTime();
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                DataViewer.layers = [layerData, layerBackground];
-                DataViewer.initMap(mapId);
+                DataViewer.layers = [layerBackground,layerData];
                 $scope.initDataLayerProperties(function(){
                     if ($scope.dataBbox) {
-                        var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
-                        DataViewer.map.zoomToExtent(extent, true);
+                        var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
+                        DataViewer.extent = extent;
                     }
+                    DataViewer.initMap(mapId);
                 });
             }else {
                 if ($scope.newStyle.name === "") {
@@ -2073,26 +2074,27 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             }
                         }
                         //to force the browser cache reloading styled layer.
-                        layerData.mergeNewParams({ts:new Date().getTime()});
+                        layerData.get('params').ts=new Date().getTime();
 
                         if(layerBackground){
-                            DataViewer.layers = [layerData, layerBackground];
+                            DataViewer.layers = [layerBackground,layerData];
                         }else {
                             DataViewer.layers = [layerData];
                         }
                         DataViewer.initMap(mapId);
                         if ($scope.dataBbox) {
-                            var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
-                            DataViewer.map.zoomToExtent(extent, true);
+                            var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
+                            DataViewer.extent = extent;
+                            DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
                         }else {
                             $scope.initDataLayerProperties(function(){
                                 if ($scope.dataBbox) {
-                                    var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
-                                    DataViewer.map.zoomToExtent(extent, true);
+                                    var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
+                                    DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
                                 }
                             });
                         }
-                        DataViewer.map.events.register("moveend", DataViewer.map, function(){
+                        DataViewer.map.on('moveend', function(){
                             setCurrentScale();
                         });
                         setCurrentScale();
@@ -2105,13 +2107,28 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         };
 
         /**
+         * Calculate and returns the map scale.
+         * OL3 does not have any getScale() function.
+         * @returns {number}
+         */
+        var calcCurrentScale = function () {
+            var map = DataViewer.map;
+            var view = map.getView();
+            var resolution = view.getResolution();
+            var mpu =view.getProjection().getMetersPerUnit();
+            var dpi = 25.4 / 0.28;
+            var scale = resolution * mpu * 39.37 * dpi;
+            return scale;
+        };
+
+        /**
          * Utility function to set the current scale of OL map into page element.
          */
         var setCurrentScale = function(){
             if(DataViewer.map) {
-                var currentScale=DataViewer.map.getScale();
+                var currentScale=calcCurrentScale();
                 currentScale = Math.round(currentScale);
-                jQuery('.currentScale').html("1 / "+currentScale);
+                jQuery('.currentScale').html("1 : "+currentScale);
             }
         };
 
@@ -2120,7 +2137,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         $scope.setMinScale = function(){
             if(DataViewer.map) {
-                var currentScale=DataViewer.map.getScale();
+                var currentScale=calcCurrentScale();
                 currentScale = Math.round(currentScale);
                 $scope.optionsSLD.selectedRule.minScale = currentScale;
             }
@@ -2131,7 +2148,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          */
         $scope.setMaxScale = function(){
             if(DataViewer.map) {
-                var currentScale=DataViewer.map.getScale();
+                var currentScale=calcCurrentScale();
                 currentScale = Math.round(currentScale);
                 $scope.optionsSLD.selectedRule.maxScale = currentScale;
             }

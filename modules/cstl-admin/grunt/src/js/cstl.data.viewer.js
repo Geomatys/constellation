@@ -13,271 +13,301 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
+function isInfinityNumber(n) {
+    return (n === Number.POSITIVE_INFINITY || n === Number.NEGATIVE_INFINITY);
+}
 window.DataViewer = {
     map : undefined,
-
-    format : new OpenLayers.Format.WMSCapabilities(),
-
-    layers : undefined,
-
-    sensorClicked : undefined,
+    target : undefined,
+    layers : [], //array of layers to display
+    extent: [-180, -85, 180, 85], //extent array of coordinates always in 4326
+    projection: 'EPSG:3857', //given projection used to display layers
+    maxExtent : undefined, //the maximum extent for the given projection
 
     initMap : function(mapId){
+        //unbind the old map
         if (DataViewer.map) {
-            DataViewer.map.destroy();
-            DataViewer.sensorClicked = undefined;
+            DataViewer.map.setTarget(undefined);
         }
-        DataViewer.map = new OpenLayers.Map(mapId, {
-            controls: [new OpenLayers.Control.Navigation()],
-            projection: new OpenLayers.Projection('CRS:84'),
-            maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
-            fractionalZoom: true,
-            allOverlays:true,
-            eventListeners: {
-                featureover: function(e) {
-                    e.feature.renderIntent = "select";
-                    e.feature.layer.drawFeature(e.feature);
-                },
-                featureout: function(e) {
-                    if (DataViewer.sensorClicked && DataViewer.sensorClicked.sensorName === e.feature.sensorName) {
-                        return;
-                    }
 
-                    e.feature.renderIntent = "default";
-                    e.feature.layer.drawFeature(e.feature);
-                },
-                featureclick: function(e) {
-                    if (DataViewer.sensorClicked) {
-                        // Unselect last sensor
-                        DataViewer.sensorClicked.renderIntent = "default";
-                        DataViewer.sensorClicked.layer.drawFeature(DataViewer.sensorClicked);
-                    }
-                    DataViewer.sensorClicked = e.feature;
+        //get projection extent
+        var projection = ol.proj.get(DataViewer.projection);
+        DataViewer.maxExtent = projection.getExtent();
+        //calculate reprojected extent for given projection
+        var reprojExtent = ol.proj.transform(DataViewer.extent, 'EPSG:4326', DataViewer.projection);
+        //if the projected extent contains Infinity then the extent will be the projection extent.
+        if(Array.isArray(reprojExtent)){
+            for(var i=0;i<reprojExtent.length;i++){
+                var coord = reprojExtent[i];
+                if(isInfinityNumber(coord)){
+                    reprojExtent = projection.getExtent();
+                    break;
                 }
             }
+        }
+
+        //adding background layer by default OSM
+        var sourceOSM = new ol.source.OSM({
+            attributions:[]
         });
-        DataViewer.map.addLayers(DataViewer.layers);
-        DataViewer.map.zoomToMaxExtent();
+        var backgroundLayer = new ol.layer.Tile({
+            source: sourceOSM
+        });
+        DataViewer.layers.unshift(backgroundLayer);
+
+        DataViewer.map = new ol.Map({
+            controls: ol.control.defaults().extend([
+                new ol.control.ScaleLine({
+                    units: 'metric'
+                })
+            ]),
+            layers: DataViewer.layers,
+            target: mapId,
+            view: new ol.View({
+                projection: DataViewer.projection,
+                extent: reprojExtent
+            }),
+            logo: false
+        });
+
+        // Zoom on specified extent
         DataViewer.map.updateSize();
+        var size = DataViewer.map.getSize();
+        DataViewer.map.getView().fitExtent(reprojExtent, size);
+
+    },
+
+    zoomToExtent : function(extent,size){
+        var reprojExtent = ol.proj.transform(extent, 'EPSG:4326', DataViewer.projection);
+        DataViewer.map.getView().fitExtent(reprojExtent, size);
     },
 
     createLayer : function(cstlUrlPrefix, layerName, providerId, filter){
-        var layer = new OpenLayers.Layer.WMS(layerName,
-           cstlUrlPrefix +'api/1/portrayal/portray',
-            {
-                layers:      layerName,
-                provider:    providerId,
-                version:     '1.3.0',
-                sld_version: '1.1.0',
-                format:      'image/png',
-                CQLFILTER:   filter
-            },
-            {
-                ratio: 1,
-                isBaseLayer: true,
-                singleTile: true,
-                transitionEffect: 'resize'
-            }
-        );
+        var params = {
+            'LAYERS':      layerName,
+            'PROVIDER':    providerId,
+            'VERSION':     '1.3.0',
+            'SLD_VERSION': '1.1.0',
+            'FORMAT':      'image/png',
+            'CQLFILTER': filter
+        };
+        var layer = new ol.layer.Tile({
+            source: new ol.source.TileWMS({
+                url: cstlUrlPrefix +'api/1/portrayal/portray',
+                params: params
+            })
+        });
+        layer.set('params',params);
+        layer.set('name', layerName);
         return layer;
     },
 
     createLayerWithStyle : function(cstlUrlPrefix, layerName, providerId, style, sldProvider, filter){
         var sldProvName = (sldProvider) ? sldProvider : "sld";
-        var layer = new OpenLayers.Layer.WMS(layerName,
-                cstlUrlPrefix +'api/1/portrayal/portray/style',
-            {
-                layers:      layerName,
-                provider:    providerId,
-                version:     '1.3.0',
-                sld_version: '1.1.0',
-                format:      'image/png',
-                SLDID:        style,
-                SLDPROVIDER:  sldProvName,
-                CQLFILTER:    filter
-            },
-            {
-                ratio: 1,
-                isBaseLayer: true,
-                singleTile: true,
-                transitionEffect: 'resize'
-            }
-        );
+        var params = {
+            'LAYERS':      layerName,
+            'PROVIDER':    providerId,
+            'VERSION':     '1.3.0',
+            'SLD_VERSION': '1.1.0',
+            'FORMAT':      'image/png',
+            'SLDID':       (style) ? style : '',
+            'SLDPROVIDER': sldProvName,
+            'CQLFILTER': filter
+        };
+        var layer = new ol.layer.Tile({
+            source: new ol.source.TileWMS({
+                url: cstlUrlPrefix +'api/1/portrayal/portray/style',
+                params: params
+            })
+        });
+        layer.set('params',params);
+        layer.set('name', layerName);
         return layer;
     },
 
     createLayerWMS : function(cstlUrlPrefix, layerName, instance){
-        var layer = new OpenLayers.Layer.WMS(layerName,
-            cstlUrlPrefix +'WS/wms/'+ instance,
-            {
-                request:     'GetMap',
-                layers:      layerName,
-                version:     '1.3.0',
-                sld_version: '1.1.0',
-                format:      'image/png',
-                transparent: 'true'
-            },
-            {
-                ratio: 1,
-                isBaseLayer: true,
-                singleTile: true,
-                transitionEffect: 'resize',
-                tileOptions: {
-                    maxGetUrlLength: 2048
-                }
-            }
-        );
+        var params = {
+            'LAYERS':      layerName,
+            'VERSION':     '1.3.0',
+            'SLD_VERSION': '1.1.0',
+            'FORMAT':      'image/png',
+            'TRANSPARENT': 'true'
+        };
+        var layer = new ol.layer.Tile({
+            source: new ol.source.TileWMS({
+                url: cstlUrlPrefix +'WS/wms/'+ instance,
+                params: params
+            })
+        });
+        layer.set('params',params);
+        layer.set('name', layerName);
         return layer;
     },
 
     createLayerWMSWithStyle : function(cstlUrlPrefix, layerName, instance, style){
-        var layer = new OpenLayers.Layer.WMS(layerName,
-            cstlUrlPrefix +'WS/wms/'+ instance,
-            {
-                request:     'GetMap',
-                layers:      layerName,
-                version:     '1.3.0',
-                sld_version: '1.1.0',
-                format:      'image/png',
-                Styles: style,
-                transparent: 'true'
-            },
-            {
-                ratio: 1,
-                isBaseLayer: true,
-                singleTile: true,
-                transitionEffect: 'resize',
-                tileOptions: {
-                    maxGetUrlLength: 2048
-                }
-            }
-        );
+        var params = {
+            'LAYERS':      layerName,
+            'VERSION':     '1.3.0',
+            'SLD_VERSION': '1.1.0',
+            'FORMAT':      'image/png',
+            'STYLES':      (style) ? style : '',
+            'TRANSPARENT': 'true'
+        };
+        var layer = new ol.layer.Tile({
+            source: new ol.source.TileWMS({
+                url: cstlUrlPrefix +'WS/wms/'+ instance,
+                params: params
+            })
+        });
+        layer.set('params',params);
+        layer.set('name', layerName);
         return layer;
     },
 
-    createLayerExternalWMS : function(cstlUrl, layerName){
-        var layer = new OpenLayers.Layer.WMS(layerName, cstlUrl,
-            {
-                request:     'GetMap',
-                layers:      layerName,
-                version:     '1.3.0',
-                sld_version: '1.1.0',
-                format:      'image/png',
-                transparent: 'true'
-            },
-            {
-                ratio: 1,
-                isBaseLayer: true,
-                singleTile: true,
-                transitionEffect: 'resize',
-                tileOptions: {
-                    maxGetUrlLength: 2048
-                }
-            }
-        );
+    createLayerExternalWMS : function(url, layerName){
+        var params = {
+            'LAYERS':      layerName,
+            'VERSION':     '1.3.0',
+            'SLD_VERSION': '1.1.0',
+            'FORMAT':      'image/png',
+            'TRANSPARENT': 'true'
+        };
+        var layer = new ol.layer.Tile({
+            source: new ol.source.TileWMS({
+                url: url,
+                params: params
+            })
+        });
+        layer.set('params',params);
+        layer.set('name', layerName);
         return layer;
     },
 
-    createLayerExternalWMSWithStyle : function(cstlUrl, layerName, style){
-        var layer = new OpenLayers.Layer.WMS(layerName, cstlUrl,
-            {
-                request:     'GetMap',
-                layers:      layerName,
-                version:     '1.3.0',
-                sld_version: '1.1.0',
-                format:      'image/png',
-                Styles: style,
-                transparent: 'true'
-            },
-            {
-                ratio: 1,
-                isBaseLayer: true,
-                singleTile: true,
-                transitionEffect: 'resize',
-                tileOptions: {
-                    maxGetUrlLength: 2048
-                }
-            }
-        );
+    createLayerExternalWMSWithStyle : function(url, layerName, style){
+        var params = {
+            'LAYERS':      layerName,
+            'VERSION':     '1.3.0',
+            'SLD_VERSION': '1.1.0',
+            'FORMAT':      'image/png',
+            'STYLES':      (style) ? style : '',
+            'TRANSPARENT': 'true'
+        };
+        var layer = new ol.layer.Tile({
+            source: new ol.source.TileWMS({
+                url: url,
+                params: params
+            })
+        });
+        layer.set('params',params);
+        layer.set('name', layerName);
         return layer;
     },
 
     createSensorsLayer : function(layerName) {
-        var style = new OpenLayers.StyleMap({
-            'default': new OpenLayers.Style({
-                    pointRadius: 12,
-                    'externalGraphic': 'img/marker_normal.png'
-                }
-            ),
-            'select': new OpenLayers.Style({
-                    pointRadius: 12,
-                    'externalGraphic': 'img/marker_selected.png'
-                }
-            )
+        var stylesMap = {
+            'default':[new ol.style.Style({
+                    image: new ol.style.Icon(({
+                                src: 'img/marker_normal.png'
+                         }))
+                    })],
+            'select':[new ol.style.Style({
+                    image: new ol.style.Icon(({
+                                src: 'img/marker_selected.png'
+                        }))
+                    })]
+        };
+        // select interaction working on "click"
+        window.selectClick = new ol.interaction.Select({
+            condition: ol.events.condition.click
         });
+        DataViewer.map.addInteraction(window.selectClick);
 
-        var layer = new OpenLayers.Layer.Vector(layerName,
-            {
-                styleMap: style,
-                ratio: 1,
-                isBaseLayer: true,
-                singleTile: true,
-                transitionEffect: 'resize',
-                tileOptions: {
-                    maxGetUrlLength: 2048
+        var layer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: []
+            }),
+            style: function(feature, resolution) {
+                var selectedFeatures = window.selectClick.getFeatures();
+                if(selectedFeatures && feature === selectedFeatures[0]){
+                    return stylesMap.select;
+                } else {
+                    return stylesMap.default;
                 }
             }
-        );
+        });
+        layer.set('name', layerName);
         return layer;
     },
 
     setSensorStyle : function(type, layer) {
-        var style;
+        var stylesMap={};
         if (type && type === 'polygon') {
-            style = new OpenLayers.StyleMap({
-                'default': new OpenLayers.Style({
-                        strokeColor: '#000000',
-                        strokeWidth: 1,
-                        fillColor: '#39B3D7',
-                        fillOpacity: 0.25
-                    }
-                ),
-                'select': new OpenLayers.Style({
-                        strokeColor: '#000000',
-                        strokeWidth: 1,
-                        fillColor: '#910000',
-                        fillOpacity: 0.25
-                    }
-                )
-            });
+            stylesMap = {
+                'default':[new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(57, 179, 215, 0.25)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: '#000000',
+                        width: 1
+                    })
+                })],
+                'select':[new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(145, 0, 0, 0.25)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: '#000000',
+                        width: 1
+                    })
+                })]
+            };
         } else if (type && type === 'line') {
-            style = new OpenLayers.StyleMap({
-                'default': new OpenLayers.Style({
-                        strokeColor: '#39B3D7',
-                        strokeWidth: 4
-                    }
-                ),
-                'select': new OpenLayers.Style({
-                        strokeColor: '#BE1522',
-                        strokeWidth: 6
-                    }
-                )
-            });
+            stylesMap = {
+                'default':[new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: '#39B3D7',
+                        width: 4
+                    })
+                })],
+                'select':[new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: '#BE1522',
+                        width: 6
+                    })
+                })]
+            };
         } else {
-            style = new OpenLayers.StyleMap({
-                'default': new OpenLayers.Style({
-                        pointRadius: 12,
-                        'externalGraphic': 'img/marker_normal.png'
-                    }
-                ),
-                'select': new OpenLayers.Style({
-                        pointRadius: 12,
-                        'externalGraphic': 'img/marker_selected.png'
-                    }
-                )
-            });
+            stylesMap = {
+                'default':[new ol.style.Style({
+                    image: new ol.style.Icon(({
+                        anchor: [0.5, 46],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
+                        opacity: 0.75,
+                        src: 'img/marker_normal.png'
+                    }))
+                })],
+                'select':[new ol.style.Style({
+                    image: new ol.style.Icon(({
+                        anchor: [0.5, 46],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
+                        opacity: 0.75,
+                        src: 'img/marker_selected.png'
+                    }))
+                })]
+            };
         }
 
-        layer.styleMap = style;
+        layer.setStyle(function(feature, resolution) {
+            var selectedFeatures = window.selectClick.getFeatures();
+            if(selectedFeatures && feature === selectedFeatures[0]){
+                return stylesMap.select;
+            } else {
+                return stylesMap.default;
+            }
+        });
     }
 };
+

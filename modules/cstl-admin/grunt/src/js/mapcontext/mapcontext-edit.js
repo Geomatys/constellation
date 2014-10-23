@@ -197,21 +197,22 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                         visible: true
                     };
                     $scope.layers.toAdd.push(layerExtToAdd);
-                } else {
-                    if ($scope.selected.layer) {
-                        var layerToAdd = {
-                            layer: $scope.selected.layer,
-                            service: $scope.selected.service,
-                            visible: true
-                        };
-                        layerToAdd.layer.opacity = 100;
-                        $scope.layers.toAdd.push(layerToAdd);
-                    }
+                    $scope.selected = {};
+                } else if ($scope.selected.layer) {
+                    var layerToAdd = {
+                        layer: $scope.selected.layer,
+                        service: $scope.selected.service,
+                        visible: true
+                    };
+                    layerToAdd.layer.opacity = 100;
+                    $scope.layers.toAdd.push(layerToAdd);
+                    $scope.selected = {};
                 }
-                $scope.viewMap(false);
-
                 // Go back to first screen
                 $scope.mode.display = 'general';
+
+                $scope.viewMap(false);
+
             } else if ($scope.mode.display==='addChooseStyle') {
                 if ($scope.layers.toStyle.layer.externalStyle) {
                     // It's an external WMS style, put the one chosen in first, as the default one
@@ -246,8 +247,8 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     $scope.layers.toStyle.layer.styleId = $scope.styles.selected.Id;
                     $scope.layers.toStyle.layer.styleName = $scope.styles.selected.Name;
                 }
-                $scope.viewMap(false);
                 $scope.mode.display = 'general';
+                $scope.viewMap(false);
             }
         };
 
@@ -307,7 +308,10 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 $scope.layers.toAdd[i] = previous;
 
                 // Now switch layer order for the map
-                DataViewer.map.setLayerIndex(DataViewer.map.layers[i], i-1);
+                var item0 = DataViewer.map.getLayers().item(i-1);
+                var item1 = DataViewer.map.getLayers().item(i);
+                DataViewer.map.getLayers().setAt(i-1, item1);
+                DataViewer.map.getLayers().setAt(i,   item0);
             }
         };
         $scope.orderDown = function(i) {
@@ -317,7 +321,10 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 $scope.layers.toAdd[i] = next;
 
                 // Now switch layer order for the map
-                DataViewer.map.setLayerIndex(DataViewer.map.layers[i+1], i);
+                var item0 = DataViewer.map.getLayers().item(i);
+                var item1 = DataViewer.map.getLayers().item(i+1);
+                DataViewer.map.getLayers().setAt(i,   item1);
+                DataViewer.map.getLayers().setAt(i+1, item0);
             }
         };
 
@@ -377,7 +384,8 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
             for (var i=0; i<DataViewer.layers.length; i++) {
                 var l = DataViewer.layers[i];
-                if (l.name === item.layer.Name) {
+                if (l.get('name') === item.layer.Name ||
+                    l.get('name') === item.layer.externalLayer) {
                     DataViewer.map.removeLayer(l);
                     return;
                 }
@@ -388,8 +396,9 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             item.visible=!(item.visible);
             for (var i=0; i<DataViewer.layers.length; i++) {
                 var l = DataViewer.layers[i];
-                if (l.name === item.layer.Name) {
-                    l.setVisibility(item.visible);
+                if (l.get('name') === item.layer.Name ||
+                    l.get('name') === item.layer.externalLayer) {
+                    l.setVisible(item.visible);
                     return;
                 }
             }
@@ -398,7 +407,8 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         $scope.updateOpacity = function(item) {
             for (var i=0; i<DataViewer.layers.length; i++) {
                 var l = DataViewer.layers[i];
-                if (l.name === item.layer.Name) {
+                if (l.get('name') === item.layer.Name ||
+                    l.get('name') === item.layer.externalLayer) {
                     l.setOpacity(item.layer.opacity / 100);
                     return;
                 }
@@ -440,8 +450,13 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             DataViewer.initMap('mapContextMap');
 
             if (firstTime) {
-                var extent = new OpenLayers.Bounds($scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north);
-                DataViewer.map.zoomToExtent(extent, true);
+                if($scope.ctxt && $scope.ctxt.west && $scope.ctxt.south && $scope.ctxt.east && $scope.ctxt.north) {
+                    var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
+                    setTimeout(function(){
+                        DataViewer.map.updateSize();
+                        DataViewer.zoomToExtent(extent, DataViewer.map.getSize());
+                    },300);
+                }
             } else {
                 fillLayersToSend();
                 mapcontext.extentForLayers({}, $scope.layers.toSend, function(response) {
@@ -452,17 +467,23 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         function useExtentForLayers(values) {
             $scope.ctxt.crs = values.crs;
-            $scope.ctxt.west = values.west;
-            $scope.ctxt.south = values.south;
-            $scope.ctxt.east = values.east;
-            $scope.ctxt.north = values.north;
-            var extent = new OpenLayers.Bounds($scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north);
-            DataViewer.map.zoomToExtent(extent, true);
+            $scope.ctxt.west = Number(values.west);
+            $scope.ctxt.south = Number(values.south);
+            $scope.ctxt.east = Number(values.east);
+            $scope.ctxt.north = Number(values.north);
+            var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
+            setTimeout(function(){
+                DataViewer.map.updateSize();
+                DataViewer.zoomToExtent(extent, DataViewer.map.getSize());
+            },300);
         }
 
         $scope.applyExtent = function() {
-            var currentMapExtent = DataViewer.map.getExtent();
-            var extent = currentMapExtent.toArray();
+            var extent = DataViewer.map.getView().calculateExtent(DataViewer.map.getSize());
+            var crsCode = DataViewer.map.getView().getProjection().getCode();
+            if(crsCode) {
+                $scope.ctxt.crs = crsCode;
+            }
             $scope.ctxt.west = extent[0];
             $scope.ctxt.south = extent[1];
             $scope.ctxt.east = extent[2];

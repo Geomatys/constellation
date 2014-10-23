@@ -15,26 +15,31 @@
  */
 window.WmtsViewer = {
     map : undefined,
-
-    format : new OpenLayers.Format.WMTSCapabilities({
-        yx: {
-            "urn:ogc:def:crs:EPSG::4326": true
-        }
-    }),
+    target : undefined,
+    layers : [],
+    extent: [-180, -90, 180, 90],
+    projection: 'EPSG:4326',
+    maxExtent : undefined,
 
     initMap : function(mapId){
         if (WmtsViewer.map) {
-            WmtsViewer.map.destroy();
+            WmtsViewer.map.setTarget(undefined);
         }
-
-//        var extent = "-5.740083333333334, 47.96008333333334, -4.332083333333334, 48.60008333333334";
-//        var maxExtent = new OpenLayers.Bounds.fromString(extent, false);
-
-        WmtsViewer.map = new OpenLayers.Map(mapId, {
-            controls: [new OpenLayers.Control.Navigation()],
-            projection: new OpenLayers.Projection('EPSG:4326'),
-            allOverlays: true
+        WmtsViewer.map = new ol.Map({
+            layers: WmtsViewer.layers,
+            target: mapId,
+            view: new ol.View({
+                projection: WmtsViewer.projection,
+                extent: WmtsViewer.extent
+            }),
+            logo: false
         });
+        var projection = ol.proj.get(WmtsViewer.projection);
+        WmtsViewer.maxExtent = projection.getExtent();
+
+        // Zoom on specified extent
+        WmtsViewer.map.updateSize();
+        WmtsViewer.map.getView().fitExtent(WmtsViewer.extent, WmtsViewer.map.getSize());
     },
 
     createLayer : function(layerName, instance, capabilities){
@@ -50,14 +55,24 @@ window.WmtsViewer = {
             }
         }
 
-        WmtsViewer.map.maxExtent =  maxExtent;
-        WmtsViewer.map.restrictedExtent = maxExtent;
-
-        return WmtsViewer.format.createLayer(capabilities, {
-            layer: layerName,
-            matrixSet: matrixSet,
-            format: "image/png",
-            style: "default"
+        var wmtslayer = new ol.layer.Tile({
+            extent: WmtsViewer.extent,
+            source: new ol.source.WMTS({
+                url: capabilities.url,
+                layer: layerName,
+                matrixSet: matrixSet, //'EPSG:3857'
+                format: 'image/png',
+                projection: WmtsViewer.projection,
+                tileGrid: new ol.tilegrid.WMTS({
+                    origin: ol.extent.getTopLeft(WmtsViewer.extent),
+                    resolutions: capabilities.resolutions,
+                    matrixIds: capabilities.matrixIds
+                }),
+                style: 'default'
+            })
         });
+
+        wmtslayer.set('name', layerName);
+        return wmtslayer;
     }
 };

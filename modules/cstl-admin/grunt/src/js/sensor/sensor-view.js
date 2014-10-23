@@ -57,26 +57,14 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
         $scope.initMap = function() {
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             sos.getFeatures({id: $scope.service.identifier, sensor: $scope.sensorId}, function(wkt) {
-                var wktReader = new OpenLayers.Format.WKT();
-                var vector = wktReader.read(wkt.value);
-                if (vector.geometry) {
-//                if (Array.isArray(vector)) {
-//                    DataViewer.layers = [layerBackground];
-//                    for (var i=0; i<vector.length; i++) {
-//                        var v = vector[i];
-//                        v.sensorName = $scope.sensorId;
-//                        var newLayer = DataViewer.createSensorsLayer($scope.sensorId);
-//                        DataViewer.layers.push(newLayer);
-//                    }
-//                    DataViewer.initMap('olSensorMap');
-//                } else {
-                    vector.sensorName = $scope.sensorId;
+                var wktReader = new ol.format.WKT();
+                var features = wktReader.readFeatures(wkt.value);
+                if (features) {
                     var newLayer = DataViewer.createSensorsLayer($scope.sensorId);
-                    determineGeomClass(vector, newLayer);
-                    newLayer.addFeatures(vector);
+                    determineGeomClass(features, newLayer);
+                    newLayer.addFeatures(features);
                     DataViewer.layers = [layerBackground, newLayer];
                     DataViewer.initMap('olSensorMap');
-//                }
                 } else {
                     DataViewer.layers = [layerBackground];
                     DataViewer.initMap('olSensorMap');
@@ -84,16 +72,19 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
             });
         };
 
-        function determineGeomClass(vector, layer) {
-            var vectorClass = vector.geometry.CLASS_NAME;
-            switch (vectorClass) {
-                case 'OpenLayers.Geometry.Point': DataViewer.setSensorStyle('point', layer); break;
-                case 'OpenLayers.Geometry.MultiPoint': DataViewer.setSensorStyle('point', layer); break;
-                case 'OpenLayers.Geometry.LineString': DataViewer.setSensorStyle('line', layer); break;
-                case 'OpenLayers.Geometry.MultiLineString': DataViewer.setSensorStyle('line', layer); break;
-                case 'OpenLayers.Geometry.Polygon': DataViewer.setSensorStyle('polygon', layer); break;
-                case 'OpenLayers.Geometry.MultiPolygon': DataViewer.setSensorStyle('polygon', layer); break;
-                default: break;
+        function determineGeomClass(features, layer) {
+            if(features && features.length > 0){
+                var feature = features[0];
+                var geomType = feature.getGeometry().getType();
+                switch (geomType) {
+                    case 'Point': DataViewer.setSensorStyle('point', layer); break;
+                    case 'MultiPoint': DataViewer.setSensorStyle('point', layer); break;
+                    case 'LineString': DataViewer.setSensorStyle('line', layer); break;
+                    case 'MultiLineString': DataViewer.setSensorStyle('line', layer); break;
+                    case 'Polygon': DataViewer.setSensorStyle('polygon', layer); break;
+                    case 'MultiPolygon': DataViewer.setSensorStyle('polygon', layer); break;
+                    default: break;
+                }
             }
         }
 

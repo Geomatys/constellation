@@ -514,20 +514,28 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.showLayer = function() {
-            $('#viewerData').modal("show");
-            var layerName = $scope.selected.Name;
-            if ($scope.service.type === 'WMTS') {
-                // GetCaps
-                textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
-                    .success(function (data, status, headers, config) {
-                        // Build map
-                        var capabilities = WmtsViewer.format.read(data);
-                        WmtsViewer.initMap('dataMap');
-                        var layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, capabilities);
-                        WmtsViewer.map.addLayer(layerData);
-                        WmtsViewer.map.zoomToMaxExtent();
-                    });
-            } else {
+            //clear the map
+            if (DataViewer.map) {
+                DataViewer.map.setTarget(undefined);
+            }
+            var viewerData = $('#viewerData');
+            viewerData.modal("show");
+            viewerData.off('shown.bs.modal');
+            viewerData.on('shown.bs.modal', function (e) {
+                var layerName = $scope.selected.Name;
+                //@TODO use ol3 wmts layer
+//                if ($scope.service.type.toLowerCase() === 'wmts') {
+//                    // GetCaps
+//                    textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
+//                        .success(function (data, status, headers, config) {
+                // Build map
+//                            var capabilities = WmtsViewer.format.read(data);
+//                            WmtsViewer.initMap('dataMap');
+//                            var layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, capabilities);
+//                            WmtsViewer.map.addLayer(layerData);
+//                            WmtsViewer.map.getView().fitExtent(WmtsViewer.maxExtent,WmtsViewer.map.getSize());
+//                        });
+//                } else {
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
                 var layerData;
                 var providerId = $scope.selected.Provider;
@@ -538,32 +546,34 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 }
 
                 //attach event loader in modal map viewer
-                layerData.events.register("loadstart", layerData, function() {
+                layerData.on('precompose',function(){
                     $scope.$apply(function() {
                         window.cfpLoadingBar_parentSelector = '#dataMap';
                         cfpLoadingBar.start();
                         cfpLoadingBar.inc();
                     });
                 });
-                layerData.events.register("loadend", layerData, function() {
+                layerData.on('postcompose',function(){
                     cfpLoadingBar.complete();
                     window.cfpLoadingBar_parentSelector = null;
                 });
 
-                DataViewer.layers = [layerData, layerBackground];
-                DataViewer.initMap('dataMap');
+                DataViewer.layers = [layerBackground,layerData];
                 provider.dataDesc({},{values: {'providerId':providerId,'dataId':layerName}},
                     function(response) {//success
                         var bbox = response.boundingBox;
                         if (bbox) {
-                            var extent = new OpenLayers.Bounds(bbox[0],bbox[1],bbox[2],bbox[3]);
-                            DataViewer.map.zoomToExtent(extent, true);
+                            var extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
+                            DataViewer.extent = extent;
                         }
+                        DataViewer.initMap('dataMap');
                     }, function() {//error
                         // failed to find a metadata, just load the full map
+                        DataViewer.initMap('dataMap');
                     }
                 );
-            }
+//                }
+            });
         };
 
         $scope.showSensor = function() {
