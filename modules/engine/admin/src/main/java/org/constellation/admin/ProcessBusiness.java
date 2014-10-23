@@ -57,6 +57,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobKey;
+import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -102,10 +103,12 @@ import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
  * @author Quentin Boileau (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
-@Component
+@Component(ProcessBusiness.BEAN_NAME)
 @Primary
 @DependsOn("database-initer")
 public class ProcessBusiness implements IProcessBusiness {
+
+    public static final String BEAN_NAME = "processBusiness";
 
     private static final DateFormat TASK_DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm");
     private static final Logger LOGGER = Logging.getLogger(ProcessBusiness.class);
@@ -253,6 +256,15 @@ public class ProcessBusiness implements IProcessBusiness {
     @Override
     public TaskParameter addTaskParameter(TaskParameter taskParameter) {
         return taskParameterRepository.create(taskParameter);
+    }
+
+    @Override
+    public void registerQuartzListener(JobListener jobListener) throws ConstellationException {
+        try {
+            quartzScheduler.getListenerManager().addJobListener(jobListener, allJobs());
+        } catch (SchedulerException e) {
+            throw new ConstellationException("Unable to attach listener to quartz scheduler.", e);
+        }
     }
 
     private ProcessDescriptor getDescriptor(final String authority, final String code) {

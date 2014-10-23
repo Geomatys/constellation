@@ -27,6 +27,8 @@ import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.*;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.chain.model.Chain;
+import org.quartz.JobListener;
+import org.quartz.SchedulerException;
 
 import java.util.List;
 
@@ -62,6 +64,8 @@ public interface IProcessBusiness {
      * @return List of all available process registry.
      */
     List<String> listProcessFactory();
+
+    void registerQuartzListener(JobListener jobListener) throws ConstellationException;
 
     List<ProcessDescriptor> getChainDescriptors() throws ConstellationException;
 
