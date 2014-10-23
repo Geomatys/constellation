@@ -49,5 +49,5 @@ public interface LayerRepository {
 
     Data findDatasFromLayerAlias(String layerAlias, String dataProviderIdentifier);
 
-    void updateLayerName(LayerSummary layerId);
+    void updateLayerTitle(LayerSummary layerId);
 }

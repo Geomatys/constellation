@@ -36,7 +36,7 @@ public interface ILayerBusiness {
     void add(String name, String namespace, String providerId, String alias,
              String serviceId, String serviceType, org.constellation.configuration.Layer config) throws ConfigurationException;
 
-    void updateLayerName(LayerSummary layer) throws ConfigurationException;
+    void updateLayerTitle(LayerSummary layer) throws ConfigurationException;
 
     void removeForService(String serviceName, String identifier) throws ConfigurationException;
 

@@ -168,8 +168,8 @@ public class LayerBusiness implements ILayerBusiness {
         }
     }
 
-    public void updateLayerName(LayerSummary layer) throws ConfigurationException {
-        layerRepository.updateLayerName(layer);
+    public void updateLayerTitle(LayerSummary layer) throws ConfigurationException {
+        layerRepository.updateLayerTitle(layer);
     }
 
     public void remove(final String spec, final String serviceId, final String name, final String namespace) throws ConfigurationException {

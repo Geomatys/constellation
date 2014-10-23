@@ -80,8 +80,8 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     }
 
     @Override
-    public void updateLayerName(LayerSummary layer) {
-        dsl.update(LAYER).set(LAYER.ALIAS, layer.getName()).set(LAYER.NAME, layer.getName())
+    public void updateLayerTitle(LayerSummary layer) {
+        dsl.update(LAYER).set(LAYER.ALIAS, layer.getAlias())
                 .where(LAYER.ID.eq(layer.getId()))
                 .execute();
     }
