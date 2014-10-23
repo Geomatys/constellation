@@ -49,7 +49,6 @@ import org.constellation.engine.register.TaskParameterWithOwnerName;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.UserRepository;
 
-import org.constellation.scheduler.Tasks;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -88,7 +87,7 @@ public final class TaskRest {
     @GET
     @Path("listProcesses")
     public Response listProcess(){
-        final List<Name> names = Tasks.listProcess();
+        final List<Name> names = processBusiness.listProcess();
         final StringList lst = new StringList();
         for(Name n : names){
             lst.getList().add(DefaultName.toJCRExtendedForm(n));
@@ -102,7 +101,7 @@ public final class TaskRest {
     @GET
     @Path("countProcesses")
     public Response countAvailableProcess(){
-        final List<Name> names = Tasks.listProcess();
+        final List<Name> names = processBusiness.listProcess();
         StringMap stringMap = new StringMap();
         stringMap.getMap().put("value",""+names.size());
         return Response.ok(stringMap).build();
@@ -116,7 +115,7 @@ public final class TaskRest {
     @GET
     @Path("process/factory/{authorityCode}")
     public Response listProcessForFactory(final @PathParam("authorityCode") String authorityCode) {
-        return Response.ok(new StringList(Tasks.listProcessForFactory(authorityCode))).build();
+        return Response.ok(new StringList(processBusiness.listProcessForFactory(authorityCode))).build();
     }
     
     /**
@@ -124,7 +123,7 @@ public final class TaskRest {
      */
     @Path("listProcessFactories")
     public Response listProcessFactories(){
-        final List<String> names = Tasks.listProcessFactory();
+        final List<String> names = processBusiness.listProcessFactory();
         return Response.ok(new StringList(names)).build();
     }
     

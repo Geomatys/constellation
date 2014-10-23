@@ -26,6 +26,7 @@ import org.constellation.engine.register.TaskParameter;
 import org.constellation.scheduler.CstlSchedulerListener;
 import org.constellation.scheduler.QuartzTask;
 import org.constellation.scheduler.TaskState;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.*;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.chain.model.Chain;
@@ -40,6 +41,30 @@ import java.util.List;
  * @author Quentin Boileau (Geomatys)
  */
 public interface IProcessBusiness {
+
+    /**
+     * The returned list is a subset of what can be found with ProcessFinder.
+     * But only process with simple types arguments are preserved.
+     *
+     * @return List of all available process.
+     */
+    List<Name> listProcess();
+
+    /**
+     * The returned list is a subset of what can be found with ProcessFinder.
+     * But only process with simple types arguments are preserved.
+     *
+     * @param authorityCode
+     * @return List of all available process.
+     */
+    List<String> listProcessForFactory(final String authorityCode);
+
+    /**
+     * The returned list of all found ProcessingRegistry with ProcessFinder.
+     *
+     * @return List of all available process registry.
+     */
+    List<String> listProcessFactory();
 
     List<ProcessDescriptor> getChainDescriptors() throws ConstellationException;
 
@@ -107,8 +132,6 @@ public interface IProcessBusiness {
     void stopScheduleTaskParameter (TaskParameter task, Integer userId) throws ConstellationException, ConfigurationException;
 
     QuartzTask getProcessTask(String id);
-
-    void addListenerOnRunningTasks(CstlSchedulerListener cstlSchedulerListener);
 
     TaskParameter addTaskParameter(TaskParameter taskParameter);
 }

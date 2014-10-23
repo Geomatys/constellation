@@ -100,6 +100,10 @@
        <!--<scope>test</scope>-->
     <!--</dependency>-->
     <dependency>
+        <groupId>org.geotoolkit.project</groupId>
+        <artifactId>geotk-test</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.constellation.engine</groupId>
       <artifactId>cstl-engine-testing</artifactId>
       <version>${project.version}</version>

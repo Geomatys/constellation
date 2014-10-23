@@ -18,26 +18,6 @@
  */
 package org.constellation.admin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
@@ -52,15 +32,19 @@ import org.constellation.engine.register.repository.ChainProcessRepository;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.TaskRepository;
 import org.constellation.scheduler.CstlSchedulerListener;
+import org.constellation.scheduler.MessagingJobListener;
 import org.constellation.scheduler.QuartzJobListener;
 import org.constellation.scheduler.QuartzTask;
-import org.constellation.scheduler.TaskState;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.io.DirectoryWatcher;
 import org.geotoolkit.io.PathChangeListener;
 import org.geotoolkit.io.PathChangedEvent;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.process.*;
 import org.geotoolkit.process.Process;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.ProcessingRegistry;
 import org.geotoolkit.process.chain.ChainProcessDescriptor;
 import org.geotoolkit.process.chain.model.Chain;
 import org.geotoolkit.process.chain.model.ChainMarshallerPool;
@@ -73,12 +57,43 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
-
-import org.quartz.*;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 
@@ -96,8 +111,6 @@ public class ProcessBusiness implements IProcessBusiness {
 
     private static final DateFormat TASK_DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm");
     private static final Logger LOGGER = Logging.getLogger(ProcessBusiness.class);
-
-    private final QuartzJobListener quartzListener = new QuartzJobListener(this);
 
     @Inject
     private TaskParameterRepository taskParameterRepository;
@@ -126,7 +139,7 @@ public class ProcessBusiness implements IProcessBusiness {
             quartzScheduler.start();
 
             //listen and attach a process on all geotk process tasks
-            quartzScheduler.getListenerManager().addJobListener(quartzListener, allJobs());
+            quartzScheduler.getListenerManager().addJobListener(new QuartzJobListener(this), allJobs());
 
         } catch (SchedulerException ex) {
             LOGGER.log(Level.SEVERE, "=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);
@@ -181,15 +194,68 @@ public class ProcessBusiness implements IProcessBusiness {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Name> listProcess(){
+        final List<Name> names = new ArrayList<>();
+
+        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
+        while(ite.hasNext()){
+            final ProcessingRegistry factory = ite.next();
+            final String authorityCode = factory.getIdentification().getCitation()
+                    .getIdentifiers().iterator().next().getCode();
+
+            for(String processCode : factory.getNames()){
+                names.add(new DefaultName(authorityCode, processCode));
+            }
+        }
+
+        return names;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> listProcessForFactory(final String authorityCode){
+        final List<String> names = new ArrayList<>();
+
+        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
+        while(ite.hasNext()){
+            final ProcessingRegistry factory = ite.next();
+            final String currentAuthorityCode = factory.getIdentification().getCitation()
+                    .getIdentifiers().iterator().next().getCode();
+            if (currentAuthorityCode.equals(authorityCode)) {
+                for(String processCode : factory.getNames()){
+                    names.add(processCode);
+                }
+            }
+        }
+        return names;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> listProcessFactory(){
+        final List<String> names = new ArrayList<>();
+
+        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
+        while(ite.hasNext()){
+            final ProcessingRegistry factory = ite.next();
+            names.add(factory.getIdentification().getCitation()
+                    .getIdentifiers().iterator().next().getCode());
+        }
+        return names;
+    }
+
     @Override
     public QuartzTask getProcessTask(String id) {
         //TODO a faire si utile
         return null;
-    }
-
-    @Override
-    public void addListenerOnRunningTasks(CstlSchedulerListener cstlSchedulerListener) {
-        //TODO a faire si utile
     }
 
     @Override

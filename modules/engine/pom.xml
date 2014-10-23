@@ -125,7 +125,6 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>scheduler</module>
     <module>process-core</module>
     <module>process</module>
     <module>testing</module>

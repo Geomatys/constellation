@@ -33,11 +33,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>cstl-engine-scheduler</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.constellation.library</groupId>
             <artifactId>cstl-lib-api</artifactId>
             <version>${project.version}</version>
