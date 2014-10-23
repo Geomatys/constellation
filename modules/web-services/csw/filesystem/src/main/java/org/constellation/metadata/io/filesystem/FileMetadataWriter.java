@@ -73,14 +73,14 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
     /**
      * An indexer lucene to add object into the index.
      */
-    private final AbstractIndexer indexer;
+    protected final AbstractIndexer indexer;
 
     /**
      * A directory in witch the metadata files are stored.
      */
-    private final File dataDirectory;
+    protected final File dataDirectory;
 
-    private final String serviceID;
+    protected final String serviceID;
     
     /**
      * Build a new File metadata writer, with the specified indexer.

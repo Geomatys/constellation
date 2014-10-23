@@ -160,7 +160,6 @@ public final class Utils {
         if (obj instanceof Node) {
             return findIdentifierNode((Node)obj);
         }
-        String identifier = UNKNOW_IDENTIFIER;
 
         final List<String> paths = new ArrayList<>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
@@ -172,6 +171,24 @@ public final class Utils {
         paths.add("Ebrim v2.5:*:id");
         paths.add("ISO 19110:FC_FeatureCatalogue:id");
         paths.add("SensorML:SensorML:member:process:id");
+
+        return findIdentifier(obj, paths);
+    }
+    
+    /**
+     * This method try to find an identifier for this object.
+     *
+     * @param obj the object for which we want a identifier.
+     * @param paths
+     *
+     * @return the founded identifier or UNKNOW_IDENTIFIER
+     */
+    public static String findIdentifier(final Object obj, final List<String> paths) {
+
+        if (obj instanceof Node) {
+            return findIdentifierNode((Node)obj, paths);
+        }
+        String identifier = UNKNOW_IDENTIFIER;
 
         for (String path : paths) {
             Object value = ReflectionUtilities.getValuesFromPath(path, obj);
