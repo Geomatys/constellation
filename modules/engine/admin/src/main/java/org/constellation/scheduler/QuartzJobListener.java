@@ -21,6 +21,7 @@ package org.constellation.scheduler;
 
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
@@ -77,7 +78,7 @@ public class QuartzJobListener implements JobListener {
 
         final org.constellation.engine.register.Task taskEntity = new org.constellation.engine.register.Task();
         taskEntity.setIdentifier(UUID.randomUUID().toString());
-        taskEntity.setState(TaskState.Status.PENDING.name());
+        taskEntity.setState(TaskState.PENDING.name());
         taskEntity.setTaskParameterId(quartzTask.getTaskParameterId());
         taskEntity.setOwner(quartzTask.getUserId());
         taskEntity.setType(""); // TODO
@@ -118,39 +119,39 @@ public class QuartzJobListener implements JobListener {
         
         @Override
         public void started(ProcessEvent event) {
-            taskEntity.setState(TaskState.Status.RUNNING.name());
+            taskEntity.setState(TaskState.RUNNING.name());
             taskEntity.setStart(System.currentTimeMillis());
             updateTask(event);
         }
 
         @Override
         public void progressing(ProcessEvent event) {
-            taskEntity.setState(TaskState.Status.RUNNING.name());
+            taskEntity.setState(TaskState.RUNNING.name());
             updateTask(event);
         }
 
         @Override
         public void paused(ProcessEvent event) {
-            taskEntity.setState(TaskState.Status.PAUSED.name());
+            taskEntity.setState(TaskState.PAUSED.name());
             updateTask(event);
         }
 
         @Override
         public void resumed(ProcessEvent event) {
-            taskEntity.setState(TaskState.Status.RUNNING.name());
+            taskEntity.setState(TaskState.RUNNING.name());
             updateTask(event);
         }
 
         @Override
         public void completed(ProcessEvent event) {
-            taskEntity.setState(TaskState.Status.SUCCEED.name());
+            taskEntity.setState(TaskState.SUCCEED.name());
             taskEntity.setEnd(System.currentTimeMillis());
             updateTask(event);
         }
 
         @Override
         public void failed(ProcessEvent event) {
-            taskEntity.setState(TaskState.Status.FAILED.name());
+            taskEntity.setState(TaskState.FAILED.name());
             taskEntity.setEnd(System.currentTimeMillis());
             StringWriter errors = new StringWriter();
             if (event.getException() != null) {

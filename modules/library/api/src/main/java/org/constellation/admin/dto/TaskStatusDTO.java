@@ -17,35 +17,24 @@
  * limitations under the License.
  */
 
-package org.constellation.dto;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+package org.constellation.admin.dto;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class TaskStatus {
+public class TaskStatusDTO {
     
-    @XmlElement
     private String id;
-    @XmlElement
+    private Integer taskId;
     private String title;
-    @XmlElement
     private String status;
-    @XmlElement
     private float percent;
-    @XmlElement
     private String message;
-    @XmlElement
     private String schedule;
 
-    public TaskStatus() {
+    public TaskStatusDTO() {
     }
 
     public String getId() {
@@ -54,6 +43,14 @@ public class TaskStatus {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Integer getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
     }
 
     public String getTitle() {

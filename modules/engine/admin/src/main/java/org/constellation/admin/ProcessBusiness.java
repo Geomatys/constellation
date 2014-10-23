@@ -31,8 +31,6 @@ import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.repository.ChainProcessRepository;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.TaskRepository;
-import org.constellation.scheduler.CstlSchedulerListener;
-import org.constellation.scheduler.MessagingJobListener;
 import org.constellation.scheduler.QuartzJobListener;
 import org.constellation.scheduler.QuartzTask;
 import org.geotoolkit.feature.type.DefaultName;
@@ -253,12 +251,6 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @Override
-    public QuartzTask getProcessTask(String id) {
-        //TODO a faire si utile
-        return null;
-    }
-
-    @Override
     public TaskParameter addTaskParameter(TaskParameter taskParameter) {
         return taskParameterRepository.create(taskParameter);
     }
@@ -298,26 +290,6 @@ public class ProcessBusiness implements IProcessBusiness {
         return params;
     }
 
-    /**
-     * Load tasks defined as programmed in the system
-     */
-    private synchronized List<QuartzTask> loadProgrammedTasks() throws Exception{
-        List<QuartzTask> quartzTasks = new ArrayList<>();
-        final List<? extends TaskParameter> programmedTasks = taskParameterRepository.findProgrammedTasks();
-        for( TaskParameter taskParameter : programmedTasks){
-            final QuartzTask quartzTask = new QuartzTask();
-
-            final ProcessDescriptor desc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
-            final ParameterValueGroup params = readTaskParameters(taskParameter, desc);
-
-            final ProcessJobDetail processJobDetails = new ProcessJobDetail(taskParameter.getProcessAuthority(), taskParameter.getProcessCode(),params );
-            quartzTask.setDetail(processJobDetails);
-            quartzTask.setTitle(taskParameter.getName());
-            quartzTasks.add(quartzTask);
-        }
-
-        return quartzTasks;
-    }
 
     private void registerJobInScheduler(String title, Integer taskParameterId, Integer userId, Trigger trigger, ProcessJobDetail detail) {
         final QuartzTask quartzTask = new QuartzTask(UUID.randomUUID().toString());

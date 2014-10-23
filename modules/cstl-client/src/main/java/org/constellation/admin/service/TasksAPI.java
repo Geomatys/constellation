@@ -19,9 +19,9 @@
 
 package org.constellation.admin.service;
 
+import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.StringList;
-import org.constellation.dto.TaskStatus;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -54,7 +54,7 @@ public class TasksAPI {
         this.client = client;
     }
     
-    public Map<String, TaskStatus> listTasks() throws HttpResponseException, IOException {
+    public Map<String, TaskStatusDTO> listTasks() throws HttpResponseException, IOException {
         String path = "task/listTasks";
         return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(Map.class);
     }

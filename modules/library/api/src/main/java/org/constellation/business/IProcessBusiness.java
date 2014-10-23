@@ -23,9 +23,6 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.ChainProcess;
 import org.constellation.engine.register.Task;
 import org.constellation.engine.register.TaskParameter;
-import org.constellation.scheduler.CstlSchedulerListener;
-import org.constellation.scheduler.QuartzTask;
-import org.constellation.scheduler.TaskState;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.*;
 import org.geotoolkit.process.Process;
@@ -130,8 +127,6 @@ public interface IProcessBusiness {
      * @throws ConfigurationException
      */
     void stopScheduleTaskParameter (TaskParameter task, Integer userId) throws ConstellationException, ConfigurationException;
-
-    QuartzTask getProcessTask(String id);
 
     TaskParameter addTaskParameter(TaskParameter taskParameter);
 }

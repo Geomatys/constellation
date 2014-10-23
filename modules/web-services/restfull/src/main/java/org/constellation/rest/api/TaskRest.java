@@ -36,13 +36,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Optional;
+import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringMap;
-import org.constellation.dto.TaskStatus;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.TaskParameterWithOwnerName;
@@ -348,7 +348,7 @@ public final class TaskRest {
     @Path("listTasks")
     public Response listTasks() {
         final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks();
-        final Map<String, TaskStatus> lst = toTaskStatus(tasks);
+        final Map<String, TaskStatusDTO> lst = toTaskStatus(tasks);
         return Response.ok(lst).build();
     }
 
@@ -359,16 +359,17 @@ public final class TaskRest {
     @Path("listRunningTasks/{id}")
     public Response listRunningTaskForTaskParameter(final @PathParam("id") Integer id) {
         final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks(id);
-        final Map<String, TaskStatus> lst = toTaskStatus(tasks);
+        final Map<String, TaskStatusDTO> lst = toTaskStatus(tasks);
         return Response.ok(lst).build();
     }
 
-    private Map<String, TaskStatus> toTaskStatus(List<org.constellation.engine.register.Task> tasks) {
-        final Map<String, TaskStatus> lst = new HashMap<>();
+    private Map<String, TaskStatusDTO> toTaskStatus(List<org.constellation.engine.register.Task> tasks) {
+        final Map<String, TaskStatusDTO> lst = new HashMap<>();
         for(org.constellation.engine.register.Task t : tasks){
 
-            final TaskStatus status = new TaskStatus();
+            final TaskStatusDTO status = new TaskStatusDTO();
             status.setId(t.getIdentifier());
+            status.setTaskId(t.getTaskParameterId());
             status.setMessage(t.getMessage());
             status.setPercent(t.getProgress() != null ? t.getProgress().floatValue() : 0f);
             status.setStatus(t.getState());
