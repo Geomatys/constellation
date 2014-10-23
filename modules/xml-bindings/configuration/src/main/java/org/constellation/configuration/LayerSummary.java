@@ -40,6 +40,8 @@ public class LayerSummary {
     private String namespace;
     @XmlElement(name = "Alias")
     private String alias;
+    @XmlElement(name = "Title")
+    private String title;
     @XmlElement(name = "Type")
     private String type;
     @XmlElement(name = "Subtype")
@@ -60,6 +62,7 @@ public class LayerSummary {
         this.name = layer.getName().getLocalPart();
         this.namespace = layer.getName().getNamespaceURI();
         this.alias = layer.getAlias();
+        this.title = layer.getTitle();
         this.type = db.getType();
         this.subtype = db.getSubtype();
         this.date = layer.getDate();
@@ -105,6 +108,14 @@ public class LayerSummary {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getType() {
@@ -178,6 +189,7 @@ public class LayerSummary {
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (alias != null ? !alias.equals(that.alias) : that.alias != null) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
         if (date != null ? !date.equals(that.date) : that.date != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (namespace != null ? !namespace.equals(that.namespace) : that.namespace != null) return false;
@@ -196,6 +208,7 @@ public class LayerSummary {
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
         result = 31 * result + (alias != null ? alias.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (subtype != null ? subtype.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
@@ -212,6 +225,7 @@ public class LayerSummary {
                 ", name='" + name + '\'' +
                 ", namespace='" + namespace + '\'' +
                 ", alias='" + alias + '\'' +
+                ", title='" + title + '\'' +
                 ", type='" + type + '\'' +
                 ", subtype='" + subtype + '\'' +
                 ", date=" + date +

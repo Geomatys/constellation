@@ -73,6 +73,7 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
         UpdateConditionStep<LayerRecord> set = dsl.update(LAYER).set(LAYER.NAME, layer.getName())
                 .set(LAYER.NAMESPACE, layer.getNamespace()).set(LAYER.ALIAS, layer.getAlias())
                 .set(LAYER.DATA, layer.getData()).set(LAYER.CONFIG, layer.getConfig())
+                .set(LAYER.TITLE, layer.getTitle())
                 .where(LAYER.ID.eq(layer.getId()));
 
         return set.execute();
@@ -81,7 +82,7 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
 
     @Override
     public void updateLayerTitle(LayerSummary layer) {
-        dsl.update(LAYER).set(LAYER.ALIAS, layer.getAlias())
+        dsl.update(LAYER).set(LAYER.TITLE, layer.getTitle())
                 .where(LAYER.ID.eq(layer.getId()))
                 .execute();
     }

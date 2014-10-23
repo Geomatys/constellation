@@ -280,6 +280,7 @@ public class LayerBusiness implements ILayerBusiness {
 
             // override with table values (TODO remove)
             layerConfig.setAlias(layer.getAlias());
+            layerConfig.setTitle(layer.getTitle());
             layerConfig.setDate(new Date(layer.getDate()));
             layerConfig.setOwner(layer.getOwner());
             layerConfig.setProviderID(provider.getIdentifier());
