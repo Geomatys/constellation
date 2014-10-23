@@ -1,0 +1,33 @@
+<div class="modal-dialog modal-dialog-resp-height">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="close()">×</button>
+            <h4 class="modal-title" translate="layer.listing.selected.edit.layer.info">Layer information</h4>
+        </div>
+        <div class="modal-body" style="height: 100px;overflow-y: auto;">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-4 col-md-4 control-label"
+                           translate="layer.listing.selected.edit.layer.name">Layer name</label>
+                    <div class="col-sm-5">
+                        <input type="text"
+                               class="form-control form-control-fix"
+                               ng-model="layerForm.title"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="close()"
+                    translate="data.modal.cancel">Cancel</button>
+            <button type="button"
+                    class="btn btn-info"
+                    ng-click="save()">
+                <span translate="metadata.edition.heading.save">Save modifications</span>
+            </button>
+        </div>
+    </div>
+</div>
+

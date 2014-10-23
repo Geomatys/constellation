@@ -211,7 +211,7 @@
                                                      ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title"
-                                                              title="{{layer.Name}}">{{truncate(small,layer.Name)}}</span>
+                                                              title="{{layer.Name}}">{{layer.Title ? truncate(small,layer.Title) : truncate(small,layer.Name)}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                         <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected"
                                                              src="img/vector-multipoint.svg"
@@ -396,7 +396,7 @@
                                         <div class="block-header"
                                              ng-click="toggleUpDownSelected()">
                                             <strong class="item-title title-bloc-service"
-                                                    title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
+                                                    title="{{selected.Name}}">{{selected.Title ? truncateTitleBlock(selected.Title) : truncateTitleBlock(selected.Name)}}</strong>
                                             <i class="fa fa-chevron-down pull-right"></i>
                                         </div>
                                         <div class="block-content"
@@ -434,6 +434,17 @@
                                                 </div>
                                                 <div class="col-sm-2">
                                                     <span class="tooltipicon">
+                                                        <button type="button"
+                                                                ng-click="editLayerInfo()"
+                                                                class="btn btn-info"
+                                                                data-placement="bottom"
+                                                                title="{{'layer.listing.selected.edit.layer.info' | translate }}" tooltip>
+                                                            <i class="glyphicon glyphicon-pencil"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                                <!--div class="col-sm-2">
+                                                    <span class="tooltipicon">
                                                         <button type="button" class="btn btn-info"
                                                             data-placement="bottom"
                                                             title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
@@ -449,7 +460,7 @@
                                                             <i class="glyphicon glyphicon-file"></i>
                                                         </button>
                                                     </span>
-                                                </div>
+                                                </div-->
                                                 <div class="col-sm-2">
                                                     <span class="tooltipicon">
                                                         <button type="button"

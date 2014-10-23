@@ -464,6 +464,28 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             });
         }
 
+        /**
+         * Open modal to edit layer title.
+         * in future this modal can be used to edit other attributes.
+         */
+        $scope.editLayerInfo = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/data/layerInfo.html',
+                controller: 'LayerInfoModalController',
+                resolve: {
+                    'serviceType':function(){return $scope.service.type;},
+                    'serviceIdentifier':function(){return $scope.service.identifier;},
+                    'selectedLayer':function(){return $scope.selected;}
+                }
+            });
+            modal.result.then(function() {
+                $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id},{},function (response) {
+                    Dashboard($scope, response, true);
+                    $scope.wrap.ordertype='Name';
+                });
+            });
+        };
+
         $scope.deleteMetadata = function() {
             if ($scope.selected) {
                 var dlg = $modal.open({
@@ -610,6 +632,32 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             }
         };
     })
+    .controller('LayerInfoModalController', function($scope, $modalInstance,webService,Growl,
+                                                     serviceType,serviceIdentifier,selectedLayer){
+        $scope.serviceType = serviceType;
+        $scope.serviceIdentifier = serviceIdentifier;
+        $scope.selectedLayer = selectedLayer;
+        $scope.layerForm = {
+            "title": $scope.selectedLayer.Title
+        };
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.save = function() {
+            $scope.selectedLayer.Title = $scope.layerForm.title;
+            webService.updateLayerTitle({type: $scope.serviceType, id: $scope.serviceIdentifier}, $scope.selectedLayer,
+                function(response) {//success
+                    Growl('success','Success','Layer information saved with success!');
+                    $modalInstance.close();
+                },
+                function(response) {//error
+                    Growl('error','Error','Layer name already exists!');
+                }
+            );
+        };
+    })
     .controller('EditCSWMetadataModalController', function($scope, $modalInstance, $controller,Growl,csw,serviceId,recordId,type,template) {
         //$scope.provider = id;
         $scope.serviceId = serviceId;
@@ -643,8 +691,6 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
          */
         $scope.save2 = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
-                //console.debug($scope.metadataValues[0]);
-                //console.debug(JSON.stringify($scope.metadataValues[0],null,1));
                 csw.saveMetadata({'id':$scope.serviceId,'metaId':$scope.recordId,'type':$scope.template},
                     $scope.metadataValues[0],
                     function(response) {//success
