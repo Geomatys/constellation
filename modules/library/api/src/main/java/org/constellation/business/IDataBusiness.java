@@ -90,6 +90,14 @@ public interface IDataBusiness {
     String getTemplate(final QName dataName, final String dataType) throws ConfigurationException;
 
     /**
+     * Returns {@link Data} instance for given data id.
+     * @param id given data id.
+     * @return {@link Data} object.
+     * @throws ConfigurationException
+     */
+    Data findById(final Integer id)throws ConfigurationException;
+
+    /**
      * Get and parse data statistics.
      * @param dataId
      * @return ImageStatistics object or null if data is not a coverage or if Statistics were not computed.

@@ -756,6 +756,14 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
     /**
      * {@inheritDoc}
+     */
+    @Override
+    public Data findById(final Integer id) throws ConfigurationException {
+        return dataRepository.findById(id);
+    }
+
+    /**
+     * {@inheritDoc}
      * Run at spring context initialization.
      */
     @Override
