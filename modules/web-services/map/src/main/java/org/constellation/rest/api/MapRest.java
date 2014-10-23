@@ -120,6 +120,20 @@ public class MapRest {
     }
 
     /**
+     * Update an existing layer to a "map" service instance.
+     *
+     * @param layer the layer to be added
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
+     */
+    @POST
+    @Path("{id}/layer/update")
+    public Response updateLayer(final @PathParam("spec") String spec, final @PathParam("id") String id, final LayerSummary layer) throws ConfigurationException {
+        layerBusiness.updateLayerName(layer);
+        return ok(AcknowlegementType.success("Layer \"" + layer.getName() + "\" successfully added to " + spec + " service \"" + id + "\"."));
+    }
+
+    /**
      * Remove a layer from a service.
      *
      * @param spec service type.

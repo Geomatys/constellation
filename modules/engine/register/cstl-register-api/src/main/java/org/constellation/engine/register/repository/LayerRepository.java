@@ -18,6 +18,7 @@
  */
 package org.constellation.engine.register.repository;
 
+import org.constellation.configuration.LayerSummary;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
@@ -47,4 +48,6 @@ public interface LayerRepository {
     Layer findByServiceIdAndLayerName(int serviceId, String layerName, String namespace);
 
     Data findDatasFromLayerAlias(String layerAlias, String dataProviderIdentifier);
+
+    void updateLayerName(LayerSummary layerId);
 }

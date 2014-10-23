@@ -20,6 +20,7 @@ package org.constellation.business;
 
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerSummary;
 import org.constellation.dto.AddLayer;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public interface ILayerBusiness {
 
     void add(String name, String namespace, String providerId, String alias,
              String serviceId, String serviceType, org.constellation.configuration.Layer config) throws ConfigurationException;
+
+    void updateLayerName(LayerSummary layer) throws ConfigurationException;
 
     void removeForService(String serviceName, String identifier) throws ConfigurationException;
 

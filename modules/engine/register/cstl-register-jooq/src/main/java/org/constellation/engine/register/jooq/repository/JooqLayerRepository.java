@@ -18,6 +18,7 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import org.constellation.configuration.LayerSummary;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
@@ -79,6 +80,13 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     }
 
     @Override
+    public void updateLayerName(LayerSummary layer) {
+        dsl.update(LAYER).set(LAYER.ALIAS, layer.getName()).set(LAYER.NAME, layer.getName())
+                .where(LAYER.ID.eq(layer.getId()))
+                .execute();
+    }
+
+    @Override
     public void delete(int layerId) {
 
         final DeleteConditionStep<LayerRecord> delete = dsl.delete(LAYER).where(LAYER.ID.eq(layerId));
@@ -119,5 +127,4 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
         return dsl.select().from(DATA).join(PROVIDER).on(DATA.PROVIDER.eq(PROVIDER.ID))
                 .join(LAYER).on(LAYER.DATA.eq(DATA.ID)).where(PROVIDER.IDENTIFIER.eq(dataProviderIdentifier)).and(LAYER.ALIAS.eq(layerAlias)).fetchOneInto(Data.class);
     }
-
 }

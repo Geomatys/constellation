@@ -23,6 +23,7 @@ import org.constellation.business.ILayerBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.LayerSummary;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.engine.register.ConstellationPersistenceException;
@@ -166,7 +167,11 @@ public class LayerBusiness implements ILayerBusiness {
             throw new TargetNotFoundException("Unable to find a service:" + serviceId);
         }
     }
-    
+
+    public void updateLayerName(LayerSummary layer) throws ConfigurationException {
+        layerRepository.updateLayerName(layer);
+    }
+
     public void remove(final String spec, final String serviceId, final String name, final String namespace) throws ConfigurationException {
         final Service service = serviceRepository.findByIdentifierAndType(serviceId, spec.toLowerCase());
         if (service != null) {
