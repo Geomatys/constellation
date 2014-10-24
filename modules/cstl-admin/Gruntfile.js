@@ -262,6 +262,6 @@ module.exports = function(grunt) {
 
     // Register tasks.
     grunt.registerTask('dev', ['jshint', 'clean', 'copy', 'less', 'concat']);
-    grunt.registerTask('prod', ['jshint', 'clean', 'copy', 'less', 'concat', 'ngAnnotate', 'uglify'/*, 'htmlmin'*/]);
+    grunt.registerTask('prod', ['jshint', 'clean', 'copy', 'less', 'concat', 'ngAnnotate', 'uglify']);
     grunt.registerTask('update', ['jshint', 'copy:app', 'less:app', 'concat:app', 'concat:app_index']);
 };

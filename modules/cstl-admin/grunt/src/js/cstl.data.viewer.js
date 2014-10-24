@@ -13,8 +13,8 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
-function isInfinityNumber(n) {
-    return (n === Number.POSITIVE_INFINITY || n === Number.NEGATIVE_INFINITY);
+function isNotNumber(n) {
+    return (n === Number.POSITIVE_INFINITY || n === Number.NEGATIVE_INFINITY || isNaN(n));
 }
 window.DataViewer = {
     map : undefined,
@@ -23,6 +23,7 @@ window.DataViewer = {
     extent: [-180, -85, 180, 85], //extent array of coordinates always in 4326
     projection: 'EPSG:3857', //given projection used to display layers
     maxExtent : undefined, //the maximum extent for the given projection
+    addBackground : true,
 
     initMap : function(mapId){
         //unbind the old map
@@ -39,21 +40,23 @@ window.DataViewer = {
         if(Array.isArray(reprojExtent)){
             for(var i=0;i<reprojExtent.length;i++){
                 var coord = reprojExtent[i];
-                if(isInfinityNumber(coord)){
+                if(isNotNumber(coord)){
                     reprojExtent = projection.getExtent();
                     break;
                 }
             }
         }
 
-        //adding background layer by default OSM
-        var sourceOSM = new ol.source.OSM({
-            attributions:[]
-        });
-        var backgroundLayer = new ol.layer.Tile({
-            source: sourceOSM
-        });
-        DataViewer.layers.unshift(backgroundLayer);
+        if(DataViewer.addBackground) {
+            //adding background layer by default OSM
+            var sourceOSM = new ol.source.OSM({
+                attributions:[]
+            });
+            var backgroundLayer = new ol.layer.Tile({
+                source: sourceOSM
+            });
+            DataViewer.layers.unshift(backgroundLayer);
+        }
 
         DataViewer.map = new ol.Map({
             controls: ol.control.defaults().extend([
@@ -78,8 +81,19 @@ window.DataViewer = {
     },
 
     zoomToExtent : function(extent,size){
+        var projection = ol.proj.get(DataViewer.projection);
         var reprojExtent = ol.proj.transform(extent, 'EPSG:4326', DataViewer.projection);
+        if(Array.isArray(reprojExtent)){
+            for(var i=0;i<reprojExtent.length;i++){
+                var coord = reprojExtent[i];
+                if(isNotNumber(coord)){
+                    reprojExtent = projection.getExtent();
+                    break;
+                }
+            }
+        }
         DataViewer.map.getView().fitExtent(reprojExtent, size);
+        DataViewer.map.getView().setZoom(DataViewer.map.getView().getZoom()+1);
     },
 
     createLayer : function(cstlUrlPrefix, layerName, providerId, filter){

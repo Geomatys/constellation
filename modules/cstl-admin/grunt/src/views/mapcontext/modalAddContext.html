@@ -600,7 +600,7 @@
                     class="btn btn-default"
                     ng-click="cancel()"
                     translate="mapcontext.modal.cancel">Cancel</button>
-            <button ng-hide="(mode.display==='chooseLayer' && mode.source==='externe' && mode.dispWmsLayers!== true)"
+            <button ng-hide="(mode.display==='chooseLayer' && mode.source==='externe' && mode.dispWmsLayers!== true) || (mode.display==='addChooseStyle' && styles.existing.length<1)"
                     type="button"
                     id="submitButton"
                     class="btn btn-add"
@@ -610,7 +610,7 @@
                 <span ng-if="mode.display==='chooseLayer'"
                       translate="mapcontext.modal.validate.layer">Validate</span>
                 <span ng-if="mode.display==='addChooseStyle'"
-                      translate="mapcontext.modal.associate">Validate</span>
+                      translate="mapcontext.modal.associate">Associate</span>
             </button>
         </div>
     </div>

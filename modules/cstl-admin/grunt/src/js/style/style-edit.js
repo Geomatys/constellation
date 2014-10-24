@@ -198,7 +198,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         /**
          * Adding watcher for newStyle variable to enable the auto preview on the map.
          */
-        $scope.$watch('newStyle', function() {
+        $scope.$watch('newStyle.rules', function() {
             if($scope.optionsSLD.autoPreview){
                 var mapId = null;
                 var timeout = 100;
@@ -2081,26 +2081,26 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         }else {
                             DataViewer.layers = [layerData];
                         }
-                        DataViewer.initMap(mapId);
-                        if ($scope.dataBbox) {
-                            var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
-                            DataViewer.extent = extent;
-                            DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
-                        }else {
-                            $scope.initDataLayerProperties(function(){
-                                if ($scope.dataBbox) {
-                                    var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
-                                    DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
-                                }
-                            });
-                        }
-                        DataViewer.map.on('moveend', function(){
+                        setTimeout(function(){
+                            DataViewer.initMap(mapId);
+                            if ($scope.dataBbox) {
+                                var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
+                                DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
+                            }
+                            else {
+                                $scope.initDataLayerProperties(function(){
+                                    if ($scope.dataBbox) {
+                                        var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
+                                        DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
+                                    }
+                                });
+                            }
+                            DataViewer.map.on('moveend',setCurrentScale,DataViewer.map);
                             setCurrentScale();
-                        });
-                        setCurrentScale();
-                        if(typeof callbackAfterCreate ==='function'){
-                            callbackAfterCreate(response);
-                        }
+                            if(typeof callbackAfterCreate ==='function'){
+                                callbackAfterCreate(response);
+                            }
+                        },200);
                     }
                 );
             }

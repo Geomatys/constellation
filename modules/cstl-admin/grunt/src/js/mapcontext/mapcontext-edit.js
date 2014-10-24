@@ -446,7 +446,7 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             if (layersToView.length === 0) {
                 return;
             }
-
+            DataViewer.addBackground = false;
             DataViewer.initMap('mapContextMap');
 
             if (firstTime) {
