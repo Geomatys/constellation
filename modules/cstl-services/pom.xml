@@ -617,6 +617,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.constellation.engine.register</groupId>
       <artifactId>cstl-register-api</artifactId>
       <version>${project.version}</version>

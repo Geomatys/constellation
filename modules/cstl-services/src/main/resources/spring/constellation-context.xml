@@ -38,4 +38,8 @@
     <task:scheduler id="cstlScheduler" pool-size="5"/>
     <task:annotation-driven executor="cstlExecutor" scheduler="cstlScheduler"/>
 
+    <!-- Guava event bus -->
+    <bean id="eventBus" class="com.google.common.eventbus.AsyncEventBus">
+        <constructor-arg ref="cstlExecutor"/>
+    </bean>
 </beans>

@@ -18,6 +18,7 @@
  */
 package org.constellation.admin;
 
+import com.google.common.eventbus.EventBus;
 import org.apache.sis.util.logging.Logging;
 import org.springframework.context.ApplicationContext;
 
@@ -29,8 +30,11 @@ public class SpringHelper {
     
     private static ApplicationContext applicationContext;
 
+    private static EventBus eventBus;
+
     public static void setApplicationContext(ApplicationContext applicationContext) {
         SpringHelper.applicationContext = applicationContext;
+        SpringHelper.eventBus = applicationContext.getBean(EventBus.class);
     }
 
     public static void injectDependencies(Object object) {
@@ -39,6 +43,14 @@ public class SpringHelper {
             LOGGER.info("spring application context loaded");
         } else {
             LOGGER.warning("No spring application context available");
+        }
+    }
+
+    public static void sendEvent(Object event) {
+        if (eventBus != null) {
+            eventBus.post(event);
+        } else {
+            LOGGER.warning("No event bus available");
         }
     }
 
