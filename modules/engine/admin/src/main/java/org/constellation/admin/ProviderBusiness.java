@@ -48,7 +48,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Component
+@Component("providerBusiness")
 @Primary
 public class ProviderBusiness implements IProviderBusiness {
     private static final Logger LOGGER = Logging.getLogger(ProviderBusiness.class);

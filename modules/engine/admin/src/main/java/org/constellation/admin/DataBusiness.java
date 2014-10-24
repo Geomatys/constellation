@@ -76,7 +76,7 @@ import java.util.logging.Logger;
 
 @Profile("standard")
 @Component
-@DependsOn("database-initer")
+@DependsOn({"database-initer", "providerBusiness"})
 @Primary
 public class DataBusiness extends InternalCSWSynchronizer implements IDataBusiness {
     /**
