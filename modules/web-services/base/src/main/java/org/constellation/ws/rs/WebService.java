@@ -241,7 +241,7 @@ public abstract class WebService {
         return httpServletRequest;
     }
 
-   /**
+    /**
      * Treat the incoming request and call the right function in the worker.
      * <p>
      * The parent class will have processed the request sufficiently to ensure
@@ -562,17 +562,21 @@ public abstract class WebService {
      * Return a map of parameters put in the query.
      * @return
      */
-    public MultivaluedMap<String,String> getParameters(){
-        final MultivaluedMap results = new StringKeyIgnoreCaseMultivaluedMap();
+    public MultivaluedMap<String, String> getParameters() {
+        final MultivaluedMap<String, String> results = new StringKeyIgnoreCaseMultivaluedMap();
 
         // GET parameters
-        for(final Entry<String, List<String>> entry : uriContext.getQueryParameters().entrySet()){
-            results.add(entry.getKey(), entry.getValue());
+        for (final Entry<String, List<String>> entry : uriContext.getQueryParameters().entrySet()) {
+            if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                results.add(entry.getKey(), entry.getValue().get(0));
+            }
         }
 
         // POST kvp parameters
-        for(final Entry<String, List<String>> entry : postKvpParameters.get().entrySet()){
-            results.add(entry.getKey(), entry.getValue());
+        for (final Entry<String, List<String>> entry : postKvpParameters.get().entrySet()) {
+            if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                results.add(entry.getKey(), entry.getValue().get(0));
+            }
         }
         return results;
     }
