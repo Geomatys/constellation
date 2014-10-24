@@ -153,7 +153,9 @@ public class QuartzJobListener implements JobListener {
             taskEntity.setState(TaskState.Status.FAILED.name());
             taskEntity.setEnd(System.currentTimeMillis());
             StringWriter errors = new StringWriter();
-            event.getException().printStackTrace(new PrintWriter(errors));
+            if (event.getException() != null) {
+                event.getException().printStackTrace(new PrintWriter(errors));
+            }
             taskEntity.setMessage(toString(event.getTask()) + " cause : " + errors.toString());
             //taskEntity.setProgress((double) event.getProgress());
             processBusiness.updateTask(taskEntity);

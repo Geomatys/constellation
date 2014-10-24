@@ -600,7 +600,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
         }
     }
 
-    private String getMetadataIdentifier(final InputStream metadataStream) throws IOException, XMLStreamException {
+    protected String getMetadataIdentifier(final InputStream metadataStream) throws IOException, XMLStreamException {
         final List<String> identifierPaths = DUBLIN_CORE_QUERYABLE.get("identifier");
         final List<String[]> paths = new ArrayList<>();
         for (String identifierPath : identifierPaths) {

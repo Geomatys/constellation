@@ -47,15 +47,16 @@ public class AddMetadaProcess extends AbstractCstlProcess {
         super(desc, parameter);
     }
 
-    public AddMetadaProcess(String serviceID, String metadataID, File metadataFile) {
-        this(INSTANCE, toParameter(serviceID, metadataID, metadataFile));
+    public AddMetadaProcess(String serviceID, String metadataID, File metadataFile, final Boolean refresh) {
+        this(INSTANCE, toParameter(serviceID, metadataID, metadataFile, refresh));
     }
 
-    private static ParameterValueGroup toParameter(String serviceID, String metadataID, File metadataFile) {
+    private static ParameterValueGroup toParameter(String serviceID, String metadataID, File metadataFile, final Boolean refresh) {
         ParameterValueGroup params = INSTANCE.getInputDescriptor().createValue();
         getOrCreate(METADATA_FILE, params).setValue(metadataFile);
         getOrCreate(METADATA_ID, params).setValue(metadataID);
         getOrCreate(SERVICE_IDENTIFIER, params).setValue(serviceID);
+        getOrCreate(REFRESH, params).setValue(refresh);
         return params;
     }
 
@@ -64,15 +65,17 @@ public class AddMetadaProcess extends AbstractCstlProcess {
         final String serviceID  = value(SERVICE_IDENTIFIER, inputParameters);
         final String metadataID = value(METADATA_ID, inputParameters);
         final File metadataFile = value(METADATA_FILE, inputParameters);
-
+        final Boolean refresh   = value(REFRESH, inputParameters);
         try {
             final CSWConfigurer configurer = (CSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
             if (configurer.metadataExist(serviceID, metadataID).getStatus().equalsIgnoreCase("Exist")) {
-                throw new ProcessException("The metadata is already present in CSW", this, null);
+                throw new ProcessException("The metadata is already present in CSW:" + metadataID, this, null);
             } else {
                 configurer.importRecords(serviceID, metadataFile, metadataFile.getName());
-                final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", serviceID);
-                worker.refresh();
+                if (refresh) {
+                    final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", serviceID);
+                    worker.refresh();
+                }
                 
             }
         } catch (ConfigurationException | CstlServiceException ex) {

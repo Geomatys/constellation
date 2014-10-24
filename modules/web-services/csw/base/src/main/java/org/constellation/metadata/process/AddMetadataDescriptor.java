@@ -56,9 +56,14 @@ public class AddMetadataDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<String> METADATA_ID =
             new DefaultParameterDescriptor<>(METADATA_ID_NAME, METADATA_ID_REMARKS, String.class, null, true);
     
+    public static final String REFRESH_NAME = "refresh";
+    private static final String REFRESH_REMARKS = "If set this flag the CSW will be refreshed.";
+    public static final ParameterDescriptor<Boolean> REFRESH =
+            new DefaultParameterDescriptor<>(REFRESH_NAME, REFRESH_REMARKS, Boolean.class, true, true);
+    
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_IDENTIFIER, METADATA_FILE, METADATA_ID});
+            new GeneralParameterDescriptor[]{SERVICE_IDENTIFIER, METADATA_FILE, METADATA_ID, REFRESH});
     
      /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
