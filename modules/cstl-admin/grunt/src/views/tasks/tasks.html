@@ -69,28 +69,39 @@
                         </div>
 
                         <div class="item-list">
-                            <div ng-repeat="registry in wrap.dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
-                                <div class="item registry" ng-class="{selected:registry==selected}" ng-click="select(registry);selectProcessChild(null);">
+                            <div ng-repeat="task in wrap.dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
+                                <div class="item registry" ng-class="{selected:task==selected}" ng-click="select(task);">
                                     <div class="top">
-                                        <span class="item-title" title="{{registry.name}}">{{truncate(small,registry.name)}} </span>
+                                        <span class="item-title" title="{{task.name}}">{{truncate(small,task.name)}} </span>
                                     </div>
                                     <div class="bottom">
                                         <div class="block">
-                                            <i class="fa fa-calendar"></i>{{registry.date | date:'yyyy-MM-dd'}}
+                                            <i class="fa fa-calendar"></i>{{task.date | date:'yyyy-MM-dd'}}
                                         </div>
 
                                         <div class="block pull-right">
                                             <i class="fa fa-paperclip"></i>
-                                            <span ng-if="registry.processes == null || registry.processes.length == 0" translate="md.listing.no.data">No</span>
-                                            <span ng-if="registry.processes.length > 0">{{registry.processes.length}}</span>
+                                            <span ng-if="task.processes == null || task.processes.length == 0" translate="md.listing.no.data">No</span>
+                                            <span ng-if="task.processes.length > 0">{{task.processes.length}}</span>
                                             <span translate="service.edit.dashboard.tasks.list.associated">associated tasks</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="item process-child" style="margin-top:0;" ng-if="registry==selected" ng-repeat="process in registry.processes" ng-class="{'selected':process===selectedProcessChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectProcessChild(process)">
+                                <div class="item process-child" style="margin-top:0;" ng-if="task==selected"
+                                     ng-repeat="exec in task.statusList | filter:{ status: 'RUNNING'}"
+                                     ng-class="{'selected':process===selectedProcessChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}">
                                     <div class="top">
-                                        <span class="item-title" title="{{process.id}}">{{truncate(small,process.id)}}</span>
+                                        <div class="progress progress-striped" style="margin:10px;">
+                                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                                 aria-valuenow="0"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="200"
+                                                 style="width: {{exec.percent}}%" >
+                                                {{exec.percent}}%
+                                            </div>
+                                        </div>
+                                        <!--<span class="item-title" title="{{exec.id}}">{{truncate(small,exec.id)}}</span>-->
                                     </div>
                                 </div>
                             </div>

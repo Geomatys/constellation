@@ -44,6 +44,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringMap;
 import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.Task;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.TaskParameterWithOwnerName;
 import org.constellation.engine.register.repository.TaskParameterRepository;
@@ -348,8 +349,18 @@ public final class TaskRest {
     @Path("listTasks")
     public Response listTasks() {
         final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks();
-        final Map<String, TaskStatusDTO> lst = toTaskStatus(tasks);
-        return Response.ok(lst).build();
+        Map<Integer, List<TaskStatusDTO>> map = new HashMap<>();
+
+        for (Task task : tasks) {
+            Integer taskParameterId = task.getTaskParameterId();
+
+            if (!map.containsKey(taskParameterId)) {
+                map.put(taskParameterId, new ArrayList<TaskStatusDTO>());
+            }
+            map.get(taskParameterId).add(toTaskStatus(task));
+        }
+
+        return Response.ok(map).build();
     }
 
     /**
@@ -359,26 +370,24 @@ public final class TaskRest {
     @Path("listRunningTasks/{id}")
     public Response listRunningTaskForTaskParameter(final @PathParam("id") Integer id) {
         final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks(id);
-        final Map<String, TaskStatusDTO> lst = toTaskStatus(tasks);
+
+        final List<TaskStatusDTO> lst = new ArrayList<>();
+        for(org.constellation.engine.register.Task task : tasks) {
+            lst.add(toTaskStatus(task));
+        }
         return Response.ok(lst).build();
     }
 
-    private Map<String, TaskStatusDTO> toTaskStatus(List<org.constellation.engine.register.Task> tasks) {
-        final Map<String, TaskStatusDTO> lst = new HashMap<>();
-        for(org.constellation.engine.register.Task t : tasks){
+    private TaskStatusDTO toTaskStatus(org.constellation.engine.register.Task task) {
+        final TaskStatusDTO status = new TaskStatusDTO();
+        status.setId(task.getIdentifier());
+        status.setTaskId(task.getTaskParameterId());
+        status.setMessage(task.getMessage());
+        status.setPercent(task.getProgress() != null ? task.getProgress().floatValue() : 0f);
+        status.setStatus(task.getState());
 
-            final TaskStatusDTO status = new TaskStatusDTO();
-            status.setId(t.getIdentifier());
-            status.setTaskId(t.getTaskParameterId());
-            status.setMessage(t.getMessage());
-            status.setPercent(t.getProgress() != null ? t.getProgress().floatValue() : 0f);
-            status.setStatus(t.getState());
-
-            final TaskParameter taskParameter = taskParameterRepository.get( t.getTaskParameterId());
-            status.setTitle(taskParameter.getName());
-
-            lst.put(t.getIdentifier(), status);
-        }
-        return lst;
+        final TaskParameter taskParameter = taskParameterRepository.get( task.getTaskParameterId());
+        status.setTitle(taskParameter.getName());
+        return status;
     }
 }

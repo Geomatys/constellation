@@ -20,13 +20,12 @@
 
 angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('TasksController', function ($scope, Dashboard, Growl, $modal, TaskService, $window){
+    .controller('TasksController', function ($scope, Dashboard, Growl, $modal, TaskService, StompService, $window){
         /**
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
 
-        var lastOpened = null;
 
         $scope.wrap.nbbypage = 5; // Default value at 5
         $scope.hideScroll = true;
@@ -36,6 +35,8 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                 .then(function(response){
                     // On success
                     Dashboard($scope, response, false);
+                    //connect to websocket
+                    StompService.connect();
                 }).catch(function(){
                     // On error
                     Growl('error', 'Error', 'Unable to get tasks list');
@@ -53,8 +54,63 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
             });
         };
 
-        $scope.getUserName = function(id) {
+        $scope.subscribe = function (task) {
+            TaskService.listRunningTasks({'id':task.id}).$promise
+              .then(function(response){
+                    // On success
+                    task.statusList = response;
+              }).catch(function(){
+                  // On error
+                  Growl('error', 'Error', 'Unable to get task running list');
+                  return;
+              });
 
+            var topicPath = '/topic/taskevents/'+task.id;
+            task.topic = StompService.subscribe(topicPath, function(data) {
+                var event = JSON.parse(data.body);
+
+                var filter = task.statusList.filter(function (elem) {
+                    return elem.id === event.id;
+                });
+                var status = filter[0];
+                if (status) {
+                    status.percent = event.percent;
+                    $scope.$digest();
+                } else {
+                    // New execution
+                    task.statusList.push(event);
+                    $scope.$digest();
+                }
+            });
+        };
+
+        $scope.$on('$destroy', function() {
+            if ($scope.selected !== null) {
+                $scope.selected.topic.unsubscribe();
+            }
+            StompService.disconnect();
+        });
+
+        $scope.runningTask = function(task){
+            var runningTasks = [];
+            task.statusList.forEach(function (elem) {
+
+                task.statusList[elem.id] = elem;
+            });
+        };
+
+        $scope.select = function(item) {
+            var oldSelect = $scope.selected;
+            if (oldSelect !== null) {
+                oldSelect.topic.unsubscribe();
+            }
+
+            if ($scope.selected === item) {
+                $scope.selected = null;
+            } else {
+                $scope.selected = item;
+                $scope.subscribe(item);
+            }
         };
 
         $scope.deleteTask = function(idTask) {
