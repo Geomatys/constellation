@@ -2,6 +2,7 @@ package org.constellation.admin;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.api.PropertyConstants;
 import org.constellation.business.IConfigurationBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.engine.register.MetadataIOUtils;
@@ -29,8 +30,6 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
 
     private static final Logger LOGGER = Logging.getLogger(ConfigurationBusiness.class);
 
-    public static final String SERVICES_URL_KEY = "services.url";
-     
     @Autowired
     private PropertyRepository propertyRepository;
     
@@ -52,7 +51,7 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
     public void setProperty(final String key, final String value) {
         propertyRepository.save(new Property(key, value));
         // update metadata when service URL key is updated
-            if (SERVICES_URL_KEY.equals(key)) {
+            if (PropertyConstants.SERVICES_URL_KEY.equals(key)) {
                 updateServiceUrlForMetadata(value);
             }
     }

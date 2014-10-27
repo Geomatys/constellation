@@ -19,6 +19,8 @@
 package org.constellation.webservice.map.component;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.api.PropertyConstants;
+import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
@@ -82,6 +84,9 @@ public class SetupBusiness  {
     @Inject
     private IStyleBusiness styleBusiness;
 
+    @Inject
+    private IConfigurationBusiness configurationBusiness;
+
     @PostConstruct
     public void contextInitialized() {
         LOGGER.log(Level.INFO, "=== Initialize Application ===");
@@ -101,6 +106,8 @@ public class SetupBusiness  {
         initializeDefaultVectorData();
         LOGGER.log(Level.INFO, "initializing raster data ...");
         initializeDefaultRasterData();
+        LOGGER.log(Level.INFO, "initializing properties ...");
+        initializeDefaultProperties();
     }
 
     /**
@@ -406,6 +413,17 @@ public class SetupBusiness  {
             }
         } catch (IOException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        }
+    }
+
+    /**
+     * Initialize default properties values if not exist.
+     */
+    private void initializeDefaultProperties() {
+        String dataAnalyse = configurationBusiness.getProperty(PropertyConstants.DATA_ANALYSE_KEY);
+        if (dataAnalyse == null) {
+            LOGGER.log(Level.FINE, "Property "+PropertyConstants.DATA_ANALYSE_KEY+ "set as : true" );
+            configurationBusiness.setProperty(PropertyConstants.DATA_ANALYSE_KEY, "true");
         }
     }
 

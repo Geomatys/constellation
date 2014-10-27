@@ -43,6 +43,7 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
             <button class="btn btn-primary" id="chain_process">chain_process</button>
             <button class="btn btn-primary" id="data_x_csw">data_x_csw</button>
             <button class="btn btn-primary" id="dataset_x_csw">dataset_x_csw</button>
+            <button class="btn btn-primary" id="property">property</button>
         </div>
     </div>
     <div class="row">
@@ -175,6 +176,10 @@ result :
         });
         $("#dataset_x_csw").on("click", function(){
             $("#query").val('select * from admin.dataset_x_csw');
+            $("#sqlForm").submit();
+        });
+        $("#property").on("click", function(){
+            $("#query").val('select * from admin.property');
             $("#sqlForm").submit();
         });
     })

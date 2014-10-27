@@ -37,6 +37,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.api.DataType;
+import org.constellation.api.PropertyConstants;
 import org.constellation.api.ProviderType;
 import org.constellation.api.StyleType;
 import org.constellation.business.IDataBusiness;
@@ -46,6 +47,7 @@ import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.engine.register.Style;
+import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -92,6 +94,9 @@ public final class DefaultConfigurator implements Configurator {
 
     @Autowired
     private IDataCoverageJob dataCoverageJob;
+
+    @Autowired
+    private PropertyRepository propertyRepository;
     
     public DefaultConfigurator() {
         SpringHelper.injectDependencies(this);
@@ -189,6 +194,11 @@ public final class DefaultConfigurator implements Configurator {
                     dataBusiness.deleteData(new QName(data.getNamespace(),data.getName()), provider.getId());
                 }
             }
+
+            //check if layer analysis is required
+            String propertyValue = propertyRepository.getValue(PropertyConstants.DATA_ANALYSE_KEY, null);
+            boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
+
             // Add new layer.
             for (final Object keyObj : provider.getKeys()) {
                 final Name key = (Name) keyObj;
@@ -263,7 +273,7 @@ public final class DefaultConfigurator implements Configurator {
                             provider.isSensorAffectable(), visible, subType, null);
 
                     //analyse coverage image (min/max/ histogram) with an asynchronous method
-                    if (DataType.COVERAGE.equals(provider.getDataType())) {
+                    if (doAnalysis && DataType.COVERAGE.equals(provider.getDataType())) {
                         dataCoverageJob.asyncUpdateDataStatistics(data.getId());
                     }
                 }

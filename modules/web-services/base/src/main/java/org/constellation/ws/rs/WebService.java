@@ -20,6 +20,7 @@ package org.constellation.ws.rs;
 
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.api.PropertyConstants;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.engine.register.Property;
 import org.constellation.engine.register.repository.PropertyRepository;
@@ -135,12 +136,11 @@ public abstract class WebService {
      */
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
 
-    public static final String SERVICES_URL_KEY = "services.url";
     private static final String PROPERTIES_URL;
     static {
         final Properties prop = ConfigDirectory.getConstellationProperties();
         if (prop != null) {
-            PROPERTIES_URL = prop.getProperty(SERVICES_URL_KEY);
+            PROPERTIES_URL = prop.getProperty(PropertyConstants.SERVICES_URL_KEY);
         } else {
             PROPERTIES_URL = null;
         }
@@ -656,7 +656,7 @@ public abstract class WebService {
         String result;
         Property service;
         if (propertyRepository != null) {
-            service = propertyRepository.findOne(SERVICES_URL_KEY);
+            service = propertyRepository.findOne(PropertyConstants.SERVICES_URL_KEY);
         } else {
             service = null;
         }

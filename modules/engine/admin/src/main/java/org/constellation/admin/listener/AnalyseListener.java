@@ -20,6 +20,8 @@ package org.constellation.admin.listener;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.SpringHelper;
+import org.constellation.api.PropertyConstants;
+import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IDataBusiness;
 
 import javax.inject.Inject;
@@ -42,12 +44,22 @@ public class AnalyseListener implements ServletContextListener {
     @Inject
     private IDataBusiness dataBusiness;
 
+    @Inject
+    private IConfigurationBusiness configurationBusiness;
+
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         SpringHelper.injectDependencies(this);
-        if (dataBusiness != null) {
-            LOGGER.log(Level.FINE, "Start data analysis");
-            dataBusiness.computeEmptyDataStatistics();
+
+        if (configurationBusiness != null) {
+            //check if data analysis is required
+            String propertyValue = configurationBusiness.getProperty(PropertyConstants.DATA_ANALYSE_KEY);
+            boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
+
+            if (doAnalysis && dataBusiness != null) {
+                LOGGER.log(Level.FINE, "Start data analysis");
+                dataBusiness.computeEmptyDataStatistics();
+            }
         }
     }
 
