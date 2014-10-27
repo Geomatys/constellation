@@ -21,8 +21,11 @@ package org.constellation.scheduler;
 
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
+import org.constellation.engine.register.Task;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.process.quartz.ProcessJob;
@@ -121,32 +124,42 @@ public class QuartzJobListener implements JobListener {
         public void started(ProcessEvent event) {
             taskEntity.setState(TaskState.RUNNING.name());
             taskEntity.setStart(System.currentTimeMillis());
-            updateTask(event);
+            taskEntity.setMessage(toString(event.getTask()));
+            taskEntity.setProgress((double) event.getProgress());
+            updateTask(taskEntity);
         }
 
         @Override
         public void progressing(ProcessEvent event) {
             taskEntity.setState(TaskState.RUNNING.name());
-            updateTask(event);
+            taskEntity.setMessage(toString(event.getTask()));
+            taskEntity.setProgress((double) event.getProgress());
+            updateTask(taskEntity);
         }
 
         @Override
         public void paused(ProcessEvent event) {
             taskEntity.setState(TaskState.PAUSED.name());
-            updateTask(event);
+            taskEntity.setMessage(toString(event.getTask()));
+            taskEntity.setProgress((double) event.getProgress());
+            updateTask(taskEntity);
         }
 
         @Override
         public void resumed(ProcessEvent event) {
             taskEntity.setState(TaskState.RUNNING.name());
-            updateTask(event);
+            taskEntity.setMessage(toString(event.getTask()));
+            taskEntity.setProgress((double) event.getProgress());
+            updateTask(taskEntity);
         }
 
         @Override
         public void completed(ProcessEvent event) {
             taskEntity.setState(TaskState.SUCCEED.name());
             taskEntity.setEnd(System.currentTimeMillis());
-            updateTask(event);
+            taskEntity.setMessage(toString(event.getTask()));
+            taskEntity.setProgress((double) event.getProgress());
+            updateTask(taskEntity);
         }
 
         @Override
@@ -159,13 +172,22 @@ public class QuartzJobListener implements JobListener {
             }
             taskEntity.setMessage(toString(event.getTask()) + " cause : " + errors.toString());
             //taskEntity.setProgress((double) event.getProgress());
-            processBusiness.updateTask(taskEntity);
+            updateTask(taskEntity);
         }
 
-        private void updateTask(ProcessEvent event) {
-            taskEntity.setMessage(toString(event.getTask()));
-            taskEntity.setProgress((double) event.getProgress());
+        private void updateTask(Task taskEntity) {
+
+            //update in database
             processBusiness.updateTask(taskEntity);
+
+            //send event
+            final TaskStatusDTO taskStatus = new TaskStatusDTO();
+            taskStatus.setId(taskEntity.getIdentifier());
+            taskStatus.setTaskId(taskEntity.getTaskParameterId());
+            taskStatus.setStatus(taskEntity.getState());
+            taskStatus.setMessage(taskEntity.getMessage());
+            taskStatus.setPercent(taskEntity.getProgress().floatValue());
+            SpringHelper.sendEvent(taskStatus);
         }
 
         private String toString(InternationalString str){

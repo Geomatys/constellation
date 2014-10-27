@@ -251,14 +251,29 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             var socket = new SockJS(url),
                 stompClient = Stomp.over(socket);
 
+            this.connect = function (callback) {
+                stompClient.connect({}, function() {
+                    console.log('Connected to ' + url);
+
+                    if (callback && typeof(callback) === "function") {
+                        callback();
+                    }
+                });
+            };
+
+            this.disconnect = function () {
+                stompClient.disconnect(function() {
+                    console.log('Disconnected from ' + url);
+                });
+            };
+
             this.subscribe = function(path, cb){
                 var topic = new Topic(stompClient, path);
                 if (stompClient.connected) {
                     topic.id = stompClient.subscribe(topic.path, cb);
                     console.log('Subscribed to ' + topic.path + ' (' + topic.id  + ').');
                 } else {
-                    stompClient.connect({}, function() {
-                        console.log('Connected to ' + url);
+                    this.connect(function() {
                         topic.id = stompClient.subscribe(topic.path, cb);
                         console.log('Subscribed to ' + topic.path + ' (' + topic.id  + ').');
                     });
