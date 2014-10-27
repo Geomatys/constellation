@@ -971,7 +971,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     // just add the data if we are not in the case of the wmts service
                     if (service.type.toLowerCase() !== 'wmts') {
                         angular.forEach($scope.selected, function(value, key){
-                            if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
+                            if (service.type.toLowerCase() === 'wms' &&
+                                $scope.conformPyramid &&
+                                value.Type.toLowerCase() !== 'vector') {
                                 // In the case of a wms service and user asked to pyramid the data
                                 dataListing.pyramidConform({providerId: value.Provider, dataId: value.Name}, {}, addLayer, pyramidGenerationError);
                             } else {
