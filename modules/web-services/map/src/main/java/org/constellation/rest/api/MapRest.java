@@ -149,14 +149,14 @@ public class MapRest {
             namespace = layernmsp.getValue();
         }
         layerBusiness.remove(spec, serviceId, layerId, namespace);
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
     @Path("{id}/updatestyle")
     public Response updateLayerStyleForService(final @PathParam("spec") String serviceType, final @PathParam("id") String serviceIdentifier, final ParameterValues params) throws ConfigurationException {
         styleBusiness.createOrUpdateStyleFromLayer(serviceType,serviceIdentifier,params.get("layerId"), params.get("spId"), params.get("styleName"));
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
@@ -164,7 +164,7 @@ public class MapRest {
     public Response removeLayerStyleForService(final @PathParam("spec") String serviceType, final @PathParam("id") String serviceIdentifier,
         final ParameterValues params) throws ConfigurationException {
         styleBusiness.removeStyleFromLayer(serviceIdentifier, serviceType, params.get("layerId"), params.get("spId"), params.get("styleName"));
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
 }
