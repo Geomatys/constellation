@@ -1371,48 +1371,6 @@ public class DataRest {
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
-    @POST
-    @Path("pyramid/{id}/")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response pyramidData(@PathParam("id") final String providerId, final SimpleValue path) {
-
-        if (path.getValue() != null) {
-            // create folder to save pyramid
-            File dataDirectory = ConfigDirectory.getDataDirectory();
-            File pyramidFolder = new File(dataDirectory, "pyramid");
-            if (!pyramidFolder.exists()) {
-                pyramidFolder.mkdir();
-            }
-
-            final File dataPyramidFolder = new File(pyramidFolder, providerId);
-            final String pyramidPath = dataPyramidFolder.getAbsolutePath();
-
-            String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
-            CstlUser user = userRepository.findOne(login).get();
-            //create listener which save information on Database
-            final ProcessListener listener = new PyramidCoverageProcessListener(user.getId(), pyramidPath, providerId);
-
-            Runnable pyramidRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        PyramidCoverageHelper pyramidHelper = PyramidCoverageHelper.builder(providerId).
-                                inputFormat("AUTO").withDeeps(new double[]{1}).
-                                fromImage(path.getValue()).toFileStore(pyramidPath).build();
-                        pyramidHelper.buildPyramid(listener);
-                    } catch (MalformedURLException | DataStoreException | TransformException | FactoryException exception) {
-                        LOGGER.log(Level.WARNING, "Error on pyramid building", exception);
-                    }
-                }
-            };
-            final Thread pyramidalThread = new Thread(pyramidRunnable);
-            pyramidalThread.start();
-
-        }
-        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
     /**
      * Generates a pyramid on a data in the given provider, create and return this new provider.
      *
@@ -1442,6 +1400,11 @@ public class DataRest {
         final Data inData = inProvider.get(new DefaultName(dataId));
         if (inData == null) {
             return Response.ok("Data " + dataId + " does not exist in provider " + providerId).status(400).build();
+        }
+
+        final Object origin = inData.getOrigin();
+        if(! (origin instanceof CoverageReference)){
+            return Response.ok("Cannot create pyramid for no coverage data!").build();
         }
 
         Envelope dataEnv;
@@ -1496,14 +1459,15 @@ public class DataRest {
                     return Response.ok("Failed to create pyramid layer " + ex.getMessage()).status(500).build();
                 }
 
-                outRef = (XMLCoverageReference) outStore.getCoverageReference(name);
-
                 // Update the parent attribute of the created provider
                 providerBusiness.updateParent(outProvider.getId(), providerId);
 
                 //update the DataRecord objects
                 //this produces an update event which will create the DataRecord
                 outProvider.reload();
+
+                outStore = (CoverageStore) outProvider.getMainStore();
+                outRef = (XMLCoverageReference) outStore.getCoverageReference(name);
 
             } catch (Exception ex) {
                 Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
@@ -1584,16 +1548,13 @@ public class DataRest {
             input.parameter("resolution_per_envelope").setValue(resolutionPerEnvelope);
             final org.geotoolkit.process.Process p = desc.createProcess(input);
 
-
-            String title = "Create conform pyramid for " + providerId + ":" + dataId;
-//            processBusiness.runProcess("Create conform pyramid for " + providerId + ":" + dataId, p);
             TaskParameter taskParameter = new TaskParameter();
             taskParameter.setProcessAuthority(desc.getIdentifier().getAuthority().toString());
             taskParameter.setProcessCode(desc.getIdentifier().getCode());
             taskParameter.setDate(System.currentTimeMillis());
             taskParameter.setInputs(ParamUtilities.writeParameter(input));
             taskParameter.setOwner(cstlUser.get().getId());
-            taskParameter.setName("Create conform pyramid for " + providerId + ":" + dataId);
+            taskParameter.setName("Create conform pyramid for " + providerId + ":" + dataId+" | "+System.currentTimeMillis());
             taskParameter = processBusiness.addTaskParameter(taskParameter);
             processBusiness.runProcess("Create conform pyramid for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
         } catch ( IOException e) {
@@ -1738,6 +1699,10 @@ public class DataRest {
             ((XMLCoverageReference) outRef).setPreferredFormat(tileFormat);
             //this produces an update event which will create the DataRecord
             outProvider.reload();
+
+            pyramidStore = (CoverageStore) outProvider.getMainStore();
+            outRef = (XMLCoverageReference) pyramidStore.getCoverageReference(outRef.getName());
+
         } catch (Exception ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Failed to create pyramid layer " + ex.getMessage()).build();
@@ -1783,7 +1748,7 @@ public class DataRest {
             taskParameter.setDate(System.currentTimeMillis());
             taskParameter.setInputs(ParamUtilities.writeParameter(input));
             taskParameter.setOwner(cstlUser.get().getId());
-            taskParameter.setName("Create pyramid " + crs + " for " + providerId + ":" + dataId);
+            taskParameter.setName("Styled pyramid " + crs + " for " + providerId + ":" + dataId+" | "+System.currentTimeMillis());
             taskParameter = processBusiness.addTaskParameter(taskParameter);
             //add task in scheduler
             processBusiness.runProcess("Create pyramid " + crs + " for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
