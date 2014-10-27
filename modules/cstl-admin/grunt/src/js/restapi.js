@@ -289,6 +289,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
 //            Use textService for getProcessDescriptor and get XML response
 //            'getProcessDescriptor':  {method: 'GET',    url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
             'listParamsTask':        {method: 'GET',    url: '@cstl/api/1/task/params/list;jsessionid=',                         isArray: true },
+            'listParamsTaskByType':  {method: 'GET',    url: '@cstl/api/1/task/params/list/:type;jsessionid=',                   isArray: true },
             'getParamsTask':         {method: 'GET',    url: '@cstl/api/1/task/params/get/:id;jsessionid=',                      isArray: false },
             'deleteParamsTask':      {method: 'GET',    url: '@cstl/api/1/task/params/delete/:id;jsessionid=',                   isArray: false },
             'createParamsTask':      {method: 'POST',   url: '@cstl/api/1/task/params/create;jsessionid=',                       isArray: false },

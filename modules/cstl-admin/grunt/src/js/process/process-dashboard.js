@@ -31,7 +31,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         $scope.hideScroll = true;
 
         $scope.init = function() {
-            TaskService.listParamsTask({}).$promise
+            TaskService.listParamsTaskByType({'type':''}).$promise
                 .then(function(response){
                     // On success
                     Dashboard($scope, response, false);

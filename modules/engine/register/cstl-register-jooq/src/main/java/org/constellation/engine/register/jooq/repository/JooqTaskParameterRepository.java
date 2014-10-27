@@ -25,8 +25,11 @@ import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.jooq.Tables;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import static org.constellation.engine.register.jooq.Tables.DOMAIN;
 
 /**
  * @author Thomas Rouby (Geomatys)
@@ -38,6 +41,11 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
 
     public JooqTaskParameterRepository() {
         super(TaskParameter.class, Tables.TASK_PARAMETER);
+    }
+
+    @Override
+    public List<? extends TaskParameter> findAllByType(String type) {
+        return findBy(Tables.TASK_PARAMETER.TYPE.eq(type));
     }
 
     @Override

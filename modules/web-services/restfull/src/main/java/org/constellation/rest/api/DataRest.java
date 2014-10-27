@@ -1555,6 +1555,7 @@ public class DataRest {
             taskParameter.setInputs(ParamUtilities.writeParameter(input));
             taskParameter.setOwner(cstlUser.get().getId());
             taskParameter.setName("Create conform pyramid for " + providerId + ":" + dataId+" | "+System.currentTimeMillis());
+            taskParameter.setType("INTERNAL");
             taskParameter = processBusiness.addTaskParameter(taskParameter);
             processBusiness.runProcess("Create conform pyramid for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
         } catch ( IOException e) {
@@ -1749,6 +1750,7 @@ public class DataRest {
             taskParameter.setInputs(ParamUtilities.writeParameter(input));
             taskParameter.setOwner(cstlUser.get().getId());
             taskParameter.setName("Styled pyramid " + crs + " for " + providerId + ":" + dataId+" | "+System.currentTimeMillis());
+            taskParameter.setType("INTERNAL");
             taskParameter = processBusiness.addTaskParameter(taskParameter);
             //add task in scheduler
             processBusiness.runProcess("Create pyramid " + crs + " for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());

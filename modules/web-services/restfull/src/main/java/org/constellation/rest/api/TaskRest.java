@@ -317,7 +317,21 @@ public final class TaskRest {
     public Response listParamsTask() throws ConfigurationException {
 
         final List<? extends TaskParameter> all = taskParameterRepository.findAll();
+        final List<TaskParameterWithOwnerName> ltpwon = convertTaskParameter(all);
+        return Response.ok(ltpwon).build();
+    }
 
+    @GET
+    @Path("params/list/{type}")
+    @RolesAllowed("cstl-admin")
+    public Response listParamsTaskByType(final @PathParam("type") String type) throws ConfigurationException {
+
+        final List<? extends TaskParameter> all = taskParameterRepository.findAllByType(type);
+        final List<TaskParameterWithOwnerName> ltpwon = convertTaskParameter(all);
+        return Response.ok(ltpwon).build();
+    }
+
+    private List<TaskParameterWithOwnerName> convertTaskParameter(List<? extends TaskParameter> all) {
         final List<TaskParameterWithOwnerName> ltpwon = new ArrayList<>();
         for (TaskParameter tp : all){
             TaskParameterWithOwnerName tpwon = new TaskParameterWithOwnerName();
@@ -337,8 +351,7 @@ public final class TaskRest {
 
             ltpwon.add(tpwon);
         }
-
-        return Response.ok(ltpwon).build();
+        return ltpwon;
     }
     // </editor-fold>
 

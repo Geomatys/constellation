@@ -26,6 +26,8 @@ public interface TaskParameterRepository {
 
     List<? extends TaskParameter> findAll();
 
+    List<? extends TaskParameter> findAllByType(String type);
+
     TaskParameter create(TaskParameter task);
 
     TaskParameter get(Integer uuid);
