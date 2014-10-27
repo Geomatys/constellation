@@ -93,13 +93,13 @@ public class SetupBusiness  {
         } catch (ClassNotFoundException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
-        LOGGER.log(Level.INFO, "intitializing default styles ...");
+        LOGGER.log(Level.INFO, "initializing default styles ...");
         initializeDefaultStyles();
-        LOGGER.log(Level.INFO, "intitializing temporary styles ...");
+        LOGGER.log(Level.INFO, "initializing temporary styles ...");
         initializeDefaultTempStyles();
-        LOGGER.log(Level.INFO, "intitializing vector data ...");
+        LOGGER.log(Level.INFO, "initializing vector data ...");
         initializeDefaultVectorData();
-        LOGGER.log(Level.INFO, "intitializing raster data ...");
+        LOGGER.log(Level.INFO, "initializing raster data ...");
         initializeDefaultRasterData();
     }
 
