@@ -89,13 +89,17 @@ public class SetupBusiness  {
         try {
             // Try to load postgresql driver for further use
             Class.forName("org.postgresql.ds.PGSimpleDataSource");
+            LOGGER.log(Level.INFO, "postgresql loading success!");
         } catch (ClassNotFoundException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
+        LOGGER.log(Level.INFO, "intitializing default styles ...");
         initializeDefaultStyles();
+        LOGGER.log(Level.INFO, "intitializing temporary styles ...");
         initializeDefaultTempStyles();
-
+        LOGGER.log(Level.INFO, "intitializing vector data ...");
         initializeDefaultVectorData();
+        LOGGER.log(Level.INFO, "intitializing raster data ...");
         initializeDefaultRasterData();
     }
 
