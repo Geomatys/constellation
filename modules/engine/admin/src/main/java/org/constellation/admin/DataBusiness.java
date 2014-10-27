@@ -764,10 +764,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
     /**
      * {@inheritDoc}
-     * Run at spring context initialization.
      */
     @Override
-    @PostConstruct
     public void computeEmptyDataStatistics() {
         final List<Data> dataList = dataRepository.findAll();
         for (Data data : dataList) {

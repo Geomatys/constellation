@@ -40,6 +40,10 @@
 	<listener>
         <listener-class>org.constellation.admin.SessionListener</listener-class>
     </listener>
+
+    <listener>
+        <listener-class>org.constellation.admin.listener.AnalyseListener</listener-class>
+    </listener>
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>WEB-INF/applicationContext.xml</param-value>
