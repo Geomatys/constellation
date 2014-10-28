@@ -21,8 +21,13 @@
       <version>${project.version}</version>
     </dependency>
 
-
     <!-- Testing -->
+    <dependency>
+      <groupId>org.constellation.testing</groupId>
+      <artifactId>cstl-test-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework</groupId>

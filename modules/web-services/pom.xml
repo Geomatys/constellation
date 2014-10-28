@@ -167,7 +167,12 @@
           <artifactId>metrics-annotation</artifactId>
           <version>3.0.1</version>
       </dependency>
-
+      <dependency>
+          <groupId>org.constellation.testing</groupId>
+          <artifactId>cstl-test-data</artifactId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 
   <!-- =========================================================== -->
