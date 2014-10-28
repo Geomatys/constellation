@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.List;
 import java.util.Locale;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -99,7 +100,7 @@ public final strictfp class TemplateTest {
         final DefaultMetadata metadata = new DefaultMetadata();
         metadata.setFileIdentifier("An archive");
         metadata.setLanguage(Locale.ENGLISH);
-        metadata.setCharacterSet(StandardCharsets.UTF_16);
+        metadata.setCharacterSets(Collections.singleton(StandardCharsets.UTF_16));
         metadata.setMetadataStandardName("ISO19115");
         metadata.setMetadataStandardVersion("2003/Cor.1:2006");
         metadata.setIdentificationInfo(singleton(identification));

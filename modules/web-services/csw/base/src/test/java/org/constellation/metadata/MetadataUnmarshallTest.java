@@ -361,7 +361,7 @@ public class MetadataUnmarshallTest extends DefaultMetadataTest {
          */
         metadata.setFileIdentifier("42292_5p_19900609195600");
         metadata.setLanguage(Locale.ENGLISH);
-        metadata.setCharacterSet(StandardCharsets.UTF_8);
+        metadata.setCharacterSets(Collections.singleton(StandardCharsets.UTF_8));
         Set set = new HashSet();
         set.add(ScopeCode.DATASET);
         metadata.setHierarchyLevels(set);
