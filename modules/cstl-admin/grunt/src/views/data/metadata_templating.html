@@ -165,6 +165,16 @@
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
         <option value="">-----</option>
     </select>
+    <select ng-if="fieldObj.field.render === 'TopicCategory.codelist'"
+            class="form-control form-control-fix"
+            ng-model="fieldObj.field.value"
+            ng-options="(code | translate) for code in codeLists.topicCategoryCodes | orderBy: 'toString() | translate'"
+            style="width:auto;min-width:165pt;height:30px;"
+            ng-required="fieldObj.field.obligation === 'M'"
+            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
+            dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
+        <option value="">-----</option>
+    </select>
     <select ng-if="fieldObj.field.render === 'GeometricObjects.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
