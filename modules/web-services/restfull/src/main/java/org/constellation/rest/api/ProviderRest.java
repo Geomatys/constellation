@@ -230,7 +230,23 @@ public final class ProviderRest {
             ).build();
 
         } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+        }
+    }
+
+    /**
+     * @see LayerProviders#getDataGeographicExtent(String, String)
+     */
+    @POST
+    @Path("dataGeographicExtent")
+    public Response dataGeographicExtent(final ParameterValues values) {
+        try {
+            final String id = values.getValues().get("providerId");
+            final String layerName = values.getValues().get("dataId");
+            return Response.ok(layerProviders.getDataGeographicExtent(id, layerName)).build();
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }

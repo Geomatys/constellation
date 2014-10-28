@@ -559,7 +559,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 });
 
                 DataViewer.layers = [layerBackground,layerData];
-                provider.dataDesc({},{values: {'providerId':providerId,'dataId':layerName}},
+                provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
                     function(response) {//success
                         var bbox = response.boundingBox;
                         if (bbox) {

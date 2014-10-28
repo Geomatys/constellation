@@ -1359,11 +1359,11 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         };
 
         /**
-         * Proceed to load all data layers properties bbox and band.
+         * Proceed to load all data layers properties bbox.
          */
         $scope.initDataLayerProperties = function(callback) {
             if($scope.providerId && $scope.layerName) {
-                provider.dataDesc({},{values: {'providerId':$scope.providerId, 'dataId':$scope.layerName}},
+                provider.dataGeoExtent({},{values: {'providerId':$scope.providerId, 'dataId':$scope.layerName}},
                     function(response) {//success
                         $scope.dataBbox = response.boundingBox;
                         if(typeof callback ==='function'){

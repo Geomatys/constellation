@@ -405,7 +405,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     window.cfpLoadingBar_parentSelector = null;
                 });
                 DataViewer.layers = [layerData];
-                provider.dataDesc({},{values: {'providerId':providerId,'dataId':layerName}},
+                provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
                     function(response) {//success
                         var bbox = response.boundingBox;
                         if (bbox) {

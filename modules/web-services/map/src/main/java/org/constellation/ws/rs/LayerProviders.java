@@ -66,7 +66,6 @@ import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
-import org.geotoolkit.process.coverage.statistics.StatisticOp;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sld.xml.Specification;
@@ -171,9 +170,43 @@ public final class LayerProviders {
         // Try to extract layer data info.
         try {
             if (layer instanceof FeatureData) {
-                return getFeatureDataDescription((FeatureData) layer, dataBrief.getId());
+                return getFeatureDataDescription((FeatureData) layer,true);
             } else {
-                return getCoverageDataDescription(layer, dataBrief.getId());
+                return getCoverageDataDescription(layer, dataBrief.getId(),true);
+            }
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException("An error occurred while trying get/open datastore for provider with id \"" + providerId + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
+        } catch (IOException ex) {
+            throw new CstlServiceException("An error occurred while trying get data for provider with id \"" + providerId + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
+        } catch (ConfigurationException ex) {
+            throw new CstlServiceException("An error occurred while trying read statistics from data id \"" + dataBrief.getId() + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
+        }
+    }
+
+    /**
+     * Returns {@link DataDescription} that contains only the geographic envelope of the data in CRS:84
+     * this method is called by rest api to provide the bounding box used to zoom to data extent.
+     *
+     * @param providerId given provider identifier.
+     * @param layerName given data name.
+     * @return {@link DataDescription}
+     * @throws CstlServiceException
+     */
+    public DataDescription getDataGeographicExtent(final String providerId, final String layerName) throws CstlServiceException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("layerName", layerName);
+
+        // Get the layer.
+        final Data layer = getLayer(providerId, layerName);
+        final QName qName = Util.parseQName(layerName);
+        final DataBrief dataBrief = dataBusiness.getDataBrief(qName, providerId);
+
+        // Try to extract layer data info.
+        try {
+            if (layer instanceof FeatureData) {
+                return getFeatureDataDescription((FeatureData) layer,false);
+            } else {
+                return getCoverageDataDescription(layer, dataBrief.getId(),false);
             }
         } catch (DataStoreException ex) {
             throw new CstlServiceException("An error occurred while trying get/open datastore for provider with id \"" + providerId + "\".", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
@@ -466,23 +499,24 @@ public final class LayerProviders {
      * @throws IOException        if an error occurred while trying to read the coverage
      * @throws DataStoreException if an error occurred during coverage store operations
      */
-    private CoverageDataDescription getCoverageDataDescription(final Data layer, final int dataId)
+    private CoverageDataDescription getCoverageDataDescription(final Data layer, final int dataId, final boolean full)
             throws IOException, DataStoreException, ConfigurationException {
 
         final CoverageDataDescription description = new CoverageDataDescription();
-        final ImageStatistics stats = dataBusiness.getDataStatistics(dataId);
 
         final CoverageReference ref = (CoverageReference)layer.getOrigin();
         final GridCoverageReader reader = ref.acquireReader();
-
-        // Bands description.
-        for (int i=0; i<stats.getBands().length; i++) {
-            final ImageStatistics.Band band = stats.getBand(i);
-            final String bandName = String.valueOf(i);
-            final double min = band.getMin();
-            final double max = band.getMax();
-            double[] noData = band.getNoData();
-            description.getBands().add(new BandDescription(bandName, min, max, noData));
+        if(full) {
+            final ImageStatistics stats = dataBusiness.getDataStatistics(dataId);
+            // Bands description.
+            for (int i=0; i<stats.getBands().length; i++) {
+                final ImageStatistics.Band band = stats.getBand(i);
+                final String bandName = String.valueOf(i);
+                final double min = band.getMin();
+                final double max = band.getMax();
+                double[] noData = band.getNoData();
+                description.getBands().add(new BandDescription(bandName, min, max, noData));
+            }
         }
 
         // Geographic extent description.
@@ -501,24 +535,27 @@ public final class LayerProviders {
      * @return the {@link FeatureDataDescription} instance
      * @throws DataStoreException if an error occurred during feature store operations
      */
-    private FeatureDataDescription getFeatureDataDescription(final FeatureData layer, final int dataId) throws DataStoreException {
+    private FeatureDataDescription getFeatureDataDescription(final FeatureData layer, final boolean full) throws DataStoreException {
         final FeatureDataDescription description = new FeatureDataDescription();
 
         // Acquire data feature type.
         final FeatureStore store = layer.getStore();
-        final FeatureType featureType = store.getFeatureType(layer.getName());
 
-        // Feature attributes description.
-        final PropertyDescriptor geometryDesc = featureType.getGeometryDescriptor();
-        description.setGeometryProperty(new PropertyDescription(
-                geometryDesc.getName().getNamespaceURI(),
-                geometryDesc.getName().getLocalPart(),
-                geometryDesc.getType().getBinding() != null ? geometryDesc.getType().getBinding() : Geometry.class));
-        for (final PropertyDescriptor desc : featureType.getDescriptors()) {
-            description.getProperties().add(new PropertyDescription(
-                    desc.getName().getNamespaceURI(),
-                    desc.getName().getLocalPart(),
-                    desc.getType().getBinding()));
+        if(full) {
+            final FeatureType featureType = store.getFeatureType(layer.getName());
+
+            // Feature attributes description.
+            final PropertyDescriptor geometryDesc = featureType.getGeometryDescriptor();
+            description.setGeometryProperty(new PropertyDescription(
+                    geometryDesc.getName().getNamespaceURI(),
+                    geometryDesc.getName().getLocalPart(),
+                    geometryDesc.getType().getBinding() != null ? geometryDesc.getType().getBinding() : Geometry.class));
+            for (final PropertyDescriptor desc : featureType.getDescriptors()) {
+                description.getProperties().add(new PropertyDescription(
+                        desc.getName().getNamespaceURI(),
+                        desc.getName().getLocalPart(),
+                        desc.getType().getBinding()));
+            }
         }
 
         // Geographic extent description.
