@@ -404,11 +404,15 @@ final class MetadataUpdater {
              *
              * Reason: "referenceSystemInfo" is a ReferenceSystem, which is defined outside of ISO 19115.
              */
-            boolean moved = false;
-            String code = null;
+            boolean moved    = false;
+            String code      = null;
+            String codeSpace = null;
+            String version   = null;
             while (np.path.length >= 2 && np.path[np.path.length - 2].equals("referenceSystemIdentifier")) {
                 switch (np.path[np.path.length - 1]) {
                     case "code": code = (String) value; break;
+                    case "codeSpace": codeSpace = (String) value; break;
+                    case "version": version = (String) value; break;
                     default: throw new ParseException("Unsupported property: \"" + np + "\".");
                 }
                 moved = true;
@@ -416,7 +420,7 @@ final class MetadataUpdater {
             }
             if (moved) {
                 ((DefaultMetadata) metadata).setReferenceSystemInfo((code == null) ? Collections.<ReferenceSystem>emptySet() :
-                        Collections.<ReferenceSystem>singleton(new ReferenceSystemMetadata(new ImmutableIdentifier(null, null, code))));
+                        Collections.<ReferenceSystem>singleton(new ReferenceSystemMetadata(new ImmutableIdentifier(null, codeSpace, code, version, null))));
                 return true;
             }
         }
