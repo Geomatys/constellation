@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Date;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import org.opengis.metadata.citation.Responsibility;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
@@ -102,18 +103,33 @@ final class MetadataUpdater {
      */
     private Object value;
 
+    private final Map<Class, Class> specialized;
+    
     /**
      * Creates a new updater which will use the entries from the given map.
      * The given map shall not be empty.
      */
-    MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values) {
+    MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values, final Map<Class, Class> specialized) {
         this.standard = standard;
+        if (specialized == null) {
+            this.specialized = new  HashMap<>();
+            this.specialized.put(Responsibility.class,        ResponsibleParty.class);
+            this.specialized.put(Identification.class,        DataIdentification.class);
+            this.specialized.put(GeographicExtent.class,      GeographicBoundingBox.class);
+            this.specialized.put(SpatialRepresentation.class, VectorSpatialRepresentation.class);
+            this.specialized.put(Constraints.class,           LegalConstraints.class);
+            this.specialized.put(Result.class,                ConformanceResult.class);
+        } else {
+            this.specialized = specialized;
+        }
         if (standard == SensorMLStandard.SYSTEM) {
             factory = SYSTEM;
         } else if (standard == SensorMLStandard.COMPONENT) {
             factory = COMPONENT;
-        } else {
+        } else if (standard == MetadataStandard.ISO_19115){
             factory = DEFAULT;
+        } else {
+            factory = new MetadataFactory(standard, MetadataStandard.ISO_19115);
         }
         it = values.entrySet().iterator();
         next();
@@ -312,13 +328,10 @@ final class MetadataUpdater {
      * @todo We need a more generic mechanism.
      */
     @SuppressWarnings("deprecation")
-    private static Class<?> specialize(Class<?> type) {
-        if (type == Responsibility.class)        type = ResponsibleParty.class;
-        if (type == Identification.class)        type = DataIdentification.class;
-        if (type == GeographicExtent.class)      type = GeographicBoundingBox.class;
-        if (type == SpatialRepresentation.class) type = VectorSpatialRepresentation.class;
-        if (type == Constraints.class)           type = LegalConstraints.class;
-        if (type == Result.class)                type = ConformanceResult.class;
+    private Class<?> specialize(Class<?> type) {
+        if (specialized.containsKey(type)){
+            type = specialized.get(type);
+        }
         return type;
     }
 

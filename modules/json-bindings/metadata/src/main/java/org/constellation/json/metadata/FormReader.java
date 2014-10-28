@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.io.IOException;
+import java.util.Map;
 import org.opengis.util.FactoryException;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.util.CharSequences;
@@ -71,15 +72,18 @@ final class FormReader {
      */
     private final SortedMap<NumerotedPath,Object> values;
 
+    private final Map<Class, Class> specialized;
+    
     /**
      * Creates a new form reader.
      */
-    FormReader(final LineReader parser, final int maxDepth, final boolean skipNulls) {
+    FormReader(final LineReader parser, final int maxDepth, final boolean skipNulls, final Map<Class, Class> specialized) {
         this.parser    = parser;
         this.indices   = new int[maxDepth];
         this.skipNulls = skipNulls;
         isNextLineRequested = true;
         values = new TreeMap<>();
+        this.specialized = specialized;
     }
 
     /**
@@ -216,7 +220,7 @@ final class FormReader {
      */
     final void writeToMetadata(final MetadataStandard standard, final Object destination) throws ParseException {
         if (!values.isEmpty()) {
-            final MetadataUpdater updater = new MetadataUpdater(standard, values);
+            final MetadataUpdater updater = new MetadataUpdater(standard, values, specialized);
             try {
                 updater.update(null, destination);
             } catch (IllegalArgumentException | ClassCastException | FactoryException e) {

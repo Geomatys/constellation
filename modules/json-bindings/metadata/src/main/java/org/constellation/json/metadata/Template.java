@@ -147,6 +147,8 @@ public class Template {
      * The maximal length of {@link TemplateNode#path} arrays.
      */
     final int depth;
+    
+    private final Map<Class, Class> specialized;
 
     /**
      * Creates a pre-defined template from a resource file of the given name.
@@ -160,6 +162,7 @@ public class Template {
     {
         root = new TemplateNode(new LineReader(standard, template, sharedLines, sharedPaths), true, null);
         this.depth = depth;
+        this.specialized = null;
         /*
          * Do not validate the path (root.validatePath(null)). We will do that in JUnit tests instead,
          * in order to avoid consuming CPU for a verification of a static resource.
@@ -177,10 +180,11 @@ public class Template {
      *
      * @see #getInstance(String)
      */
-    public Template(final MetadataStandard standard, final Iterable<String> template) throws IOException {
+    public Template(final MetadataStandard standard, final Iterable<String> template, final Map<Class, Class> specialized) throws IOException {
         root = new TemplateNode(new LineReader(standard, template, new HashMap<String,String>(),
                 new HashMap<String,String[]>()), true, null);
         depth = root.validatePath(null);
+        this.specialized = specialized;
     }
 
     /**
@@ -242,7 +246,7 @@ public class Template {
      * @throws IOException if an error occurred while parsing.
      */
     public void read(final Iterable<? extends CharSequence> json, final Object destination, final boolean skipNulls) throws IOException {
-        final FormReader r = new FormReader(new LineReader(root.standard, json, null, null), depth, skipNulls);
+        final FormReader r = new FormReader(new LineReader(root.standard, json, null, null), depth, skipNulls, specialized);
         r.read((String[]) null);
         r.writeToMetadata(root.standard, destination);
     }
@@ -258,7 +262,7 @@ public class Template {
      * @throws IOException if an error occurred while parsing.
      */
     public void read(final RootObj json, final Object destination, final boolean skipNulls) throws IOException {
-        final FormReader r = new FormReader(null, depth, skipNulls);
+        final FormReader r = new FormReader(null, depth, skipNulls, specialized);
         r.read(json);
         r.writeToMetadata(root.standard, destination);
     }

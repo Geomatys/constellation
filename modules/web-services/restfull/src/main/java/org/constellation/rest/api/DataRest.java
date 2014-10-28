@@ -2320,8 +2320,10 @@ public class DataRest {
     public Response getAssociatedData(final String[] params) {
         final Map<String, List<DataBrief>> mapping = new HashMap<>();
         for (final String id : params) {
-            final List<DataBrief> dataBriefs = dataBusiness.getDataBriefsFromMetadataId(id);
-            mapping.put(id, dataBriefs);
+            if (id != null) {
+                final List<DataBrief> dataBriefs = dataBusiness.getDataBriefsFromMetadataId(id);
+                mapping.put(id, dataBriefs);
+            }
         }
         return Response.ok(mapping).build();
     }
