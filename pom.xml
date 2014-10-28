@@ -175,6 +175,7 @@
     <properties>
         <!-- Define parent projects versions -->
         <shiro.version>1.2.1</shiro.version>
+        <geoapi.version>4.0-SNAPSHOT</geoapi.version>
         <sis.version>0.5-jdk7-SNAPSHOT</sis.version>
         <geotoolkit.version>4.x-SNAPSHOT</geotoolkit.version>
         <!--<mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>-->
@@ -293,6 +294,12 @@
                 <version>${geotoolkit.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opengis</groupId>
+                <artifactId>geoapi-conformance</artifactId>
+                <version>${geoapi.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>

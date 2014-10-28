@@ -78,6 +78,11 @@
 
     <!-- Testing dependencies -->
     <dependency>
+        <groupId>org.opengis</groupId>
+        <artifactId>geoapi-conformance</artifactId>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
         <groupId>org.constellation.engine</groupId>
         <artifactId>cstl-engine-process-core</artifactId>
         <version>${project.version}</version>
