@@ -41,6 +41,8 @@ public class MetadataLists implements Serializable {
     private List<String> classificationCodes;
     private List<String> characterSetCodes;
     private List<String> keywordTypeCodes;
+    private List<String> restrictionCodes;
+    private List<String> scopeCodes;
 
     public MetadataLists() {
     }
@@ -56,6 +58,8 @@ public class MetadataLists implements Serializable {
             this.classificationCodes= m.classificationCodes;
             this.characterSetCodes= m.classificationCodes;
             this.keywordTypeCodes= m.keywordTypeCodes;
+            this.restrictionCodes = m.restrictionCodes;
+            this.scopeCodes = m.scopeCodes;
         }
     }
 
@@ -129,5 +133,21 @@ public class MetadataLists implements Serializable {
 
     public void setKeywordTypeCodes(List<String> keywordTypeCodes) {
         this.keywordTypeCodes = keywordTypeCodes;
+    }
+    
+    public List<String> getRestrictionCodes() {
+        return restrictionCodes;
+    }
+
+    public void setRestrictionCodes(List<String> restrictionCodes) {
+        this.restrictionCodes = restrictionCodes;
+    }
+    
+    public List<String> getScopeCodes() {
+        return scopeCodes;
+    }
+
+    public void setScopeCodes(List<String> scopeCodes) {
+        this.scopeCodes = scopeCodes;
     }
 }

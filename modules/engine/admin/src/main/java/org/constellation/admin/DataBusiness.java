@@ -69,9 +69,11 @@ import org.apache.sis.util.iso.Types;
 import org.constellation.dto.MetadataLists;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
+import org.opengis.metadata.constraint.Restriction;
 import org.opengis.metadata.identification.KeywordType;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
+import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.spatial.GeometricObjectType;
 
 
@@ -924,6 +926,28 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         Collections.sort(characterSetCodes);
         mdList.setCharacterSetCodes(characterSetCodes);
 
+        //for Restriction codes
+        final List<String> restrictionCodes = new LinkedList<>();
+        for (final Restriction cl : Restriction.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            classificationCodes.add(codeListName);
+        }
+        Collections.sort(restrictionCodes);
+        mdList.setRestrictionCodes(restrictionCodes);
+        
+        //for Scope codes
+        final List<String> scopeCodes = new LinkedList<>();
+        for (final ScopeCode cl : ScopeCode.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            classificationCodes.add(codeListName);
+        }
+        Collections.sort(scopeCodes);
+        mdList.setScopeCodes(scopeCodes);
+        
         return mdList;
     }
 }
