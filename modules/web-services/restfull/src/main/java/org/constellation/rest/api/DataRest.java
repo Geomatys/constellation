@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -62,17 +61,11 @@ import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.Locales;
-import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.exception.ConstellationException;
-import org.constellation.business.IDataBusiness;
-import org.constellation.business.IDatasetBusiness;
-import org.constellation.business.IProcessBusiness;
-import org.constellation.business.IProviderBusiness;
-import org.constellation.business.ISensorBusiness;
+import org.constellation.business.*;
 import org.constellation.configuration.*;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
@@ -87,6 +80,7 @@ import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.TaskParameter;
+import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.json.metadata.Template;
@@ -133,19 +127,13 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
 import org.geotoolkit.storage.DataFileStore;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.opengis.geometry.Envelope;
-import org.opengis.metadata.citation.DateType;
-import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.constraint.Classification;
-import org.opengis.metadata.identification.KeywordType;
-import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.metadata.maintenance.MaintenanceFrequency;
-import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -175,6 +163,12 @@ public class DataRest {
 
     @Inject
     private UserRepository userRepository;
+
+    @Inject
+    private StyleRepository styleRepository;
+
+    @Inject
+    private IStyleBusiness styleBusiness;
 
     @Inject
     private IDataBusiness dataBusiness;
@@ -1468,17 +1462,21 @@ public class DataRest {
      * TODO : Input pyramid parameters should contain an horizontal envelope, not an upper-left point. Upper-left point
      * is not sufficient to determine a custom pyramid zone. Unused.
      *
-     * @param providerId Provider identifier of the data to tile.
-     * @param dataId Data identifier
+     * @param dataId Data id
+     * @param provider Provider identifier of the data to tile.
+     * @param dataName Data identifier
      * @param params PyramidParams
      * @return
      */
     @POST
-    @Path("pyramid/create/{providerId}/{dataId}")
+    @Path("pyramid/create/{dataId}/{provider}/{dataName}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response createTiledProvider(
-            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId, final PyramidParams params, @Context HttpServletRequest req) {
+    public Response createTiledProvider(@PathParam("dataId") final Integer dataId,
+                                        @PathParam("provider") final String provider,
+                                        @PathParam("dataName") final String dataName,
+                                        final PyramidParams params,
+                                        @Context HttpServletRequest req) {
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 
         if (!cstlUser.isPresent()) {
@@ -1491,13 +1489,13 @@ public class DataRest {
         Double upperCornerY = params.getUpperCornerY();
         
         //get data
-        final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
+        final DataProvider inProvider = DataProviders.getInstance().getProvider(provider);
         if(inProvider==null){
-            return Response.ok("Provider "+providerId+" does not exist").status(400).build();
+            return Response.ok("Provider "+provider+" does not exist").status(400).build();
         }
-        final Data inData = inProvider.get(new DefaultName(dataId));
+        final Data inData = inProvider.get(new DefaultName(dataName));
         if(inData==null){
-            return Response.ok("Data "+dataId+" does not exist in provider "+providerId).status(400).build();
+            return Response.ok("Data "+dataName+" does not exist in provider "+provider).status(400).build();
         }
         
         Envelope dataEnv;
@@ -1505,12 +1503,26 @@ public class DataRest {
             //use data crs
             dataEnv = inData.getEnvelope();
         } catch (DataStoreException ex) {
-            return Response.ok("Failed to extract envelope for data "+dataId).status(500).build();
+            return Response.ok("Failed to extract envelope for data "+dataName).status(500).build();
         }
 
         //get tile format 
         if(tileFormat==null || tileFormat.isEmpty()) {
             tileFormat = "PNG";
+        }
+
+        MutableStyle style = null;
+        try {
+            final org.constellation.engine.register.Data data = dataBusiness.findById(dataId);
+            if(data != null){
+                List<org.constellation.engine.register.Style> list =  styleRepository.findByData(data);
+                if(list != null && !list.isEmpty()){
+                    final org.constellation.engine.register.Style s = list.get(0);
+                    style = styleBusiness.getStyle("sld",s.getName());
+                }
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
         }
         
         //get pyramid CRS, we force longiude first on the pyramids
@@ -1562,7 +1574,7 @@ public class DataRest {
         //create the output folder for pyramid
         PyramidalCoverageReference outRef;
         String pyramidProviderId = RENDERED_PREFIX + UUID.randomUUID().toString();
-        final File providerDirectory = ConfigDirectory.getDataIntegratedDirectory(providerId);
+        final File providerDirectory = ConfigDirectory.getDataIntegratedDirectory(provider);
         final File pyramidDirectory = new File(providerDirectory, pyramidProviderId);
         pyramidDirectory.mkdirs();
 
@@ -1579,7 +1591,7 @@ public class DataRest {
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue("no namespace");
             outProvider = DataProviders.getInstance().createProvider(pyramidProviderId, factory, pparams);
             // Update the parent attribute of the created provider
-            providerBusiness.updateParent(outProvider.getId(), providerId);
+            providerBusiness.updateParent(outProvider.getId(), provider);
         } catch (Exception ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Failed to create pyramid provider " + ex.getMessage()).build();
@@ -1588,7 +1600,7 @@ public class DataRest {
         try {
             //create the output pyramid coverage reference
             CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
-            outRef = (XMLCoverageReference) pyramidStore.create(new DefaultName(dataId));
+            outRef = (XMLCoverageReference) pyramidStore.create(new DefaultName(dataName));
             outRef.setPackMode(ViewType.RENDERED);
             ((XMLCoverageReference) outRef).setPreferredFormat(tileFormat);
             //this produces an update event which will create the DataRecord
@@ -1618,7 +1630,8 @@ public class DataRest {
          */
         final MapContext context = MapBuilder.createContext();
         try {
-            context.items().add(inData.getMapLayer(null, null));
+            //if style is null, a default style will be used in maplayer.
+            context.items().add(inData.getMapLayer(style, null));
         } catch (PortrayalException ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Failed to create map context layer for data " + ex.getMessage()).build();
@@ -1642,11 +1655,11 @@ public class DataRest {
             taskParameter.setDate(System.currentTimeMillis());
             taskParameter.setInputs(ParamUtilities.writeParameter(input));
             taskParameter.setOwner(cstlUser.get().getId());
-            taskParameter.setName("Styled pyramid " + crs + " for " + providerId + ":" + dataId+" | "+System.currentTimeMillis());
+            taskParameter.setName("Styled pyramid " + crs + " for " + provider + ":" + dataName+" | "+System.currentTimeMillis());
             taskParameter.setType("INTERNAL");
             taskParameter = processBusiness.addTaskParameter(taskParameter);
             //add task in scheduler
-            processBusiness.runProcess("Create pyramid " + crs + " for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
+            processBusiness.runProcess("Create pyramid " + crs + " for " + provider + ":" + dataName, p, taskParameter.getId(), cstlUser.get().getId());
 
 
         } catch (NoSuchIdentifierException ex) {
@@ -1660,7 +1673,7 @@ public class DataRest {
             return Response.status(500).entity("Data cannot be tiled. " + ex.getMessage()).build();
         }
 
-        final ProviderData ref = new ProviderData(pyramidProviderId, dataId);
+        final ProviderData ref = new ProviderData(pyramidProviderId, dataName);
         return Response.ok(ref).status(202).build();
     }
 
@@ -1681,11 +1694,13 @@ public class DataRest {
     }
     
     @GET
-    @Path("pyramid/bestscales/{providerId}/{dataId}")
+    @Path("pyramid/bestscales/{providerId}/{dataId}/{crs}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response findBestScales(
-            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId){
+            @PathParam("providerId") final String providerId,
+            @PathParam("dataId") final String dataId,
+            @PathParam("crs") final String crs){
         
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);

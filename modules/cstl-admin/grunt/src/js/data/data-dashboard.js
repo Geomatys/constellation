@@ -932,10 +932,6 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             $modalInstance.dismiss('close');
         }
 
-        function setScale(response) {
-            $scope.scales = response.Entry[0].split(',');
-        }
-
         function errorOnPyramid() {
                Growl('error', 'Error', 'No scale can automatically be set');
         }
@@ -967,9 +963,9 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     return;
                 }
 
-                if ($scope.wmtsParams === false) {
                     // just add the data if we are not in the case of the wmts service
                     if (service.type.toLowerCase() !== 'wmts') {
+                        //using angular.forEach to avoid jsHint warning when decalring function in loop
                         angular.forEach($scope.selected, function(value, key){
                             if (service.type.toLowerCase() === 'wms' &&
                                 $scope.conformPyramid &&
@@ -990,21 +986,29 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                             }
                         });
                         return;
+                    }else {
+                        //WMTS pyramid
+                        //using angular.forEach to avoid jsHint warning when decalring function in loop
+                        angular.forEach($scope.selected, function(layer, key){
+                            dataListing.pyramidScales({providerId: layer.Provider,
+                                                       dataId: layer.Name},
+                                function(response){//success
+                                    $scope.scales = response.Entry[0].split(',');
+                                    dataListing.pyramidData({provider: layer.Provider,
+                                                             dataName: layer.Name,
+                                                             dataId: layer.Id},
+                                                            {tileFormat: $scope.tileFormat,
+                                                             crs: $scope.crs,
+                                                             scales: $scope.scales,
+                                                             upperCornerX: $scope.upperCornerX,
+                                                             upperCornerY: $scope.upperCornerY},
+                                        addLayer,
+                                        pyramidGenerationError);
+                                },
+                                errorOnPyramid);
+                            $scope.wmtsParams = true;
+                        });
                     }
-
-                    for(var j=0; j<$scope.selected.length; j++) {
-                        // WMTS here, prepare form
-                        dataListing.pyramidScales({providerId: $scope.selected[j].Provider, dataId: $scope.selected[j].Name}, setScale, errorOnPyramid);
-                        $scope.wmtsParams = true;
-                    }
-                } else {
-                    // Finish the WMTS publish process
-                    // Pyramid the data to get the new provider to add
-                    for(var k=0; k<$scope.selected.length; k++) {
-                        dataListing.pyramidData({providerId: $scope.selected[k].Provider, dataId: $scope.selected[k].Name},
-                            {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY}, addLayer, pyramidGenerationError);
-                    }
-                }
             }
         };
 

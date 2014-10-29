@@ -518,6 +518,9 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             if (DataViewer.map) {
                 DataViewer.map.setTarget(undefined);
             }
+            if (WmtsViewer.map) {
+                WmtsViewer.map.setTarget(undefined);
+            }
             var viewerData = $('#viewerData');
             viewerData.modal("show");
             viewerData.off('shown.bs.modal');
@@ -525,53 +528,65 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                 var layerName = $scope.selected.Name;
                 //@TODO use ol3 wmts layer
 //                if ($scope.service.type.toLowerCase() === 'wmts') {
-//                    // GetCaps
+                    // GetCaps
 //                    textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
 //                        .success(function (data, status, headers, config) {
                 // Build map
-//                            var capabilities = WmtsViewer.format.read(data);
-//                            WmtsViewer.initMap('dataMap');
+//                            var format = ol.format.WMSCapabilities();
+//                            var capabilities = format.read(data);
 //                            var layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, capabilities);
 //                            WmtsViewer.map.addLayer(layerData);
+//                            WmtsViewer.initMap('dataMap');
 //                            WmtsViewer.map.getView().fitExtent(WmtsViewer.maxExtent,WmtsViewer.map.getSize());
 //                        });
 //                } else {
-                var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                var layerData;
-                var providerId = $scope.selected.Provider;
-                if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
-                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
-                } else {
-                    layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
-                }
-
-                //attach event loader in modal map viewer
-                layerData.on('precompose',function(){
-                    $scope.$apply(function() {
-                        window.cfpLoadingBar_parentSelector = '#dataMap';
-                        cfpLoadingBar.start();
-                        cfpLoadingBar.inc();
-                    });
-                });
-                layerData.on('postcompose',function(){
-                    cfpLoadingBar.complete();
-                    window.cfpLoadingBar_parentSelector = null;
-                });
-
-                DataViewer.layers = [layerBackground,layerData];
-                provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
-                    function(response) {//success
-                        var bbox = response.boundingBox;
-                        if (bbox) {
-                            var extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
-                            DataViewer.extent = extent;
+                    var layerData;
+                    var providerId = $scope.selected.Provider;
+                    if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
+                        if($scope.service.type.toLowerCase() === 'wms') {
+                            //create wms layer
+                            layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
+                        }else {
+                            //create portrayal layer
+                            layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
                         }
-                        DataViewer.initMap('dataMap');
-                    }, function() {//error
-                        // failed to find a metadata, just load the full map
-                        DataViewer.initMap('dataMap');
+                    } else {
+                        if($scope.service.type.toLowerCase() === 'wms') {
+                            //create wms layer
+                            layerData = DataViewer.createLayerWMS($cookies.cstlUrl, layerName, $scope.service.identifier);
+                        }else {
+                            //create portrayal layer
+                            layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+                        }
                     }
-                );
+
+                    //attach event loader in modal map viewer
+                    layerData.on('precompose',function(){
+                        $scope.$apply(function() {
+                            window.cfpLoadingBar_parentSelector = '#dataMap';
+                            cfpLoadingBar.start();
+                            cfpLoadingBar.inc();
+                        });
+                    });
+                    layerData.on('postcompose',function(){
+                        cfpLoadingBar.complete();
+                        window.cfpLoadingBar_parentSelector = null;
+                    });
+
+                    DataViewer.layers = [layerData];
+                    provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
+                        function(response) {//success
+                            var bbox = response.boundingBox;
+                            if (bbox) {
+                                var extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
+                                DataViewer.extent = extent;
+                            }
+                            DataViewer.initMap('dataMap');
+                        }, function() {//error
+                            // failed to find a metadata, just load the full map
+                            DataViewer.initMap('dataMap');
+                        }
+                    );
 //                }
             });
         };

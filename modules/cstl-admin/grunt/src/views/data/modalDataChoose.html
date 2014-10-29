@@ -5,7 +5,7 @@
             <h4 class="modal-title" translate="service.edit.dashboard.action.add.data">Add data</h4>
         </div>
         <div class="modal-body modal-body-list-data" style="height: 575px;overflow-y: auto;">
-            <div class="dashboard" ng-hide="wmtsParams">
+            <div class="dashboard">
                 <div class="navbar sort-navbar">
                     <div class="navbar-inner">
                         <ul class="nav nav-style">
@@ -193,55 +193,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div ng-show="wmtsParams" style="margin:20pt;">
-                <div class="form-group">
-                    <div class="control-label"
-                         for="tileFormat"
-                         translate="data.modal.choose.tile.format.label">Tile format</div>
-                    <input type="text"
-                           class="form-control"
-                           ng-model="$parent.tileFormat"
-                           id="tileFormat"
-                           placeholder="{{'data.modal.choose.tile.format.placeholder' | translate}}"/>
-                </div>
-                <div class="form-group">
-                    <div class="control-label" for="crs">CRS</div>
-                    <input type="text"
-                           class="form-control"
-                           ng-model="$parent.crs"
-                           id="crs"
-                           placeholder="{{'data.modal.choose.tile.crs.placeholder' | translate}}"/>
-                </div>
-                <div class="form-group">
-                    <div class="control-label"
-                         for="scales"
-                         translate="data.modal.choose.scales">Scales</div>
-                    <input type="text"
-                           class="form-control"
-                           ng-model="$parent.scales"
-                           id="scales" ng-list required/>
-                </div>
-                <div class="form-group">
-                    <div class="control-label"
-                         for="upperCornerX"
-                         translate="data.modal.choose.uppercornerx">Upper corner X</div>
-                    <input type="text"
-                           class="form-control"
-                           ng-model="$parent.upperCornerX"
-                           id="upperCornerX"
-                           placeholder="{{'data.modal.choose.uppercornerx.placeholder' | translate}}"/>
-                </div>
-                <div class="form-group">
-                    <div class="control-label"
-                         for="upperCornerY"
-                         translate="data.modal.choose.uppercornery">Upper corner Y</div>
-                    <input type="text"
-                           class="form-control"
-                           ng-model="$parent.upperCornerY"
-                           id="upperCornerY"
-                           placeholder="{{'data.modal.choose.uppercornery.placeholder' | translate}}"/>
                 </div>
             </div>
         </div>
