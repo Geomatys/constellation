@@ -25,10 +25,13 @@ import org.constellation.engine.register.repository.PropertyRepository;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Record1;
 import org.jooq.SelectQuery;
+import org.jooq.UpdateConditionStep;
+import org.jooq.UpdateSetMoreStep;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static org.constellation.engine.register.jooq.Tables.LAYER;
 import static org.constellation.engine.register.jooq.Tables.PROPERTY;
 
 @Component
@@ -58,8 +61,17 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRe
 
     @Override
     public void save(Property prop) {
-        PropertyRecord newRecord = dsl.newRecord(PROPERTY, prop);
-        newRecord.store();
+        final Property old = findOne(prop.getName());
+        if (old == null) {
+            PropertyRecord newRecord = dsl.newRecord(PROPERTY, prop);
+            newRecord.store();
+        } else {
+            final UpdateConditionStep<PropertyRecord> updateQuery = dsl.update(PROPERTY)
+                    .set(PROPERTY.VALUE, prop.getValue())
+                    .where(PROPERTY.NAME.eq(prop.getName()));
+
+            updateQuery.execute();
+        }
     }
 
     @Override
