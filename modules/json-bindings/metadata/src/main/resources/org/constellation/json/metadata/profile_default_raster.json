@@ -506,7 +506,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
 								"path":"identificationInfo.pointOfContact.contactInfo.address.postalCode",
-								"render":"integer",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -636,7 +636,7 @@
                                 "multiplicity":1,
                                 "help":"metadata.field.postalCode_help",
                                 "path":"contact.contactInfo.address.postalCode",
-                                "render":"integer",
+                                "render":"text",
                                 "obligation":"O",
                                 "defaultValue":null,
                                 "value":null
