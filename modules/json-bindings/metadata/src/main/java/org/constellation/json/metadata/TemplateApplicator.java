@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.logging.Logger;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.Metadata;
 import org.opengis.temporal.Position;
@@ -36,6 +37,7 @@ import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.TypeValuePolicy;
 import org.apache.sis.metadata.ValueExistencePolicy;
+import org.apache.sis.util.logging.Logging;
 
 
 /**
@@ -112,6 +114,9 @@ import org.apache.sis.metadata.ValueExistencePolicy;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class TemplateApplicator {
+    
+    public static final Logger LOGGER = Logging.getLogger(TemplateApplicator.class);
+            
     /**
      * A path to be handled in a special way.
      */
@@ -240,6 +245,9 @@ final class TemplateApplicator {
             if (metadata != null) {
                 type = isMetadataInstance ? metadata.getClass() : (Class<?>) metadata; // See method javadoc.
                 do {
+                    if (pathOffset >= template.path.length) {
+                        LOGGER.severe(Arrays.toString(template.path)); // debug
+                    }
                     final String identifier = template.path[pathOffset];
                     final Class<?> propertyType;
                     try {
