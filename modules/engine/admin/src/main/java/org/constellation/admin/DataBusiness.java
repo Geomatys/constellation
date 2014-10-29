@@ -58,11 +58,21 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.Locales;
+import org.apache.sis.util.iso.Types;
+import org.constellation.dto.MetadataLists;
+import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.constraint.Classification;
+import org.opengis.metadata.identification.KeywordType;
+import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.metadata.maintenance.MaintenanceFrequency;
+import org.opengis.metadata.spatial.GeometricObjectType;
 
 
 /**
@@ -807,5 +817,113 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
     protected DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
         return (DefaultMetadata) XML.unmarshal(metadata);
+    }
+
+    @Override
+    public MetadataLists getMetadataCodeLists() {
+        final MetadataLists mdList = new MetadataLists();
+
+        //for role codes
+        final List<String> roleCodes = new LinkedList<>();
+        for (final org.opengis.metadata.citation.Role role : org.opengis.metadata.citation.Role.values()) {
+            final String standardName = Types.getStandardName(role.getClass());
+            final String code = role.identifier()!=null?role.identifier():role.name();
+            final String codeListName = standardName+"."+code;
+            roleCodes.add(codeListName);
+        }
+        Collections.sort(roleCodes);
+        mdList.setRoleCodes(roleCodes);
+
+        //for keyword type codes
+        final List<String> keywordTypesCodes = new LinkedList<>();
+        for (final KeywordType ktype : KeywordType.values()) {
+            final String standardName = Types.getStandardName(ktype.getClass());
+            final String code = ktype.identifier()!=null?ktype.identifier():ktype.name();
+            final String codeListName = standardName+"."+code;
+            keywordTypesCodes.add(codeListName);
+        }
+        Collections.sort(keywordTypesCodes);
+        mdList.setKeywordTypeCodes(keywordTypesCodes);
+
+        //for locale codes
+        final List<String> localeCodes = new LinkedList<>();
+        for (final Locale locale : Locales.ALL.getAvailableLanguages()) {
+            localeCodes.add("LanguageCode."+locale.getISO3Language());
+        }
+        Collections.sort(localeCodes);
+        mdList.setLocaleCodes(localeCodes);
+
+        //for topic category codes
+        final List<String> topicCategoryCodes = new LinkedList<>();
+        for (final TopicCategory tc : TopicCategory.values()) {
+            final String standardName = Types.getStandardName(tc.getClass());
+            final String code = tc.identifier()!=null? tc.identifier(): tc.name();
+            final String codeListName = standardName+"."+code;
+            topicCategoryCodes.add(codeListName);
+        }
+        Collections.sort(topicCategoryCodes);
+        mdList.setTopicCategoryCodes(topicCategoryCodes);
+
+        //for date type codes
+        final List<String> dateTypeCodes = new LinkedList<>();
+        for (final DateType dateType : DateType.values()) {
+            final String standardName = Types.getStandardName(dateType.getClass());
+            final String code = dateType.identifier()!=null? dateType.identifier(): dateType.name();
+            final String codeListName = standardName+"."+code;
+            dateTypeCodes.add(codeListName);
+        }
+        Collections.sort(dateTypeCodes);
+        mdList.setDateTypeCodes(dateTypeCodes);
+
+        //for maintenanceFrequency codes
+        final List<String> maintenanceFrequencyCodes = new LinkedList<>();
+        for (final MaintenanceFrequency cl : MaintenanceFrequency.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            maintenanceFrequencyCodes.add(codeListName);
+        }
+        Collections.sort(maintenanceFrequencyCodes);
+        mdList.setMaintenanceFrequencyCodes(maintenanceFrequencyCodes);
+
+        //for GeometricObjectType codes
+        final List<String> geometricObjectTypeCodes = new LinkedList<>();
+        for (final GeometricObjectType got : GeometricObjectType.values()) {
+            final String standardName = Types.getStandardName(got.getClass());
+            final String code = got.identifier()!=null? got.identifier(): got.name();
+            final String codeListName = standardName+"."+code;
+            geometricObjectTypeCodes.add(codeListName);
+        }
+        Collections.sort(geometricObjectTypeCodes);
+        mdList.setGeometricObjectTypeCodes(geometricObjectTypeCodes);
+
+        //for Classification codes
+        final List<String> classificationCodes = new LinkedList<>();
+        for (final Classification cl : Classification.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            classificationCodes.add(codeListName);
+        }
+        Collections.sort(classificationCodes);
+        mdList.setClassificationCodes(classificationCodes);
+
+        // for characterSet codes
+        final List<String> characterSetCodes = new LinkedList<>();
+        final Set<String> keys = Charset.availableCharsets().keySet();
+        final List<String> keep = Arrays.asList("UTF-8","UTF-16","UTF-32",
+                "ISO-8859-1","ISO-8859-13","ISO-8859-15",
+                "ISO-8859-2","ISO-8859-3","ISO-8859-4",
+                "ISO-8859-5","ISO-8859-6","ISO-8859-7",
+                "ISO-8859-8","ISO-8859-9","Shift_JIS",
+                "EUC-JP","EUC-KR","US-ASCII","Big5","GB2312");
+        keep.retainAll(keys);
+        for (final String c : keep) {
+            characterSetCodes.add(c);
+        }
+        Collections.sort(characterSetCodes);
+        mdList.setCharacterSetCodes(characterSetCodes);
+
+        return mdList;
     }
 }

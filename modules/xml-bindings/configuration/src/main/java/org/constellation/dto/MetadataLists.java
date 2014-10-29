@@ -44,6 +44,20 @@ public class MetadataLists implements Serializable {
 
     public MetadataLists() {
     }
+    
+    public MetadataLists(MetadataLists m) {
+        if (m != null) {
+            this.roleCodes = m.roleCodes;
+            this.localeCodes= m.localeCodes;
+            this.topicCategoryCodes= m.topicCategoryCodes;
+            this.dateTypeCodes= m.dateTypeCodes;
+            this.maintenanceFrequencyCodes= m.maintenanceFrequencyCodes;
+            this.geometricObjectTypeCodes= m.geometricObjectTypeCodes;
+            this.classificationCodes= m.classificationCodes;
+            this.characterSetCodes= m.classificationCodes;
+            this.keywordTypeCodes= m.keywordTypeCodes;
+        }
+    }
 
     public List<String> getRoleCodes() {
         return roleCodes;

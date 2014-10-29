@@ -32,9 +32,9 @@ import org.constellation.engine.register.Provider;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.dto.MetadataLists;
 import org.constellation.engine.register.Dataset;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 
@@ -110,4 +110,6 @@ public interface IDataBusiness {
      * on each coverage type data without computed statistics.
      */
     void computeEmptyDataStatistics();
+    
+    MetadataLists getMetadataCodeLists();
 }

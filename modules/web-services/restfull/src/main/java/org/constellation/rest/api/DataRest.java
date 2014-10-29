@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -75,8 +74,6 @@ import org.constellation.business.IProcessBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.*;
-import org.constellation.coverage.PyramidCoverageHelper;
-import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.FileBean;
@@ -103,7 +100,6 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.ParamUtilities;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
@@ -133,7 +129,6 @@ import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
@@ -208,109 +203,7 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getMetadataCodeLists() {
-        final MetadataLists mdList = new MetadataLists();
-
-        //for role codes
-        final List<String> roleCodes = new LinkedList<>();
-        for (final Role role : Role.values()) {
-            final String standardName = Types.getStandardName(role.getClass());
-            final String code = role.identifier()!=null?role.identifier():role.name();
-            final String codeListName = standardName+"."+code;
-            roleCodes.add(codeListName);
-        }
-        Collections.sort(roleCodes);
-        mdList.setRoleCodes(roleCodes);
-
-        //for keyword type codes
-        final List<String> keywordTypesCodes = new LinkedList<>();
-        for (final KeywordType ktype : KeywordType.values()) {
-            final String standardName = Types.getStandardName(ktype.getClass());
-            final String code = ktype.identifier()!=null?ktype.identifier():ktype.name();
-            final String codeListName = standardName+"."+code;
-            keywordTypesCodes.add(codeListName);
-        }
-        Collections.sort(keywordTypesCodes);
-        mdList.setKeywordTypeCodes(keywordTypesCodes);
-
-        //for locale codes
-        final List<String> localeCodes = new LinkedList<>();
-        for (final Locale locale : Locales.ALL.getAvailableLanguages()) {
-            localeCodes.add("LanguageCode."+locale.getISO3Language());
-        }
-        Collections.sort(localeCodes);
-        mdList.setLocaleCodes(localeCodes);
-
-        //for topic category codes
-        final List<String> topicCategoryCodes = new LinkedList<>();
-        for (final TopicCategory tc : TopicCategory.values()) {
-            final String standardName = Types.getStandardName(tc.getClass());
-            final String code = tc.identifier()!=null? tc.identifier(): tc.name();
-            final String codeListName = standardName+"."+code;
-            topicCategoryCodes.add(codeListName);
-        }
-        Collections.sort(topicCategoryCodes);
-        mdList.setTopicCategoryCodes(topicCategoryCodes);
-
-        //for date type codes
-        final List<String> dateTypeCodes = new LinkedList<>();
-        for (final DateType dateType : DateType.values()) {
-            final String standardName = Types.getStandardName(dateType.getClass());
-            final String code = dateType.identifier()!=null? dateType.identifier(): dateType.name();
-            final String codeListName = standardName+"."+code;
-            dateTypeCodes.add(codeListName);
-        }
-        Collections.sort(dateTypeCodes);
-        mdList.setDateTypeCodes(dateTypeCodes);
-
-        //for maintenanceFrequency codes
-        final List<String> maintenanceFrequencyCodes = new LinkedList<>();
-        for (final MaintenanceFrequency cl : MaintenanceFrequency.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            maintenanceFrequencyCodes.add(codeListName);
-        }
-        Collections.sort(maintenanceFrequencyCodes);
-        mdList.setMaintenanceFrequencyCodes(maintenanceFrequencyCodes);
-
-        //for GeometricObjectType codes
-        final List<String> geometricObjectTypeCodes = new LinkedList<>();
-        for (final GeometricObjectType got : GeometricObjectType.values()) {
-            final String standardName = Types.getStandardName(got.getClass());
-            final String code = got.identifier()!=null? got.identifier(): got.name();
-            final String codeListName = standardName+"."+code;
-            geometricObjectTypeCodes.add(codeListName);
-        }
-        Collections.sort(geometricObjectTypeCodes);
-        mdList.setGeometricObjectTypeCodes(geometricObjectTypeCodes);
-
-        //for Classification codes
-        final List<String> classificationCodes = new LinkedList<>();
-        for (final Classification cl : Classification.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            classificationCodes.add(codeListName);
-        }
-        Collections.sort(classificationCodes);
-        mdList.setClassificationCodes(classificationCodes);
-
-        // for characterSet codes
-        final List<String> characterSetCodes = new LinkedList<>();
-        final Set<String> keys = Charset.availableCharsets().keySet();
-        final List<String> keep = Arrays.asList("UTF-8","UTF-16","UTF-32",
-                "ISO-8859-1","ISO-8859-13","ISO-8859-15",
-                "ISO-8859-2","ISO-8859-3","ISO-8859-4",
-                "ISO-8859-5","ISO-8859-6","ISO-8859-7",
-                "ISO-8859-8","ISO-8859-9","Shift_JIS",
-                "EUC-JP","EUC-KR","US-ASCII","Big5","GB2312");
-        keep.retainAll(keys);
-        for (final String c : keep) {
-            characterSetCodes.add(c);
-        }
-        Collections.sort(characterSetCodes);
-        mdList.setCharacterSetCodes(characterSetCodes);
-
+        final MetadataLists mdList = dataBusiness.getMetadataCodeLists();
         return Response.ok().entity(mdList).build();
     }
 
