@@ -43,7 +43,7 @@
       <plugin>
         <groupId>com.geomatys.maven</groupId>
         <artifactId>geomatys-sqlpojo-plugin</artifactId>
-        <version>0.0.5-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
         <dependencies>
           <dependency>
             <groupId>org.constellation.engine</groupId>
@@ -64,8 +64,8 @@
             <goals>
               <goal>generate</goal>
             </goals>
-            <configuration>
-              <jdbcURL>jdbc:h2:${basedir}/target/db</jdbcURL>
+            <configuration>              
+              <database>db</database>
               <targetSchema>ADMIN</targetSchema>
               <changeLog>cstl/db/db-changelog.xml</changeLog>
               <targetPackage>org.constellation.engine.register</targetPackage>
