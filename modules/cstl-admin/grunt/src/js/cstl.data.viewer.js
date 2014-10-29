@@ -13,9 +13,6 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details..
  */
-function isNotNumber(n) {
-    return (n === Number.POSITIVE_INFINITY || n === Number.NEGATIVE_INFINITY || isNaN(n));
-}
 window.DataViewer = {
     map : undefined,
     target : undefined,
@@ -40,7 +37,7 @@ window.DataViewer = {
         if(Array.isArray(reprojExtent)){
             for(var i=0;i<reprojExtent.length;i++){
                 var coord = reprojExtent[i];
-                if(isNotNumber(coord)){
+                if(DataViewer.isNotNumber(coord)){
                     reprojExtent = projection.getExtent();
                     break;
                 }
@@ -80,13 +77,17 @@ window.DataViewer = {
 
     },
 
+    isNotNumber : function(n) {
+        return (n === Number.POSITIVE_INFINITY || n === Number.NEGATIVE_INFINITY || isNaN(n));
+    },
+
     zoomToExtent : function(extent,size){
         var projection = ol.proj.get(DataViewer.projection);
         var reprojExtent = ol.proj.transform(extent, 'EPSG:4326', DataViewer.projection);
         if(Array.isArray(reprojExtent)){
             for(var i=0;i<reprojExtent.length;i++){
                 var coord = reprojExtent[i];
-                if(isNotNumber(coord)){
+                if(DataViewer.isNotNumber(coord)){
                     reprojExtent = projection.getExtent();
                     break;
                 }
