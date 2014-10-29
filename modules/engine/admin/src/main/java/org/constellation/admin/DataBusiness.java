@@ -932,7 +932,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             final String standardName = Types.getStandardName(cl.getClass());
             final String code = cl.identifier()!=null? cl.identifier(): cl.name();
             final String codeListName = standardName+"."+code;
-            classificationCodes.add(codeListName);
+            restrictionCodes.add(codeListName);
         }
         Collections.sort(restrictionCodes);
         mdList.setRestrictionCodes(restrictionCodes);
@@ -943,7 +943,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             final String standardName = Types.getStandardName(cl.getClass());
             final String code = cl.identifier()!=null? cl.identifier(): cl.name();
             final String codeListName = standardName+"."+code;
-            classificationCodes.add(codeListName);
+            scopeCodes.add(codeListName);
         }
         Collections.sort(scopeCodes);
         mdList.setScopeCodes(scopeCodes);
