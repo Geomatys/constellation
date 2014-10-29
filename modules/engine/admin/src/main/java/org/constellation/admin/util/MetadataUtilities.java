@@ -28,6 +28,7 @@ import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
+import org.apache.sis.xml.XML;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -39,7 +40,6 @@ import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
-import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
@@ -72,11 +72,9 @@ import org.opengis.util.NoSuchIdentifierException;
 import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -475,9 +473,7 @@ public final class MetadataUtilities {
             final String templateApplied = templateEngine.apply(templateFile, prop);
             
             //unmarshall the template
-            final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
-            final DefaultMetadata meta = (DefaultMetadata) um.unmarshal(new StringReader(templateApplied));
-            ISOMarshallerPool.getInstance().recycle(um);
+            final DefaultMetadata meta = (DefaultMetadata) XML.unmarshal(templateApplied);
             return meta;
         } catch (TemplateEngineException | IOException | JAXBException ex) {
            LOGGER.log(Level.WARNING, null, ex);

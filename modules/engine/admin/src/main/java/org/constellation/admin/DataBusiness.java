@@ -27,6 +27,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
@@ -42,7 +43,6 @@ import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.repository.*;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.opengis.feature.PropertyType;
@@ -52,7 +52,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -166,11 +165,16 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         final MarshallerPool pool = getMarshallerPool();
         try {
-            if (data != null && data.getIsoMetadata() != null) {
-                final InputStream sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
-                final Unmarshaller m = pool.acquireUnmarshaller();
-                metadata = (DefaultMetadata) m.unmarshal(sr);
-                pool.recycle(m);
+            final String metadataStr = data.getIsoMetadata();
+            if (data != null && metadataStr != null) {
+                if(pool != null){
+                    final InputStream sr = new ByteArrayInputStream(metadataStr.getBytes("UTF-8"));
+                    final Unmarshaller m = pool.acquireUnmarshaller();
+                    metadata = (DefaultMetadata) m.unmarshal(sr);
+                    pool.recycle(m);
+                }else {
+                    metadata = unmarshallMetadata(metadataStr);
+                }
             }
         } catch (UnsupportedEncodingException | JAXBException e) {
             throw new ConstellationException(e);
@@ -190,11 +194,16 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         final Data data = dataRepository.findById(dataId);
         final MarshallerPool pool = getMarshallerPool();
         try {
-            if (data != null && data.getIsoMetadata() != null) {
-                final InputStream sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
-                final Unmarshaller m = pool.acquireUnmarshaller();
-                metadata = (DefaultMetadata) m.unmarshal(sr);
-                pool.recycle(m);
+            final String metadataStr = data.getIsoMetadata();
+            if (data != null && metadataStr != null) {
+                if(pool != null){
+                    final InputStream sr = new ByteArrayInputStream(metadataStr.getBytes("UTF-8"));
+                    final Unmarshaller m = pool.acquireUnmarshaller();
+                    metadata = (DefaultMetadata) m.unmarshal(sr);
+                    pool.recycle(m);
+                } else {
+                    metadata = unmarshallMetadata(metadataStr);
+                }
             }
         } catch (UnsupportedEncodingException | JAXBException e) {
             throw new ConstellationException(e);
@@ -255,16 +264,23 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public void saveMetadata(final String providerId,
                              final QName name,
                              final DefaultMetadata metadata) throws ConstellationException {
-        final StringWriter sw = new StringWriter();
+        final String metadataStr;
         try {
-            final Marshaller marshaller = getMarshallerPool().acquireMarshaller();
-            marshaller.marshal(metadata, sw);
-            getMarshallerPool().recycle(marshaller);
+            final MarshallerPool pool = getMarshallerPool();
+            if(pool != null) {
+                final Marshaller marshaller = pool.acquireMarshaller();
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(metadata, sw);
+                pool.recycle(marshaller);
+                metadataStr = sw.toString();
+            } else {
+                metadataStr = marshallMetadata(metadata);
+            }
         } catch (JAXBException ex) {
             throw new ConstellationException(ex);
         }
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
-        data.setIsoMetadata(sw.toString());
+        data.setIsoMetadata(metadataStr);
         data.setMetadataId(metadata.getFileIdentifier());
         dataRepository.update(data);
         indexEngine.addMetadataToIndexForData(metadata, data.getId());
@@ -686,14 +702,18 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     
     @Override
     public void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException {
-        String metadataString = null;
+        final String metadataString;
         try {
             final MarshallerPool pool = getMarshallerPool();
-            final Marshaller marshaller = pool.acquireMarshaller();
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            marshaller.marshal(metadata, outputStream);
-            pool.recycle(marshaller);
-            metadataString = outputStream.toString();
+            if(pool != null) {
+                final Marshaller marshaller = pool.acquireMarshaller();
+                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                marshaller.marshal(metadata, outputStream);
+                pool.recycle(marshaller);
+                metadataString = outputStream.toString();
+            } else {
+                metadataString = marshallMetadata(metadata);
+            }
         } catch (JAXBException ex) {
             throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
         }
@@ -778,6 +798,14 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     protected MarshallerPool getMarshallerPool() {
-        return ISOMarshallerPool.getInstance();
+        return null; //in constellation this should always return null, since this method can be overrided by sub-project.
+    }
+
+    protected String marshallMetadata(final DefaultMetadata metadata) throws JAXBException {
+        return XML.marshal(metadata);
+    }
+
+    protected DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
+        return (DefaultMetadata) XML.unmarshal(metadata);
     }
 }
