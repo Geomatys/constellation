@@ -180,6 +180,22 @@ public class Template {
      *
      * @see #getInstance(String)
      */
+    public Template(final MetadataStandard standard, final Iterable<String> template) throws IOException {
+        this(standard, template, null);
+    }
+
+    /**
+     * Creates a new template with the given lines.
+     * This constructor is for use of custom templates.
+     * Consider using one of the predefined templates returned by {@link #getInstance(String)} instead.
+     *
+     * @param  standard The standard used by the metadata objects to write.
+     * @param  template The JSON lines to use as a template.
+     * @param  specialized
+     * @throws IOException if an error occurred while parsing the JSON template.
+     *
+     * @see #getInstance(String)
+     */
     public Template(final MetadataStandard standard, final Iterable<String> template, final Map<Class, Class> specialized) throws IOException {
         root = new TemplateNode(new LineReader(standard, template, new HashMap<String,String>(),
                 new HashMap<String,String[]>()), true, null);

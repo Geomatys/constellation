@@ -104,7 +104,11 @@ final class MetadataUpdater {
     private Object value;
 
     private final Map<Class, Class> specialized;
-    
+
+    MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values) {
+        this(standard, values, null);
+    }
+
     /**
      * Creates a new updater which will use the entries from the given map.
      * The given map shall not be empty.
