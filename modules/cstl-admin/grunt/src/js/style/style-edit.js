@@ -2027,8 +2027,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
-                var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                DataViewer.layers = [layerBackground,layerData];
+                DataViewer.layers = [layerData];
                 $scope.initDataLayerProperties(function(){
                     if ($scope.dataBbox) {
                         var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
@@ -2048,14 +2047,12 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     function(response) {
                         //$scope.newStyle.rules = response.rules;
                         var layerData;
-                        var layerBackground = null;
                         if($scope.selectedLayer){
                             if($scope.newStyle.rules.length ===0){
                                 layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
                             }else {
                                 layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name, "sld_temp");
                             }
-                            layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
                         }else {
                             //if there is no selectedLayer ie the sld editor in styles dashboard
                             if ($scope.dataType.toLowerCase() === 'raster') {
@@ -2068,19 +2065,11 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             }else {
                                 layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name, "sld_temp");
                             }
-
-                            if(!existsLinePolygonSymbolizers()){
-                                layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                            }
                         }
                         //to force the browser cache reloading styled layer.
                         layerData.get('params').ts=new Date().getTime();
 
-                        if(layerBackground){
-                            DataViewer.layers = [layerBackground,layerData];
-                        }else {
-                            DataViewer.layers = [layerData];
-                        }
+                        DataViewer.layers = [layerData];
                         setTimeout(function(){
                             DataViewer.initMap(mapId);
                             if ($scope.dataBbox) {
@@ -2151,23 +2140,6 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 var currentScale=calcCurrentScale();
                 currentScale = Math.round(currentScale);
                 $scope.optionsSLD.selectedRule.maxScale = currentScale;
-            }
-        };
-
-        /**
-         * Returns true if there is a LINE or POLYGON symbolizer for the current style.
-         * this is needed to set the background layer depending on what symbolizer is present.
-         * @returns {boolean}
-         */
-        var existsLinePolygonSymbolizers = function(){
-            for(var i=0;i<$scope.newStyle.rules.length;i++){
-                var rule = $scope.newStyle.rules[i];
-                for(var j=0;j<rule.symbolizers.length;j++){
-                    var symb = rule.symbolizers[j];
-                    if(symb['@symbol']==='line' || symb['@symbol']==='polygon'){
-                        return true;
-                    }
-                }
             }
         };
 
