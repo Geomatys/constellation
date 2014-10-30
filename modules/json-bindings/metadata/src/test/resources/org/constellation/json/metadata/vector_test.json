@@ -655,7 +655,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
 								"path":"identificationInfo[1].pointOfContact[1].contactInfo.address[1].postalCode",
-								"render":"integer",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -785,7 +785,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
 								"path":"identificationInfo[1].pointOfContact[2].contactInfo.address[1].postalCode",
-								"render":"integer",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -915,7 +915,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
 								"path":"identificationInfo[1].pointOfContact[3].contactInfo.address[1].postalCode",
-								"render":"integer",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
@@ -1045,7 +1045,7 @@
 								"multiplicity":1,
 								"help":"metadata.field.postalCode_help",
 								"path":"contact[1].contactInfo.address.postalCode",
-								"render":"integer",
+								"render":"text",
 								"obligation":"O",
 								"defaultValue":null,
 								"value":null
