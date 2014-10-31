@@ -333,7 +333,7 @@ public class DataRest {
                     uploadDirectory.mkdir();
                 }
                 Files.copy(fileIs, newFileData.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                fileIs.close();
+                //fileIs.close();
                 hashMap.put("dataPath", newFileData.getAbsolutePath());
             }
         } catch (IOException ex) {
@@ -384,7 +384,7 @@ public class DataRest {
                             uploadDirectory.mkdir();
                         }
                         Files.copy(mdFileIs, newFileMetaData.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        mdFileIs.close();
+                        //mdFileIs.close();
 
                         try {
                             extractIdentifierFromMetadataFile(hashMap, newFileMetaData);
