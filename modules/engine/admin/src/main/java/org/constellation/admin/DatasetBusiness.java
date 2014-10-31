@@ -96,7 +96,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * Injected user repository.
      */
     @Inject
-    private UserRepository userRepository;
+    protected UserRepository userRepository;
 
     /**
      * Injected dataset repository.
@@ -333,6 +333,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * @param dataType data type vector or raster.
      * @throws ConfigurationException
      */
+    @Override
     public void saveMetadata(final String providerId, final String dataType) throws ConfigurationException {
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
         DefaultMetadata extractedMetadata;
