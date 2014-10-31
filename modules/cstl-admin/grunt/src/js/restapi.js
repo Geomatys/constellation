@@ -286,10 +286,9 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'listTasks':             {method: 'GET',    url: '@cstl/api/1/task/listTasks;jsessionid=',                           isArray: false },
             'listRunningTasks':      {method: 'GET',    url: '@cstl/api/1/task/listRunningTasks/:id;jsessionid=',                isArray: true },
             'listProcess':           {method: 'GET',    url: '@cstl/api/1/task/listProcesses;jsessionid=',                       isArray: false },
+            'describeProcess':       {method: 'GET',    url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
             'countProcess':          {method: 'GET',    url: '@cstl/api/1/task/countProcesses;jsessionid=' },
             'listProcessForFactory': {method: 'GET',    url: '@cstl/api/1/task/process/factory/:authorityCode;jsessionid=',      isArray: false },
-//            Use textService for getProcessDescriptor and get XML response
-//            'getProcessDescriptor':  {method: 'GET',    url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
             'listParamsTask':        {method: 'GET',    url: '@cstl/api/1/task/params/list;jsessionid=',                         isArray: true },
             'listParamsTaskByType':  {method: 'GET',    url: '@cstl/api/1/task/params/list/:type;jsessionid=',                   isArray: true },
             'getParamsTask':         {method: 'GET',    url: '@cstl/api/1/task/params/get/:id;jsessionid=',                      isArray: false },
@@ -315,9 +314,6 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             },
             capaWmsExterne : function(url){
                 return $http.get(url +'?REQUEST=GetCapabilities&SERVICE=WMS');
-            },
-            getProcessDescriptor : function(authority, code){
-                return $http.get('@cstl/api/1/task/process/descriptor/'+authority+'/'+code+';jsessionid=');
             },
             createStyleXml : function(provider, styleXml){
                 return $http({

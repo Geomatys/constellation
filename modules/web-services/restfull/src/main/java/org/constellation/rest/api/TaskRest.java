@@ -18,6 +18,11 @@
  */
 package org.constellation.rest.api;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -34,6 +39,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.stream.XMLStreamException;
 
 import com.google.common.base.Optional;
 import org.constellation.admin.dto.TaskStatusDTO;
@@ -56,6 +62,11 @@ import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.chain.model.Chain;
+import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.xml.parameter.ParameterDescriptorWriter;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.XML;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -130,13 +141,32 @@ public final class TaskRest {
     
     /**
      * Returns a description of the process parameters.
-     * TODO produce JSON instead of XML
      */
     @GET
     @Path("process/descriptor/{authority}/{code}")
-    public Response getProcessDescriptor(final @PathParam("authority") String authority, final @PathParam("code") String code) throws ConfigurationException {
+    public Response getProcessDescriptor(final @PathParam("authority") String authority, final @PathParam("code") String code)
+            throws ConfigurationException {
+
         final ParameterDescriptorGroup idesc = getDescriptor(authority, code);
-        return Response.ok(idesc).build();
+
+        //TODO use real binding from ParameterDescriptorGroup to JSON
+        try {
+            //write descriptor to XML String
+            final Writer xmlWriter = new StringWriter();
+            final ParameterDescriptorWriter descWriter = new ParameterDescriptorWriter();
+            descWriter.setOutput(xmlWriter);
+            descWriter.write(idesc);
+            xmlWriter.flush();
+
+            // write XML String into JSON
+            final JSONObject jsonObject = XML.toJSONObject(xmlWriter.toString());
+            final String jsonString = jsonObject.toString();
+            return Response.ok(jsonString, MediaType.APPLICATION_JSON_TYPE).build();
+
+        } catch (XMLStreamException | JSONException | IOException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new AcknowlegementType("Failure", "Could not find chain for given authority/code.")).build();
+        }
     }
 
     private ParameterDescriptorGroup getDescriptor(final String authority, final String code) throws ConfigurationException {
@@ -187,12 +217,19 @@ public final class TaskRest {
     public Response createParamsTask(final TaskParameter taskParameter, @Context HttpServletRequest req) throws ConfigurationException {
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 
-        if (cstlUser.isPresent()) {
-            taskParameter.setOwner(cstlUser.get().getId());
-            taskParameterRepository.create(taskParameter);
-            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
-        } else {
-            return Response.status(Response.Status.EXPECTATION_FAILED).build();
+        try {
+            processBusiness.testTaskParameter(taskParameter);
+            if (cstlUser.isPresent()) {
+                taskParameter.setOwner(cstlUser.get().getId());
+                taskParameter.setDate(System.currentTimeMillis());
+                taskParameterRepository.create(taskParameter);
+                return Response.ok().status(Response.Status.CREATED).type(MediaType.TEXT_PLAIN_TYPE).build();
+            } else {
+                return Response.status(Response.Status.EXPECTATION_FAILED).build();
+            }
+        } catch (ConfigurationException ex) {
+            final AcknowlegementType failure = new AcknowlegementType("Failure", "Failed to create task : " + ex.getMessage());
+            return Response.status(Response.Status.NOT_ACCEPTABLE).entity(failure).build();
         }
     }
 
@@ -200,8 +237,14 @@ public final class TaskRest {
     @Path("params/update")
     @RolesAllowed("cstl-admin")
     public Response updateParamsTask(final TaskParameter taskParameter) throws ConfigurationException {
-        taskParameterRepository.update(taskParameter);
-        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+        try {
+            processBusiness.testTaskParameter(taskParameter);
+            taskParameterRepository.update(taskParameter);
+            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+        } catch (ConfigurationException ex) {
+            final AcknowlegementType failure = new AcknowlegementType("Failure", "Failed to create task : " + ex.getMessage());
+            return Response.status(Response.Status.NOT_ACCEPTABLE).entity(failure).build();
+        }
     }
 
     @GET
@@ -261,7 +304,7 @@ public final class TaskRest {
 
         try {
             processBusiness.executeTaskParameter(taskParameter, title, cstlUser.get().getId());
-        } catch (ConstellationException ex) {
+        } catch (ConstellationException | ConfigurationException ex) {
             final AcknowlegementType failure = new AcknowlegementType("Failure", "Failed to run task : " + ex.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(failure).build();
         }

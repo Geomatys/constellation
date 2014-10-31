@@ -18,6 +18,9 @@
  */
 package org.constellation.admin;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
@@ -39,6 +42,7 @@ import org.geotoolkit.io.DirectoryWatcher;
 import org.geotoolkit.io.PathChangeListener;
 import org.geotoolkit.io.PathChangedEvent;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
@@ -282,7 +286,7 @@ public class ProcessBusiness implements IProcessBusiness {
         return desc;
     }
 
-    private ParameterValueGroup readTaskParameters(final TaskParameter taskParameter, final ProcessDescriptor processDesc) {
+    private ParameterValueGroup readTaskParametersFromXML(final TaskParameter taskParameter, final ProcessDescriptor processDesc) {
 
         //change the description, always encapsulate in the same namespace and name
         //jaxb object factory can not reconize changing names without a namespace
@@ -299,6 +303,23 @@ public class ProcessBusiness implements IProcessBusiness {
         } catch (XMLStreamException | IOException ex) {
             throw new ConstellationException(ex);
         }
+        return params;
+    }
+
+    private ParameterValueGroup readTaskParametersFromJSON(final TaskParameter taskParameter, final ProcessDescriptor processDesc)
+            throws ConfigurationException {
+
+        final ParameterDescriptorGroup idesc = processDesc.getInputDescriptor();
+
+        ParameterValueGroup params;
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            final Map valueMap = mapper.readValue(taskParameter.getInputs(), Map.class);
+            params = Parameters.toParameter(valueMap, idesc);
+        } catch (IOException e) {
+            throw new ConfigurationException("Fail to parse input parameter as JSON for task : "+taskParameter.getId(), e);
+        }
+
         return params;
     }
 
@@ -322,10 +343,11 @@ public class ProcessBusiness implements IProcessBusiness {
      *                      ProcessJobDetails create it-self a new instance each time is executed.
      * @return ProcessJobDetails
      */
-    private ProcessJobDetail createJobDetailFromTaskParameter(final TaskParameter task, final boolean createProcess) {
+    private ProcessJobDetail createJobDetailFromTaskParameter(final TaskParameter task, final boolean createProcess)
+            throws ConfigurationException {
 
         final ProcessDescriptor processDesc = getDescriptor(task.getProcessAuthority(), task.getProcessCode());
-        final ParameterValueGroup params = readTaskParameters(task, processDesc);
+        final ParameterValueGroup params = readTaskParametersFromJSON(task, processDesc);
 
         if (createProcess) {
             final ParameterDescriptorGroup originalDesc = processDesc.getInputDescriptor();
@@ -498,6 +520,20 @@ public class ProcessBusiness implements IProcessBusiness {
      * {@inheritDoc}
      */
     @Override
+    public void testTaskParameter(TaskParameter taskParameter) throws ConfigurationException {
+
+        if (taskParameter.getInputs() != null && !taskParameter.getInputs().isEmpty()) {
+            final ProcessDescriptor processDesc = getDescriptor(taskParameter.getProcessAuthority(), taskParameter.getProcessCode());
+            readTaskParametersFromJSON(taskParameter, processDesc);
+        } else {
+            throw new ConfigurationException("No input for task : " + taskParameter.getName());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void scheduleTaskParameter (final TaskParameter task, final String title, final Integer userId)
             throws ConstellationException {
 
@@ -533,7 +569,7 @@ public class ProcessBusiness implements IProcessBusiness {
                     registerJobInScheduler(task.getName(), task.getId(), userId, cronTrigger, jobDetail);
                     scheduledTasks.put(task.getId(), key);
 
-                } catch (ParseException e) {
+                } catch (ParseException | ConfigurationException e) {
                     throw new ConstellationException(e.getMessage(), e);
                 }
 

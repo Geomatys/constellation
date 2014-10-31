@@ -20,7 +20,7 @@
 
 angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('ModalAddTaskController', function($scope, $modalInstance, Growl, textService, TaskService, processes, task, style){
+    .controller('ModalAddTaskController', function($scope, $modalInstance, Growl, TaskService, processes, task, style){
 
         // Private function
         function parseProcessDefaultName(processName) {
@@ -65,44 +65,35 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
         function getDescribeProcess() {
             var authority = $scope.processes[$scope.option.authIndex];
-            textService.getProcessDescriptor(authority.auth, authority.processes[$scope.option.processIndex])
-                .success(function(data){ // On success
+            TaskService.describeProcess({'authority':authority.auth, 'code':authority.processes[$scope.option.processIndex]}).$promise
+                .then(function(data){ // On success
                     $scope.describeProcess = data;
-                }).error(function(data){ // On error
+                }).catch(function(data){ // On error
                     Growl('error', 'Error', 'Unable to get the describe process');
                 });
         }
 
-        function setSaved(dom, name, iter){
-            dom.find(name).each(function(ind, _el) {
-                switch ($scope.inputs[iter].annotation.info) {
-                    case "valueClass:java.lang.Double":
-                        $scope.inputs[iter].save[ind] = parseFloat(jQuery(_el)[0].textContent);
-                        break;
-                    case "valueClass:java.lang.Integer":
-                        $scope.inputs[iter].save[ind] = parseInt(jQuery(_el)[0].textContent);
-                        break;
-                    case "valueClass:java.lang.Boolean":
-                        $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent === "true";
-                        break;
-                    default:
-                        $scope.inputs[iter].save[ind] = jQuery(_el)[0].textContent;
-                }
-            });
-
-        }
-
         function restoreInputs(){
             if ($scope.task.inputs) {
-                var dom = jQuery(jQuery.parseXML($scope.task.inputs));
+                //convert to object
+                if (angular.isString($scope.task.inputs)) {
+                    $scope.task.inputs = angular.fromJson($scope.task.inputs);
+                }
 
-                for (var iter in $scope.inputs){
-                    if($scope.inputs.hasOwnProperty(iter)){
-                        var name = $scope.inputs[iter].name;
-                        setSaved(dom, name, iter);
+                for (var param in $scope.task.inputs) {
+                    if($scope.task.inputs.hasOwnProperty(param)) {
+                        var scopeInput = getInputByName(param);
+                        scopeInput.save = $scope.task.inputs[param];
                     }
                 }
             }
+        }
+
+        function getInputByName(param) {
+            var filter = $scope.inputs.filter(function (elem) {
+                return elem.name === param;
+            });
+            return filter[0];
         }
 
         // Scope variables
@@ -153,7 +144,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
             $scope.task.processAuthority = $scope.processes[$scope.option.authIndex].auth;
             $scope.task.processCode = $scope.processes[$scope.option.authIndex].processes[$scope.option.processIndex];
-            $scope.task.inputs = '<input xmlns="http://www.geotoolkit.org/parameter">';
+            $scope.task.inputs = {};
 
             for (var i in $scope.inputs){
                 if($scope.inputs.hasOwnProperty(i)){
@@ -164,34 +155,18 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                         return false;
                     }
 
-                    switch(element.annotation.info) {
+                    if (element.type === 'simple') {
+                        $scope.task.inputs[element.name] = element.save;
+                    } else {
+                        $scope.task.inputs[element.name] = [];
 
-                        case "valueClass:java.lang.Boolean" :
-                            if (element.save && element.save.length > 0) {
-                                for (var s in element.save) {
-                                    if(element.save.hasOwnProperty(s)){
-                                        $scope.task.inputs += '<' + element.name + '>' + element.save[s] + '</' + element.name + '>';
-                                    }
-                                }
-                            } else {
-                                $scope.task.inputs += '<' + element.name + '>' + (element.default||false) + '</' + element.name + '>';
-                            }
-                            break;
-                        default:
-                            if (element.save && element.save.length > 0) {
-                                for (var save in element.save) {
-                                    if (element.save.hasOwnProperty(save)) {
-                                        $scope.task.inputs += '<' + element.name + '>' + element.save[save] + '</' + element.name + '>';
-                                    }
-                                }
-                            } else if (element.default) {
-                                $scope.task.inputs += '<' + element.name + '>' + element.default + '</' + element.name + '>';
-                            }
-                            break;
+                        //TODO handle group
                     }
                 }
             }
-            $scope.task.inputs += '</input>';
+
+            //convert to JSON
+            $scope.task.inputs = angular.toJson($scope.task.inputs);
 
             if ($scope.task.id != null){
                 TaskService.updateParamsTask($scope.task).$promise
@@ -236,57 +211,100 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 $scope.canManage = true;
 
                 var inputs = [];
-                var save = {};
-                var dom = jQuery(jQuery.parseXML(newValue));
+                var initializationFlags = {};
 
-                var getAnnotationFor = function(_el) {
-                    var element = jQuery(_el);
-                    var annotation = {};
-                    annotation.info = element.find("appinfo").get(0).textContent;
-                    annotation.documentation = element.find("documentation").get(0).textContent;
+                var prepareFields = function(input) {
 
-                    if ("valueClass:org.constellation.util.StyleReference" === annotation.info) {
-                        $scope.listAvailableStyles();
+                    //initialize style list
+                    if ("valueClass:org.constellation.util.StyleReference" === input.binding) {
+                        //initialize only once
+                        if (!initializationFlags[input.binding]) {
+                            $scope.listAvailableStyles();
+                        }
+                        initializationFlags[input.binding] = true;
+                        input.restriction.enumeration = $scope.styles;
                     }
-
-                    return annotation;
                 };
 
-                var getRestrictionFor = function(_el) {
-                    var element = jQuery(_el);
-
+                var extractEnumeration = function(enumList) {
                     var enumerationList = [];
-                    element.find("restriction").find("enumeration").each(function (a, _enum) {
-                        enumerationList.push(jQuery(_enum).attr("value"));
-                    });
-                    return {
-                        enumeration : enumerationList
-                    };
+                    if (enumList && Array.isArray(enumList)) {
+                        enumList.forEach(function (val) {
+                            enumerationList.push(val.value);
+                        });
+                    }
+                    return enumerationList;
                 };
 
-                dom.find('element[name=input]').find('element').each(function(a, el) {
-                    var element = jQuery(el);
+                var parseParameterDescriptor = function(elem) {
+                    var inputElement = {};
+                    inputElement.name = elem.name;
+                    inputElement.minOccurs = elem.minOccurs || 1;
+                    inputElement.maxOccurs = elem.maxOccurs || 1;
+                    inputElement.mandatory = inputElement.minOccurs > 0;
 
-                    var index = inputs.push({
-                            'mandatory' : true,
-                            'name': element.attr("name"),
-                            'default' : element.attr("default") || "",
-                            'minOccurs' : parseInt(element.attr("minOccurs") || "1"),
-                            'maxOccurs' : parseInt(element.attr("maxOccurs") || "1"),
-                            'annotation' : getAnnotationFor(element),
-                            'restriction' : getRestrictionFor(element),
-                            'save' : []
-                        })-1; // Push add to the end of the array and return length... so length-1 => last element insert
+                    //Simple parameter
+                    var simple = elem.simpleType;
+                    if (simple) {
+                        inputElement.type = "simple";
+                        inputElement.default = elem.default;
+                        inputElement.binding = simple.annotation.appinfo;
+                        inputElement.documentation = simple.annotation.documentation;
+                        inputElement.save = null;
 
-                    // Check mandatory once
-                    if (inputs[index].minOccurs === 0) {
-                        inputs[index].mandatory = false;
+                        //check if parameter is handled
+                        if (inputElement.mandatory && jQuery.inArray(inputElement.binding, $scope.manageField) === -1) {
+                            $scope.canManage = false;
+                        }
+
+                        if (simple.restriction) {
+                            var restriction = simple.restriction;
+                            inputElement.base = restriction.base;
+
+                            //extract valid value range
+                            inputElement.restriction = {};
+                            var minValue = restriction.minInclusive !== undefined ? restriction.minInclusive.value : null;
+                            var maxValue = restriction.maxInclusive !== undefined ? restriction.maxInclusive.value : null;
+                            if (minValue !== null && maxValue !== null) {
+                                inputElement.restriction.range = [minValue, maxValue];
+                            }
+
+                            //extract valid values
+                            inputElement.restriction.enumeration = extractEnumeration(restriction.enumeration);
+                        }
+
+                        prepareFields(inputElement);
+
+                    } else {
+                        //Group parameters
+                        inputElement.type = "group";
+                        inputElement.inputs = [];
+                        inputElement.save = [];
+
+                        var complex = elem.complexType;
+                        parseElements(complex.sequence.element, inputElement.inputs);
+
+                        if (complex.sequence.annotation) {
+                            inputElement.documentation = complex.sequence.annotation.documentation;
+                        }
                     }
+                    return inputElement;
+                };
 
-                    if (inputs[index].mandatory === true && jQuery.inArray(inputs[index].annotation.info, $scope.manageField)===-1){
-                        $scope.canManage = false;
+                var parseElements = function(elements, inputsDesc) {
+
+                    if (elements) {
+                        if (Array.isArray(elements)) {
+                            elements.forEach(function (elem) {
+                                inputsDesc.push(parseParameterDescriptor(elem));
+                            });
+                        } else {
+                            inputsDesc.push(parseParameterDescriptor(elements));
+                        }
                     }
-                });
+                };
+
+                parseElements(newValue.schema.element.complexType.sequence.element, inputs);
                 $scope.inputs = inputs;
                 restoreInputs();
             }

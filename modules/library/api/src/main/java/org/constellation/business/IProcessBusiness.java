@@ -133,4 +133,11 @@ public interface IProcessBusiness {
     void stopScheduleTaskParameter (TaskParameter task, Integer userId) throws ConstellationException, ConfigurationException;
 
     TaskParameter addTaskParameter(TaskParameter taskParameter);
+
+    /**
+     * Test TaskParameter inputs
+     * @param taskParameter
+     * @return
+     */
+    void testTaskParameter(TaskParameter taskParameter) throws ConfigurationException;
 }

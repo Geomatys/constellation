@@ -182,7 +182,8 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                         } else {
                             return {
                                 'id' : null,
-                                'name' : ""
+                                'name' : "",
+                                'inputs': {}
                             };
                         }
                     }
