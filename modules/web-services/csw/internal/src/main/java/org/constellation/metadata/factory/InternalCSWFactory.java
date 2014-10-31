@@ -44,12 +44,14 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.apache.sis.xml.MarshallerPool;
 
 import static org.constellation.generic.database.Automatic.BYID;
 import static org.constellation.generic.database.Automatic.DEFAULT;
 import static org.constellation.generic.database.Automatic.FILESYSTEM;
 import org.constellation.metadata.CSWConstants;
 import org.constellation.metadata.io.internal.InternalMetadataWriter;
+import org.constellation.utils.ISOMarshallerPool;
 
 // J2SE dependencies
 // Constellation dependencies
@@ -153,5 +155,10 @@ public class InternalCSWFactory implements AbstractCSWFactory {
     @Override
     public Map<String, List<String>> getBriefFieldMap() {
         return CSWConstants.ISO_BRIEF_FIELDS;
+    }
+    
+    @Override
+    public MarshallerPool getMarshallerPool() {
+        return ISOMarshallerPool.getInstance();
     }
 }

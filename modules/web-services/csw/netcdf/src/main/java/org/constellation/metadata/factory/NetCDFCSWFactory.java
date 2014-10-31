@@ -43,11 +43,13 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.apache.sis.xml.MarshallerPool;
 
 import static org.constellation.generic.database.Automatic.BYID;
 import static org.constellation.generic.database.Automatic.DEFAULT;
 import static org.constellation.generic.database.Automatic.FILESYSTEM;
 import org.constellation.metadata.CSWConstants;
+import org.constellation.utils.ISOMarshallerPool;
 
 /**
  *
@@ -151,4 +153,8 @@ public class NetCDFCSWFactory implements AbstractCSWFactory {
         return CSWConstants.ISO_BRIEF_FIELDS;
     }
     
+    @Override
+    public MarshallerPool getMarshallerPool() {
+        return ISOMarshallerPool.getInstance();
+    }
 }

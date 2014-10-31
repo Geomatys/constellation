@@ -56,7 +56,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.ws.ICSWConfigurer;
+import org.opengis.metadata.Metadata;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for CSW service.
@@ -705,5 +710,30 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
             LOGGER.log(Level.WARNING, "Error while getting metadata count on CSW instance:" + identifier, ex);
         }
         return instance;
+    }
+    
+    /**
+     * Convert {@code Metadata} to {@code Node} object.
+     *
+     * @param serviceID
+     * @param metadataNode given node object to convert.
+     * @return {@code Metadata}
+     * @throws ConfigurationException
+     */
+    public Metadata getMetadataFromNode(final String serviceID, final Node metadataNode) throws ConfigurationException {
+        try {
+            final AbstractCSWFactory factory = getCSWFactory(serviceID);
+            final MarshallerPool pool = factory.getMarshallerPool();
+            final Unmarshaller um = pool.acquireUnmarshaller();
+            final Object obj = um.unmarshal(metadataNode);
+            pool.recycle(um);
+            if (obj instanceof Metadata) {
+                return (Metadata) obj;
+            } else {
+                throw new TargetNotFoundException("Record is not a metadata object");
+            }
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("JAXB Exception while reading record", ex);
+        }
     }
 }

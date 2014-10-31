@@ -35,6 +35,7 @@ import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import org.apache.sis.xml.MarshallerPool;
 
 // constellation dependencies
 // Geotoolkit dependencies
@@ -121,4 +122,6 @@ public interface AbstractCSWFactory {
     MetadataSecurityFilter getSecurityFilter();
     
     Map<String, List<String>> getBriefFieldMap();
+    
+    MarshallerPool getMarshallerPool();
 }

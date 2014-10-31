@@ -32,7 +32,6 @@ import org.constellation.json.metadata.Template;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.configuration.CSWConfigurer;
-import org.constellation.utils.ISOMarshallerPool;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.opengis.metadata.Metadata;
@@ -50,7 +49,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.List;
 import java.util.TimeZone;
@@ -219,9 +217,10 @@ public class CSWServicesRest {
                                        final @PathParam("type") String type,
                                        final @PathParam("prune") boolean prune) {
         try{
-            final Node node = getConfigurer().getMetadata(id, metaID);
+            final CSWConfigurer configurer = getConfigurer();
+            final Node node = configurer.getMetadata(id, metaID);
             if(node!=null){
-                final Metadata metadata = getMetadataFromNode(node);
+                final Metadata metadata = configurer.getMetadataFromNode(id, node);
                 if(metadata!=null){
                     if(metadata instanceof DefaultMetadata){
                         //prune the metadata
@@ -270,13 +269,14 @@ public class CSWServicesRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveMetadata(final @PathParam("id") String id,
-                                  final @PathParam("metaID") String metaID,
-                                  final @PathParam("type") String type,
-                                  final RootObj metadataValues) {
+                                 final @PathParam("metaID") String metaID,
+                                 final @PathParam("type") String type,
+                                 final RootObj metadataValues) {
         try {
-            final Node node = getConfigurer().getMetadata(id, metaID);
+            final CSWConfigurer configurer = getConfigurer();
+            final Node node = configurer.getMetadata(id, metaID);
             if(node!=null){
-                final Metadata metadata = getMetadataFromNode(node);
+                final Metadata metadata = configurer.getMetadataFromNode(id, node);
                 if(metadata!=null){
                     //get template name
                     final String templateName;
@@ -303,28 +303,6 @@ public class CSWServicesRest {
             return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
-    /**
-     * Convert {@code Metadata} to {@code Node} object.
-     *
-     * @param metadataNode given node object to convert.
-     * @return {@code Metadata}
-     * @throws ConfigurationException
-     */
-    private Metadata getMetadataFromNode(final Node metadataNode) throws ConfigurationException {
-        try {
-            final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
-            final Object obj = um.unmarshal(metadataNode);
-            ISOMarshallerPool.getInstance().recycle(um);
-            if (obj instanceof Metadata) {
-                return (Metadata) obj;
-            } else {
-                throw new TargetNotFoundException("Record is not a metadata object");
-            }
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("JAXB Exception while reading record", ex);
-        }
     }
 
     /**
