@@ -124,4 +124,6 @@ public interface AbstractCSWFactory {
     Map<String, List<String>> getBriefFieldMap();
     
     MarshallerPool getMarshallerPool();
+    
+    String getTemplateName(final String metaID, final String type);
 }

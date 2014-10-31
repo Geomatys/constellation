@@ -736,4 +736,9 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
             throw new ConfigurationException("JAXB Exception while reading record", ex);
         }
     }
+    
+    public String getTemplateName(final String serviceID, final String metadataID, final String type) throws ConfigurationException {
+        final AbstractCSWFactory factory = getCSWFactory(serviceID);
+        return factory.getTemplateName(metadataID, type);
+    }
 }

@@ -161,4 +161,20 @@ public class InternalCSWFactory implements AbstractCSWFactory {
     public MarshallerPool getMarshallerPool() {
         return ISOMarshallerPool.getInstance();
     }
+    
+    @Override
+    public String getTemplateName(String metaID, String type) {
+        final String templateName;
+        if("vector".equalsIgnoreCase(type)){
+            //vector template
+            templateName="profile_default_vector";
+        }else if ("raster".equalsIgnoreCase(type)){
+            //raster template
+            templateName="profile_default_raster";
+        } else {
+            //default template is import
+            templateName="profile_import";
+        }
+        return templateName;
+    }
 }

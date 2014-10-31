@@ -228,17 +228,7 @@ public class CSWServicesRest {
                     }
 
                     final StringBuilder buffer = new StringBuilder();
-                    final String templateName;
-                    if("vector".equalsIgnoreCase(type)){
-                        //vector template
-                        templateName="profile_default_vector";
-                    }else if ("raster".equalsIgnoreCase(type)){
-                        //raster template
-                        templateName="profile_default_raster";
-                    } else {
-                        //default template is import
-                        templateName="profile_import";
-                    }
+                    final String templateName = configurer.getTemplateName(id, metaID, type);
                     final Template template = Template.getInstance(templateName);
                     template.write(metadata,buffer,prune);
                     return Response.ok(buffer.toString()).build();
