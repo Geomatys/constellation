@@ -49,7 +49,9 @@ import org.opengis.filter.capability.SpatialOperator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.geotoolkit.gml.xml.v311.ObjectFactory._Envelope_QNAME;
@@ -312,6 +314,14 @@ public abstract class CSWConstants {
         return CswXmlFactory.createCapabilities(version, servIdent, servProv, null, null, null);
     }
 
+    public final static Map<String, List<String>> ISO_BRIEF_FIELDS = new HashMap<>();
+    static {
+        ISO_BRIEF_FIELDS.put("identifier", Arrays.asList("/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString"));
+        ISO_BRIEF_FIELDS.put("title",      Arrays.asList("/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString"));
+        ISO_BRIEF_FIELDS.put("date",       Arrays.asList("/gmd:MD_Metadata/gmd:dateStamp/gco:DateTime", "/gmd:MD_Metadata/gmd:dateStamp/gco:Date"));
+        ISO_BRIEF_FIELDS.put("creator",    Arrays.asList("/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString"));
+    }
+    
     private CSWConstants() {}
 
 }

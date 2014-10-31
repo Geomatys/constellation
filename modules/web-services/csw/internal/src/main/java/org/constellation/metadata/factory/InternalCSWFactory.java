@@ -48,6 +48,7 @@ import java.util.Map;
 import static org.constellation.generic.database.Automatic.BYID;
 import static org.constellation.generic.database.Automatic.DEFAULT;
 import static org.constellation.generic.database.Automatic.FILESYSTEM;
+import org.constellation.metadata.CSWConstants;
 import org.constellation.metadata.io.internal.InternalMetadataWriter;
 
 // J2SE dependencies
@@ -147,5 +148,10 @@ public class InternalCSWFactory implements AbstractCSWFactory {
     @Override
     public MetadataSecurityFilter getSecurityFilter() {
         return new NoMetadataSecurityFilter();
+    }
+    
+    @Override
+    public Map<String, List<String>> getBriefFieldMap() {
+        return CSWConstants.ISO_BRIEF_FIELDS;
     }
 }

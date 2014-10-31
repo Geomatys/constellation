@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import org.constellation.ws.ICSWConfigurer;
 
@@ -422,15 +423,17 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
     @Override
     public List<BriefNode> getMetadataList(final String id, final int count, final int startIndex) throws ConfigurationException {
         final CSWMetadataReader reader = getReader(id);
+        final AbstractCSWFactory factory = getCSWFactory(id);
         try {
             final List<BriefNode> results = new ArrayList<>();
             final List<String> ids = reader.getAllIdentifiers();
             if (startIndex >= ids.size()) {
                 return results;
             }
+            final Map<String , List<String>> fieldMap = factory.getBriefFieldMap();
 
             for (int i = startIndex; i<ids.size() && i<startIndex + count; i++) {
-                results.add(new BriefNode(reader.getMetadata(ids.get(i), MetadataType.ISO_19115)));
+                results.add(new BriefNode(reader.getMetadata(ids.get(i), MetadataType.ISO_19115), fieldMap));
             }
             return results;
         } catch (MetadataIoException ex) {
@@ -664,6 +667,15 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
         }
     }
 
+    private AbstractCSWFactory getCSWFactory(final String serviceID) throws ConfigurationException {
+        final Automatic config = getServiceConfiguration(serviceID);
+        if (config != null) {
+            return getCSWFactory(config.getType());
+        } else {
+            throw new ConfigurationException("there is no configuration file correspounding to this ID:" + serviceID);
+        }
+    }
+    
     /**
      * Select the good CSW factory in the available ones in function of the dataSource type.
      *

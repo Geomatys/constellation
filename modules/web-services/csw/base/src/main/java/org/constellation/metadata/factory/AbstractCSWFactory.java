@@ -95,7 +95,6 @@ public interface AbstractCSWFactory {
     /**
      * Return a Lucene index searcher for the specified dataSource type.
      *
-     * @param dbType The type of the dataSource.
      * @param configDir The directory containing the lucene index.
      * @param serviceID  An identifier of the service/index.
      *
@@ -120,4 +119,6 @@ public interface AbstractCSWFactory {
     FilterParser getSQLFilterParser();
     
     MetadataSecurityFilter getSecurityFilter();
+    
+    Map<String, List<String>> getBriefFieldMap();
 }

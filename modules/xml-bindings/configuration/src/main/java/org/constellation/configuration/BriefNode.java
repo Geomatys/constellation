@@ -18,6 +18,7 @@
  */
 package org.constellation.configuration;
 
+import java.util.ArrayList;
 import org.constellation.util.NodeUtilities;
 import org.w3c.dom.Node;
 
@@ -26,6 +27,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Extract some information from a node representing a ISO-19115 metadata.
@@ -50,28 +52,35 @@ public class BriefNode {
 
     }
 
-    public BriefNode(final Node node) {
+    public BriefNode(final Node node, final Map<String, List<String>> fieldMapping) {
         this.node = node;
 
-        final List<String> identifiers = NodeUtilities.getValuesFromPath(node, "/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString");
+        final List<String> identifiers = new ArrayList<>();
+        for (String path : fieldMapping.get("identifier")) {
+            identifiers.addAll(NodeUtilities.getValuesFromPath(node, path));
+        }
         if (!identifiers.isEmpty()) {
             identifier = identifiers.get(0);
         }
 
-        final List<String> titles = NodeUtilities.getValuesFromPath(node, "/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString");
+        final List<String> titles = new ArrayList<>();
+        for (String path : fieldMapping.get("title")) {
+            titles.addAll(NodeUtilities.getValuesFromPath(node, path));
+        }
         if (!titles.isEmpty()) {
             title = titles.get(0);
         }
-        List<String> dates = NodeUtilities.getValuesFromPath(node, "/gmd:MD_Metadata/gmd:dateStamp/gco:DateTime");
-        if (dates.isEmpty()) {
-            dates = NodeUtilities.getValuesFromPath(node, "/gmd:MD_Metadata/gmd:dateStamp/gco:Date");
-            if (!dates.isEmpty()) {
-                createDate = dates.get(0);
-            }
-        } else {
+        List<String> dates = new ArrayList<>();
+        for (String path : fieldMapping.get("date")) {
+            dates.addAll(NodeUtilities.getValuesFromPath(node, path));
+        }
+        if (!dates.isEmpty()) {
             createDate = dates.get(0);
         }
-        final List<String> creators = NodeUtilities.getValuesFromPath(node, "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName/gco:CharacterString");
+        final List<String> creators = new ArrayList<>();
+        for (String path : fieldMapping.get("creator")) {
+            creators.addAll(NodeUtilities.getValuesFromPath(node, path));
+        }
         if (!creators.isEmpty()) {
             creator = creators.get(0);
         }
