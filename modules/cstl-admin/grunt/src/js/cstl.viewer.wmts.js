@@ -96,33 +96,21 @@ window.WmtsViewer = {
         WmtsViewer.map.getView().setZoom(WmtsViewer.map.getView().getZoom()+1);
     },
 
-    createLayer : function(layerName, instance, capabilities){
-        var layers = capabilities.contents.layers;
-        var maxExtent = null;
-        var matrixSet = null;
-        for (var i=0; i<layers.length; i++) {
-            var layer = layers[i];
-            if (layer.title === layerName) {
-                maxExtent = layer.bounds;
-                matrixSet = layer.tileMatrixSetLinks[0].tileMatrixSet;
-                break;
-            }
-        }
-
+    createLayer : function(layerName, instance, wmtsValues){
         var wmtslayer = new ol.layer.Tile({
-            extent: WmtsViewer.extent,
+            extent: wmtsValues.dataExtent,
             source: new ol.source.WMTS({
-                url: capabilities.url,
+                url: wmtsValues.url,
                 layer: layerName,
-                matrixSet: matrixSet, //'EPSG:3857'
+                matrixSet: wmtsValues.matrixSet,
                 format: 'image/png',
                 projection: WmtsViewer.projection,
                 tileGrid: new ol.tilegrid.WMTS({
-                    origin: ol.extent.getTopLeft(WmtsViewer.extent),
-                    resolutions: capabilities.resolutions,
-                    matrixIds: capabilities.matrixIds
+                    origin: ol.extent.getTopLeft(wmtsValues.dataExtent),
+                    resolutions: wmtsValues.resolutions,
+                    matrixIds: wmtsValues.matrixIds
                 }),
-                style: 'default'
+                style: wmtsValues.style
             })
         });
 
