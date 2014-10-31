@@ -124,7 +124,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'updateLayerTitle':        {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/layer/update/title;jsessionid='},
             'deleteLayer':             {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/delete/:layerid;jsessionid='},
             'updateLayerStyle':        {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/updatestyle;jsessionid='},
-            'removeLayerStyle':        {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/removestyle;jsessionid='}
+            'removeLayerStyle':        {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/removestyle;jsessionid='},
+            'extractWMTSLayerInfo':    {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/extractLayerInfo/:layerName/:crs;jsessionid=', headers: {'Content-Type': 'application/xml'}}
         });
     })
 
@@ -140,7 +141,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'listCoverage':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/coverage/list/;jsessionid='},
             'pyramidData':          {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/pyramid/create/:dataId/:provider/:dataName;jsessionid='},
             'pyramidConform':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/pyramid/createconform/:providerId/:dataId;jsessionid='},
-            'pyramidScales':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/pyramid/bestscales/:providerId/:dataId;jsessionid='},
+            'pyramidScales':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/pyramid/bestscales/:providerId/:dataId/:crs;jsessionid='},
             'deletePyramidFolder':  {method: 'DELETE',  url: '@cstl/api/1/domain/$domainId/data/pyramid/folder/:providerId;jsessionid='},
             'dataFolder':           {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/datapath/true;jsessionid=', isArray: true},
             'metadataFolder':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadatapath/true;jsessionid=', isArray: true},

@@ -20,6 +20,7 @@
 package org.constellation.rest.api;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IStyleBusiness;
@@ -34,6 +35,12 @@ import org.constellation.dto.AddLayer;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.security.SecurityManager;
+import org.geotoolkit.ows.xml.v110.BoundingBoxType;
+import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.wmts.WMTSUtilities;
+import org.geotoolkit.wmts.xml.v100.*;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -45,8 +52,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -155,7 +162,7 @@ public class MapRest {
     @POST
     @Path("{id}/updatestyle")
     public Response updateLayerStyleForService(final @PathParam("spec") String serviceType, final @PathParam("id") String serviceIdentifier, final ParameterValues params) throws ConfigurationException {
-        styleBusiness.createOrUpdateStyleFromLayer(serviceType,serviceIdentifier,params.get("layerId"), params.get("spId"), params.get("styleName"));
+        styleBusiness.createOrUpdateStyleFromLayer(serviceType, serviceIdentifier, params.get("layerId"), params.get("spId"), params.get("styleName"));
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
@@ -165,6 +172,88 @@ public class MapRest {
         final ParameterValues params) throws ConfigurationException {
         styleBusiness.removeStyleFromLayer(serviceIdentifier, serviceType, params.get("layerId"), params.get("spId"), params.get("styleName"));
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    @POST
+    @Path("{id}/extractLayerInfo/{layerName}/{crs}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML})
+    public Response extractWMTSLayerInfo(final @PathParam("spec") String serviceType,
+                                         final @PathParam("id") String serviceIdentifier,
+                                         final @PathParam("layerName") String layerName,
+                                         final @PathParam("crs") String crs,
+                                         final Capabilities capabilities) throws ConfigurationException {
+        final Map<String,Object> map = new HashMap<>();
+        if(capabilities != null){
+            final ContentsType contents = capabilities.getContents();
+            if(contents != null){
+                final List<LayerType> layertypeList = contents.getLayers();
+                LayerType layerType = null;
+                for(final LayerType lt : layertypeList){
+                    if(layerName.equals(lt.getIdentifier().getValue())){
+                        layerType = lt;
+                        break;
+                    }
+                }
+                if(layerType == null) {
+                    throw new ConstellationException("There is no layer in capabilities with name "+layerName);
+                }
+                final List<TileMatrixSetLink> tmslList = layerType.getTileMatrixSetLink();
+                if(tmslList!=null && !tmslList.isEmpty()){
+                    final TileMatrixSetLink tmsl = tmslList.get(0); //the layer contains only one tilematrixSetLink
+                    if(tmsl != null){
+                        final String matrixSetId = tmsl.getTileMatrixSet();
+                        map.put("matrixSet",matrixSetId);
+
+                        final TileMatrixSet matrixSet = contents.getTileMatrixSetByIdentifier(matrixSetId);
+                        if(matrixSet!=null){
+                            final List<TileMatrix> tileMatrixList = matrixSet.getTileMatrix();
+                            if(tileMatrixList != null){
+                                final List<String> matrixIds = new ArrayList<>();
+                                final List<Double> resolutions = new ArrayList<>();
+                                for(int i=tileMatrixList.size()-1;i>=0;i--){
+                                    final TileMatrix tm = tileMatrixList.get(i);
+                                    matrixIds.add(tm.getIdentifier().getValue());
+
+                                    try{
+                                        final CoordinateReferenceSystem crsObj = CRS.decode(matrixSet.getSupportedCRS());
+                                        final double scale = WMTSUtilities.unitsByPixel(matrixSet, crsObj, tm);
+                                        resolutions.add(scale);
+                                    }catch(Exception ex){
+                                        LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+                                    }
+                                }
+                                map.put("matrixIds",matrixIds.toArray());
+                                map.put("resolutions",resolutions.toArray());
+                            }
+                        }
+                    }
+                }
+                final List<Style> styleList = layerType.getStyle();
+                if(styleList != null && !styleList.isEmpty()){
+                    final Style style = styleList.get(0);
+                    map.put("style",style.getIdentifier().getValue());
+                }
+                final List<WGS84BoundingBoxType> bboxList = layerType.getWGS84BoundingBox();
+                if (bboxList != null && ! bboxList.isEmpty()) {
+                    final WGS84BoundingBoxType bbt = bboxList.get(0);
+                    map.put("dataExtent", Arrays.asList(bbt.getLowerCorner().get(0),
+                            bbt.getLowerCorner().get(1),
+                            bbt.getUpperCorner().get(0),
+                            bbt.getUpperCorner().get(1)).toArray());
+                }else {
+                    final List<BoundingBoxType> bboxList2 = layerType.getBoundingBox();
+                    if (bboxList2 != null && ! bboxList2.isEmpty()) {
+                        final BoundingBoxType bbt = bboxList2.get(0);
+                        map.put("dataExtent", Arrays.asList(bbt.getLowerCorner().get(0),
+                                bbt.getLowerCorner().get(1),
+                                bbt.getUpperCorner().get(0),
+                                bbt.getUpperCorner().get(1)).toArray());
+                    }
+                }
+            }
+        }
+        return Response.ok(map).build();
     }
 
 }

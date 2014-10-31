@@ -115,6 +115,7 @@ import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.geometry.Envelopes;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
@@ -1692,16 +1693,15 @@ public class DataRest {
         }
         return Response.ok(crs instanceof GeographicCRS).build();
     }
-    
+
     @GET
     @Path("pyramid/bestscales/{providerId}/{dataId}/{crs}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response findBestScales(
-            @PathParam("providerId") final String providerId,
-            @PathParam("dataId") final String dataId,
-            @PathParam("crs") final String crs){
-        
+    public Response findBestScales(@PathParam("providerId") final String providerId,
+                                   @PathParam("dataId") final String dataId,
+                                   @PathParam("crs") final String crs){
+
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
         if(inProvider==null){
@@ -1711,7 +1711,7 @@ public class DataRest {
         if(inData==null){
             return Response.ok("Data "+dataId+" does not exist in provider "+providerId).status(400).build();
         }
-        
+
         Envelope dataEnv;
         try {
             //use data crs
@@ -1719,11 +1719,20 @@ public class DataRest {
         } catch (DataStoreException ex) {
             return Response.ok("Failed to extract envelope for data "+dataId).status(500).build();
         }
-        
-        final CoordinateReferenceSystem objCRS = dataEnv.getCoordinateReferenceSystem();
         final Object origin = inData.getOrigin();
-        
         final Object[] scales;
+
+        Envelope env;
+        if(crs == null || crs.isEmpty()){
+            env = dataEnv;
+        }else {
+            try{
+                env = Envelopes.transform(dataEnv, CRS.decode(crs));
+            }catch(Exception ex) {
+                env = dataEnv;
+            }
+        }
+
         if(origin instanceof CoverageReference){
             //calculate pyramid scale levels
             final CoverageReference inRef = (CoverageReference) inData.getOrigin();
@@ -1737,13 +1746,13 @@ public class DataRest {
                 return Response.ok("Failed to extract grid geometry for data "+dataId+". "+ex.getMessage()).status(500).build();
             }
 
-            final double geospanX = dataEnv.getSpan(0);
+            final double geospanX = env.getSpan(0);
             final double baseScale = geospanX / gg.getExtent().getSpan(0);
             final int tileSize = 256;
             double scale = geospanX / tileSize;
-            final GeneralDirectPosition ul = new GeneralDirectPosition(dataEnv.getCoordinateReferenceSystem());
-            ul.setOrdinate(0, dataEnv.getMinimum(0));
-            ul.setOrdinate(1, dataEnv.getMaximum(1));
+            final GeneralDirectPosition ul = new GeneralDirectPosition(env.getCoordinateReferenceSystem());
+            ul.setOrdinate(0, env.getMinimum(0));
+            ul.setOrdinate(1, env.getMaximum(1));
             final List<Double> scalesList = new ArrayList<>();
             while (true) {
                 if (scale <= baseScale) {
@@ -1763,35 +1772,17 @@ public class DataRest {
             //featurecollection or anything else, scales can not be defined accurately.
             //vectors have virtually an unlimited resolution
             //we build scales, to obtain 8 levels, this should be enough for a default case
-            final double geospanX = dataEnv.getSpan(0);
+            final double geospanX = env.getSpan(0);
             final int tileSize = 256;
             scales = new Object[8];
             scales[0] = geospanX / tileSize;
             for(int i=1;i<scales.length;i++){
                 scales[i] = ((Double)scales[i-1]) / 2.0;
             }
-            
+
         }
-        
         final String scalesStr = StringUtilities.toCommaSeparatedValues(scales);
-        
         return Response.ok(new StringList(Collections.singleton(scalesStr))).build();
-        
-//        /**
-//         * Used in SLD/SE to calculate scale for degree CRSs.
-//         * We should use this to calculate a more friendly scale value.
-//         * TODO : move this algo in Javascript, we should see 2 columns : real crs scale + map scale.
-//         */
-//        final double SE_DEGREE_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360;
-//        final double DEFAULT_DPI = 90; // ~ 0.28 * 0.28mm
-//        final double PIXEL_SIZE = 0.0254;
-//    
-//        if(objCRS instanceof GeographicCRS) {
-//            return (dataEnv.getSpan(0) * SE_DEGREE_TO_METERS) / (width / DEFAULT_DPI*PIXEL_SIZE);
-//        } else {
-//            return dataEnv.getSpan(0) / (width / DEFAULT_DPI*PIXEL_SIZE);
-//        }
-        
     }
     
     /**

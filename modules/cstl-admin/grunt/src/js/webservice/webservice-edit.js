@@ -526,20 +526,33 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             viewerData.off('shown.bs.modal');
             viewerData.on('shown.bs.modal', function (e) {
                 var layerName = $scope.selected.Name;
-                //@TODO use ol3 wmts layer
-//                if ($scope.service.type.toLowerCase() === 'wmts') {
-                    // GetCaps
-//                    textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
-//                        .success(function (data, status, headers, config) {
-                // Build map
-//                            var format = ol.format.WMSCapabilities();
-//                            var capabilities = format.read(data);
-//                            var layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, capabilities);
-//                            WmtsViewer.map.addLayer(layerData);
-//                            WmtsViewer.initMap('dataMap');
-//                            WmtsViewer.map.getView().fitExtent(WmtsViewer.maxExtent,WmtsViewer.map.getSize());
-//                        });
-//                } else {
+                if ($scope.service.type.toLowerCase() === 'wmts') {
+                    // Get wmts values: resolutions, extent, matrixSet and matrixIds
+                    textService.capa($scope.service.type.toLowerCase(),
+                                     $scope.service.identifier,
+                                     $scope.service.versions[0])
+                        .success(function(data, status, headers, config) {
+                            webService.extractWMTSLayerInfo({"type":$scope.service.type,
+                                                             "id":$scope.service.identifier,
+                                                             "layerName":layerName,
+                                                             "crs":WmtsViewer.projection},
+                                                             data,
+                                function(response){//success
+                                    var wmtsValues = {
+                                        "url":$cookies.cstlUrl +'WS/wmts/'+ $scope.service.identifier,
+                                        "resolutions": response.resolutions,
+                                        "matrixSet":response.matrixSet,
+                                        "matrixIds":response.matrixIds,
+                                        "style":response.style,
+                                        "dataExtent":response.dataExtent
+                                    };
+                                    var layerwmts = WmtsViewer.createLayer(layerName, $scope.service.identifier, wmtsValues);
+                                    WmtsViewer.layers = [layerwmts];
+                                    WmtsViewer.initMap('dataMap');
+                                    WmtsViewer.map.getView().fitExtent(wmtsValues.dataExtent,WmtsViewer.map.getSize());
+                            });
+                        });
+                } else {
                     var layerData;
                     var providerId = $scope.selected.Provider;
                     if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
@@ -587,7 +600,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                             DataViewer.initMap('dataMap');
                         }
                     );
-//                }
+                }
             });
         };
 

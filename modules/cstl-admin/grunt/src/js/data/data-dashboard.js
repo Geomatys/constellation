@@ -841,7 +841,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         // WMTS params in the last form before closing the popup
         $scope.wmtsParams = false;
         $scope.tileFormat = undefined;
-        $scope.crs = undefined;
+        $scope.crs = "EPSG:3857";
         $scope.scales = [];
         $scope.upperCornerX = undefined;
         $scope.upperCornerY = undefined;
@@ -988,10 +988,12 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                         return;
                     }else {
                         //WMTS pyramid
-                        //using angular.forEach to avoid jsHint warning when decalring function in loop
+                        //using angular.forEach to avoid jsHint warning when declaring function in loop
+                        //@TODO move to server side with a single request
                         angular.forEach($scope.selected, function(layer, key){
                             dataListing.pyramidScales({providerId: layer.Provider,
-                                                       dataId: layer.Name},
+                                                       dataId: layer.Name,
+                                                       crs: $scope.crs},
                                 function(response){//success
                                     $scope.scales = response.Entry[0].split(',');
                                     dataListing.pyramidData({provider: layer.Provider,
