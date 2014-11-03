@@ -26,6 +26,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
          */
         $scope.wrap = {};
         $scope.wrap.nbbypage = 5; // Default value at 5
+        $scope.historySize = 100;
         $scope.hideScroll = true;
 
         $scope.init = function() {
@@ -58,7 +59,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         };
 
         $scope.subscribe = function (task) {
-            TaskService.listRunningTasks({'id':task.id}).$promise
+            TaskService.listRunningTasks({'id':task.id, 'limit':$scope.historySize}).$promise
               .then(function(response){
                     // On success
                     task.statusList = response;
@@ -164,8 +165,6 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
 
         // Open the add task modal
         $scope.showAddTaskPopup = function(idTask) {
-            var id = idTask;
-
             var modal = $modal.open({
                 templateUrl: 'views/tasks/modalAddTask.html',
                 controller: 'ModalAddTaskController',

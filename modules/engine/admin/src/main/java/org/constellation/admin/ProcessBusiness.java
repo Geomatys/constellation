@@ -421,8 +421,8 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @Override
-    public List<org.constellation.engine.register.Task> listRunningTasks(Integer id) {
-        return taskRepository.findRunningTasks(id);
+    public List<org.constellation.engine.register.Task> listRunningTasks(Integer id, Integer offset, Integer limit) {
+        return taskRepository.findRunningTasks(id, offset, limit);
     }
 
     @Override

@@ -18,29 +18,6 @@
  */
 package org.constellation.rest.api;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.stream.XMLStreamException;
-
 import com.google.common.base.Optional;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.admin.exception.ConstellationException;
@@ -55,14 +32,12 @@ import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.TaskParameterWithOwnerName;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.UserRepository;
-
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.chain.model.Chain;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.parameter.ParameterDescriptorWriter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,6 +46,31 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.util.NoSuchIdentifierException;
+
+import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * RestFull API for task management/operations.
@@ -424,11 +424,11 @@ public final class TaskRest {
      * List running tasks.
      */
     @GET
-    @Path("listRunningTasks/{id}")
-    public Response listRunningTaskForTaskParameter(final @PathParam("id") Integer id) {
-        final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks(id);
+    @Path("listRunningTasks/{id}/{limit}")
+    public Response listRunningTaskForTaskParameter(final @PathParam("id") Integer id, final @PathParam("limit") Integer limit) {
+        final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks(id, 0, limit);
 
-        final List<TaskStatusDTO> lst = new ArrayList<>();
+        List<TaskStatusDTO> lst = new ArrayList<>();
         for(org.constellation.engine.register.Task task : tasks) {
             lst.add(toTaskStatus(task));
         }

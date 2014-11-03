@@ -88,7 +88,7 @@ public interface IProcessBusiness {
      * @param id TaskParameter
      * @return
      */
-    List<Task> listRunningTasks(Integer id);
+    List<Task> listRunningTasks(Integer id, Integer offset, Integer limit);
 
     /**
      * Run an instantiated geotk process on scheduler only once.
