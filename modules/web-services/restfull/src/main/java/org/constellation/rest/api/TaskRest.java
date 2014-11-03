@@ -386,6 +386,7 @@ public final class TaskRest {
             tpwon.setProcessAuthority(tp.getProcessAuthority());
             tpwon.setProcessCode(tp.getProcessCode());
             tpwon.setInputs(tp.getInputs());
+            tpwon.setType(tp.getType());
 
             final Optional<CstlUser> byId = userRepository.findById(tp.getOwner());
             if (byId.isPresent()) {
@@ -441,6 +442,8 @@ public final class TaskRest {
         status.setMessage(task.getMessage());
         status.setPercent(task.getProgress() != null ? task.getProgress().floatValue() : 0f);
         status.setStatus(task.getState());
+        status.setStart(task.getStart());
+        status.setEnd(task.getEnd());
 
         final TaskParameter taskParameter = taskParameterRepository.get( task.getTaskParameterId());
         status.setTitle(taskParameter.getName());

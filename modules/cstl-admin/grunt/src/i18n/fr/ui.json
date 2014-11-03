@@ -1040,7 +1040,11 @@
     "tasks.plan.label.everyDay":"Touts les jours",
     "tasks.plan.label.everyMonth":"Touts les mois",
     "tasks.plan.label.everyWeek":"Toutes les semaines",
-
+    "task.history":"Historique",
+    "task.history.date":"Date",
+    "task.history.state":"Etat",
+    "task.history.error.msg":"Message d'erreur",
+    "tasks.history.show.error":"Voir le message d'erreur",
 
     "mapcontext.information.title":"Compositions cartographiques disponibles",
 

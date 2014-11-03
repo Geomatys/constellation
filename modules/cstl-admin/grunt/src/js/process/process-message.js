@@ -1,15 +1,15 @@
 /*
  * Constellation - An open source and standard compliant SDI
  *
- *    http://www.constellation-sdi.org
+ *     http://www.constellation-sdi.org
  *
- *    Copyright 2014 Geomatys.
+ *     Copyright 2014 Geomatys
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,19 +18,10 @@
  * limitations under the License.
  */
 
-// Bootstrap
-@import "../../lib/bootstrap/less/variables";
-@import "../../lib/bootstrap/less/mixins";
+angular.module('cstl-process-message', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-// Constellation
-@import "variables";
-@import "mixins";
-@import "type";
-@import "header";
-@import "main";
-@import "admin";
-@import "style-sld";
-@import "metadata";
-@import "dataset";
-@import "tasks";
-@import "footer";
+    .controller('ModalStatusMessageController', function($scope, $modalInstance, Growl, textService, TaskService, taskStatus) {
+        $scope.taskStatus = taskStatus;
+        $scope.close = $scope.cancel = $modalInstance.close;
+    });
+

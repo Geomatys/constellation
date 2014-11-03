@@ -111,22 +111,13 @@
                 </div>
                 <div class="pull-left" style="width: 40%;">
                     <div id="selection">
-                        <div class="alert alert-task alert-info alert-data" ng-class="{hide: selected != null}">
+                        <div class="alert alert-task alert-info alert-data" ng-if="selected === null">
                             <h4 translate="label.no.selected.task">No selected task</h4>
                             <p translate="msg.no.selected.task" style="font-weight:normal;">Click on a data to display more information</p>
                         </div>
-                        <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
+                        <div class="selected-item" id="selected-item" ng-if="selected !== null">
                             <div class="block-header block-header-process" ng-click="toggleUpDownSelected()">
                                 <strong class="item-title title-bloc" title="{{selected.Name}}">{{truncateTitleBlock(selected.name)}}</strong><i class="fa fa-chevron-down pull-right"></i>
-                            </div>
-                            <div class="block-content" ng-if="selectedProcessChild != null">
-                                <h6 translate="label.title">Title</h6>
-                                <span>{{selectedProcessChild.id}}</span>
-
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2"><img src="img/block-content-description.svg" alt="" /></div>
-                                    <div class="col-sm-9 col-md-10 description-text">{{selectedProcessChild.description}}</div>
-                                </div>
                             </div>
                             <div class="block-action block-action-process">
                                 <div class="row">
@@ -170,6 +161,37 @@
                                             </button>
                                         </span>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="block-content block-content-process">
+                                <h6 translate="task.history">History</h6>
+
+                                <div class="row description-block">
+                                   <table class="table table-condensed table-hover task-history"
+                                          fixed-header table-height="200px" ng-model="selected.statusList">
+                                       <thead>
+                                            <tr>
+                                                <th translate="task.history.date">Date</th>
+                                                <th translate="task.history.state">Status</th>
+                                                <th></th>
+                                            </tr>
+                                       </thead>
+                                       <tbody>
+                                           <tr ng-repeat="status in selected.statusList | filter:statusHistoryFilter | orderBy:-end:false"
+                                                   ng-class="statusClass(status)"
+                                                   style="line-height: 20px">
+                                               <td>{{status.end | date:"dd/MM/yyyy h:mma"}}</td>
+                                               <td>{{status.status}}</td>
+                                               <td>
+                                                   <span ng-show="status.status === 'FAILED'" ng-click="showMessage(status)"
+                                                         title="{{'tasks.history.show.error' | translate }}" tooltip
+                                                         style="display: inline-block; cursor: pointer;">
+                                                       <i class="glyphicon glyphicon-info-sign"/>
+                                                   </span>
+                                               </td>
+                                           </tr>
+                                       </tbody>
+                                   </table>
                                 </div>
                             </div>
                         </div>

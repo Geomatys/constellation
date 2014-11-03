@@ -20,4 +20,5 @@
 
 angular.module('cstl-process', ['cstl-process-dashboard',
                                 'cstl-process-edit',
-                                'cstl-process-plan']);
+                                'cstl-process-plan',
+                                'cstl-process-message']);

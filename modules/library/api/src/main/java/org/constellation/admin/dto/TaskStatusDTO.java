@@ -33,6 +33,8 @@ public class TaskStatusDTO {
     private float percent;
     private String message;
     private String schedule;
+    private Long start;
+    private Long end;
 
     public TaskStatusDTO() {
     }
@@ -92,5 +94,20 @@ public class TaskStatusDTO {
     public void setSchedule(String schedule) {
         this.schedule = schedule;
     }
-    
+
+    public Long getStart() {
+        return start;
+    }
+
+    public void setStart(Long start) {
+        this.start = start;
+    }
+
+    public Long getEnd() {
+        return end;
+    }
+
+    public void setEnd(Long end) {
+        this.end = end;
+    }
 }

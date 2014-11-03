@@ -25,16 +25,19 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
-
-
         $scope.wrap.nbbypage = 5; // Default value at 5
         $scope.hideScroll = true;
 
         $scope.init = function() {
-            TaskService.listParamsTaskByType({'type':''}).$promise
+            TaskService.listParamsTask().$promise
                 .then(function(response){
+
+                    var filterList = response.filter(function (task) {
+                        return task.type !== 'INTERNAL';
+                    });
+
                     // On success
-                    Dashboard($scope, response, false);
+                    Dashboard($scope, filterList, false);
                     //connect to websocket
                     StompService.connect();
                 }).catch(function(){
@@ -91,23 +94,15 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
             StompService.disconnect();
         });
 
-        $scope.runningTask = function(task){
-            var runningTasks = [];
-            task.statusList.forEach(function (elem) {
-
-                task.statusList[elem.id] = elem;
-            });
-        };
-
         $scope.select = function(item) {
             var oldSelect = $scope.selected;
+            $scope.selected = null;
             if (oldSelect !== null) {
                 oldSelect.topic.unsubscribe();
+                oldSelect.topic = null;
             }
 
-            if ($scope.selected === item) {
-                $scope.selected = null;
-            } else {
+            if (oldSelect !== item) {
                 $scope.selected = item;
                 $scope.subscribe(item);
             }
@@ -163,7 +158,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
 
         $scope.toggleUpDownSelected = function() {
             var $header = $('#ProcessDashboard').find('.selected-item').find('.block-header');
-            $header.next().slideToggle(200);
+            $header.nextAll().slideToggle(200);
             $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
         };
 
@@ -192,6 +187,36 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
             modal.result.then(function(){
                 $scope.init();
             });
+        };
+
+        // Open task status message popup
+        $scope.showMessage = function(taskStatus) {
+            var modal = $modal.open({
+                templateUrl: 'views/tasks/modalStatusMessage.html',
+                controller: 'ModalStatusMessageController',
+                resolve : {
+                    'taskStatus' : function () {return taskStatus;}
+                }
+            });
+        };
+
+        $scope.statusClass = function(status) {
+            if (status.status === 'FAILED' || status.status === 'CANCELLED') {
+                return "danger";
+            }
+            if (status.status === 'SUCCEED') {
+                return "success";
+            }
+        };
+
+        $scope.statusHistoryFilter = function(status) {
+            if (status.status === 'FAILED' ||
+                status.status === 'CANCELLED' ||
+                status.status === 'SUCCEED') {
+                return true;
+            }
+
+            return false;
         };
 
         $scope.truncate = function(small, text){

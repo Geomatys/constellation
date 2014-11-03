@@ -1048,7 +1048,7 @@
     "tasks.information.edit":"Edit task",
     "tasks.information.execute":"Execute task",
     "tasks.information.duplicate":"Duplicate task",
-    "tasks.information.planning":"Plan execution",
+    "tasks.information.planning":"Schedule execution",
     "tasks.information.delete":"Delete task",
     "tasks.information.title":"Available tasks",
     "tasks.notask":"No current process",
@@ -1064,6 +1064,11 @@
     "tasks.plan.label.everyDay":"Every day",
     "tasks.plan.label.everyMonth":"Every month",
     "tasks.plan.label.everyWeek":"Every week",
+    "task.history":"History",
+    "task.history.date":"Date",
+    "task.history.state":"State",
+    "task.history.error.msg":"Error message",
+    "tasks.history.show.error":"Show error message",
 
     "mapcontext.information.title":"Available map context",
 
