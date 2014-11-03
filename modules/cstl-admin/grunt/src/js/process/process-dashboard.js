@@ -78,12 +78,16 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                 });
                 var status = filter[0];
                 if (status) {
-                    status.percent = event.percent;
-                    $scope.$digest();
+                    $scope.$apply( function (){
+                        status.percent = event.percent;
+                        status.status = event.status;
+                        status.end = event.end;
+                    });
                 } else {
                     // New execution
-                    task.statusList.push(event);
-                    $scope.$digest();
+                    $scope.$apply( function (){
+                        task.statusList.unshift(event);
+                    });
                 }
             });
         };
@@ -105,7 +109,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
 
             if (oldSelect !== item) {
                 $scope.selected = item;
-                $scope.subscribe(item);
+                $scope.subscribe($scope.selected);
             }
         };
 

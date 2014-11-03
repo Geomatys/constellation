@@ -87,7 +87,7 @@ public class QuartzJobListener implements JobListener {
         taskEntity.setType(""); // TODO
         processBusiness.addTask(taskEntity);
 
-        final ProcessListener listener = new StateListener(taskEntity.getIdentifier(), processBusiness);
+        final ProcessListener listener = new StateListener(taskEntity.getIdentifier(), processBusiness, quartzTask.getTitle() );
         pj.addListener(listener);
         LOGGER.log(Level.INFO, "Run task "+taskEntity.getIdentifier());
     }
@@ -111,13 +111,15 @@ public class QuartzJobListener implements JobListener {
     private static class StateListener implements ProcessListener{
     
         private final String taskId;
+        private final String title;
         private final IProcessBusiness processBusiness;
         private final org.constellation.engine.register.Task taskEntity;
 
-        public StateListener(String taskId, IProcessBusiness processBusiness) {
+        public StateListener(String taskId, IProcessBusiness processBusiness, String title) {
             this.taskId = taskId;
             this.processBusiness = processBusiness;
-            taskEntity = processBusiness.getTask(taskId);
+            this.taskEntity = processBusiness.getTask(taskId);
+            this.title = title;
         }
         
         @Override
@@ -184,9 +186,12 @@ public class QuartzJobListener implements JobListener {
             final TaskStatusDTO taskStatus = new TaskStatusDTO();
             taskStatus.setId(taskEntity.getIdentifier());
             taskStatus.setTaskId(taskEntity.getTaskParameterId());
+            taskStatus.setTitle(title);
             taskStatus.setStatus(taskEntity.getState());
             taskStatus.setMessage(taskEntity.getMessage());
             taskStatus.setPercent(taskEntity.getProgress().floatValue());
+            taskStatus.setStart(taskEntity.getStart());
+            taskStatus.setEnd(taskEntity.getEnd());
             SpringHelper.sendEvent(taskStatus);
         }
 
