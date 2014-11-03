@@ -43,6 +43,12 @@ public class LegendTemplate implements Serializable {
     
     @XmlElement(name="MainFont")
     private String mainFont;
+
+    @XmlElement(name="MainFontColor")
+    private String mainFontColor;
+
+    @XmlElement(name="MainFontOpacity")
+    private Float mainFontOpacity;
     
     @XmlElement(name="SecondFont")
     private String secondFont;
@@ -109,6 +115,22 @@ public class LegendTemplate implements Serializable {
         this.mainFont = mainFont;
     }
 
+    public String getMainFontColor() {
+        return mainFontColor;
+    }
+
+    public void setMainFontColor(String mainFontColor) {
+        this.mainFontColor = mainFontColor;
+    }
+
+    public Float getMainFontOpacity() {
+        return mainFontOpacity;
+    }
+
+    public void setMainFontOpacity(Float mainFontOpacity) {
+        this.mainFontOpacity = mainFontOpacity;
+    }
+
     public String getSecondFont() {
         return secondFont;
     }
@@ -156,7 +178,12 @@ public class LegendTemplate implements Serializable {
         }else{
             glyphSize = null;
         }
-        
+
+        if (mainFontColor != null && !mainFontColor.isEmpty()) {
+            final Color mainColor = Color.decode(mainFontColor);
+            return new DefaultLegendTemplate(dispBackground, gap, glyphSize, mainF, layerVisible, secondF, mainColor,
+                    mainFontOpacity != null ? mainFontOpacity : 255f, false);
+        }
         return new DefaultLegendTemplate(dispBackground, gap, glyphSize, mainF, layerVisible, secondF);
     }
     
