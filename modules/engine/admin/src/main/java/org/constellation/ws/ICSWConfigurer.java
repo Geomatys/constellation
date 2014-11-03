@@ -85,5 +85,7 @@ public interface ICSWConfigurer {
     int getMetadataCount(final String id) throws ConfigurationException;
 
     StringList getAvailableCSWDataSourceType();
+    
+    String getImplementation(final String id) throws ConfigurationException;
    
 }

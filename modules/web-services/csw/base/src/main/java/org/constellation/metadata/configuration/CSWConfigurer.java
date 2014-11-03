@@ -761,4 +761,13 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
         final AbstractCSWFactory factory = getCSWFactory(serviceID);
         return factory.getTemplateName(metadataID, type);
     }
+
+    @Override
+    public String getImplementation(final String serviceID) throws ConfigurationException {
+        final Automatic config = getServiceConfiguration(serviceID);
+        if (config != null) {
+            return config.getFormat();
+        }
+        return null;
+    }
 }
