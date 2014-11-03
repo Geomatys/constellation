@@ -81,6 +81,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                     $scope.$apply( function (){
                         status.percent = event.percent;
                         status.status = event.status;
+                        status.message = event.message;
                         status.end = event.end;
                     });
                 } else {

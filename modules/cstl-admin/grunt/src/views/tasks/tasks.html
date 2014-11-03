@@ -80,10 +80,12 @@
                                         </div>
 
                                         <div class="block pull-right">
-                                            <i class="fa fa-paperclip"></i>
-                                            <span ng-if="task.processes == null || task.processes.length == 0" translate="md.listing.no.data">No</span>
-                                            <span ng-if="task.processes.length > 0">{{task.processes.length}}</span>
-                                            <span translate="service.edit.dashboard.tasks.list.associated">associated tasks</span>
+                                            <div ng-if="task.statusList.length > 0">
+                                                <i class="fa fa-paperclip"></i>
+                                                <span ng-if="task.statusList.length > 0">{{task.statusList.length}}</span>
+                                                <span translate="service.edit.dashboard.tasks.list.associated">associated tasks</span>
+                                            </div>
+                                            <!--<span ng-if="task.statusList == null ||task.statusList.length == 0" translate="md.listing.no.data">No</span>-->
                                         </div>
                                     </div>
                                 </div>
@@ -92,7 +94,7 @@
                                      ng-repeat="exec in task.statusList | filter:{ status: 'RUNNING'}"
                                      ng-class="{'selected':process===selectedProcessChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}">
                                     <div class="top">
-                                        <div class="progress progress-striped" style="margin:10px;">
+                                        <div class="progress progress-striped" style="margin:5px;">
                                             <div class="progress-bar progress-bar-success" role="progressbar"
                                                  aria-valuenow="0"
                                                  aria-valuemin="0"
@@ -101,12 +103,15 @@
                                                 {{exec.percent}}%
                                             </div>
                                         </div>
-                                        <!--<span class="item-title" title="{{exec.id}}">{{truncate(small,exec.id)}}</span>-->
+                                    </div>
+                                    <div class="bottom">
+                                        <div class="block">
+                                            <span title="{{exec.message}}">{{truncate(false, exec.message)}}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">

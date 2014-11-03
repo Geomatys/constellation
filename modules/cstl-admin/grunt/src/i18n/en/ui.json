@@ -664,7 +664,7 @@
     "service.edit.dashboard.action.add.layer": "Add Layer",
     "service.edit.dashboard.sensors.list":"Available sensors",
     "service.edit.dashboard.sensors.list.associated": "associated sensors",
-    "service.edit.dashboard.tasks.list.associated": "associated tasks",
+    "service.edit.dashboard.tasks.list.associated": "execution status",
     "service.edit.dashboard.tasks.list": "Available tasks",
     "service.edit.dashboard.mapcontext.list.associated": "associated data",
     "service.edit.dashboard.mapcontext.list": "available map context",
