@@ -562,7 +562,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         }
                     };
                     var paletteRule = {
-                        "name": 'palette-rule',
+                        "name": 'palette-rule-'+new Date().getTime(),
                         "title":'',
                         "description":'',
                         "maxScale":500000000,
@@ -613,7 +613,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         }
                     };
                     var cellRule = {
-                        "name": 'cell-rule',
+                        "name": 'cell-rule-'+new Date().getTime(),
                         "title":'',
                         "description":'',
                         "maxScale":500000000,
@@ -769,7 +769,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     }
                     var xArray=[],yArray=[];
                     if($scope.dataBandsRepartition[selectedBand]){
-                        var repartitionBand = $scope.dataBandsRepartition[selectedBand].repartition;
+                        var repartitionBand = $scope.dataBandsRepartition[selectedBand].fullDistribution;
                         for(var key in repartitionBand){
                             if(repartitionBand.hasOwnProperty(key)){
                                 xArray.push(key);
@@ -1640,7 +1640,9 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     //get interpolation points for ui
                     if ($scope.optionsSLD.rasterPalette.palette.index) {
                         //show palette
-                        style.paletteStyle({provider: 'sld_temp', name : $scope.newStyle.name, ruleName : $scope.optionsSLD.selectedRule.name},
+                        style.paletteStyle({provider: 'sld_temp',
+                                            name : $scope.newStyle.name,
+                                            ruleName : $scope.optionsSLD.selectedRule.name},
                             function(response) {
                                 if(response.points){
                                     $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points = response.points;
@@ -1653,7 +1655,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                                         var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
                                         var xArray=[],yArray=[];
                                         if($scope.dataBandsRepartition[selectedBand]){
-                                            var repartition = $scope.dataBandsRepartition[selectedBand].repartition;
+                                            var repartition = $scope.dataBandsRepartition[selectedBand].fullDistribution;
                                             for(var key in repartition){
                                                 if(repartition.hasOwnProperty(key)){
                                                     xArray.push(key);
