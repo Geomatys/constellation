@@ -68,15 +68,10 @@ public class AddMetadaProcess extends AbstractCstlProcess {
         final Boolean refresh   = value(REFRESH, inputParameters);
         try {
             final CSWConfigurer configurer = (CSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
-            if (configurer.metadataExist(serviceID, metadataID).getStatus().equalsIgnoreCase("Exist")) {
-                throw new ProcessException("The metadata is already present in CSW:" + metadataID, this, null);
-            } else {
-                configurer.importRecords(serviceID, metadataFile, metadataFile.getName());
-                if (refresh) {
-                    final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", serviceID);
-                    worker.refresh();
-                }
-                
+            configurer.importRecords(serviceID, metadataFile, metadataFile.getName());
+            if (refresh) {
+                final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", serviceID);
+                worker.refresh();
             }
         } catch (ConfigurationException | CstlServiceException ex) {
             throw new ProcessException(null, this, ex);
