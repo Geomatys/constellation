@@ -54,6 +54,11 @@
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
        <groupId>org.constellation.testing</groupId>

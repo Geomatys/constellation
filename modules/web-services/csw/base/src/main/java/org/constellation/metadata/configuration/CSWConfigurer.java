@@ -445,6 +445,26 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
             throw new ConfigurationException(ex);
         }
     }
+    
+    @Override
+    public List<Node> getFullMetadataList(final String id, final int count, final int startIndex, MetadataType type) throws ConfigurationException {
+        final CSWMetadataReader reader = getReader(id);
+        try {
+            final List<Node> results = new ArrayList<>();
+            final List<String> ids = reader.getAllIdentifiers();
+            if (startIndex >= ids.size()) {
+                return results;
+            }
+
+            for (int i = startIndex; i<ids.size() && i<startIndex + count; i++) {
+                results.add(reader.getMetadata(ids.get(i), type));
+            }
+            return results;
+        } catch (MetadataIoException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+
 
     @Override
     public Node getMetadata(final String id, final String metadataName) throws ConfigurationException {

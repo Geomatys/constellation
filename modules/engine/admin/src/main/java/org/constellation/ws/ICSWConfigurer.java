@@ -24,6 +24,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
+import org.constellation.metadata.io.MetadataType;
 import org.w3c.dom.Node;
 
 /**
@@ -76,6 +77,8 @@ public interface ICSWConfigurer {
     AcknowlegementType metadataExist(final String id, final String metadataName) throws ConfigurationException;
 
     List<BriefNode> getMetadataList(final String id, final int count, final int startIndex) throws ConfigurationException;
+    
+    List<Node> getFullMetadataList(final String id, final int count, final int startIndex, MetadataType type) throws ConfigurationException;
 
     Node getMetadata(final String id, final String metadataName) throws ConfigurationException;
     
