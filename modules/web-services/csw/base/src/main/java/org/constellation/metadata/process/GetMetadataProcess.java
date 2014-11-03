@@ -62,12 +62,8 @@ public class GetMetadataProcess extends AbstractCstlProcess {
 
         try {
             final CSWConfigurer configurer = (CSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
-            if (configurer.metadataExist(serviceID, metadataID).getStatus().equalsIgnoreCase("Exist")) {
-                throw new ProcessException("The metadata is already present in CSW", this, null);
-            } else {
-                final Node n = configurer.getMetadata(serviceID, metadataID);
-                getOrCreate(METADATA, outputParameters).setValue(n);
-            }
+            final Node n = configurer.getMetadata(serviceID, metadataID);
+            getOrCreate(METADATA, outputParameters).setValue(n);
         } catch (ConfigurationException ex) {
             throw new ProcessException(null, this, ex);
         }
