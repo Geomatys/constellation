@@ -26,6 +26,7 @@ import org.geotoolkit.util.ImageIOUtilities;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -33,7 +34,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -92,8 +92,17 @@ public class StreamResponseWriter implements MessageBodyWriter<TileReference>  {
                     stream = ((URI) input).toURL().openStream();
                 } else if (input instanceof File) {
                     stream = new FileInputStream((File) input);
+                }else if (input instanceof ImageInputStream) {
+                    final ImageInputStream iis = (ImageInputStream) input;
+                    final byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    while ((bytesRead = iis.read(buffer)) >= 0) {
+                        baos.write(buffer, 0, bytesRead);
+                    }
+                    stream = new ByteArrayInputStream(baos.toByteArray());
                 } else {
-                    LOGGER.log(Level.WARNING, "Unsupported tyle type : {0}", input.getClass());
+                    LOGGER.log(Level.WARNING, "Unsupported tile type : {0}", input.getClass());
                     return;
                 }
             }
