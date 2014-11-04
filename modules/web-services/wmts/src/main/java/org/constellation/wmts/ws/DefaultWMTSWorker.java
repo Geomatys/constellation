@@ -51,7 +51,6 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
-import org.geotoolkit.metadata.Citations;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
@@ -114,11 +113,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Level;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * Working part of the WMTS service.
@@ -568,20 +563,25 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final String level            = request.getTileMatrix();
 
         if (columnIndex < 0 || rowIndex < 0) {
-            throw new CstlServiceException("TileCol and TileRow must be positive integers. Received position : " +
-                    new Point(columnIndex, rowIndex), INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException("Operation request contains an invalid parameter value, " +
+                    "TileCol and TileRow must be positive integers. Received position : " +
+                    new Point(columnIndex, rowIndex), INVALID_PARAMETER_VALUE, "TileCol or TileRow");
         }
 
         try {
             final Data details = getLayerReference(userLogin, layerName);
             if(details == null){
-                throw new CstlServiceException("No layer for name : " + layerName , INVALID_PARAMETER_VALUE, "layerName");
+                throw new CstlServiceException("Operation request contains an invalid parameter value, " +
+                        "No layer for name : " + layerName ,
+                        INVALID_PARAMETER_VALUE, "layerName");
             }
 
             final Object origin = details.getOrigin();
             if(!(origin instanceof PyramidalCoverageReference)){
                 //WMTS only handle PyramidalCoverageReference
-                throw new CstlServiceException("Invalid layer :" + layerName + " , layer is not a pyramid model" + layerName, INVALID_PARAMETER_VALUE, "layerName");
+                throw new CstlServiceException("Operation request contains an invalid parameter value, " +
+                        "invalid layer : " + layerName + " , layer is not a pyramid model " + layerName,
+                        INVALID_PARAMETER_VALUE, "layerName");
             }
 
             final PyramidSet set = ((PyramidalCoverageReference)origin).getPyramidSet();
@@ -593,7 +593,9 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 }
             }
             if(pyramid == null){
-                throw new CstlServiceException("Undefined matrixSet:" + matrixSetName + " for layer:" + layerName, INVALID_PARAMETER_VALUE, "tilematrixset");
+                throw new CstlServiceException("Operation request contains an invalid parameter value," +
+                        " undefined matrixSet: " + matrixSetName + " for layer: " + layerName,
+                        INVALID_PARAMETER_VALUE, "tilematrixset");
             }
 
             GridMosaic mosaic = null;
@@ -615,14 +617,18 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             }
 
             if (mosaic == null) {
-                throw new CstlServiceException("Undefined matrix:" + level + " for matrixSet:" + matrixSetName, INVALID_PARAMETER_VALUE, "tilematrix");
+                throw new CstlServiceException("Operation request contains an invalid parameter value," +
+                        " undefined matrix: " + level + " for matrixSet: " + matrixSetName,
+                        INVALID_PARAMETER_VALUE, "tilematrix");
             }
 
             if (columnIndex >= mosaic.getGridSize().width) {
-                throw new CstlServiceException("TileCol out of band" + columnIndex + " > " +  mosaic.getGridSize().width, INVALID_PARAMETER_VALUE, "tilecol");
+                throw new CstlServiceException("TileCol out of range, expected value < "+mosaic.getGridSize().width+" but got " + columnIndex,
+                        TILE_OUT_OF_RANGE, "tilecol");
             }
             if (rowIndex >= mosaic.getGridSize().height) {
-                throw new CstlServiceException("TileRow out of band" + rowIndex + " > " +  mosaic.getGridSize().height, INVALID_PARAMETER_VALUE, "tilerow");
+                throw new CstlServiceException("TileRow out of range, expected value < " + mosaic.getGridSize().height + " but got "+rowIndex,
+                        TILE_OUT_OF_RANGE, "tilerow");
             }
 
             if (mosaic.isMissing(columnIndex, rowIndex)) {
@@ -631,8 +637,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 return mosaic.getTile(columnIndex, rowIndex, null);
             }
 
+        } catch(CstlServiceException ex) {
+            throw ex;
         } catch(Exception ex) {
-            throw new CstlServiceException("Unexpected error while retrieving layer : "+ layerName, ex , NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Unexpected error for operation GetTile  : "+ layerName, ex , NO_APPLICABLE_CODE);
         }
 
     }
