@@ -269,17 +269,7 @@ public class CSWServicesRest {
                 final Metadata metadata = configurer.getMetadataFromNode(id, node);
                 if(metadata!=null){
                     //get template name
-                    final String templateName;
-                    if ("vector".equalsIgnoreCase(type)) {
-                        //vector template
-                        templateName = "profile_default_vector";
-                    } else if ("raster".equalsIgnoreCase(type)){
-                        //raster template
-                        templateName = "profile_default_raster";
-                    }else {
-                        //default template is import
-                        templateName = "profile_import";
-                    }
+                    final String templateName = configurer.getTemplateName(id, metaID, type);
                     final Template template = Template.getInstance(templateName);
                     template.read(metadataValues,metadata,false);
                     // Save metadata

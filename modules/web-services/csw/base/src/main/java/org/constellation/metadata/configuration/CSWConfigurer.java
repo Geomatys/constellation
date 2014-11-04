@@ -438,7 +438,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
             final Map<String , List<String>> fieldMap = factory.getBriefFieldMap();
 
             for (int i = startIndex; i<ids.size() && i<startIndex + count; i++) {
-                results.add(new BriefNode(reader.getMetadata(ids.get(i), MetadataType.ISO_19115), fieldMap));
+                results.add(new BriefNode(reader.getMetadata(ids.get(i), MetadataType.NATIVE), fieldMap));
             }
             return results;
         } catch (MetadataIoException ex) {
@@ -470,7 +470,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
     public Node getMetadata(final String id, final String metadataName) throws ConfigurationException {
         final CSWMetadataReader reader = getReader(id);
         try {
-            return reader.getMetadata(metadataName, MetadataType.ISO_19115);
+            return reader.getMetadata(metadataName, MetadataType.NATIVE);
         } catch (MetadataIoException ex) {
             throw new ConfigurationException(ex);
         }

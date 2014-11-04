@@ -26,10 +26,13 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.opengis.util.FactoryException;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.util.CharSequences;
 import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.json.metadata.binding.*;
 
 
@@ -40,6 +43,8 @@ import org.constellation.json.metadata.binding.*;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class FormReader {
+    private final static Logger LOGGER = Logging.getLogger(FormReader.class);
+    
     /**
      * For iterating over the lines of the JSON file to parse.
      */
@@ -156,6 +161,9 @@ final class FormReader {
             return null;
         }
         final String[] components = (String[]) CharSequences.split(path, Keywords.PATH_SEPARATOR);
+        if (components.length > indices.length) {
+            LOGGER.log(Level.WARNING, "Error parsing path:{0}", path);
+        }
         Arrays.fill(indices, 0, components.length, 0);
         NumberFormatException cause = null;
         for (int i=0; i<components.length; i++) {
