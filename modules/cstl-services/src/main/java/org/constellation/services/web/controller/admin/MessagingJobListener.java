@@ -32,8 +32,6 @@ import javax.inject.Singleton;
  * Quartz job listener that register a geotk process listener each time the job is executed.
  * And send messages on websocket "/topic/taskevents*" topic.
  *
- * TODO for a clustering support this mechanism should be changed to directly listen to database updates.
- *
  * @author Quentin Boileau (Geomatys)
  */
 @Named
