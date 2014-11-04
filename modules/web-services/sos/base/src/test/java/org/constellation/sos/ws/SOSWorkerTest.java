@@ -935,7 +935,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
 
         assertEquals(result.getMember().size(), 1);
 
-        assertEquals(result.getMember().iterator().next().getName(), "urn:ogc:object:observation:GEOM:304");
+        assertEquals(result.getMember().iterator().next().getName().getCode(), "urn:ogc:object:observation:GEOM:304");
 
         /**
          *  Test 6: getObservation with procedure urn:ogc:object:sensor:GEOM:3

@@ -201,7 +201,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         final FieldType ft = new FieldType();
         ft.setIndexed(true);
         ft.setStored(true);
-        doc.add(new Field("id", observation.getName(), ft));
+        doc.add(new Field("id", observation.getName().getCode(), ft));
         if (observation instanceof MeasurementType) {
             doc.add(new Field("type", "measurement" , ft));
         } else {
@@ -209,7 +209,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         }
         doc.add(new Field("procedure", ((Process)observation.getProcedure()).getHref(), ft));
 
-        doc.add(new Field("observed_property",   ((Phenomenon)observation.getObservedProperty()).getName(), ft));
+        doc.add(new Field("observed_property",   ((Phenomenon)observation.getObservedProperty()).getName().getCode(), ft));
 
         doc.add(new Field("feature_of_interest", ((AbstractGML)observation.getFeatureOfInterest()).getId(), ft));
 
@@ -247,7 +247,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
      */
     @Override
     protected String getIdentifier(Observation obj) {
-        return obj.getName();
+        return obj.getName().getCode();
     }
 
     /**

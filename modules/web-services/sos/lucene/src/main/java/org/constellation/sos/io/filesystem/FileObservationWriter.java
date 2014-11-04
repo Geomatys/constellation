@@ -133,7 +133,7 @@ public class FileObservationWriter implements ObservationWriter {
                 writeFeatureOfInterest((SamplingFeature) observation.getFeatureOfInterest());
             }
             indexer.indexDocument(observation);
-            return observation.getName();
+            return observation.getName().getCode();
         } catch (JAXBException | IOException ex) {
             throw new DataStoreException("Exception while marshalling the observation file.", ex);
         }
@@ -146,10 +146,10 @@ public class FileObservationWriter implements ObservationWriter {
     public String writeObservation(final Observation observation) throws DataStoreException {
         try {
             final File observationFile;
-            if (observation.getName().startsWith(observationTemplateIdBase)) {
-                observationFile = new File(observationTemplateDirectory, observation.getName() + FILE_EXTENSION);
+            if (observation.getName().getCode().startsWith(observationTemplateIdBase)) {
+                observationFile = new File(observationTemplateDirectory, observation.getName().getCode() + FILE_EXTENSION);
             } else {
-                observationFile = new File(observationDirectory, observation.getName() + FILE_EXTENSION);
+                observationFile = new File(observationDirectory, observation.getName().getCode() + FILE_EXTENSION);
             }
             if (observationFile.exists()) {
                 final boolean created      = observationFile.createNewFile();
@@ -169,7 +169,7 @@ public class FileObservationWriter implements ObservationWriter {
                 writeFeatureOfInterest((SamplingFeature) observation.getFeatureOfInterest());
             }
             indexer.indexDocument(observation);
-            return observation.getName();
+            return observation.getName().getCode();
         } catch (JAXBException | IOException ex) {
             throw new DataStoreException("Exception while marshalling the observation file.", ex);
         }
