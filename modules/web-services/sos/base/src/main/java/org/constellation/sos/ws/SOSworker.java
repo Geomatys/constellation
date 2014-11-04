@@ -1361,8 +1361,7 @@ public class SOSworker extends AbstractWorker {
                 final List<Observation> observations = new ArrayList<>();
                 for (Observation o : matchingResult) {
                     if (template) {
-
-                        final String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
+                        final String temporaryTemplateId = o.getName().getCode() + '-' + getTemplateSuffix(o.getName().getCode());
                         final AbstractObservation temporaryTemplate = ((AbstractObservation) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
 
                         // Remove the default templateTime

@@ -199,7 +199,7 @@ public final class Normalizer {
                 } else if (featProp.getAbstractFeature() != null) {
                     final AbstractFeature feature = featProp.getAbstractFeature();
                     if (feature.getName() != null) {
-                        return feature.getName();
+                        return feature.getName().getCode();
                     } else if (feature.getId() != null) {
                         return feature.getId();
                     }
