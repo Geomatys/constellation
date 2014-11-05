@@ -71,7 +71,7 @@ angular.module('CstlIndexApp', [
     .controller('HeaderController', function($scope, $http, $cookies) {
         $http.get('app/conf').success(function(data) {
             $cookies.cstlUrl = data.cstl;
-            $scope.cstlLoginUrl = data.cstl + 'spring/auth/form';
+            $scope.cstlLoginUrl = 'login.html';
             $scope.cstlLogoutUrl = data.cstl + 'logout';
         });
     })

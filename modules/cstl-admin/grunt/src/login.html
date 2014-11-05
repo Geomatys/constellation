@@ -1,0 +1,86 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" ng-app="cstlLoginApp">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>cstl-admin</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+  <!-- build:css(.tmp) styles/main.css -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/jquery.min.css">
+  <link rel="stylesheet" href="css/angular.min.css">
+  <link rel="stylesheet" href="css/c3.min.css">
+  <link rel="stylesheet" href="css/famfamfam-flags.min.css">
+  <link rel="stylesheet" href="css/highlight.min.css">
+  <link rel="stylesheet" href="css/cstl.css">
+  <link rel="stylesheet" href="css/openlayers.min.css">
+
+    <!-- endbuild -->
+</head>
+<body ng-controller="login">
+<!--[if lt IE 10]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+<div class="header">
+    <div class="row" style="margin:0;">
+        <div class="col-sm-2">
+            <a href="#" class="brand"
+               style="padding-bottom: 5px; padding-top: 5px"> <img id="brand"
+                                                                   src="img/constellation-menu.png"
+                                                                   alt="constellation-logo" />
+            </a>
+        </div>
+        <div class="col-sm-10">
+        </div>
+    </div>
+</div>
+
+<div class="container" style="box-sizing: border-box" ng-view="">
+
+<div>
+		<div class="row">
+			<div class="col-md-4"></div>
+			<div class="col-md-4">
+				<h1 translate="login.title">Authentication</h1>
+				<div id="msg-error" style="visibility:hidden; border-color:rgb(216, 154, 154); background-color:pink;padding: 8px;" class="alert alert-data" translate="login.error">Login or password incorrect.</div>
+				<form id="loginForm" class="form" role="form" ng-submit="login()">
+					<div class="form-group">
+						<label for="username" translate="login.form.username">Login</label>
+						<input type="text" class="form-control" name="username"
+							id="username"
+							placeholder="login"
+							ng-model="username">
+					</div>
+					<div class="form-group">
+						<label for="password" translate="login.form.password">Password</label>
+						<input type="password" class="form-control" name="password"
+							id="password"
+							placeholder="password"  ng-model="password">
+					</div>
+					<button type="submit" class="btn btn-primary" id="submitLogin">Login</button>
+				</form>
+			</div>
+			<div class="col-md-4"></div>
+		</div>
+	</div>
+</div>
+
+<!-- build:js scripts/scripts.js -->
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/angular.min.js"></script>
+<!-- endbuild -->
+
+<script type="text/javascript" src="js/login.js"></script>
+</body>
+
+</html>

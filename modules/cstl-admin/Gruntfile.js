@@ -187,6 +187,12 @@ module.exports = function(grunt) {
                     ]
                 }
             },
+            login: {
+              files : {
+                '<%= target_dir %>/js/login.js': [
+                    '<%= src_dir %>/js/login.js']
+              }
+            },
             lib: {
                 files: {
                     '<%= target_dir %>/js/ace.min.js': '<%= lib_dir %>/ace/js/*.js',

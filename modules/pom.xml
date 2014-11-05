@@ -81,6 +81,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
     <modules>
+        <module>cstl-token</module>
         <module>library</module>
         <module>xml-bindings</module>
         <module>json-bindings</module>

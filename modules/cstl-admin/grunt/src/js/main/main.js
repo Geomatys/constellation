@@ -27,7 +27,17 @@ angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pasc
     .controller('HeaderController', function ($scope, $http) {
         $http.get("app/conf").success(function(data){
             $scope.cstlLoginUrl = data.cstl + "spring/auth/form";
-            $scope.cstlLogoutUrl = data.cstl + "logout";
+            $scope.logout = function(){
+              $http.delete('@cstl/api/user/logout').then(function() {
+//                $http.get('/app/logout').success(function() {
+                  $.removeCookie('authToken', { path: '/' });
+                  $.removeCookie('cstlUserId', { path: '/' });
+                  $.removeCookie('cstlActiveDomainId', { path: '/' });
+                  window.location.href="index.html";
+//                });
+            });
+              
+            };
         });
     })
 

@@ -74,7 +74,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
              * @param fillSessionId {Boolean} indicates if should fill the jsessionid
              * @returns {String} the complied url
              */
-            compileUrl: function(url, fillSessionId) {
+            compileUrl: function(config, url, fillSessionId) {
                 // Acquire cookie values.
                 var cstlUrl   = $cookies[CstlConfig['cookie.cstl.url']],
                     domainId  = $cookies[CstlConfig['cookie.domain.id']],
@@ -84,6 +84,9 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 // Inject cstl-service webapp url.
                 if (angular.isDefined(cstlUrl)) {
                     url = url.replace(CstlConfig['inject.expr.ctrl.url'], cstlUrl);
+                    if(config){
+                      config.headers['X-Auth-Token'] = $.cookie('authToken');
+                    }
                 }
 
                 // Inject domain id value.
@@ -152,9 +155,9 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                         $rootScope.$broadcast('event:auth-loginRequired');
                         return; // auth required cancel request
                     }
-
+                    
                     // Inject contextual values into request url.
-                    config.url = CstlUtils.compileUrl(config.url);
+                    config.url = CstlUtils.compileUrl(config, config.url);
                 }
                 return config;
             },
@@ -282,7 +285,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             };
         }
 
-        return new Stomper(CstlUtils.compileUrl('@cstl/spring/ws/adminmessages', false));
+        return new Stomper(CstlUtils.compileUrl(null, '@cstl/spring/ws/adminmessages', false));
     })
 
     // -------------------------------------------------------------------------

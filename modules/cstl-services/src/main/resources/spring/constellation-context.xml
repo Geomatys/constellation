@@ -1,45 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-lazy-init="default"
-       xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:task="http://www.springframework.org/schema/task"
-       xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+<beans default-lazy-init="default" xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:task="http://www.springframework.org/schema/task"
+  xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
-    <util:properties id="constellation.properties" location="classpath:/constellation.properties"
-                     local-override="true"/>
+  <util:properties id="constellation.properties" location="classpath:/constellation.properties"
+    local-override="true" />
 
-    <context:property-placeholder properties-ref="constellation.properties"/>
+  <context:property-placeholder properties-ref="constellation.properties" />
 
-    <bean id="securityManager" class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance"/>
-    <bean class="org.constellation.admin.ConfigurationServiceInit" init-method="init" autowire="byType"/>
+  <context:component-scan base-package="org.constellation.services.component" />
 
-    <context:component-scan base-package="org.constellation.admin"/>
+  <bean class="org.constellation.rest.api.UserResource" />
 
-    <import resource="classpath:cstl/spring/cstl-web-base-context.xml"/>
+  <bean id="securityManager" class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance" />
+
+  <bean class="org.constellation.admin.ConfigurationServiceInit" init-method="init" autowire="byType" />
+
+  <context:component-scan base-package="org.constellation.admin" />
+
+  <import resource="classpath:cstl/spring/cstl-web-base-context.xml" />
     <!-- Detection of deployed modules -->
-    <import resource="classpath*:/cstl/spring/auto/*-context.xml"/>
+  <import resource="classpath*:/cstl/spring/auto/*-context.xml" />
 
 
     <!--    <metrics:annotation-driven /> -->
 
-    <bean class="org.constellation.services.SessionDataImpl"/>
+  <bean class="org.constellation.services.SessionDataImpl" />
 
-    <context:component-scan base-package="org.constellation.conf"/>
+  <context:component-scan base-package="org.constellation.conf" />
 
-    <context:component-scan base-package="org.constellation.ws.rs"/>
+  <context:component-scan base-package="org.constellation.ws.rs" />
 
     <!-- Executor and scheduler -->
-    <task:executor id="cstlExecutor" pool-size="5"/>
-    <task:scheduler id="cstlScheduler" pool-size="5"/>
-    <task:annotation-driven executor="cstlExecutor" scheduler="cstlScheduler"/>
+  <task:executor id="cstlExecutor" pool-size="5" />
+  <task:scheduler id="cstlScheduler" pool-size="5" />
+  <task:annotation-driven executor="cstlExecutor" scheduler="cstlScheduler" />
 
     <!-- Guava event bus -->
-    <bean id="eventBus" class="com.google.common.eventbus.AsyncEventBus">
-        <constructor-arg ref="cstlExecutor"/>
-    </bean>
+  <bean id="eventBus" class="com.google.common.eventbus.AsyncEventBus">
+    <constructor-arg ref="cstlExecutor" />
+  </bean>
 </beans>
