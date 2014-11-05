@@ -249,7 +249,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             if (phen instanceof CompositePhenomenon) {
                 final CompositePhenomenon compo = (CompositePhenomenon) phen;
                 for (Phenomenon child : compo.getComponent()) {
-                    results.add(((org.geotoolkit.swe.xml.Phenomenon)child).getName());
+                    results.add(((org.geotoolkit.swe.xml.Phenomenon)child).getName().getCode());
                 }
             } else {
                 results.add(phenomenon);

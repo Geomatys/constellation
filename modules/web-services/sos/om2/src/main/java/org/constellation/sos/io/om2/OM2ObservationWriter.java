@@ -192,7 +192,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 oid = generatedID;
                 observationName = observationIdBase + oid;
             } else {
-                observationName = observation.getName();
+                observationName = observation.getName().getCode();
                 if (observationName.startsWith(observationIdBase)) {
                     try {
                         oid = Integer.parseInt(observationName.substring(observationIdBase.length()));
@@ -263,7 +263,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             writeResult(oid, pid, procedureID, observation.getResult(), samplingTime, c);
             
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
-            return observation.getName();
+            return observation.getName().getCode();
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observation.", ex);
         }
@@ -277,7 +277,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             for (Phenomenon phenomenon : phenomenons) {
                 if (phenomenon instanceof InternalPhenomenon) {
                     final InternalPhenomenon internal = (InternalPhenomenon)phenomenon;
-                    phenomenon = new PhenomenonType(internal.getName(), internal.getName());
+                    phenomenon = new PhenomenonType(internal.getName().getCode(), internal.getName().getCode());
                 }
                 final PhenomenonProperty phenomenonP = SOSXmlFactory.buildPhenomenonProperty("1.0.0", (org.geotoolkit.swe.xml.Phenomenon) phenomenon);
                 writePhenomenon(phenomenonP, c);
@@ -323,7 +323,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         if (phenomenonP.getHref() != null) {
             return phenomenonP.getHref();
         } else if (phenomenonP.getPhenomenon() != null) {
-            return phenomenonP.getPhenomenon().getName();
+            return phenomenonP.getPhenomenon().getName().getCode();
         } else {
             return null;
         }
@@ -366,7 +366,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         if (!rs.next()) {
             final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"sampling_features\" VALUES(?,?,?,?,?,?)");
             stmtInsert.setString(1, foi.getId());
-            stmtInsert.setString(2, foi.getName());
+            stmtInsert.setString(2, foi.getName().getCode());
             stmtInsert.setString(3, foi.getDescription());
             stmtInsert.setNull(4, java.sql.Types.VARCHAR); // TODO
             
@@ -672,7 +672,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)");
             stmt.setString(1, offering.getId());
             stmt.setString(2, offering.getDescription());
-            stmt.setString(3, offering.getName());
+            stmt.setString(3, offering.getName().getCode());
             if (offering.getTime() instanceof Period) {
                 final Period period = (Period)offering.getTime();
                 if (period.getBeginning() != null && period.getBeginning().getPosition() != null && period.getBeginning().getPosition().getDate() != null) {
