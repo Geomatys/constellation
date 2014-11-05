@@ -31,15 +31,11 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
+import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.style.DefaultExternalGraphic;
-import org.geotoolkit.style.DefaultGraphic;
-import org.geotoolkit.style.DefaultOnlineResource;
-import org.geotoolkit.style.DefaultPointSymbolizer;
-import org.geotoolkit.style.DefaultStyleFactory;
-import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.*;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -181,64 +177,62 @@ public class SetupBusiness  {
         }
 
         // Fill default SLD provider.
-        final DefaultStyleFactory sf = new DefaultStyleFactory();
+        final MutableStyleFactory SF = (MutableStyleFactory)FactoryFinder.getStyleFactory(null);
         try {
             if (provider.get("default-point") == null) {
-                final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
+                final MutableStyle style = SF.style(DEFAULT_POINT_SYMBOLIZER);
                 style.setName("default-point");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-point");
                 styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-point-sensor") == null) {
-                final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
+                final MutableStyle style = SF.style(DEFAULT_POINT_SYMBOLIZER);
                 style.setName("default-point-sensor");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-point-sensor");
 
                 // Marker
                 final File markerFile = new File(dstImages, "marker_normal.png");
-                final DefaultExternalGraphic graphSymb = new DefaultExternalGraphic(
-                        new DefaultOnlineResource(markerFile.toURI(), "", "", "marker_normal.png", null, null), "png", null
-                );
+                final DefaultOnlineResource onlineResource = new DefaultOnlineResource(markerFile.toURI(), "", "", "marker_normal.png", null, null);
+                final DefaultExternalGraphic graphSymb = (DefaultExternalGraphic) SF.externalGraphic(onlineResource, "png", null);
                 final List<GraphicalSymbol> symbs = new ArrayList<>();
                 symbs.add(graphSymb);
-                final DefaultGraphic graphic = new DefaultGraphic(symbs, null, null, null, null, null);
-                final DefaultPointSymbolizer pointSymbolizer = new DefaultPointSymbolizer(graphic, null, "", "default-point-sensor", null);
+                final DefaultGraphic graphic = (DefaultGraphic) SF.graphic(symbs, null, null, null, null, null);
+                final DefaultPointSymbolizer pointSymbolizer = (DefaultPointSymbolizer) SF.pointSymbolizer("default-point-sensor","",null,null,graphic);
                 style.featureTypeStyles().get(0).rules().get(0).symbolizers().clear();
                 style.featureTypeStyles().get(0).rules().get(0).symbolizers().add(pointSymbolizer);
                 styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-point-sensor-selected") == null) {
-                final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
+                final MutableStyle style = SF.style(DEFAULT_POINT_SYMBOLIZER);
                 style.setName("default-point-sensor-selected");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-point-sensor-selected");
 
                 // Marker
                 final File markerFile = new File(dstImages, "marker_selected.png");
-                final DefaultExternalGraphic graphSymb = new DefaultExternalGraphic(
-                        new DefaultOnlineResource(markerFile.toURI(), "", "", "marker_selected.png", null, null), "png", null
-                );
+                final DefaultOnlineResource onlineResource = new DefaultOnlineResource(markerFile.toURI(), "", "", "marker_selected.png", null, null);
+                final DefaultExternalGraphic graphSymb = (DefaultExternalGraphic) SF.externalGraphic(onlineResource, "png", null);
                 final List<GraphicalSymbol> symbs = new ArrayList<>();
                 symbs.add(graphSymb);
-                final DefaultGraphic graphic = new DefaultGraphic(symbs, null, null, null, null, null);
-                final DefaultPointSymbolizer pointSymbolizer = new DefaultPointSymbolizer(graphic, null, "", "default-point-sensor-selected", null);
+                final DefaultGraphic graphic = (DefaultGraphic) SF.graphic(symbs, null, null, null, null, null);
+                final DefaultPointSymbolizer pointSymbolizer = (DefaultPointSymbolizer) SF.pointSymbolizer("default-point-sensor-selected","",null,null,graphic);
                 style.featureTypeStyles().get(0).rules().get(0).symbolizers().clear();
                 style.featureTypeStyles().get(0).rules().get(0).symbolizers().add(pointSymbolizer);
                 styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-line") == null) {
-                final MutableStyle style = sf.style(DEFAULT_LINE_SYMBOLIZER);
+                final MutableStyle style = SF.style(DEFAULT_LINE_SYMBOLIZER);
                 style.setName("default-line");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-line");
                 styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-polygon") == null) {
-                final MutableStyle style = sf.style(DEFAULT_POLYGON_SYMBOLIZER);
+                final MutableStyle style = SF.style(DEFAULT_POLYGON_SYMBOLIZER);
                 style.setName("default-polygon");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-polygon");
                 styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-raster") == null) {
-                final MutableStyle style = sf.style(DEFAULT_RASTER_SYMBOLIZER);
+                final MutableStyle style = SF.style(DEFAULT_RASTER_SYMBOLIZER);
                 style.setName("default-raster");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-raster");
                 styleBusiness.createStyle("sld", style);
