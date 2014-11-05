@@ -87,7 +87,8 @@ public class DataCoverageJob implements IDataCoverageJob {
         try {
             Data data = dataRepository.findById(dataId);
 
-            if (data != null && DataType.COVERAGE.name().equals(data.getType())) {
+            if (data != null && DataType.COVERAGE.name().equals(data.getType()) &&
+                    (data.isRendered() == null || !data.isRendered())) {
                 LOGGER.log(Level.INFO, "Start computing data " + dataId + " coverage statistics.");
 
                 data.setStats("PENDING");

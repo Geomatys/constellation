@@ -474,6 +474,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setSensorable(data.isSensorable());
             db.setTargetSensor(sensorRepository.getLinkedSensors(data));
             db.setStats(data.getStats());
+            db.setRendered(data.isRendered());
 
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
             for (final Style style : styles) {
@@ -577,6 +578,22 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public Data create(final QName name, final String providerIdentifier,
                        final String type, final boolean sensorable,
                        final boolean visible, final String subType, final String metadata) {
+        return create(name, providerIdentifier, type, sensorable, visible, null, subType, metadata);
+    }
+
+    /**
+     * Proceed to create a new data for given parameters.
+     * @param name data name to create.
+     * @param providerIdentifier provider identifier.
+     * @param type data type.
+     * @param sensorable flag that indicates if data is sensorable.
+     * @param visible flag that indicates if data is visible.
+     * @param rendered flag that indicates if data is rendered (can be null).
+     * @param subType data subType.
+     * @param metadataXml metadata of data.
+     */
+    @Override
+    public Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, Boolean rendered, String subType, String metadataXml) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
             final Data data = new Data();
@@ -592,7 +609,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             data.setType(type);
             data.setSubtype(subType);
             data.setVisible(visible);
-            data.setMetadata(metadata);
+            data.setMetadata(metadataXml);
+            data.setRendered(rendered);
             return dataRepository.create(data);
         }
         return null;
@@ -766,7 +784,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public ImageStatistics getDataStatistics(final int dataId) throws ConfigurationException {
 
         final Data data = dataRepository.findById(dataId);
-        if (data != null && DataType.COVERAGE.name().equals(data.getType())) {
+        if (data != null && DataType.COVERAGE.name().equals(data.getType()) &&
+                (data.isRendered() == null || !data.isRendered())) {
             try {
                 final String stats = data.getStats();
                 if (stats != null && !stats.equalsIgnoreCase("PENDING")) {
@@ -802,7 +821,10 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         final List<Data> dataList = dataRepository.findAll();
         for (Data data : dataList) {
             String stats = data.getStats();
+
+            //compute statistics only on coverage data not rendered and without previous statistic computed.
             if (DataType.COVERAGE.name().equals(data.getType()) &&
+                    (data.isRendered() == null || !data.isRendered()) &&
                     (stats == null || stats.isEmpty() || stats.equalsIgnoreCase("PENDING") )) {
                 dataCoverageJob.asyncUpdateDataStatistics(data.getId());
             }
@@ -949,5 +971,15 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         mdList.setScopeCodes(scopeCodes);
         
         return mdList;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void updateDataRendered(QName fullName, String providerIdentifier, boolean isRendered) {
+        final Data data = dataRepository.findDataFromProvider(fullName.getNamespaceURI(), fullName.getLocalPart(), providerIdentifier);
+        data.setRendered(isRendered);
+        dataRepository.update(data);
     }
 }

@@ -69,6 +69,9 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Sensorable")
     private boolean sensorable;
 
+    @XmlElement(name="Rendered")
+    private Boolean rendered;
+
     @XmlElement(name="Owner")
     private String owner;
 
@@ -164,6 +167,14 @@ public final class DataBrief implements Serializable {
         this.sensorable = sensorable;
     }
 
+    public Boolean getRendered() {
+        return rendered;
+    }
+
+    public void setRendered(Boolean rendered) {
+        this.rendered = rendered;
+    }
+
     public String getOwner() {
         return owner;
     }
@@ -216,6 +227,7 @@ public final class DataBrief implements Serializable {
                 ", type='" + type + '\'' +
                 ", subtype='" + subtype + '\'' +
                 ", sensorable='" + sensorable + '\'' +
+                ", rendered='" + rendered + '\'' +
                 ", owner='" + owner + '\'' +
                 ", targetStyle=" + targetStyle +
                 ", targetService=" + targetService +

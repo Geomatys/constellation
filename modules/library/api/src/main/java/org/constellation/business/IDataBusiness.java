@@ -47,6 +47,8 @@ public interface IDataBusiness {
 
     Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, String subType, String metadataXml);
 
+    Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, Boolean rendered, String subType, String metadataXml);
+
     void removeDataFromProvider(String providerId);
 
     DataBrief getDataBrief(QName dataName, Integer id) throws ConstellationException;
@@ -112,4 +114,14 @@ public interface IDataBusiness {
     void computeEmptyDataStatistics();
     
     MetadataLists getMetadataCodeLists();
+
+    /**
+     * Update {@link org.constellation.engine.register.Data#isRendered()} attribute that define
+     * if a data is Rendered or Geophysic.
+     *
+     * @param fullName data name
+     * @param providerIdentifier provider identifier name
+     * @param isRendered if true data is Rendered, otherwise it's Geophysic
+     */
+    void updateDataRendered(QName fullName, String providerIdentifier, boolean isRendered);
 }

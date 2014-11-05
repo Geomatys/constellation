@@ -59,8 +59,11 @@ import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.ParamUtilities;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
+import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
@@ -174,7 +177,7 @@ public final class DefaultConfigurator implements Configurator {
         final List<org.constellation.engine.register.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
         final String type = pr.getType();
         if (type.equals(ProviderType.LAYER.name())) {
-            final Provider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
+            final DataProvider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
             
             // Remove no longer existing layer.
             final Map<String, String> metadata = new HashMap<>(0);
@@ -200,8 +203,7 @@ public final class DefaultConfigurator implements Configurator {
             boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
 
             // Add new layer.
-            for (final Object keyObj : provider.getKeys()) {
-                final Name key = (Name) keyObj;
+            for (final Name key : provider.getKeys()) {
                 final QName name = new QName(key.getNamespaceURI(), key.getLocalPart());
                 boolean found = false;
                 for (final org.constellation.engine.register.Data data : list) {
@@ -266,11 +268,31 @@ public final class DefaultConfigurator implements Configurator {
                             }
                         }
                     }
+
+                    // find if data is rendered
+                    Boolean rendered = null;
+                    if (DataType.COVERAGE.equals(provider.getDataType())) {
+                        Data providerData = provider.get(key);
+                        Object origin = providerData.getOrigin();
+                        if (origin instanceof PyramidalCoverageReference) {
+                            try {
+                                ViewType packMode = ((PyramidalCoverageReference) origin).getPackMode();
+                                if (ViewType.RENDERED.equals(packMode)) {
+                                    rendered = Boolean.TRUE;
+                                }
+                            } catch (DataStoreException e) {
+                                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+                            }
+                        } else {
+                            rendered = Boolean.FALSE;
+                        }
+                    }
+
                     //dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
                     //do not save the coverage metadata in database, this metadata is obsolete, the full iso metadata is stored later.
                     org.constellation.engine.register.Data data = dataBusiness.create(
                             name, pr.getIdentifier(), provider.getDataType().name(),
-                            provider.isSensorAffectable(), visible, subType, null);
+                            provider.isSensorAffectable(), visible, rendered, subType, null);
 
                     //analyse coverage image (min/max/ histogram) with an asynchronous method
                     if (doAnalysis && DataType.COVERAGE.equals(provider.getDataType())) {
