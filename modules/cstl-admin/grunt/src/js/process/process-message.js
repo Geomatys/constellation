@@ -18,9 +18,9 @@
  * limitations under the License.
  */
 
-angular.module('cstl-process-message', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-process-message', ['ui.bootstrap.modal'])
 
-    .controller('ModalStatusMessageController', function($scope, $modalInstance, Growl, textService, TaskService, taskStatus) {
+    .controller('ModalStatusMessageController', function($scope, $modalInstance, taskStatus) {
         $scope.taskStatus = taskStatus;
         $scope.close = $scope.cancel = $modalInstance.close;
     });

@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-dialog-resp-height">
+<div class="modal-dialog modal-dialog-edit-task modal-dialog-resp-height">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
@@ -44,86 +44,9 @@
 
                 <div class="row">
                     <div class="col-sm-12">
-                        <div class="form-group" ng-class="{'has-error':!isValid(parameter.name)}" ng-repeat="parameter in inputs track by $index" ng-switch="parameter.binding" >
-
-                            <label for="{{parameter.name}}">{{parameter.name}} {{parameter.mandatory?'*':''}}</label>
-                            <!-- java.lang.String management -->
-                            <div ng-switch-when="valueClass:java.lang.String">
-                                <!-- We need one String parameter with no restriction -->
-                                <div ng-show="parameter.maxOccurs==1 && parameter.restriction.enumeration.length == 0">
-                                    <input id="{{parameter.name}}" class="form-control" ng-required="parameter.mandatory" type="text"
-                                           value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save"/>
-                                </div>
-
-                                <!-- We need one String parameter with 1 restriction -->
-                                <div ng-show="parameter.maxOccurs==1 && parameter.restriction.enumeration.length == 1">
-                                    <p id="{{parameter.name}}" class="form-control-static">{{parameter.restriction.enumeration[0]}}"</p>
-                                </div>
-
-                                <!-- We need one String parameter with multiple restriction -->
-                                <div ng-show="parameter.maxOccurs==1 && parameter.restriction.enumeration.length > 1">
-                                    <select id="{{parameter.name}}" ng-required="parameter.mandatory" class="form-control"
-                                            ng-model="parameter.save" ng-options="val for val in parameter.restriction.enumeration">
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- java.lang.Boolean management -->
-                            <div ng-switch-when="valueClass:java.lang.Boolean">
-                                <!-- We need one Boolean parameter -->
-                                <div class="checkbox" ng-show="parameter.maxOccurs==1">
-                                    <input id="{{parameter.name}}" type="checkbox" value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
-                                </div>
-                            </div>
-
-                            <!-- java.net.URL management -->
-                            <div ng-switch-when="valueClass:java.net.URL">
-                                <!-- We need one URL parameter -->
-                                <div ng-show="parameter.maxOccurs==1">
-                                    <input id="{{parameter.name}}" ng-required="parameter.mandatory" class="form-control" type="text" value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
-                                </div>
-                            </div>
-
-                            <!-- java.io.File management -->
-                            <div ng-switch-when="valueClass:java.io.File">
-                                <!-- We need one File parameter with no restriction -->
-                                <div ng-show="parameter.maxOccurs==1">
-                                    <input id="{{parameter.name}}" ng-required="parameter.mandatory" class="form-control" type="text" value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
-                                </div>
-                            </div>
-
-                            <!-- java.lang.Integer management -->
-                            <div ng-switch-when="valueClass:java.lang.Integer">
-                                <!-- We need one Integer parameter with no restriction -->
-                                <div ng-show="parameter.maxOccurs==1">
-                                    <input id="{{parameter.name}}" ng-required="parameter.mandatory" class="form-control" type="number" value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
-                                </div>
-                            </div>
-
-                            <!-- java.lang.Double management -->
-                            <div ng-switch-when="valueClass:java.lang.Double">
-                                <!-- We need one Double parameter with no restriction -->
-                                <div ng-show="parameter.maxOccurs==1">
-                                    <input id="{{parameter.name}}" ng-required="parameter.mandatory" class="form-control" type="number" value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
-                                </div>
-                            </div>
-
-                            <!--org.constellation.util.StyleReference-->
-                            <div ng-switch-when="valueClass:org.constellation.util.StyleReference">
-                                <div ng-show="parameter.maxOccurs==1">
-                                    <select id="{{parameter.name}}" ng-required="parameter.mandatory" class="form-control"
-                                            ng-model="parameter.save" ng-options="style.ref as style.name for style in parameter.restriction.enumeration">
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- We can't edit this type -->
-                            <div ng-switch-default>
-                                <p id="{{parameter.name}}" class="form-control-static">This field can't be manage in the web application</p>
-                            </div>
-
-                            <p class="help-block">{{parameter.documentation}}</p>
-                        </div>
+                        <div class="form-group row" ng-class="{'has-error':!isValid(parameter.name)}"
+                             ng-repeat="parameter in parameters track by $index"
+                             ng-include="'views/tasks/param_renderer.html'"></div>
                     </div>
                 </div>
             </form>

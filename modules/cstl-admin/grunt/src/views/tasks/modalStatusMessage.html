@@ -4,9 +4,9 @@
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title">{{'task.history.error.msg' | translate}} - {{taskStatus.title}} - {{taskStatus.end | date:"dd/MM/yyyy-h:mma"}}</h4>
         </div>
-        <div class="modal-body modal-body-style" style="padding-top: 15px; overflow-y: auto;">
+        <div class="modal-body modal-body-style" style="padding-top: 15px; overflow: auto;">
             <!-- WRITE CONTENT HERE -->
-            <p>{{taskStatus.message}}</p>
+            <pre>{{taskStatus.message}}</pre>
         </div>
         <div class="modal-footer">
             <button type="button" id="cancelButton" class="btn btn-default" ng-click="cancel()" translate="mapcontext.modal.cancel">Cancel</button>
