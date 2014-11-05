@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope">
     <env:Body>
-        <sos:Capabilities xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:icism="urn:us:gov:ic:ism:v2" xmlns:ns16="http://www.opengis.net/gml" xmlns:ns20="http://www.opengis.net/sos/2.0" xmlns:ns23="http://www.opengis.net/om/2.0" xmlns:ns24="http://www.opengis.net/sampling/2.0" xmlns:ns26="http://www.w3.org/2005/08/addressing" xmlns:ns27="http://www.opengis.net/swe/2.0" xmlns:ns28="http://docs.oasis-open.org/wsn/t-1" xmlns:ns29="http://www.opengis.net/gml/" xmlns:ogc="http://www.opengis.net/ogc" xmlns:om="http://www.opengis.net/om/1.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:sampling="http://www.opengis.net/sampling/1.0" xmlns:samplingspatial="http://www.opengis.net/samplingSpatial/2.0" xmlns:sml="http://www.opengis.net/sensorML/1.0.1" xmlns:sml1="http://www.opengis.net/sensorML/1.0" xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:swe1="http://www.opengis.net/swe/1.0" xmlns:swes="http://www.opengis.net/swes/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" updateSequence="1404743896342" version="1.0.0">
+        <sos:Capabilities xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:icism="urn:us:gov:ic:ism:v2" xmlns:ns15="http://www.opengis.net/gml/3.2" xmlns:ns20="http://www.opengis.net/sos/2.0" xmlns:ns22="http://www.opengis.net/om/2.0" xmlns:ns23="http://www.opengis.net/sampling/2.0" xmlns:ns25="http://www.opengis.net/swe/2.0" xmlns:ns26="http://www.w3.org/2005/08/addressing" xmlns:ns28="http://docs.oasis-open.org/wsn/t-1" xmlns:ns29="http://www.opengis.net/gml/" xmlns:ogc="http://www.opengis.net/ogc" xmlns:om="http://www.opengis.net/om/1.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:sampling="http://www.opengis.net/sampling/1.0" xmlns:samplingspatial="http://www.opengis.net/samplingSpatial/2.0" xmlns:sml="http://www.opengis.net/sensorML/1.0.1" xmlns:sml1="http://www.opengis.net/sensorML/1.0" xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:swe1="http://www.opengis.net/swe/1.0" xmlns:swes="http://www.opengis.net/swes/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" updateSequence="1415203156830" version="1.0.0">
             <ows:ServiceIdentification>
                 <ows:Title>Constellation SOS Server</ows:Title>
                 <ows:Abstract>Constellation SOS Server</ows:Abstract>
@@ -339,7 +339,7 @@
             <sos:Filter_Capabilities>
                 <ogc:Spatial_Capabilities>
                     <ogc:GeometryOperands>
-                        <ogc:GeometryOperand>ns16:Envelope</ogc:GeometryOperand>
+                        <ogc:GeometryOperand>gml:Envelope</ogc:GeometryOperand>
                     </ogc:GeometryOperands>
                     <ogc:SpatialOperators>
                         <ogc:SpatialOperator name="BBOX"/>
@@ -347,8 +347,8 @@
                 </ogc:Spatial_Capabilities>
                 <ogc:Temporal_Capabilities>
                     <ogc:TemporalOperands>
-                        <ogc:TemporalOperand>ns16:TimeInstant</ogc:TemporalOperand>
-                        <ogc:TemporalOperand>ns16:TimePeriod</ogc:TemporalOperand>
+                        <ogc:TemporalOperand>gml:TimeInstant</ogc:TemporalOperand>
+                        <ogc:TemporalOperand>gml:TimePeriod</ogc:TemporalOperand>
                     </ogc:TemporalOperands>
                     <ogc:TemporalOperators>
                         <ogc:TemporalOperator name="TM_During"/>
@@ -376,11 +376,11 @@
             </sos:Filter_Capabilities>
             <sos:Contents>
                 <sos:ObservationOfferingList>
-                    <sos:ObservationOffering ns16:id="offering-1">
-                        <ns16:name>offering-1</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-1">
+                        <gml:name>offering-1</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:1"/>
                         <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
@@ -389,11 +389,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-10">
-                        <ns16:name>offering-10</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-10">
+                        <gml:name>offering-10</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:10"/>
                         <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
@@ -402,11 +402,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-2">
-                        <ns16:name>offering-2</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-2">
+                        <gml:name>offering-2</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:2"/>
                         <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
@@ -415,11 +415,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-3">
-                        <ns16:name>offering-3</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-3">
+                        <gml:name>offering-3</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:3"/>
                         <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"/>
@@ -432,11 +432,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-4">
-                        <ns16:name>offering-4</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-4">
+                        <gml:name>offering-4</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:4"/>
                         <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"/>
@@ -449,11 +449,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-5">
-                        <ns16:name>offering-5</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-5">
+                        <gml:name>offering-5</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:5"/>
                         <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"/>
@@ -466,11 +466,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-6">
-                        <ns16:name>offering-6</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-6">
+                        <gml:name>offering-6</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:6"/>
                         <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
@@ -479,11 +479,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-7">
-                        <ns16:name>offering-7</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-7">
+                        <gml:name>offering-7</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:7"/>
                         <sos:responseFormat>text/xml; subtype="om/1.0.0"</sos:responseFormat>
@@ -492,11 +492,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-8">
-                        <ns16:name>offering-8</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-8">
+                        <gml:name>offering-8</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:8"/>
                         <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"/>
@@ -509,11 +509,11 @@
                         <sos:responseMode>inline</sos:responseMode>
                         <sos:responseMode>resultTemplate</sos:responseMode>
                     </sos:ObservationOffering>
-                    <sos:ObservationOffering ns16:id="offering-9">
-                        <ns16:name>offering-9</ns16:name>
-                        <ns16:boundedBy>
-                            <ns16:Null>not_bounded</ns16:Null>
-                        </ns16:boundedBy>
+                    <sos:ObservationOffering gml:id="offering-9">
+                        <gml:name>offering-9</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>not_bounded</gml:Null>
+                        </gml:boundedBy>
                         <sos:time/>
                         <sos:procedure xlink:href="urn:ogc:object:sensor:GEOM:9"/>
                         <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:depth"/>

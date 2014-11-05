@@ -153,7 +153,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
     @Order(order=1)
     public void testSOSGetCapabilities() throws Exception {
 
-        waitForStart();
+        waitForSoapStart("sos/default", 200);
         
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;

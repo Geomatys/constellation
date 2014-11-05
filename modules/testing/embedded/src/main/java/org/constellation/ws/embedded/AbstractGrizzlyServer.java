@@ -144,6 +144,10 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     }
     
     public void waitForSoapStart(String instance) throws Exception {
+        waitForSoapStart(instance, 100);
+    }
+    
+    public void waitForSoapStart(String instance, int max) throws Exception {
         boolean ex = true;
         int cpt = 0;
         while (ex) {
@@ -167,7 +171,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             } catch (IOException e) {
                 ex = true;
             }
-            if (cpt == 100) {
+            if (cpt == max) {
                 throw new Exception("The grizzly server never start");
             }
             cpt++;
