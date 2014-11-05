@@ -1357,6 +1357,10 @@ public class DataRest {
                 outStore = (CoverageStore) outProvider.getMainStore();
                 outRef = (XMLCoverageReference) outStore.getCoverageReference(name);
 
+                //set data as GEOPHYSIC
+                outRef.setPackMode(ViewType.GEOPHYSICS);
+                dataBusiness.updateDataRendered(new QName(name.getNamespaceURI(), name.getLocalPart()), outProvider.getId(), false);
+
             } catch (Exception ex) {
                 Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                 return Response.ok("Failed to create pyramid provider " + ex.getMessage()).status(500).build();
@@ -1609,6 +1613,10 @@ public class DataRest {
 
             pyramidStore = (CoverageStore) outProvider.getMainStore();
             outRef = (XMLCoverageReference) pyramidStore.getCoverageReference(outRef.getName());
+
+            //set data as RENDERED
+            final QName outDataQName = new QName(outRef.getName().getNamespaceURI(), outRef.getName().getLocalPart());
+            dataBusiness.updateDataRendered(outDataQName, outProvider.getId(), true);
 
         } catch (Exception ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
