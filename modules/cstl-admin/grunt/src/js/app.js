@@ -194,5 +194,7 @@ cstlAdminApp
             });
 
            $rootScope.hasRole = function(){return false;};
+           
+           TokenService.init();
                     
         }]);

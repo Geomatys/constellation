@@ -146,10 +146,25 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     //  Authentication Service
     // -------------------------------------------------------------------------
 
-    .factory('TokenService', function ($rootScope, $http, CstlConfig) {
+    .factory('TokenService', function ($rootScope, $http, CstlConfig, Account) {
         var lastCall = new Date().getTime();
         var tokenHalfLife = 15 * 60 * 1000;
         return {
+            init: function() {
+              Account.get(function(account) {
+                $rootScope.account = account;
+
+                $rootScope.hasRole = function(role) {
+                    return account.roles.indexOf(role) !== -1;
+                };
+
+                $rootScope.hasMultipleDomains = function() {
+                    return account.domains.length > 1;
+                };
+
+                $rootScope.$broadcast('event:auth-authConfirmed');
+              });
+            },
             renew: function() {
               var now = new Date().getTime();
               if(now > lastCall + tokenHalfLife){
