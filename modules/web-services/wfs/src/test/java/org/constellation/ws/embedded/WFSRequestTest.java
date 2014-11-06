@@ -543,7 +543,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 feat.getFeatureMember().get(0).getAbstractFeature() instanceof SamplingPointType);
         SamplingPointType sp = (SamplingPointType) feat.getFeatureMember().get(0).getAbstractFeature();
 
-        assertEquals("10972X0137-PONT", sp.getName());
+        assertEquals("10972X0137-PONT", sp.getName().getCode());
     }
 
     @Test
