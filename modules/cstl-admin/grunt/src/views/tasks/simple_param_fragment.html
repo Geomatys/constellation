@@ -1,87 +1,94 @@
 
-<label for="{{parameter.id}}">{{parameter.name}} <span ng-show="parameter.mandatory" class="mandatory">(*)</span></label>
+<div class="form-group">
+    <label for="{{parameter.id}}" class="col-sm-3 control-label" style="text-align:left;">
+        {{parameter.name}} <span ng-show="parameter.mandatory" class="mandatory">(*)</span>
+    </label>
 
-<div ng-show="parameter.maxOccurs==1">
-    <div ng-switch="parameter.binding">
-        <!-- java.lang.String management -->
-        <div ng-switch-when="valueClass:java.lang.String">
-            <!-- We need one String parameter with no restriction -->
-            <div ng-if="parameter.restriction.enumeration.length == 0">
-                <input id="{{parameter.id}}" class="form-control" ng-required="parameter.mandatory" type="text"
-                       value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save"/>
+    <div ng-show="parameter.maxOccurs==1" class="col-sm-9">
+        <div ng-switch="parameter.binding">
+            <!-- java.lang.String management -->
+            <div ng-switch-when="valueClass:java.lang.String">
+                <!-- We need one String parameter with no restriction -->
+                <div ng-if="parameter.restriction.enumeration.length == 0">
+                    <input id="{{parameter.id}}" class="form-control" ng-required="parameter.mandatory" type="text"
+                           value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save"/>
+                </div>
+
+                <!-- We need one String parameter with multiple restriction -->
+                <div ng-if="parameter.restriction.enumeration.length > 1">
+                    <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
+                            ng-model="parameter.save" ng-options="val for val in parameter.restriction.enumeration">
+                    </select>
+                </div>
             </div>
 
-            <!-- We need one String parameter with multiple restriction -->
-            <div ng-if="parameter.restriction.enumeration.length > 1">
-                <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
-                        ng-model="parameter.save" ng-options="val for val in parameter.restriction.enumeration">
-                </select>
+            <!-- java.lang.Boolean management -->
+            <div ng-switch-when="valueClass:java.lang.Boolean">
+                <!-- We need one Boolean parameter -->
+                <div class="checkbox">
+                    <input id="{{parameter.id}}" type="checkbox" value="{{parameter.default}}"
+                           name="{{parameter.name}}" ng-model="parameter.save" />
+                </div>
             </div>
-        </div>
 
-        <!-- java.lang.Boolean management -->
-        <div ng-switch-when="valueClass:java.lang.Boolean">
-            <!-- We need one Boolean parameter -->
-            <div class="checkbox">
-                <input id="{{parameter.id}}" type="checkbox" value="{{parameter.default}}"
-                       name="{{parameter.name}}" ng-model="parameter.save" />
-            </div>
-        </div>
-
-        <!-- java.net.URL management -->
-        <div ng-switch-when="valueClass:java.net.URL">
-            <!-- We need one URL parameter -->
-            <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="text"
-                   value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
-        </div>
-
-        <!-- java.io.File management -->
-        <div ng-switch-when="valueClass:java.io.File">
-            <!-- We need one File parameter with no restriction -->
-            <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="text"
-                   value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
-        </div>
-
-        <!-- java.lang.Integer management -->
-        <div ng-switch-when="valueClass:java.lang.Integer">
-            <!-- We need one Integer parameter with no restriction -->
-            <div ng-if="parameter.restriction.enumeration.length == 0">
-                <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="number"
+            <!-- java.net.URL management -->
+            <div ng-switch-when="valueClass:java.net.URL">
+                <!-- We need one URL parameter -->
+                <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="text"
                        value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
             </div>
-            <!-- We need one Integer parameter with multiple restriction -->
-            <div ng-if="parameter.restriction.enumeration.length > 1">
-                <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
-                        ng-model="parameter.save" ng-options="val for val in parameter.restriction.enumeration">
-                </select>
-            </div>
-        </div>
 
-        <!-- java.lang.Double management -->
-        <div ng-switch-when="valueClass:java.lang.Double">
-            <!-- We need one Double parameter with no restriction -->
-            <div ng-if="parameter.restriction.enumeration.length == 0">
-                <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="number"
+            <!-- java.io.File management -->
+            <div ng-switch-when="valueClass:java.io.File">
+                <!-- We need one File parameter with no restriction -->
+                <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="text"
                        value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
             </div>
-            <!-- We need one Double parameter with multiple restriction -->
-            <div ng-if="parameter.restriction.enumeration.length > 1">
+
+            <!-- java.lang.Integer management -->
+            <div ng-switch-when="valueClass:java.lang.Integer">
+                <!-- We need one Integer parameter with no restriction -->
+                <div ng-if="parameter.restriction.enumeration.length == 0">
+                    <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="number"
+                           value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
+                </div>
+                <!-- We need one Integer parameter with multiple restriction -->
+                <div ng-if="parameter.restriction.enumeration.length > 1">
+                    <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
+                            ng-model="parameter.save" ng-options="val for val in parameter.restriction.enumeration">
+                    </select>
+                </div>
+            </div>
+
+            <!-- java.lang.Double management -->
+            <div ng-switch-when="valueClass:java.lang.Double">
+                <!-- We need one Double parameter with no restriction -->
+                <div ng-if="parameter.restriction.enumeration.length == 0">
+                    <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="number"
+                           value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
+                </div>
+                <!-- We need one Double parameter with multiple restriction -->
+                <div ng-if="parameter.restriction.enumeration.length > 1">
+                    <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
+                            ng-model="parameter.save" ng-options="val for val in parameter.restriction.enumeration">
+                    </select>
+                </div>
+            </div>
+
+            <!--org.constellation.util.StyleReference-->
+            <div ng-switch-when="valueClass:org.constellation.util.StyleReference">
                 <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
-                        ng-model="parameter.save" ng-options="val for val in parameter.restriction.enumeration">
+                        ng-model="parameter.save" ng-options="style.ref as style.name for style in parameter.restriction.enumeration">
                 </select>
             </div>
-        </div>
 
-        <!--org.constellation.util.StyleReference-->
-        <div ng-switch-when="valueClass:org.constellation.util.StyleReference">
-            <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
-                    ng-model="parameter.save" ng-options="style.ref as style.name for style in parameter.restriction.enumeration">
-            </select>
-        </div>
-
-        <!-- We can't edit this type -->
-        <div ng-switch-default>
-            <p id="{{parameter.id}}" class="form-control-static">This field can't be manage in the web application</p>
+            <!-- We can't edit this type -->
+            <div ng-switch-default>
+                <p id="{{parameter.id}}" class="form-control-static">This field can't be manage in the web application</p>
+            </div>
         </div>
     </div>
+
+    <div class="clearfix"></div>
+    <p ng-show="parameter.documentation" class="help-block col-sm-12">{{parameter.documentation}}</p>
 </div>

@@ -4,19 +4,15 @@
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title" translate="{{task.id === null ?'tasks.modal.title':'tasks.information.edit'}}">Add new task</h4>
         </div>
-        <div class="modal-body modal-body-style" style="padding-top: 15px; overflow-y: auto;">
+        <div class="modal-body modal-body-style" style="padding: 15px 15px 0 15px; overflow-y: auto;">
             <!-- WRITE CONTENT HERE -->
-            <form id="formModalAddTask" class="col-sm-12" role="form">
+            <form id="formModalAddTask" class="" role="form">
 
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group" ng-class="{'has-error':!isValid('inputTaskName')}">
-                            <label for="inputTaskName" translate="tasks.modal.name">
-                                Task name *
-                            </label>
-                            <input type="text" required="required" id="inputTaskName" class="form-control" ng-model="task.name" />
-                        </div>
-                    </div>
+                <div class="form-group" ng-class="{'has-error':!isValid('inputTaskName')}">
+                    <label for="inputTaskName" translate="tasks.modal.name">
+                        Task name *
+                    </label>
+                    <input type="text" required="required" id="inputTaskName" class="form-control" ng-model="task.name" />
                 </div>
 
                 <div class="row">
@@ -42,12 +38,10 @@
 
                 <hr class="form-separator"/>
 
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group row" ng-class="{'has-error':!isValid(parameter.name)}"
-                             ng-repeat="parameter in parameters track by $index"
-                             ng-include="'views/tasks/param_renderer.html'"></div>
-                    </div>
+                <div class="form-horizontal">
+                <div class="" ng-class="{'has-error':!isValid(parameter.name)}"
+                     ng-repeat="parameter in parameters track by $index"
+                     ng-include="'views/tasks/param_renderer.html'"></div>
                 </div>
             </form>
 

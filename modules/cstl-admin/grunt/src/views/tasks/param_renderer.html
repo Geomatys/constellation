@@ -1,15 +1,16 @@
 
 <!-- Group parameters -->
-<div ng-if="parameter.type === 'group'" class="col-sm-12 parameter_group">
+<div ng-if="parameter.type === 'group'" class="parameter-group">
     <label>{{parameter.name}} <span ng-show="parameter.mandatory" class="mandatory">(*)</span></label>
-    <div>
-        <div ng-repeat="group in parameter.inputs track by $index" ng-init="occurIdx = $index;" class="group_occurence">
+    <p ng-show="parameter.documentation" class="help-block">{{parameter.documentation}}</p>
+    <div style="padding-left:15px;">
+        <div ng-repeat="group in parameter.inputs track by $index" ng-init="occurIdx = $index;" class="group-occurence">
             <div class="row">
-                <div class="form-group col-sm-11">
+                
+                <div class="col-sm-11">
                     <div ng-repeat="parameter in group track by $index"
                          ng-include="'views/tasks/param_renderer.html'"></div>
                 </div>
-
                 <div class="col-sm-1">
                     <button type="button"
                             ng-if="occurIdx === 0 && parameter.maxOccurs > parameter.inputs.length"
@@ -34,6 +35,5 @@
 <!-- Simple parameters -->
 <div ng-if="parameter.type === 'simple'"
      ng-include="'views/tasks/simple_param_fragment.html'"
-     class="parameter_simple col-sm-12"></div>
+     class="parameter_simple"></div>
 
-<p ng-show="parameter.documentation" class="help-block col-sm-12">{{parameter.documentation}}</p>
