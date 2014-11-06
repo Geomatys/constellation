@@ -86,6 +86,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     if(config){
                       config.headers['X-Auth-Token'] = $.cookie(CstlConfig['cookie.auth.token']);
                     }
+                }else if (/@cstl/.test(url)){
+                  window.location.href="index.html";
                 }
 
                 // Inject domain id value.
