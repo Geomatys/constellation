@@ -43,6 +43,7 @@ import org.geotoolkit.io.PathChangeListener;
 import org.geotoolkit.io.PathChangedEvent;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
@@ -352,7 +353,7 @@ public class ProcessBusiness implements IProcessBusiness {
         if (createProcess) {
             final ParameterDescriptorGroup originalDesc = processDesc.getInputDescriptor();
             final ParameterValueGroup orig = originalDesc.createValue();
-            orig.values().addAll(params.values());
+            ParametersExt.deepCopy(params, orig);
             final Process process = processDesc.createProcess(orig);
             return new ProcessJobDetail(process);
         } else {
