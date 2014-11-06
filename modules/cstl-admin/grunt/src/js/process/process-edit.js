@@ -157,6 +157,12 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         function isValid(parameter) {
             if (parameter.type === 'simple') {
 
+                //test emptyness
+                if (parameter.mandatory && parameter.save === null) {
+                    Growl('error', 'Error', 'Parameter '+parameter.name+' is mandatory');
+                    return false;
+                }
+
                 //test cast
                 switch(parameter.binding) {
                     case "valueClass:java.lang.Integer" : //fall trough
@@ -170,12 +176,14 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
                 //test restrictions
                 if (parameter.restriction) {
-
                     var enumeration = parameter.restriction.enumeration;
                     if (enumeration && enumeration.length > 0) {
-                        if (enumeration.indexOf(parameter.save) === -1) {
-                            Growl('error', 'Error', 'Value of parameter '+parameter.name+' not valid.');
-                            return false;
+                        //only test primitive enumeration
+                        if (!angular.isObject(enumeration[0])) {
+                            if (enumeration.indexOf(parameter.save) === -1) {
+                                Growl('error', 'Error', 'Value of parameter ' + parameter.name + ' not valid.');
+                                return false;
+                            }
                         }
                     }
 
@@ -266,6 +274,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             if ("valueClass:java.lang.Boolean" === binding) {
                 return Boolean(value);
             }
+            return value;
         }
 
         // Scope variables
