@@ -197,7 +197,8 @@ module.exports = function(grunt) {
                     '<%= target_dir %>/js/highlight.min.js': '<%= lib_dir %>/highlight/js/*.js',
                     '<%= target_dir %>/js/jquery.min.js': '<%= lib_dir %>/jquery/js/*.js',
                     '<%= target_dir %>/js/openlayers.min.js': [
-                        '<%= lib_dir %>/ol3/js/ol.js',
+                        '<%= lib_dir %>/ol3/js/ol-debug.js',
+                        '<%= lib_dir %>/ol3/js/olext/canvastilelayerrenderer.js',
                         '<%= lib_dir %>/ol3/js/olext/CQL.js'
                     ],
                     '<%= target_dir %>/js/sockjs.min.js': '<%= lib_dir %>/sockjs/js/*.js',
