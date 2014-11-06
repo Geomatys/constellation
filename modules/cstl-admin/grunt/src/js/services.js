@@ -39,7 +39,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
         'cookie.cstl.url':   'cstlUrl',
         'cookie.domain.id':  'cstlActiveDomainId',
         'cookie.user.id':    'cstlUserId',
-        'cookie.session.id': 'cstlSessionId'
+        'cookie.auth.token': 'authToken'
     })
 
     // -------------------------------------------------------------------------
@@ -78,14 +78,13 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 // Acquire cookie values.
                 var cstlUrl   = $cookies[CstlConfig['cookie.cstl.url']],
                     domainId  = $cookies[CstlConfig['cookie.domain.id']],
-                    userId    = $cookies[CstlConfig['cookie.user.id']],
-                    sessionId = $cookies[CstlConfig['cookie.session.id']];
+                    userId    = $cookies[CstlConfig['cookie.user.id']];
 
                 // Inject cstl-service webapp url.
                 if (angular.isDefined(cstlUrl)) {
                     url = url.replace(CstlConfig['inject.expr.ctrl.url'], cstlUrl);
                     if(config){
-                      config.headers['X-Auth-Token'] = $.cookie('authToken');
+                      config.headers['X-Auth-Token'] = $.cookie(CstlConfig['cookie.auth.token']);
                     }
                 }
 
@@ -99,22 +98,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     url = url.replace(CstlConfig['inject.expr.user.id'], userId);
                 }
 
-                // Inject jsessionid value.
-                if (angular.isDefined(sessionId)) {
-                    if (url.indexOf(';jsessionid=') !== -1) {
-                        url = url.replace(';jsessionid=', ';jsessionid=' + sessionId);
-                    } else if (fillSessionId !== false) {
-                        var reqIndex = url.indexOf('?');
-                        if (reqIndex !== -1) {
-                            url = url.replace('?', ';jsessionid=' + sessionId + '?');
-                        } else {
-                            url = url + ';jsessionid=' + sessionId;
-                        }
-                    }
-                } else {
-                    url = url.replace(';jsessionid=', ''); // remove it if no session
-                }
-
+                url = url.replace(';jsessionid=', ''); // remove it if no session
+    
                 return url;
             }
         };
@@ -125,16 +110,6 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     // -------------------------------------------------------------------------
 
     .factory('AuthInterceptor', function($rootScope, $q, $cookies, $cookieStore, CstlConfig, CstlUtils) {
-        /**
-         * Checks if an user is/was logged. This method can return true even
-         * the user session has expired.
-         *
-         * @return {Boolean} true if an user is/was logged, otherwise false
-         */
-        function isUserLogged() {
-            return angular.isDefined($cookies[CstlConfig['cookie.cstl.url']]);
-        }
-
         /**
          * Checks if the request url destination is the Constellation REST API.
          *
@@ -148,13 +123,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             'request': function(config) {
                 // Intercept request to Constellation REST API.
                 if (isCstlRequest(config.url)) {
-
-                    // Broadcast 'event:auth-loginRequired' event and cancel request
-                    // if no authentication.
-                    if (!isUserLogged()) {
-                        $rootScope.$broadcast('event:auth-loginRequired');
-                        return; // auth required cancel request
-                    }
+                    $rootScope.$broadcast('event:auth-cstl-request');
                     
                     // Inject contextual values into request url.
                     config.url = CstlUtils.compileUrl(config, config.url);
@@ -163,9 +132,6 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             },
             'responseError': function(response) {
                 if (response.status === 401) {
-                    // Remove constellation session id cookie.
-                    $cookieStore.remove($cookies[CstlConfig['cookie.session.id']]);
-
                     // Broadcast 'event:auth-loginRequired' event.
                     $rootScope.$broadcast('event:auth-loginRequired');
                 }
@@ -178,31 +144,24 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     //  Authentication Service
     // -------------------------------------------------------------------------
 
-    .factory('AuthService', function ($rootScope, $http, $cookieStore, Account) {
+    .factory('TokenService', function ($rootScope, $http, CstlConfig) {
+        var lastCall = new Date().getTime();
+        var tokenHalfLife = 15 * 60 * 1000;
         return {
-            authenticate: function() {
-                Account.get(function(account) {
-                    $rootScope.account = account;
-
-                    $rootScope.hasRole = function(role) {
-                        return account.roles.indexOf(role) !== -1;
-                    };
-
-                    $rootScope.hasMultipleDomains = function() {
-                        return account.domains.length > 1;
-                    };
-
-                    $rootScope.$broadcast('event:auth-authConfirmed');
+            renew: function() {
+              var now = new Date().getTime();
+              if(now > lastCall + tokenHalfLife){
+                lastCall = now;
+                $http.get('@cstl/api/user/extendToken').success(function(token){
+                  $.cookie(CstlConfig['cookie.auth.token'], token, { path : '/' });
+                  console.log("Token extended: " + token);
                 });
+              }
             },
-
-            logout: function () {
-                $http.get('@cstl/spring/session/logout;jsessionid=').then(function() {
-                    $cookieStore.remove('cstlSessionId');
-                    $http.get('/app/logout').success(function() {
-                        $rootScope.$broadcast('event:auth-loginCancelled');
-                    });
-                });
+            clear: function(){
+              $.removeCookie(CstlConfig['cookie.auth.token'], { path: '/' });
+              $.removeCookie(CstlConfig['cookie.user.id'], { path: '/' });
+              $.removeCookie(CstlConfig['cookie.domain.id'], { path: '/' });
             }
         };
     })
@@ -525,6 +484,30 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                     }
                 });
             }
+        };
+    })
+    
+    .factory('interval', function() {
+        /**
+         * An helper service to call an action on demand with a fixed time
+         * interval between two calls.
+         *
+         * @param fn {function} the action to call
+         * @param interval {number} the interval in milliseconds
+         */
+        return function(fn, interval) {
+
+            // The last execution timestamp.
+            var lastTime = null;
+
+            // Calls the specified function if the configured interval is passed.
+            return function() {
+                var time = new Date().getTime();
+                if (!lastTime || (time - lastTime) > interval) {
+                    fn.apply(null, arguments);
+                    lastTime = time;
+                }
+            };
         };
     })
 

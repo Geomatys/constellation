@@ -179,50 +179,20 @@ cstlAdminApp
             // remember language
             $translateProvider.useCookieStorage();
         }])
-        .run(['$rootScope', '$location', 'AuthService', 'Account',
-            function($rootScope, $location, AuthService, Account) {
+        .run(['$rootScope', '$location', 'TokenService', 'Account',
+            function($rootScope, $location, TokenService, Account) {
 
-            $rootScope.$on("$routeChangeStart", function(event, next, current) {
-                // Check if the status of the user. Is it authenticated or not?
-                if($rootScope.authenticated){return;}
-                AuthService.authenticate({}, function() {
-                    $rootScope.authenticated = true;
-                });
+            $rootScope.$on('event:auth-cstl-request', function(){
+              TokenService.renew();
             });
+          
 
             // Call when the 401 response is returned by the client
             $rootScope.$on('event:auth-loginRequired', function() {
+                TokenService.clear();
                 window.location.href="index.html";
             });
 
            $rootScope.hasRole = function(){return false;};
-            
-            // Call when the user is authenticated
-           $rootScope.$on('event:auth-authConfirmed', function() {
-               $rootScope.authenticated = true;
-               
-               Account.get(function(sessionData){
-                $rootScope.cstlSession=sessionData;
-                cstlSession = sessionData;
-               });
-
-               // If the login page has been requested and the user is already logged in
-               // the user is redirected to the home page
-               if ($location.path() === "/login") {
-                   $location.path('/').replace();
-               }
-            });
-
-            // Call when the user logs in
-            $rootScope.$on('event:auth-loginConfirmed', function() {
-                $rootScope.authenticated = true;
-                $rootScope.account = Account.get();
-                $location.path('').replace();
-            });
-
-            // Call when the user logs out
-            $rootScope.$on('event:auth-loginCancelled', function() {
-                $rootScope.authenticated = false;
-                $location.path('');
-            });
+                    
         }]);

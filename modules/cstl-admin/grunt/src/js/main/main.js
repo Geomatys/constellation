@@ -24,15 +24,12 @@ var dataNotReady = function(){alert("data not ready");};
 
 angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('HeaderController', function ($scope, $http) {
+    .controller('HeaderController', function ($scope, $http, TokenService) {
         $http.get("app/conf").success(function(data){
-            $scope.cstlLoginUrl = data.cstl + "spring/auth/form";
             $scope.logout = function(){
               $http.delete('@cstl/api/user/logout').then(function() {
-//                $http.get('/app/logout').success(function() {
-                  $.removeCookie('authToken', { path: '/' });
-                  $.removeCookie('cstlUserId', { path: '/' });
-                  $.removeCookie('cstlActiveDomainId', { path: '/' });
+                TokenService.clear();
+//                $http.get('/app/logout').success(function() {                  
                   window.location.href="index.html";
 //                });
             });
@@ -109,14 +106,6 @@ angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pasc
                 }
             });
         };
-    })
-
-    .controller('LogoutController', function($location, AuthService) {
-        AuthService.logout({
-            success: function () {
-                $location.path('');
-            }
-        });
     })
 
     .controller('ModalInstanceCtrl', function($scope, $modalInstance){
