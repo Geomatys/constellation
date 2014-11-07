@@ -211,7 +211,8 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
             this.path = path;
 
             this.unsubscribe = function() {
-                stompClient.unsubscribe(self.id);
+                self.id.unsubscribe();
+                //stompClient.unsubscribe(self.id);
                 console.log('Unsubscribed from ' + path + ' (' + self.id + ')');
             };
         }
