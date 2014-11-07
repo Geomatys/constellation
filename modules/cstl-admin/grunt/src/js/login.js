@@ -5,6 +5,22 @@ $(document).ready(function() {
 
 var cstlLoginApp = angular.module("cstlLoginApp", []);
 
+cstlLoginApp.directive('formAutofillFix', function() {
+    return function(scope, elem, attrs) {
+        elem.prop('method', 'POST');
+        // Fix autofill issues where Angular doesn't know about autofilled inputs
+        if(attrs.ngSubmit) {
+            setTimeout(function() {
+                elem.unbind('submit').bind('submit',function(e) {
+                    e.preventDefault();
+                    elem.find('input, textarea, select').trigger('input').trigger('change').trigger('keydown');
+                    scope.$apply(attrs.ngSubmit);
+                });
+            }, 0);
+        }
+    };
+});
+
 cstlLoginApp.controller("login", function($scope, $http){
 
     var cstlUrl;
@@ -15,10 +31,6 @@ cstlLoginApp.controller("login", function($scope, $http){
     };
 
     $scope.login = function(){
-        //angular cannot bind the password value when browser fill it automatically.
-        //then fixing it with jquery
-        $scope.formInputs.password = $('#password').val();
-
         $http.post(cstlUrl + 'api/user/authenticate', {username: $scope.formInputs.username,
                                                        password: $scope.formInputs.password})
             .success(function(resp){
