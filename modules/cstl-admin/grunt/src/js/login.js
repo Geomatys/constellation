@@ -5,45 +5,34 @@ $(document).ready(function() {
 
 var cstlLoginApp = angular.module("cstlLoginApp", []);
 
+cstlLoginApp.controller("login", function($scope, $http){
 
-cstlLoginApp.controller("login", function($scope, $http){  
-  $http.get('app/conf', {isArray: false}).success(function(conf){
-    var cstlUrl = conf.cstl;
-    $.cookie('cstlUrl', cstlUrl );
-    $scope.login = function(){
-      $http.post(cstlUrl + 'api/user/authenticate', {username: $scope.username, password: $scope.password}).success(function(resp){
-        if (resp.token) {
-          $.cookie('authToken', resp.token, { path : '/' });
-          $.cookie('cstlActiveDomainId', resp.domainId, { path : '/' });
-          $.cookie('cstlUserId', resp.userId, { path : '/' });
-          window.location.href="admin.html";
-        }
-      });
+    var cstlUrl;
+
+    $scope.formInputs = {
+        username:undefined,
+        password:undefined
     };
-  });
+
+    $scope.login = function(){
+        //angular cannot bind the password value when browser fill it automatically.
+        //then fixing it with jquery
+        $scope.formInputs.password = $('#password').val();
+
+        $http.post(cstlUrl + 'api/user/authenticate', {username: $scope.formInputs.username,
+                                                       password: $scope.formInputs.password})
+            .success(function(resp){
+                if (resp.token) {
+                    $.cookie('authToken', resp.token, { path : '/' });
+                    $.cookie('cstlActiveDomainId', resp.domainId, { path : '/' });
+                    $.cookie('cstlUserId', resp.userId, { path : '/' });
+                    window.location.href="admin.html";
+                }
+            });
+    };
+
+    $http.get('app/conf', {isArray: false}).success(function(conf){
+        cstlUrl = conf.cstl;
+        $.cookie('cstlUrl', cstlUrl );
+    });
 });
-
-
-// setTimeout(
-// function() {
-// $
-// .ajax({
-// url : 'http://localhost:8180/constellation/api/user/extendToken'
-// + "?token="
-// + resp.token,
-// type : 'GET',
-// crossDomain : true,
-// success : function(
-// resp) {
-// if (resp.token)
-// $
-// .cookie(
-// 'authToken',
-// resp.token,
-// {
-// path : '/'
-// });
-// }
-// });
-
-// }, 5000);

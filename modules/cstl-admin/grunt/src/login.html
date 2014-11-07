@@ -34,9 +34,10 @@
     <div class="row" style="margin:0;">
         <div class="col-sm-2">
             <a href="#" class="brand"
-               style="padding-bottom: 5px; padding-top: 5px"> <img id="brand"
-                                                                   src="img/constellation-menu.png"
-                                                                   alt="constellation-logo" />
+               style="padding-bottom: 5px; padding-top: 5px">
+                <img id="brand"
+                     src="img/constellation-menu.png"
+                     alt="constellation-logo" />
             </a>
         </div>
         <div class="col-sm-10">
@@ -45,28 +46,39 @@
 </div>
 
 <div class="container" style="box-sizing: border-box" ng-view="">
-
-<div>
+    <div>
 		<div class="row">
 			<div class="col-md-4"></div>
 			<div class="col-md-4">
 				<h1 translate="login.title">Authentication</h1>
-				<div id="msg-error" style="visibility:hidden; border-color:rgb(216, 154, 154); background-color:pink;padding: 8px;" class="alert alert-data" translate="login.error">Login or password incorrect.</div>
+				<div id="msg-error"
+                     style="visibility:hidden; border-color:rgb(216, 154, 154); background-color:pink;padding: 8px;"
+                     class="alert alert-data"
+                     translate="login.error">Login or password incorrect.</div>
 				<form id="loginForm" class="form" role="form" ng-submit="login()">
 					<div class="form-group">
-						<label for="username" translate="login.form.username">Login</label>
-						<input type="text" class="form-control" name="username"
-							id="username"
-							placeholder="login"
-							ng-model="username">
+						<label for="username"
+                               translate="login.form.username">Login</label>
+						<input id="username"
+                               type="text"
+                               class="form-control"
+                               name="username"
+							   placeholder="login"
+                               ng-model="formInputs.username"/>
 					</div>
 					<div class="form-group">
-						<label for="password" translate="login.form.password">Password</label>
-						<input type="password" class="form-control" name="password"
-							id="password"
-							placeholder="password"  ng-model="password">
+						<label for="password"
+                               translate="login.form.password">Password</label>
+						<input id="password"
+                               type="password"
+                               class="form-control"
+                               name="password"
+							   placeholder="password"
+                               ng-model="formInputs.password"/>
 					</div>
-					<button type="submit" class="btn btn-primary" id="submitLogin">Login</button>
+					<button id="submitLogin"
+                            type="submit"
+                            class="btn btn-primary">Login</button>
 				</form>
 			</div>
 			<div class="col-md-4"></div>
@@ -81,6 +93,11 @@
 <!-- endbuild -->
 
 <script type="text/javascript" src="js/login.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#username').focus();
+    });
+</script>
 </body>
 
 </html>
