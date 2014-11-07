@@ -29,7 +29,6 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         $scope.wrap.ordertype = 'id';
         $scope.sensorCtrl = {
             cstlUrl : $cookies.cstlUrl,
-            cstlSessionId : $cookies.cstlSessionId,
             domainId : $cookies.cstlActiveDomainId,
             selectedSensor : null,
             selectedSensorsChild : null,

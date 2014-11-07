@@ -28,7 +28,6 @@ angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-
 
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.domainId = $cookies.cstlActiveDomainId;
-        $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.hideScroll = true;
 
         $scope.init = function() {

@@ -31,7 +31,7 @@
                     <a class="dropdown-toggle" data-toggle="dropdown">
                                 <span>
                                     <span class="glyphicon glyphicon-user"></span>
-                                    <span class="hidden-tablet" >{{cstlSession.firstname}} {{cstlSession.lastname}}</span>
+                                    <span class="hidden-tablet" >{{firstname}} {{lastname}}</span>
                                     <span class="fa fa-caret-down"></span>
                                 </span>
                     </a>
@@ -194,14 +194,6 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>
-
-
-                        <li ng-hide="authenticated">
-                            <a href="/cstl-admin/" id="authenticateLink">
-                                <span class="glyphicon glyphicon-log-in"></span> &nbsp;
-                                <span translate="global.menu.account.login">Authenticate</span>
-                            </a>
                         </li>
                     </ul>
                 </div>

@@ -30,7 +30,6 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
 
         $scope.dataCtrl = {
             cstlUrl : $cookies.cstlUrl,
-            cstlSessionId : $cookies.cstlSessionId,
             domainId : $cookies.cstlActiveDomainId,
             advancedDataSearch : false,
             advancedMetadataSearch : false,

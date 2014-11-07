@@ -72,7 +72,6 @@ angular.module('CstlIndexApp', [
         $http.get('app/conf').success(function(data) {
             $cookies.cstlUrl = data.cstl;
             $scope.cstlLoginUrl = 'login.html';
-            $scope.cstlLogoutUrl = data.cstl + 'logout';
         });
     })
 

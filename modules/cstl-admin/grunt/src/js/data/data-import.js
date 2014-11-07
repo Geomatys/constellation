@@ -237,7 +237,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
     })
 
-    .controller('ModalImportDataStep1LocalController', function($scope, dataListing, $cookies, Growl, cfpLoadingBar) {
+    .controller('ModalImportDataStep1LocalController', function($rootScope, $scope, dataListing, $cookies, Growl, cfpLoadingBar) {
         $scope.loader = {
             upload: false
         };
@@ -252,7 +252,10 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             var formData = new FormData($form[0]);
             $scope.loader.upload = true;
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                headers: {
+                  'X-Auth-Token': $rootScope.authToken
+                },
+                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/data",
                 type: 'POST',
                 data: formData,
                 cache: false,
@@ -388,7 +391,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
 })
 
-    .controller('ModalImportDataStep2MetadataController', function($scope, $cookies, Growl, dataListing, cfpLoadingBar) {
+    .controller('ModalImportDataStep2MetadataController', function($rootScope, $scope, $cookies, Growl, dataListing, cfpLoadingBar) {
 
         $scope.columns = [];
 
@@ -517,7 +520,10 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             var $form = $('#uploadMetadataForm');
             var formData = new FormData($form[0]);
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/metadata;jsessionid="+ $cookies.cstlSessionId,
+                headers: {
+                  'X-Auth-Token': $rootScope.authToken
+                },
+                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + '/data/upload/metadata',
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -567,7 +573,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
     })
 
-    .controller('ModalImportDataStep4SensorController', function($scope, sensor, dataListing, Dashboard, Growl, $cookies, cfpLoadingBar) {
+    .controller('ModalImportDataStep4SensorController', function($rootScope, $scope, sensor, dataListing, Dashboard, Growl, $cookies, cfpLoadingBar) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -623,7 +629,10 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                headers: {
+                  'X-Auth-Token': $rootScope.authToken
+                },
+                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + '/data/upload/data',
                 type: 'POST',
                 data: formData,
                 async: false,

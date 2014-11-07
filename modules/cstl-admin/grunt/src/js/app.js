@@ -14,8 +14,6 @@
  *  Lesser General Public License for more details..
  */
 
-var cstlSession = {};
-
 
 /* App Module */
 /*jshint -W079 */
@@ -182,6 +180,10 @@ cstlAdminApp
         .run(['$rootScope', '$location', 'TokenService', 'Account',
             function($rootScope, $location, TokenService, Account) {
 
+            $rootScope.authenticated=true;
+          
+            $rootScope.authToken = TokenService.get();
+          
             $rootScope.$on('event:auth-cstl-request', function(){
               TokenService.renew();
             });
@@ -195,6 +197,8 @@ cstlAdminApp
 
            $rootScope.hasRole = function(){return false;};
            
-           TokenService.init();
+           
+          
+          
                     
         }]);

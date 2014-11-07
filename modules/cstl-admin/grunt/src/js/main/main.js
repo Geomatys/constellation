@@ -24,17 +24,28 @@ var dataNotReady = function(){alert("data not ready");};
 
 angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('HeaderController', function ($scope, $http, TokenService) {
+    .controller('HeaderController', function ($rootScope, $scope, $http, TokenService, Account) {
         $http.get("app/conf").success(function(data){
             $scope.logout = function(){
               $http.delete('@cstl/api/user/logout').then(function() {
                 TokenService.clear();
-//                $http.get('/app/logout').success(function() {                  
-                  window.location.href="index.html";
-//                });
-            });
-              
+                window.location.href="index.html";
+                });
             };
+            Account.get(function(account){
+              $scope.firstname = account.firstname;
+              $scope.lastname = account.lastname;  
+              $rootScope.account = account;
+
+              $rootScope.hasRole = function(role) {
+                 return account.roles.indexOf(role) !== -1;
+              };
+
+              $rootScope.hasMultipleDomains = function() {
+                 return account.domains.length > 1;
+              };             
+            });
+            
         });
     })
 

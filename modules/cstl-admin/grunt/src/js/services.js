@@ -150,20 +150,9 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
         var lastCall = new Date().getTime();
         var tokenHalfLife = 15 * 60 * 1000;
         return {
-            init: function() {
-              Account.get(function(account) {
-                $rootScope.account = account;
-
-                $rootScope.hasRole = function(role) {
-                    return account.roles.indexOf(role) !== -1;
-                };
-
-                $rootScope.hasMultipleDomains = function() {
-                    return account.domains.length > 1;
-                };
-
-                $rootScope.$broadcast('event:auth-authConfirmed');
-              });
+            get : function(){
+              console.log("TokenService.get: " + $.cookie(CstlConfig['cookie.auth.token']));
+              return $.cookie(CstlConfig['cookie.auth.token']);
             },
             renew: function() {
               var now = new Date().getTime();
@@ -171,6 +160,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
                 lastCall = now;
                 $http.get('@cstl/api/user/extendToken').success(function(token){
                   $.cookie(CstlConfig['cookie.auth.token'], token, { path : '/' });
+                  $rootScope = token;
                   console.log("Token extended: " + token);
                 });
               }

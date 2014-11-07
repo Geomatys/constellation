@@ -20,7 +20,7 @@
 
 angular.module('cstl-sensor-import', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('SensorAddModalController', function ($scope, $modalInstance, sensor, Growl, $cookies, cfpLoadingBar) {
+    .controller('SensorAddModalController', function ($rootScope, $scope, $modalInstance, sensor, Growl, $cookies, cfpLoadingBar) {
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
@@ -31,7 +31,10 @@ angular.module('cstl-sensor-import', ['ngCookies', 'cstl-restapi', 'cstl-service
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/sensor/upload;jsessionid="+ $cookies.cstlSessionId,
+                headers: {
+                 'X-Auth-Token': $rootScope.authToken
+                },
+                url: $cookies.cstlUrl + "api/1/sensor/upload",
                 type: 'POST',
                 data: formData,
                 async: false,

@@ -33,7 +33,6 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
         $scope.cstlUrl = $cookies.cstlUrl;
-        $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.urlBoxSize = Math.min($scope.url.length,100);
         $scope.domainId = $cookies.cstlActiveDomainId;
         $scope.writeOperationAvailable = $scope.type === 'csw' || $scope.type === 'sos' || $scope.type === 'wfs';
