@@ -147,9 +147,14 @@ public final class TaskRest {
     public Response getProcessDescriptor(final @PathParam("authority") String authority, final @PathParam("code") String code)
             throws ConfigurationException {
 
-        final ParameterDescriptorGroup idesc = getDescriptor(authority, code);
-
-        //TODO use real binding from ParameterDescriptorGroup to JSON
+        final ParameterDescriptorGroup idesc;
+        try {
+            idesc = getDescriptor(authority, code);
+        } catch (ConfigurationException e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(new AcknowlegementType("Failure", "Could not find process description for given authority/code.")).build();
+        }
+            //TODO use real binding from ParameterDescriptorGroup to JSON
         try {
             //write descriptor to XML String
             final Writer xmlWriter = new StringWriter();

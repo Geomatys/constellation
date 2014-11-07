@@ -32,19 +32,12 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
         function createProcesses(processesList) {
 
-            var processAuthority = $scope.task.processAuthority || "";
-            var processCode = $scope.task.processCode || "";
-
             var tree = {};
             for (var p in processesList) {
                 if(processesList.hasOwnProperty(p)){
                     var process = parseProcessDefaultName(processesList[p]);
                     tree[process[0]] = tree[process[0]] || [];
                     var codeInd = tree[process[0]].push(process[1])-1;
-
-                    if (process[0] === processAuthority && process[1] === processCode){
-                        $scope.option.processIndex = ""+codeInd;
-                    }
                 }
             }
 
@@ -55,21 +48,31 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                             'auth' : auth,
                             'processes' : tree[auth]
                         })-1;
-                    if (auth === processAuthority) {
-                        $scope.option.authIndex = ""+indAuth;
-                    }
                 }
             }
             return procTree;
         }
 
         function getDescribeProcess() {
-            var authority = $scope.processes[$scope.option.authIndex];
-            TaskService.describeProcess({'authority':authority.auth, 'code':authority.processes[$scope.option.processIndex]}).$promise
-                .then(function(data){ // On success
+            var auth = null;
+            var code = null;
+
+            if ($scope.task.processAuthority && $scope.task.processCode) {
+                //edit mode
+                auth = $scope.task.processAuthority;
+                code = $scope.task.processCode;
+            } else {
+                //add mode
+                var authority = $scope.processes[$scope.option.authIndex];
+                auth = authority.auth;
+                code = authority.processes[$scope.option.processIndex];
+            }
+
+            TaskService.describeProcess({'authority': auth, 'code': code}).$promise
+                .then(function (data) { // On success
                     $scope.describeProcess = data;
-                }).catch(function(data){ // On error
-                    Growl('error', 'Error', 'Unable to get the describe process');
+                }).catch(function (data) { // On error
+                    Growl('error', 'Error', 'Unable to get the process description');
                 });
         }
 
