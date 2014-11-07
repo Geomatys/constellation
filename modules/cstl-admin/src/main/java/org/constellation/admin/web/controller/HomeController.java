@@ -18,14 +18,13 @@
  */
 package org.constellation.admin.web.controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Home Controller
@@ -37,32 +36,14 @@ public class HomeController {
     public String home() {
         return "index";
     }
-    
-    @RequestMapping(value = "/cstl", method = RequestMethod.GET)
-    public String cstl(HttpServletRequest request, HttpServletResponse response, @RequestParam("cstlSessionId") String csltSessionId, @RequestParam("cstlActiveDomainId") int cstlActiveDomainId, @RequestParam("cstlUserId") int cstlUserId) {
-    	Cookie cookie = new Cookie("cstlSessionId", csltSessionId);
-    	cookie.setPath(request.getContextPath());
-		response.addCookie(cookie);
-		
-		Cookie activeDomainId = new Cookie("cstlActiveDomainId", String.valueOf(cstlActiveDomainId));
-		activeDomainId.setPath(request.getContextPath());
-        response.addCookie(activeDomainId);
-        
-        Cookie userId = new Cookie("cstlUserId", String.valueOf(cstlUserId));
-        userId.setPath(request.getContextPath());
-        response.addCookie(userId);
-        
-		
-        return "redirect:/admin.html";
-    }
-    
+
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logout(HttpServletRequest request, HttpServletResponse response) {
-    	request.getSession().invalidate();
-    	Cookie cookie = new Cookie("cstlSessionId", "");
-    	cookie.setPath("/cstl-admin");
-		response.addCookie(cookie);
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
         return "redirect:/";
     }
-    
+
 }

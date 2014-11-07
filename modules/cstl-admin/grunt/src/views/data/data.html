@@ -544,7 +544,7 @@
                                         <div class="col-sm-2">
                                             <span class="tooltipicon">
                                                 <a id="exportData" class="btn btn-info "
-                                                   ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/export/{{dataCtrl.selectedDataSetChild.Provider}}/{{dataCtrl.selectedDataSetChild.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
+                                                   ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/export/{{dataCtrl.selectedDataSetChild.Provider}}/{{dataCtrl.selectedDataSetChild.Name}}?token={{authToken}}"
                                                    tooltip-placement="bottom"
                                                    tooltip-html-unsafe="{{'layer.listing.selected.export.button' | translate }}">
                                                         <i class="fa fa-download"></i>

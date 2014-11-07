@@ -363,7 +363,7 @@
                                     <span class="tooltipicon">
                                         <a id="exportMD"
                                            class="btn btn-csw"
-                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selectedDS.Name}};jsessionid={{dataCtrl.cstlSessionId}}"
+                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selectedDS.Name}}?token={{authToken}}"
                                            data-placement="bottom"
                                            title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
                                             <i class="fa fa-download"></i>
@@ -374,7 +374,7 @@
                                     <span class="tooltipicon">
                                         <a id="exportMDChild"
                                            class="btn btn-csw"
-                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/metadata/iso/download/{{dataCtrl.selectedDataSetChild.Provider}}/{{dataCtrl.selectedDataSetChild.Id}};jsessionid={{dataCtrl.cstlSessionId}}"
+                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/metadata/iso/download/{{dataCtrl.selectedDataSetChild.Provider}}/{{dataCtrl.selectedDataSetChild.Id}}?token={{authToken}}"
                                            data-placement="bottom"
                                            title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
                                             <i class="fa fa-download"></i>

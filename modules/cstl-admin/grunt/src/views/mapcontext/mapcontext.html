@@ -227,7 +227,7 @@
                                     <div class="col-sm-2">
                                         <span class="tooltipicon">
                                             <a class="btn btn-mapcontext"
-                                               ng-href="{{cstlUrl}}api/1/context/{{selected.id}}/export;jsessionid={{cstlSessionId}}"
+                                               ng-href="{{cstlUrl}}api/1/context/{{selected.id}}/export?token={{authToken}}"
                                                data-placement="bottom" title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
                                                 <i class="fa fa-download"></i>
                                             </a>
