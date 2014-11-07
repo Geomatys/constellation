@@ -147,6 +147,10 @@ public class UserResource
         int id = findOne.get().getId();
         Domain defaultDomain = domainRepository.findDefaultByUserId(id);
         
+        if(defaultDomain==null) {
+            //No domain associated.
+            return Response.status(Status.FORBIDDEN).build();
+        }
 		
 		return Response.ok(new TokenTransfer(createToken, id, defaultDomain.getId())).build();
 	}
