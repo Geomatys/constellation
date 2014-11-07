@@ -322,7 +322,7 @@ public class DataRest {
                                @FormDataParam("metadata") InputStream fileMetaIs,
                                @FormDataParam("metadata") FormDataContentDisposition fileMetaDetail,
                                @Context HttpServletRequest request) {
-    	final String sessionId = request.getSession(false).getId();
+    	final String sessionId = request.getSession().getId();
     	final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
         HashMap<String,String> hashMap = new HashMap<>();
         String dataName = fileDetail.getFileName();
@@ -363,7 +363,7 @@ public class DataRest {
                                @FormDataParam("identifier") String identifier,
                                @FormDataParam("serverMetadataPath") String serverMetadataPath,
                                @Context HttpServletRequest request) {
-    	final String sessionId = request.getSession(false).getId();
+    	final String sessionId = request.getSession().getId();
         final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
         Map<String,String> hashMap = new HashMap<>();
         if (identifier != null && ! identifier.isEmpty()){

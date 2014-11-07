@@ -385,7 +385,7 @@ public class SensorRest {
     public Response uploadSensor(@FormDataParam("data") InputStream fileIs,
                                @FormDataParam("data") FormDataContentDisposition fileDetail,
                                @Context HttpServletRequest request) {
-        final String sessionId = request.getSession(false).getId();
+        final String sessionId = request.getSession().getId();
         final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
         final String fileName = fileDetail.getFileName();
         final File newFileData = new File(uploadDirectory, fileName);
