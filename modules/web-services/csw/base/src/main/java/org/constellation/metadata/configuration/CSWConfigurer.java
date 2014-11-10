@@ -52,6 +52,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.ws.ICSWConfigurer;
+import org.geotoolkit.index.tree.manager.NamedEnvelope;
 import org.opengis.metadata.Metadata;
 
 /**
@@ -607,6 +609,32 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
                 }
             }
         }
+    }
+    
+    public Map<Integer, NamedEnvelope> getMapperContent(String serviceID) throws ConfigurationException {
+        final AbstractIndexer indexer = getIndexer(serviceID, null);
+        if (indexer != null) {
+            try {
+                return indexer.getMapperContent();
+            } catch (IOException ex) {
+                throw new ConfigurationException(ex);
+            } finally {
+                indexer.destroy();
+            }
+        }
+        return new HashMap<>();
+    }
+
+    public String getTreeRepresentation(String serviceID) throws ConfigurationException {
+        final AbstractIndexer indexer = getIndexer(serviceID, null);
+        if (indexer != null) {
+            try {
+                return indexer.getTreeRepresentation();
+            } finally {
+                indexer.destroy();
+            }
+        }
+        return null;
     }
 
     /**

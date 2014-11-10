@@ -51,6 +51,8 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +67,7 @@ import org.constellation.metadata.io.MetadataIoException;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.index.tree.manager.NamedEnvelope;
 import org.w3c.dom.Document;
 
 /**
@@ -285,6 +288,29 @@ public class CSWServicesRest {
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
+    @GET
+    @Path("{serviceID}/mapper")
+    @Produces("text/html")
+    public String getMapperContent(@PathParam("serviceID") final String serviceID) throws ConfigurationException {
+        final CSWConfigurer configurer = getConfigurer();
+        final Map<Integer, NamedEnvelope> map =  configurer.getMapperContent(serviceID);
+        StringBuilder s = new StringBuilder("<html><body><table border=\"1\"><tr><th>Tree ID</td><th> Envelope</td></tr>");
+        for (Entry<Integer, NamedEnvelope> entry : map.entrySet()) {
+            s.append("<tr><td>").append(Integer.toString(entry.getKey())).append("</td><td>").append(entry.getValue().toString()).append("</td></tr>");
+        }
+        s.append("</table></body></html>");
+        return s.toString();
+    }
+    
+    @GET
+    @Path("{serviceID}/tree")
+    @Produces("text/plain")
+    public String getStreeRepresentation(@PathParam("serviceID") final String serviceID) throws ConfigurationException {
+        final CSWConfigurer configurer = getConfigurer();
+        final String result =  configurer.getTreeRepresentation(serviceID);
+        return result;
+    }
+    
     /**
      * Convert geotk metadata string xml to w3c document.
      *
