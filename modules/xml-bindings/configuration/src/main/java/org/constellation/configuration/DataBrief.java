@@ -51,6 +51,9 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Provider")
     private String provider;
 
+    @XmlElement(name="DatasetId")
+    private Integer datasetId;
+
     @XmlElement(name="Parent")
     private String parent;
 
@@ -117,6 +120,14 @@ public final class DataBrief implements Serializable {
 
     public void setProvider(final String provider) {
         this.provider = provider;
+    }
+
+    public Integer getDatasetId() {
+        return datasetId;
+    }
+
+    public void setDatasetId(Integer datasetId) {
+        this.datasetId = datasetId;
     }
 
     public String getParent() {

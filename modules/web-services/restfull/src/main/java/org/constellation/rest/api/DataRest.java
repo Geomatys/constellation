@@ -711,11 +711,13 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deletePyramidFolder(@PathParam("id") final String providerId) {
+        final Map<String,Object> map = new HashMap<>();
         final DataStore ds = DataProviders.getInstance().getProvider(providerId).getMainStore();
         if (!(ds instanceof XMLCoverageStore)) {
-            return Response.status(500).entity("Datastore is not instance of XMLCoverageStore").build();
+            map.put("isPyramid",false);
+            return Response.ok(map).build();
         }
-
+        map.put("isPyramid",true);
         final XMLCoverageStore xmlCoverageStore = (XMLCoverageStore)ds;
         final ParameterValue paramVal = ParametersExt.getValue(xmlCoverageStore.getConfiguration(), XMLCoverageStoreFactory.PATH.getName().getCode());
         if (paramVal.getValue() instanceof URL) {
@@ -727,7 +729,7 @@ public class DataRest {
                 return Response.status(500).entity(ex.getLocalizedMessage()).build();
             }
         }
-        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+        return Response.ok(map).build();
     }
 
     private static void truncateZipFolder(String filePath) throws IOException {
@@ -1359,7 +1361,14 @@ public class DataRest {
 
                 //set data as GEOPHYSIC
                 outRef.setPackMode(ViewType.GEOPHYSICS);
-                dataBusiness.updateDataRendered(new QName(name.getNamespaceURI(), name.getLocalPart()), outProvider.getId(), false);
+                final QName qName = new QName(name.getNamespaceURI(), name.getLocalPart());
+                //set flag for pyramided data to disable stats computing on it.
+                dataBusiness.updateDataRendered(qName, outProvider.getId(), false);
+
+                //set dataset id for pyramided data
+                final DataBrief dataBrief = dataBusiness.getDataBrief(qName, providerId);
+                final Integer datasetId = dataBrief.getDatasetId();
+                dataBusiness.updateDataDataSetId(qName, outProvider.getId(), datasetId);
 
             } catch (Exception ex) {
                 Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
@@ -1464,7 +1473,6 @@ public class DataRest {
      *
      * N.B : It creates a styled pyramid, which can be used for display purposes, but not for analysis.
      *
-     * TODO : Input pyramid parameters should contain an horizontal envelope, not an upper-left point. Upper-left point
      * is not sufficient to determine a custom pyramid zone. Unused.
      *
      * @param dataId Data id
@@ -1490,8 +1498,6 @@ public class DataRest {
         String tileFormat = params.getTileFormat();
         String crs = params.getCrs();
         double[] scales = params.getScales();
-        Double upperCornerX = params.getUpperCornerX();
-        Double upperCornerY = params.getUpperCornerY();
         
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(provider);
@@ -1570,12 +1576,6 @@ public class DataRest {
             return Response.ok("Scale values missing").status(400).build();
         }
 
-        //get upper corner
-        if(upperCornerX==null || upperCornerY==null){
-            upperCornerX = dataEnv.getMinimum(0);
-            upperCornerY = dataEnv.getMaximum(1);
-        }
-
         //create the output folder for pyramid
         PyramidalCoverageReference outRef;
         String pyramidProviderId = RENDERED_PREFIX + UUID.randomUUID().toString();
@@ -1617,6 +1617,11 @@ public class DataRest {
             //set data as RENDERED
             final QName outDataQName = new QName(outRef.getName().getNamespaceURI(), outRef.getName().getLocalPart());
             dataBusiness.updateDataRendered(outDataQName, outProvider.getId(), true);
+
+            //set dataset id for pyramided data
+            final DataBrief dataBrief = dataBusiness.getDataBrief(outDataQName, provider);
+            final Integer datasetId = dataBrief.getDatasetId();
+            dataBusiness.updateDataDataSetId(outDataQName, outProvider.getId(), datasetId);
 
         } catch (Exception ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);

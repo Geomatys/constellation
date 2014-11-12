@@ -815,6 +815,7 @@
     "service.edit.dashboard.date.from":"Du",
     "service.edit.dashboard.button.graph.hide":"Cacher le graphique",
     "service.edit.dashboard.button.graph.show":"Afficher le graphique",
+    "service.edit.dashboard.wmts.action.addnewlayer.button":"Ajouter une couche",
     "service.id.label":"Identifiant du service",
     "service.menu.delete.label": "Supprimer le service",
     "service.menu.edit.label": "Éditer",

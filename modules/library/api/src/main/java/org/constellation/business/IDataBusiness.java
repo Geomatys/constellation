@@ -124,4 +124,13 @@ public interface IDataBusiness {
      * @param isRendered if true data is Rendered, otherwise it's Geophysic
      */
     void updateDataRendered(QName fullName, String providerIdentifier, boolean isRendered);
+
+    /**
+     * Update {@link org.constellation.engine.register.Data#datasetId} attribute.
+     *
+     * @param fullName data name
+     * @param providerIdentifier provider identifier name
+     * @param datasetId dataset Id value to set
+     */
+    void updateDataDataSetId(QName fullName, String providerIdentifier, Integer datasetId);
 }

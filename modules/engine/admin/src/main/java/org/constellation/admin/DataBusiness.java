@@ -226,7 +226,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Override
     public Dataset getDatasetForData(final String providerId, final QName name) throws ConstellationException{
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
-        if (data != null) {
+        if (data != null && data.getDatasetId() != null) {
             return datasetRepository.findById(data.getDatasetId());
         }
         return null;
@@ -235,7 +235,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Override
     public Dataset getDatasetForData(final int dataId) throws ConstellationException{
         final Data data = dataRepository.findById(dataId);
-        if (data != null) {
+        if (data != null && data.getDatasetId() != null) {
             return datasetRepository.findById(data.getDatasetId());
         }
         return null;
@@ -469,6 +469,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setNamespace(data.getNamespace());
             db.setDate(new Date(data.getDate()));
             db.setProvider(getProviderIdentifier(data.getProvider()));
+            db.setDatasetId(data.getDatasetId());
             db.setType(data.getType());
             db.setSubtype(data.getSubtype());
             db.setSensorable(data.isSensorable());
@@ -977,9 +978,24 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * {@inheritDoc }
      */
     @Override
-    public void updateDataRendered(QName fullName, String providerIdentifier, boolean isRendered) {
-        final Data data = dataRepository.findDataFromProvider(fullName.getNamespaceURI(), fullName.getLocalPart(), providerIdentifier);
+    public void updateDataRendered(final QName fullName, final String providerIdentifier, boolean isRendered) {
+        final Data data = dataRepository.findDataFromProvider(fullName.getNamespaceURI(),
+                                                              fullName.getLocalPart(),
+                                                              providerIdentifier);
         data.setRendered(isRendered);
         dataRepository.update(data);
     }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void updateDataDataSetId(final QName fullName, final String providerIdentifier, final Integer datasetId) {
+        final Data data = dataRepository.findDataFromProvider(fullName.getNamespaceURI(),
+                                                              fullName.getLocalPart(),
+                                                              providerIdentifier);
+        data.setDatasetId(datasetId);
+        dataRepository.update(data);
+    }
+
 }

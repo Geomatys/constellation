@@ -675,6 +675,7 @@
     "service.edit.dashboard.date.from":"From",
     "service.edit.dashboard.button.graph.hide":"Hide graph",
     "service.edit.dashboard.button.graph.show":"Show graph",
+    "service.edit.dashboard.wmts.action.addnewlayer.button":"Add new layer",
     "service.id.label":"Service identifier",
     "service.menu.delete.label": "Delete service",
     "service.menu.edit.label": "Edit",

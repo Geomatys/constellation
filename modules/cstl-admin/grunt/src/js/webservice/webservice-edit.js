@@ -347,6 +347,26 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             });
         };
 
+        $scope.showDataToAddWMTS = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/webservice/wmts/modalAddLayer.html',
+                controller: 'WMTSAddLayerModalController',
+                resolve: {
+                    service: function() { return $scope.service; }
+                }
+            });
+
+            modal.result.then(function() {
+                $scope.layers = webService.layers({type: $scope.type,
+                                                   id: $routeParams.id},
+                                                   {},
+                    function (response) {//success
+                        Dashboard($scope, response, true);
+                    }
+                );
+            });
+        };
+
         $scope.deleteLayer = function() {
             var keymsg = ($scope.service.type.toLowerCase() === 'wmts') ? "dialog.message.confirm.delete.tiledLayer" : "dialog.message.confirm.delete.layer";
             if ($scope.selected) {
@@ -394,10 +414,12 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
         };
 
         $scope.deleteTiledData = function(service, layerName, providerId) {
-            dataListing.deletePyramidFolder({providerId: providerId}, function() {
-                provider.delete({id: providerId}, function() {}, function() {
-                    Growl('error','Error','Unable to delete data for layer '+ layerName);
-                });
+            dataListing.deletePyramidFolder({providerId: providerId}, function(response) {
+                if(response.isPyramid){
+                    provider.delete({id: providerId}, function() {}, function() {
+                        Growl('error','Error','Unable to delete data for layer '+ layerName);
+                    });
+                }
             });
         };
 
@@ -744,4 +766,156 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         $controller('EditMetadataController', {$scope: $scope});
 
+    })
+
+    .controller('WMTSAddLayerModalController', function($scope, dataListing, webService, Dashboard, $modalInstance,
+                                                service, Growl) {
+        /**
+         * To fix angular bug with nested scope.
+         */
+        $scope.wrap = {};
+        //the wmts service object
+        $scope.service = service;
+
+        $scope.wrap.nbbypage = 5;
+
+        // for SDI this params are hardcoded
+        $scope.tileFormat = undefined; //PNG will be used as default
+        $scope.crs = "EPSG:3857";
+        $scope.scales = [];
+
+        $scope.init = function() {
+            dataListing.listAll({}, function (response) {
+                Dashboard($scope, response, true);
+            });
+        };
+
+        $scope.dataSelect={all:false};
+        $scope.listSelect=[];
+
+        /**
+         * Proceed to select all items of dashboard
+         * depending on the property binded to checkbox.
+         */
+        $scope.selectAllData = function() {
+            $scope.listSelect = ($scope.dataSelect.all) ? $scope.wrap.fullList.slice(0) : [];
+        };
+        /**
+         * binding call when clicking on each row item.
+         */
+        $scope.toggleDataInArray = function(item){
+            var itemExists = false;
+            for (var i = 0; i < $scope.listSelect.length; i++) {
+                if ($scope.listSelect[i].Id === item.Id) {
+                    itemExists = true;
+                    $scope.listSelect.splice(i, 1);//remove item
+                    break;
+                }
+            }
+            if(!itemExists){
+                $scope.listSelect.push(item);
+            }
+            $scope.dataSelect.all=($scope.listSelect.length === $scope.wrap.fullList.length);
+
+        };
+        /**
+         * Returns true if item is in the selected items list.
+         * binding function for css purposes.
+         * @param item
+         * @returns {boolean}
+         */
+        $scope.isInSelected = function(item){
+            for(var i=0; i < $scope.listSelect.length; i++){
+                if($scope.listSelect[i].Id === item.Id){
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        function addLayer(tiledProvider) {
+            webService.addLayer({type: service.type, id: service.identifier},
+                                {layerAlias: tiledProvider.dataId,
+                                 layerId: tiledProvider.dataId,
+                                 serviceType: service.type,
+                                 serviceId: service.identifier,
+                                 providerId: tiledProvider.providerId},
+                function () {//success
+                    Growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
+                    $modalInstance.close();
+                },
+                function () {
+                    Growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
+                    $modalInstance.dismiss('close');
+                }
+            );
+        }
+
+        function pyramidGenerationError() {
+            Growl('error', 'Error', 'Failed to generate pyramid');
+            $modalInstance.dismiss('close');
+        }
+
+        /**
+         * @FIXME rewrite this function to call rest api outside loop
+         * the server side must provide method to treat pyramid with an array instead of treating for each data item.
+         * @TODO ugly code, the client side should never call rest api inside a loop.
+         */
+        $scope.choose = function() {
+            if ($scope.listSelect.length !== 0) {
+                $scope.selected = $scope.listSelect;
+            }
+            if (!$scope.selected) {
+                Growl('warning', 'Warning', 'No data selected');
+                $modalInstance.dismiss('close');
+                return;
+            }
+            //WMTS pyramid
+            //using angular.forEach to avoid jsHint warning when declaring function in loop
+            //@TODO move to server side with a single request
+            angular.forEach($scope.selected, function(layer, key){
+                dataListing.pyramidScales({providerId: layer.Provider,
+                        dataId: layer.Name,
+                        crs: $scope.crs},
+                    function(response){//success
+                        $scope.scales = response.Entry[0].split(',');
+                        dataListing.pyramidData({provider: layer.Provider,
+                                dataName: layer.Name,
+                                dataId: layer.Id},
+                            {tileFormat: $scope.tileFormat,
+                                crs: $scope.crs,
+                                scales: $scope.scales},
+                            addLayer,
+                            pyramidGenerationError);
+                    },function(){//error
+                        Growl('error', 'Error', 'No scale can automatically be set');
+                    }
+                );
+            });
+        };
+
+        /**
+         * truncate text with JS.
+         * Why not use CSS for this?
+         *
+         * css rule is
+         * {
+         *  width: 100px
+         *  white-space: nowrap
+         *  overflow: hidden
+         *  text-overflow: ellipsis // This is where the magic happens
+         *  }
+         *
+         * @param text
+         * @returns {string}
+         */
+        $scope.truncate = function(text){
+            if(text) {
+                return (text.length > 40) ? text.substr(0, 40) + "..." : text;
+            }
+        };
     });

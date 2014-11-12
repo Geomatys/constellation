@@ -372,13 +372,24 @@
                         </div>
                         <div class="col-sm-4">
                             <div style="margin-bottom:10px;"
-                                 ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps'">
+                                 ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps' && service.type.toLowerCase() !== 'wmts'">
                                 <a data-toggle="modal"
                                    class="btn btn-add btn-lg btn-block"
                                    ng-click="showDataToAdd()" id="showDataToAdd">
                                     <span class="fa fa-plus"
                                           style="margin-right:5px;"></span>
                                     <span translate="service.edit.dashboard.action.add.button">Add</span>
+                                </a>
+                            </div>
+                            <div style="margin-bottom:10px;"
+                                 ng-if="service.type.toLowerCase() === 'wmts'">
+                                <a id="showDataToAddWMTS"
+                                   data-toggle="modal"
+                                   class="btn btn-add btn-lg btn-block"
+                                   ng-click="showDataToAddWMTS()">
+                                    <span class="fa fa-plus"
+                                          style="margin-right:5px;"></span>
+                                    <span translate="service.edit.dashboard.wmts.action.addnewlayer.button">Add new layer</span>
                                 </a>
                             </div>
                             <div id="selection">
