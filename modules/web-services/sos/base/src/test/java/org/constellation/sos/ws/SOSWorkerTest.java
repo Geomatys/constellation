@@ -111,7 +111,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Guilhem Legal (Geomatys)
  */
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles("standard")
+@ActiveProfiles({"standard","derby"})
 public abstract class SOSWorkerTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

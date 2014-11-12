@@ -17,8 +17,9 @@
 
 package org.constellation.admin;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.ObjectUtils;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.Provider;
@@ -28,9 +29,7 @@ import org.constellation.provider.DataProviders;
 import org.geotoolkit.coverage.CoverageStoreFactory;
 import org.geotoolkit.coverage.filestore.FileCoverageStoreFactory;
 import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.referencing.CRS;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
@@ -38,12 +37,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Date: 18/09/14
@@ -53,7 +49,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles("standard")
+@ActiveProfiles({"standard", "derby"})
 public class ProviderBusinessTest implements ApplicationContextAware {
 
     @Autowired

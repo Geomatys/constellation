@@ -61,7 +61,7 @@ import org.springframework.test.context.ActiveProfiles;
 @Ignore //issue with Spring security filter and grizzly
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles("standard")
+@ActiveProfiles({"standard","derby"})
 public class ConstellationServerTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

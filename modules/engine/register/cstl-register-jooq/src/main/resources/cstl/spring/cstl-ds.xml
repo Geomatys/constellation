@@ -1,6 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-  xmlns:context="http://www.springframework.org/schema/context"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
   xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jee="http://www.springframework.org/schema/jee"
   xmlns:util="http://www.springframework.org/schema/util"
   xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
@@ -15,13 +14,10 @@
     <!-- (in this case, JDBC-related settings for the dataSource definition below) -->
     
   
-    <!-- DataSource configuration for the tomcat jdbc connection pool
-    See here for more details on commons-dbcp versus tomcat-jdbc:
-    http://blog.ippon.fr/2013/03/13/improving-the-performance-of-the-spring-petclinic-sample-application-part-3-of-5/-->
-
- <bean id="dataSource" class="org.constellation.admin.EmbeddedDatabase" factory-method="getOrCreateDataSource"></bean>
+    <!-- DataSource configuration for the tomcat jdbc connection pool -->
 <!--     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close" -->
 <!--           p:driverClassName="${jdbc.driverClassName}" p:url="jdbc:${jdbc.database}:${user.home}/.constellation/admin-db;create=true" /> -->
+
 
 
   <bean id="database-initer" class="liquibase.integration.spring.SpringLiquibase">
@@ -32,7 +28,33 @@
       contexts specifies the runtime contexts to use.
       -->
     <property name="contexts" value="test, production" />
+    
   </bean>
+
+  <beans profile="derby">
+    <bean id="dataSource" class="org.constellation.admin.EmbeddedDatabase" factory-method="getOrCreateDataSource"></bean>
+  </beans>
+
+<!--   <beans profile="derby"> -->
+<!--     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" -->
+<!--       p:url="jdbc:derby:/Users/cheleb/.constellation/mydbamoi;create=true" /> -->
+
+<!--   </beans> -->
+  
+  <beans profile="h2">
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close" p:driverClassName="org.h2.Driver"
+      p:url="jdbc:h2:/Users/cheleb/.constellation/myh2" />
+
+  </beans>
+
+  <beans profile="postgresql">
+  <!-- DataSource configuration for the tomcat jdbc connection pool -->
+
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close" p:driverClassName="org.postgresql.Driver"
+      p:url="jdbc:postgresql:constellation" />
+
+  </beans>
+
 
 </beans>
 

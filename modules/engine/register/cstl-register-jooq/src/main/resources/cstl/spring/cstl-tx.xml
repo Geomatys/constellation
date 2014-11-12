@@ -6,7 +6,7 @@
 
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource" />
-    <qualifier value="txManager"/>
+    <qualifier value="txManager" />
   </bean>
 
 
@@ -49,10 +49,10 @@
       <null />
     </constructor-arg>
     <constructor-arg index="5">
-      <value type="org.jooq.SQLDialect">DERBY</value>
+      <ref bean="dialect" />
     </constructor-arg>
     <constructor-arg index="6">
-      <null />
+      <ref bean="jooq-setting" />
     </constructor-arg>
     <constructor-arg index="7">
       <null />
@@ -62,11 +62,24 @@
   <!-- Configure the DSL object, optionally overriding jOOQ Exceptions with Spring Exceptions -->
   <bean id="dsl" class="org.jooq.impl.DefaultDSLContext">
     <constructor-arg ref="config" />
-    <qualifier value="dsl"/>
+    <qualifier value="dsl" />
   </bean>
 
+<!--   <beans profile="postgresql"> -->
+<!--   </beans> -->
 
-  
 
+
+  <beans profile="postgresql">
+    <bean class="org.constellation.engine.register.configuration.JooqPostgreSQLConfiguration" />
+  </beans>
+
+  <beans profile="h2">
+    <bean class="org.constellation.engine.register.configuration.JooqH2Configuration" />
+  </beans>
+
+  <beans profile="derby">
+    <bean class="org.constellation.engine.register.configuration.JooqDerbyConfiguration" />
+  </beans>
 
 </beans>

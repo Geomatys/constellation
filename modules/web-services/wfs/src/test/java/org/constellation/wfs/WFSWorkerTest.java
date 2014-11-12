@@ -147,7 +147,7 @@ import org.springframework.test.context.ContextConfiguration;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles("standard")
+@ActiveProfiles({"standard","derby"})
 public class WFSWorkerTest implements ApplicationContextAware {
 
     private static final Logger LOGGER = Logging.getLogger(WFSWorkerTest.class);

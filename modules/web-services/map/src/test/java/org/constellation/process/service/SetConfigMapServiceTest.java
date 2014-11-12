@@ -85,8 +85,6 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
             fail();
         } catch (ProcessException ex) {
             assertEquals("Service " + serviceName.toLowerCase() + ":instance10 not found.", ex.getCause().getMessage());
-        } finally {
-            deleteInstance(serviceBusiness, "instance10");
-        }
+        } 
     }
 }

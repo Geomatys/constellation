@@ -3,6 +3,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
+  
+
+  <changeSet id="init-schema" author="olivier">
+    <sql>create schema admin</sql>
+  </changeSet>
 
   <changeSet id="init-v1" author="olivier">
     <createTable schemaName="admin" tableName="cstl_user">

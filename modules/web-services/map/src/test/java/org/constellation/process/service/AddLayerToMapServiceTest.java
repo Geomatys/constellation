@@ -36,7 +36,9 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.util.FileUtilities;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.filter.Filter;
@@ -45,7 +47,10 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
@@ -71,8 +76,8 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
     private static final DataReference STYLE_DATA_REF = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "styleProvider", "redBlue");
     private static final FilterFactory FF = FactoryFinder.getFilterFactory(null);
     
-    @BeforeClass
-    public static void createProvider() throws ConfigurationException{
+    @Before
+    public void createProvider() throws ConfigurationException{
         
         ParameterDescriptorGroup sourceDesc = null;
         ProviderFactory service = null;
@@ -107,8 +112,8 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         DataProviders.getInstance().createProvider("shapeProvider",(DataProviderFactory) service, sourceValue);
     }
     
-    @AfterClass
-    public static void destroyProvider() throws ConfigurationException {
+    @After
+    public void destroyProvider() throws ConfigurationException {
         DataProvider provider = null;
         for (DataProvider p : DataProviders.getInstance().getProviders()) {
             if (p.getId().equals("shapeProvider")) {
