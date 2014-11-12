@@ -382,14 +382,13 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     layerData = DataViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,
                         layerName,
                         providerId,
-                        $scope.dataCtrl.selectedDataSetChild.TargetStyle[0].Name);
+                        $scope.dataCtrl.selectedDataSetChild.TargetStyle[0].Name,
+                        null,null,true);
                 } else {
-                    layerData = DataViewer.createLayer($scope.dataCtrl.cstlUrl, layerName, providerId);
+                    layerData = DataViewer.createLayer($scope.dataCtrl.cstlUrl, layerName, providerId,null,true);
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
-
-                //var layerBackground = DataViewer.createLayer($scope.dataCtrl.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
 
                 //attach event loader in modal map viewer
                 layerData.on('precompose',function(){
@@ -872,36 +871,41 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         $scope.dataSelect={all:false};
         $scope.listSelect=[];
 
+        /**
+         * Proceed to select all items of dashboard
+         * depending on the property binded to checkbox.
+         */
         $scope.selectAllData = function() {
-            if ($scope.dataSelect.all) {
-                $scope.listSelect = $scope.wrap.dataList.slice();
-            }else{
-                $scope.listSelect=[];
-            }
+            $scope.listSelect = ($scope.dataSelect.all) ? $scope.wrap.fullList.slice(0) : [];
         };
-        $scope.dataInArray = function(item){
-            if($scope.listSelect.length>0) {
-                for (var i = 0; i < $scope.listSelect.length; i++) {
-                    if ($scope.listSelect[i].Name === item.Name && $scope.listSelect[i].Provider === item.Provider) {
-                        $scope.listSelect.splice(i, 1);
-                        break;
-                    }
-                    if(i===$scope.listSelect.length-1){
-                        if ($scope.listSelect[i].Name !== item.Name || $scope.listSelect[i].Provider !== item.Provider){
-                            $scope.listSelect.push(item);
-                            break;
-                        }
-                    }
-                }
-            } else { $scope.listSelect.push(item);}
 
-            if($scope.listSelect.length < $scope.wrap.dataList.length){
-                $scope.dataSelect.all=false;
-            } else { $scope.dataSelect.all=true; }
+        /**
+         * binding call when clicking on each row item.
+         */
+        $scope.toggleDataInArray = function(item){
+            var itemExists = false;
+            for (var i = 0; i < $scope.listSelect.length; i++) {
+                if ($scope.listSelect[i].Id === item.Id) {
+                    itemExists = true;
+                    $scope.listSelect.splice(i, 1);//remove item
+                    break;
+                }
+            }
+            if(!itemExists){
+                $scope.listSelect.push(item);
+            }
+            $scope.dataSelect.all=($scope.listSelect.length === $scope.wrap.fullList.length);
+
         };
+        /**
+         * Returns true if item is in the selected items list.
+         * binding function for css purposes.
+         * @param item
+         * @returns {boolean}
+         */
         $scope.isInSelected = function(item){
             for(var i=0; i < $scope.listSelect.length; i++){
-                if($scope.listSelect[i].Name === item.Name && $scope.listSelect[i].Provider === item.Provider){
+                if($scope.listSelect[i].Id === item.Id){
                     return true;
                 }
             }
@@ -914,13 +918,17 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
 
         function addLayer(tiledProvider) {
             webService.addLayer({type: service.type, id: service.identifier},
-                {layerAlias: tiledProvider.dataId, layerId: tiledProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: tiledProvider.providerId},
-                function () {
-                    Growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
+                                {layerAlias: tiledProvider.dataId,
+                                 layerId: tiledProvider.dataId,
+                                 serviceType: service.type,
+                                 serviceId: service.identifier,
+                                 providerId: tiledProvider.providerId},
+                function () {//success
+                    Growl('success','Success','Layer '+tiledProvider.dataId+' successfully added to service '+service.name);
                     $modalInstance.close();
                 },
                 function () {
-                    Growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
+                    Growl('error','Error','Layer '+tiledProvider.dataId+' failed to be added to service '+service.name);
                     $modalInstance.dismiss('close');
                 }
             );
@@ -1013,11 +1021,24 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
             }
         };
 
+        /**
+         * truncate text with JS.
+         * Why not use CSS for this?
+         *
+         * css rule is
+         * {
+         *  width: 100px
+         *  white-space: nowrap
+         *  overflow: hidden
+         *  text-overflow: ellipsis // This is where the magic happens
+         *  }
+         *
+         * @param text
+         * @returns {string}
+         */
         $scope.truncate = function(text){
             if(text) {
-                if (text.length > 40) {
-                    return text.substr(0, 40) + "...";
-                } else { return text; }
+                return (text.length > 40) ? text.substr(0, 40) + "..." : text;
             }
         };
     })

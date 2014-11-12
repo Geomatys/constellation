@@ -582,7 +582,8 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                             layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
                         }else {
                             //create portrayal layer
-                            layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
+                            layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId,
+                                $scope.selected.TargetStyle[0].Name,null,null,true);
                         }
                     } else {
                         if($scope.service.type.toLowerCase() === 'wms') {
@@ -590,7 +591,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                             layerData = DataViewer.createLayerWMS($cookies.cstlUrl, layerName, $scope.service.identifier);
                         }else {
                             //create portrayal layer
-                            layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+                            layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId,null,true);
                         }
                     }
 
@@ -845,11 +846,11 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                                  serviceId: service.identifier,
                                  providerId: tiledProvider.providerId},
                 function () {//success
-                    Growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
+                    Growl('success','Success','Layer '+tiledProvider.dataId+' successfully added to service '+service.name);
                     $modalInstance.close();
                 },
                 function () {
-                    Growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
+                    Growl('error','Error','Layer '+tiledProvider.dataId+' failed to be added to service '+service.name);
                     $modalInstance.dismiss('close');
                 }
             );

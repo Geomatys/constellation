@@ -97,27 +97,39 @@ window.DataViewer = {
         DataViewer.map.getView().setZoom(DataViewer.map.getView().getZoom()+1);
     },
 
-    createLayer : function(cstlUrlPrefix, layerName, providerId, filter){
+    createLayer : function(cstlUrlPrefix, layerName, providerId, filter, tiled){
         var params = {
             'LAYERS':      layerName,
             'PROVIDER':    providerId,
             'VERSION':     '1.3.0',
             'SLD_VERSION': '1.1.0',
-            'FORMAT':      'image/png',
-            'CQLFILTER': filter
+            'FORMAT':      'image/png'
         };
-        var layer = new ol.layer.Tile({
-            source: new ol.source.TileWMS({
-                url: cstlUrlPrefix +'api/1/portrayal/portray',
-                params: params
-            })
-        });
+        if(filter){
+            params.CQLFILTER=filter;
+        }
+        var layer;
+        if(tiled){
+            layer = new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                    url: cstlUrlPrefix +'api/1/portrayal/portray',
+                    params: params
+                })
+            });
+        }else {
+            layer = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    url: cstlUrlPrefix +'api/1/portrayal/portray',
+                    params: params
+                })
+            });
+        }
         layer.set('params',params);
         layer.set('name', layerName);
         return layer;
     },
 
-    createLayerWithStyle : function(cstlUrlPrefix, layerName, providerId, style, sldProvider, filter){
+    createLayerWithStyle : function(cstlUrlPrefix, layerName, providerId, style, sldProvider, filter, tiled){
         var sldProvName = (sldProvider) ? sldProvider : "sld";
         var params = {
             'LAYERS':      layerName,
@@ -126,15 +138,27 @@ window.DataViewer = {
             'SLD_VERSION': '1.1.0',
             'FORMAT':      'image/png',
             'SLDID':       (style) ? style : '',
-            'SLDPROVIDER': sldProvName,
-            'CQLFILTER': filter
+            'SLDPROVIDER': sldProvName
         };
-        var layer = new ol.layer.Tile({
-            source: new ol.source.TileWMS({
-                url: cstlUrlPrefix +'api/1/portrayal/portray/style',
-                params: params
-            })
-        });
+        if(filter){
+            params.CQLFILTER=filter;
+        }
+        var layer;
+        if(tiled){
+            layer = new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                    url: cstlUrlPrefix +'api/1/portrayal/portray/style',
+                    params: params
+                })
+            });
+        }else {
+            layer = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    url: cstlUrlPrefix +'api/1/portrayal/portray/style',
+                    params: params
+                })
+            });
+        }
         layer.set('params',params);
         layer.set('name', layerName);
         return layer;

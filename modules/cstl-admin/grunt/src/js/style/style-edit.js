@@ -2023,9 +2023,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 }
                 var layerData;
                 if(styleName){
-                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, styleName);
+                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                        $scope.providerId, styleName,null,null,false);
                 }else {
-                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
+                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId,null,true);
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
@@ -2051,21 +2052,26 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         var layerData;
                         if($scope.selectedLayer){
                             if($scope.newStyle.rules.length ===0){
-                                layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
+                                layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName,
+                                    $scope.providerId,null,true);
                             }else {
-                                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name, "sld_temp");
+                                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                    $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                             }
                         }else {
                             //if there is no selectedLayer ie the sld editor in styles dashboard
                             if ($scope.dataType.toLowerCase() === 'raster') {
                                 //to avoid layer disappear when rules is empty
                                 if($scope.newStyle.rules.length ===0){
-                                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
+                                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName,
+                                        $scope.providerId,null,true);
                                 }else {
-                                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name, "sld_temp");
+                                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                        $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                                 }
                             }else {
-                                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name, "sld_temp");
+                                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                    $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                             }
                         }
                         //to force the browser cache reloading styled layer.

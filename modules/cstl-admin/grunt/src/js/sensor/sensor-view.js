@@ -55,7 +55,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.initMap = function() {
-            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp",null,true);
             sos.getFeatures({id: $scope.service.identifier, sensor: $scope.sensorId}, function(wkt) {
                 var wktReader = new ol.format.WKT();
                 var features = wktReader.readFeatures(wkt.value);
