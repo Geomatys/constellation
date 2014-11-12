@@ -75,6 +75,13 @@
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-coverage-geotiff</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverage-xml</artifactId>
+            <version>${geotoolkit.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.constellation.testing</groupId>
             <artifactId>cstl-test-data</artifactId>

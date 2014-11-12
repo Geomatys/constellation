@@ -110,6 +110,11 @@
         <!-- Geomatys external project -->
         <dependency>
             <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverage-xml</artifactId>
+            <version>${geotoolkit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-feature-shapefile</artifactId>
         </dependency>
         <dependency>

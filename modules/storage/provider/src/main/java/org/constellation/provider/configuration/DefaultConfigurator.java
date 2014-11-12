@@ -63,7 +63,6 @@ import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
@@ -161,7 +160,7 @@ public final class DefaultConfigurator implements Configurator {
         if(provider==null) provider = StyleProviders.getInstance().getProvider(providerId);
         final ProviderType type = provider.getProviderType();
         final String factoryName = provider.getFactory().getName();
-        
+
 //        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config)
         try {
             final org.constellation.engine.register.Provider pr = providerBusiness.storeProvider(providerId, null, type, factoryName, config);
