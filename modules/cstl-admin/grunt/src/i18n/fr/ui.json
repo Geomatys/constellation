@@ -228,7 +228,7 @@
     "edition.style.label.size": "Taille",
     "edition.style.label.square": "Carré",
     "edition.style.label.star": "Etoile",
-    "edition.style.label.stroke": "Contour",
+    "edition.style.label.stroke": "Contour de ligne",
     "edition.style.label.style": "Style",
     "edition.style.label.symbolizers": "Symboles",
     "edition.style.label.text": "Texte",
@@ -998,6 +998,8 @@
     "sldeditor.edition.apply":"Appliquer",
     "sldeditor.edition.rasterCells.cellSize":"Taille des cellules",
     "sldeditor.edition.rasterCells.cellType":"Type",
+    "sldeditor.edition.expression.btn.help":"Donner une expression en fonction d'un attribut",
+    "sldeditor.edition.expression.raster.btn.help":"Donner un expression",
 
     "tooltip.service.create.name":"L'identifiant peut être le même que le nom",
     "tooltip.service.create.tag":"Utiliser la touche Tab ou Entrée pour valider un mot-clé",

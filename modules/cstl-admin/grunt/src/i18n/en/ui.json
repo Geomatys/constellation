@@ -228,7 +228,7 @@
     "edition.style.label.size": "Size",
     "edition.style.label.square": "Square",
     "edition.style.label.star": "Star",
-    "edition.style.label.stroke": "Stroke",
+    "edition.style.label.stroke": "Stroke line",
     "edition.style.label.style": "Style",
     "edition.style.label.style.name": "Style name",
     "edition.style.label.symbolizers": "Symbolizers",
@@ -1022,6 +1022,8 @@
     "sldeditor.edition.apply":"Apply",
     "sldeditor.edition.rasterCells.cellSize":"Cell size",
     "sldeditor.edition.rasterCells.cellType":"Cell type",
+    "sldeditor.edition.expression.btn.help":"Set expression value with attribute",
+    "sldeditor.edition.expression.raster.btn.help":"Set an expression value",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",

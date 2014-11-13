@@ -25,12 +25,12 @@ import org.opengis.filter.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
 import static org.constellation.json.util.StyleUtilities.literal;
+import static org.constellation.json.util.StyleUtilities.parseExpression;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -44,7 +44,7 @@ public final class Font implements StyleElement<org.opengis.style.Font> {
      */
     private static final Logger LOGGER = Logging.getLogger(Font.class);
 
-    private double size    = 12;
+    private String size    = "12";
     private boolean bold   = false;
     private boolean italic = false;
     private List<String> family = new ArrayList<>();
@@ -57,12 +57,7 @@ public final class Font implements StyleElement<org.opengis.style.Font> {
 
         final Expression sizeExp = font.getSize();
         if(sizeExp != null){
-            final String sizeStr = CQL.write(sizeExp);
-            try {
-                size = Double.parseDouble(sizeStr);
-            }catch (NumberFormatException ex){
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(),ex);
-            }
+            size = CQL.write(sizeExp);
         }
         final Expression weightExp = font.getWeight();
         if (weightExp != null) {
@@ -77,11 +72,11 @@ public final class Font implements StyleElement<org.opengis.style.Font> {
         }
     }
 
-    public double getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(final double size) {
+    public void setSize(final String size) {
         this.size = size;
     }
 
@@ -122,6 +117,6 @@ public final class Font implements StyleElement<org.opengis.style.Font> {
                 famExp,
                 literal(this.italic ? "italic" : "normal"),
                 literal(this.bold ? "bold" : "normal"),
-                literal(this.size));
+                parseExpression(this.size));
     }
 }

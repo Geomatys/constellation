@@ -24,13 +24,12 @@ import org.geotoolkit.cql.CQL;
 import org.opengis.filter.expression.Expression;
 
 import java.awt.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
 import static org.constellation.json.util.StyleUtilities.literal;
-import static org.constellation.json.util.StyleUtilities.opacity;
+import static org.constellation.json.util.StyleUtilities.parseExpression;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -44,8 +43,8 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
     private static final Logger LOGGER = Logging.getLogger(Stroke.class);
 
     private String color   = "#000000";
-    private double opacity = 1.0;
-    private double width   = 1.0;
+    private String opacity = "1.0";
+    private String width   = "1.0";
     private boolean dashed = false;
     private String lineJoin = "round";
     private String lineCap = "round";
@@ -61,22 +60,12 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         color = String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
         final Expression opacityExp = stroke.getOpacity();
         if(opacityExp != null){
-            final String opacityStr = CQL.write(opacityExp);
-            try {
-                opacity = Double.parseDouble(opacityStr);
-            }catch(NumberFormatException ex){
-                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-            }
+            opacity = CQL.write(opacityExp);
         }
 
         final Expression widthExp = stroke.getWidth();
         if(widthExp != null){
-            final String widthStr = CQL.write(widthExp);
-            try {
-                width = Double.parseDouble(widthStr);
-            }catch(NumberFormatException ex){
-                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-            }
+            width = CQL.write(widthExp);
         }
         dashed  = (stroke.getDashArray() != null);
         lineJoin = stroke.getLineJoin().evaluate(null, String.class);
@@ -93,19 +82,19 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         return color;
     }
 
-    public double getOpacity() {
+    public String getOpacity() {
         return opacity;
     }
 
-    public void setOpacity(final double opacity) {
+    public void setOpacity(final String opacity) {
         this.opacity = opacity;
     }
 
-    public double getWidth() {
+    public String getWidth() {
         return width;
     }
 
-    public void setWidth(final double width) {
+    public void setWidth(final String width) {
         this.width = width;
     }
 
@@ -157,8 +146,8 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
     public org.opengis.style.Stroke toType() {
         return SF.stroke(
                 literal(this.color),
-                opacity(opacity),
-                literal(this.width),
+                parseExpression(opacity),
+                parseExpression(this.width),
                 literal(this.lineJoin),
                 literal(this.lineCap),
                 dashArray,

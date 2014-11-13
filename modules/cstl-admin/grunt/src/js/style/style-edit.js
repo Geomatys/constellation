@@ -16,8 +16,9 @@
 
 angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('StyleModalController', function($scope, Dashboard, $modalInstance, style, $cookies, dataListing, provider, Growl,
-                                                 textService, newStyle, selectedLayer,selectedStyle, serviceName, exclude, $timeout,stylechooser,$modal) {
+    .controller('StyleModalController', function($scope, Dashboard, $modalInstance, style, $cookies, dataListing,
+                                                 provider, Growl, textService, newStyle, selectedLayer,selectedStyle,
+                                                 serviceName, exclude, $timeout,stylechooser,$modal) {
 
         /**
          * To fix angular bug with nested scope.
@@ -185,7 +186,9 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 }],
                 chart:{
                     "widget":null,
-                    "attribute":""
+                    "attribute":"",
+                    "min":null,
+                    "max":null
                 }
             };
         }
@@ -2366,6 +2369,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
             //Now send all params to server and it will create the temporary style and returns the full style as json object.
             style.getChartDataJson({}, parameters,
                 function(response) {
+                    $scope.optionsSLD.chart.min=response.minimum;
+                    $scope.optionsSLD.chart.max=response.maximum;
                     if(response.mapping){
                         var xarray = [];
                         var yarray = [];
@@ -2388,11 +2393,52 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
 
         };
 
+
+        /**
+         * utility function that returns true if the expression is a number.
+         * otherwise return false.
+         * @param expr
+         * @returns {boolean}
+         */
+        $scope.isExpressionNumber = function(expr) {
+            var n = Number(expr);
+            return isFinite(n);
+        };
+
+        $scope.styleBtnSelected = {"color":'#ffffff',"background-color":'#c1c1c1'};
+        $scope.styleBtnDefault = {"color":'#333333',"background-color":'#ffffff'};
+
+        $scope.setAttrToInputSize = function(attrName,symbolizerGraphicOrFont) {
+            symbolizerGraphicOrFont.size = attrName;
+        };
+        $scope.setAttrToInputRotation = function(attrName,symbolizerGraphic) {
+            symbolizerGraphic.rotation = attrName;
+        };
+        $scope.setAttrToInputOpacity = function(attrName,symbolizerGraphic) {
+            symbolizerGraphic.opacity = attrName;
+        };
+        $scope.setAttrToInputWidth = function(attrName,symbolizerStroke) {
+            symbolizerStroke.width = attrName;
+        };
+
+        /**
+         * truncate text with JS.
+         * Why not use CSS for this?
+         *
+         * css rule is
+         * {
+         *  width: 100px
+         *  white-space: nowrap
+         *  overflow: hidden
+         *  text-overflow: ellipsis // This is where the magic happens
+         *  }
+         *
+         * @param text
+         * @returns {string}
+         */
         $scope.truncate = function(text){
             if(text) {
-                if (text.length > 30) {
-                    return text.substr(0, 30) + "...";
-                } else {return text;}
+                return (text.length > 30) ? text.substr(0, 30) + "..." : text;
             }
         };
 

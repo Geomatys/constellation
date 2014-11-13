@@ -680,6 +680,11 @@
                         </div>
                     </div>
                 </div>
+                <div ng-if="optionsSLD.chart.max !== null && optionsSLD.chart.min !== null"
+                     style="position:absolute;right:20px;top:30px;">
+                    <span>Min: {{optionsSLD.chart.min}}</span>
+                    <span>Max: {{optionsSLD.chart.max}}</span>
+                </div>
                 <div style="height: 250px;position: relative;">
                     <div id="chart" ng-init="initVectorPlot();"></div>
                 </div>
