@@ -419,6 +419,7 @@
     "label.mapcontext.system":"Composition cartographique",
     "label.name": "Nom",
     "label.new.style": "Associer un nouveau style",
+    "label.new.style.select": "Sélectionner un nouveau style",
     "label.new.sensor": "Associer un nouveau capteur",
     "label.no.association": "Aucune association.",
     "label.no.available.data": "Aucune donnée disponible.",

@@ -373,6 +373,7 @@
     "label.mapcontext.system":"Map context",
     "label.name": "Name",
     "label.new.style": "Associate a new style",
+    "label.new.style.select": "Select a new style",
     "label.new.sensor": "Associate a new sensor",
     "label.no.association": "No association.",
     "label.no.available.data": "No available data.",
