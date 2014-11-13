@@ -19,10 +19,14 @@
 
 package org.constellation.json.binding;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.cql.CQL;
 import org.opengis.filter.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
@@ -35,6 +39,11 @@ import static org.constellation.json.util.StyleUtilities.literal;
  */
 public final class Font implements StyleElement<org.opengis.style.Font> {
 
+    /**
+     * Used for debugging purposes.
+     */
+    private static final Logger LOGGER = Logging.getLogger(Font.class);
+
     private double size    = 12;
     private boolean bold   = false;
     private boolean italic = false;
@@ -45,14 +54,23 @@ public final class Font implements StyleElement<org.opengis.style.Font> {
 
     public Font(org.opengis.style.Font font) {
         ensureNonNull("font", font);
-        if (font.getSize() != null) {
-            size = Double.parseDouble(font.getSize().toString());
+
+        final Expression sizeExp = font.getSize();
+        if(sizeExp != null){
+            final String sizeStr = CQL.write(sizeExp);
+            try {
+                size = Double.parseDouble(sizeStr);
+            }catch (NumberFormatException ex){
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(),ex);
+            }
         }
-        if (font.getWeight() != null) {
-            bold = "bold".equals(font.getWeight().toString());
+        final Expression weightExp = font.getWeight();
+        if (weightExp != null) {
+            bold = "bold".equals(CQL.write(weightExp));
         }
-        if (font.getStyle() != null) {
-            italic = "italic".equals(font.getStyle().toString());
+        final Expression styleExp = font.getStyle();
+        if (styleExp != null) {
+            italic = "italic".equals(CQL.write(styleExp));
         }
         for (final Expression fam : font.getFamily()) {
             family.add(fam.evaluate(null, String.class));

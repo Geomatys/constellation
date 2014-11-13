@@ -19,6 +19,8 @@
 
 package org.constellation.json.binding;
 
+import org.geotoolkit.cql.CQL;
+import org.opengis.filter.expression.Expression;
 import org.opengis.style.GraphicalSymbol;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
@@ -43,9 +45,18 @@ public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
 
     public Graphic(final org.opengis.style.Graphic graphic) {
         ensureNonNull("graphic", graphic);
-        this.size     = graphic.getSize().toString();
-        this.opacity  = graphic.getOpacity().toString();
-        this.rotation = graphic.getRotation().toString();
+        final Expression sizeExp = graphic.getSize();
+        if(sizeExp!=null){
+            this.size = CQL.write(sizeExp);
+        }
+        final Expression opacityExp = graphic.getOpacity();
+        if(opacityExp!=null){
+            this.opacity = CQL.write(opacityExp);
+        }
+        final Expression rotationExp = graphic.getRotation();
+        if(rotationExp!=null){
+            this.rotation = CQL.write(rotationExp);
+        }
         for (final GraphicalSymbol gs : graphic.graphicalSymbols()) {
             if (gs instanceof org.opengis.style.Mark) {
                 this.mark = new Mark((org.opengis.style.Mark) gs);

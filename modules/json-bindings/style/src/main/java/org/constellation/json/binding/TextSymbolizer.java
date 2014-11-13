@@ -19,6 +19,9 @@
 
 package org.constellation.json.binding;
 
+import org.geotoolkit.cql.CQL;
+import org.opengis.filter.expression.Expression;
+
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
 import static org.constellation.json.util.StyleUtilities.expression;
@@ -42,8 +45,9 @@ public final class TextSymbolizer implements Symbolizer {
     public TextSymbolizer(final org.opengis.style.TextSymbolizer symbolizer) {
         ensureNonNull("symbolizer", symbolizer);
         name = symbolizer.getName();
-        if (symbolizer.getLabel() != null) {
-            this.label = symbolizer.getLabel().toString();
+        final Expression labelExp = symbolizer.getLabel();
+        if (labelExp != null) {
+            this.label = CQL.write(labelExp);
         }
         if (symbolizer.getFont() != null) {
             this.font = new Font(symbolizer.getFont());

@@ -19,7 +19,13 @@
 
 package org.constellation.json.binding;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.cql.CQL;
+import org.opengis.filter.expression.Expression;
+
 import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
@@ -32,6 +38,10 @@ import static org.constellation.json.util.StyleUtilities.opacity;
  * @since 0.9
  */
 public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
+    /**
+     * Used for debugging purposes.
+     */
+    private static final Logger LOGGER = Logging.getLogger(Stroke.class);
 
     private String color   = "#000000";
     private double opacity = 1.0;
@@ -49,8 +59,25 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         ensureNonNull("stroke", stroke);
         final Color col = stroke.getColor().evaluate(null, Color.class);
         color = String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
-        opacity = Double.parseDouble(stroke.getOpacity().toString());
-        width   = Double.parseDouble(stroke.getWidth().toString());
+        final Expression opacityExp = stroke.getOpacity();
+        if(opacityExp != null){
+            final String opacityStr = CQL.write(opacityExp);
+            try {
+                opacity = Double.parseDouble(opacityStr);
+            }catch(NumberFormatException ex){
+                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            }
+        }
+
+        final Expression widthExp = stroke.getWidth();
+        if(widthExp != null){
+            final String widthStr = CQL.write(widthExp);
+            try {
+                width = Double.parseDouble(widthStr);
+            }catch(NumberFormatException ex){
+                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            }
+        }
         dashed  = (stroke.getDashArray() != null);
         lineJoin = stroke.getLineJoin().evaluate(null, String.class);
         lineCap = stroke.getLineCap().evaluate(null, String.class);

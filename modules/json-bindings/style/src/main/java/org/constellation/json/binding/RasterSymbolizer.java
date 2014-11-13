@@ -19,6 +19,13 @@
 
 package org.constellation.json.binding;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.cql.CQL;
+import org.opengis.filter.expression.Expression;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
 import static org.constellation.json.util.StyleUtilities.literal;
@@ -33,6 +40,11 @@ public final class RasterSymbolizer implements Symbolizer {
 
 	private static final long serialVersionUID = 1L;
 
+    /**
+     * Used for debugging purposes.
+     */
+    private static final Logger LOGGER = Logging.getLogger(RasterSymbolizer.class);
+
 	private String name;
     private double opacity                          = 1.0;
     private ChannelSelection channelSelection       = null;
@@ -44,7 +56,15 @@ public final class RasterSymbolizer implements Symbolizer {
     public RasterSymbolizer(final org.opengis.style.RasterSymbolizer symbolizer) {
         ensureNonNull("symbolizer", symbolizer);
         name = symbolizer.getName();
-        opacity = Double.parseDouble(symbolizer.getOpacity().toString());
+        final Expression opacityExp = symbolizer.getOpacity();
+        if(opacityExp!=null){
+            final String opacityStr = CQL.write(opacityExp);
+            try{
+                opacity = Double.parseDouble(opacityStr);
+            }catch(NumberFormatException ex){
+                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            }
+        }
         if (symbolizer.getChannelSelection() != null) {
             this.channelSelection = new ChannelSelection(symbolizer.getChannelSelection());
         }

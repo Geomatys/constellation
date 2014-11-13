@@ -19,7 +19,13 @@
 
 package org.constellation.json.binding;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.cql.CQL;
+import org.opengis.filter.expression.Expression;
+
 import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
@@ -32,6 +38,10 @@ import static org.constellation.json.util.StyleUtilities.opacity;
  * @since 0.9
  */
 public final class Fill implements StyleElement<org.opengis.style.Fill> {
+    /**
+     * Used for debugging purposes.
+     */
+    private static final Logger LOGGER = Logging.getLogger(Fill.class);
 
     private String color   = "#555555";
     private double opacity = 1.0;
@@ -43,7 +53,15 @@ public final class Fill implements StyleElement<org.opengis.style.Fill> {
         ensureNonNull("fill", fill);
         final Color col = fill.getColor().evaluate(null, Color.class);
         color = String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
-        opacity = Double.parseDouble(fill.getOpacity().toString());
+        final Expression opacityExp = fill.getOpacity();
+        if(opacityExp != null){
+            final String opacityStr = CQL.write(opacityExp);
+            try {
+                opacity = Double.parseDouble(opacityStr);
+            }catch (NumberFormatException ex){
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(),ex);
+            }
+        }
     }
 
     public String getColor() {
