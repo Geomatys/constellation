@@ -111,6 +111,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -153,6 +155,14 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                                 MimeType.APP_XML,
                                                 MimeType.TEXT_PLAIN);
     }
+
+    /**
+     * A map which contains the binding between capabilities tile matrix set identifiers and input
+     * {@link org.geotoolkit.coverage.Pyramid} ids. It's used only if we've got multiple pyramids with the same ID but
+     * different matrix structure. Otherwise, we directly use pyramid ids as tile matrix set name.
+     */
+    private HashMap<String, String> tmsIdBinding = new HashMap<>();
+    private ReentrantReadWriteLock tmsBindingLock = new ReentrantReadWriteLock();
 
     /**
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
@@ -225,6 +235,17 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         if (cachedCapabilities != null) {
             return (Capabilities) cachedCapabilities.applySections(sections);
         }
+
+        /*
+         * BUILD NEW CAPABILITIES DOCUMENT
+         */
+        tmsBindingLock.writeLock().lock();
+        try {
+            tmsIdBinding.clear();
+        } finally {
+            tmsBindingLock.writeLock().unlock();
+        }
+
         // we load the skeleton capabilities
         final Details skeleton = getStaticCapabilitiesObject("wmts", null);
         final Capabilities skeletonCapabilities = (Capabilities) WMTSConstant.createCapabilities("1.0.0", skeleton);
@@ -242,7 +263,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         // Build the list of layers
         final List<LayerType> outputLayers = new ArrayList<>();
         // and the list of matrix set
-        final List<TileMatrixSet> tileSets = new ArrayList<>();
+        final HashMap<String, TileMatrixSet> tileSets = new HashMap<>();
 
         final List<Layer> declaredLayers = getConfigurationLayers(userLogin);
 
@@ -387,9 +408,46 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     }
                     tms.setTileMatrix(tm);
 
-                    final TileMatrixSetLink tmsl = new TileMatrixSetLink(pr.getId());
+                    /*
+                     * Once our tile matrix set is defined, we must check if we've got one with the same name already
+                     * defined. If no tile matrix set is defined for the same name, we add the current one to the list
+                     * of available matrix sets. Otherwise, we have two possibilities :
+                     * - The 2 sets are different : We must compute an unique identifier for the new matrix set, and
+                     * store the binding
+                     * - Both sets are equals : we just use the one previously defined.
+                     */
+                    TileMatrixSet previousDefined = tileSets.get(pr.getId());
+
+                    if (previousDefined == null || !areEqual(tms, previousDefined)) {
+                        for (final TileMatrixSet tmpSet : tileSets.values()) {
+                            if (areEqual(tms, tmpSet)) {
+                                previousDefined = tmpSet;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (previousDefined == null) {
+                        tileSets.put(pr.getId(), tms);
+
+                    } else if (!areEqual(tms, previousDefined)) {
+                        final String tmsUUID = UUID.randomUUID().toString();
+                        tms.setIdentifier(new CodeType(tmsUUID));
+
+                        final TileMatrixSetLink tmsl = new TileMatrixSetLink(tmsUUID);
+                        outputLayer.addTileMatrixSetLink(tmsl);
+                        tileSets.put(tmsUUID, tms);
+
+                        tmsBindingLock.writeLock().lock();
+                        try {
+                            tmsIdBinding.put(tmsUUID, pr.getId());
+                        } finally {
+                            tmsBindingLock.writeLock().unlock();
+                        }
+                    }
+
+                    final TileMatrixSetLink tmsl = new TileMatrixSetLink(tms.getIdentifier().getValue());
                     outputLayer.addTileMatrixSetLink(tmsl);
-                    tileSets.add(tms);
                 }
 
                 outputLayers.add(outputLayer);
@@ -397,7 +455,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 LOGGER.log(Level.WARNING, "Cannot build matrix list of the following layer : " + name,ex);
             }
         }
-        final ContentsType cont = new ContentsType(outputLayers, tileSets);
+        final ContentsType cont = new ContentsType(outputLayers, new ArrayList<>(tileSets.values()));
 
         // put full capabilities in cache
         final Capabilities c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
@@ -559,8 +617,13 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         // 3. Get and check parameters
         final int columnIndex         = request.getTileCol();
         final int rowIndex            = request.getTileRow();
-        final String matrixSetName    = request.getTileMatrixSet();
         final String level            = request.getTileMatrix();
+
+        String matrixSetName   = request.getTileMatrixSet();
+        final String idBinding = tmsIdBinding.get(matrixSetName);
+        if (idBinding != null) {
+            matrixSetName = idBinding;
+        }
 
         if (columnIndex < 0 || rowIndex < 0) {
             throw new CstlServiceException("Operation request contains an invalid parameter value, " +
@@ -742,5 +805,28 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             }
         }
         return result;
+    }
+
+    /**
+     * Test the equality of 2 {@link org.geotoolkit.wmts.xml.v100.TileMatrixSet}, ignoring their name.
+     *
+     * We check their bounding box, CRS and list of tile matrixes.
+     * @param tms1
+     * @param tms2
+     * @return
+     */
+    private static boolean areEqual(final TileMatrixSet tms1, TileMatrixSet tms2) {
+        if (!tms1.getSupportedCRS().equals(tms2.getSupportedCRS())) return false;
+
+        final BoundingBoxType bbox1 = (tms1.getBoundingBox() == null)? null : tms1.getBoundingBox().getValue();
+        final BoundingBoxType bbox2 = (tms2.getBoundingBox() == null)? null : tms2.getBoundingBox().getValue();
+        if (bbox1 != null? !bbox1.equals(bbox2) : bbox2 != null) return false;
+
+        final List<TileMatrix> targetMatrixes = tms2.getTileMatrix();
+        for (final TileMatrix matrix : tms1.getTileMatrix()) {
+            if (!targetMatrixes.contains(matrix)) return false;
+        }
+
+        return true;
     }
 }
