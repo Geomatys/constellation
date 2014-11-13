@@ -34,6 +34,10 @@ public class ChartDataModelDTO implements Serializable {
 
     private boolean isNumberField;
 
+    private Double minimum;
+
+    private Double maximum;
+
     private Map<Object,Long> mapping = new LinkedHashMap<>();
 
     public ChartDataModelDTO(){}
@@ -52,5 +56,21 @@ public class ChartDataModelDTO implements Serializable {
 
     public void setNumberField(boolean isNumberField) {
         this.isNumberField = isNumberField;
+    }
+
+    public Double getMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(Double minimum) {
+        this.minimum = minimum;
+    }
+
+    public Double getMaximum() {
+        return maximum;
+    }
+
+    public void setMaximum(Double maximum) {
+        this.maximum = maximum;
     }
 }

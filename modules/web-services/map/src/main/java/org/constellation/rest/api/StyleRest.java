@@ -707,6 +707,8 @@ public final class StyleRest {
                 Arrays.sort(allValues);
                 double minimum = allValues[0];
                 double maximum = allValues[allValues.length-1];
+                result.setMinimum(minimum);
+                result.setMaximum(maximum);
 
                 double[] interValues = new double[intervals + 1];
                 for (int i = 0; i < interValues.length; i++) {
