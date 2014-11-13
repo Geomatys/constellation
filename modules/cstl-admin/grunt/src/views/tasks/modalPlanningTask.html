@@ -19,9 +19,9 @@
                     <div class="col-sm-11">
                         <div class="row">
                             <div class="form-group col-sm-5" ng-class="{'has-error':!isValid('inputPlanDate')}">
-                                <label for="inputPlanDate" translate="label.date">Date</label>
+                                <label for="inputPlanDate" translate="tasks.plan.label.date">Date</label>
                                 <div class="input-group date"
-                                     datepicker="{language:getCurrentLang(),format:'yyyy-mm-dd '}"
+                                     datepicker="{language:getCurrentLang(),format:'dd-mm-yyyy'}"
                                      ng-disabled="triggerType !== 'date'">
 
                                     <input type="text" id="inputPlanDate" class="form-control" ng-model="plan.date" ng-disabled="plan.triggerType !== cronTrigger"/>
@@ -32,7 +32,7 @@
                             </div>
 
                             <div class="form-group col-sm-3" ng-class="{'has-error':!isValid('inputPlanHour')}">
-                                <label for="inputPlanHour" translate="label.hour">Hour</label>
+                                <label for="inputPlanHour" translate="tasks.plan.label.hour">Hour</label>
                                 <input type="time" id="inputPlanHour" class="form-control" ng-model="plan.time" ng-disabled="plan.triggerType !== cronTrigger"/>
                             </div>
 
@@ -41,6 +41,24 @@
                                 <select id="inputPlanRepeat" ng-model="plan.repeat" class="form-control"
                                         ng-options="(repeat | translate) for repeat in repeatValues" ng-disabled="plan.triggerType !== cronTrigger">
                                 </select>
+                            </div>
+
+                            <div class="form-group col-sm-5" ng-class="{'has-error':!isValid('inputPlanDate')}" ng-show="plan.repeat !== repeatValues[0]">
+                                <label for="inputPlanDateEnd" translate="tasks.plan.label.dateEnd">Date end</label>
+                                <div class="input-group date"
+                                     datepicker="{language:getCurrentLang(),format:'dd-mm-yyyy'}"
+                                     ng-disabled="triggerType !== 'date'">
+
+                                    <input type="text" id="inputPlanDateEnd" class="form-control" ng-model="plan.dateEnd" ng-disabled="plan.triggerType !== cronTrigger"/>
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-sm-3" ng-class="{'has-error':!isValid('inputPlanHour')}"  ng-show="plan.repeat !== repeatValues[0]">
+                                <label for="inputPlanHourEnd" translate="tasks.plan.label.hour">Hour</label>
+                                <input type="time" id="inputPlanHourEnd" class="form-control" ng-model="plan.timeEnd" ng-disabled="plan.triggerType !== cronTrigger"/>
                             </div>
                         </div>
                     </div>

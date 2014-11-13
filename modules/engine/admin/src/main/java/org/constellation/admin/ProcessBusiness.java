@@ -18,8 +18,6 @@
  */
 package org.constellation.admin;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
@@ -66,6 +64,7 @@ import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
@@ -548,29 +547,53 @@ public class ProcessBusiness implements IProcessBusiness {
         }
 
         String trigger = task.getTrigger();
-        if (task.getTriggerType() != null && trigger != null) {
+        if (task.getTriggerType() != null && trigger != null && !trigger.isEmpty()) {
 
             if ("CRON".equalsIgnoreCase(task.getTriggerType())) {
 
                 try {
+                    String cronExp = null;
+                    Date endDate = null;
+                    if (trigger.contains("{")) {
+                        ObjectMapper jsonMapper = new ObjectMapper();
+                        Map map = jsonMapper.readValue(trigger, Map.class);
+
+                        cronExp = (String) map.get("cron");
+                        long endDateMs = (long) map.get("endDate");
+                        if (endDateMs > 0) {
+                            endDate = new Date(endDateMs);
+                        }
+                    } else {
+                        cronExp = trigger;
+                    }
+
+                    if (cronExp == null) {
+                        throw new ConstellationException("Invalid cron expression. Can't be empty.");
+                    }
+
                     // HACK for Quartz to prevent ParseException :
                     // "Support for specifying both a day-of-week AND a day-of-month parameter is not implemented."
                     // in this case replace the last '*' by '?'
-                    if (trigger.matches("([0-9]\\d{0,1}|\\*) ([0-9]\\d{0,1}|\\*) ([0-9]\\d{0,1}|\\*) \\* ([0-9]\\d{0,1}|\\*) \\*")) {
-                        trigger = trigger.substring(0, trigger.length()-1)+ "?";
+                    if (cronExp.matches("([0-9]\\d{0,1}|\\*) ([0-9]\\d{0,1}|\\*) ([0-9]\\d{0,1}|\\*) \\* ([0-9]\\d{0,1}|\\*) \\*")) {
+                        cronExp = cronExp.substring(0, cronExp.length()-1)+ "?";
                     }
-
-                    final TriggerBuilder tb = TriggerBuilder.newTrigger();
-                    final CronScheduleBuilder cronSchedule = CronScheduleBuilder.cronSchedule(trigger);
-                    final Trigger cronTrigger = tb.withSchedule(cronSchedule).build();
 
                     final ProcessJobDetail jobDetail = createJobDetailFromTaskParameter(task, false);
                     final JobKey key = jobDetail.getKey();
 
+                    final TriggerBuilder tb = TriggerBuilder.newTrigger();
+                    final CronScheduleBuilder cronSchedule = CronScheduleBuilder.cronSchedule(cronExp);
+                    final Trigger cronTrigger;
+                    if (endDate != null) {
+                        cronTrigger = tb.withSchedule(cronSchedule).forJob(key).endAt(endDate).build();
+                    } else {
+                        cronTrigger = tb.withSchedule(cronSchedule).forJob(key).build();
+                    }
+
                     registerJobInScheduler(task.getName(), task.getId(), userId, cronTrigger, jobDetail);
                     scheduledTasks.put(task.getId(), key);
 
-                } catch (ParseException | ConfigurationException e) {
+                } catch (ParseException | ConfigurationException | IOException e) {
                     throw new ConstellationException(e.getMessage(), e);
                 }
 
