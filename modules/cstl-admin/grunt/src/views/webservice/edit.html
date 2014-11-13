@@ -12,17 +12,13 @@
                     <p style="cursor:default; padding:7px 20px 7px 0; font-weight: normal;  margin-left:0;"
                        class="brand">{{service.identifier}} : {{service.name}}</p>
                 </div>
-                <div ng-init="showURL=false" style="float: left;">
-                    <button ng-click="showURL=!showURL"
-                            title="{{label.service.url}}"
-                            class="btn btn-default"
-                            ng-class="{active:showURL}">
-                        <span class="glyphicon glyphicon-link"></span>
-                    </button>
-                </div>
-                <form class="navbar-form">
+                <form class="navbar-form" ng-init="showURL=false">
                     <div class="btn-group service-item pull-right"
                          style="margin-top: 2px; margin-bottom: 8px;">
+                        <button ng-click="showURL=!showURL"
+                                title="{{label.service.url}}"
+                                class="btn btn-sm btn-default"
+                                ng-class="{active:showURL}">URL</button>
                         <button type="button"
                                 class="btn btn-default btn-sm"
                                 ng-click="showCapa(service)"
@@ -45,7 +41,7 @@
                 </form>
                 <div class="navbar-left col-xs-12 col-sm-7 col-md-12"
                      ng-show="showURL"
-                     style="margin-bottom: 6px; margin-left: 0px; padding-left: 0;">
+                     style="margin-bottom: 6px; margin-left: 0px; padding-left: 0; text-align: right;">
                     <input class="form-control service-link"
                            style="display:inline"
                            size="{{urlBoxSize}}"
