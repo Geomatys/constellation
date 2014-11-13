@@ -77,15 +77,23 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
     @Override
     public List<Task> findRunningTasks() {
         return dsl.select().from(Tables.TASK)
-                .where(Tables.TASK.END.isNotNull().or(Tables.TASK.END.lt(System.currentTimeMillis())))
+                .where(Tables.TASK.END.isNull().or(Tables.TASK.END.lt(System.currentTimeMillis())))
                 .fetchInto(Task.class);
     }
 
     @Override
     public List<Task> findRunningTasks(Integer id, Integer offset, Integer limit) {
         return dsl.select().from(Tables.TASK)
-                .where(Tables.TASK.END.isNotNull().or(Tables.TASK.END.lt(System.currentTimeMillis()))
-                        .and(Tables.TASK.TASK_PARAMETER_ID.eq(id)))
+                .where(Tables.TASK.END.isNull().and(Tables.TASK.TASK_PARAMETER_ID.eq(id)))
+                .orderBy(Tables.TASK.END.desc())
+                .limit(limit).offset(offset)
+                .fetchInto(Task.class);
+    }
+
+    @Override
+    public List<Task> taskHistory(Integer id, Integer offset, Integer limit) {
+        return dsl.select().from(Tables.TASK)
+                .where(Tables.TASK.TASK_PARAMETER_ID.eq(id))
                 .orderBy(Tables.TASK.END.desc())
                 .limit(limit).offset(offset)
                 .fetchInto(Task.class);

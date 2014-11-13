@@ -426,6 +426,11 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @Override
+    public List<org.constellation.engine.register.Task> listTaskHistory(Integer id, Integer offset, Integer limit) {
+        return taskRepository.taskHistory(id, offset, limit);
+    }
+
+    @Override
     public List<ProcessDescriptor> getChainDescriptors() throws ConstellationException {
         final List<ProcessDescriptor> result = new ArrayList<>();
         final List<ChainProcess> chains = chainRepository.findAll();

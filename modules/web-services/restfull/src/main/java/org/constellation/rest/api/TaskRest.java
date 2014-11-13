@@ -440,6 +440,21 @@ public final class TaskRest {
         return Response.ok(lst).build();
     }
 
+    /**
+     * List running tasks.
+     */
+    @GET
+    @Path("taskHistory/{id}/{limit}")
+    public Response listHistoryForTaskParameter(final @PathParam("id") Integer id, final @PathParam("limit") Integer limit) {
+        final List<org.constellation.engine.register.Task> tasks = processBusiness.listTaskHistory(id, 0, limit);
+
+        List<TaskStatusDTO> lst = new ArrayList<>();
+        for(org.constellation.engine.register.Task task : tasks) {
+            lst.add(toTaskStatus(task));
+        }
+        return Response.ok(lst).build();
+    }
+
     private TaskStatusDTO toTaskStatus(org.constellation.engine.register.Task task) {
         final TaskStatusDTO status = new TaskStatusDTO();
         status.setId(task.getIdentifier());

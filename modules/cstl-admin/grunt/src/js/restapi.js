@@ -285,6 +285,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         return $resource('@cstl/api/1/task', {}, {
             'listTasks':             {method: 'GET',    url: '@cstl/api/1/task/listTasks;jsessionid=',                           isArray: false },
             'listRunningTasks':      {method: 'GET',    url: '@cstl/api/1/task/listRunningTasks/:id/:limit;jsessionid=',                isArray: true },
+            'taskHistory':           {method: 'GET',    url: '@cstl/api/1/task/taskHistory/:id/:limit;jsessionid=',                isArray: true },
             'listProcess':           {method: 'GET',    url: '@cstl/api/1/task/listProcesses;jsessionid=',                       isArray: false },
             'describeProcess':       {method: 'GET',    url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
             'countProcess':          {method: 'GET',    url: '@cstl/api/1/task/countProcesses;jsessionid=' },

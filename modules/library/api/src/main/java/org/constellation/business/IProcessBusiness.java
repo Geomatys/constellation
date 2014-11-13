@@ -91,6 +91,13 @@ public interface IProcessBusiness {
     List<Task> listRunningTasks(Integer id, Integer offset, Integer limit);
 
     /**
+     * List all task for a TaskParameter id
+     * @param id TaskParameter
+     * @return
+     */
+    List<Task> listTaskHistory(Integer id, Integer offset, Integer limit);
+
+    /**
      * Run an instantiated geotk process on scheduler only once.
      *
      * @param title

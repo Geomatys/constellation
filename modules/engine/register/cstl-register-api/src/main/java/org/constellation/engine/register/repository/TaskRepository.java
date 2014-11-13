@@ -35,4 +35,6 @@ public interface TaskRepository {
     List<Task> findRunningTasks();
 
     List<Task> findRunningTasks(Integer id, Integer offset, Integer limit);
+
+    List<Task> taskHistory(Integer id, Integer offset, Integer limit);
 }

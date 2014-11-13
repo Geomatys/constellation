@@ -59,7 +59,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         };
 
         $scope.subscribe = function (task) {
-            TaskService.listRunningTasks({'id':task.id, 'limit':$scope.historySize}).$promise
+            TaskService.taskHistory({'id':task.id, 'limit':$scope.historySize}).$promise
               .then(function(response){
                     // On success
                     task.statusList = response;
