@@ -336,10 +336,12 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 final int xAxis = Math.max(0, CoverageUtilities.getMinOrdinate(env.getCoordinateReferenceSystem()));
                 final int yAxis = xAxis + 1;
                 final BoundingBoxType bbox = new WGS84BoundingBoxType(
+                        getCRSCode(env.getCoordinateReferenceSystem()),
                         env.getMinimum(xAxis),
                         env.getMinimum(yAxis),
                         env.getMaximum(xAxis),
                         env.getMaximum(yAxis));
+
 
                 final LayerType outputLayer = new LayerType(
                         name,
@@ -348,6 +350,18 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                         bbox,
                         WMTSConstant.DEFAULT_STYLES,
                         new ArrayList<>(dims.values()));
+
+                try {
+                    final Envelope crs84Env = CRS.transform(env, CommonCRS.defaultGeographic());
+                    outputLayer.getWGS84BoundingBox().add(new WGS84BoundingBoxType("CRS:84",
+                            crs84Env.getMinimum(xAxis),
+                            crs84Env.getMinimum(yAxis),
+                            crs84Env.getMaximum(xAxis),
+                            crs84Env.getMaximum(yAxis)));
+                } catch (Exception e) {
+                    // Optional parameter, we don't let exception make capabilities fail.
+                    LOGGER.log(Level.FINE, "Input envelope cannot be reprojected in CRS:84.");
+                }
 
                 final List<String> pformats = set.getFormats();
                 outputLayer.setFormat(pformats);
