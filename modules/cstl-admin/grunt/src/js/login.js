@@ -1,10 +1,28 @@
-$(document).ready(function() {
-  $('#username').focus();
+/**
+ * On document ready set focus to username input
+ */
+jQuery(document).ready(function() {
+  jQuery('#username').focus();
 });
 
+/**
+ * Angular login app.
+ */
+var cstlLoginApp = angular.module("cstlLoginApp", ['pascalprecht.translate']);
+cstlLoginApp.config(['$translateProvider', '$translatePartialLoaderProvider',
+    function ($translateProvider, $translatePartialLoaderProvider) {
+        // Initialize angular-translate
+        $translateProvider.useLoader('$translatePartialLoader', {
+            urlTemplate: 'i18n/{lang}/{part}.json'
+        });
+        $translatePartialLoaderProvider.addPart('ui');
+        $translateProvider.preferredLanguage('en');
+    }
+]);
 
-var cstlLoginApp = angular.module("cstlLoginApp", []);
-
+/**
+ * Directive to fix a bug with form auto filling by navigator and angular.
+ */
 cstlLoginApp.directive('formAutofillFix', function() {
     return function(scope, elem, attrs) {
         elem.prop('method', 'POST');
@@ -21,10 +39,12 @@ cstlLoginApp.directive('formAutofillFix', function() {
     };
 });
 
+/**
+ * Login controller.
+ */
 cstlLoginApp.controller("login", function($scope, $http){
 
     var cstlUrl;
-
     $scope.formInputs = {
         username:undefined,
         password:undefined
@@ -34,12 +54,15 @@ cstlLoginApp.controller("login", function($scope, $http){
         $http.post(cstlUrl + 'api/user/authenticate', {username: $scope.formInputs.username,
                                                        password: $scope.formInputs.password})
             .success(function(resp){
+                jQuery('#msg-error').hide();
                 if (resp.token) {
                     $.cookie('authToken', resp.token, { path : '/' });
                     $.cookie('cstlActiveDomainId', resp.domainId, { path : '/' });
                     $.cookie('cstlUserId', resp.userId, { path : '/' });
                     window.location.href="admin.html";
                 }
+            }).error(function(resp){
+                jQuery('#msg-error').show('fade');
             });
     };
 
