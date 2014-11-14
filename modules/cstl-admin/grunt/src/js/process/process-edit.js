@@ -334,8 +334,11 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 return false;
             }
 
-            $scope.task.processAuthority = $scope.processes[$scope.option.authIndex].auth;
-            $scope.task.processCode = $scope.processes[$scope.option.authIndex].processes[$scope.option.processIndex];
+            if (!$scope.task.processAuthority && !$scope.task.processCode) {
+                //add mode
+                $scope.task.processAuthority = $scope.processes[$scope.option.authIndex].auth;
+                $scope.task.processCode = $scope.processes[$scope.option.authIndex].processes[$scope.option.processIndex];
+            }
             $scope.task.inputs = {};
 
             fillInputsValues($scope.task.inputs, $scope.parameters);
