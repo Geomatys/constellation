@@ -120,6 +120,9 @@ public class LayerBusiness implements ILayerBusiness {
             }
 
             final Data data = dataRepository.findDataFromProvider(namespace, name, providerId);
+            if(data == null) {
+                throw new TargetNotFoundException("Unable to find data for namespace:" + namespace+" name:"+name+" provider:"+providerId);
+            }
             boolean update = true;
             Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace);
             if (layer == null) {
