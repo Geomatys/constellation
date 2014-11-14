@@ -88,6 +88,7 @@ import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -368,8 +369,12 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     final List<TileMatrix> tm = new ArrayList<>();
                     final double[] scales = pr.getScales();
                     for(int i=0; i<scales.length; i++){
-                        final GridMosaic mosaic = pr.getMosaics(i).iterator().next();
-                        final DirectPosition upperLeft = mosaic.getUpperLeftCorner();
+                        final Iterator<GridMosaic> mosaicIt = pr.getMosaics(i).iterator();
+                        if (!mosaicIt.hasNext()) {
+                            continue;
+                        }
+                        final GridMosaic mosaic = mosaicIt.next();
+                        DirectPosition upperLeft = mosaic.getUpperLeftCorner();
                         double scale = mosaic.getScale();
                         //convert scale in the strange WMTS scale denominator
                         scale = WMTSUtilities.toScaleDenominator(pr.getCoordinateReferenceSystem(), scale);
@@ -382,16 +387,20 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                         matrix.getTopLeftCorner().add(upperLeft.getOrdinate(yAxis));
                         tm.add(matrix);
 
-                        // Fill dimensions
+                        // Fill dimensions. We iterate over all mosaics of the current scale to find all slices.
+                        int timeIndex = -1;
+                        MathTransform toJavaTime = null;
                         for (Map.Entry<Integer, CoordinateReferenceSystem> entry : splittedCRS.entrySet()) {
                             String strValue = null;
                             // For temporal values, we convert it into timestamp, then to an ISO 8601 date.
                             final List<String> currentDimValues = dims.get(entry.getKey()).getValue();
                             if (entry.getValue() instanceof TemporalCRS) {
+                                timeIndex = entry.getKey();
                                 double value = upperLeft.getOrdinate(entry.getKey());
                                 if (!CRS.equalsApproximatively(JAVA_TIME, entry.getValue())) {
                                     final double[] tmpArray = new double[]{value};
-                                    CRS.findMathTransform(entry.getValue(), JAVA_TIME).transform(tmpArray, 0, tmpArray, 0, 1);
+                                    toJavaTime = CRS.findMathTransform(entry.getValue(), JAVA_TIME);
+                                    toJavaTime.transform(tmpArray, 0, tmpArray, 0, 1);
                                     value = tmpArray[0];
                                 }
 
@@ -403,6 +412,32 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
                             if (strValue != null && !currentDimValues.contains(strValue)) {
                                 currentDimValues.add(strValue);
+                            }
+                        }
+
+                        while (mosaicIt.hasNext()) {
+                            upperLeft = mosaicIt.next().getUpperLeftCorner();
+                            for (Map.Entry<Integer, CoordinateReferenceSystem> entry : splittedCRS.entrySet()) {
+                                String strValue = null;
+                                // For temporal values, we convert it into timestamp, then to an ISO 8601 date.
+                                final List<String> currentDimValues = dims.get(entry.getKey()).getValue();
+                                if (timeIndex == entry.getKey()) {
+                                    double value = upperLeft.getOrdinate(entry.getKey());
+                                    if (toJavaTime != null) {
+                                        final double[] tmpArray = new double[]{value};
+                                        toJavaTime.transform(tmpArray, 0, tmpArray, 0, 1);
+                                        value = tmpArray[0];
+                                    }
+
+                                    strValue = ISO_8601_FORMATTER.format(new Date((long) value));
+
+                                } else {
+                                    strValue = String.valueOf(upperLeft.getOrdinate(entry.getKey()));
+                                }
+
+                                if (strValue != null && !currentDimValues.contains(strValue)) {
+                                    currentDimValues.add(strValue);
+                                }
                             }
                         }
                     }
@@ -440,9 +475,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                         // Two different matrix sets with same identifier. We'll change the name of the new one.
                         final String tmsUUID = UUID.randomUUID().toString();
                         tms.setIdentifier(new CodeType(tmsUUID));
-
-                        final TileMatrixSetLink tmsl = new TileMatrixSetLink(tmsUUID);
-                        outputLayer.addTileMatrixSetLink(tmsl);
                         tileSets.put(tmsUUID, tms);
 
                         tmsBindingLock.writeLock().lock();
