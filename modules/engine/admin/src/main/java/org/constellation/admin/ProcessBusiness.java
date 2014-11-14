@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
-import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.ConfigurationException;
@@ -64,10 +63,11 @@ import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -95,8 +95,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 
@@ -115,7 +113,7 @@ public class ProcessBusiness implements IProcessBusiness {
     public static final String BEAN_NAME = "processBusiness";
 
     private static final DateFormat TASK_DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-    private static final Logger LOGGER = Logging.getLogger(ProcessBusiness.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessBusiness.class);
 
     @Inject
     private TaskParameterRepository taskParameterRepository;
@@ -134,7 +132,7 @@ public class ProcessBusiness implements IProcessBusiness {
 
     @PostConstruct
     public void init(){
-        LOGGER.log(Level.INFO, "=== Starting Constellation Scheduler ===");
+        LOGGER.info("=== Starting Constellation Scheduler ===");
         /*
             Quartz scheduler
          */
@@ -147,15 +145,15 @@ public class ProcessBusiness implements IProcessBusiness {
             quartzScheduler.getListenerManager().addJobListener(new QuartzJobListener(this), allJobs());
 
         } catch (SchedulerException ex) {
-            LOGGER.log(Level.SEVERE, "=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);
+            LOGGER.error("=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);
             return;
         }
-        LOGGER.log(Level.INFO, "=== Constellation Scheduler successfully started ===");
+        LOGGER.info("=== Constellation Scheduler successfully started ===");
 
         /*
             DirectoryWatcher
          */
-        LOGGER.log(Level.INFO, "=== Starting directory watcher ===");
+        LOGGER.info("=== Starting directory watcher ===");
         try {
             directoryWatcher = new DirectoryWatcher(true);
             directoryWatcher.start();
@@ -172,7 +170,7 @@ public class ProcessBusiness implements IProcessBusiness {
                             try {
                                 executeTaskParameter(taskParameter, null, taskParameter.getOwner());
                             } catch (ConfigurationException ex) {
-                                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                                LOGGER.warn(ex.getMessage(), ex);
                             }
                         }
                     }
@@ -181,10 +179,10 @@ public class ProcessBusiness implements IProcessBusiness {
             directoryWatcher.addPathChangeListener(pathListener);
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "=== Failed to start directory watcher ===\n"+ex.getLocalizedMessage(), ex);
+            LOGGER.error("=== Failed to start directory watcher ===\n"+ex.getLocalizedMessage(), ex);
             return;
         }
-        LOGGER.log(Level.INFO, "=== Directory watcher successfully started ===");
+        LOGGER.info("=== Directory watcher successfully started ===");
 
         /*
           Re-programme taskParameters with trigger in scheduler.
@@ -192,9 +190,9 @@ public class ProcessBusiness implements IProcessBusiness {
         List<? extends TaskParameter> programmedTasks = taskParameterRepository.findProgrammedTasks();
         for (TaskParameter taskParameter : programmedTasks) {
             try {
-                scheduleTaskParameter(taskParameter, taskParameter.getName(), taskParameter.getOwner());
+                scheduleTaskParameter(taskParameter, taskParameter.getName(), taskParameter.getOwner(), false);
             } catch (ConstellationException ex) {
-                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                LOGGER.warn(ex.getMessage(), ex);
             }
         }
     }
@@ -373,7 +371,7 @@ public class ProcessBusiness implements IProcessBusiness {
         } catch (SchedulerException e) {
             throw new ConstellationException(e);
         }
-        LOGGER.log(Level.INFO, "Scheduler task added : {0}, {1}   type : {2}.{3}", new Object[]{
+        LOGGER.info("Scheduler task added : {0}, {1}   type : {2}.{3}", new Object[]{
                 quartzTask.getId(),
                 quartzTask.getTitle(),
                 quartzTask.getDetail().getFactoryIdentifier(),
@@ -388,9 +386,9 @@ public class ProcessBusiness implements IProcessBusiness {
         final boolean removed = quartzScheduler.deleteJob(key);
 
         if(removed){
-            LOGGER.log(Level.INFO, "Scheduler task removed : "+key);
+            LOGGER.info("Scheduler task removed : "+key);
         }else{
-            LOGGER.log(Level.WARNING, "Scheduler failed to remove task : "+key);
+            LOGGER.warn("Scheduler failed to remove task : "+key);
         }
 
     }
@@ -539,7 +537,7 @@ public class ProcessBusiness implements IProcessBusiness {
      * {@inheritDoc}
      */
     @Override
-    public void scheduleTaskParameter (final TaskParameter task, final String title, final Integer userId)
+    public void scheduleTaskParameter (final TaskParameter task, final String title, final Integer userId, boolean checkEndDate)
             throws ConstellationException {
 
         // Stop previous scheduling first.
@@ -574,6 +572,16 @@ public class ProcessBusiness implements IProcessBusiness {
 
                     if (cronExp == null) {
                         throw new ConstellationException("Invalid cron expression. Can't be empty.");
+                    }
+
+                    if (endDate != null && endDate.before(new Date())) {
+                        String message = "Task " + task.getName() + " can't be scheduled : end date in the past.";
+                        if (checkEndDate) {
+                            throw new ConstellationException(message);
+                        } else {
+                            LOGGER.info(message);
+                            return;
+                        }
                     }
 
                     // HACK for Quartz to prevent ParseException :
@@ -649,22 +657,22 @@ public class ProcessBusiness implements IProcessBusiness {
 
     @PreDestroy
     public void stop() {
-        LOGGER.log(Level.INFO, "=== Stopping Scheduler ===");
+        LOGGER.info("=== Stopping Scheduler ===");
         try {
             quartzScheduler.shutdown();
         } catch (SchedulerException ex) {
-            LOGGER.log(Level.SEVERE, "=== Failed to stop quartz scheduler ===");
+            LOGGER.error("=== Failed to stop quartz scheduler ===");
             return;
         }
-        LOGGER.log(Level.INFO, "=== Scheduler successfully stopped ===");
+        LOGGER.info("=== Scheduler successfully stopped ===");
 
-        LOGGER.log(Level.INFO, "=== Stopping directory watcher ===");
+        LOGGER.info("=== Stopping directory watcher ===");
         try {
             directoryWatcher.close();
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "=== Failed to stop directory watcher ===");
+            LOGGER.error("=== Failed to stop directory watcher ===");
             return;
         }
-        LOGGER.log(Level.INFO, "=== Directory watcher successfully stopped ===");
+        LOGGER.info("=== Directory watcher successfully stopped ===");
     }
 }

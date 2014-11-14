@@ -125,10 +125,11 @@ public interface IProcessBusiness {
      * @param task
      * @param title
      * @param userId
+     * @param checkEndDate flag that used to throw exception if CRON endDate is invalid.
      * @throws ConstellationException
      * @throws ConfigurationException
      */
-    void scheduleTaskParameter (TaskParameter task, String title, Integer userId) throws ConstellationException, ConfigurationException;
+    void scheduleTaskParameter (TaskParameter task, String title, Integer userId, boolean checkEndDate) throws ConstellationException, ConfigurationException;
 
     /**
      * Remove TaskParameter from scheduler.

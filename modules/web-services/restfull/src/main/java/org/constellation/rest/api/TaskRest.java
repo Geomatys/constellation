@@ -326,11 +326,12 @@ public final class TaskRest {
         if (!cstlUser.isPresent()) {
             throw new ConstellationException("operation not allowed without login");
         }
+        final Date now = new Date();
         final TaskParameter taskParameter = taskParameterRepository.get(id);
-        final String title = taskParameter.getName()+" "+TASK_DATE.format(new Date());
+        final String title = taskParameter.getName()+" "+TASK_DATE.format(now);
 
         try {
-            processBusiness.scheduleTaskParameter(taskParameter, title, cstlUser.get().getId());
+            processBusiness.scheduleTaskParameter(taskParameter, title, cstlUser.get().getId(), true);
         } catch (ConstellationException ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new AcknowlegementType("Failure", "Failed to schedule task : "+ex.getMessage())).build();
