@@ -2,7 +2,9 @@
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="edition.style.label.name">Name</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control form-control-fix" ng-model="symbolizer.name"/>
+            <input type="text" class="form-control form-control-fix"
+                   ng-model="symbolizer.name"
+                   debounce="200"/>
         </div>
     </div>
     <div class="form-group">
@@ -53,7 +55,8 @@
                    name="picker"
                    class="picker"
                    spectrum oncolorchanged="affectAlpha(value, symbolizer.graphic.mark.stroke)"
-                   ng-model="symbolizer.graphic.mark.stroke.color" />
+                   ng-model="symbolizer.graphic.mark.stroke.color"
+                   debounce="200"/>
 
         </div>
     </div>
@@ -64,7 +67,8 @@
                    name="picker"
                    class="picker"
                    spectrum oncolorchanged="affectAlpha(value, symbolizer.graphic.mark.fill)"
-                   ng-model="symbolizer.graphic.mark.fill.color" />
+                   ng-model="symbolizer.graphic.mark.fill.color"
+                   debounce="200"/>
 
         </div>
     </div>
@@ -77,7 +81,9 @@
                  ng-show="isExpressionNumber(symbolizer.graphic.size) && !advSize">
                 <input class="slider"
                        type="range"
-                       ng-model="symbolizer.graphic.size" max="100" min="0" step="1"/>
+                       ng-model="symbolizer.graphic.size"
+                       max="100" min="0" step="1"
+                       debounce="200"/>
             </div>
             <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"
                  ng-show="isExpressionNumber(symbolizer.graphic.size) && !advSize">
@@ -86,7 +92,8 @@
                        type="text"
                        ng-model="symbolizer.graphic.size"
                        min="0"
-                       max="100"/>
+                       max="100"
+                       debounce="200"/>
             </div>
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4"
                  style="padding: 0;"
@@ -103,7 +110,8 @@
                 <input class="form-control form-control-fix"
                        type="text"
                        placeholder="attr * 50 / max"
-                       ng-model="symbolizer.graphic.size"/>
+                       ng-model="symbolizer.graphic.size"
+                       debounce="200"/>
             </div>
             <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" style="padding: 0;">
                 <button type="button"
@@ -125,7 +133,9 @@
                  ng-show="isExpressionNumber(symbolizer.graphic.rotation) && !advRotation">
                 <input class="slider"
                        type="range"
-                       ng-model="symbolizer.graphic.rotation" max="360" min="0" step="1"/>
+                       ng-model="symbolizer.graphic.rotation"
+                       max="360" min="0" step="1"
+                       debounce="200"/>
             </div>
             <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"
                  ng-show="isExpressionNumber(symbolizer.graphic.rotation) && !advRotation">
@@ -134,7 +144,8 @@
                        type="text"
                        ng-model="symbolizer.graphic.rotation"
                        min="0"
-                       max="360"/>
+                       max="360"
+                       debounce="200"/>
             </div>
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4"
                  style="padding: 0;"
@@ -151,7 +162,8 @@
                 <input class="form-control form-control-fix"
                        type="text"
                        placeholder="attr * 360/max"
-                       ng-model="symbolizer.graphic.rotation"/>
+                       ng-model="symbolizer.graphic.rotation"
+                       debounce="200"/>
             </div>
             <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" style="padding: 0;">
                 <button type="button"
@@ -173,7 +185,9 @@
                  ng-show="isExpressionNumber(symbolizer.graphic.opacity) && !advOpacity">
                 <input class="slider"
                        type="range"
-                       ng-model="symbolizer.graphic.opacity" max="1" min="0" step="0.1"/>
+                       ng-model="symbolizer.graphic.opacity"
+                       max="1" min="0" step="0.1"
+                       debounce="200"/>
             </div>
             <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"
                  ng-show="isExpressionNumber(symbolizer.graphic.opacity) && !advOpacity">
@@ -183,7 +197,8 @@
                        ng-model="symbolizer.graphic.opacity"
                        min="0"
                        max="1"
-                       step="0.1"/>
+                       step="0.1"
+                       debounce="200"/>
             </div>
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4"
                  style="padding: 0;"
@@ -200,7 +215,8 @@
                 <input class="form-control form-control-fix"
                        type="text"
                        placeholder="attr / max"
-                       ng-model="symbolizer.graphic.opacity"/>
+                       ng-model="symbolizer.graphic.opacity"
+                       debounce="200"/>
             </div>
             <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" style="padding: 0;">
                 <button type="button"

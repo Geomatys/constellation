@@ -2,14 +2,20 @@
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="edition.style.label.name">Name</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control form-control-fix" ng-model="symbolizer.name"/>
+            <input type="text"
+                   class="form-control form-control-fix"
+                   ng-model="symbolizer.name"
+                   debounce="200"/>
         </div>
     </div>
     <hr/>
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.label">Label</label>
         <div class="col-sm-8 col-md-6">
-            <input type="text" class="form-control form-control-fix" ng-model="symbolizer.label"/>
+            <input type="text"
+                   class="form-control form-control-fix"
+                   ng-model="symbolizer.label"
+                   debounce="200"/>
         </div>
         <div class="col-sm-offset-4 col-sm-1 col-md-offset-0">
             <button type="button"
@@ -56,7 +62,8 @@
                  ng-show="isExpressionNumber(symbolizer.font.size) && !advTSize">
                 <input class="slider"
                        type="range"
-                       ng-model="symbolizer.font.size" max="50" min="1" step="1"/>
+                       ng-model="symbolizer.font.size" max="50" min="1" step="1"
+                       debounce="200"/>
             </div>
             <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"
                  ng-show="isExpressionNumber(symbolizer.font.size) && !advTSize">
@@ -65,7 +72,8 @@
                        type="text"
                        ng-model="symbolizer.font.size"
                        min="1"
-                       max="50"/>
+                       max="50"
+                       debounce="200"/>
             </div>
             <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4"
                  style="padding: 0;"
@@ -82,7 +90,8 @@
                 <input class="form-control form-control-fix"
                        type="text"
                        placeholder="attr * 12 / max"
-                       ng-model="symbolizer.font.size"/>
+                       ng-model="symbolizer.font.size"
+                       debounce="200"/>
             </div>
             <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" style="padding: 0;">
                 <button type="button"
@@ -147,7 +156,10 @@
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.radius">Radius</label>
         <div class="col-sm-4 col-md-3">
-            <input type="number" class="form-control" ng-model="symbolizer.halo.radius"/>
+            <input type="number"
+                   class="form-control"
+                   ng-model="symbolizer.halo.radius"
+                   debounce="200"/>
         </div>
     </div>
 </form>
