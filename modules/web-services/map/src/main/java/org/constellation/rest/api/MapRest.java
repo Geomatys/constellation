@@ -235,21 +235,23 @@ public class MapRest {
                     map.put("style",style.getIdentifier().getValue());
                 }
                 final List<WGS84BoundingBoxType> bboxList = layerType.getWGS84BoundingBox();
-                if (bboxList != null && ! bboxList.isEmpty()) {
-                    final WGS84BoundingBoxType bbt = bboxList.get(0);
+                final List<BoundingBoxType> bboxList2 = layerType.getBoundingBox();
+                if (bboxList2 != null && ! bboxList2.isEmpty()) {
+                    final BoundingBoxType bbt = bboxList2.get(0);
                     map.put("dataExtent", Arrays.asList(bbt.getLowerCorner().get(0),
                             bbt.getLowerCorner().get(1),
                             bbt.getUpperCorner().get(0),
                             bbt.getUpperCorner().get(1)).toArray());
-                }else {
-                    final List<BoundingBoxType> bboxList2 = layerType.getBoundingBox();
-                    if (bboxList2 != null && ! bboxList2.isEmpty()) {
-                        final BoundingBoxType bbt = bboxList2.get(0);
-                        map.put("dataExtent", Arrays.asList(bbt.getLowerCorner().get(0),
-                                bbt.getLowerCorner().get(1),
-                                bbt.getUpperCorner().get(0),
-                                bbt.getUpperCorner().get(1)).toArray());
-                    }
+                } else if (bboxList != null && ! bboxList.isEmpty()) {
+                    final WGS84BoundingBoxType bbt = bboxList.get(0);
+                    //in case of Constellation wmts getBoundingBox() is never null.
+                    //so this case is never called, but to keep the code generic
+                    //we need to check for getWGS84BoundingBox and transform coordinates.
+                    //@TODO transform coordinates to given crs.
+                    map.put("dataExtent", Arrays.asList(bbt.getLowerCorner().get(0),
+                            bbt.getLowerCorner().get(1),
+                            bbt.getUpperCorner().get(0),
+                            bbt.getUpperCorner().get(1)).toArray());
                 }
             }
         }
