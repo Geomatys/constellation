@@ -409,12 +409,15 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     tms.setTileMatrix(tm);
 
                     /*
-                     * Once our tile matrix set is defined, we must check if we've got one with the same name already
-                     * defined. If no tile matrix set is defined for the same name, we add the current one to the list
-                     * of available matrix sets. Otherwise, we have two possibilities :
-                     * - The 2 sets are different : We must compute an unique identifier for the new matrix set, and
-                     * store the binding
-                     * - Both sets are equals : we just use the one previously defined.
+                     * Once our tile matrix set is defined, we must check if we've got one which is equal to the newly
+                     * computed set.
+                     * - If no matrix set is equal to the new one, and no matrix set with the same name exists, we add our
+                     * matrix set to the service capabilities.
+                     * - If we already have a tile matrix set equal to the current one, we just make a link to the old
+                     * one.
+                     * - If we've got two sets with the same name, but they're different, we rename the new matrix set
+                     * to avoid mistakes. We store a binding between the new identifier and the old one to be able to
+                     * retrieve pyramid at getTile request.
                      */
                     TileMatrixSet previousDefined = tileSets.get(pr.getId());
 
@@ -430,7 +433,11 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     if (previousDefined == null) {
                         tileSets.put(pr.getId(), tms);
 
-                    } else if (!areEqual(tms, previousDefined)) {
+                    } else if (areEqual(tms, previousDefined)) {
+                        tms.setIdentifier(previousDefined.getIdentifier());
+
+                    } else {
+                        // Two different matrix sets with same identifier. We'll change the name of the new one.
                         final String tmsUUID = UUID.randomUUID().toString();
                         tms.setIdentifier(new CodeType(tmsUUID));
 
