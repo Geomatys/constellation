@@ -1271,11 +1271,13 @@ public class DataRest {
      * @return
      */
     @POST
-    @Path("pyramid/createconform/{providerId}/{dataId}")
+    @Path("pyramid/createconform/{dataId}/{providerId}/{dataName}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response createTiledProvider(
-            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId, @Context HttpServletRequest req) {
+    public Response createTiledProviderConform(@PathParam("dataId") final Integer dataId,
+                                               @PathParam("providerId") final String providerId,
+                                               @PathParam("dataName") final String dataName,
+                                               @Context HttpServletRequest req) {
 
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 
@@ -1287,14 +1289,9 @@ public class DataRest {
         if (inProvider == null) {
             return Response.ok("Provider " + providerId + " does not exist").status(400).build();
         }
-        final Data inData = inProvider.get(new DefaultName(dataId));
+        final Data inData = inProvider.get(new DefaultName(dataName));
         if (inData == null) {
-            return Response.ok("Data " + dataId + " does not exist in provider " + providerId).status(400).build();
-        }
-
-        final Object origin = inData.getOrigin();
-        if(! (origin instanceof CoverageReference)){
-            return Response.ok("Cannot create pyramid for no coverage data!").build();
+            return Response.ok("Data " + dataName + " does not exist in provider " + providerId).status(400).build();
         }
 
         Envelope dataEnv;
@@ -1303,7 +1300,22 @@ public class DataRest {
             dataEnv = inData.getEnvelope();
         } catch (DataStoreException ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            return Response.ok("Failed to extract envelope for data " + dataId + ". " + ex.getMessage()).status(500).build();
+            return Response.ok("Failed to extract envelope for data " + dataName + ". " + ex.getMessage()).status(500).build();
+        }
+
+        final Object origin = inData.getOrigin();
+
+        if(!(origin instanceof CoverageReference)) {
+            final double[] scales = new double[8];
+            final double geospanX = dataEnv.getSpan(0);
+            final int tileSize = 256;
+            scales[0] = geospanX / tileSize;
+            for(int i=1;i<scales.length;i++){
+                scales[i] = (scales[i-1]) / 2.0;
+            }
+            final PyramidParams params = new PyramidParams();
+            params.setScales(scales);
+            return createTiledProvider(dataId,providerId,dataName,params,req);
         }
 
         //calculate pyramid scale levels
@@ -1315,7 +1327,7 @@ public class DataRest {
 
         } catch (CoverageStoreException ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            return Response.ok("Failed to extract grid geometry for data " + dataId + ". " + ex.getMessage()).status(500).build();
+            return Response.ok("Failed to extract grid geometry for data " + dataName + ". " + ex.getMessage()).status(500).build();
         }
 
         //create the output folder for pyramid
@@ -1341,7 +1353,7 @@ public class DataRest {
 
                 //create the output pyramid coverage reference
                 CoverageStore outStore = (CoverageStore) outProvider.getMainStore();
-                Name name = new DefaultName(dataId);
+                Name name = new DefaultName(dataName);
                 try {
                     name = ((XMLCoverageReference) outStore.create(name)).getName();
                 } catch (DataStoreException ex) {
@@ -1455,17 +1467,18 @@ public class DataRest {
             taskParameter.setDate(System.currentTimeMillis());
             taskParameter.setInputs(ParamUtilities.writeParameter(input));
             taskParameter.setOwner(cstlUser.get().getId());
-            taskParameter.setName("Create conform pyramid for " + providerId + ":" + dataId+" | "+System.currentTimeMillis());
+            taskParameter.setName("Create conform pyramid for " + providerId + ":" + dataName+" | "+System.currentTimeMillis());
             taskParameter.setType("INTERNAL");
             taskParameter = processBusiness.addTaskParameter(taskParameter);
-            processBusiness.runProcess("Create conform pyramid for " + providerId + ":" + dataId, p, taskParameter.getId(), cstlUser.get().getId());
+            processBusiness.runProcess("Create conform pyramid for " + providerId + ":" + dataName,
+                    p, taskParameter.getId(), cstlUser.get().getId());
         } catch ( IOException e) {
             LOGGER.log(Level.WARNING, "Unable to run pyramid process on scheduler");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
-        final ProviderData ref = new ProviderData(pyramidProviderId, dataId);
-        return Response.ok(ref).status(202).build();
+        final ProviderData ref = new ProviderData(pyramidProviderId, dataName);
+        return Response.ok(ref).build();
     }
 
     /**
@@ -1536,7 +1549,7 @@ public class DataRest {
             LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
         }
         
-        //get pyramid CRS, we force longiude first on the pyramids
+        //get pyramid CRS, we force longitude first on the pyramids
         // WMTS is made for display like WMS, so longitude is expected to be on the X axis.
         // Note : this is not writen in the spec.
         final CoordinateReferenceSystem coordsys;
@@ -1688,7 +1701,7 @@ public class DataRest {
         }
 
         final ProviderData ref = new ProviderData(pyramidProviderId, dataName);
-        return Response.ok(ref).status(202).build();
+        return Response.ok(ref).build();
     }
 
     @POST

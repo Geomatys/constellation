@@ -843,7 +843,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         $scope.scales = [];
         $scope.upperCornerX = undefined;
         $scope.upperCornerY = undefined;
-        $scope.conformPyramid = undefined;
+        $scope.conformPyramid = true;
 
         $scope.init = function() {
             if (service.type.toLowerCase() === 'sos') {
@@ -978,10 +978,17 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                                 $scope.conformPyramid &&
                                 value.Type.toLowerCase() !== 'vector') {
                                 // In the case of a wms service and user asked to pyramid the data
-                                dataListing.pyramidConform({providerId: value.Provider, dataId: value.Name}, {}, addLayer, pyramidGenerationError);
+                                dataListing.pyramidConform({dataId:value.Id,
+                                                            providerId: value.Provider,
+                                                            dataName: value.Name}, {}, addLayer, pyramidGenerationError);
                             } else {
                                 webService.addLayer({type: service.type, id: service.identifier},
-                                    {layerAlias: value.Name, layerId: value.Name, serviceType: service.type, serviceId: service.identifier, providerId: value.Provider, layerNamespace: value.Namespace},
+                                                    {layerAlias: value.Name,
+                                                     layerId: value.Name,
+                                                     serviceType: service.type,
+                                                     serviceId: service.identifier,
+                                                     providerId: value.Provider,
+                                                     layerNamespace: value.Namespace},
                                 function(response) {
                                     Growl('success', 'Success', response.message);
                                     $modalInstance.close();

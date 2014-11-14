@@ -140,7 +140,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'listDataForProv':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/provider/:providerId;jsessionid=', isArray: true},
             'listCoverage':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/coverage/list/;jsessionid='},
             'pyramidData':          {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/pyramid/create/:dataId/:provider/:dataName;jsessionid='},
-            'pyramidConform':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/pyramid/createconform/:providerId/:dataId;jsessionid='},
+            'pyramidConform':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/pyramid/createconform/:dataId/:providerId/:dataName;jsessionid='},
             'pyramidScales':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/pyramid/bestscales/:providerId/:dataId/:crs;jsessionid='},
             'deletePyramidFolder':  {method: 'DELETE',  url: '@cstl/api/1/domain/$domainId/data/pyramid/folder/:providerId;jsessionid='},
             'dataFolder':           {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/datapath/true;jsessionid=', isArray: true},
