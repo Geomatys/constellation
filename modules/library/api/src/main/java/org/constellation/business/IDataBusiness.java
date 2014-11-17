@@ -32,6 +32,7 @@ import org.constellation.engine.register.Provider;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.List;
+import javax.xml.bind.JAXBException;
 
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
@@ -133,4 +134,8 @@ public interface IDataBusiness {
      * @param datasetId dataset Id value to set
      */
     void updateDataDataSetId(QName fullName, String providerIdentifier, Integer datasetId);
+    
+    String marshallMetadata(final DefaultMetadata metadata) throws JAXBException;
+    
+    DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException;
 }

@@ -836,11 +836,13 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         return null; //in constellation this should always return null, since this method can be overrided by sub-project.
     }
 
-    protected String marshallMetadata(final DefaultMetadata metadata) throws JAXBException {
+    @Override
+    public String marshallMetadata(final DefaultMetadata metadata) throws JAXBException {
         return XML.marshal(metadata);
     }
 
-    protected DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
+    @Override
+    public DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
         return (DefaultMetadata) XML.unmarshal(metadata);
     }
 

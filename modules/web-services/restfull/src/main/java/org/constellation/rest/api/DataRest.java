@@ -63,7 +63,6 @@ import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.XML;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.*;
 import org.constellation.configuration.*;
@@ -2171,7 +2170,7 @@ public class DataRest {
             }
             if (metadata != null) {
                 metadata.prune();
-                final String xmlStr = XML.marshal(metadata);
+                final String xmlStr = dataBusiness.marshallMetadata(metadata);
                 return Response.ok(xmlStr, MediaType.APPLICATION_XML_TYPE)
                         .header("Content-Disposition", "attachment; filename=\"" + providerId + ".xml\"").build();
             }
