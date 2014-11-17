@@ -23,6 +23,7 @@ import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
 import org.constellation.admin.exception.ConstellationException;
+import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.ChainProcess;
@@ -62,7 +63,6 @@ import org.quartz.JobKey;
 import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
@@ -94,6 +94,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
@@ -132,12 +133,27 @@ public class ProcessBusiness implements IProcessBusiness {
 
     @PostConstruct
     public void init(){
+        cleanTasksStates();
+
         LOGGER.info("=== Starting Constellation Scheduler ===");
         /*
             Quartz scheduler
          */
-        final SchedulerFactory schedFact = new StdSchedulerFactory();
+        Properties properties;
         try {
+            properties = new Properties();
+            properties.load(ProcessBusiness.class.getResourceAsStream("/org/constellation/scheduler/tasks-quartz.properties"));
+        } catch (IOException e) {
+            LOGGER.warn("Failed to load quartz properties", e);
+            //use default quartz configuration
+            properties = null;
+        }
+
+        try {
+            final StdSchedulerFactory schedFact = new StdSchedulerFactory();
+            if (properties != null) {
+                schedFact.initialize(properties);
+            }
             quartzScheduler = schedFact.getScheduler();
             quartzScheduler.start();
 
@@ -659,10 +675,11 @@ public class ProcessBusiness implements IProcessBusiness {
     public void stop() {
         LOGGER.info("=== Stopping Scheduler ===");
         try {
-            quartzScheduler.shutdown();
+            LOGGER.info("=== Wait for job to stop ===");
+            quartzScheduler.shutdown(false);
+            quartzScheduler = null;
         } catch (SchedulerException ex) {
-            LOGGER.error("=== Failed to stop quartz scheduler ===");
-            return;
+            LOGGER.error("=== Failed to stop quartz scheduler ===", ex);
         }
         LOGGER.info("=== Scheduler successfully stopped ===");
 
@@ -670,9 +687,31 @@ public class ProcessBusiness implements IProcessBusiness {
         try {
             directoryWatcher.close();
         } catch (IOException ex) {
-            LOGGER.error("=== Failed to stop directory watcher ===");
-            return;
+            LOGGER.error("=== Failed to stop directory watcher ===", ex);
         }
         LOGGER.info("=== Directory watcher successfully stopped ===");
+        cleanTasksStates();
+    }
+
+    /**
+     * Clear remaining running tasks before server shutdown or after server startup
+     */
+    private void cleanTasksStates() {
+        List<Task> runningTasks = taskRepository.findRunningTasks();
+
+        if (!runningTasks.isEmpty()) {
+            LOGGER.info("=== Clear remaining running tasks ===");
+        }
+
+        long now = System.currentTimeMillis();
+        String msg = "Stopped by server shutdown";
+        for (Task runningTask : runningTasks) {
+            if (runningTask.getEnd() == null) {
+                runningTask.setEnd(now);
+                runningTask.setState(TaskState.CANCELLED.name());
+                runningTask.setMessage(msg);
+                taskRepository.update(runningTask);
+            }
+        }
     }
 }

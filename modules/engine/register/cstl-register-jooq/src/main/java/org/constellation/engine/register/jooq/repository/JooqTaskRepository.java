@@ -77,7 +77,7 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
     @Override
     public List<Task> findRunningTasks() {
         return dsl.select().from(Tables.TASK)
-                .where(Tables.TASK.END.isNull().or(Tables.TASK.END.lt(System.currentTimeMillis())))
+                .where(Tables.TASK.END.isNull())
                 .fetchInto(Task.class);
     }
 
