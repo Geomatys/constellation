@@ -263,7 +263,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             writeResult(oid, pid, procedureID, observation.getResult(), samplingTime, c);
             
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
-            return observation.getName().getCode();
+            return observationName;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observation.", ex);
         }
@@ -322,11 +322,13 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     private String getPhenomenonId(final PhenomenonProperty phenomenonP) {
         if (phenomenonP.getHref() != null) {
             return phenomenonP.getHref();
-        } else if (phenomenonP.getPhenomenon() != null) {
-            return phenomenonP.getPhenomenon().getName().getCode();
-        } else {
-            return null;
         }
+
+        if (phenomenonP.getPhenomenon() != null && phenomenonP.getPhenomenon().getName() != null) {
+            return phenomenonP.getPhenomenon().getName().getCode();
+        }
+
+        return null;
     }
     
     private int writeProcedure(final String procedureID, final Connection c) throws SQLException {
@@ -366,7 +368,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         if (!rs.next()) {
             final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"sampling_features\" VALUES(?,?,?,?,?,?)");
             stmtInsert.setString(1, foi.getId());
-            stmtInsert.setString(2, foi.getName().getCode());
+            stmtInsert.setString(2, (foi.getName() != null) ? foi.getName().getCode() : null);
             stmtInsert.setString(3, foi.getDescription());
             stmtInsert.setNull(4, java.sql.Types.VARCHAR); // TODO
             
@@ -672,7 +674,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)");
             stmt.setString(1, offering.getId());
             stmt.setString(2, offering.getDescription());
-            stmt.setString(3, offering.getName().getCode());
+            stmt.setString(3, (offering.getName() != null) ? offering.getName().getCode() : null);
             if (offering.getTime() instanceof Period) {
                 final Period period = (Period)offering.getTime();
                 if (period.getBeginning() != null && period.getBeginning().getPosition() != null && period.getBeginning().getPosition().getDate() != null) {
