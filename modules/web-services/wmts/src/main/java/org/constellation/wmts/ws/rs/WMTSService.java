@@ -34,6 +34,7 @@ import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.util.ImageIOUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
+import org.geotoolkit.wmts.xml.v100.DimensionNameValue;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
@@ -43,6 +44,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
@@ -254,17 +256,46 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      */
     private GetTile createNewGetTileRequest() throws CstlServiceException {
         final GetTile getTile = new GetTile();
+        final MultivaluedMap<String, String> parameters = getParameters();
+        parameters.remove(REQUEST_PARAMETER);
         // Mandatory parameters
         getTile.setFormat(getParameter("format", true));
+        parameters.remove("format");
         getTile.setLayer(getParameter("layer", true));
+        parameters.remove("layer");
         getTile.setService(getParameter(SERVICE_PARAMETER, true));
+        parameters.remove(SERVICE_PARAMETER);
         getTile.setVersion(getParameter(VERSION_PARAMETER, true));
+        parameters.remove(VERSION_PARAMETER);
         getTile.setTileCol(Integer.valueOf(getParameter("TileCol", true)));
+        parameters.remove("TileCol");
         getTile.setTileRow(Integer.valueOf(getParameter("TileRow", true)));
+        parameters.remove("TileRow");
         getTile.setTileMatrix(getParameter("TileMatrix", true));
+        parameters.remove("TileMatrix");
         getTile.setTileMatrixSet(getParameter("TileMatrixSet", true));
+        parameters.remove("TileMatrixSet");
         // Optional parameters
         getTile.setStyle(getParameter("style", false));
+        parameters.remove("style");
+        /*
+         * HACK : Remaining parameters will be considered as extra dimension of the layer. We don't check layer
+         * capabilities because it could be resource consuming operation. Filtering will be done by worker when it will
+         * recompose a multi-dimensional envelope.
+         */
+        if (!parameters.isEmpty()) {
+            final List<DimensionNameValue> dims = getTile.getDimensionNameValue();
+            for (Map.Entry<String, List<String>> entry : parameters.entrySet()) {
+                if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                    final DimensionNameValue dnv = new DimensionNameValue();
+                    dnv.setName(entry.getKey());
+                    dnv.setValue(entry.getValue().get(0));
+                    dims.add(dnv);
+                }
+            }
+        }
+
+
         return getTile;
     }
 
