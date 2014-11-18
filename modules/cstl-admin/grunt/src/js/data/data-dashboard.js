@@ -664,7 +664,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    dataListing.setMetadata({}, {values: {"providerId": result.file,
+                    dataListing.initMetadata({}, {values: {"providerId": result.file,
                                                           "dataType": result.type,
                                                           "mergeWithUploadedMD":result.completeMetadata}},
                        function () {//success
@@ -693,7 +693,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    dataListing.setMetadata({}, {values: {"providerId": result.file,
+                    dataListing.initMetadata({}, {values: {"providerId": result.file,
                                                           "dataType": result.type,
                                                           "mergeWithUploadedMD":result.completeMetadata}},
                        function () {//success
@@ -722,7 +722,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    dataListing.setMetadata({}, {values: {"providerId": result.file,
+                    dataListing.initMetadata({}, {values: {"providerId": result.file,
                                                           "dataType": result.type,
                                                           "mergeWithUploadedMD":result.completeMetadata}},
                        function () {//success
@@ -751,7 +751,7 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                 if(!result.file){
                     return;
                 }else {
-                    dataListing.setMetadata({}, {values: {"providerId": result.file,
+                    dataListing.initMetadata({}, {values: {"providerId": result.file,
                                                           "dataType": result.type}},
                         function () {//success
                             $scope.initAfterImport();
