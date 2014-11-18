@@ -34,12 +34,14 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -67,13 +69,13 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         final File configDir = ConfigDirectory.setupTestEnvironement("FSSOSWorkerTest");
 
         File SOSDirectory  = new File(configDir, "SOS");
-        SOSDirectory.mkdir();
+        SOSDirectory.mkdirs();
         instDirectory = new File(SOSDirectory, "default");
-        instDirectory.mkdir();
+        instDirectory.mkdirs();
 
 
         File sensorDirectory = new File(instDirectory, "sensors");
-        sensorDirectory.mkdir();
+        sensorDirectory.mkdirs();
         writeCommonDataFile(sensorDirectory, "system.xml",     "urn:ogc:object:sensor:GEOM:1");
         writeCommonDataFile(sensorDirectory, "component.xml",  "urn:ogc:object:sensor:GEOM:2");
         writeCommonDataFile(sensorDirectory, "component2.xml", "urn:ogc:object:sensor:GEOM:3");
