@@ -508,14 +508,16 @@ public final class LayerProviders {
         final GridCoverageReader reader = ref.acquireReader();
         if(full) {
             final ImageStatistics stats = dataBusiness.getDataStatistics(dataId);
-            // Bands description.
-            for (int i=0; i<stats.getBands().length; i++) {
-                final ImageStatistics.Band band = stats.getBand(i);
-                final String bandName = String.valueOf(i);
-                final double min = band.getMin();
-                final double max = band.getMax();
-                double[] noData = band.getNoData();
-                description.getBands().add(new BandDescription(bandName, min, max, noData));
+            if(stats!=null) {
+                // Bands description.
+                for (int i=0; i<stats.getBands().length; i++) {
+                    final ImageStatistics.Band band = stats.getBand(i);
+                    final String bandName = String.valueOf(i);
+                    final double min = band.getMin();
+                    final double max = band.getMax();
+                    double[] noData = band.getNoData();
+                    description.getBands().add(new BandDescription(bandName, min, max, noData));
+                }
             }
         }
 
