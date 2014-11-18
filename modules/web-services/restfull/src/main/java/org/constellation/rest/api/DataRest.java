@@ -1232,7 +1232,10 @@ public class DataRest {
     }
 
     /**
-     * Save metadata.
+     * Init metadata for imported data.
+     * It is the first save called after import phase.
+     * if user send its own metadata he can decide if its
+     * metadata will be merged with reader metadata by passing parameter flag mergeWithUploadedMD.
      *
      * @param values
      * @return {@link javax.ws.rs.core.Response}
@@ -1242,7 +1245,7 @@ public class DataRest {
     @Path("metadata")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response saveMetadata(final ParameterValues values) throws ConfigurationException {
+    public Response initMetadataFromReader(final ParameterValues values) throws ConfigurationException {
         final String providerId          = values.getValues().get("providerId");
         final String dataType            = values.getValues().get("dataType");
         final String mergeWithUploadedMD = values.getValues().get("mergeWithUploadedMD");
