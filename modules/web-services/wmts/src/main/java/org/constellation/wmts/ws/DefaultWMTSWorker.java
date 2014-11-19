@@ -50,6 +50,7 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
+import org.geotoolkit.image.io.mosaic.Tile;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -97,6 +98,7 @@ import org.springframework.context.annotation.Scope;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.inject.Named;
+import javax.ws.rs.HEAD;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -108,6 +110,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -269,7 +272,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final List<Layer> declaredLayers = getConfigurationLayers(userLogin);
 
        for (final Layer configLayer : declaredLayers) {
-            final Data details = getLayerReference(userLogin, configLayer.getName());
+           final Data details = getLayerReference(userLogin, configLayer.getName());
            final String name;
            if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
                name = configLayer.getAlias().trim().replaceAll(" ", "_");
@@ -277,21 +280,15 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                name = configLayer.getName().getLocalPart();
            }
 
-            final Object origin        = details.getOrigin();
-            if(!(origin instanceof CoverageReference)){
-                //WMTS only handle CoverageReference object
-                LOGGER.log(Level.INFO, "Layer {0} has not a coverageReference origin. It will not be included in capabilities", name);
-                continue;
-            }
-            final CoverageReference ref = (CoverageReference) origin;
-            if(!(ref instanceof PyramidalCoverageReference)){
+            final Object origin = details.getOrigin();
+            if(!(origin instanceof PyramidalCoverageReference)){
                 //WMTS only handle PyramidalModel
                 LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", name);
                 continue;
             }
 
             try{
-                final PyramidalCoverageReference pmodel = (PyramidalCoverageReference) ref;
+                final PyramidalCoverageReference pmodel = (PyramidalCoverageReference) origin;
                 final PyramidSet set = pmodel.getPyramidSet();
 
                 final Envelope env = set.getEnvelope();
@@ -375,7 +372,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 }
                 outputLayer.setResourceURL(resources);
 
-                for(Pyramid pr : set.getPyramids()){
+                for (Pyramid pr : set.getPyramids()) {
                     final TileMatrixSet tms = new TileMatrixSet();
                     tms.setIdentifier(new CodeType(pr.getId()));
                     tms.setSupportedCRS(getCRSCode(pr.getCoordinateReferenceSystem()));
@@ -405,7 +402,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                         int timeIndex = -1;
                         MathTransform toJavaTime = null;
                         for (Map.Entry<Integer, CoordinateReferenceSystem> entry : splittedCRS.entrySet()) {
-                            String strValue = null;
+                            String strValue;
                             // For temporal values, we convert it into timestamp, then to an ISO 8601 date.
                             final List<String> currentDimValues = dims.get(entry.getKey()).getValue();
                             if (entry.getValue() instanceof TemporalCRS) {
@@ -469,10 +466,11 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                      * retrieve pyramid at getTile request.
                      */
                     TileMatrixSet previousDefined = tileSets.get(pr.getId());
-
-                    if (previousDefined == null || !areEqual(tms, previousDefined)) {
+                    boolean equalSets = false;
+                    if (previousDefined == null || !(equalSets = areEqual(tms, previousDefined))) {
                         for (final TileMatrixSet tmpSet : tileSets.values()) {
                             if (areEqual(tms, tmpSet)) {
+                                equalSets = true;
                                 previousDefined = tmpSet;
                                 break;
                             }
@@ -482,7 +480,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     if (previousDefined == null) {
                         tileSets.put(pr.getId(), tms);
 
-                    } else if (areEqual(tms, previousDefined)) {
+                    } else if (equalSets) {
                         tms.setIdentifier(previousDefined.getIdentifier());
 
                     } else {
@@ -758,7 +756,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         } catch(Exception ex) {
             throw new CstlServiceException("Unexpected error for operation GetTile  : "+ layerName, ex , NO_APPLICABLE_CODE);
         }
-
     }
 
     /**
@@ -875,11 +872,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final BoundingBoxType bbox2 = (tms2.getBoundingBox() == null)? null : tms2.getBoundingBox().getValue();
         if (bbox1 != null? !bbox1.equals(bbox2) : bbox2 != null) return false;
 
+        final List<TileMatrix> sourceMatrixes = tms1.getTileMatrix();
         final List<TileMatrix> targetMatrixes = tms2.getTileMatrix();
-        for (final TileMatrix matrix : tms1.getTileMatrix()) {
-            if (!targetMatrixes.contains(matrix)) return false;
-        }
-
-        return true;
+        return (targetMatrixes == null ? sourceMatrixes == null : targetMatrixes.equals(sourceMatrixes));
     }
 }
