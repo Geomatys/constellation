@@ -377,7 +377,6 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
                         Growl('success','Success','SensorML saved with success!');
                     },
                     function(response) {//error
-                        $scope.close();
                         Growl('error','Error','Failed to save sensorML because the server returned an error!');
                     }
                 );
