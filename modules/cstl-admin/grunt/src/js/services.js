@@ -38,11 +38,10 @@ angular.module('cstl-services', ['cstl-restapi'])
              * Returns the value of given cookie key
              *
              * @param {string} key Id to use for lookup.
-             * @returns {Object} Deserialized cookie value.
+             * @returns {string} Cookie value.
              */
             get: function(key) {
-                var value = $.cookie(key);
-                return value ? angular.isString(value) ? value : angular.fromJson(value) : value;
+                return $.cookie(key);
             },
 
             /**
@@ -52,12 +51,11 @@ angular.module('cstl-services', ['cstl-restapi'])
              * Sets a value for given cookie key
              *
              * @param {string} key Id for the `value`.
-             * @param {Object} value Value to be stored.
+             * @param {string} value Value to be stored.
              * @param {Object} attributes Cookie attributes.
              */
             put: function(key, value, attributes) {
-                var val = angular.isString(value)?value:angular.toJson(value);
-                $.cookie(key, val, attributes);
+                $.cookie(key, value, attributes);
             },
 
             /**
@@ -70,7 +68,7 @@ angular.module('cstl-services', ['cstl-restapi'])
              * @param {Object} attributes Cookie attributes.
              */
             remove: function(key, attributes) {
-                $.cookie(key, attributes);
+                $.removeCookie(key, attributes);
             }
         };
     })
