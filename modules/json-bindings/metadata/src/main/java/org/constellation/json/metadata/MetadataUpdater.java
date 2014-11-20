@@ -59,6 +59,7 @@ import org.apache.sis.xml.NilReason;
 import org.geotoolkit.sml.xml.v101.ValidTime;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.opengis.metadata.identification.TopicCategory;
 
 
 /**
@@ -272,7 +273,7 @@ final class MetadataUpdater {
                 throw new ParseException("Illegal value: \"" + text + "\".", e);
             } else {
                 final boolean isCodeList = CodeList.class.isAssignableFrom(type);
-                if (isCodeList || type == Locale.class || type == Charset.class) {
+                if (isCodeList || type == Locale.class || type == Charset.class || type == TopicCategory.class ) {
                     text = text.substring(text.indexOf('.') + 1).trim();
                     if (isCodeList) {
                         value = Types.forCodeName(type.asSubclass(CodeList.class), text, false);
