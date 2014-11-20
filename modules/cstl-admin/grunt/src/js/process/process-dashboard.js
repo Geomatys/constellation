@@ -25,7 +25,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
-        $scope.wrap.nbbypage = 5; // Default value at 5
+        $scope.wrap.nbbypage = 10; // Default value at 10
         $scope.historySize = 100;
         $scope.hideScroll = true;
 
