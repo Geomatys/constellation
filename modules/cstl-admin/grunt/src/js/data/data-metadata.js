@@ -508,7 +508,6 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                             Growl('success','Success','Metadata saved with success!');
                         },
                         function(response) {
-                            $scope.close();
                             Growl('error','Error','Failed to save metadata because the server returned an error!');
                         }
                     );
@@ -520,7 +519,6 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                             Growl('success','Success','Metadata saved with success!');
                         },
                         function(response) {
-                            $scope.close();
                             Growl('error','Error','Failed to save metadata because the server returned an error!');
                         }
                     );
