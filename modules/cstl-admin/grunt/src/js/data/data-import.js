@@ -523,7 +523,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
                 headers: {
                   'X-Auth-Token': $rootScope.authToken
                 },
-                url: $cookieStore.get('.cstlUrl') + "api/1/domain/"+ $cookieStore.get('cstlActiveDomainId') + '/data/upload/metadata',
+                url: $cookieStore.get('cstlUrl') + "api/1/domain/"+ $cookieStore.get('cstlActiveDomainId') + '/data/upload/metadata',
                 type: 'POST',
                 data: formData,
                 async: false,
