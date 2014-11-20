@@ -42,7 +42,7 @@ angular.module('cstl-services', ['cstl-restapi'])
              */
             get: function(key) {
                 var value = $.cookie(key);
-                return value ? angular.fromJson(value) : value;
+                return value ? angular.isString(value) ? value : angular.fromJson(value) : value;
             },
 
             /**
@@ -56,7 +56,8 @@ angular.module('cstl-services', ['cstl-restapi'])
              * @param {Object} attributes Cookie attributes.
              */
             put: function(key, value, attributes) {
-                $.cookie(key, angular.toJson(value), attributes);
+                var val = angular.isString(value)?value:angular.toJson(value);
+                $.cookie(key, val, attributes);
             },
 
             /**
