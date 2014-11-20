@@ -68,7 +68,7 @@ cstlLoginApp.controller("login", function($scope, $http){
 
     $http.get('app/conf', {isArray: false}).success(function(conf){
         cstlUrl = conf.cstl;
-        if(!cstlUrl.startsWith('http')){
+        if(cstlUrl.indexOf('http://')===-1){
             var currentUrl = window.location.href;
             cstlUrl = currentUrl.substring(0,currentUrl.indexOf('/',7))+cstlUrl;
         }
