@@ -454,7 +454,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
                     setTimeout(function(){
                         DataViewer.map.updateSize();
-                        DataViewer.zoomToExtent(extent, DataViewer.map.getSize());
+                        DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
                     },300);
                 }
             } else {
@@ -474,7 +474,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
             setTimeout(function(){
                 DataViewer.map.updateSize();
-                DataViewer.zoomToExtent(extent, DataViewer.map.getSize());
+                DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
             },300);
         }
 

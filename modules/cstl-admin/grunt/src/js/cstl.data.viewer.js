@@ -81,7 +81,7 @@ window.DataViewer = {
         return (n === Number.POSITIVE_INFINITY || n === Number.NEGATIVE_INFINITY || isNaN(n));
     },
 
-    zoomToExtent : function(extent,size){
+    zoomToExtent : function(extent,size,postZoom){
         var projection = ol.proj.get(DataViewer.projection);
         var reprojExtent = ol.proj.transform(extent, 'EPSG:4326', DataViewer.projection);
         if(Array.isArray(reprojExtent)){
@@ -94,7 +94,9 @@ window.DataViewer = {
             }
         }
         DataViewer.map.getView().fitExtent(reprojExtent, size);
-        DataViewer.map.getView().setZoom(DataViewer.map.getView().getZoom()+1);
+        if(postZoom) {
+            DataViewer.map.getView().setZoom(DataViewer.map.getView().getZoom()+1);
+        }
     },
 
     createLayer : function(cstlUrlPrefix, layerName, providerId, filter, tiled){

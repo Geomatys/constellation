@@ -305,7 +305,7 @@
                                             class="col-xs-7 col-sm-7 col-md-6 col-lg-6 currentScale"></em>
                                     </div>
                                     <hr style="margin-bottom:10px;"/>
-                                    <div class="form-group">
+                                    <div class="form-group" ng-show="!optionsSLD.showFilterTextArea">
                                         <div class="col-xs-8">
                                             <div>
                                                 <label style="cursor: pointer;">
@@ -318,7 +318,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" ng-show="optionsSLD.filtersEnabled" style="margin-left:0;">
+                                    <div class="form-group"
+                                         ng-show="optionsSLD.filtersEnabled && !optionsSLD.showFilterTextArea"
+                                         style="margin-left:0;">
                                         <table ng-init="restoreFilters();">
                                             <tbody>
                                                 <tr ng-repeat="filter in optionsSLD.filters">
@@ -362,6 +364,25 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <div class="form-group" ng-show="optionsSLD.showFilterTextArea">
+                                        <label for="inputFilterComplex"
+                                               class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label"
+                                               translate="edition.style.label.filters.expression">Expression</label>
+                                        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                            <textarea id="inputFilterComplex"
+                                                      class="form-control form-control-fix"
+                                                      rows="3"
+                                                      ng-model="optionsSLD.selectedRule.filter"></textarea>
+                                        </div>
+                                        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" style="padding: 0;">
+                                            <button type="button"
+                                                    class="btn btn-default"
+                                                    style="padding:5px;"
+                                                    ng-click="optionsSLD.selectedRule.filter=null;optionsSLD.showFilterTextArea=false;">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </form>
                             </div>

@@ -564,7 +564,7 @@ p.error-select-one{
 .serviceTypeWMS{
   width: 171px;
   height: 113px;
-  background: url(../img/serviceTypes.svg) 365px 0;
+  background: url('../img/serviceTypes.svg') 365px 0;
   position: absolute;
   bottom: 20px;
   right: 15px;
@@ -572,7 +572,7 @@ p.error-select-one{
 .serviceTypeSOS{
   width: 151px;
   height: 113px;
-  background: url(../img/serviceTypes.svg) -167px 0;
+  background: url('../img/serviceTypes.svg') -167px 0;
   position: absolute;
   bottom: 20px;
   right: 15px;
@@ -580,7 +580,7 @@ p.error-select-one{
 .serviceTypeWMTS{
   width: 194px;
   height: 85px;
-  background: url(../img/serviceTypes.svg) 388px 85px;
+  background: url('../img/serviceTypes.svg') 388px 85px;
   position: absolute;
   bottom: 20px;
   right: 15px;
@@ -588,7 +588,7 @@ p.error-select-one{
 .serviceTypeWPS{
   width: 156px;
   height: 77px;
-  background: url(../img/serviceTypes.svg) 156px -36px;
+  background: url('../img/serviceTypes.svg') 156px -36px;
   position: absolute;
   bottom: 20px;
   right: 15px;
@@ -596,7 +596,7 @@ p.error-select-one{
 .serviceTypeWFS{
   width: 153px;
   height: 85px;
-  background: url(../img/serviceTypes.svg) -165px 85px;
+  background: url('../img/serviceTypes.svg') -165px 85px;
   position: absolute;
   bottom: 20px;
   right: 15px;
@@ -604,10 +604,66 @@ p.error-select-one{
 .serviceTypeWCS{
   width: 156px;
   height: 85px;
-  background: url(../img/serviceTypes.svg) 0 85px;
+  background: url('../img/serviceTypes.svg') 0 85px;
   position: absolute;
   bottom: 20px;
   right: 15px;
+}
+.serviceTypeCSWHeader{
+  background: url('../img/serviceTypes.svg') no-repeat 0 -30px;
+  height:85px;
+  width:153px;
+  position:absolute;
+  right: 2px;
+  top: -35px;
+}
+.serviceTypeWMSHeader{
+  background: url('../img/serviceTypes.svg') no-repeat -358px -30px;
+  height: 83px;
+  width: 171px;
+  position: absolute;
+  right: 2px;
+  top: -33px;
+}
+.serviceTypeSOSHeader{
+  background: url('../img/serviceTypes.svg') -167px -30px;
+  height: 84px;
+  width: 151px;
+  position: absolute;
+  right: 2px;
+  top: -33px;
+}
+.serviceTypeWMTSHeader{
+  background: url('../img/serviceTypes.svg') 388px 85px;
+  height: 85px;
+  width: 194px;
+  position: absolute;
+  right: 2px;
+  top: -33px;
+}
+.serviceTypeWPSHeader{
+  background: url('../img/serviceTypes.svg') 156px -36px;
+  height: 77px;
+  width: 156px;
+  position: absolute;
+  right: 2px;
+  top: -27px;
+}
+.serviceTypeWFSHeader{
+  background: url('../img/serviceTypes.svg') -165px 85px;
+  height: 85px;
+  position: absolute;
+  right: 2px;
+  top: -33px;
+  width: 153px;
+}
+.serviceTypeWCSHeader{
+  background: url('../img/serviceTypes.svg') 0 85px;
+  height: 85px;
+  position: absolute;
+  right: 2px;
+  top: -35px;
+  width: 156px;
 }
 /*
  * Dashboards
@@ -1243,6 +1299,17 @@ p.error-select-one{
 .dashboard .advanced-open{
   margin-bottom:0;
 }
+
+.dashboard-wmts-internal .item-list .item {
+  height: 68px;
+  margin-top: 4px;
+  max-height: 68px;
+}
+.dashboard-wmts-internal .item-list .item .top .item-title,
+.dashboard-wmts-internal .item-list .item .top .text-right {
+  font-size: 11px !important;
+}
+
 .backtotop{
   display: inline;
   position: fixed;

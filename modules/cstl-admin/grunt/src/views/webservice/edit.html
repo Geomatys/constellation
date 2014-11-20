@@ -2,6 +2,7 @@
     <div class="col-sm-12">
         <h3 class="header-title"
             translate="page.header.title.edit.service">Edit Service</h3>
+        <div ng-class="{'serviceTypeCSWHeader':service.type=='csw','serviceTypeWMSHeader':service.type=='wms','serviceTypeWMTSHeader':service.type=='wmts','serviceTypeSOSHeader':service.type=='sos','serviceTypeWPSHeader':service.type=='wps','serviceTypeWFSHeader':service.type=='wfs','serviceTypeWCSHeader':service.type=='wcs'}"></div>
     </div>
 </div>
 <div id="serviceDashboard" class="row frame dashboard">

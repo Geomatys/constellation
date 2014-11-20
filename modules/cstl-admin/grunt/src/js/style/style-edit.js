@@ -178,6 +178,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 selectedSymbolizerType:"",
                 selectedSymbolizer:null,
                 filtersEnabled:false,
+                showFilterTextArea:false,
                 filters:[{
                     "attribute":"",
                     "comparator":"=",
@@ -1075,10 +1076,12 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 //@TODO ol3 does not have any cql formatter, so needs to write one. good luck.
                 var format = new olext.Format.CQL();
                 var olfilter;
+                var readfailed = false;
                 try {
                     olfilter = format.read(cql);
                 } catch (err) {
                     console.error(err);
+                    readfailed=true;
                 }
                 if(olfilter){
                     $scope.optionsSLD.filters = convertOLFilterToArray(olfilter);
@@ -1091,6 +1094,8 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "value":"",
                         "operator":''
                     }];
+                    //show textarea instead of auto form inputs in case of read fail
+                    $scope.optionsSLD.showFilterTextArea = readfailed;
                 }
             }else {
                 $scope.optionsSLD.filtersEnabled=false;
@@ -2085,13 +2090,13 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                             DataViewer.initMap(mapId);
                             if ($scope.dataBbox) {
                                 var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
-                                DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
+                                DataViewer.zoomToExtent(extent,DataViewer.map.getSize(),true);
                             }
                             else {
                                 $scope.initDataLayerProperties(function(){
                                     if ($scope.dataBbox) {
                                         var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
-                                        DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
+                                        DataViewer.zoomToExtent(extent,DataViewer.map.getSize(),true);
                                     }
                                 });
                             }
@@ -2409,16 +2414,16 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
         $scope.styleBtnDefault = {"color":'#333333',"background-color":'#ffffff'};
 
         $scope.setAttrToInputSize = function(attrName,symbolizerGraphicOrFont) {
-            symbolizerGraphicOrFont.size = attrName;
+            symbolizerGraphicOrFont.size = '"'+attrName+'"';
         };
         $scope.setAttrToInputRotation = function(attrName,symbolizerGraphic) {
-            symbolizerGraphic.rotation = attrName;
+            symbolizerGraphic.rotation = '"'+attrName+'"';
         };
         $scope.setAttrToInputOpacity = function(attrName,symbolizerGraphic) {
-            symbolizerGraphic.opacity = attrName;
+            symbolizerGraphic.opacity = '"'+attrName+'"';
         };
         $scope.setAttrToInputWidth = function(attrName,symbolizerStroke) {
-            symbolizerStroke.width = attrName;
+            symbolizerStroke.width = '"'+attrName+'"';
         };
 
         /**
