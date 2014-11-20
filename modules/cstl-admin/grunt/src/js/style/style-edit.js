@@ -14,9 +14,9 @@
  *  Lesser General Public License for more details..
  */
 
-angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('StyleModalController', function($scope, Dashboard, $modalInstance, style, $cookies, dataListing,
+    .controller('StyleModalController', function($scope, Dashboard, $modalInstance, style, $cookieStore, dataListing,
                                                  provider, Growl, textService, newStyle, selectedLayer,selectedStyle,
                                                  serviceName, exclude, $timeout,stylechooser,$modal) {
 
@@ -2026,10 +2026,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 }
                 var layerData;
                 if(styleName){
-                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                    layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                         $scope.providerId, styleName,null,null,false);
                 }else {
-                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId,null,true);
+                    layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName, $scope.providerId,null,true);
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
@@ -2055,10 +2055,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         var layerData;
                         if($scope.selectedLayer){
                             if($scope.newStyle.rules.length ===0){
-                                layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName,
+                                layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName,
                                     $scope.providerId,null,true);
                             }else {
-                                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                                     $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                             }
                         }else {
@@ -2066,14 +2066,14 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             if ($scope.dataType.toLowerCase() === 'raster') {
                                 //to avoid layer disappear when rules is empty
                                 if($scope.newStyle.rules.length ===0){
-                                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName,
+                                    layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName,
                                         $scope.providerId,null,true);
                                 }else {
-                                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                    layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                                         $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                                 }
                             }else {
-                                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                                     $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                             }
                         }

@@ -21,15 +21,15 @@
 angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('SensorsController', function($scope, $routeParams, $filter, Dashboard, webService, sensor,
-                                              $modal, Growl, $window, $cookies) {
+                                              $modal, Growl, $window, $cookieStore) {
         /**
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
         $scope.wrap.ordertype = 'id';
         $scope.sensorCtrl = {
-            cstlUrl : $cookies.cstlUrl,
-            domainId : $cookies.cstlActiveDomainId,
+            cstlUrl : $cookieStore.get('cstlUrl'),
+            domainId : $cookieStore.get('cstlActiveDomainId'),
             selectedSensor : null,
             selectedSensorsChild : null,
             smallMode : false,

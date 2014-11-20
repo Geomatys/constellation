@@ -23,7 +23,56 @@
  * @require angular-cookies.js
  * @require app-restapi.js
  */
-angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
+angular.module('cstl-services', ['cstl-restapi'])
+
+    // -------------------------------------------------------------------------
+    //  'ngCookies' Substitution (using jQuery Cookie)
+    // -------------------------------------------------------------------------
+
+    .factory('$cookieStore', function() {
+        return {
+            /**
+             * @name $cookieStore#get
+             *
+             * @description
+             * Returns the value of given cookie key
+             *
+             * @param {string} key Id to use for lookup.
+             * @returns {Object} Deserialized cookie value.
+             */
+            get: function(key) {
+                var value = $.cookie(key);
+                return value ? angular.fromJson(value) : value;
+            },
+
+            /**
+             * @name $cookieStore#put
+             *
+             * @description
+             * Sets a value for given cookie key
+             *
+             * @param {string} key Id for the `value`.
+             * @param {Object} value Value to be stored.
+             * @param {Object} attributes Cookie attributes.
+             */
+            put: function(key, value, attributes) {
+                $.cookie(key, angular.toJson(value), attributes);
+            },
+
+            /**
+             * @name $cookieStore#remove
+             *
+             * @description
+             * Remove given cookie
+             *
+             * @param {string} key Id of the key-value pair to delete.
+             * @param {Object} attributes Cookie attributes.
+             */
+            remove: function(key, attributes) {
+                $.cookie(key, attributes);
+            }
+        };
+    })
 
     // -------------------------------------------------------------------------
     //  Constellation Configuration Properties
@@ -46,7 +95,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     //  Constellation Utilities
     // -------------------------------------------------------------------------
 
-    .factory('CstlUtils', function($cookies, CstlConfig) {
+    .factory('CstlUtils', function($cookieStore, CstlConfig) {
         return {
             /**
              * Return the webapp context path.
@@ -76,9 +125,9 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
              */
             compileUrl: function(config, url, fillSessionId) {
                 // Acquire cookie values.
-                var cstlUrl   = $cookies[CstlConfig['cookie.cstl.url']],
-                    domainId  = $cookies[CstlConfig['cookie.domain.id']],
-                    userId    = $cookies[CstlConfig['cookie.user.id']];
+                var cstlUrl   = $cookieStore.get(CstlConfig['cookie.cstl.url']),
+                    domainId  = $cookieStore.get(CstlConfig['cookie.domain.id']),
+                    userId    = $cookieStore.get(CstlConfig['cookie.user.id']);
 
                 // Inject cstl-service webapp url.
                 if (angular.isDefined(cstlUrl)) {
@@ -111,7 +160,7 @@ angular.module('cstl-services', ['ngCookies', 'cstl-restapi'])
     //  Authentication HTTP Interceptor
     // -------------------------------------------------------------------------
 
-    .factory('AuthInterceptor', function($rootScope, $q, $cookies, $cookieStore, CstlConfig, CstlUtils) {
+    .factory('AuthInterceptor', function($rootScope, $q, CstlConfig, CstlUtils) {
         /**
          * Checks if the request url destination is the Constellation REST API.
          *

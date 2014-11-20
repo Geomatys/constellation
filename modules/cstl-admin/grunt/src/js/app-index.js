@@ -20,7 +20,6 @@
 
 angular.module('CstlIndexApp', [
     // Angular official modules.
-    'ngCookies',
     'ngResource',
     'ngRoute',
     // Libraries modules.
@@ -68,9 +67,9 @@ angular.module('CstlIndexApp', [
     //  Controllers
     // -------------------------------------------------------------------------
 
-    .controller('HeaderController', function($scope, $http, $cookies) {
+    .controller('HeaderController', function($scope, $http, $cookieStore) {
         $http.get('app/conf').success(function(data) {
-            $cookies.cstlUrl = data.cstl;
+            $cookieStore.put('cstlUrl', data.cstl);
             $scope.cstlLoginUrl = 'login.html';
         });
     })

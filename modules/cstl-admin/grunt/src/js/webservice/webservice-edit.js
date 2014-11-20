@@ -18,11 +18,11 @@
  * limitations under the License.
  */
 
-angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
+angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('WebServiceEditController', function($rootScope, $scope, $routeParams , webService, dataListing, provider,
                                                      csw, sos, $modal, textService, Dashboard, Growl, $filter,
-                                                     DomainResource,StyleSharedService, style, $cookies, $translate,
+                                                     DomainResource,StyleSharedService, style, $cookieStore, $translate,
                                                      $window, cfpLoadingBar) {
         /**
          * To fix angular bug with nested scope.
@@ -31,10 +31,10 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
 
         $scope.tagText = '';
         $scope.type = $routeParams.type;
-        $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
-        $scope.cstlUrl = $cookies.cstlUrl;
+        $scope.url = $cookieStore.get('cstlUrl') + "WS/" + $routeParams.type + "/" + $routeParams.id;
+        $scope.cstlUrl = $cookieStore.get('cstlUrl');
         $scope.urlBoxSize = Math.min($scope.url.length,100);
-        $scope.domainId = $cookies.cstlActiveDomainId;
+        $scope.domainId = $cookieStore.get('cstlActiveDomainId');
         $scope.writeOperationAvailable = $scope.type === 'csw' || $scope.type === 'sos' || $scope.type === 'wfs';
         $scope.hideScroll = true;
 
@@ -560,7 +560,7 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                                                              data,
                                 function(response){//success
                                     var wmtsValues = {
-                                        "url":$cookies.cstlUrl +'WS/wmts/'+ $scope.service.identifier,
+                                        "url":$cookieStore.get('cstlUrl') +'WS/wmts/'+ $scope.service.identifier,
                                         "resolutions": response.resolutions,
                                         "matrixSet":response.matrixSet,
                                         "matrixIds":response.matrixIds,
@@ -579,19 +579,19 @@ angular.module('cstl-webservice-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
                         if($scope.service.type.toLowerCase() === 'wms') {
                             //create wms layer
-                            layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
+                            layerData = DataViewer.createLayerWMSWithStyle($cookieStore.get('cstlUrl'), layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
                         }else {
                             //create portrayal layer
-                            layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId,
+                            layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), layerName, providerId,
                                 $scope.selected.TargetStyle[0].Name,null,null,true);
                         }
                     } else {
                         if($scope.service.type.toLowerCase() === 'wms') {
                             //create wms layer
-                            layerData = DataViewer.createLayerWMS($cookies.cstlUrl, layerName, $scope.service.identifier);
+                            layerData = DataViewer.createLayerWMS($cookieStore.get('cstlUrl'), layerName, $scope.service.identifier);
                         }else {
                             //create portrayal layer
-                            layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId,null,true);
+                            layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), layerName, providerId,null,true);
                         }
                     }
 

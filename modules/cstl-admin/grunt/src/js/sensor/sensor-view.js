@@ -18,9 +18,9 @@
  * limitations under the License.
  */
 
-angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('SensorModalController', function($scope, $modalInstance, $modal, $cookies, sos, service, sensorId, Growl, $http) {
+    .controller('SensorModalController', function($scope, $modalInstance, $modal, $cookieStore, sos, service, sensorId, Growl, $http) {
         $scope.service = service;
         $scope.sensorId = sensorId;
         $scope.measures = undefined;
@@ -55,7 +55,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.initMap = function() {
-            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp",null,true);
+            var layerBackground = DataViewer.createLayer($cookieStore.get('cstlUrl'), "CNTR_BN_60M_2006", "generic_shp",null,true);
             sos.getFeatures({id: $scope.service.identifier, sensor: $scope.sensorId}, function(wkt) {
                 var wktReader = new ol.format.WKT();
                 var features = wktReader.readFeatures(wkt.value);
