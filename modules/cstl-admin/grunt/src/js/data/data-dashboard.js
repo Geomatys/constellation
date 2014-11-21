@@ -431,8 +431,10 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     var layerName = $scope.dataCtrl.selectedDataSetChild.Name;
                     var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
 
-                    dataListing.hideData({providerid: providerId, dataid: layerName},
-                        {value : $scope.dataCtrl.selectedDataSetChild.Namespace},
+                    dataListing.hideData({},
+                        {providerIdentifier:providerId,
+                         dataIdentifier:layerName,
+                         dataNmsp : $scope.dataCtrl.selectedDataSetChild.Namespace},
                         function() {//success
                             Growl('success','Success','Data '+ layerName +' successfully deleted');
                             datasetListing.listAll({}, function(response) {

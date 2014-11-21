@@ -149,7 +149,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'importDataFull':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/import/full;jsessionid='},
             'loadData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/load;jsessionid='},
             'extension':            {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/testextension;jsessionid='},
-            'hideData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/:providerid/:dataid/hidden;jsessionid='},
+            'hideData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/hidden;jsessionid='},
             'initMetadata':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata;jsessionid='},
             'setUpMetadata':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/upload;jsessionid='},
             'mergeMetadata':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/merge/:provider/:identifier/:type;jsessionid='},
