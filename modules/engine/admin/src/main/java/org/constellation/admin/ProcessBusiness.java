@@ -18,6 +18,7 @@
  */
 package org.constellation.admin;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
@@ -83,6 +84,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -592,10 +594,12 @@ public class ProcessBusiness implements IProcessBusiness {
                     Date endDate = null;
                     if (trigger.contains("{")) {
                         ObjectMapper jsonMapper = new ObjectMapper();
+                        jsonMapper.configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true);
+
                         Map map = jsonMapper.readValue(trigger, Map.class);
 
                         cronExp = (String) map.get("cron");
-                        long endDateMs = (long) map.get("endDate");
+                        long endDateMs =  ((BigInteger)map.get("endDate")).longValue();
                         if (endDateMs > 0) {
                             endDate = new Date(endDateMs);
                         }

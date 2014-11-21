@@ -24,38 +24,74 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
         // Private function
         function generateCronExpression() {
-            var cron = ['0', '0', '0', '0', '0', '0']; //seconds, minutes, hours, dayOfMonth, month, dayOfWeek
-
-            if ($scope.plan.time !== null) {
-                var timeParts = $scope.plan.time.split(':');
-                cron[1] = trimZero(timeParts[1]); //minutes
-                cron[2] = trimZero(timeParts[0]); //hours
-            }
-
-            if ($scope.plan.date !== null) {
-                var dateParts = $scope.plan.date.split('-');
-                cron[3] = parseInt(trimZero(dateParts[0]));
-                cron[4] = parseInt(trimZero(dateParts[1]));
-                cron[5] = parseInt(trimZero(dateParts[2]));
-            }
+            var cron = ['0', '0', '0', '0', '0', '?']; //seconds, minutes, hours, dayOfMonth, month, dayOfWeek
+            var parse = [false, true, true, true, true, true];
 
             //repeat
             var repeatIdx = $scope.repeatValues.indexOf($scope.plan.repeat);
 
-            //exclude once
             if (repeatIdx !== 0) {
 
                 //special case for weekly periodicity
                 if (repeatIdx === 5) {
                     cron[3] = cron[4] = '*';
+                    parse[3] = parse[4] = false;
                 } else {
                     //standard case (minutely, hourly, daily, monthly)
                     for (var i = repeatIdx; i < 6; i++) {
                         cron[i] = '*';
+                        parse[i] = false;
+                    }
+                }
+            } else {
+                parse[5] = false;
+            }
+
+            var now = new Date();
+
+            if ($scope.plan.time !== null) {
+                var timeParts = $scope.plan.time.split(':');
+
+                //minutes
+                if (parse[1]) {
+                    var minStr = trimZero(timeParts[1]);
+                    if (minStr !== '--') {
+                        cron[1] = minStr !== '' ? parseInt(minStr) : now.getMinutes();
+                    }
+                }
+
+                //hours
+                if (parse[2]) {
+                    var hourStr = trimZero(timeParts[0]);
+                    if (hourStr !== '--') {
+                        cron[2] = hourStr !== '' ? parseInt(hourStr) : now.getMinutes();
                     }
                 }
             }
-            
+
+            if ($scope.plan.date !== null) {
+                var dateParts = $scope.plan.date.split('-');
+                var date = new Date(dateParts[2], dateParts[1]-1, dateParts[0]);
+
+                // minutes
+                if (parse[3]) {
+                    cron[3] = date.getDate();
+                }
+
+                // month (js 0-11 / cron 1-12)
+                if (parse[4]) {
+                    cron[4] = date.getMonth() + 1;
+                }
+
+                // day of week
+                if (parse[5]) {
+                    cron[5] = repeatIdx !== 0 ? date.getDay() : '?';
+                }
+            }
+
+            if (cron[5] === '*') {
+                cron[5] = '?';
+            }
             return cron.join(' ');
         }
 
@@ -139,21 +175,23 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
                     if (day === null) {
                         day = '01';
                     }
-                    $scope.plan.date = year + "-" + month + '-' +day;
+                    $scope.plan.date = day + "-" + month + '-' +year;
                 }
+            } else {
+                $scope.plan.date = null;
             }
         }
 
         function isEveryMinutes(exp) {
-            return exp.search(/[0-9]\d{0,1} \* \* \* \* \*/i) === 0;
+            return exp.search(/[0-9]\d{0,1} \* \* \* \* (?:\*|\?)/i) === 0;
         }
 
         function isEveryHour(exp) {
-            return exp.search(/[[0-9]\d{0,1} [0-9]\d{0,1} \* \* \* \*/i) === 0;
+            return exp.search(/[[0-9]\d{0,1} [0-9]\d{0,1} \* \* \* (?:\*|\?)/i) === 0;
         }
 
         function isEveryDay(exp) {
-            return exp.search(/[0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} \* \* \*/i) === 0;
+            return exp.search(/[0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} \* \* (?:\*|\?)/i) === 0;
         }
 
         function isEveryWeek(exp) {
@@ -161,7 +199,7 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
         }
 
         function isEveryMonth(exp) {
-            return exp.search(/[0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} \* \*/i) === 0;
+            return exp.search(/[0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} [0-9]\d{0,1} \* (?:\*|\?)/i) === 0;
         }
 
         function trimZero(candidate) {
@@ -191,7 +229,7 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
                     var endDateMs = jdonObj.endDate;
                     if (endDateMs > 0) {
                         var endDate = new Date(endDateMs);
-                        $scope.plan.dateEnd = addZero(endDate.getDate()) + '-' + addZero(endDate.getMonth()) + '-' + endDate.getFullYear();
+                        $scope.plan.dateEnd = addZero(endDate.getDate()) + '-' + addZero(endDate.getMonth()+1) + '-' + endDate.getFullYear();
                         $scope.plan.timeEnd = addZero(endDate.getHours()) + ':' + addZero(endDate.getMinutes());
                     }
                     parseCronExpression(cron);
@@ -238,7 +276,7 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 year = parseInt(trimZero(dateParts[2]));
             }
 
-            return new Date(year, month, day, hours, min, 0, 0);
+            return new Date(year, month-1, day, hours, min, 0, 0);
         }
 
         function init() {
@@ -249,7 +287,7 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 $scope.plan.folder = $scope.task.trigger;
             } else if ($scope.task.triggerType === null) {
                 var now = new Date();
-                $scope.plan.date = addZero(now.getDate()) + '-' + addZero(now.getMonth()) + '-' + now.getFullYear();
+                $scope.plan.date = addZero(now.getDate()) + '-' + addZero(now.getMonth()+1) + '-' + now.getFullYear();
                 $scope.plan.time = addZero(now.getHours()) + ':' + addZero(now.getMinutes());
             }
         }
@@ -344,7 +382,7 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
             };
 
             var now = new Date();
-            $scope.plan.date = addZero(now.getDate()) + '-' + addZero(now.getMonth()) + '-' + now.getFullYear();
+            $scope.plan.date = addZero(now.getDate()) + '-' + addZero(now.getMonth()+1) + '-' + now.getFullYear();
             $scope.plan.time = addZero(now.getHours()) + ':' + addZero(now.getMinutes());
         };
 
@@ -360,7 +398,9 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
             var repeatIdx = $scope.repeatValues.indexOf(newValue);
             if (repeatIdx > 0 && $scope.plan.dateEnd === '') {
                 var startDate = toDate(new Date(), $scope.plan.date, $scope.plan.time);
-                $scope.plan.dateEnd = addZero(startDate.getDate()) + '-' + addZero(startDate.getMonth()) + '-' + startDate.getFullYear();
+
+                //update end date
+                $scope.plan.dateEnd = addZero(startDate.getDate()) + '-' + addZero(startDate.getMonth()+1) + '-' + startDate.getFullYear();
                 $scope.plan.timeEnd = addZero(startDate.getHours()) + ':' + addZero(startDate.getMinutes());
             }
         }, true);
