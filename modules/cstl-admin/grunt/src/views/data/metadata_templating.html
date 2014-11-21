@@ -299,6 +299,17 @@
         <option value="">-----</option>
     </select>
     </select>
+        <select ng-if="fieldObj.field.render === 'DimensionNameType.codelist'"
+            class="form-control form-control-fix"
+            ng-model="fieldObj.field.value"
+            ng-options="(code | translate) for code in codeLists.dimensionNameTypeCodes | orderBy: 'toString() | translate'"
+            style="width:auto;min-width:165pt;height:30px;"
+            ng-required="fieldObj.field.obligation === 'M'"
+            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
+            dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
+        <option value="">-----</option>
+    </select>
+    </select>
         <select ng-if="fieldObj.field.render === 'ScopeCode.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"

@@ -75,6 +75,7 @@ import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.spatial.CellGeometry;
+import org.opengis.metadata.spatial.DimensionNameType;
 import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.metadata.spatial.PixelOrientation;
 
@@ -967,7 +968,16 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         Collections.sort(restrictionCodes);
         mdList.setRestrictionCodes(restrictionCodes);
         
-        //for pixel orientation codes
+        final List<String> dimensionNameTypeCodes = new LinkedList<>();
+        for (final DimensionNameType cl : DimensionNameType.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            dimensionNameTypeCodes.add(codeListName);
+        }
+        Collections.sort(dimensionNameTypeCodes);
+        mdList.setDimensionNameTypeCodes(dimensionNameTypeCodes);
+        
         final List<String> cellGeometryCodes = new LinkedList<>();
         for (final CellGeometry cl : CellGeometry.values()) {
             final String standardName = Types.getStandardName(cl.getClass());
