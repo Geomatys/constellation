@@ -132,8 +132,21 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     public String writeObservationTemplate(final ObservationTemplate template) throws DataStoreException {
         if (template.getObservation() != null) {
             return writeObservation((AbstractObservation)template.getObservation());
+        } else  {
+            try {
+                final Connection c = source.getConnection();
+                c.setAutoCommit(false);
+                writeProcedure(template.getProcedure(), c);
+                for (PhenomenonProperty phen : template.getFullObservedProperties()) {
+                    writePhenomenon(phen, c);
+                }
+                c.commit();
+                c.close();
+                return null;
+            } catch (SQLException ex) {
+                throw new DataStoreException("Error while inserting observations.", ex);
+            }
         }
-        return null;
     }
     
     /**
