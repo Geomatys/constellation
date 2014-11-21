@@ -56,7 +56,7 @@ public class MetadataLists implements Serializable {
             this.maintenanceFrequencyCodes= m.maintenanceFrequencyCodes;
             this.geometricObjectTypeCodes= m.geometricObjectTypeCodes;
             this.classificationCodes= m.classificationCodes;
-            this.characterSetCodes= m.classificationCodes;
+            this.characterSetCodes= m.characterSetCodes;
             this.keywordTypeCodes= m.keywordTypeCodes;
             this.restrictionCodes = m.restrictionCodes;
             this.scopeCodes = m.scopeCodes;
