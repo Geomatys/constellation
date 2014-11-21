@@ -638,7 +638,10 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 layerRepository.delete(layer.getId());
             }
 
-            // 2. cleanup provider if empty
+            // 2. unlink from csw
+            dataRepository.removeDataFromAllCSW(data.getId());
+            
+            // 3. cleanup provider if empty
             boolean remove = true;
             for (Data pdata : dataRepository.findByProviderId(data.getProvider())) {
                 if (pdata.isVisible()) {
