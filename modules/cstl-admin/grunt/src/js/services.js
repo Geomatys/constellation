@@ -266,10 +266,13 @@ angular.module('cstl-services', ['cstl-restapi'])
         }
 
         function Stomper(url){
-            var socket = new SockJS(url),
-                stompClient = Stomp.over(socket);
+            var stompClient = null;
 
             this.connect = function (callback) {
+                if (stompClient == null) {
+                    var socket = new SockJS(url);
+                    stompClient = Stomp.over(socket);
+                }
                 stompClient.connect({}, function() {
                     console.log('Connected to ' + url);
 
@@ -280,9 +283,12 @@ angular.module('cstl-services', ['cstl-restapi'])
             };
 
             this.disconnect = function () {
-                stompClient.disconnect(function() {
-                    console.log('Disconnected from ' + url);
-                });
+                if (stompClient != null) {
+                    stompClient.disconnect(function () {
+                        console.log('Disconnected from ' + url);
+                    });
+                    stompClient = null;
+                }
             };
 
             this.subscribe = function(path, cb){
