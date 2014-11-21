@@ -29,6 +29,7 @@ import java.util.Date;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import org.opengis.metadata.citation.Responsibility;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
@@ -55,11 +56,14 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
 import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
+import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.NilReason;
 import org.geotoolkit.sml.xml.v101.ValidTime;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gts.xml.PeriodDurationType;
 import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.temporal.PeriodDuration;
 
 
 /**
@@ -70,6 +74,9 @@ import org.opengis.metadata.identification.TopicCategory;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class MetadataUpdater {
+    
+    private static final Logger LOGGER = Logging.getLogger(MetadataUpdater.class);
+    
     /**
      * The metadata factory to use for creating new instances of ISO 19115 objects.
      */
@@ -265,12 +272,21 @@ final class MetadataUpdater {
         if (type == Date.class) {
             return toDate(value);
         }
+        if (type == PeriodDuration.class && value instanceof String) {
+            try {
+                return new PeriodDurationType((String)value);
+            } catch (IllegalArgumentException ex) {
+                LOGGER.warning("Bad period duration value:" + value);
+            }
+        }
         if (!CharSequence.class.isAssignableFrom(type) && (value instanceof CharSequence)) {
             String text = value.toString();
-            if (text.startsWith(Keywords.NIL_REASON)) try {
-                value = NilReason.valueOf(text.substring(Keywords.NIL_REASON.length())).createNilObject(type);
-            } catch (URISyntaxException | IllegalArgumentException e) {
-                throw new ParseException("Illegal value: \"" + text + "\".", e);
+            if (text.startsWith(Keywords.NIL_REASON)) {
+                try {
+                    value = NilReason.valueOf(text.substring(Keywords.NIL_REASON.length())).createNilObject(type);
+                } catch (URISyntaxException | IllegalArgumentException e) {
+                    throw new ParseException("Illegal value: \"" + text + "\".", e);
+                } 
             } else {
                 final boolean isCodeList = CodeList.class.isAssignableFrom(type);
                 if (isCodeList || type == Locale.class || type == Charset.class || type == TopicCategory.class ) {
