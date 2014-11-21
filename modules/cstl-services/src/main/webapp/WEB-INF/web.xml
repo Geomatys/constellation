@@ -56,6 +56,7 @@
   <filter>
     <filter-name>CorsFilter</filter-name>
     <filter-class>org.constellation.filter.CorsFilter</filter-class>
+    <async-supported>true</async-supported>
     <init-param>
      <param-name>exclude</param-name>
      <param-value>/spring/ws/.*</param-value>
@@ -72,6 +73,7 @@
     <filter-name>securityFilter</filter-name>
     <!-- <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class> -->
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    <async-supported>true</async-supported>
     <init-param>
       <param-name>targetFilterLifecycle</param-name>
       <param-value>true</param-value>
@@ -98,6 +100,7 @@
   <filter>
     <filter-name>encodingFilter</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <async-supported>true</async-supported>
     <init-param>
       <param-name>encoding</param-name>
       <param-value>UTF-8</param-value>
