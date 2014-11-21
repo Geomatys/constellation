@@ -43,6 +43,8 @@ public class MetadataLists implements Serializable {
     private List<String> keywordTypeCodes;
     private List<String> restrictionCodes;
     private List<String> scopeCodes;
+    private List<String> pixelOrientationCodes;
+    private List<String> cellGeometryCodes;
 
     public MetadataLists() {
     }
@@ -60,6 +62,8 @@ public class MetadataLists implements Serializable {
             this.keywordTypeCodes= m.keywordTypeCodes;
             this.restrictionCodes = m.restrictionCodes;
             this.scopeCodes = m.scopeCodes;
+            this.pixelOrientationCodes = m.pixelOrientationCodes;
+            this.cellGeometryCodes = m.cellGeometryCodes;
         }
     }
 
@@ -149,5 +153,21 @@ public class MetadataLists implements Serializable {
 
     public void setScopeCodes(List<String> scopeCodes) {
         this.scopeCodes = scopeCodes;
+    }
+    
+    public List<String> getPixelOrientationCodes() {
+        return pixelOrientationCodes;
+    }
+
+    public void setPixelOrientationCodes(List<String> pixelOrientationCodes) {
+        this.pixelOrientationCodes = pixelOrientationCodes;
+    }
+    
+    public List<String> getCellGeometryCodes() {
+        return cellGeometryCodes;
+    }
+
+    public void setCellGeometryCodes(List<String> cellGeometryCodes) {
+        this.cellGeometryCodes = cellGeometryCodes;
     }
 }

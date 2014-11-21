@@ -74,7 +74,9 @@ import org.opengis.metadata.identification.KeywordType;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.maintenance.ScopeCode;
+import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.GeometricObjectType;
+import org.opengis.metadata.spatial.PixelOrientation;
 
 
 /**
@@ -964,6 +966,28 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(restrictionCodes);
         mdList.setRestrictionCodes(restrictionCodes);
+        
+        //for pixel orientation codes
+        final List<String> cellGeometryCodes = new LinkedList<>();
+        for (final CellGeometry cl : CellGeometry.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            cellGeometryCodes.add(codeListName);
+        }
+        Collections.sort(cellGeometryCodes);
+        mdList.setCellGeometryCodes(cellGeometryCodes);
+        
+        //for pixel orientation codes
+        final List<String> pixelOrientationCodes = new LinkedList<>();
+        for (final PixelOrientation cl : PixelOrientation.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            pixelOrientationCodes.add(codeListName);
+        }
+        Collections.sort(pixelOrientationCodes);
+        mdList.setPixelOrientationCodes(pixelOrientationCodes);
         
         //for Scope codes
         final List<String> scopeCodes = new LinkedList<>();

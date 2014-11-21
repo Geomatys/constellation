@@ -63,6 +63,7 @@ import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gts.xml.PeriodDurationType;
 import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.temporal.PeriodDuration;
 
 
@@ -289,7 +290,7 @@ final class MetadataUpdater {
                 } 
             } else {
                 final boolean isCodeList = CodeList.class.isAssignableFrom(type);
-                if (isCodeList || type == Locale.class || type == Charset.class || type == TopicCategory.class ) {
+                if (isCodeList || type == Locale.class || type == Charset.class || type == TopicCategory.class || type == PixelOrientation.class ) {
                     text = text.substring(text.indexOf('.') + 1).trim();
                     if (isCodeList) {
                         value = Types.forCodeName(type.asSubclass(CodeList.class), text, false);
