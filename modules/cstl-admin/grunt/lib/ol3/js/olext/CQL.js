@@ -101,6 +101,7 @@ olext.Filter.Comparison.LESS_THAN_OR_EQUAL_TO    = "<=";
 olext.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO = ">=";
 olext.Filter.Comparison.BETWEEN                  = "..";
 olext.Filter.Comparison.LIKE                     = "~";
+olext.Filter.Comparison.ILIKE                    = "ILIKE";
 olext.Filter.Comparison.IS_NULL                  = "NULL";
 
 /********************************/
@@ -124,7 +125,7 @@ olext.Format.CQL = (function() {
 
         patterns = {
             PROPERTY: /^[_a-zA-Z]\w*/,
-            COMPARISON: /^(=|<>|<=|<|>=|>|LIKE)/i,
+            COMPARISON: /^(=|<>|<=|<|>=|>|LIKE|ILIKE)/i,
             IS_NULL: /^IS NULL/i,
             COMMA: /^,/,
             LOGICAL: /^(AND|OR)/i,
@@ -184,6 +185,7 @@ olext.Format.CQL = (function() {
             '>': olext.Filter.Comparison.GREATER_THAN,
             '>=': olext.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO,
             'LIKE': olext.Filter.Comparison.LIKE,
+            'ILIKE': olext.Filter.Comparison.ILIKE,
             'BETWEEN': olext.Filter.Comparison.BETWEEN,
             'IS NULL': olext.Filter.Comparison.IS_NULL
         },

@@ -1209,6 +1209,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          olext.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO = “>=”;
          olext.Filter.Comparison.BETWEEN = “..”;
          olext.Filter.Comparison.LIKE = “~”;
+         olext.Filter.Comparison.ILIKE = “ILIKE”;
          olext.Filter.Comparison.IS_NULL = “NULL”;
          */
         var convertOLComparatorToCQL = function(olType){
