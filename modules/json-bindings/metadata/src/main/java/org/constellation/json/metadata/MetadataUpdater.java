@@ -62,8 +62,6 @@ import org.geotoolkit.sml.xml.v101.ValidTime;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gts.xml.PeriodDurationType;
-import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.temporal.PeriodDuration;
 
 
@@ -75,9 +73,9 @@ import org.opengis.temporal.PeriodDuration;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class MetadataUpdater {
-    
+
     private static final Logger LOGGER = Logging.getLogger(MetadataUpdater.class);
-    
+
     /**
      * The metadata factory to use for creating new instances of ISO 19115 objects.
      */
@@ -287,10 +285,10 @@ final class MetadataUpdater {
                     value = NilReason.valueOf(text.substring(Keywords.NIL_REASON.length())).createNilObject(type);
                 } catch (URISyntaxException | IllegalArgumentException e) {
                     throw new ParseException("Illegal value: \"" + text + "\".(property:" + identifier + ")", e);
-                } 
+                }
             } else {
                 final boolean isCodeList = CodeList.class.isAssignableFrom(type);
-                if (isCodeList || type == Locale.class || type == Charset.class || type == TopicCategory.class || type == PixelOrientation.class ) {
+                if (isCodeList || type == Locale.class || type == Charset.class || type.isEnum()) {
                     text = text.substring(text.indexOf('.') + 1).trim();
                     if (isCodeList) {
                         value = Types.forCodeName(type.asSubclass(CodeList.class), text, false);
