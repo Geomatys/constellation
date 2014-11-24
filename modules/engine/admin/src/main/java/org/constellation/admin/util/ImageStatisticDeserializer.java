@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 
@@ -43,8 +42,11 @@ public class ImageStatisticDeserializer extends JsonDeserializer<ImageStatistics
                         stats.getBand(b).setName(name.textValue());
                     }
 
-                    double min = ((DoubleNode) band.get("min")).doubleValue();
-                    double max = ((DoubleNode) band.get("max")).doubleValue();
+                    String minStr = band.get("min").asText();
+                    String maxStr = band.get("max").asText();
+
+                    double min = Double.valueOf(minStr);
+                    double max = Double.valueOf(maxStr);
 
                     JsonNode noDataNode = band.get("noData");
                     if (noDataNode != null && noDataNode.isArray()) {
@@ -53,7 +55,7 @@ public class ImageStatisticDeserializer extends JsonDeserializer<ImageStatistics
                         Iterator<JsonNode> noDataIte = noDataArray.iterator();
                         int i = 0;
                         while (noDataIte.hasNext()) {
-                            noData[i++] = noDataIte.next().doubleValue();
+                            noData[i++] = Double.valueOf(noDataIte.next().asText());
                         }
                         stats.getBand(b).setNoData(noData);
                     }
