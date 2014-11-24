@@ -70,6 +70,8 @@ import org.constellation.dto.MetadataLists;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.Restriction;
+import org.opengis.metadata.content.CoverageContentType;
+import org.opengis.metadata.content.ImagingCondition;
 import org.opengis.metadata.identification.KeywordType;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
@@ -977,6 +979,26 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(dimensionNameTypeCodes);
         mdList.setDimensionNameTypeCodes(dimensionNameTypeCodes);
+        
+        final List<String> coverageContentTypeCodes = new LinkedList<>();
+        for (final CoverageContentType cl : CoverageContentType.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            coverageContentTypeCodes.add(codeListName);
+        }
+        Collections.sort(coverageContentTypeCodes);
+        mdList.setCoverageContentTypeCodes(coverageContentTypeCodes);
+        
+        final List<String> imagingConditionCodes = new LinkedList<>();
+        for (final ImagingCondition cl : ImagingCondition.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            imagingConditionCodes.add(codeListName);
+        }
+        Collections.sort(imagingConditionCodes);
+        mdList.setImagingConditionCodes(imagingConditionCodes);
         
         final List<String> cellGeometryCodes = new LinkedList<>();
         for (final CellGeometry cl : CellGeometry.values()) {

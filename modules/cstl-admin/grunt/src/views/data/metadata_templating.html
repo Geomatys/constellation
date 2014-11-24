@@ -288,6 +288,16 @@
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
         <option value="">-----</option>
     </select>
+    <select ng-if="fieldObj.field.render === 'CoverageContentType.codelist'"
+            class="form-control form-control-fix"
+            ng-model="fieldObj.field.value"
+            ng-options="(code | translate) for code in codeLists.coverageContentTypeCodes | orderBy: 'toString() | translate'"
+            style="width:auto;min-width:165pt;height:30px;"
+            ng-required="fieldObj.field.obligation === 'M'"
+            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
+            dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
+        <option value="">-----</option>
+    </select>
         <select ng-if="fieldObj.field.render === 'Restriction.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
@@ -298,8 +308,7 @@
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
         <option value="">-----</option>
     </select>
-    </select>
-        <select ng-if="fieldObj.field.render === 'DimensionNameType.codelist'"
+     <select ng-if="fieldObj.field.render === 'DimensionNameType.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.dimensionNameTypeCodes | orderBy: 'toString() | translate'"
@@ -309,6 +318,15 @@
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
         <option value="">-----</option>
     </select>
+    <select ng-if="fieldObj.field.render === 'ImagingCondition.codelist'"
+            class="form-control form-control-fix"
+            ng-model="fieldObj.field.value"
+            ng-options="(code | translate) for code in codeLists.imagingConditionCodes | orderBy: 'toString() | translate'"
+            style="width:auto;min-width:165pt;height:30px;"
+            ng-required="fieldObj.field.obligation === 'M'"
+            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
+            dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
+        <option value="">-----</option>
     </select>
         <select ng-if="fieldObj.field.render === 'ScopeCode.codelist'"
             class="form-control form-control-fix"

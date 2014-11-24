@@ -46,6 +46,8 @@ public class MetadataLists implements Serializable {
     private List<String> pixelOrientationCodes;
     private List<String> cellGeometryCodes;
     private List<String> dimensionNameTypeCodes;
+    private List<String> imagingConditionCodes;
+    private List<String> coverageContentTypeCodes;
 
     public MetadataLists() {
     }
@@ -66,6 +68,8 @@ public class MetadataLists implements Serializable {
             this.pixelOrientationCodes = m.pixelOrientationCodes;
             this.cellGeometryCodes = m.cellGeometryCodes;
             this.dimensionNameTypeCodes = m.dimensionNameTypeCodes;
+            this.imagingConditionCodes = m.imagingConditionCodes;
+            this.coverageContentTypeCodes = m.coverageContentTypeCodes;
         }
     }
 
@@ -179,5 +183,21 @@ public class MetadataLists implements Serializable {
 
     public void setDimensionNameTypeCodes(List<String> dimensionNameTypeCodes) {
         this.dimensionNameTypeCodes = dimensionNameTypeCodes;
+    }
+    
+    public List<String> getImagingConditionCodes() {
+        return imagingConditionCodes;
+    }
+
+    public void setImagingConditionCodes(List<String> imagingConditionCodes) {
+        this.imagingConditionCodes = imagingConditionCodes;
+    }
+    
+    public List<String> getCoverageContentTypeCodes() {
+        return coverageContentTypeCodes;
+    }
+
+    public void setCoverageContentTypeCodes(List<String> coverageContentTypeCodes) {
+        this.coverageContentTypeCodes = coverageContentTypeCodes;
     }
 }
