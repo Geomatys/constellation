@@ -751,8 +751,8 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         bandIdentified = $scope.dataBands[0];
                     }
                     $scope.optionsSLD.rasterPalette.band.selected = bandIdentified;
-                    $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
-                    $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+                    $scope.optionsSLD.rasterPalette.palette.rasterMinValue = parseFloat($scope.optionsSLD.rasterPalette.band.selected.minValue);
+                    $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = parseFloat($scope.optionsSLD.rasterPalette.band.selected.maxValue);
                 }
                 var colorMap = symbolizers[0].colorMap;
                 if(colorMap){
@@ -1306,8 +1306,8 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                             $scope.dataBands = response.bands;
                             if($scope.dataBands && $scope.dataBands.length > 0){
                                 $scope.optionsSLD.rasterPalette.band.selected = $scope.dataBands[0];
-                                $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
-                                $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+                                $scope.optionsSLD.rasterPalette.palette.rasterMinValue = parseFloat($scope.optionsSLD.rasterPalette.band.selected.minValue);
+                                $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = parseFloat($scope.optionsSLD.rasterPalette.band.selected.maxValue);
                             }
                         }
                     },
@@ -1323,8 +1323,8 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          * Fix rzslider bug with angular on value changed for band selector.
          */
         $scope.fixRZSlider = function(){
-            $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
-            $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+            $scope.optionsSLD.rasterPalette.palette.rasterMinValue = parseFloat($scope.optionsSLD.rasterPalette.band.selected.minValue);
+            $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = parseFloat($scope.optionsSLD.rasterPalette.band.selected.maxValue);
         };
 
         /**
@@ -1856,6 +1856,10 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             }else {
                 colorMap.function.nanColor = null;
             }
+
+            //parse min/max values
+            palette.rasterMinValue = parseFloat(palette.rasterMinValue);
+            palette.rasterMaxValue = parseFloat(palette.rasterMaxValue);
 
             switch (palette.index) {
                 case 1:
