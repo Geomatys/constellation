@@ -7,12 +7,17 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
+import org.geotoolkit.image.internal.SampleType;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import static org.geotoolkit.process.coverage.statistics.ImageStatistics.*;
 
 /**
  * @author Quentin Boileau (Geomatys)
@@ -28,27 +33,36 @@ public class ImageStatisticDeserializer extends JsonDeserializer<ImageStatistics
             ArrayNode bandArray = (ArrayNode) bandsNode;
             int nbBands = bandArray.size();
 
-            ImageStatistics stats = new ImageStatistics(nbBands);
+            final ImageStatistics stats = new ImageStatistics(nbBands);
             Iterator<JsonNode> bandIte = bandArray.iterator();
 
             int b = 0;// band index
             while (bandIte.hasNext()) {
-                JsonNode band = bandIte.next();
-                if (band.isObject()) {
-                    int idx = ((IntNode) band.get("index")).intValue();
+                JsonNode bandNode = bandIte.next();
+                if (bandNode.isObject()) {
 
-                    JsonNode name = band.get("name");
-                    if (name != null) {
-                        stats.getBand(b).setName(name.textValue());
+                    int idx = ((IntNode) bandNode.get("index")).intValue();
+
+                    JsonNode nameNode = bandNode.get("name");
+                    if (nameNode != null) {
+                        stats.getBand(b).setName(nameNode.textValue());
                     }
 
-                    String minStr = band.get("min").asText();
-                    String maxStr = band.get("max").asText();
+                    JsonNode dataTypeNode = bandNode.get("dataType");
+                    if (dataTypeNode != null) {
+                        stats.getBand(b).setDataType(SampleType.valueOf(dataTypeNode.textValue()));
+                    }
+
+                    String minStr = bandNode.get("min").asText();
+                    String maxStr = bandNode.get("max").asText();
 
                     double min = Double.valueOf(minStr);
                     double max = Double.valueOf(maxStr);
 
-                    JsonNode noDataNode = band.get("noData");
+                    stats.getBand(b).setMin(min);
+                    stats.getBand(b).setMax(max);
+
+                    JsonNode noDataNode = bandNode.get("noData");
                     if (noDataNode != null && noDataNode.isArray()) {
                         ArrayNode noDataArray = (ArrayNode) noDataNode;
                         double[] noData = new double[noDataArray.size()];
@@ -60,7 +74,7 @@ public class ImageStatisticDeserializer extends JsonDeserializer<ImageStatistics
                         stats.getBand(b).setNoData(noData);
                     }
 
-                    JsonNode histogramNode = band.get("histogram");
+                    JsonNode histogramNode = bandNode.get("histogram");
                     if (histogramNode != null && histogramNode.isArray()) {
                         ArrayNode histogramArray = (ArrayNode) histogramNode;
                         int size = histogramArray.size();
@@ -71,18 +85,7 @@ public class ImageStatisticDeserializer extends JsonDeserializer<ImageStatistics
                         while (histogramIte.hasNext()) {
                             histogram[i++] = histogramIte.next().longValue();
                         }
-
-                        if (size > 0) {
-                            double span = max - min;
-                            double step = span / size;
-
-                            Map<Double, Long> distribution = new HashMap<>(histogram.length);
-                            for (int j = 0; j < size; j++) {
-                                distribution.put(min+j*step, histogram[j]);
-                            }
-                            stats.getBand(b).setFullDistribution(distribution);
-                        }
-
+                        stats.getBand(b).setHistogram(histogram);
                     } else {
                         throw new IOException("Invalid JSON");
                     }

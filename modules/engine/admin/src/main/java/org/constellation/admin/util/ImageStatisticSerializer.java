@@ -27,6 +27,9 @@ public class ImageStatisticSerializer extends JsonSerializer<ImageStatistics> {
             if (band.getName() != null) {
                 jsonGen.writeStringField("name", band.getName());
             }
+            if (band.getDataType() != null) {
+                jsonGen.writeStringField("dataType", band.getDataType().name());
+            }
             jsonGen.writeNumberField("min", band.getMin());
             jsonGen.writeNumberField("max", band.getMax());
 
@@ -38,7 +41,7 @@ public class ImageStatisticSerializer extends JsonSerializer<ImageStatistics> {
                 jsonGen.writeEndArray();//noData
             }
 
-            final Long[] distrib = band.tightenDistribution(255);
+            final long[] distrib = band.tightenHistogram(255);
             jsonGen.writeArrayFieldStart("histogram");
             for (int j = 0; j < distrib.length; j++) {
                 jsonGen.writeNumber(distrib[j]);
