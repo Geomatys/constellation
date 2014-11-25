@@ -209,7 +209,6 @@ public class ServiceBusiness implements IServiceBusiness {
                     if (!worker.isStarted()) {
                         service.setStatus("ERROR");
                         serviceRepository.update(service);
-                        throw new ConfigurationException("Unable to start the instance " + identifier + ".");
                     }
                     service.setStatus("STARTED");
                     serviceRepository.update(service);
