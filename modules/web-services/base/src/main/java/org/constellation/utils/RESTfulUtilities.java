@@ -39,8 +39,8 @@ public final class RESTfulUtilities extends Static {
     public static Response created(final Object entity) {
         return Response.status(201).entity(entity).build();
     }
-    public static Response noContent() {
-        return Response.status(204).build();
+    public static Response noContent(final Object entity) {
+        return Response.status(204).entity(entity).build();
     }
 
     // Failure.
