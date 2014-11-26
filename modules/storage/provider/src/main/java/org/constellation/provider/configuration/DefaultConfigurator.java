@@ -42,11 +42,14 @@ import org.constellation.api.ProviderType;
 import org.constellation.api.StyleType;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDataCoverageJob;
+import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Style;
+import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.Data;
@@ -99,6 +102,12 @@ public final class DefaultConfigurator implements Configurator {
 
     @Autowired
     private PropertyRepository propertyRepository;
+
+    @Autowired
+    private DatasetRepository datasetRepository;
+
+    @Autowired
+    private IDatasetBusiness datasetBusiness;
     
     public DefaultConfigurator() {
         SpringHelper.injectDependencies(this);
@@ -171,13 +180,18 @@ public final class DefaultConfigurator implements Configurator {
     }
 
     private void checkDataUpdate(final org.constellation.engine.register.Provider pr) throws IOException{
-        
+
 //        final List<DataRecord> list = pr.getData();
         final List<org.constellation.engine.register.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
         final String type = pr.getType();
         if (type.equals(ProviderType.LAYER.name())) {
             final DataProvider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
-            
+
+            Dataset dataset = datasetRepository.findByIdentifier(pr.getIdentifier());
+            if (dataset == null) {
+                dataset = datasetBusiness.createDataset(pr.getIdentifier(), null, null, pr.getOwner());
+            }
+
             // Remove no longer existing layer.
             final Map<String, String> metadata = new HashMap<>(0);
             for (final org.constellation.engine.register.Data data : list) {
@@ -292,6 +306,7 @@ public final class DefaultConfigurator implements Configurator {
                     org.constellation.engine.register.Data data = dataBusiness.create(
                             name, pr.getIdentifier(), provider.getDataType().name(),
                             provider.isSensorAffectable(), visible, rendered, subType, null);
+                    dataBusiness.updateDataDataSetId(name, pr.getIdentifier(), dataset.getId());
 
                     //analyse coverage image (min/max/ histogram) with an asynchronous method
                     if (doAnalysis && DataType.COVERAGE.equals(provider.getDataType())) {

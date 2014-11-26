@@ -247,17 +247,13 @@ public class ProviderBusiness implements IProviderBusiness {
     @Override
     public Provider create(final int domainId, final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException {
         final DataProviderFactory providerSPI = DataProviders.getInstance().getFactory(providerSPIName);
+        /////
+        // WARNING : createProvider() will create provider, data list and dataset records in repositories.
+        /////
         DataProviders.getInstance().createProvider(id, providerSPI, providerConfig);
         final int count = domainRepository.addProviderDataToDomain(id, domainId);
-        final Provider provider = getProvider(id);
-        final int provId = provider.getId();
-
-        // for now we assume provider == dataset, so we create a dataset bound to the new provider.
-        final Dataset dataset = datasetBusiness.createDataset(id, null, null, provider.getOwner());
-        datasetBusiness.linkDataTodataset(dataset, getDatasFromProviderId(provId));
-
         LOGGER.info("Added " + count + " data to domain " + domainId);
-        return provider;
+        return getProvider(id);
     }
 
     public void update(final int domainId, final String id, final ProviderConfiguration config) {
