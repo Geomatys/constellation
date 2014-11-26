@@ -38,11 +38,14 @@ import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessListenerAdapter;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.geotoolkit.process.coverage.statistics.Statistics;
+import org.geotoolkit.util.Exceptions;
+import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -51,6 +54,9 @@ import javax.inject.Inject;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.geotoolkit.parameter.Parameters.value;
+import static org.geotoolkit.process.coverage.statistics.StatisticsDescriptor.OUTCOVERAGE;
 
 /**
  *
@@ -64,6 +70,11 @@ public class DataCoverageJob implements IDataCoverageJob {
      * Used for debugging purposes.
      */
     protected static final Logger LOGGER = Logging.getLogger(DataCoverageJob.class);
+
+    public static final String STATE_PENDING    = "PENDING";
+    public static final String STATE_ERROR      = "ERROR";
+    public static final String STATE_COMPLETED  = "COMPLETED";
+    public static final String STATE_PARTIAL    = "PARTIAL";
 
     /**
      * Injected data repository.
@@ -84,14 +95,14 @@ public class DataCoverageJob implements IDataCoverageJob {
     @Async
     public Future<ImageStatistics> asyncUpdateDataStatistics(final int dataId) {
 
+        Data data = dataRepository.findById(dataId);
         try {
-            Data data = dataRepository.findById(dataId);
-
-            if (data != null && DataType.COVERAGE.name().equals(data.getType()) &&
-                    (data.isRendered() == null || !data.isRendered())) {
+            if (data != null && DataType.COVERAGE.name().equals(data.getType())
+                    && (data.isRendered() == null || !data.isRendered())
+                    && data.getStatsState() == null) {
                 LOGGER.log(Level.INFO, "Start computing data " + dataId + " coverage statistics.");
 
-                data.setStats("PENDING");
+                data.setStatsState(STATE_PENDING);
                 dataRepository.update(data);
 
                 final Provider provider = providerRepository.findOne(data.getProvider());
@@ -106,23 +117,99 @@ public class DataCoverageJob implements IDataCoverageJob {
                     }
                     final CoverageReference covRef = coverageStore.getCoverageReference(name);
 
-                    final ImageStatistics analyse = Statistics.analyse(covRef, false);
-                    final ObjectMapper mapper = new ObjectMapper();
-                    final SimpleModule module = new SimpleModule();
-                    module.addSerializer(ImageStatistics.class, new ImageStatisticSerializer()); //custom serializer
-                    mapper.registerModule(module);
-                    mapper.enable(SerializationFeature.INDENT_OUTPUT); //json pretty print
+                    final org.geotoolkit.process.Process process = new Statistics(covRef, false);
+                    process.addListener(new DataStatisticsListener(dataId));
+                    final ParameterValueGroup out = process.call();
 
-                    //get last version of data
-                    data = dataRepository.findById(dataId);
-                    data.setStats(mapper.writeValueAsString(analyse));
-                    dataRepository.update(data);
-                    return new AsyncResult<>(analyse);
+                    return new AsyncResult<>(value(OUTCOVERAGE, out));
                 }
             }
-        } catch (DataStoreException | ProcessException | JsonProcessingException e) {
-            LOGGER.log(Level.WARNING, "Error during coverage statistic update for data "+dataId+" : "+e.getMessage(), e);
+        } catch (DataStoreException | ProcessException e) {
+            LOGGER.log(Level.WARNING, "Error during coverage statistic update for data " + dataId + " : " + e.getMessage(), e);
+
+            //update data
+            Data lastData = dataRepository.findById(dataId);
+            if (!lastData.getStatsState().equals(STATE_ERROR)) {
+                data.setStatsState(STATE_ERROR);
+                data.setStatsResult(Exceptions.formatStackTrace(e));
+                dataRepository.update(data);
+            }
         }
         return null;
+    }
+
+    /**
+     * ProcessListener that will update data record in database.
+     */
+    private class DataStatisticsListener extends ProcessListenerAdapter {
+
+        private int dataId;
+
+        public DataStatisticsListener(int dataId) {
+            this.dataId = dataId;
+        }
+
+        @Override
+        public void progressing(ProcessEvent event) {
+            if (event.getOutput() != null) {
+                final Data data = getData();
+                try {
+                    data.setStatsState(STATE_PARTIAL);
+                    data.setStatsResult(statisticsAsString(event));
+                    dataRepository.update(data);
+                } catch (JsonProcessingException e) {
+                    data.setStatsState(STATE_ERROR);
+                    data.setStatsResult("Error during statistic serializing.");
+                    dataRepository.update(data);
+                }
+            }
+        }
+
+        @Override
+        public void completed(ProcessEvent event) {
+            final Data data = getData();
+            try {
+                data.setStatsState(STATE_COMPLETED);
+                data.setStatsResult(statisticsAsString(event));
+                dataRepository.update(data);
+            } catch (JsonProcessingException e) {
+                data.setStatsState(STATE_ERROR);
+                data.setStatsResult("Error during statistic serializing.");
+                dataRepository.update(data);
+            }
+        }
+
+        @Override
+        public void failed(ProcessEvent event) {
+            final Data data = getData();
+            data.setStatsState(STATE_ERROR);
+            data.setStatsResult(Exceptions.formatStackTrace(event.getException()));
+            dataRepository.update(data);
+        }
+
+        private Data getData() {
+            return dataRepository.findById(dataId);
+        }
+
+        /**
+         * Serialize Statistic in JSON
+         * @param event
+         * @return JSON String or null if event output is null.
+         * @throws JsonProcessingException
+         */
+        private String statisticsAsString(ProcessEvent event) throws JsonProcessingException {
+            final ParameterValueGroup out = event.getOutput();
+            if (out != null) {
+                final ImageStatistics statistics = value(OUTCOVERAGE, out);
+
+                final ObjectMapper mapper = new ObjectMapper();
+                final SimpleModule module = new SimpleModule();
+                module.addSerializer(ImageStatistics.class, new ImageStatisticSerializer()); //custom serializer
+                mapper.registerModule(module);
+                mapper.enable(SerializationFeature.INDENT_OUTPUT); //json pretty print
+                return mapper.writeValueAsString(statistics);
+            }
+            return null;
+        }
     }
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.23" author="qboileau">
+        <renameColumn schemaName="admin" tableName="data" oldColumnName="stats" newColumnName="stats_result"/>
+        <addColumn schemaName="admin" tableName="data">
+            <column name="stats_state" type="TEXT">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <sql>UPDATE admin.data SET stats_result=null WHERE CAST(stats_result AS VARCHAR(128)) = 'PENDING'</sql>
+        <sql>UPDATE admin.data SET stats_state='COMPLETED' WHERE stats_result IS NOT null</sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -167,7 +167,8 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
                 .set(DATA.VISIBLE, data.isVisible())
                 .set(DATA.DATASET_ID, data.getDatasetId())
                 .set(DATA.FEATURE_CATALOG, data.getFeatureCatalog())
-                .set(DATA.STATS, data.getStats())
+                .set(DATA.STATS_RESULT, data.getStatsResult())
+                .set(DATA.STATS_STATE, data.getStatsState())
                 .set(DATA.RENDERED, data.isRendered())
                 .where(DATA.ID.eq(data.getId()))
                 .execute();

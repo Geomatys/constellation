@@ -112,6 +112,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
+import static org.constellation.utils.RESTfulUtilities.noContent;
+import static org.constellation.utils.RESTfulUtilities.internalError;
+import static org.constellation.utils.RESTfulUtilities.badRequest;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DISPLACEMENT;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_UOM;
@@ -785,9 +788,12 @@ public final class StyleRest {
 
        if (DataType.COVERAGE.name().equals(dataBrief.getType())) {
            final ImageStatistics stats = dataBusiness.getDataStatistics(dataBrief.getId());
-           return ok(stats);
+           if (stats != null) {
+               return ok(stats);
+           }
+           return noContent(new AcknowlegementType("Processing", "Data is currently analysed, statistics not yet available."));
        }
-       return ok(new AcknowlegementType("Failure", "datastore is not coverage store."));
+       return badRequest(new AcknowlegementType("Failure", "Data is not coverage type."));
    }
 
 }

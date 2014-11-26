@@ -479,7 +479,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setSubtype(data.getSubtype());
             db.setSensorable(data.isSensorable());
             db.setTargetSensor(sensorRepository.getLinkedSensors(data));
-            db.setStats(data.getStats());
+            db.setStatsResult(data.getStatsResult());
+            db.setStatsState(data.getStatsState());
             db.setRendered(data.isRendered());
 
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
@@ -796,22 +797,33 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         if (data != null && DataType.COVERAGE.name().equals(data.getType()) &&
                 (data.isRendered() == null || !data.isRendered())) {
             try {
-                final String stats = data.getStats();
-                if (stats != null && !stats.equalsIgnoreCase("PENDING")) {
-                    final ObjectMapper mapper = new ObjectMapper();
-                    final SimpleModule module = new SimpleModule();
-                    module.addDeserializer(ImageStatistics.class, new ImageStatisticDeserializer()); //custom deserializer
-                    mapper.registerModule(module);
-                    return mapper.readValue(stats, ImageStatistics.class);
-                } else {
-                    Future<ImageStatistics> futureStats = dataCoverageJob.asyncUpdateDataStatistics(data.getId());
-                    return futureStats.get();
+                final String state = data.getStatsState();
+                final String result = data.getStatsResult();
+
+                if (state != null) {
+                    switch (state) {
+                        case "PARTIAL" : //fall through
+                        case "COMPLETED" :
+                            return deserializeImageStatistics(result);
+                        case "PENDING" : //fall through
+                        case "ERROR" :
+                            return null;
+                    }
                 }
-            } catch (IOException | InterruptedException | ExecutionException e) {
+
+            } catch (IOException e) {
                 throw new ConfigurationException("Invalid statistic JSON format for data : "+dataId, e);
             }
         }
         return null;
+    }
+
+    private ImageStatistics deserializeImageStatistics(String state) throws IOException {
+        final ObjectMapper mapper = new ObjectMapper();
+        final SimpleModule module = new SimpleModule();
+        module.addDeserializer(ImageStatistics.class, new ImageStatisticDeserializer()); //custom deserializer
+        mapper.registerModule(module);
+        return mapper.readValue(state, ImageStatistics.class);
     }
 
     /**
@@ -824,19 +836,35 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
     /**
      * {@inheritDoc}
+     * IMPORTANT : Should call only once at server startup after all spring context is initialized.
      */
     @Override
     public void computeEmptyDataStatistics() {
         final List<Data> dataList = dataRepository.findAll();
+
+        List<Integer> dataWithoutStats = new ArrayList<>();
         for (Data data : dataList) {
-            String stats = data.getStats();
 
             //compute statistics only on coverage data not rendered and without previous statistic computed.
             if (DataType.COVERAGE.name().equals(data.getType()) &&
-                    (data.isRendered() == null || !data.isRendered()) &&
-                    (stats == null || stats.isEmpty() || stats.equalsIgnoreCase("PENDING") )) {
-                dataCoverageJob.asyncUpdateDataStatistics(data.getId());
+                    (data.isRendered() == null || !data.isRendered())) {
+
+                String state = data.getStatsState();
+                if ("PENDING".equalsIgnoreCase(state)) {
+                    data.setStatsState(null);
+                    data.setStatsResult(null);
+                    dataRepository.update(data);
+                    dataWithoutStats.add(data.getId());
+                }
+
+                if (state == null || state.isEmpty()) {
+                    dataWithoutStats.add(data.getId());
+                }
             }
+        }
+
+        for (Integer dataId : dataWithoutStats) {
+            dataCoverageJob.asyncUpdateDataStatistics(dataId);
         }
     }
 
