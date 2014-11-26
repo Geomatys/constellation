@@ -51,7 +51,7 @@
                         <goal>grunt</goal>
                     </goals>
                     <configuration>
-                        <arguments>${grunt.build.profile} --target_dir=${grunt.target.dir}</arguments>
+                        <arguments>${grunt.build.profile} --target_dir="${grunt.target.dir}"</arguments>
                     </configuration>
                 </execution>
             </executions>
