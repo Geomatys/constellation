@@ -41,12 +41,14 @@ public class ImageStatisticSerializer extends JsonSerializer<ImageStatistics> {
                 jsonGen.writeEndArray();//noData
             }
 
-            final long[] distrib = band.tightenHistogram(255);
-            jsonGen.writeArrayFieldStart("histogram");
-            for (int j = 0; j < distrib.length; j++) {
-                jsonGen.writeNumber(distrib[j]);
+            if (band.getHistogram() != null) {
+                final long[] distrib = band.tightenHistogram(255);
+                jsonGen.writeArrayFieldStart("histogram");
+                for (int j = 0; j < distrib.length; j++) {
+                    jsonGen.writeNumber(distrib[j]);
+                }
+                jsonGen.writeEndArray();//histogram
             }
-            jsonGen.writeEndArray();//histogram
 
             jsonGen.writeEndObject();//end band
         }
