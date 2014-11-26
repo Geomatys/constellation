@@ -12,47 +12,8 @@
   </parent>
 
   <profiles>
-    <profile>
-      <id>dev</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <!-- Grunt build profile -->
-        <grunt.build.profile>dev</grunt.build.profile>
-        <!-- Spring profile to use -->
-        <spring.profiles.active>dev</spring.profiles.active>
-        <!-- i18n resource files reloading -->
-        <message.reloading.enabled>true</message.reloading.enabled>
-        <!-- log configuration -->
-        <logback.loglevel>DEBUG</logback.loglevel>
-
-        <!-- development database configuration -->
-        <datasource.datasourceclassname>org.hsqldb.jdbc.JDBCDataSource</datasource.datasourceclassname>
-        <datasource.url>jdbc:hsqldb:mem:cstl-admin</datasource.url>
-        <datasource.databaseName></datasource.databaseName>
-        <datasource.serverName></datasource.serverName>
-        <datasource.username></datasource.username>
-        <datasource.password></datasource.password>
-        <hibernate.dialect>org.hibernate.dialect.HSQLDialect</hibernate.dialect>
-        <hibernate.show_sql>true</hibernate.show_sql>
-        <hibernate.generate_statistics>true</hibernate.generate_statistics>
-        <!-- email configuration -->
-        <mail.host>localhost</mail.host>
-        <mail.port>25</mail.port>
-        <mail.user></mail.user>
-        <mail.password></mail.password>
-        <mail.tls></mail.tls>
-        <mail.from>jhipster@localhost</mail.from>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.hsqldb</groupId>
-          <artifactId>hsqldb</artifactId>
-          <version>2.3.1</version>
-        </dependency>
-      </dependencies>
-    </profile>
+   
+   
     <profile>
       <id>prod</id>
       <properties>
@@ -69,9 +30,44 @@
 
       </properties>
     </profile>
+    <profile>
+     <id>windows</id>
+     <activation>
+      <os>
+       <family>windows</family>
+      </os>
+     </activation>
+     <build>
+       <plugins>
+        <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <version>0.0.16</version>
+            <executions>
+                <!-- Run grunt build -->
+                <execution>
+                    <id>grunt-build</id>
+                    <goals>
+                        <goal>grunt</goal>
+                    </goals>
+                    <configuration>
+                        <arguments>${grunt.build.profile} --target_dir=${grunt.target.dir}</arguments>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+       </plugins>
+     </build>
+    </profile>
   </profiles>
 
   <properties>
+   <logback.loglevel>DEBUG</logback.loglevel>
+        <message.reloading.enabled>true</message.reloading.enabled>
+  
+          <!-- Grunt build profile -->
+        <grunt.build.profile>dev</grunt.build.profile>
+  
     <!-- Maven build properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.7</java.version>
