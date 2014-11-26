@@ -429,7 +429,7 @@
                                         </div>
                                         <div class="block-action">
                                             <div class="row" style="padding-bottom: 5px">
-                                                <div class="col-sm-2" ng-if="service.status=='STARTED'">
+                                                <div class="col-sm-3 col-md-2" ng-if="service.status=='STARTED'">
                                                     <span class="tooltipicon">
                                                         <button id="showData"
                                                                 class="btn btn-success"
@@ -441,7 +441,7 @@
                                                         </button>
                                                     </span>
                                                 </div>
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-3 col-md-2">
                                                     <span class="tooltipicon">
                                                         <button type="button"
                                                                 ng-click="editLayerInfo()"
@@ -470,7 +470,7 @@
                                                         </button>
                                                     </span>
                                                 </div-->
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-3 col-md-2">
                                                     <span class="tooltipicon">
                                                         <button type="button"
                                                                 id="deleteLayer"
@@ -512,7 +512,7 @@
                                                          style="margin-bottom:5px;">
                                                         <button type="button"
                                                                 ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
-                                                                class="btn btn-small">
+                                                                class="btn btn-small btn-block-assos">
                                                             <i class="glyphicon glyphicon-trash"></i>
                                                         </button>
                                                         {{truncateTitleBlock(style.Name)}}
@@ -521,7 +521,7 @@
                                                         <div class="col-xs-12">
                                                             <button type="button"
                                                                     ng-click="showStyleList();"
-                                                                    class="btn btn-sm pull-right">
+                                                                    class="btn btn-sm pull-right btn-block-assos">
                                                                 <i class="glyphicon glyphicon-plus"></i>
                                                                 <span translate="label.new.style.select"
                                                                       style="margin-left:5px;">Add new style</span>
@@ -616,7 +616,7 @@
                                         </div>
                                         <div class="block-action">
                                             <div class="row" style="padding-bottom: 5px">
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-3 col-md-2 tooltip-left-menu">
                                                     <span class="tooltipicon">
                                                         <button type="button"
                                                                 id="seeMetadata"
@@ -628,7 +628,7 @@
                                                         </button>
                                                     </span>
                                                 </div>
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-3 col-md-2 tooltip-left-menu">
                                                     <span class="tooltipicon">
                                                         <button type="button"
                                                                 class="btn btn-csw"
@@ -639,7 +639,7 @@
                                                         </button>
                                                     </span>
                                                 </div>
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-3 col-md-2 tooltip-left-menu">
                                                     <span class="tooltipicon">
                                                         <a id="exportMD"
                                                            class="btn btn-info btn-csw"
@@ -650,7 +650,7 @@
                                                         </a>
                                                     </span>
                                                 </div>
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-3 col-md-2 tooltip-left-menu">
                                                     <span class="tooltipicon">
                                                         <button type="button"
                                                                 id="deleteMetadata"
@@ -699,7 +699,7 @@
                                         </div>
                                         <div class="block-action">
                                             <div class="row">
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-3 col-md-2">
                                                     <span class="tooltipicon">
                                                         <button class="btn btn-sos"
                                                                 type="button"
@@ -711,7 +711,7 @@
                                                         </button>
                                                     </span>
                                                 </div>
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-3 col-md-2">
                                                     <span class="tooltipicon">
                                                         <button type="button"
                                                                 class="btn btn-sos"
@@ -1215,6 +1215,7 @@
 <div scroll-to=""
      id="backtotop"
      class="backtotop"
-     ng-hide="hideScroll">
+     ng-hide="hideScroll"
+        ng-if="tabdata">
     <span class="glyphicon glyphicon-chevron-up"></span>
 </div>
