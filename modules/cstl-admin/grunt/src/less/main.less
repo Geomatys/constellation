@@ -1973,6 +1973,28 @@ body.modal-open{
   border-top: 1px solid #ededed;
 }
 
+.animate.ng-enter,
+.animate.ng-leave {
+  -webkit-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+  -moz-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+  -ms-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+  -o-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+  transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.animate.ng-leave.animate.ng-leave-active,
+.animate.ng-enter {
+  opacity: 0;
+  height: 0px;
+}
+.animate.ng-enter.ng-enter-active,
+.animate.ng-leave {
+  opacity: 1;
+  height: 50px;
+}
+
 /* -------------- Responsive -------------- */
 
 @media screen and (max-width: @screen-xs-max){
