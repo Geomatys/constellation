@@ -1028,16 +1028,29 @@ p.error-select-one{
 }
 .dashboard .item-list .item.coverage {
    background: transparent url('../img/raster2.svg') -145px 0;
+    &.style-small{
+      background: transparent url('../img/raster2.svg') -425px 0;
+    }
 }
 .dashboard .item-list .item.coverage.selected, .dashboard .item-list .item.metadata-coverage.selected {
     background: transparent url('../img/raster2.svg') -145px 72px;
+  &.style-small{
+    background: transparent url('../img/raster2.svg') -425px 72px;
+  }
 }
 .dashboard .item-list .item.vector {
     background: transparent url('../img/vector2.svg') -145px 0;
+  &.style-small{
+    background: transparent url('../img/vector2.svg') -425px 0;
+  }
 }
 .dashboard .item-list .item.vector.selected, .dashboard .item-list .item.metadata-vector.selected {
     background: transparent url('../img/vector2.svg') -145px 73px;
+  &.style-small{
+    background: transparent url('../img/vector2.svg') -425px 73px;
+  }
 }
+
 .dashboard .item-list .item.sensor {
     background: transparent url('../img/sensor.svg') right center no-repeat;
 }
@@ -1065,24 +1078,39 @@ p.error-select-one{
 .dashboard .item-list .item.sensor-system-service.selected {
   background: transparent url('../img/sensor2.svg') -144px 70px;
 }
+
 .dashboard .item-list .item.pyramid {
     background: transparent url('../img/pyramid.svg') right center no-repeat;
 }
 .dashboard .item-list .item.pyramid.selected {
     background: transparent url('../img/pyramid-selected.svg') right center no-repeat;
 }
+
 .dashboard .item-list .item.style-coverage {
     background: transparent url('../img/style2.svg') -209px 144px;
+    &.style-small{
+      background: transparent url('../img/style2.svg') -370px 144px;
+    }
 }
 .dashboard .item-list .item.style-coverage.selected{
     background: transparent url('../img/style2.svg') -209px 72px;
+    &.style-small{
+      background: transparent url('../img/style2.svg') -370px 72px;
+    }
 }
 .dashboard .item-list .item.style-vector {
     background: transparent url('../img/style2.svg') -209px 0;
+    &.style-small{
+      background: transparent url('../img/style2.svg') -370px 0;
+    }
 }
 .dashboard .item-list .item.style-vector.selected{
     background: transparent url('../img/style2.svg') -209px 216px;
+    &.style-small{
+      background: transparent url('../img/style2.svg') -370px 216px;
+    }
 }
+
 .dashboard .item-list .item.metadata {
     background: transparent url('../img/dataset.svg') -144px 0;
 }
@@ -1122,6 +1150,7 @@ p.error-select-one{
 .dashboard .item-list .item.metadata-service.selected {
   background: transparent url('../img/metadata2.svg') -144px 70px;
 }
+
 .dashboard .item-list .item.registry{
     background: transparent url('../img/registery2.svg') -209px -3px;
 }
@@ -1134,6 +1163,7 @@ p.error-select-one{
 .dashboard .item-list .item.process-child.selected{
     background: transparent url('../img/registery2.svg') -209px 68px;
 }
+
 .dashboard .item-list .item.mapcontext{
     background: transparent url('../img/mapcontext2.svg') -209px 0;
 }
@@ -1146,6 +1176,7 @@ p.error-select-one{
 .dashboard .item-list .item.mapcontext.layer.selected{
     background: transparent url('../img/mapcontext2.svg') -209px 72px;
 }
+
 .dashboard .item-list .item.coverage.compo {
   background: transparent url('../img/mapcontext2.svg') -209px 432px;
 }
@@ -1164,6 +1195,7 @@ p.error-select-one{
 .dashboard .item-list .item.style-compo-layer{
     background: transparent url('../img/style2.svg') -209px 360px;
 }
+
 .dashboard .item-list .item.dataset {
   background: transparent url('../img/dataset.svg') -144px 0;
 }
@@ -1190,27 +1222,51 @@ p.error-select-one{
 }
 .dashboard .item-list .item.dataset-data {
   background: transparent url('../img/dataset-data.svg') -144px 0;
+  &.style-small{
+    background: transparent url('../img/dataset-data.svg') -400px 0;
+  }
 }
 .dashboard .item-list .item.dataset-data.selected {
   background: transparent url(../img/dataset-data.svg) -144px 289px;
+  &.style-small{
+    background: transparent url('../img/dataset-data.svg') -400px 289px;
+  }
 }
 .dashboard .item-list .item.dataset-data-vector {
   background: transparent url('../img/dataset-data.svg') -144px -72px;
+  &.style-small{
+    background: transparent url('../img/dataset-data.svg') -400px -72px;
+  }
 }
 .dashboard .item-list .item.dataset-data-vector.selected {
   background: transparent url(../img/dataset-data.svg) -144px 216px;
+  &.style-small{
+    background: transparent url('../img/dataset-data.svg') -400px 216px;
+  }
 }
 .dashboard .item-list .item.dataset-data-coverage {
   background: transparent url('../img/dataset-data.svg') -144px -144px;
+  &.style-small{
+    background: transparent url('../img/dataset-data.svg') -400px -144px;
+  }
 }
 .dashboard .item-list .item.dataset-data-coverage.selected {
   background: transparent url(../img/dataset-data.svg) -144px 144px;
+  &.style-small{
+    background: transparent url('../img/dataset-data.svg') -400px 144px;
+  }
 }
 .dashboard .item-list .item.dataset-data-sensor {
   background: transparent url('../img/dataset-data.svg') -144px -216px;
+  &.style-small{
+    background: transparent url('../img/dataset-data.svg') -400px 289px;
+  }
 }
 .dashboard .item-list .item.dataset-data-sensor.selected {
   background: transparent url(../img/dataset-data.svg) -144px 72px;
+  &.style-small{
+    background: transparent url('../img/dataset-data.svg') -400px 72px;
+  }
 }
 
 .dashboard .item-list .item {
@@ -2181,6 +2237,11 @@ body.modal-open{
   .form-horizontal .control-label.admin-contact-label{
     text-align: left;
   }
+
+  //responsive
+  .btn-emprise{
+    margin-left:-13px;
+  }
 }
 
 @media screen and (min-width: @screen-md)and (max-width: @screen-md-max) {
@@ -2231,6 +2292,20 @@ body.modal-open{
   .item-title.title-sensorSystem{
     width: 349px;
   }
+
+  .dashboard .item-list .item.style-coverage.style-small{
+      background: transparent url('../img/style2.svg') -430px 144px;
+  }
+  .dashboard .item-list .item.style-coverage.selected.style-small{
+      background: transparent url('../img/style2.svg') -430px 72px;
+  }
+  .dashboard .item-list .item.style-vector.style-small{
+      background: transparent url('../img/style2.svg') -430px 0;
+  }
+  .dashboard .item-list .item.style-vector.selected.style-small{
+      background: transparent url('../img/style2.svg') -430px 216px;
+  }
+
   /* modale */
   .buttons-div{
     padding: 0;
@@ -2256,6 +2331,11 @@ body.modal-open{
     width:296px;
     padding:5px 10px;
     margin-left: 75px;
+  }
+
+  //responsive
+  .btn-emprise{
+    margin-left:7px;
   }
 }
 
@@ -2308,6 +2388,11 @@ body.modal-open{
   /*service edit*/
   .service-link{
     width:500px;
+  }
+
+  //responsive
+  .btn-emprise{
+    margin-left:14px;
   }
 }
 

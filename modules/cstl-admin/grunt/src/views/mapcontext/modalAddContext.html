@@ -38,7 +38,7 @@
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane block-border"
+                            <div class="tab-pane"
                                  ng-class="{active:mode.selTab==='tabInfo'}"
                                  style="padding-top: 13px;">
                                 <form class="form-horizontal form-style" role="form">
@@ -81,7 +81,7 @@
                                                            ng-model="ctxt.north"
                                                            placeholder="{{'label.north.first.letter' | translate}}"/>
                                                 </div>
-                                                <div class="col-sm-offset-1 col-sm-2">
+                                                <div class="col-sm-offset-1 col-sm-2 btn-emprise">
                                                     <button class="btn btn-add"
                                                             type="button"
                                                             ng-click="applyExtent()"
@@ -136,7 +136,7 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="tab-pane block-border"
+                            <div class="tab-pane"
                                  ng-class="{active:mode.selTab==='tabLayers'}"
                                  style="padding-top: 7px;">
                                 <div class="row dash-inner"
@@ -338,7 +338,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-xs-1"
-                                                 style="margin-top: 37px;">
+                                                 style="margin-top: 37px; padding-right: 0;">
                                                 <span class="glyphicon glyphicon-star"
                                                       ng-show="selected.item.layer.styleName===styleItem.Name"></span>
                                             </div>

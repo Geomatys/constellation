@@ -329,7 +329,7 @@
                                      ng-class="{'col-xs-6':dataCtrl.smallMode}"
                                      style="padding-left:0;">
                                     <div class="item {{dataset.Type? ('dataset-data-'+dataset.Type | lowercase) : 'dataset-data'}}"
-                                         ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
+                                         ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id), 'style-small':dataCtrl.smallMode}"
                                          ng-click="selectDS(dataset);selectDataSetChild(null,null);"
                                          data-name="{{dataset.Name}}"
                                          ng-show="dataset.Children.length!=1"
@@ -369,7 +369,8 @@
                                          ng-class="{'selected':dataCtrl.selectedDataSetChild && (data.Id==dataCtrl.selectedDataSetChild.Id),
                                                     'col-xs-11':dataCtrl.smallMode && dataset.Children.length>1,
                                                     'child':!dataCtrl.smallMode && dataset.Children.length>1,
-                                                    'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1}"
+                                                    'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1,
+                                                    'style-small':dataCtrl.smallMode}"
                                          ng-click="selectDataSetChild(data,dataset)"
                                          ng-cloak
                                          data-name="{{dataset.Name+':'+data.Name}}">
