@@ -774,7 +774,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     }
                     var xArray=[],yArray=[];
                     if($scope.dataBandsRepartition[selectedBand]){
-                        var repartitionBand = $scope.dataBandsRepartition[selectedBand].fullDistribution;
+                        var repartitionBand = $scope.dataBandsRepartition[selectedBand].distribution;
                         for(var key in repartitionBand){
                             if(repartitionBand.hasOwnProperty(key)){
                                 xArray.push(key);
@@ -1665,7 +1665,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                                         var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
                                         var xArray=[],yArray=[];
                                         if($scope.dataBandsRepartition[selectedBand]){
-                                            var repartition = $scope.dataBandsRepartition[selectedBand].fullDistribution;
+                                            var repartition = $scope.dataBandsRepartition[selectedBand].distribution;
                                             for(var key in repartition){
                                                 if(repartition.hasOwnProperty(key)){
                                                     xArray.push(key);
@@ -2263,7 +2263,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     function(response){
                         if(response.bands && response.bands.length>0){
                             $scope.dataBandsRepartition = response.bands;
-                            var repartition = response.bands[0].fullDistribution;
+                            var repartition = response.bands[0].distribution;
                             var xArray=[],yArray=[];
                             for(var key in repartition){
                                 if(repartition.hasOwnProperty(key)){

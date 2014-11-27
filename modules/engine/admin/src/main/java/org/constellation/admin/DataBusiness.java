@@ -805,9 +805,14 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                         case "PARTIAL" : //fall through
                         case "COMPLETED" :
                             return deserializeImageStatistics(result);
-                        case "PENDING" : //fall through
+                        case "PENDING" : return null;
                         case "ERROR" :
-                            return null;
+                            //can have partial statistics even if an error occurs.
+                            if (result != null && result.startsWith("{")) {
+                                return deserializeImageStatistics(result);
+                            } else {
+                                return null;
+                            }
                     }
                 }
 

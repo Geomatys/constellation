@@ -131,7 +131,7 @@ public class DataCoverageJob implements IDataCoverageJob {
             Data lastData = dataRepository.findById(dataId);
             if (!lastData.getStatsState().equals(STATE_ERROR)) {
                 data.setStatsState(STATE_ERROR);
-                data.setStatsResult(Exceptions.formatStackTrace(e));
+                //data.setStatsResult(Exceptions.formatStackTrace(e));
                 dataRepository.update(data);
             }
         }
@@ -183,7 +183,7 @@ public class DataCoverageJob implements IDataCoverageJob {
         public void failed(ProcessEvent event) {
             final Data data = getData();
             data.setStatsState(STATE_ERROR);
-            data.setStatsResult(Exceptions.formatStackTrace(event.getException()));
+            //data.setStatsResult(Exceptions.formatStackTrace(event.getException()));
             dataRepository.update(data);
         }
 
