@@ -39,6 +39,22 @@ angular.module('cstl-webservice-dashboard', ['cstl-restapi', 'cstl-services', 'p
             $scope.$apply();
         });
         webService.listAll({lang: $scope.getCurrentLang()}, function(response){//success
+
+            angular.forEach(response.instance,function(item,i){
+                var service = item;
+                if(service.type === 'csw'){
+                    csw.count({id:service.identifier}, function(count){
+                        service.layersNumber=count.value;
+                    });
+                }
+                if(service.type === 'sos'){
+                    sos.count({id:service.identifier}, function(count){
+                        service.layersNumber=count.value;
+                    });
+                }
+                response.instance[i] = service;
+            });
+
             $scope.services = response;
         }, function() {//error
             Growl('error','Error','Unable to show services list!');
@@ -149,4 +165,5 @@ angular.module('cstl-webservice-dashboard', ['cstl-restapi', 'cstl-services', 'p
             }
             return 0;
         };
+
     });

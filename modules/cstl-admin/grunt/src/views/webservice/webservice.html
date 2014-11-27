@@ -75,8 +75,12 @@
                                     </ul>
                                 </div>
                                 <div class="pull-right service-published-data-nb" style="padding-top:2px;">
-                                    <p tooltip-html-unsafe="{{'service.data.label' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()!=='sos'" ><span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{getLayersCount(service)}}</p>
-                                    <p tooltip-html-unsafe="{{'service.data.label.sos' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()==='sos'" ><span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{getLayersCount(service)}}</p>
+                                    <p tooltip-html-unsafe="{{'service.data.label' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()!=='sos'" >
+                                        <span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{service.layersNumber}}
+                                    </p>
+                                    <p tooltip-html-unsafe="{{'service.data.label.sos' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()==='sos'" >
+                                        <span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{service.layersNumber}}
+                                    </p>
                                 </div>
                             </div>
                         </div>
