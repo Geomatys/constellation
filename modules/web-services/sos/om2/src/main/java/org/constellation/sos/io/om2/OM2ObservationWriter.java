@@ -138,7 +138,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 c.setAutoCommit(false);
                 writeProcedure(template.getProcedure(), c);
                 for (PhenomenonProperty phen : template.getFullObservedProperties()) {
-                    writePhenomenon(phen, c);
+                    writePhenomenon(phen, c, true);
                 }
                 c.commit();
                 c.close();
@@ -252,7 +252,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 stmt.setNull(4, java.sql.Types.TIMESTAMP);
             }
             final PhenomenonProperty phenomenon = (PhenomenonProperty)((AbstractObservation)observation).getPropertyObservedProperty();
-            final String phenRef = writePhenomenon(phenomenon, c);
+            final String phenRef = writePhenomenon(phenomenon, c, false);
             stmt.setString(5, phenRef);
             
             final org.geotoolkit.observation.xml.Process procedure = (org.geotoolkit.observation.xml.Process)observation.getProcedure();
@@ -293,7 +293,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     phenomenon = new PhenomenonType(internal.getName().getCode(), internal.getName().getCode());
                 }
                 final PhenomenonProperty phenomenonP = SOSXmlFactory.buildPhenomenonProperty("1.0.0", (org.geotoolkit.swe.xml.Phenomenon) phenomenon);
-                writePhenomenon(phenomenonP, c);
+                writePhenomenon(phenomenonP, c, false);
             }
             c.commit();
             c.close();
@@ -302,16 +302,24 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         }
     }
     
-    private String writePhenomenon(final PhenomenonProperty phenomenonP, final Connection c) throws SQLException {
+    private String writePhenomenon(final PhenomenonProperty phenomenonP, final Connection c, final boolean partial) throws SQLException {
         final String phenomenonId = getPhenomenonId(phenomenonP);
         if (phenomenonId == null) return null;
         
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\", \"partial\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
         stmtExist.setString(1, phenomenonId);
         final ResultSet rs = stmtExist.executeQuery();
-        if (!rs.next()) {
-            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"observed_properties\" VALUES(?)");
+        boolean exist = false;
+        boolean isPartial = false;
+        if (rs.next()) {
+            isPartial = rs.getBoolean("partial");
+            exist = true;
+        }
+        rs.close();
+        if (!exist) {
+            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"observed_properties\" VALUES(?,?)");
             stmtInsert.setString(1, phenomenonId);
+            stmtInsert.setBoolean(2, partial);
             stmtInsert.executeUpdate();
             stmtInsert.close();
             if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
@@ -319,15 +327,32 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)");
                 for (PhenomenonProperty child : composite.getRealComponent()) {
                     final String childID = getPhenomenonId(child);
-                    writePhenomenon(child, c);
+                    writePhenomenon(child, c, false);
                     stmtInsertCompo.setString(1, phenomenonId);
                     stmtInsertCompo.setString(2, childID);
                     stmtInsertCompo.executeUpdate();
                 }
                 stmtInsertCompo.close();
             }
-        } 
-        rs.close();
+        } else if (exist && isPartial) {
+            final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET partial = ?");
+            stmtUpdate.setBoolean(1, false);
+            stmtUpdate.executeUpdate();
+            stmtUpdate.close();
+            if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
+                final CompositePhenomenon composite = (CompositePhenomenon) phenomenonP.getPhenomenon();
+                final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)");
+                for (PhenomenonProperty child : composite.getRealComponent()) {
+                    final String childID = getPhenomenonId(child);
+                    writePhenomenon(child, c, false);
+                    stmtInsertCompo.setString(1, phenomenonId);
+                    stmtInsertCompo.setString(2, childID);
+                    stmtInsertCompo.executeUpdate();
+                }
+                stmtInsertCompo.close();
+            }
+        }
+        
         stmtExist.close();
         return phenomenonId;
     }
