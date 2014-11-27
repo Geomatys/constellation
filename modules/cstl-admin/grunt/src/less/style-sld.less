@@ -22,11 +22,11 @@
     font-weight: bold;
 }
 .modal-dialog-sld label{
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .modal-dialog-sld .control-label{
-    font-size: 13px;
+    font-size: 12px;
 	font-weight: bold;	
 }
 
@@ -35,6 +35,12 @@
 	margin-top: 0px;
     margin-bottom: 8px;
 }
+
+.sld-choose-style{
+  text-align: right;
+  padding-right: 15px;
+}
+
 /*choix type*/
 .choix_type{
 	background-color: #eeeeee;
@@ -362,6 +368,24 @@ select.form-control-fix{
   top: 36px;
 }
 
+//color picker
+.sp-replacer{
+  padding: 6px 6px 6px 8px;
+  border: solid 1px #ccc;
+  background: #FFF;
+  border-radius: 3px;
+  width: 60px;
+  &:hover{
+    color: #333;
+    background-color: #ebebeb;
+    border-color: #adadad;
+  }
+}
+
+.div-padding-left-0{
+  padding-left:0;
+}
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991px) { 
 	/*choix type*/
@@ -371,9 +395,6 @@ select.form-control-fix{
 	.btn-editer{
 		float: right;
 	}
-    .pointille{
-        margin-top:20px;   
-    }
     .btn-group img{
         width:16px;
     }
@@ -387,7 +408,7 @@ select.form-control-fix{
 		margin-right: 15px;
 	}
 	img.img_palette{
-		width: 117px;
+        width: 80px;
 		height: 20px;
 	}
 	.bloc_apercu{
@@ -399,6 +420,20 @@ select.form-control-fix{
 	.dashed-pb{
 		margin-top:40px;
 	}
+
+    .pagination-sld{
+      padding:0 !important;
+      width:70%;
+      margin-right: 0 !important;
+    }
+
+    //raster - responsive
+  .checkbox-inline.sld-chexkbox-nan{
+    margin-left:0;
+  }
+  .form-horizontal .control-label.control-label-leftsm{
+    text-align:left;
+  }
 }
 
 /* Medium devices (desktops, 992px and up) */

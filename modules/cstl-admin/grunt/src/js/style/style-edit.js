@@ -190,7 +190,8 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     "attribute":"",
                     "min":null,
                     "max":null
-                }
+                },
+                searchVisible:false
             };
         }
         initOptionsSLD();

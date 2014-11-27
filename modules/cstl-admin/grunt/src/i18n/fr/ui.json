@@ -974,7 +974,7 @@
     "sldeditor.edition.font":"Police",
     "sldeditor.edition.label":"Libellé",
     "sldeditor.edition.reversecolors":"Inverser les couleurs",
-    "sldeditor.edition.point":"Point",
+    "sldeditor.edition.point":"Centroïde",
     "sldeditor.edition.text.style":"Style du texte",
     "sldeditor.edition.method":"Méthode de quantification",
     "sldeditor.edition.intervals":"Intervalles",
