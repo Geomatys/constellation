@@ -172,7 +172,7 @@ public class MetadataFeeder {
                 cont.setContactInstructions(new SimpleInternationalString(contact.getContactInstructions()));
             }
             if (contact.getHoursOfService() != null && !contact.getHoursOfService().isEmpty()) {
-                cont.setHoursOfService(new SimpleInternationalString(contact.getHoursOfService()));
+                cont.setHoursOfService(Collections.singletonList(new SimpleInternationalString(contact.getHoursOfService())));
             }
 
             final DefaultTelephone phone = new DefaultTelephone();
