@@ -32,7 +32,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
         };
 
         $scope.init = function() {
-            sos.measuresForSensor({id: service.identifier, 'sensorID': sensorId}, function(measures){
+            sos.measuresForSensor({id: service.identifier},{value: sensorId}, function(measures){
                 var oldMeasures = $scope.measures;
 
                 $scope.measures = [];
@@ -56,7 +56,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
 
         $scope.initMap = function() {
             DataViewer.initConfig();
-            sos.getFeatures({id: $scope.service.identifier, sensor: $scope.sensorId}, function(wkt) {
+            sos.getFeatures({id: $scope.service.identifier},{value: $scope.sensorId}, function(wkt) {
                 var wktReader = new ol.format.WKT();
                 var features = wktReader.readFeatures(wkt.value,{"dataProjection":ol.proj.get('EPSG:4326'),
                                                                  "featureProjection":ol.proj.get(DataViewer.projection)});
@@ -169,7 +169,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
             var line;
             if (measures.length === 1) {
                 line = d3.svg.line()
-                    .x(function (d) { return x(d.time); })
+                    .x(function (d) { return x(d.Time); })
                     .y(function (d) { return y(d[measures[0]]); });
             } else {
                 line = d3.svg.line()
@@ -193,7 +193,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
 
             data.forEach(function(d) {
                 if (measures.length === 1) {
-                    d.time = parseDate(d.time);
+                    d.Time = parseDate(d.Time);
                     d[measures[0]] = +d[measures[0]];
                 } else {
                     d[measures[0]] = +d[measures[0]];
@@ -203,7 +203,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
 
             if (measures.length === 1) {
                 x.domain(d3.extent(data, function (d) {
-                    return d.time;
+                    return d.Time;
                 }));
                 y.domain(d3.extent(data, function (d) {
                     return d[measures[0]];
