@@ -84,7 +84,7 @@ public final class ConfigDirectory {
             private boolean testing;
 
             public Builder() {
-                this.homeLocation = System.getProperty("cstl.conf", System.getProperty("user.home") + "/.constellation");
+                this.homeLocation = System.getProperty("cstl.home", System.getProperty("user.home") + "/.constellation");
                 this.dataLocation = System.getProperty("cstl.data", homeLocation + "/data");
             }
 
