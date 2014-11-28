@@ -136,7 +136,7 @@
 
                                 <div ng-if="context.id==selected.id"
                                      ng-repeat="layer in context.layers" style="padding-left:0;">
-                                    <div class="item child compo layer" ng-class="{'selected':layer.id==selectedLayer.id,'mapcontext': layer.externalLayer,'coverage':layer.Type.toLowerCase()==='coverage' || layer.Type.toLowerCase()==='raster','vector':layer.Type.toLowerCase()==='observation-store'||layer.Type.toLowerCase()==='vector'}"
+                                    <div class="item child compo layer" ng-class="{'selected':layer.id==selectedLayer.id,'mapcontext': layer.externalLayer,'coverage':layer.Type.toLowerCase()==='coverage' || layer.Type.toLowerCase()==='raster','vector':layer.Type.toLowerCase()==='observation-store'||layer.Type.toLowerCase()==='vector', 'style-small':small}"
                                          ng-click="selectContextChild(layer);">
                                         <div class="top">
                                             <span class="item-title" title="{{layer.Name}}">{{truncate(small,layer.Name)}}</span>
