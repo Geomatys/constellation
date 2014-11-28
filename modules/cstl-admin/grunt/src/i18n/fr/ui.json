@@ -1021,7 +1021,7 @@
     "tooltip.service.create.maxheight":"Longueur maximal des images renvoyées par le service",
     "tooltip.service.source.url":"Renseignez uniquement le nom de domaine",
     "tooltip.service.source.connexion":"Connexion entre plusieurs bases",
-    "tooltip.service.source.sensormlfolder":"TODO",
+    "tooltip.service.source.sensormlfolder":"Chemin du dossier sur le serveur",
     "tooltip.data.add.choicedata.local":"Formats supportés :<br/>Donnée shape ou mif-mid (archive zip)<br/>NetCDF<br/>TIF (GeoTIFF)",
     "tooltip.data.add.choicedata.server":"Formats couramment supportés : shp, NetCDF, tif",
     "tooltip.data.add.choicemetadata.server":"Formats de métadonnée attendu : XML",
