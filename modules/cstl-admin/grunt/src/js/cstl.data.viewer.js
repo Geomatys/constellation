@@ -22,6 +22,13 @@ window.DataViewer = {
     maxExtent : undefined, //the maximum extent for the given projection
     addBackground : true,
 
+    initConfig : function() {
+        DataViewer.layers = [];
+        DataViewer.extent = [-180, -85, 180, 85];
+        DataViewer.projection = 'EPSG:3857';
+        DataViewer.addBackground = true;
+    },
+
     initMap : function(mapId){
         //unbind the old map
         if (DataViewer.map) {
@@ -257,23 +264,19 @@ window.DataViewer = {
                         }))
                     })]
         };
-        // select interaction working on "click"
-        window.selectClick = new ol.interaction.Select({
-            condition: ol.events.condition.click
-        });
-        DataViewer.map.addInteraction(window.selectClick);
 
         var layer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 features: []
             }),
             style: function(feature, resolution) {
-                var selectedFeatures = window.selectClick.getFeatures();
-                if(selectedFeatures && feature === selectedFeatures[0]){
-                    return stylesMap.select;
-                } else {
-                    return stylesMap.default;
+                if(window.selectClick){
+                    var selectedFeatures = window.selectClick.getFeatures();
+                    if(selectedFeatures && feature === selectedFeatures[0]){
+                        return stylesMap.select;
+                    }
                 }
+                return stylesMap.default;
             }
         });
         layer.set('name', layerName);

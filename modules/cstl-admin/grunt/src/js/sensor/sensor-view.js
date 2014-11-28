@@ -55,18 +55,22 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
         };
 
         $scope.initMap = function() {
-            var layerBackground = DataViewer.createLayer($cookieStore.get('cstlUrl'), "CNTR_BN_60M_2006", "generic_shp",null,true);
+            DataViewer.initConfig();
             sos.getFeatures({id: $scope.service.identifier, sensor: $scope.sensorId}, function(wkt) {
                 var wktReader = new ol.format.WKT();
-                var features = wktReader.readFeatures(wkt.value);
+                var features = wktReader.readFeatures(wkt.value,{featureProjection:ol.proj.get(DataViewer.projection)});
                 if (features) {
                     var newLayer = DataViewer.createSensorsLayer($scope.sensorId);
                     determineGeomClass(features, newLayer);
-                    newLayer.addFeatures(features);
-                    DataViewer.layers = [layerBackground, newLayer];
+                    newLayer.getSource().addFeatures(features);
+                    DataViewer.layers = [newLayer];
                     DataViewer.initMap('olSensorMap');
+                    // select interaction working on "click"
+                    window.selectClick = new ol.interaction.Select({
+                        condition: ol.events.condition.click
+                    });
+                    DataViewer.map.addInteraction(window.selectClick);
                 } else {
-                    DataViewer.layers = [layerBackground];
                     DataViewer.initMap('olSensorMap');
                 }
             });

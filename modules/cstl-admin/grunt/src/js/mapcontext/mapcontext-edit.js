@@ -419,7 +419,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             if (!$scope.layers.toAdd || $scope.layers.toAdd.length===0) {
                 return;
             }
-
+            DataViewer.initConfig();
             var cstlUrl = $cookieStore.get('cstlUrl');
 
             var layersToView = [];
