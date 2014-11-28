@@ -1038,6 +1038,13 @@
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",
     "tooltip.service.create.version":"At least one version must be selected",
     "tooltip.service.create.port":"The port number for database",
+
+    "tooltip.service.create.fees":"Information on the service fees",
+    "tooltip.service.create.contraints":"Description of service usage constraints",
+    "tooltip.service.create.layer":"Maximum number of layers that service can support",
+    "tooltip.service.create.maxwidth":"Maximum width of the images returned by the service",
+    "tooltip.service.create.maxheight":"Maximum height of the images returned by the service",
+
     "tooltip.service.source.url":"Fill only the domain name",
     "tooltip.service.source.connexion":"Connection between multiple databases",
     "tooltip.service.source.sensormlfolder":"TODO",
