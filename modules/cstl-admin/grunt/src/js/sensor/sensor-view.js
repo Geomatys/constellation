@@ -58,7 +58,8 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
             DataViewer.initConfig();
             sos.getFeatures({id: $scope.service.identifier, sensor: $scope.sensorId}, function(wkt) {
                 var wktReader = new ol.format.WKT();
-                var features = wktReader.readFeatures(wkt.value,{featureProjection:ol.proj.get(DataViewer.projection)});
+                var features = wktReader.readFeatures(wkt.value,{"dataProjection":ol.proj.get('EPSG:4326'),
+                                                                 "featureProjection":ol.proj.get(DataViewer.projection)});
                 if (features) {
                     var newLayer = DataViewer.createSensorsLayer($scope.sensorId);
                     determineGeomClass(features, newLayer);
