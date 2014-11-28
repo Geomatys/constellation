@@ -108,23 +108,6 @@ public class AdminRest {
     }
 
     /**
-     * Reset configuration path
-     * 
-     * @param configuration
-     *            contain new path
-     * @return an {@link AcknowlegementType} on {@link Response} to know
-     *         operation state
-     * @throws CstlServiceException
-     */
-    @POST
-    @Path("/configurationLocation")
-    public Response configurationPath(final Configuration configuration) throws CstlServiceException {
-        final String path = configuration.getPath();
-        final boolean result = ConfigurationBusiness.setConfigPath(path);
-        return Response.ok(new AcknowlegementType(result, path)).build();
-    }
-
-    /**
      *
      * @return the value of the constellation property
      * @throws CstlServiceException

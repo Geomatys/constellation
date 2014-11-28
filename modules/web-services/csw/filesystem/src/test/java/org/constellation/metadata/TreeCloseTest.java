@@ -100,7 +100,7 @@ public class TreeCloseTest implements ApplicationContextAware {
             if (!initialized) {
                 serviceBusiness.deleteAll();
                 final File configDir = ConfigDirectory.setupTestEnvironement("TreeCloseTest");
-                File CSWDirectory  = new File(configDir, "CSW");
+                File CSWDirectory  = new File(configDir, "data/services/CSW");
                 CSWDirectory.mkdir();
                 final File instDirectory = new File(CSWDirectory, "default");
                 instDirectory.mkdir();

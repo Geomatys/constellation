@@ -136,15 +136,7 @@ public abstract class WebService {
      */
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
 
-    private static final String PROPERTIES_URL;
-    static {
-        final Properties prop = ConfigDirectory.getConstellationProperties();
-        if (prop != null) {
-            PROPERTIES_URL = prop.getProperty(PropertyConstants.SERVICES_URL_KEY);
-        } else {
-            PROPERTIES_URL = null;
-        }
-    }
+    private static final String PROPERTIES_URL = ConfigDirectory.getServiceURL();
 
     /**
      * Automatically set by Jersey.

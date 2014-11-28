@@ -37,6 +37,7 @@ import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
+import org.junit.Assume;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -140,6 +141,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
     @Override
     @Order(order=1)
     public void getRecordByIdTest() throws Exception {
+        Assume.assumeTrue(System.getProperty("os.name").toLowerCase().contains("linux"));
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : getRecordById with the first metadata in ISO mode.
