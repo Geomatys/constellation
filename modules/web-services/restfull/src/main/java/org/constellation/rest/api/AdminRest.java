@@ -18,6 +18,7 @@
  */
 package org.constellation.rest.api;
 
+import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.dto.ServiceLayersDTO;
@@ -26,19 +27,14 @@ import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IServiceBusiness;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.Instance;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerSummary;
-import org.constellation.configuration.ServiceReport;
-import org.constellation.configuration.ServiceStatus;
+import org.constellation.configuration.*;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ICSWConfigurer;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 
 import javax.inject.Inject;
@@ -188,12 +184,35 @@ public class AdminRest {
         instance.setId(service.getId());
         instance.set_abstract(service.getDescription());
         instance.setIdentifier(service.getIdentifier());
-        int layersNumber = layerRepository.findByServiceId(service.getId()).size();
-        instance.setLayersNumber(layersNumber);
+        int count;
+        if("csw".equalsIgnoreCase(service.getType())){
+            try {
+                count = getCSWConfigurer().getMetadataCount(service.getIdentifier());
+            }catch(Exception ex){
+                count = 0;
+            }
+        } else if("sos".equalsIgnoreCase(service.getType())){
+            try {
+                count = getSOSConfigurer().getSensorCount(service.getIdentifier());
+            }catch(Exception ex){
+                count = 0;
+            }
+        } else {
+            count = layerRepository.findByServiceId(service.getId()).size();
+        }
+        instance.setLayersNumber(count);
         instance.setName(service.getTitle());
         instance.setType(service.getType());
         instance.setVersions(Arrays.asList(service.getVersions().split("µ")));
         instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
         return instance;
+    }
+
+    private ICSWConfigurer getCSWConfigurer() throws NotRunningServiceException {
+        return (ICSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
+    }
+
+    private SOSConfigurer getSOSConfigurer() throws NotRunningServiceException {
+        return (SOSConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.SOS);
     }
 }
