@@ -34,7 +34,6 @@
 
 
 
-
   </dependencies>
 
 
@@ -46,15 +45,16 @@
         <version>0.2.0-SNAPSHOT</version>
         <dependencies>
           <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>derby-store</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.180</version>
           </dependency>
+          <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>derby-store</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+
         </dependencies>
         <executions>
 
@@ -64,7 +64,7 @@
             <goals>
               <goal>generate</goal>
             </goals>
-            <configuration>              
+            <configuration>
               <database>db</database>
               <targetSchema>ADMIN</targetSchema>
               <changeLog>cstl/db/db-changelog.xml</changeLog>
