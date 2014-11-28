@@ -890,7 +890,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 if($scope.optionsSLD.selectedSymbolizerType === 'point'){
                     symbol={
                         "@symbol": 'point',
-                        "name":$scope.optionsSLD.selectedSymbolizerType,
+                        "name":'symbol point',
                         "graphic":{
                             "size":15,
                             "rotation":0,
@@ -2029,7 +2029,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             if(! $scope.layerName){
                 return;
             }
-
+            DataViewer.initConfig();
             if($scope.selectedLayer && $scope.stylechooser === 'existing'){
                 var styleName = null;
                 if ($scope.selected) {
