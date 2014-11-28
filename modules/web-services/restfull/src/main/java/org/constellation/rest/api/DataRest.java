@@ -533,7 +533,7 @@ public class DataRest {
         final ImportedData importedDataReport = new ImportedData();
         try{
             final File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
-            final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
+            final File uploadFolder = ConfigDirectory.getDataUploads().toFile();
 
             if (metadataFilePath != null) {
                 if (metadataFilePath.startsWith(uploadFolder.getAbsolutePath())) {

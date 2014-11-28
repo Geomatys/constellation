@@ -53,7 +53,6 @@ public final class ConfigDirectory {
 
     private static class Config {
 
-
         public Config(Builder builder) {
             this.home = builder.home;
             this.data = builder.data;
@@ -65,7 +64,7 @@ public final class ConfigDirectory {
             this.dataAdmin = builder.dataAdmin;
             this.dataServices = builder.dataServices;
             this.testing = builder.testing;
-            
+
         }
 
         private static class Builder {
@@ -110,11 +109,9 @@ public final class ConfigDirectory {
                 return ConfigDirectory.initFolder(data.resolve(paths));
             }
 
-           
-
             public Builder forTest(String filename) {
                 this.homeLocation = filename;
-                this.dataLocation = filename + "/data"; 
+                this.dataLocation = filename + "/data";
                 this.testing = true;
                 return this;
             }
@@ -147,8 +144,7 @@ public final class ConfigDirectory {
     private ConfigDirectory() {
     }
 
-    
-     static Path initFolder(Path path) {
+    static Path initFolder(Path path) {
         if (Files.notExists(path)) {
             try {
                 Files.createDirectories(path);
@@ -159,7 +155,7 @@ public final class ConfigDirectory {
         }
         return path;
     }
-    
+
     public static File getUserHomeDirectory() {
         final String home = System.getProperty("user.home");
         return new File(home);
@@ -174,6 +170,10 @@ public final class ConfigDirectory {
      */
     public static File getDataDirectory() {
         return config.data.toFile();
+    }
+    
+    public static Path getDataPath() {
+        return config.data;
     }
 
     /**
@@ -226,35 +226,38 @@ public final class ConfigDirectory {
     }
 
     private static void deleteDir(Path sessionFolder) {
-        try {
-            Files.walkFileTree(sessionFolder, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
+        if (Files.exists(sessionFolder)) {
 
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
+            try {
+                Files.walkFileTree(sessionFolder, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            });
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, e.getMessage(), e);
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        Files.delete(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                });
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, e.getMessage(), e);
+            }
+            LOGGER.info(sessionFolder.toString() + " deleted.");
         }
     }
 
     private static Path resolveUserUploads(String sessionId) {
         return config.dataUserUploads.resolve(sessionId);
     }
-    
+
     private static Path resolveInstanceDirectory(String type, String id) {
         Path typeService = resolveInstanceServiceDirectoryByType(type);
         return initFolder(typeService.resolve(id));
     }
-
 
     private static Path resolveInstanceServiceDirectoryByType(String type) {
         Path typeService = config.dataServices.resolve(type);
@@ -387,11 +390,11 @@ public final class ConfigDirectory {
     public static File setupTestEnvironement(String filename) {
         config = new Config.Builder().forTest("target/" + filename).build();
         return config.home.toFile();
-        
+
     }
 
     public static void shutdownTestEnvironement(String string) {
-        if(config.testing) {
+        if (config.testing) {
             deleteDir(config.home);
         }
     }
@@ -408,12 +411,14 @@ public final class ConfigDirectory {
         return resolveInstanceDirectory(type, id).toFile();
     }
 
-
     public static Collection<? extends File> getInstanceDirectories(String typeService) {
         Path instancesDirectory = resolveInstanceServiceDirectoryByType(typeService);
         return Arrays.asList(instancesDirectory.toFile().listFiles());
     }
 
-    
+    public static Path getDataUploads() {
+        return config.dataUserUploads;
+    }
+
 
 }
