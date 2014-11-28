@@ -68,6 +68,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -171,6 +172,10 @@ public final class SOSUtils {
                 final AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0).getRealProcess();
                 if (component.getSMLLocation() != null && component.getSMLLocation().getGeometry()!= null) {
                     return component.getSMLLocation().getGeometry();
+                } else if (component.getPosition() != null && component.getPosition().getPosition() != null &&
+                           component.getPosition().getPosition().getLocation() != null && component.getPosition().getPosition().getLocation().getVector() != null) {
+                    final URI crs = component.getPosition().getPosition().getReferenceFrame();
+                    return component.getPosition().getPosition().getLocation().getVector().getGeometry(crs);
                 }
             }
         }

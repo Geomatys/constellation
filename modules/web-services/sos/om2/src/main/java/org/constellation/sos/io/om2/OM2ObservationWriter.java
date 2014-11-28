@@ -871,12 +871,15 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 return;
             }
             //NEW
-            final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
+            try {
+                final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
+                stmtMes.setString(1, procedureID);
+                stmtMes.executeUpdate();
+                stmtMes.close();
+            } catch (SQLException ex) {
+                LOGGER.warning("Error while trunkating mesure" + pid + " table. Maybe this table is missing");
+            }
             final PreparedStatement stmtObs  = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE \"procedure\"=?");
-            
-            stmtMes.setString(1, procedureID);
-            stmtMes.executeUpdate();
-            stmtMes.close();
             stmtObs.setString(1, procedureID);
             stmtObs.executeUpdate();
             stmtObs.close();
