@@ -62,7 +62,6 @@ import org.geotoolkit.referencing.CRS;
 import org.apache.sis.referencing.CommonCRS;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wcs.xml.Content;
 import org.geotoolkit.wcs.xml.CoverageInfo;
