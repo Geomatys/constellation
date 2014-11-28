@@ -78,7 +78,7 @@
                         </div>
                         <div class="item-list">
                             <div ng-repeat="sosdata in wrap.dataList">
-                                <div class="item"
+                                <div class="item sensorChoose"
                                      ng-class="{'sensor-sos':sosdata.type!='System','sensor-system':sosdata.type=='System','selected':sosdata.id==sensorModalChooseCtrl.selectedSensor.id}"
                                      ng-click="toggleSelectSensor(sosdata);selectSensorsChild(null);">
                                     <div class="top">

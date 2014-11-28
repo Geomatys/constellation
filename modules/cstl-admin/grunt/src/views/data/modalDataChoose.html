@@ -97,7 +97,7 @@
                         </div>
                         <div class="item-list">
                             <div ng-if="service.type.toLowerCase() !== 'sos'">
-                                <div class="item {{data.Type.toLowerCase()}}"
+                                <div class="item {{data.Type.toLowerCase()}} dataChoose"
                                      ng-repeat="data in wrap.dataList"
                                      ng-class="{selected:isInSelected(data)}"
                                      ng-click="toggleDataInArray(data)"
@@ -151,7 +151,7 @@
                             </div>
                             <div ng-if="service.type.toLowerCase() === 'sos'">
                                 <div ng-repeat="sosdata in wrap.dataList">
-                                    <div class="item"
+                                    <div class="item sensorChoose"
                                          ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}"
                                          ng-click="select(sosdata);selectSensorsChild(null);">
                                         <div class="top">
@@ -181,7 +181,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="item child sensor-sos"
+                                    <div class="item child sensor-sos sensorChoose"
                                          ng-if="sosdata==selected"
                                          ng-repeat="soschild in sosdata.children"
                                          ng-class="{'selected':soschild===selectedSensorsChild}"

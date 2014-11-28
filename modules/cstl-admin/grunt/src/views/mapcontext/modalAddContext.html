@@ -176,7 +176,7 @@
                                                         </div>
                                                         <div class="col-xs-8 no-padding"
                                                              ng-click="selectItem(layerToAdd)">
-                                                            <div class="item layer compo"
+                                                            <div class="item layer compo style-small"
                                                                  ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toLowerCase()==='coverage',vector:layerToAdd.layer.Type.toLowerCase()==='observation-store' || layerToAdd.layer.Type.toLowerCase()==='vector'}">
                                                                 <div class="top edit-mapcontext-modale">
                                                                     <span class="item-title"
@@ -319,7 +319,7 @@
                                     <div class="item-list">
                                         <div ng-repeat="styleItem in styles.existing"
                                              class="row">
-                                            <div class="item col-xs-11"
+                                            <div class="item col-xs-11 style-small"
                                                  ng-class="{selected: styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage'), 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector', 'style-compo-layer':styleItem.Type == null || styleItem.Type == undefined}"
                                                  ng-click="selectStyle(styleItem)">
                                                 <div class="top">

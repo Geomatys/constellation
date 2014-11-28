@@ -205,7 +205,7 @@
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
                                                 <div class="item"
                                                      ng-repeat="layer in wrap.dataList"
-                                                     ng-class="{selected:layer==selected,coverage:layer.Type.toLowerCase()==='coverage',vector:layer.Type.toLowerCase()==='observation-store' || layer.Type.toLowerCase()==='vector', 'col-xs-6':small==true}"
+                                                     ng-class="{selected:layer==selected,coverage:layer.Type.toLowerCase()==='coverage',vector:layer.Type.toLowerCase()==='observation-store' || layer.Type.toLowerCase()==='vector', 'col-xs-6':small, 'style-small':small}"
                                                      ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title"
@@ -259,7 +259,7 @@
                                                      ng-class="{'col-xs-6':small==true}"
                                                      style="padding-left:0;">
                                                     <div class="item"
-                                                         ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}"
+                                                         ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv', 'style-small':small}"
                                                          ng-click="select(cswdata);selectMetadataChild(null)">
                                                         <div class="top">
                                                             <span class="item-title csw-title"
@@ -288,7 +288,7 @@
                                                          ng-if="cswdata==selected"
                                                          ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
                                                          ng-click="selectMetadataChild(relatedData)"
-                                                         ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}">
+                                                         ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true, 'style-small':small}">
                                                         <div class="top">
                                                             <span class="item-title csw-title"
                                                                   title="{{relatedData.Name}}">{{truncate(small,relatedData.Name)}}</span>
@@ -311,7 +311,7 @@
                                                      ng-class="{'col-xs-6':small==true}"
                                                      style="padding-left:0;">
                                                     <div class="item"
-                                                         ng-class="{'sensor-sos-service':sosdata.type!=='System','sensor-system-service':sosdata.type==='System','selected':sosdata==selected}"
+                                                         ng-class="{'sensor-sos-service':sosdata.type!=='System','sensor-system-service':sosdata.type==='System','selected':sosdata==selected, 'style-small':small}"
                                                          ng-click="select(sosdata);selectSensorsChild(null);">
                                                         <div class="top">
                                                             <span class="item-title"
@@ -343,7 +343,7 @@
                                                          style="margin-top:0;"
                                                          ng-if="sosdata==selected"
                                                          ng-repeat="soschild in sosdata.children"
-                                                         ng-class="{'selected':soschild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}"
+                                                         ng-class="{'selected':soschild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true, 'style-small':small}"
                                                          ng-click="selectSensorsChild(soschild)">
                                                         <div class="top">
                                                             <span class="item-title"

@@ -121,7 +121,7 @@
                                                 <li ng-click="duplicateChooseStyle(style);"><a disabled="disabled"><span translate="sldeditor.edition.duplicate">Duplicate</span></a></li>
                                             </ul>
                                         </div>
-                                        <div class="item style-{{style.Type | lowercase}}"
+                                        <div class="item style-{{style.Type | lowercase}} style-small"
                                              ng-class="{selected:style==selected}"
                                              ng-click="select(style);displayCurrentStyle('styledMapWithSelectedStyle',null);">
                                             <div class="top">

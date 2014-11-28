@@ -122,7 +122,7 @@
                                  ng-class="{'col-xs-6':sensorCtrl.smallMode}"
                                  style="padding-left:0;">
                                 <div class="item"
-                                     ng-class="{'sensor-sos':sosdata.type!='System','sensor-system':sosdata.type=='System','selected':sosdata.id==sensorCtrl.selectedSensor.id}"
+                                     ng-class="{'sensor-sos':sosdata.type!='System','sensor-system':sosdata.type=='System','selected':sosdata.id==sensorCtrl.selectedSensor.id, 'style-small':sensorCtrl.smallMode}"
                                      ng-click="toggleSelectSensor(sosdata);selectSensorsChild(null);">
                                     <div class="top">
                                         <span class="item-title"
@@ -148,7 +148,7 @@
                                             <span ng-if="sosdata.children == null || sosdata.children.length == 0"
                                                   translate="md.listing.no.sensor">No</span>
                                             <span ng-if="sosdata.children.length > 0">{{sosdata.children.length}}</span>
-                                            <span translate="service.edit.dashboard.sensors.list.associated">associated sensors</span>
+                                            <span translate="service.edit.dashboard.sensors.list.associated" ng-class="{hide:sensorCtrl.smallMode}">associated sensors</span>
                                         </div>
                                     </div>
                                 </div>
@@ -156,7 +156,7 @@
                                      style="margin-top:0;"
                                      ng-if="sosdata.id==sensorCtrl.selectedSensor.id"
                                      ng-repeat="soschild in sosdata.children"
-                                     ng-class="{'selected':soschild.id==sensorCtrl.selectedSensorsChild.id,'child':!sensorCtrl.smallMode,'col-xs-11':sensorCtrl.smallMode,'col-sm-offset-1':sensorCtrl.smallMode}"
+                                     ng-class="{'selected':soschild.id==sensorCtrl.selectedSensorsChild.id,'child':!sensorCtrl.smallMode,'col-xs-11':sensorCtrl.smallMode,'col-sm-offset-1':sensorCtrl.smallMode, 'style-small':sensorCtrl.smallMode}"
                                      ng-click="selectSensorsChild(soschild)">
                                     <div class="top">
                                         <span class="item-title"

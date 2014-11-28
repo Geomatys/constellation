@@ -1069,27 +1069,63 @@ p.error-select-one{
 }
 .dashboard .item-list .item.sensor-sos {
     background: transparent url('../img/sensor2.svg') -209px 0px;
+  &.style-small{
+    background: transparent url('../img/sensor2.svg') -500px 0px;
+  }
+  &.sensorChoose{
+    background: transparent url('../img/sensor2.svg') -300px 0px;
+  }
 }
 .dashboard .item-list .item.sensor-system {
     background: transparent url('../img/sensor2.svg') -209px 140px;
+  &.style-small{
+    background: transparent url('../img/sensor2.svg') -500px 140px;
+  }
+  &.sensorChoose{
+    background: transparent url('../img/sensor2.svg') -300px 140px;
+  }
 }
 .dashboard .item-list .item.sensor.selected, .dashboard .item-list .item.metadata-sensor.selected, .dashboard .item-list .item.sensor-sos.selected, .dashboard .item-list .item.metadata-sensor-sos.selected {
     background: transparent url('../img/sensor2.svg') -209px 210px;
+  &.style-small{
+    background: transparent url('../img/sensor2.svg') -500px 210px;
+  }
+  &.sensorChoose{
+    background: transparent url('../img/sensor2.svg') -300px 210px;
+  }
 }
 .dashboard .item-list .item.sensor-system.selected, .dashboard .item-list .item.metadata-sensor-system.selected{
     background: transparent url('../img/sensor2.svg') -209px 70px;
+  &.style-small{
+    background: transparent url('../img/sensor2.svg') -500px 70px;
+  }
+  &.sensorChoose{
+    background: transparent url('../img/sensor2.svg') -300px 70px;
+  }
 }
 .dashboard .item-list .item.sensor-sos-service {
   background: transparent url('../img/sensor2.svg') -144px 0px;
+  &.style-small{
+    background: transparent url('../img/sensor2.svg') -500px 0px;
+  }
 }
 .dashboard .item-list .item.sensor-system-service {
   background: transparent url('../img/sensor2.svg') -144px 140px;
+  &.style-small{
+    background: transparent url('../img/sensor2.svg') -500px 140px;
+  }
 }
 .dashboard .item-list .item.sensor-sos-service.selected {
   background: transparent url('../img/sensor2.svg') -144px 210px;
+  &.style-small{
+    background: transparent url('../img/sensor2.svg') -500px 210px;
+  }
 }
 .dashboard .item-list .item.sensor-system-service.selected {
   background: transparent url('../img/sensor2.svg') -144px 70px;
+  &.style-small{
+    background: transparent url('../img/sensor2.svg') -500px 70px;
+  }
 }
 
 .dashboard .item-list .item.pyramid {
@@ -1125,10 +1161,16 @@ p.error-select-one{
 }
 
 .dashboard .item-list .item.metadata {
-    background: transparent url('../img/dataset.svg') -144px 0;
+  background: transparent url('../img/dataset.svg') -144px 0;
+  &.style-small{
+    background: transparent url('../img/dataset.svg') -400px 0;
+  }
 }
 .dashboard .item-list .item.metadata.selected {
   background: transparent url(../img/dataset.svg) -144px 289px;
+  &.style-small{
+    background: transparent url('../img/dataset.svg') -400px 289px;
+  }
 }
 .dashboard .item-list .item.metadata-vector {
   background: transparent url('../img/vector-metadata.svg') right center no-repeat;
@@ -1141,66 +1183,125 @@ p.error-select-one{
 }
 .dashboard .item-list .item.metadata-product-sensor {
     background: transparent url('../img/metadata2.svg') -149px -144px;
+  &.style-small{
+    background: transparent url('../img/dataset.svg') -400px -144px;
+  }
 }
 .dashboard .item-list .item.metadata-product-sensor.selected {
   background: transparent url('../img/metadata2.svg') -149px 144px;
+  &.style-small{
+    background: transparent url('../img/dataset.svg') -400px 144px;
+  }
 }
 .dashboard .item-list .item.metadata-product-vector {
     background: transparent url('../img/metadata2.svg') -149px -2px;
+  &.style-small{
+    background: transparent url('../img/metadata2.svg') -400px -2px;
+  }
 }
 .dashboard .item-list .item.metadata-product-vector.selected {
   background: transparent url('../img/metadata2.svg') -149px 287px;
+  &.style-small{
+    background: transparent url('../img/metadata2.svg') -400px 287px;
+  }
 }
 .dashboard .item-list .item.metadata-product-coverage {
     background: transparent url('../img/metadata2.svg') -149px -72px;
+  &.style-small{
+    background: transparent url('../img/metadata2.svg') -400px -72px;
+  }
 }
 .dashboard .item-list .item.metadata-product-coverage.selected {
   background: transparent url('../img/metadata2.svg') -149px 215px;
+  &.style-small{
+    background: transparent url('../img/metadata2.svg') -400px 215px;
+  }
 }
 .dashboard .item-list .item.metadata-service {
     background: transparent url('../img/metadata2.svg') -144px -218px;
+  &.style-small{
+    background: transparent url('../img/metadata2.svg') -400px -218px;
+  }
 }
 .dashboard .item-list .item.metadata-service.selected {
   background: transparent url('../img/metadata2.svg') -144px 70px;
+  &.style-small{
+    background: transparent url('../img/metadata2.svg') -400px 70px;
+  }
 }
 
 .dashboard .item-list .item.registry{
     background: transparent url('../img/registery2.svg') -209px -3px;
+    &.style-small{
+      background: transparent url('../img/registery2.svg') -500px -3px;
+    }
 }
 .dashboard .item-list .item.registry.selected{
     background: transparent url('../img/registery2.svg') -209px 211px;
+    &.style-small{
+      background: transparent url('../img/registery2.svg') -500px 211px;
+    }
 }
 .dashboard .item-list .item.process-child{
     background: transparent url('../img/registery2.svg') -209px 140px;
+    &.style-small{
+      background: transparent url('../img/registery2.svg') -500px 140px;
+    }
 }
 .dashboard .item-list .item.process-child.selected{
     background: transparent url('../img/registery2.svg') -209px 68px;
+    &.style-small{
+      background: transparent url('../img/registery2.svg') -500px 68px;
+    }
 }
 
 .dashboard .item-list .item.mapcontext{
     background: transparent url('../img/mapcontext2.svg') -209px 0;
+  &.style-small{
+    background: transparent url('../img/mapcontext2.svg') -450px 0;
+  }
 }
 .dashboard .item-list .item.mapcontext.selected{
     background: transparent url('../img/mapcontext2.svg') -209px 504px;
+  &.style-small{
+    background: transparent url('../img/mapcontext2.svg') -450px 504px;
+  }
 }
 .dashboard .item-list .item.mapcontext.layer{
     background: transparent url('../img/mapcontext2.svg') -209px 144px;
+  &.style-small{
+    background: transparent url('../img/mapcontext2.svg') -450px 144px;
+  }
 }
 .dashboard .item-list .item.mapcontext.layer.selected{
     background: transparent url('../img/mapcontext2.svg') -209px 72px;
+  &.style-small{
+    background: transparent url('../img/mapcontext2.svg') -450px 72px;
+  }
 }
-
 .dashboard .item-list .item.coverage.compo {
   background: transparent url('../img/mapcontext2.svg') -209px 432px;
+  &.style-small{
+    background: transparent url('../img/mapcontext2.svg') -450px 432px;
+  }
 }
 .dashboard .item-list .item.coverage.compo.selected {
   background: transparent url('../img/mapcontext2.svg') -209px 360px;
+  &.style-small{
+    background: transparent url('../img/mapcontext2.svg') -450px 360px;
+  }
 }
 .dashboard .item-list .item.vector.compo {
   background: transparent url('../img/mapcontext2.svg')  -209px 288px;
+  &.style-small{
+    background: transparent url('../img/mapcontext2.svg') -450px 288px;
+  }
 }
 .dashboard .item-list .item.vector.compo.selected {
   background: transparent url('../img/mapcontext2.svg')  -209px 216px;
+  &.style-small{
+    background: transparent url('../img/mapcontext2.svg') -450px 216px;
+  }
 }
 .dashboard .item-list .item.style-compo-layer.selected{
     background: transparent url('../img/style2.svg') -209px 288px;
@@ -1233,6 +1334,7 @@ p.error-select-one{
 .dashboard .item-list .item.dataset-sensor.selected {
   background: transparent url(../img/dataset.svg) -144px 72px;
 }
+
 .dashboard .item-list .item.dataset-data {
   background: transparent url('../img/dataset-data.svg') -144px 0;
   &.style-small{
@@ -2147,16 +2249,28 @@ body.modal-open{
   }
   /*Dashboard images*/
   .dashboard .item-list .item.coverage {
-    background: transparent url('../img/raster2.svg') -255px 0;
+    background: transparent url('../img/raster2.svg') -375px 0;
+    &.dataChoose{
+      background: transparent url('../img/raster2.svg') -300px 0;
+    }
   }
   .dashboard .item-list .item.coverage.selected, .dashboard .item-list .item.metadata-coverage.selected {
-    background: transparent url('../img/raster2.svg') -255px 72px;
+    background: transparent url('../img/raster2.svg') -375px 72px;
+    &.dataChoose{
+      background: transparent url('../img/raster2.svg') -300px 72px;
+    }
   }
   .dashboard .item-list .item.vector {
-    background: transparent url('../img/vector2.svg') -255px 0;
+    background: transparent url('../img/vector2.svg') -375px 0;
+    &.dataChoose{
+      background: transparent url('../img/vector2.svg') -300px 0;
+    }
   }
   .dashboard .item-list .item.vector.selected, .dashboard .item-list .item.metadata-vector.selected {
-    background: transparent url('../img/vector2.svg') -255px 73px;
+    background: transparent url('../img/vector2.svg') -375px 73px;
+    &.dataChoose{
+      background: transparent url('../img/vector2.svg') -300px 73px;
+    }
   }
   .dashboard .item-list .item.metadata {
     background: transparent url('../img/dataset.svg') -255px 0;
@@ -2250,6 +2364,81 @@ body.modal-open{
     background: transparent url('../img/raster-pyramid.svg') -375px 0;
   }
 
+  .dashboard .item-list .item.dataset-data {
+    background: transparent url('../img/dataset-data.svg') -375px 0;
+  }
+  .dashboard .item-list .item.dataset-data.selected {
+    background: transparent url(../img/dataset-data.svg) -375px 289px;
+  }
+  .dashboard .item-list .item.dataset-data-vector {
+    background: transparent url('../img/dataset-data.svg') -375px -72px;
+  }
+  .dashboard .item-list .item.dataset-data-vector.selected {
+    background: transparent url(../img/dataset-data.svg) -375px 216px;
+  }
+  .dashboard .item-list .item.dataset-data-coverage {
+    background: transparent url('../img/dataset-data.svg') -375px -144px;
+  }
+  .dashboard .item-list .item.dataset-data-coverage.selected {
+    background: transparent url(../img/dataset-data.svg) -375px 144px;
+  }
+  .dashboard .item-list .item.dataset-data-sensor {
+    background: transparent url('../img/dataset-data.svg') -375px -216px;
+  }
+  .dashboard .item-list .item.dataset-data-sensor.selected {
+    background: transparent url(../img/dataset-data.svg) -375px 72px;
+  }
+
+
+  .dashboard .item-list .item.sensor-sos {
+    background: transparent url('../img/sensor2.svg') -450px 0px;
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 0px;
+    }
+  }
+  .dashboard .item-list .item.sensor-system {
+    background: transparent url('../img/sensor2.svg') -450px 140px;
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 140px;
+    }
+  }
+  .dashboard .item-list .item.sensor.selected, .dashboard .item-list .item.metadata-sensor.selected, .dashboard .item-list .item.sensor-sos.selected, .dashboard .item-list .item.metadata-sensor-sos.selected {
+    background: transparent url('../img/sensor2.svg') -450px 210px;
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 210px;
+    }
+  }
+  .dashboard .item-list .item.sensor-system.selected, .dashboard .item-list .item.metadata-sensor-system.selected{
+    background: transparent url('../img/sensor2.svg') -450px 70px;
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 70px;
+    }
+  }
+  .dashboard .item-list .item.sensor-sos-service {
+    background: transparent url('../img/sensor2.svg') -450px 0px;
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 0px;
+    }
+  }
+  .dashboard .item-list .item.sensor-system-service {
+    background: transparent url('../img/sensor2.svg') -450px 140px;
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 140px;
+    }
+  }
+  .dashboard .item-list .item.sensor-sos-service.selected {
+    background: transparent url('../img/sensor2.svg') -450px 210px;
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 210px;
+    }
+  }
+  .dashboard .item-list .item.sensor-system-service.selected {
+    background: transparent url('../img/sensor2.svg') -450px 70px;
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 70px;
+    }
+  }
+
   /*index-sprite-images*/
   .img-left-block-service, .img-left-block-data, .img-left-block-sensor{
     margin-left:94px;
@@ -2337,6 +2526,67 @@ body.modal-open{
     background: transparent url('../img/raster-pyramid.svg') -275px 0;
     &.style-small{
       background: transparent url('../img/raster-pyramid.svg') -525px 0;
+    }
+  }
+
+  .dashboard .item-list .item.sensor-sos {
+    background: transparent url('../img/sensor2.svg') -320px 0px;
+    &.style-small{
+      background: transparent url('../img/sensor2.svg') -575px 0px;
+    }
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 0px;
+    }
+  }
+  .dashboard .item-list .item.sensor-system {
+    background: transparent url('../img/sensor2.svg') -320px 140px;
+    &.style-small{
+      background: transparent url('../img/sensor2.svg') -575px 140px;
+    }
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 140px;
+    }
+  }
+  .dashboard .item-list .item.sensor.selected, .dashboard .item-list .item.metadata-sensor.selected, .dashboard .item-list .item.sensor-sos.selected, .dashboard .item-list .item.metadata-sensor-sos.selected {
+    background: transparent url('../img/sensor2.svg') -320px 210px;
+    &.style-small{
+      background: transparent url('../img/sensor2.svg') -575px 210px;
+    }
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 210px;
+    }
+  }
+  .dashboard .item-list .item.sensor-system.selected, .dashboard .item-list .item.metadata-sensor-system.selected{
+    background: transparent url('../img/sensor2.svg') -320px 70px;
+    &.style-small{
+      background: transparent url('../img/sensor2.svg') -575px 70px;
+    }
+    &.sensorChoose{
+      background: transparent url('../img/sensor2.svg') -300px 70px;
+    }
+  }
+  .dashboard .item-list .item.sensor-sos-service {
+    background: transparent url('../img/sensor2.svg') -320px 0px;
+    &.style-small{
+      background: transparent url('../img/sensor2.svg') -575px 0px;
+    }
+  }
+  .dashboard .item-list .item.sensor-system-service {
+    background: transparent url('../img/sensor2.svg') -320px 140px;
+    &.style-small{
+      background: transparent url('../img/sensor2.svg') -575px 140px;
+    }
+  }
+  .dashboard .item-list .item.sensor-sos-service.selected {
+    background: transparent url('../img/sensor2.svg') -320px 210px;
+    &.style-small{
+      background: transparent url('../img/sensor2.svg') -575px 210px;
+    }
+  }
+  .dashboard .item-list .item.sensor-system-service.selected {
+    background: transparent url('../img/sensor2.svg') -320px 70px;
+    &.style-small{
+      background: transparent url('../img/sensor2.svg') -575px 70px;
     }
   }
 

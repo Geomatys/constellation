@@ -222,7 +222,7 @@
                              style="padding-left:0;">
                             <div data-name="{{dataset.Name}}"
                                  class="item metadata"
-                                 ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
+                                 ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id), 'style-small':dataCtrl.smallMode}"
                                  ng-click="selectDS(dataset);selectDataSetChild(null,null);"
                                  ng-show="dataset.Children.length!=1"
                                  ng-cloak>
@@ -262,7 +262,8 @@
                                             'metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor',
                                             'child':!dataCtrl.smallMode && dataset.Children.length>1,
                                             'col-xs-11':dataCtrl.smallMode && dataset.Children.length>1,
-                                            'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1}">
+                                            'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1,
+                                            'style-small':dataCtrl.smallMode}">
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{relatedData.Name}}">{{truncate(dataCtrl.smallMode,relatedData.Name)}}</span>
