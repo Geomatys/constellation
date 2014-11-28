@@ -187,16 +187,10 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
 
             $scope.var.topic = StompService.subscribe('/topic/sosevents/'+$scope.sensorId, function(data) {
                 var event = JSON.parse(data.body);
-                console.log(event);
                 var arrayLength = event.headers.length;
                 for (var i = 0; i < arrayLength; i++) {
-                    //console.log(event.headers[i].toLowerCase());
-                    //console.log(i);
-                    //console.log(measuresChecked.toLowerCase());
 
                     if (event.headers[i].toLowerCase() === measuresChecked[0].toLowerCase()){
-                        console.log(event.values.split(event.tokenSeparator)[i]);
-                        console.log(i);
                         var x = new Date();  // current time
                         var y = event.values.split(event.tokenSeparator)[i];
                         var sosdata = $scope.var.sosdata;
@@ -206,14 +200,11 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
                         }
                         g.updateOptions( { 'file': sosdata } );
                         var maxy = g.getOption('valueRange')[1];
-                        console.log(maxy);
-                        console.log(y);
                         if (y > maxy){
                             g.updateOptions( {valueRange:  [0.0, (parseFloat(y)+parseFloat(5))]});
                         }
                     }
                 }
-                //console.log(event.headers.);
             });
         };
 
