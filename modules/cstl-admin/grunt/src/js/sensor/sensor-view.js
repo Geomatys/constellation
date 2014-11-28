@@ -121,6 +121,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
             $scope.var.displayMesureSelector=true;
             $scope.var.displayGraph=false;
             $scope.var.displayRealTimeGraph=false;
+            $scope.var.topic.unsubscribe();
         };
 
         $scope.showGraph = function() {
@@ -178,6 +179,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
                     drawPoints: true,
                     showRoller: true,
                     valueRange: [0.0, 12],
+                    ylabel: measuresChecked,
                     labels: ['Time', measuresChecked]
                 });
             g.resize(jQuery("#sos_realtime_graph").width(), jQuery("#sos_realtime_graph").height());
