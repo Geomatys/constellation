@@ -818,6 +818,7 @@
     "service.edit.dashboard.date.from":"Du",
     "service.edit.dashboard.button.graph.hide":"Cacher le graphique",
     "service.edit.dashboard.button.graph.show":"Afficher le graphique",
+    "service.edit.dashboard.button.realtime.graph.show":"Afficher le graphique temp réel",
     "service.edit.dashboard.wmts.action.addnewlayer.button":"Ajouter une couche",
     "service.edit.dashboard.wmts.select.source":"Choisir un mode de création de la couche",
     "service.edit.dashboard.wmts.select.internal":"Choisir une ou plusieurs données",

@@ -21,6 +21,7 @@ package org.constellation.sos.io.om2;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKBWriter;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.om2.OM2BaseReader.Field;
@@ -46,6 +47,9 @@ import org.geotoolkit.swe.xml.Quantity;
 import org.geotoolkit.swe.xml.SimpleDataRecord;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.swe.xml.v200.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v200.DataRecordType;
+import org.geotoolkit.swe.xml.v200.TextEncodingType;
 import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.opengis.observation.Measure;
@@ -274,14 +278,31 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             stmt.close();
             
             writeResult(oid, pid, procedureID, observation.getResult(), samplingTime, c);
-            
+            emitResultOnBus(procedureID, observation.getResult());
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
             return observationName;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observation.", ex);
         }
     }
-    
+
+    private void emitResultOnBus(String procedureID, Object result) {
+        if (result instanceof DataArrayPropertyType){
+            OM2ResultEventDTO resultEvent = new OM2ResultEventDTO();
+            resultEvent.setBlockSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getBlockSeparator());
+            resultEvent.setDecimalSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getDecimalSeparator());
+            resultEvent.setTokenSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getTokenSeparator());
+            resultEvent.setValues(((DataArrayPropertyType)result).getDataArray().getValues());
+            List<String> headers = new ArrayList<>();
+            for (org.geotoolkit.swe.xml.v200.Field field : ((DataRecordType)((DataArrayPropertyType)result).getDataArray().getElementType().getAbstractDataComponent().getValue()).getField()){
+                headers.add(field.getName());
+            }
+            resultEvent.setHeaders(headers);
+            resultEvent.setProcedureID(procedureID);
+            SpringHelper.sendEvent(resultEvent);
+        }
+    }
+
     @Override
     public void writePhenomenons(final List<Phenomenon> phenomenons) throws DataStoreException {
         try {

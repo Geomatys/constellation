@@ -20,18 +20,22 @@
 
 angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('SensorModalController', function($scope, $modalInstance, $modal, $cookieStore, sos, service, sensorId, Growl, $http) {
+    .controller('SensorModalController', function($scope, $modalInstance, $modal, $cookieStore, sos, service, sensorId, Growl, $http, StompService) {
         $scope.service = service;
         $scope.sensorId = sensorId;
         $scope.measures = undefined;
         $scope.var = {
             displayGraph:  false,
+            displayRealTimeGraph:  false,
+            displayMesureSelector: true,
             needToSelectMeasure: false,
             start: '',
-            end: ''
+            end: '',
+            sosdata: []
         };
 
-        $scope.init = function() {
+        $scope.initSensorView = function() {
+            StompService.connect();
             sos.measuresForSensor({id: service.identifier},{value: sensorId}, function(measures){
                 var oldMeasures = $scope.measures;
 
@@ -113,6 +117,12 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
             return allMeasures;
         }
 
+        $scope.displaySelector = function(){
+            $scope.var.displayMesureSelector=true;
+            $scope.var.displayGraph=false;
+            $scope.var.displayRealTimeGraph=false;
+        };
+
         $scope.showGraph = function() {
             var measuresChecked = getMeasuresChecked();
             if (measuresChecked.length === 0) {
@@ -125,7 +135,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
                     return;
                 }
             }
-
+            $scope.var.displayMesureSelector = false;
             $scope.var.displayGraph = true;
 
             var obsFilter = {
@@ -141,6 +151,75 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
                     generateD3Graph(response, measuresChecked);
                 });
         };
+
+
+
+        $scope.showRealTimeGraph = function() {
+            var measuresChecked = getMeasuresChecked();
+            if (measuresChecked.length === 0) {
+                var allMeasures = getAllMeasures();
+                if (allMeasures.length === 1) {
+                    measuresChecked = allMeasures;
+                } else {
+                    // Please select one or more measure(s) in the list
+                    $scope.var.needToSelectMeasure = true;
+                    return;
+                }
+            }
+            $scope.var.displayMesureSelector = false;
+            $scope.var.displayRealTimeGraph = true;
+
+            var t = new Date();
+            $scope.var.sosdata.push([t,0]);
+
+
+            var g = new Dygraph((jQuery("#sos_realtime_graph")[0]), $scope.var.sosdata,
+                {
+                    drawPoints: true,
+                    showRoller: true,
+                    valueRange: [0.0, 12],
+                    labels: ['Time', measuresChecked]
+                });
+            g.resize(jQuery("#sos_realtime_graph").width(), jQuery("#sos_realtime_graph").height());
+            
+
+            $scope.var.topic = StompService.subscribe('/topic/sosevents/'+$scope.sensorId, function(data) {
+                var event = JSON.parse(data.body);
+                console.log(event);
+                var arrayLength = event.headers.length;
+                for (var i = 0; i < arrayLength; i++) {
+                    //console.log(event.headers[i].toLowerCase());
+                    //console.log(i);
+                    //console.log(measuresChecked.toLowerCase());
+
+                    if (event.headers[i].toLowerCase() === measuresChecked[0].toLowerCase()){
+                        console.log(event.values.split(event.tokenSeparator)[i]);
+                        console.log(i);
+                        var x = new Date();  // current time
+                        var y = event.values.split(event.tokenSeparator)[i];
+                        var sosdata = $scope.var.sosdata;
+                        sosdata.push([x, y]);
+                        if (sosdata.length > 20){
+                            sosdata.shift();
+                        }
+                        g.updateOptions( { 'file': sosdata } );
+                        var maxy = g.getOption('valueRange')[1];
+                        console.log(maxy);
+                        console.log(y);
+                        if (y > maxy){
+                            g.updateOptions( {valueRange:  [0.0, (parseFloat(y)+parseFloat(5))]});
+                        }
+                    }
+                }
+                //console.log(event.headers.);
+            });
+        };
+
+
+
+        $scope.$on('$destroy', function() {
+            $scope.var.topic.unsubscribe();
+        });
 
         $scope.clickMeasure = function(measure) {
             $scope.var.needToSelectMeasure = false;

@@ -678,6 +678,7 @@
     "service.edit.dashboard.date.from":"From",
     "service.edit.dashboard.button.graph.hide":"Hide graph",
     "service.edit.dashboard.button.graph.show":"Show graph",
+    "service.edit.dashboard.button.realtime.graph.show":"Show realtime graph",
     "service.edit.dashboard.wmts.action.addnewlayer.button":"Add new layer",
     "service.edit.dashboard.wmts.select.source":"Select how to build the layer",
     "service.edit.dashboard.wmts.select.internal":"Select one or more data in the list",
