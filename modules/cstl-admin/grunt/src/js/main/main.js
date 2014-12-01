@@ -32,6 +32,9 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
                 window.location.href="index.html";
                 });
             };
+            if(data["token.life"]){
+              TokenService.setTokenLife(data["token.life"]);
+            }
             Account.get(function(account){
               $scope.firstname = account.firstname;
               $scope.lastname = account.lastname;  

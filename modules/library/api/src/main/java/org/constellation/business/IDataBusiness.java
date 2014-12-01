@@ -138,4 +138,7 @@ public interface IDataBusiness {
     String marshallMetadata(final DefaultMetadata metadata) throws JAXBException;
     
     DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException;
+    
+    
+    void uploadCleaner();
 }

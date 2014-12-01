@@ -23,7 +23,7 @@ import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.security.spring.TokenService;
+import org.constellation.token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;

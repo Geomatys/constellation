@@ -265,6 +265,10 @@ public final class ConfigDirectory {
         return typeService;
     }
 
+    
+    public static Path getUploadDirectory() {
+        return config.dataUserUploads;
+    }
     /**
      * Give a upload directory {@link java.io.File} defined on
      * constellation.properties or by default on

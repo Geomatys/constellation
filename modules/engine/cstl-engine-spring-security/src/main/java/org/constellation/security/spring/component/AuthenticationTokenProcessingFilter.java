@@ -1,17 +1,14 @@
 package org.constellation.security.spring.component;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.constellation.security.spring.TokenService;
+import org.constellation.token.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +25,7 @@ import org.springframework.web.filter.GenericFilterBean;
 @Component
 public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("token");
+    private static final Logger LOGGER = LoggerFactory.getLogger(TokenService.class);
 
     @Autowired
     private UserDetailsService userService;
@@ -63,7 +60,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
     }
 
     private UserDetails fromToken(HttpServletRequest httpRequest) {
-        String authToken = this.extractAuthTokenFromRequest(httpRequest);
+        String authToken = tokenService.extractAuthTokenFromRequest(httpRequest);
         if (authToken != null) {
             String userName = tokenService.getUserNameFromToken(authToken);
             if (tokenService.validateToken(authToken, userName)) {
@@ -100,74 +97,5 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         return (HttpServletRequest) request;
     }
 
-    private String extractAuthTokenFromRequest(HttpServletRequest httpRequest) {
-
-        String authToken = headers(httpRequest);
-        if (authToken != null) {
-            return authToken;
-        }
-
-        authToken = cookie(httpRequest);
-        if (authToken != null) {
-            return authToken;
-        }
-
-        authToken = queryString(httpRequest);
-        if (authToken != null) {
-            return authToken;
-        }
-
-        return null;
-
-    }
-
-    private String queryString(HttpServletRequest httpRequest) {
-
-        /*
-         * If token not found get it from request query string 'token' parameter
-         */
-        String queryString = httpRequest.getQueryString();
-        if (StringUtils.hasText(queryString)) {
-            int tokenIndex = queryString.indexOf("token=");
-            if (tokenIndex != -1) {
-                tokenIndex += "token=".length();
-                int tokenEndIndex = queryString.indexOf('&', tokenIndex);
-                String authToken;
-                if (tokenEndIndex == -1)
-                    authToken = queryString.substring(tokenIndex);
-                else
-                    authToken = queryString.substring(tokenIndex, tokenEndIndex);
-                LOGGER.debug("QueryString: " + authToken + " (" + httpRequest.getRequestURI() + ")");
-                return authToken;
-            }
-        }
-        return null;
-    }
-
-    private String cookie(HttpServletRequest httpRequest) {
-        /* Extract from cookie */
-        Cookie[] cookies = httpRequest.getCookies();
-        if (cookies != null)
-            for (Cookie cookie : cookies) {
-                if ("authToken".equals(cookie.getName())) {
-                    try {
-                        String authToken = URLDecoder.decode(cookie.getValue(), "UTF-8");
-                        LOGGER.debug("Cookie: " + authToken + " (" + httpRequest.getRequestURI() + ")");
-                        return authToken;
-                    } catch (UnsupportedEncodingException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
-            }
-        return null;
-    }
-
-    private String headers(HttpServletRequest httpRequest) {
-        String authToken = httpRequest.getHeader("X-Auth-Token");
-        if (authToken != null) {
-            LOGGER.debug("Header: " + authToken + " (" + httpRequest.getRequestURI() + ")");
-            return authToken;
-        }
-        return authToken;
-    }
+   
 }

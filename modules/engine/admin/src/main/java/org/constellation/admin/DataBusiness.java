@@ -19,13 +19,35 @@
 
 package org.constellation.admin;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.google.common.base.Optional;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.logging.Logging;
+import org.apache.sis.util.Locales;
+import org.apache.sis.util.iso.Types;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
@@ -35,38 +57,39 @@ import org.constellation.admin.util.ImageStatisticDeserializer;
 import org.constellation.api.DataType;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDataCoverageJob;
-import org.constellation.configuration.*;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.CstlConfigurationRuntimeException;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.ServiceProtocol;
+import org.constellation.configuration.StyleBrief;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.*;
+import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.repository.*;
+import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.Style;
+import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.DatasetRepository;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.engine.register.repository.ProviderRepository;
+import org.constellation.engine.register.repository.SensorRepository;
+import org.constellation.engine.register.repository.StyleRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
+import org.constellation.token.TokenUtils;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
+import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.PropertyType;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.sis.util.Locales;
-import org.apache.sis.util.iso.Types;
-import org.constellation.dto.MetadataLists;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.Restriction;
@@ -80,6 +103,18 @@ import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.DimensionNameType;
 import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.metadata.spatial.PixelOrientation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.google.common.base.Optional;
 
 
 /**
@@ -98,7 +133,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     /**
      * Used for debugging purposes.
      */
-    protected static final Logger LOGGER = Logging.getLogger(DataBusiness.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DataBusiness.class);
     /**
      * Injected user repository.
      */
@@ -326,7 +361,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 return metadata;
             }
         } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+            LOGGER.warn("An error occurred while updating service database", ex);
             throw new ConstellationException(ex);
         }
         return null;
@@ -1090,6 +1125,21 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                                                               providerIdentifier);
         data.setDatasetId(datasetId);
         dataRepository.update(data);
+    }
+    
+    
+    @Override
+    @Scheduled(fixedDelay=5*60*1000)
+    public void uploadCleaner() {
+        LOGGER.debug("Cleaner");
+        java.nio.file.Path uploadDirectory = ConfigDirectory.getUploadDirectory();
+        File[] listFiles = uploadDirectory.toFile().listFiles();
+        for (File file : listFiles) {
+            if(TokenUtils.isExpired(file.getName())) {
+                LOGGER.info(file.getName() + " expired");
+                FileUtilities.deleteDirectory(file);                
+            }
+        }
     }
 
 }

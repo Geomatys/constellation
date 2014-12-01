@@ -96,6 +96,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.constellation</groupId>
+      <artifactId>cstl-token</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
       <version>1.0.13</version>

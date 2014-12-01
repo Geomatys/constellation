@@ -24,6 +24,7 @@ import java.util.Properties;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.constellation.token.TokenUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/conf")
 public class ConfigController {
 	
+    
+    private static long TOKEN_LIFE = TokenUtils.getTokenLife();
+    
 	@Inject
 	private Environment env;
 	/**
@@ -62,7 +66,7 @@ public class ConfigController {
 		    context += "/";
 		}
 		properties.put("cstl", context);
-		
+		properties.put("token.life", TOKEN_LIFE);
 		return properties;
 	}
 

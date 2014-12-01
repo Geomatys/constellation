@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -57,6 +58,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import com.google.common.base.Optional;
+
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
@@ -93,6 +95,7 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.ProviderParameters;
+import org.constellation.token.TokenService;
 import org.constellation.util.ParamUtilities;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
@@ -114,6 +117,7 @@ import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.filter.function.string.ToLowerCaseFunction;
 import org.geotoolkit.geometry.Envelopes;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.map.MapBuilder;
@@ -143,6 +147,7 @@ import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.w3c.dom.Node;
 
 /**
@@ -185,6 +190,8 @@ public class DataRest {
     @Inject
     private IProcessBusiness processBusiness;
 
+    @Inject
+    private TokenService tokenService;
 
 
     /**
@@ -321,8 +328,7 @@ public class DataRest {
                                @FormDataParam("metadata") InputStream fileMetaIs,
                                @FormDataParam("metadata") FormDataContentDisposition fileMetaDetail,
                                @Context HttpServletRequest request) {
-    	final String sessionId = request.getSession().getId();
-    	final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
+    	final File uploadDirectory = ConfigDirectory.getUploadDirectory(tokenService.extractAuthTokenFromRequest(request));
         HashMap<String,String> hashMap = new HashMap<>();
         String dataName = fileDetail.getFileName();
 
@@ -342,6 +348,9 @@ public class DataRest {
         }
         return Response.ok(hashMap).build();
     }
+    
+    
+    
 
     /**
      * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
@@ -362,8 +371,8 @@ public class DataRest {
                                @FormDataParam("identifier") String identifier,
                                @FormDataParam("serverMetadataPath") String serverMetadataPath,
                                @Context HttpServletRequest request) {
-    	final String sessionId = request.getSession().getId();
-        final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
+    	
+        final File uploadDirectory = ConfigDirectory.getUploadDirectory(tokenService.extractAuthTokenFromRequest(request));
         Map<String,String> hashMap = new HashMap<>();
         if (identifier != null && ! identifier.isEmpty()){
             hashMap.put("dataName", identifier);

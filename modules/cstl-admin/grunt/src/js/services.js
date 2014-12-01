@@ -196,8 +196,12 @@ angular.module('cstl-services', ['cstl-restapi'])
 
     .factory('TokenService', function ($rootScope, $http, CstlConfig, Account) {
         var lastCall = new Date().getTime();
-        var tokenHalfLife = 15 * 60 * 1000;
+        var tokenHalfLife = 30 * 60 * 1000;
         return {
+            setTokenLife : function(l){
+              tokenHalfLife = 500 * 60 * l;
+              console.log("Token life set to " + l + " minutes.");
+            },
             get : function(){
               console.log("TokenService.get: " + $.cookie(CstlConfig['cookie.auth.token']));
               return $.cookie(CstlConfig['cookie.auth.token']);
@@ -208,7 +212,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                 lastCall = now;
                 $http.get('@cstl/api/user/extendToken').success(function(token){
                   $.cookie(CstlConfig['cookie.auth.token'], token, { path : '/' });
-                  $rootScope = token;
+                  $rootScope.authToken = token;
                   console.log("Token extended: " + token);
                 });
               }
