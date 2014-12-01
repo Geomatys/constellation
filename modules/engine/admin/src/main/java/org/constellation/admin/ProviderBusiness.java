@@ -1,6 +1,7 @@
 package org.constellation.admin;
 
 import com.google.common.base.Optional;
+
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
@@ -8,6 +9,7 @@ import org.constellation.api.ProviderType;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.engine.register.*;
@@ -40,10 +42,13 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -247,17 +252,13 @@ public class ProviderBusiness implements IProviderBusiness {
     @Override
     public Provider create(final int domainId, final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException {
         final DataProviderFactory providerSPI = DataProviders.getInstance().getFactory(providerSPIName);
+        /////
+        // WARNING : createProvider() will create provider, data list and dataset records in repositories.
+        /////
         DataProviders.getInstance().createProvider(id, providerSPI, providerConfig);
         final int count = domainRepository.addProviderDataToDomain(id, domainId);
-        final Provider provider = getProvider(id);
-        final int provId = provider.getId();
-
-        // for now we assume provider == dataset, so we create a dataset bound to the new provider.
-        final Dataset dataset = datasetBusiness.createDataset(id, null, null, provider.getOwner());
-        datasetBusiness.linkDataTodataset(dataset, getDatasFromProviderId(provId));
-
         LOGGER.info("Added " + count + " data to domain " + domainId);
-        return provider;
+        return getProvider(id);
     }
 
     public void update(final int domainId, final String id, final ProviderConfiguration config) {
@@ -294,11 +295,12 @@ public class ProviderBusiness implements IProviderBusiness {
                 // randomly named parameters.
                 boolean foundProvider = false;
                 try {
-                    final String filePath = inParams.get("path");
+                    
+                    final Path filePath = Paths.get(inParams.get("path"));
                     URL url = null;
-                    if (filePath != null && !filePath.isEmpty()) {
-                        url = new URL("file:" + filePath);
-                        final File folder = new File(filePath);
+                    if (filePath != null) {
+                        url = filePath.toUri().toURL();
+                        final File folder = filePath.toFile();
                         final File[] candidates;
                         if (folder.isDirectory()) {
                             candidates = folder.listFiles();
@@ -375,8 +377,13 @@ public class ProviderBusiness implements IProviderBusiness {
             case "coverage-store":
                 // TODO : remove this crappy hack after provider system refactoring.
                 final String filePath = inParams.get("path");
-                if (filePath != null && !filePath.toLowerCase().startsWith("file:")) {
-                    inParams.put("path", "file:"+filePath);
+                if (filePath != null ) {
+                    
+                    try {
+                        inParams.put("path", Paths.get(filePath).toUri().toURL().toString());
+                    } catch (MalformedURLException e) {
+                     throw new CstlConfigurationRuntimeException(e);
+                    }
                 }
                 final CoverageStoreFactory cvgFactory = CoverageStoreFinder.getFactoryById(subType);
                 final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, cvgFactory.getParametersDescriptor(), true);

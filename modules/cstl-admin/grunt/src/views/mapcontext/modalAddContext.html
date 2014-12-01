@@ -38,7 +38,7 @@
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane block-border"
+                            <div class="tab-pane"
                                  ng-class="{active:mode.selTab==='tabInfo'}"
                                  style="padding-top: 13px;">
                                 <form class="form-horizontal form-style" role="form">
@@ -81,7 +81,7 @@
                                                            ng-model="ctxt.north"
                                                            placeholder="{{'label.north.first.letter' | translate}}"/>
                                                 </div>
-                                                <div class="col-sm-offset-1 col-sm-2">
+                                                <div class="col-sm-offset-1 col-sm-2 btn-emprise">
                                                     <button class="btn btn-add"
                                                             type="button"
                                                             ng-click="applyExtent()"
@@ -136,7 +136,7 @@
                                     </div>
                                 </form>
                             </div>
-                            <div class="tab-pane block-border"
+                            <div class="tab-pane"
                                  ng-class="{active:mode.selTab==='tabLayers'}"
                                  style="padding-top: 7px;">
                                 <div class="row dash-inner"
@@ -176,7 +176,7 @@
                                                         </div>
                                                         <div class="col-xs-8 no-padding"
                                                              ng-click="selectItem(layerToAdd)">
-                                                            <div class="item layer compo"
+                                                            <div class="item layer compo style-small"
                                                                  ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toLowerCase()==='coverage',vector:layerToAdd.layer.Type.toLowerCase()==='observation-store' || layerToAdd.layer.Type.toLowerCase()==='vector'}">
                                                                 <div class="top edit-mapcontext-modale">
                                                                     <span class="item-title"
@@ -319,7 +319,7 @@
                                     <div class="item-list">
                                         <div ng-repeat="styleItem in styles.existing"
                                              class="row">
-                                            <div class="item col-xs-11"
+                                            <div class="item col-xs-11 style-small"
                                                  ng-class="{selected: styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage'), 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector', 'style-compo-layer':styleItem.Type == null || styleItem.Type == undefined}"
                                                  ng-click="selectStyle(styleItem)">
                                                 <div class="top">
@@ -338,7 +338,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-xs-1"
-                                                 style="margin-top: 37px;">
+                                                 style="margin-top: 37px; padding-right: 0;">
                                                 <span class="glyphicon glyphicon-star"
                                                       ng-show="selected.item.layer.styleName===styleItem.Name"></span>
                                             </div>
@@ -374,9 +374,9 @@
                             <input type="radio"
                                    ng-model="mode.source"
                                    value="interne"
-                                   style="margin-left:0; display: none;"/>
+                                   style="display: none;"/>
                             <div translate="mapcontext.modal.label.internal"
-                                 style="margin-top:10px;">Vector data</div>
+                                 style="margin-top:10px;">Internal</div>
                         </label>
                     </div>
                     <div class="col-sm-4"
@@ -392,9 +392,9 @@
                             <input type="radio"
                                    ng-model="mode.source"
                                    value="externe"
-                                   style="margin-left:0; display: none;"/>
+                                   style="display: none;"/>
                             <div translate="mapcontext.modal.label.external"
-                                 style="margin-top:10px;">Raster data</div>
+                                 style="margin-top:10px;">External</div>
                         </label>
                     </div>
                 </div>

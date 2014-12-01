@@ -18,6 +18,7 @@
  */
 package org.constellation.admin;
 
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.security.SecurityManagerHolder;
@@ -33,6 +34,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.inject.Inject;
+
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -55,11 +57,12 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
     private ProviderRepository providerRepository;
     
     /**
-     * Spring applucation context.
+     * Spring application context.
      */
     private ApplicationContext applicationContext;
 
     public void init() {
+        ConfigDirectory.init();
         
     	SpringHelper.setApplicationContext(applicationContext);
         WSEngine.setWorkerFactory(new WorkerFactory() {

@@ -533,7 +533,7 @@ public class DataRest {
         final ImportedData importedDataReport = new ImportedData();
         try{
             final File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
-            final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
+            final File uploadFolder = ConfigDirectory.getDataUploads().toFile();
 
             if (metadataFilePath != null) {
                 if (metadataFilePath.startsWith(uploadFolder.getAbsolutePath())) {
@@ -2118,11 +2118,14 @@ public class DataRest {
     }
 
     @POST
-    @Path("{providerid}/{dataid}/hidden")
-    public Response hideData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid, final SimpleValue dataNmsp) throws ConfigurationException {
+    @Path("/hidden")
+    public Response hideData(final Map<String,String> values) throws ConfigurationException {
+        final String providerid = values.get("providerIdentifier");
+        final String dataid = values.get("dataIdentifier");
+        final String dataNmsp = values.get("dataNmsp");
         final QName dataName;
         if (dataNmsp != null) {
-            dataName = new QName(dataNmsp.getValue(), dataid);
+            dataName = new QName(dataNmsp, dataid);
         } else {
             dataName = new QName(dataid);
         }

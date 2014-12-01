@@ -29,6 +29,7 @@ import java.util.Date;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import org.opengis.metadata.citation.Responsibility;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
@@ -55,10 +56,13 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
 import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
+import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.NilReason;
 import org.geotoolkit.sml.xml.v101.ValidTime;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gts.xml.PeriodDurationType;
+import org.opengis.temporal.PeriodDuration;
 
 
 /**
@@ -69,6 +73,9 @@ import org.geotoolkit.gml.xml.v311.TimePeriodType;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class MetadataUpdater {
+
+    private static final Logger LOGGER = Logging.getLogger(MetadataUpdater.class);
+
     /**
      * The metadata factory to use for creating new instances of ISO 19115 objects.
      */
@@ -238,10 +245,10 @@ final class MetadataUpdater {
                     @SuppressWarnings("unchecked") // See 'this.value' javadoc.
                     final List<Object> list = (List<Object>) value;
                     for (int i=list.size(); --i >= 0;) {
-                        list.set(i, convert(type, list.get(i)));
+                        list.set(i, convert(identifier, type, list.get(i)));
                     }
                 } else {
-                    value = convert(type, value);
+                    value = convert(identifier, type, value);
                 }
             } else {
                 /*
@@ -260,19 +267,28 @@ final class MetadataUpdater {
     /**
      * Converts the given value to an instance of the given class before to store in the metadata object.
      */
-    private static Object convert(final Class<?> type, Object value) throws ParseException {
+    private static Object convert(final String identifier, final Class<?> type, Object value) throws ParseException {
         if (type == Date.class) {
-            return toDate(value);
+            return toDate(value, identifier);
+        }
+        if (type == PeriodDuration.class && value instanceof String) {
+            try {
+                return new PeriodDurationType((String)value);
+            } catch (IllegalArgumentException ex) {
+                LOGGER.warning("Bad period duration value:" + value + " (property:" + identifier + ")");
+            }
         }
         if (!CharSequence.class.isAssignableFrom(type) && (value instanceof CharSequence)) {
             String text = value.toString();
-            if (text.startsWith(Keywords.NIL_REASON)) try {
-                value = NilReason.valueOf(text.substring(Keywords.NIL_REASON.length())).createNilObject(type);
-            } catch (URISyntaxException | IllegalArgumentException e) {
-                throw new ParseException("Illegal value: \"" + text + "\".", e);
+            if (text.startsWith(Keywords.NIL_REASON)) {
+                try {
+                    value = NilReason.valueOf(text.substring(Keywords.NIL_REASON.length())).createNilObject(type);
+                } catch (URISyntaxException | IllegalArgumentException e) {
+                    throw new ParseException("Illegal value: \"" + text + "\".(property:" + identifier + ")", e);
+                }
             } else {
                 final boolean isCodeList = CodeList.class.isAssignableFrom(type);
-                if (isCodeList || type == Locale.class || type == Charset.class) {
+                if (isCodeList || type == Locale.class || type == Charset.class || type.isEnum()) {
                     text = text.substring(text.indexOf('.') + 1).trim();
                     if (isCodeList) {
                         value = Types.forCodeName(type.asSubclass(CodeList.class), text, false);
@@ -288,7 +304,7 @@ final class MetadataUpdater {
     /**
      * Returns the given value as a date.
      */
-    private static Date toDate(final Object value) throws ParseException {
+    private static Date toDate(final Object value, final String identifier) throws ParseException {
         if (value == null) {
             return null;
         }
@@ -299,14 +315,14 @@ final class MetadataUpdater {
         if (t.indexOf('-') < 0) try {
             return new Date(Long.valueOf(t));
         } catch (NumberFormatException e) {
-            throw new ParseException("Illegal date: " + value, e);
+            throw new ParseException("Illegal date: " + value + " (property:" + identifier +")", e);
         }
         try {
             synchronized (ValueNode.DATE_FORMAT) {
                 return ValueNode.DATE_FORMAT.parse((String) value);
             }
         } catch (java.text.ParseException e) {
-            throw new ParseException("Illegal date: " + value, e);
+            throw new ParseException("Illegal date: " + value + " (property:" + identifier +")", e);
         }
     }
 
@@ -358,7 +374,7 @@ final class MetadataUpdater {
             boolean moved = false;
             Date beginPosition = null, endPosition = null;
             while (np.path.length >= 2 && np.path[np.path.length - 2].equals("extent")) {
-                final Date t = toDate(value);
+                final Date t = toDate(value, identifier);
                 switch (np.path[np.path.length - 1]) {
                     case "beginPosition": beginPosition = t; break;
                     case "endPosition":   endPosition   = t; break;
@@ -380,7 +396,7 @@ final class MetadataUpdater {
             boolean moved = false;
             Date beginPosition = null, endPosition = null;
             while (np.path.length >= 2 && np.path[np.path.length - 2].equals("timePeriod")) {
-                final Date t = toDate(value);
+                final Date t = toDate(value, identifier);
                 switch (np.path[np.path.length - 1]) {
                     case "beginPosition": beginPosition = t; break;
                     case "endPosition":   endPosition   = t; break;

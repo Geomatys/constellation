@@ -18,9 +18,9 @@
  * limitations under the License.
  */
 
-angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
+angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('MapContextModalController', function($scope, $modalInstance, mapcontext, webService, style, Growl, $translate, ctxtToEdit, layersForCtxt, $cookies, $modal) {
+    .controller('MapContextModalController', function($scope, $modalInstance, mapcontext, webService, style, Growl, $translate, ctxtToEdit, layersForCtxt, $cookieStore, $modal) {
         // item to save in the end
         $scope.ctxt = {};
         // defines if we are in adding or edition mode
@@ -419,8 +419,8 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             if (!$scope.layers.toAdd || $scope.layers.toAdd.length===0) {
                 return;
             }
-
-            var cstlUrl = $cookies.cstlUrl;
+            DataViewer.initConfig();
+            var cstlUrl = $cookieStore.get('cstlUrl');
 
             var layersToView = [];
             for (var i=0; i<$scope.layers.toAdd.length; i++) {
@@ -454,7 +454,7 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
                     var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
                     setTimeout(function(){
                         DataViewer.map.updateSize();
-                        DataViewer.zoomToExtent(extent, DataViewer.map.getSize());
+                        DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
                     },300);
                 }
             } else {
@@ -474,7 +474,7 @@ angular.module('cstl-mapcontext-edit', ['ngCookies', 'cstl-restapi', 'cstl-servi
             var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
             setTimeout(function(){
                 DataViewer.map.updateSize();
-                DataViewer.zoomToExtent(extent, DataViewer.map.getSize());
+                DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
             },300);
         }
 

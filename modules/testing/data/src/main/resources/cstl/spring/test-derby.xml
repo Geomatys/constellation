@@ -1,11 +1,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-       xmlns:task="http://www.springframework.org/schema/task"
-       xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:task="http://www.springframework.org/schema/task"
+  xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
@@ -13,38 +10,65 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
 
-    <context:component-scan base-package="org.constellation.engine.register.jooq, org.constellation.admin"/>
-    <context:component-scan base-package="org.constellation.map.configuration"/>
-    <context:component-scan base-package="org.constellation.ws.rs"/>
+  <context:component-scan base-package="org.constellation.engine.register.jooq, org.constellation.admin" />
+  <context:component-scan base-package="org.constellation.map.configuration" />
+  <context:component-scan base-package="org.constellation.ws.rs" />
 
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-
-
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"
-          p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" p:url="jdbc:derby:memory:db;create=true"/>
+  <tx:annotation-driven transaction-manager="transactionManager" />
 
 
-    <bean id="database-initer" class="liquibase.integration.spring.SpringLiquibase">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="changeLog" value="classpath:/cstl/db/db-changelog.xml"/>
+
+
+
+
+
+
+  <bean id="database-initer" class="liquibase.integration.spring.SpringLiquibase">
+    <property name="dataSource" ref="dataSource" />
+    <property name="changeLog" value="classpath:/cstl/db/db-changelog.xml" />
 
         <!--
         contexts specifies the runtime contexts to use.
         -->
-        <property name="contexts" value="test, production"/>
-    </bean>
+    <property name="contexts" value="test, production" />
+  </bean>
 
-    <bean id="securityManager" class="org.constellation.security.spring.SpringSecurityManager"></bean>
+  <bean id="securityManager" class="org.constellation.security.spring.SpringSecurityManager"></bean>
 
-    <task:executor id="cstlExecutor" pool-size="5"/>
-    <task:scheduler id="cstlScheduler" pool-size="5"/>
-    <task:annotation-driven executor="cstlExecutor" scheduler="cstlScheduler"/>
+  <task:executor id="cstlExecutor" pool-size="5" />
+  <task:scheduler id="cstlScheduler" pool-size="5" />
+  <task:annotation-driven executor="cstlExecutor" scheduler="cstlScheduler" />
 
     <!-- Guava event bus -->
-    <bean id="eventBus" class="com.google.common.eventbus.AsyncEventBus">
-        <constructor-arg ref="cstlExecutor"/>
-    </bean>
+  <bean id="eventBus" class="com.google.common.eventbus.AsyncEventBus">
+    <constructor-arg ref="cstlExecutor" />
+  </bean>
 
-    <import resource="cstl-tx.xml"/>
+  <import resource="cstl-tx.xml" />
+
+  <beans profile="derby">
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
+      p:url="jdbc:derby:memory:db;create=true" />
+  </beans>
+
+<!--   <beans profile="derby"> -->
+<!--     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" -->
+<!--       p:url="jdbc:derby:/Users/cheleb/.constellation/mydbamoi;create=true" /> -->
+
+<!--   </beans> -->
+
+  <beans profile="h2">
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close" p:driverClassName="org.h2.Driver"
+      p:url="jdbc:h2:mem:cstl" />
+
+  </beans>
+
+  <beans profile="postgresql">
+  <!-- DataSource configuration for the tomcat jdbc connection pool -->
+
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close" p:driverClassName="org.postgresql.Driver"
+      p:url="jdbc:postgresql:constellation_test" />
+
+  </beans>
 </beans>
 

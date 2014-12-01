@@ -52,6 +52,8 @@
         <url>http://hg.geomatys.com/Public/constellation</url>
     </scm>
 
+
+
     <ciManagement>
         <system>jenkins</system>
         <url>http://dev.geomatys.com/jenkins/job/Constellation</url>
@@ -283,6 +285,34 @@
                 <constellation.services.soap.packages>${constellation.wps.soap}</constellation.services.soap.packages>
             </properties>
         </profile>
+                <profile>
+      <id>derby</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <spring.profiles.active>derby</spring.profiles.active>
+      </properties>
+    </profile>
+    <profile>
+      <id>h2</id>
+      <properties>
+        <spring.profiles.active>h2</spring.profiles.active>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>1.4.180</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>postgresql</id>
+      <properties>
+        <spring.profiles.active>postgresql</spring.profiles.active>
+      </properties>
+    </profile>      
     </profiles>
 
     <dependencyManagement>
@@ -739,7 +769,7 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit</groupId>
-                <artifactId>geotk-svg</artifactId>
+                <artifactId>geotk-svg-batik</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>
             <dependency>
@@ -1191,6 +1221,9 @@
                 <configuration>
                     <useSystemClassLoader>true</useSystemClassLoader>
                     <argLine>-Xmx1024m -XX:MaxPermSize=512m</argLine>
+                    <systemPropertyVariables>
+                      <spring.profiles.active>${spring.profiles.active}</spring.profiles.active>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>

@@ -1,11 +1,11 @@
-<div class="modal-dialog  modal-dialog-responsive" ng-init="init()">
+<div class="modal-dialog  modal-dialog-responsive" ng-init="initSensorView()">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title" translate="data.modal.sensor.title">Sensor view</h4>
         </div>
         <div class="modal-body">
-            <div class="row" ng-if="var.displayGraph === false">
+            <div class="row" ng-if="var.displayMesureSelector === true">
                 <div class="col-sm-4 sos_edit_blocs">
                     <label class="control-label" translate="service.edit.dashboard.measures.list">Available measures</label>
                     <div class="sos_edit_checkboxlist" ng-class="{'error-select-one': var.needToSelectMeasure === true}">
@@ -26,8 +26,6 @@
                 </div>
             </div>
 
-            
-
             <!-- Graph -->
             <div class="row" ng-if="var.displayGraph === true">
                 <div class="col-sm-12">
@@ -44,11 +42,21 @@
                     </div>
                 </div>
             </div>
-        </div>
+            <!-- RealTimeGraph -->
+            <div class="row" ng-show="var.displayRealTimeGraph === true">
+                <div class="col-sm-12">
+                    <div id="sos_realtime_graph" style="width:840px; height:300px;"> </div>
+                </div>
+            </div>
+        <!--</div>-->
+
+
+    </div>
         <div class="modal-footer" style="border-top:none;">
-            <button type="button" ng-show="var.displayGraph === true" class="btn btn-default" ng-click="var.displayGraph=false" translate="label.return">Back</button>
+            <button type="button" ng-show="var.displayMesureSelector === false" class="btn btn-default" ng-click="displaySelector()" translate="label.return">Back</button>
             <button type="button" class="btn btn-default" ng-click="close()" translate="data.modal.close">Close</button>
-            <button type="button" class="btn btn-add" ng-show="var.displayGraph === false" ng-click="showGraph()" translate="service.edit.dashboard.button.graph.show">Show graph</button>
+            <button type="button" class="btn btn-add" ng-show="var.displayMesureSelector === true" ng-click="showGraph()" translate="service.edit.dashboard.button.graph.show">Show graph</button>
+            <button type="button" class="btn btn-add" ng-show="var.displayMesureSelector === true" ng-click="showRealTimeGraph()" translate="service.edit.dashboard.button.realtime.graph.show">Show realtime graph</button>
         </div>
     </div>
 </div>

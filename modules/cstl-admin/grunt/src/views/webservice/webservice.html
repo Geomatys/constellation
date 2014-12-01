@@ -75,8 +75,11 @@
                                     </ul>
                                 </div>
                                 <div class="pull-right service-published-data-nb" style="padding-top:2px;">
-                                    <p tooltip-html-unsafe="{{'service.data.label' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()!=='sos'" ><span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{getLayersCount(service)}}</p>
-                                    <p tooltip-html-unsafe="{{'service.data.label.sos' | translate }}" tooltip-placement="bottom" class="pull-right " ng-if="service.type.toLocaleLowerCase()==='sos'" ><span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{getLayersCount(service)}}</p>
+                                    <p tooltip-html-unsafe="{{(service.type.toLowerCase()!=='sos' ? 'service.data.label' : 'service.data.label.sos') | translate }}"
+                                       tooltip-placement="bottom"
+                                       class="pull-right ">
+                                        <span style="font-size:20px;" class="glyphicon glyphicon-file"></span> {{service.layersNumber}}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -87,11 +90,6 @@
                                 <p style="margin-bottom: 5px;"><strong><span translate="service.abstract.label">Service description</span></strong></p>
                                 <p class="service-description" ng-if="service._abstract != null && service._abstract !==''" title="{{service._abstract}}" >{{service._abstract}}</p>
                                 <p class="service-description" ng-if="service._abstract == null || service._abstract ===''"> - </p>
-                                <!--
-                                <p><strong><span ng-if="service.type.toLocaleLowerCase()!=='sos'" translate="service.data.label">Published data on service</span></strong></p>
-                                <p><strong><span ng-if="service.type.toLocaleLowerCase()==='sos'" translate="service.data.label.sos">Available sensors on service</span></strong></p>
-                                <p>{{getLayersCount(service)}}</p>
-                                -->
                             </div>
                         </div>
                     </div>

@@ -22,7 +22,7 @@
 /*jshint -W079 */
 var dataNotReady = function(){alert("data not ready");};
 
-angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
+angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('HeaderController', function ($rootScope, $scope, $http, TokenService, Account) {
         $http.get("app/conf").success(function(data){
@@ -173,19 +173,19 @@ angular.module('cstl-main', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pasc
         };
     })
 
-    .controller('DomainSwitcherController', function(Account, $scope, $cookies, $window) {
+    .controller('DomainSwitcherController', function(Account, $scope, $cookieStore, $window) {
         Account.get(function(account){
             $scope.domains = account.domains;
             for(var d in account.domains){
-                if(account.domains[d].id === $cookies.cstlActiveDomainId){
-                    $scope.activeDomain=account.domains[d].name;
+                if(account.domains[d].id === $cookieStore.get('cstlActiveDomainId')){
+                    $scope.activeDomain = account.domains[d].name;
                     break;
                 }
             }
             $scope.changeDomain = function(i){
-                if($cookies.cstlActiveDomainId !== account.domains[i].id){
-                    $scope.activeDomain=account.domains[i].name;
-                    $cookies.cstlActiveDomainId= ""+account.domains[i].id;
+                if($cookieStore.get('cstlActiveDomainId') !== account.domains[i].id){
+                    $scope.activeDomain = account.domains[i].name;
+                    $cookieStore.put('cstlActiveDomainId', '' + account.domains[i].id);
                     $window.location.href="admin.html";
                 }
             };

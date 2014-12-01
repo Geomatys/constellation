@@ -42,6 +42,7 @@ import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.netcdf.ExtractionResult;
 import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -126,9 +127,9 @@ public class SOSRest {
         return ok(new StringList(getConfigurer().getSensorIds(id)));
     }
     
-    @GET
-    @Path("{id}/sensors/identifiers/{observedProperty}")
-    public Response getSensorIdsForObservedProperty(final @PathParam("id") String id, final @PathParam("observedProperty") String observedProperty) throws Exception {
+    @POST
+    @Path("{id}/sensors/identifiers/id")
+    public Response getSensorIdsForObservedProperty(final @PathParam("id") String id, final @RequestParam("observedProperty") String observedProperty) throws Exception {
         return ok(new StringList(getConfigurer().getSensorIdsForObservedProperty(id, observedProperty)));
     }
     
@@ -144,16 +145,16 @@ public class SOSRest {
         return ok(getConfigurer().updateSensorLocation(id, sensorID, location));
     }
     
-    @GET
-    @Path("{id}/sensor/location/{sensorID}")
-    public Response getWKTSensorLocation(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
-        return ok(new SimpleValue(getConfigurer().getWKTSensorLocation(id, sensorID)));
+    @POST
+    @Path("{id}/sensor/location/id")
+    public Response getWKTSensorLocation(final @PathParam("id") String id, final SimpleValue value) throws Exception {
+        return ok(new SimpleValue(getConfigurer().getWKTSensorLocation(id, value.getValue())));
     }
     
-    @GET
-    @Path("{id}/observedProperty/identifiers/{sensorID}")
-    public Response getObservedPropertiesForSensor(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
-        return ok(new StringList(getConfigurer().getObservedPropertiesForSensorId(id, sensorID)));
+    @POST
+    @Path("{id}/observedProperty/identifiers/id")
+    public Response getObservedPropertiesForSensor(final @PathParam("id") String id, final SimpleValue value) throws Exception {
+        return ok(new StringList(getConfigurer().getObservedPropertiesForSensorId(id, value.getValue())));
     }
     
     @GET

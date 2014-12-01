@@ -18,16 +18,16 @@
  * limitations under the License.
  */
 
-angular.module('cstl-mapcontext-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('MapcontextController', function($scope, Dashboard, Growl, $modal, $cookies, mapcontext, $window){
+    .controller('MapcontextController', function($scope, Dashboard, Growl, $modal, $cookieStore, mapcontext, $window){
         /**
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
 
-        $scope.cstlUrl = $cookies.cstlUrl;
-        $scope.domainId = $cookies.cstlActiveDomainId;
+        $scope.cstlUrl = $cookieStore.get('cstlUrl');
+        $scope.domainId = $cookieStore.get('cstlActiveDomainId');
         $scope.hideScroll = true;
 
         $scope.init = function() {

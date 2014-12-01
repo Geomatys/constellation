@@ -3,8 +3,8 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-
   <changeSet id="init-v1" author="olivier">
+    <sql>create schema admin</sql>
     <createTable schemaName="admin" tableName="cstl_user">
       <column autoIncrement="true" name="id" type="INTEGER">
         <constraints primaryKey="true" primaryKeyName="USER_PK" />

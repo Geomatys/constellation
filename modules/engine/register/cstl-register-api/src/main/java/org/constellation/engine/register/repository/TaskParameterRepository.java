@@ -28,6 +28,8 @@ public interface TaskParameterRepository {
 
     List<? extends TaskParameter> findAllByType(String type);
 
+    List<? extends TaskParameter> findAllByNameAndProcess(String name, String authority, String code);
+
     TaskParameter create(TaskParameter task);
 
     TaskParameter get(Integer uuid);

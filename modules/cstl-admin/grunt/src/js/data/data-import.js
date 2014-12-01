@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
+angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('ModalImportDataController', function($scope, $modalInstance, dataListing, datasetListing, provider, firstStep, importType, UploadFiles, Growl) {
         $scope.import = {
@@ -237,7 +237,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
     })
 
-    .controller('ModalImportDataStep1LocalController', function($rootScope, $scope, dataListing, $cookies, Growl, cfpLoadingBar) {
+    .controller('ModalImportDataStep1LocalController', function($rootScope, $scope, dataListing, $cookieStore, Growl, cfpLoadingBar) {
         $scope.loader = {
             upload: false
         };
@@ -255,7 +255,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 headers: {
                   'X-Auth-Token': $rootScope.authToken
                 },
-                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/data",
+                url: $cookieStore.get('cstlUrl') + "api/1/domain/"+ $cookieStore.get('cstlActiveDomainId') + "/data/upload/data",
                 type: 'POST',
                 data: formData,
                 cache: false,
@@ -391,7 +391,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
 })
 
-    .controller('ModalImportDataStep2MetadataController', function($rootScope, $scope, $cookies, Growl, dataListing, cfpLoadingBar) {
+    .controller('ModalImportDataStep2MetadataController', function($rootScope, $scope, $cookieStore, Growl, dataListing, cfpLoadingBar) {
 
         $scope.columns = [];
 
@@ -523,7 +523,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 headers: {
                   'X-Auth-Token': $rootScope.authToken
                 },
-                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + '/data/upload/metadata',
+                url: $cookieStore.get('cstlUrl') + "api/1/domain/"+ $cookieStore.get('cstlActiveDomainId') + '/data/upload/metadata',
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -573,7 +573,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
     })
 
-    .controller('ModalImportDataStep4SensorController', function($rootScope, $scope, sensor, dataListing, Dashboard, Growl, $cookies, cfpLoadingBar) {
+    .controller('ModalImportDataStep4SensorController', function($rootScope, $scope, sensor, dataListing, Dashboard, Growl, $cookieStore, cfpLoadingBar) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -632,7 +632,7 @@ angular.module('cstl-data-import', ['ngCookies', 'cstl-restapi', 'cstl-services'
                 headers: {
                   'X-Auth-Token': $rootScope.authToken
                 },
-                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + '/data/upload/data',
+                url: $cookieStore.get('cstlUrl') + "api/1/domain/"+ $cookieStore.get('cstlActiveDomainId') + '/data/upload/data',
                 type: 'POST',
                 data: formData,
                 async: false,

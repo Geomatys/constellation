@@ -250,8 +250,8 @@ public class CstlEmbeddedService extends CommandLine {
             working = true;
             try {
                 final ResourceConfig config = ResourceConfig.forApplication(new CstlApplication());
-                System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, "standard");
-                System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "standard");
+                System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, "standard,derby");
+                System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "standard,derby");
 //                grizzlyWebContainerProperties.put(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, "standard");
 //                grizzlyWebContainerProperties.put(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "standard");
                 config.addProperties(grizzlyWebContainerProperties);

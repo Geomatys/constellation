@@ -55,7 +55,7 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
     /**
      * The Reader of this lucene index (generic DB mode).
      */
-    private final MetadataReader reader;
+    protected final MetadataReader reader;
 
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.

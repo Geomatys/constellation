@@ -21,6 +21,7 @@ package org.constellation.sos.io.om2;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKBWriter;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.om2.OM2BaseReader.Field;
@@ -46,6 +47,9 @@ import org.geotoolkit.swe.xml.Quantity;
 import org.geotoolkit.swe.xml.SimpleDataRecord;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.swe.xml.v200.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v200.DataRecordType;
+import org.geotoolkit.swe.xml.v200.TextEncodingType;
 import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.opengis.observation.Measure;
@@ -132,8 +136,21 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     public String writeObservationTemplate(final ObservationTemplate template) throws DataStoreException {
         if (template.getObservation() != null) {
             return writeObservation((AbstractObservation)template.getObservation());
+        } else  {
+            try {
+                final Connection c = source.getConnection();
+                c.setAutoCommit(false);
+                writeProcedure(template.getProcedure(), c);
+                for (PhenomenonProperty phen : template.getFullObservedProperties()) {
+                    writePhenomenon(phen, c, true);
+                }
+                c.commit();
+                c.close();
+                return null;
+            } catch (SQLException ex) {
+                throw new DataStoreException("Error while inserting observations.", ex);
+            }
         }
-        return null;
     }
     
     /**
@@ -239,7 +256,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 stmt.setNull(4, java.sql.Types.TIMESTAMP);
             }
             final PhenomenonProperty phenomenon = (PhenomenonProperty)((AbstractObservation)observation).getPropertyObservedProperty();
-            final String phenRef = writePhenomenon(phenomenon, c);
+            final String phenRef = writePhenomenon(phenomenon, c, false);
             stmt.setString(5, phenRef);
             
             final org.geotoolkit.observation.xml.Process procedure = (org.geotoolkit.observation.xml.Process)observation.getProcedure();
@@ -261,14 +278,31 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             stmt.close();
             
             writeResult(oid, pid, procedureID, observation.getResult(), samplingTime, c);
-            
+            emitResultOnBus(procedureID, observation.getResult());
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
             return observationName;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observation.", ex);
         }
     }
-    
+
+    private void emitResultOnBus(String procedureID, Object result) {
+        if (result instanceof DataArrayPropertyType){
+            OM2ResultEventDTO resultEvent = new OM2ResultEventDTO();
+            resultEvent.setBlockSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getBlockSeparator());
+            resultEvent.setDecimalSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getDecimalSeparator());
+            resultEvent.setTokenSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getTokenSeparator());
+            resultEvent.setValues(((DataArrayPropertyType)result).getDataArray().getValues());
+            List<String> headers = new ArrayList<>();
+            for (org.geotoolkit.swe.xml.v200.Field field : ((DataRecordType)((DataArrayPropertyType)result).getDataArray().getElementType().getAbstractDataComponent().getValue()).getField()){
+                headers.add(field.getName());
+            }
+            resultEvent.setHeaders(headers);
+            resultEvent.setProcedureID(procedureID);
+            SpringHelper.sendEvent(resultEvent);
+        }
+    }
+
     @Override
     public void writePhenomenons(final List<Phenomenon> phenomenons) throws DataStoreException {
         try {
@@ -280,7 +314,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     phenomenon = new PhenomenonType(internal.getName().getCode(), internal.getName().getCode());
                 }
                 final PhenomenonProperty phenomenonP = SOSXmlFactory.buildPhenomenonProperty("1.0.0", (org.geotoolkit.swe.xml.Phenomenon) phenomenon);
-                writePhenomenon(phenomenonP, c);
+                writePhenomenon(phenomenonP, c, false);
             }
             c.commit();
             c.close();
@@ -289,16 +323,24 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         }
     }
     
-    private String writePhenomenon(final PhenomenonProperty phenomenonP, final Connection c) throws SQLException {
+    private String writePhenomenon(final PhenomenonProperty phenomenonP, final Connection c, final boolean partial) throws SQLException {
         final String phenomenonId = getPhenomenonId(phenomenonP);
         if (phenomenonId == null) return null;
         
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\", \"partial\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
         stmtExist.setString(1, phenomenonId);
         final ResultSet rs = stmtExist.executeQuery();
-        if (!rs.next()) {
-            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"observed_properties\" VALUES(?)");
+        boolean exist = false;
+        boolean isPartial = false;
+        if (rs.next()) {
+            isPartial = rs.getBoolean("partial");
+            exist = true;
+        }
+        rs.close();
+        if (!exist) {
+            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"observed_properties\" VALUES(?,?)");
             stmtInsert.setString(1, phenomenonId);
+            stmtInsert.setBoolean(2, partial);
             stmtInsert.executeUpdate();
             stmtInsert.close();
             if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
@@ -306,15 +348,32 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)");
                 for (PhenomenonProperty child : composite.getRealComponent()) {
                     final String childID = getPhenomenonId(child);
-                    writePhenomenon(child, c);
+                    writePhenomenon(child, c, false);
                     stmtInsertCompo.setString(1, phenomenonId);
                     stmtInsertCompo.setString(2, childID);
                     stmtInsertCompo.executeUpdate();
                 }
                 stmtInsertCompo.close();
             }
-        } 
-        rs.close();
+        } else if (exist && isPartial) {
+            final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET partial = ?");
+            stmtUpdate.setBoolean(1, false);
+            stmtUpdate.executeUpdate();
+            stmtUpdate.close();
+            if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
+                final CompositePhenomenon composite = (CompositePhenomenon) phenomenonP.getPhenomenon();
+                final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)");
+                for (PhenomenonProperty child : composite.getRealComponent()) {
+                    final String childID = getPhenomenonId(child);
+                    writePhenomenon(child, c, false);
+                    stmtInsertCompo.setString(1, phenomenonId);
+                    stmtInsertCompo.setString(2, childID);
+                    stmtInsertCompo.executeUpdate();
+                }
+                stmtInsertCompo.close();
+            }
+        }
+        
         stmtExist.close();
         return phenomenonId;
     }
@@ -833,12 +892,15 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 return;
             }
             //NEW
-            final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
+            try {
+                final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
+                stmtMes.setString(1, procedureID);
+                stmtMes.executeUpdate();
+                stmtMes.close();
+            } catch (SQLException ex) {
+                LOGGER.warning("Error while trunkating mesure" + pid + " table. Maybe this table is missing");
+            }
             final PreparedStatement stmtObs  = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE \"procedure\"=?");
-            
-            stmtMes.setString(1, procedureID);
-            stmtMes.executeUpdate();
-            stmtMes.close();
             stmtObs.setString(1, procedureID);
             stmtObs.executeUpdate();
             stmtObs.close();

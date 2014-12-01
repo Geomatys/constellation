@@ -140,7 +140,15 @@ public interface IProcessBusiness {
      */
     void stopScheduleTaskParameter (TaskParameter task, Integer userId) throws ConstellationException, ConfigurationException;
 
+    TaskParameter getTaskParameterById(Integer id);
+
     TaskParameter addTaskParameter(TaskParameter taskParameter);
+
+    void updateTaskParameter(TaskParameter taskParameter);
+
+    void deleteTaskParameter(TaskParameter taskParameter);
+
+    List<TaskParameter> findTaskParameterByNameAndProcess(String name, String authority, String code);
 
     /**
      * Test TaskParameter inputs

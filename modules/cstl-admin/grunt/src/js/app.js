@@ -177,8 +177,8 @@ cstlAdminApp
             // remember language
             $translateProvider.useCookieStorage();
         }])
-        .run(['$rootScope', '$location', 'TokenService', 'Account',
-            function($rootScope, $location, TokenService, Account) {
+        .run(['$rootScope', '$location', 'TokenService', 'Account', 'StompService',
+            function($rootScope, $location, TokenService, Account, StompService) {
 
             $rootScope.authenticated=true;
           
@@ -195,10 +195,13 @@ cstlAdminApp
                 window.location.href="index.html";
             });
 
-           $rootScope.hasRole = function(){return false;};
-           
-           
-          
-          
-                    
+            $rootScope.hasRole = function(){return false;};
+
+            // call on window is about to unload its resources (refresh page or close tab)
+            window.addEventListener("beforeunload", function( event ) {
+
+                //disconnect form websocket to avoid BrokenPipe error on server
+                StompService.disconnect();
+            });
+
         }]);

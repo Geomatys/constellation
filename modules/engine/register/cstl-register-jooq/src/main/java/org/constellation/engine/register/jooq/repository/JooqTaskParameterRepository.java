@@ -49,6 +49,13 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
     }
 
     @Override
+    public List<? extends TaskParameter> findAllByNameAndProcess(String name, String authority, String code) {
+        return findBy(Tables.TASK_PARAMETER.NAME.eq(name)
+                .and(Tables.TASK_PARAMETER.PROCESS_AUTHORITY.eq(authority))
+                .and(Tables.TASK_PARAMETER.PROCESS_CODE.eq(code)));
+    }
+
+    @Override
     public TaskParameter create(TaskParameter task ) {
         TaskParameterRecord newRecord = TaskParameterHelper.copy(task, dsl.newRecord(Tables.TASK_PARAMETER));
         newRecord.store();

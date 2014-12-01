@@ -27,13 +27,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
+
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -190,13 +193,15 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
                 worker.setServiceUrl(URL);
                 worker.setLogLevel(Level.FINER);
             } else if (worker == null) {
-                
+
                 serviceBusiness.delete("sos", "default");
+
+                setUpClass();
                 
-                //we write the configuration file
+                // we write the configuration file
                 Automatic SMLConfiguration = new Automatic();
 
-                Automatic OMConfiguration  = new Automatic();
+                Automatic OMConfiguration = new Automatic();
                 OMConfiguration.setDataDirectory(instDirectory.getPath());
                 SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
                 configuration.setObservationReaderType(DataSourceType.FILESYSTEM);

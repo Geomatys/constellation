@@ -14,9 +14,9 @@
  *  Lesser General Public License for more details..
  */
 
-angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('StyleModalController', function($scope, Dashboard, $modalInstance, style, $cookies, dataListing,
+    .controller('StyleModalController', function($scope, Dashboard, $modalInstance, style, $cookieStore, dataListing,
                                                  provider, Growl, textService, newStyle, selectedLayer,selectedStyle,
                                                  serviceName, exclude, $timeout,stylechooser,$modal) {
 
@@ -178,6 +178,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 selectedSymbolizerType:"",
                 selectedSymbolizer:null,
                 filtersEnabled:false,
+                showFilterTextArea:false,
                 filters:[{
                     "attribute":"",
                     "comparator":"=",
@@ -189,7 +190,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     "attribute":"",
                     "min":null,
                     "max":null
-                }
+                },
+                searchVisible:false
             };
         }
         initOptionsSLD();
@@ -750,8 +752,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         bandIdentified = $scope.dataBands[0];
                     }
                     $scope.optionsSLD.rasterPalette.band.selected = bandIdentified;
-                    $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
-                    $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+                    $scope.optionsSLD.rasterPalette.palette.rasterMinValue = Number($scope.optionsSLD.rasterPalette.band.selected.minValue);
+                    $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = Number($scope.optionsSLD.rasterPalette.band.selected.maxValue);
                 }
                 var colorMap = symbolizers[0].colorMap;
                 if(colorMap){
@@ -772,7 +774,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     }
                     var xArray=[],yArray=[];
                     if($scope.dataBandsRepartition[selectedBand]){
-                        var repartitionBand = $scope.dataBandsRepartition[selectedBand].fullDistribution;
+                        var repartitionBand = $scope.dataBandsRepartition[selectedBand].distribution;
                         for(var key in repartitionBand){
                             if(repartitionBand.hasOwnProperty(key)){
                                 xArray.push(key);
@@ -888,7 +890,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 if($scope.optionsSLD.selectedSymbolizerType === 'point'){
                     symbol={
                         "@symbol": 'point',
-                        "name":$scope.optionsSLD.selectedSymbolizerType,
+                        "name":'symbol point',
                         "graphic":{
                             "size":15,
                             "rotation":0,
@@ -1075,10 +1077,12 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 //@TODO ol3 does not have any cql formatter, so needs to write one. good luck.
                 var format = new olext.Format.CQL();
                 var olfilter;
+                var readfailed = false;
                 try {
                     olfilter = format.read(cql);
                 } catch (err) {
                     console.error(err);
+                    readfailed=true;
                 }
                 if(olfilter){
                     $scope.optionsSLD.filters = convertOLFilterToArray(olfilter);
@@ -1091,6 +1095,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         "value":"",
                         "operator":''
                     }];
+                    //show textarea instead of auto form inputs in case of read fail
+                    $scope.optionsSLD.showFilterTextArea = readfailed;
                 }
             }else {
                 $scope.optionsSLD.filtersEnabled=false;
@@ -1204,6 +1210,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          olext.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO = “>=”;
          olext.Filter.Comparison.BETWEEN = “..”;
          olext.Filter.Comparison.LIKE = “~”;
+         olext.Filter.Comparison.ILIKE = “ILIKE”;
          olext.Filter.Comparison.IS_NULL = “NULL”;
          */
         var convertOLComparatorToCQL = function(olType){
@@ -1300,8 +1307,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             $scope.dataBands = response.bands;
                             if($scope.dataBands && $scope.dataBands.length > 0){
                                 $scope.optionsSLD.rasterPalette.band.selected = $scope.dataBands[0];
-                                $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
-                                $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+                                $scope.optionsSLD.rasterPalette.palette.rasterMinValue = Number($scope.optionsSLD.rasterPalette.band.selected.minValue);
+                                $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = Number($scope.optionsSLD.rasterPalette.band.selected.maxValue);
                             }
                         }
                     },
@@ -1317,8 +1324,8 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
          * Fix rzslider bug with angular on value changed for band selector.
          */
         $scope.fixRZSlider = function(){
-            $scope.optionsSLD.rasterPalette.palette.rasterMinValue = $scope.optionsSLD.rasterPalette.band.selected.minValue;
-            $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = $scope.optionsSLD.rasterPalette.band.selected.maxValue;
+            $scope.optionsSLD.rasterPalette.palette.rasterMinValue = Number($scope.optionsSLD.rasterPalette.band.selected.minValue);
+            $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = Number($scope.optionsSLD.rasterPalette.band.selected.maxValue);
         };
 
         /**
@@ -1658,7 +1665,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                                         var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
                                         var xArray=[],yArray=[];
                                         if($scope.dataBandsRepartition[selectedBand]){
-                                            var repartition = $scope.dataBandsRepartition[selectedBand].fullDistribution;
+                                            var repartition = $scope.dataBandsRepartition[selectedBand].distribution;
                                             for(var key in repartition){
                                                 if(repartition.hasOwnProperty(key)){
                                                     xArray.push(key);
@@ -1851,6 +1858,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 colorMap.function.nanColor = null;
             }
 
+            //prevent against string number from input value of slider
+            palette.rasterMinValue = Number(palette.rasterMinValue);
+            palette.rasterMaxValue = Number(palette.rasterMaxValue);
+
             switch (palette.index) {
                 case 1:
                     var delta1 = palette.rasterMaxValue - palette.rasterMinValue;
@@ -2018,7 +2029,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
             if(! $scope.layerName){
                 return;
             }
-
+            DataViewer.initConfig();
             if($scope.selectedLayer && $scope.stylechooser === 'existing'){
                 var styleName = null;
                 if ($scope.selected) {
@@ -2026,10 +2037,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                 }
                 var layerData;
                 if(styleName){
-                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                    layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                         $scope.providerId, styleName,null,null,false);
                 }else {
-                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId,null,true);
+                    layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName, $scope.providerId,null,true);
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
@@ -2055,10 +2066,10 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                         var layerData;
                         if($scope.selectedLayer){
                             if($scope.newStyle.rules.length ===0){
-                                layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName,
+                                layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName,
                                     $scope.providerId,null,true);
                             }else {
-                                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                                     $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                             }
                         }else {
@@ -2066,14 +2077,14 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             if ($scope.dataType.toLowerCase() === 'raster') {
                                 //to avoid layer disappear when rules is empty
                                 if($scope.newStyle.rules.length ===0){
-                                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName,
+                                    layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName,
                                         $scope.providerId,null,true);
                                 }else {
-                                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                    layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                                         $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                                 }
                             }else {
-                                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName,
+                                layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                                     $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                             }
                         }
@@ -2085,13 +2096,13 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                             DataViewer.initMap(mapId);
                             if ($scope.dataBbox) {
                                 var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
-                                DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
+                                DataViewer.zoomToExtent(extent,DataViewer.map.getSize(),true);
                             }
                             else {
                                 $scope.initDataLayerProperties(function(){
                                     if ($scope.dataBbox) {
                                         var extent = [$scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]];
-                                        DataViewer.zoomToExtent(extent,DataViewer.map.getSize());
+                                        DataViewer.zoomToExtent(extent,DataViewer.map.getSize(),true);
                                     }
                                 });
                             }
@@ -2252,7 +2263,7 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
                     function(response){
                         if(response.bands && response.bands.length>0){
                             $scope.dataBandsRepartition = response.bands;
-                            var repartition = response.bands[0].fullDistribution;
+                            var repartition = response.bands[0].distribution;
                             var xArray=[],yArray=[];
                             for(var key in repartition){
                                 if(repartition.hasOwnProperty(key)){
@@ -2409,16 +2420,16 @@ angular.module('cstl-style-edit', ['ngCookies', 'cstl-restapi', 'cstl-services',
         $scope.styleBtnDefault = {"color":'#333333',"background-color":'#ffffff'};
 
         $scope.setAttrToInputSize = function(attrName,symbolizerGraphicOrFont) {
-            symbolizerGraphicOrFont.size = attrName;
+            symbolizerGraphicOrFont.size = '"'+attrName+'"';
         };
         $scope.setAttrToInputRotation = function(attrName,symbolizerGraphic) {
-            symbolizerGraphic.rotation = attrName;
+            symbolizerGraphic.rotation = '"'+attrName+'"';
         };
         $scope.setAttrToInputOpacity = function(attrName,symbolizerGraphic) {
-            symbolizerGraphic.opacity = attrName;
+            symbolizerGraphic.opacity = '"'+attrName+'"';
         };
         $scope.setAttrToInputWidth = function(attrName,symbolizerStroke) {
-            symbolizerStroke.width = attrName;
+            symbolizerStroke.width = '"'+attrName+'"';
         };
 
         /**

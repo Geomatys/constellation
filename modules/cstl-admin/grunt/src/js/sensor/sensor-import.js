@@ -18,9 +18,9 @@
  * limitations under the License.
  */
 
-angular.module('cstl-sensor-import', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-sensor-import', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('SensorAddModalController', function ($rootScope, $scope, $modalInstance, sensor, Growl, $cookies, cfpLoadingBar) {
+    .controller('SensorAddModalController', function ($rootScope, $scope, $modalInstance, sensor, Growl, $cookieStore, cfpLoadingBar) {
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
@@ -34,7 +34,7 @@ angular.module('cstl-sensor-import', ['ngCookies', 'cstl-restapi', 'cstl-service
                 headers: {
                  'X-Auth-Token': $rootScope.authToken
                 },
-                url: $cookies.cstlUrl + "api/1/sensor/upload",
+                url: $cookieStore.get('cstlUrl') + "api/1/sensor/upload",
                 type: 'POST',
                 data: formData,
                 async: false,

@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 <div class="navbar sort-navbar" ng-class="{'advanced-open':dataCtrl.advancedDataSearch==true}">
-                    <div class="navbar-inner">
+                    <div class="navbar-inner navbar-inner-serach">
                         <ul class="nav nav-style">
                             <li ng-click="wrap.ordertype='Name';wrap.orderreverse=!wrap.orderreverse">
                                 <a>
@@ -329,7 +329,7 @@
                                      ng-class="{'col-xs-6':dataCtrl.smallMode}"
                                      style="padding-left:0;">
                                     <div class="item {{dataset.Type? ('dataset-data-'+dataset.Type | lowercase) : 'dataset-data'}}"
-                                         ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id)}"
+                                         ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id), 'style-small':dataCtrl.smallMode}"
                                          ng-click="selectDS(dataset);selectDataSetChild(null,null);"
                                          data-name="{{dataset.Name}}"
                                          ng-show="dataset.Children.length!=1"
@@ -369,7 +369,8 @@
                                          ng-class="{'selected':dataCtrl.selectedDataSetChild && (data.Id==dataCtrl.selectedDataSetChild.Id),
                                                     'col-xs-11':dataCtrl.smallMode && dataset.Children.length>1,
                                                     'child':!dataCtrl.smallMode && dataset.Children.length>1,
-                                                    'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1}"
+                                                    'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1,
+                                                    'style-small':dataCtrl.smallMode}"
                                          ng-click="selectDataSetChild(data,dataset)"
                                          ng-cloak
                                          data-name="{{dataset.Name+':'+data.Name}}">
@@ -622,12 +623,12 @@
                                              style="margin-bottom:5px;">
                                             <button type="button"
                                                     ng-click="unlinkStyle(style.Provider, style.Name, dataCtrl.selectedDataSetChild.Provider, dataCtrl.selectedDataSetChild.Name);"
-                                                    class="btn btn-small">
+                                                    class="btn btn-small btn-block-assos">
                                                 <i class="glyphicon glyphicon-trash"></i>
                                             </button>
                                             <button type="button"
                                                     ng-click="editLinkedStyle(style.Provider, style.Name, dataCtrl.selectedDataSetChild);"
-                                                    class="btn btn-small">
+                                                    class="btn btn-small btn-block-assos">
                                                 <i class="glyphicon glyphicon-pencil"></i>
                                             </button>
                                             {{truncateTitleBlock(style.Name)}}
@@ -636,7 +637,7 @@
                                             <div class="col-xs-12">
                                                 <button type="button"
                                                         ng-click="showStyleList();"
-                                                        class="btn btn-sm pull-right">
+                                                        class="btn btn-sm pull-right btn-block-assos">
                                                     <i class="glyphicon glyphicon-plus"></i>
                                                     <span style="margin-left:5px;"
                                                           translate="label.new.style">Add new style</span>
@@ -676,7 +677,7 @@
                                              ng-repeat="sensorId in dataCtrl.selectedDataSetChild.TargetSensor"
                                              style="margin-bottom:5px;">
                                             <button type="button" ng-click="unlinkSensor(sensorId)"
-                                                    class="btn btn-small">
+                                                    class="btn btn-small btn-block-assos">
                                                 <i class="glyphicon glyphicon-trash"></i>
                                             </button>
                                             {{truncateTitleBlock(sensorId)}}
@@ -686,7 +687,7 @@
                                                 <button type="button"
                                                         ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
                                                         ng-click="showSensorsList();"
-                                                        class="btn btn-sm pull-right">
+                                                        class="btn btn-sm pull-right btn-block-assos">
                                                     <i class="glyphicon glyphicon-plus"></i>
                                                     <span style="margin-left:5px;"
                                                           translate="label.new.sensor">Add new sensor</span>

@@ -70,11 +70,16 @@ import org.constellation.dto.MetadataLists;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.Restriction;
+import org.opengis.metadata.content.CoverageContentType;
+import org.opengis.metadata.content.ImagingCondition;
 import org.opengis.metadata.identification.KeywordType;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.maintenance.ScopeCode;
+import org.opengis.metadata.spatial.CellGeometry;
+import org.opengis.metadata.spatial.DimensionNameType;
 import org.opengis.metadata.spatial.GeometricObjectType;
+import org.opengis.metadata.spatial.PixelOrientation;
 
 
 /**
@@ -474,7 +479,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setSubtype(data.getSubtype());
             db.setSensorable(data.isSensorable());
             db.setTargetSensor(sensorRepository.getLinkedSensors(data));
-            db.setStats(data.getStats());
+            db.setStatsResult(data.getStatsResult());
+            db.setStatsState(data.getStatsState());
             db.setRendered(data.isRendered());
 
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
@@ -638,7 +644,10 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 layerRepository.delete(layer.getId());
             }
 
-            // 2. cleanup provider if empty
+            // 2. unlink from csw
+            dataRepository.removeDataFromAllCSW(data.getId());
+            
+            // 3. cleanup provider if empty
             boolean remove = true;
             for (Data pdata : dataRepository.findByProviderId(data.getProvider())) {
                 if (pdata.isVisible()) {
@@ -788,22 +797,38 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         if (data != null && DataType.COVERAGE.name().equals(data.getType()) &&
                 (data.isRendered() == null || !data.isRendered())) {
             try {
-                final String stats = data.getStats();
-                if (stats != null && !stats.equalsIgnoreCase("PENDING")) {
-                    final ObjectMapper mapper = new ObjectMapper();
-                    final SimpleModule module = new SimpleModule();
-                    module.addDeserializer(ImageStatistics.class, new ImageStatisticDeserializer()); //custom deserializer
-                    mapper.registerModule(module);
-                    return mapper.readValue(stats, ImageStatistics.class);
-                } else {
-                    Future<ImageStatistics> futureStats = dataCoverageJob.asyncUpdateDataStatistics(data.getId());
-                    return futureStats.get();
+                final String state = data.getStatsState();
+                final String result = data.getStatsResult();
+
+                if (state != null) {
+                    switch (state) {
+                        case "PARTIAL" : //fall through
+                        case "COMPLETED" :
+                            return deserializeImageStatistics(result);
+                        case "PENDING" : return null;
+                        case "ERROR" :
+                            //can have partial statistics even if an error occurs.
+                            if (result != null && result.startsWith("{")) {
+                                return deserializeImageStatistics(result);
+                            } else {
+                                return null;
+                            }
+                    }
                 }
-            } catch (IOException | InterruptedException | ExecutionException e) {
+
+            } catch (IOException e) {
                 throw new ConfigurationException("Invalid statistic JSON format for data : "+dataId, e);
             }
         }
         return null;
+    }
+
+    private ImageStatistics deserializeImageStatistics(String state) throws IOException {
+        final ObjectMapper mapper = new ObjectMapper();
+        final SimpleModule module = new SimpleModule();
+        module.addDeserializer(ImageStatistics.class, new ImageStatisticDeserializer()); //custom deserializer
+        mapper.registerModule(module);
+        return mapper.readValue(state, ImageStatistics.class);
     }
 
     /**
@@ -816,19 +841,35 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
     /**
      * {@inheritDoc}
+     * IMPORTANT : Should call only once at server startup after all spring context is initialized.
      */
     @Override
     public void computeEmptyDataStatistics() {
         final List<Data> dataList = dataRepository.findAll();
+
+        List<Integer> dataWithoutStats = new ArrayList<>();
         for (Data data : dataList) {
-            String stats = data.getStats();
 
             //compute statistics only on coverage data not rendered and without previous statistic computed.
             if (DataType.COVERAGE.name().equals(data.getType()) &&
-                    (data.isRendered() == null || !data.isRendered()) &&
-                    (stats == null || stats.isEmpty() || stats.equalsIgnoreCase("PENDING") )) {
-                dataCoverageJob.asyncUpdateDataStatistics(data.getId());
+                    (data.isRendered() == null || !data.isRendered())) {
+
+                String state = data.getStatsState();
+                if ("PENDING".equalsIgnoreCase(state)) {
+                    data.setStatsState(null);
+                    data.setStatsResult(null);
+                    dataRepository.update(data);
+                    dataWithoutStats.add(data.getId());
+                }
+
+                if (state == null || state.isEmpty()) {
+                    dataWithoutStats.add(data.getId());
+                }
             }
+        }
+
+        for (Integer dataId : dataWithoutStats) {
+            dataCoverageJob.asyncUpdateDataStatistics(dataId);
         }
     }
 
@@ -961,6 +1002,57 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(restrictionCodes);
         mdList.setRestrictionCodes(restrictionCodes);
+        
+        final List<String> dimensionNameTypeCodes = new LinkedList<>();
+        for (final DimensionNameType cl : DimensionNameType.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            dimensionNameTypeCodes.add(codeListName);
+        }
+        Collections.sort(dimensionNameTypeCodes);
+        mdList.setDimensionNameTypeCodes(dimensionNameTypeCodes);
+        
+        final List<String> coverageContentTypeCodes = new LinkedList<>();
+        for (final CoverageContentType cl : CoverageContentType.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            coverageContentTypeCodes.add(codeListName);
+        }
+        Collections.sort(coverageContentTypeCodes);
+        mdList.setCoverageContentTypeCodes(coverageContentTypeCodes);
+        
+        final List<String> imagingConditionCodes = new LinkedList<>();
+        for (final ImagingCondition cl : ImagingCondition.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            imagingConditionCodes.add(codeListName);
+        }
+        Collections.sort(imagingConditionCodes);
+        mdList.setImagingConditionCodes(imagingConditionCodes);
+        
+        final List<String> cellGeometryCodes = new LinkedList<>();
+        for (final CellGeometry cl : CellGeometry.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            cellGeometryCodes.add(codeListName);
+        }
+        Collections.sort(cellGeometryCodes);
+        mdList.setCellGeometryCodes(cellGeometryCodes);
+        
+        //for pixel orientation codes
+        final List<String> pixelOrientationCodes = new LinkedList<>();
+        for (final PixelOrientation cl : PixelOrientation.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            pixelOrientationCodes.add(codeListName);
+        }
+        Collections.sort(pixelOrientationCodes);
+        mdList.setPixelOrientationCodes(pixelOrientationCodes);
         
         //for Scope codes
         final List<String> scopeCodes = new LinkedList<>();

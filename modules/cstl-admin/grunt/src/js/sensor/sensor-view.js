@@ -18,21 +18,25 @@
  * limitations under the License.
  */
 
-angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('SensorModalController', function($scope, $modalInstance, $modal, $cookies, sos, service, sensorId, Growl, $http) {
+    .controller('SensorModalController', function($scope, $modalInstance, $modal, $cookieStore, sos, service, sensorId, Growl, $http, StompService) {
         $scope.service = service;
         $scope.sensorId = sensorId;
         $scope.measures = undefined;
         $scope.var = {
             displayGraph:  false,
+            displayRealTimeGraph:  false,
+            displayMesureSelector: true,
             needToSelectMeasure: false,
             start: '',
-            end: ''
+            end: '',
+            sosdata: []
         };
 
-        $scope.init = function() {
-            sos.measuresForSensor({id: service.identifier, 'sensorID': sensorId}, function(measures){
+        $scope.initSensorView = function() {
+            StompService.connect();
+            sos.measuresForSensor({id: service.identifier},{value: sensorId}, function(measures){
                 var oldMeasures = $scope.measures;
 
                 $scope.measures = [];
@@ -55,18 +59,23 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
         };
 
         $scope.initMap = function() {
-            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp",null,true);
-            sos.getFeatures({id: $scope.service.identifier, sensor: $scope.sensorId}, function(wkt) {
+            DataViewer.initConfig();
+            sos.getFeatures({id: $scope.service.identifier},{value: $scope.sensorId}, function(wkt) {
                 var wktReader = new ol.format.WKT();
-                var features = wktReader.readFeatures(wkt.value);
+                var features = wktReader.readFeatures(wkt.value,{"dataProjection":ol.proj.get('EPSG:4326'),
+                                                                 "featureProjection":ol.proj.get(DataViewer.projection)});
                 if (features) {
                     var newLayer = DataViewer.createSensorsLayer($scope.sensorId);
                     determineGeomClass(features, newLayer);
-                    newLayer.addFeatures(features);
-                    DataViewer.layers = [layerBackground, newLayer];
+                    newLayer.getSource().addFeatures(features);
+                    DataViewer.layers = [newLayer];
                     DataViewer.initMap('olSensorMap');
+                    // select interaction working on "click"
+                    window.selectClick = new ol.interaction.Select({
+                        condition: ol.events.condition.click
+                    });
+                    DataViewer.map.addInteraction(window.selectClick);
                 } else {
-                    DataViewer.layers = [layerBackground];
                     DataViewer.initMap('olSensorMap');
                 }
             });
@@ -108,6 +117,13 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
             return allMeasures;
         }
 
+        $scope.displaySelector = function(){
+            $scope.var.displayMesureSelector=true;
+            $scope.var.displayGraph=false;
+            $scope.var.displayRealTimeGraph=false;
+            $scope.var.topic.unsubscribe();
+        };
+
         $scope.showGraph = function() {
             var measuresChecked = getMeasuresChecked();
             if (measuresChecked.length === 0) {
@@ -120,7 +136,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
                     return;
                 }
             }
-
+            $scope.var.displayMesureSelector = false;
             $scope.var.displayGraph = true;
 
             var obsFilter = {
@@ -136,6 +152,67 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
                     generateD3Graph(response, measuresChecked);
                 });
         };
+
+
+
+        $scope.showRealTimeGraph = function() {
+            var measuresChecked = getMeasuresChecked();
+            if (measuresChecked.length === 0) {
+                var allMeasures = getAllMeasures();
+                if (allMeasures.length === 1) {
+                    measuresChecked = allMeasures;
+                } else {
+                    // Please select one or more measure(s) in the list
+                    $scope.var.needToSelectMeasure = true;
+                    return;
+                }
+            }
+            $scope.var.displayMesureSelector = false;
+            $scope.var.displayRealTimeGraph = true;
+
+            var t = new Date();
+            $scope.var.sosdata.push([t,0]);
+
+
+            var g = new Dygraph((jQuery("#sos_realtime_graph")[0]), $scope.var.sosdata,
+                {
+                    drawPoints: true,
+                    showRoller: true,
+                    valueRange: [0.0, 12],
+                    ylabel: measuresChecked,
+                    labels: ['Time', measuresChecked]
+                });
+            g.resize(jQuery("#sos_realtime_graph").width(), jQuery("#sos_realtime_graph").height());
+            
+
+            $scope.var.topic = StompService.subscribe('/topic/sosevents/'+$scope.sensorId, function(data) {
+                var event = JSON.parse(data.body);
+                var arrayLength = event.headers.length;
+                for (var i = 0; i < arrayLength; i++) {
+
+                    if (event.headers[i].toLowerCase() === measuresChecked[0].toLowerCase()){
+                        var x = new Date();  // current time
+                        var y = event.values.split(event.tokenSeparator)[i];
+                        var sosdata = $scope.var.sosdata;
+                        sosdata.push([x, y]);
+                        if (sosdata.length > 20){
+                            sosdata.shift();
+                        }
+                        g.updateOptions( { 'file': sosdata } );
+                        var maxy = g.getOption('valueRange')[1];
+                        if (y > maxy){
+                            g.updateOptions( {valueRange:  [0.0, (parseFloat(y)+parseFloat(5))]});
+                        }
+                    }
+                }
+            });
+        };
+
+
+
+        $scope.$on('$destroy', function() {
+            $scope.var.topic.unsubscribe();
+        });
 
         $scope.clickMeasure = function(measure) {
             $scope.var.needToSelectMeasure = false;
@@ -164,7 +241,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
             var line;
             if (measures.length === 1) {
                 line = d3.svg.line()
-                    .x(function (d) { return x(d.time); })
+                    .x(function (d) { return x(d.Time); })
                     .y(function (d) { return y(d[measures[0]]); });
             } else {
                 line = d3.svg.line()
@@ -188,7 +265,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
             data.forEach(function(d) {
                 if (measures.length === 1) {
-                    d.time = parseDate(d.time);
+                    d.Time = parseDate(d.Time);
                     d[measures[0]] = +d[measures[0]];
                 } else {
                     d[measures[0]] = +d[measures[0]];
@@ -198,7 +275,7 @@ angular.module('cstl-sensor-view', ['ngCookies', 'cstl-restapi', 'cstl-services'
 
             if (measures.length === 1) {
                 x.domain(d3.extent(data, function (d) {
-                    return d.time;
+                    return d.Time;
                 }));
                 y.domain(d3.extent(data, function (d) {
                     return d[measures[0]];

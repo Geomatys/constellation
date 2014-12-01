@@ -41,6 +41,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.Cache;
 import org.apache.sis.util.logging.Logging;
@@ -61,6 +62,8 @@ import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.io.wkt.PrjFiles;
 import org.geotoolkit.referencing.CRS;
@@ -154,21 +157,39 @@ public final class ProviderRest {
 
     @POST
     @Path("/{id}/createprj")
-    public Response createPrj(final @PathParam("domainId") int domainId, final @PathParam("id") String providerIdentifier, Map<String,String> epsgCode) throws DataStoreException, FactoryException, IOException {
+    public Response createPrj(final @PathParam("domainId") int domainId,
+                              final @PathParam("id") String providerIdentifier,
+                              final Map<String,String> epsgCode) throws DataStoreException, FactoryException, IOException {
         final DataProvider provider = DataProviders.getInstance().getProvider(providerIdentifier);
-        if (provider.getMainStore() instanceof DataFileStore){
-            File[] dataFiles = ((DataFileStore) provider.getMainStore()).getDataFiles();
-            if (dataFiles.length == 1 && dataFiles[0].isDirectory()){
-                dataFiles = dataFiles[0].listFiles();
-            }
-            final String fileNameWithoutExtention = dataFiles[0].getName().substring(0, dataFiles[0].getName().indexOf('.'));
-            final String parentPath = dataFiles[0].getParentFile().getAbsolutePath();
-            final CoordinateReferenceSystem coordinateReferenceSystem = CRS.decode(epsgCode.get("codeEpsg"));
-            PrjFiles.write(coordinateReferenceSystem, new File(parentPath+File.separator+fileNameWithoutExtention+".prj"));
-            provider.reload();
+        final DataStore datastore = provider.getMainStore();
+        if (datastore instanceof DataFileStore){
+            proceedToCreatePrj(provider,(DataFileStore)datastore,epsgCode);
             return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+        }else if(datastore instanceof ExtendedFeatureStore) {
+            final ExtendedFeatureStore efs = (ExtendedFeatureStore) datastore;
+            final FeatureStore fstore = efs.getWrapped();
+            if(fstore instanceof DataFileStore) {
+                proceedToCreatePrj(provider,(DataFileStore)fstore,epsgCode);
+                return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+            }
         }
-        return Response.status(500).build();
+        return Response.status(500).entity("Cannot creates the prj file for the data. the operation is not implemented yet for this format!").build();
+    }
+
+    private void proceedToCreatePrj(final DataProvider provider,
+                                    final DataFileStore dataFileStore,
+                                    final Map<String,String> epsgCode) throws DataStoreException,FactoryException,IOException {
+        File[] dataFiles = dataFileStore.getDataFiles();
+        if(dataFiles == null) return;
+        if (dataFiles.length == 1 && dataFiles[0].isDirectory()){
+            dataFiles = dataFiles[0].listFiles();
+        }
+        if(dataFiles == null || dataFiles.length==0) return;
+        final String fileNameWithoutExtention = dataFiles[0].getName().substring(0, dataFiles[0].getName().indexOf('.'));
+        final String parentPath = dataFiles[0].getParentFile().getAbsolutePath();
+        final CoordinateReferenceSystem coordinateReferenceSystem = CRS.decode(epsgCode.get("codeEpsg"));
+        PrjFiles.write(coordinateReferenceSystem, new File(parentPath+File.separator+fileNameWithoutExtention+".prj"));
+        provider.reload();
     }
 
     /**

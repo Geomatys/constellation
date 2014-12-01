@@ -142,11 +142,4 @@ angular.module('cstl-webservice-dashboard', ['cstl-restapi', 'cstl-services', 'p
                 function() { Growl('error','Error','Search index for the service '+ service.name +' failed to be updated'); }
             );
         };
-
-        $scope.getLayersCount = function(service) {
-            if (service.layersNumber) {
-                return service.layersNumber;
-            }
-            return 0;
-        };
     });

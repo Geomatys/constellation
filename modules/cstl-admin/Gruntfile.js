@@ -39,6 +39,7 @@ module.exports = function(grunt) {
                         "d3":false,
                         "Stomp":false,
                         "SockJS":false,
+                        "Dygraph":false,
                         "c3":false,
                         "dataNotReady":true,
                         "cstlAdminApp":true,
@@ -208,7 +209,8 @@ module.exports = function(grunt) {
                         '<%= lib_dir %>/ol3/js/olext/CQL.js'
                     ],
                     '<%= target_dir %>/js/sockjs.min.js': '<%= lib_dir %>/sockjs/js/*.js',
-                    '<%= target_dir %>/js/stomp.min.js': '<%= lib_dir %>/stomp/js/*.js'
+                    '<%= target_dir %>/js/stomp.min.js': '<%= lib_dir %>/stomp/js/*.js',
+                    '<%= target_dir %>/js/dygraph.min.js': '<%= lib_dir %>/dygraph/js/*.js'
                 }
             }
         },

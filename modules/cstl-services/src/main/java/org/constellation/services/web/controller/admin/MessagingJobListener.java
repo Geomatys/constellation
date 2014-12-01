@@ -21,6 +21,7 @@ package org.constellation.services.web.controller.admin;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.constellation.admin.dto.TaskStatusDTO;
+import org.constellation.sos.io.om2.OM2ResultEventDTO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.annotation.PostConstruct;
@@ -53,5 +54,11 @@ public class MessagingJobListener  {
     public void onBusEvent(TaskStatusDTO taskStatus) {
         template.convertAndSend("/topic/taskevents", taskStatus);
         template.convertAndSend("/topic/taskevents/"+taskStatus.getTaskId(), taskStatus);
+    }
+
+
+    @Subscribe
+    public void onBusEvent(OM2ResultEventDTO sosResult) {
+        template.convertAndSend("/topic/sosevents/"+sosResult.getProcedureID(), sosResult);
     }
 }

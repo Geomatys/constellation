@@ -130,7 +130,7 @@
                         <div class="item-list">
                             <div class="item style-{{style.Type | lowercase}}"
                                  ng-repeat="style in wrap.dataList"
-                                 ng-class="{selected:style.Id==selected.Id, 'col-xs-6':small==true}"
+                                 ng-class="{selected:style.Id==selected.Id, 'col-xs-6':small==true, 'style-small': small}"
                                  ng-click="select(style)">
                                 <div class="top">
                                     <span class="item-title" title="{{style.Name}}">{{truncate(small,style.Name)}}</span>
@@ -191,7 +191,7 @@
                             </div>
                             <div class="block-action block-action-style">
                                 <div class="row" style="padding-bottom: 5px">
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
                                         <span class="tooltipicon">
                                             <button type="button"
                                                     id="editStyleBtn"
@@ -203,7 +203,7 @@
                                             </button>
                                         </span>
                                     </div>
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
                                         <span class="tooltipicon">
                                             <button type="button"
                                                     id="deleteStyleBtn"

@@ -227,7 +227,7 @@ public final class TaskRest {
             if (cstlUser.isPresent()) {
                 taskParameter.setOwner(cstlUser.get().getId());
                 taskParameter.setDate(System.currentTimeMillis());
-                taskParameterRepository.create(taskParameter);
+                processBusiness.addTaskParameter(taskParameter);
                 return Response.ok().status(Response.Status.CREATED).type(MediaType.TEXT_PLAIN_TYPE).build();
             } else {
                 return Response.status(Response.Status.EXPECTATION_FAILED).build();
@@ -244,7 +244,7 @@ public final class TaskRest {
     public Response updateParamsTask(final TaskParameter taskParameter) throws ConfigurationException {
         try {
             processBusiness.testTaskParameter(taskParameter);
-            taskParameterRepository.update(taskParameter);
+            processBusiness.updateTaskParameter(taskParameter);
             return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         } catch (ConfigurationException ex) {
             final AcknowlegementType failure = new AcknowlegementType("Failure", "Failed to create task : " + ex.getMessage());
@@ -256,7 +256,7 @@ public final class TaskRest {
     @Path("params/get/{id}")
     @RolesAllowed("cstl-admin")
     public Response getParamsTask(final @PathParam("id") Integer id) {
-        final TaskParameter taskParameter = taskParameterRepository.get(id);
+        final TaskParameter taskParameter = processBusiness.getTaskParameterById(id);
         if (taskParameter != null) {
             return Response.ok(taskParameter).build();
         }
@@ -267,9 +267,9 @@ public final class TaskRest {
     @Path("params/delete/{id}")
     @RolesAllowed("cstl-admin")
     public Response deleteParamsTask(final @PathParam("id") Integer id) {
-        final TaskParameter taskParameter = taskParameterRepository.get(id);
+        final TaskParameter taskParameter = processBusiness.getTaskParameterById(id);
         if (taskParameter != null) {
-            taskParameterRepository.delete(taskParameter);
+            processBusiness.deleteTaskParameter(taskParameter);
             return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
@@ -282,7 +282,7 @@ public final class TaskRest {
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 
         if (cstlUser.isPresent()) {
-            final TaskParameter taskParameter = taskParameterRepository.get(taskParameterIdForTemplate);
+            final TaskParameter taskParameter = processBusiness.getTaskParameterById(taskParameterIdForTemplate);
             taskParameter.setId(null);
             taskParameter.setName(taskParameter.getName()+"(COPY)");
             taskParameter.setOwner(cstlUser.get().getId());
@@ -304,7 +304,7 @@ public final class TaskRest {
         if (!cstlUser.isPresent()) {
             throw new ConstellationException("operation not allowed without login");
         }
-        final TaskParameter taskParameter = taskParameterRepository.get(id);
+        final TaskParameter taskParameter = processBusiness.getTaskParameterById(id);
         final String title = taskParameter.getName()+" "+TASK_DATE.format(new Date());
 
         try {
@@ -327,7 +327,7 @@ public final class TaskRest {
             throw new ConstellationException("operation not allowed without login");
         }
         final Date now = new Date();
-        final TaskParameter taskParameter = taskParameterRepository.get(id);
+        final TaskParameter taskParameter = processBusiness.getTaskParameterById(id);
         final String title = taskParameter.getName()+" "+TASK_DATE.format(now);
 
         try {
@@ -348,7 +348,7 @@ public final class TaskRest {
         if (!cstlUser.isPresent()) {
             throw new ConstellationException("operation not allowed without login");
         }
-        final TaskParameter taskParameter = taskParameterRepository.get(id);
+        final TaskParameter taskParameter = processBusiness.getTaskParameterById(id);
 
         try {
             processBusiness.stopScheduleTaskParameter(taskParameter, cstlUser.get().getId());
@@ -466,7 +466,7 @@ public final class TaskRest {
         status.setStart(task.getStart());
         status.setEnd(task.getEnd());
 
-        final TaskParameter taskParameter = taskParameterRepository.get( task.getTaskParameterId());
+        final TaskParameter taskParameter = processBusiness.getTaskParameterById(task.getTaskParameterId());
         status.setTitle(taskParameter.getName());
         return status;
     }

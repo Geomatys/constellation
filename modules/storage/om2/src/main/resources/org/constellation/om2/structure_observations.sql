@@ -2,7 +2,7 @@ CREATE TABLE "version" (
     "number"   character varying(10) NOT NULL
 );
 
-INSERT INTO "version" VALUES ('1.0.1');
+INSERT INTO "version" VALUES ('1.0.2');
 
 CREATE SCHEMA "om";
 
@@ -50,7 +50,8 @@ CREATE TABLE "om"."offering_foi" (
 );
 
 CREATE TABLE "om"."observed_properties" (
-    "id" character varying(200) NOT NULL
+    "id" character varying(200) NOT NULL,
+    "partial" integer NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "om"."procedures" (

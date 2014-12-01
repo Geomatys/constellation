@@ -1,7 +1,7 @@
 <form class="form-horizontal form-style" role="form">
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="edition.style.label.name">Name</label>
-        <div class="col-sm-5">
+        <div class="col-sm-8 col-md-9">
             <input type="text"
                    class="form-control form-control-fix"
                    ng-model="symbolizer.name"
@@ -11,13 +11,13 @@
     <hr/>
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.label">Label</label>
-        <div class="col-sm-8 col-md-6">
+        <div class="col-sm-6 col-md-7">
             <input type="text"
                    class="form-control form-control-fix"
                    ng-model="symbolizer.label"
                    debounce="200"/>
         </div>
-        <div class="col-sm-offset-4 col-sm-1 col-md-offset-0">
+        <div class="col-sm-1 col-md-2 div-padding-left-0">
             <button type="button"
                     class="btn btn-default"
                     ng-style="dispPropNames?styleBtnSelected:styleBtnDefault"
@@ -39,7 +39,7 @@
     </div>
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.font">Font</label>
-        <div class="col-sm-6">
+        <div class="col-sm-6 col-md-7">
             <select class="form-control form-control-fix"
                     ng-init="$parent.initFontFamilies(symbolizer)"
                     ng-model="symbolizer.font.family[0]">
@@ -58,14 +58,14 @@
         <label class="col-xs-4 col-sm-4 col-md-3 col-lg-3 control-label"
                translate="sldeditor.edition.size">Size</label>
         <div class="col-xs-8 col-sm-8 col-md-9 col-lg-9">
-            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7"
+            <div class="col-xs-7 col-sm-7 col-md-8 col-lg-8 div-padding-left-0"
                  ng-show="isExpressionNumber(symbolizer.font.size) && !advTSize">
                 <input class="slider"
                        type="range"
                        ng-model="symbolizer.font.size" max="50" min="1" step="1"
                        debounce="200"/>
             </div>
-            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"
+            <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2 div-padding-left-0"
                  ng-show="isExpressionNumber(symbolizer.font.size) && !advTSize">
                 <input class="form-control form-control-fix"
                        style="padding: 6px 4px;"

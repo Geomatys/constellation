@@ -15,7 +15,6 @@
  */
 angular.module('CstlAdminDep', [
     // Angular official modules.
-    'ngCookies',
     'ngResource',
     'ngRoute',
     'ngAnimate',

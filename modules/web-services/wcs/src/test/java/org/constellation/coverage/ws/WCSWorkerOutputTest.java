@@ -74,7 +74,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles("standard")
+@ActiveProfiles({"standard","derby"})
 public class WCSWorkerOutputTest extends WCSWorkerInit {
     /**
      * Ensures that a PostGRID layer preconfigured is found in the GetCapabilities document

@@ -43,6 +43,11 @@ public class MetadataLists implements Serializable {
     private List<String> keywordTypeCodes;
     private List<String> restrictionCodes;
     private List<String> scopeCodes;
+    private List<String> pixelOrientationCodes;
+    private List<String> cellGeometryCodes;
+    private List<String> dimensionNameTypeCodes;
+    private List<String> imagingConditionCodes;
+    private List<String> coverageContentTypeCodes;
 
     public MetadataLists() {
     }
@@ -56,10 +61,15 @@ public class MetadataLists implements Serializable {
             this.maintenanceFrequencyCodes= m.maintenanceFrequencyCodes;
             this.geometricObjectTypeCodes= m.geometricObjectTypeCodes;
             this.classificationCodes= m.classificationCodes;
-            this.characterSetCodes= m.classificationCodes;
+            this.characterSetCodes= m.characterSetCodes;
             this.keywordTypeCodes= m.keywordTypeCodes;
             this.restrictionCodes = m.restrictionCodes;
             this.scopeCodes = m.scopeCodes;
+            this.pixelOrientationCodes = m.pixelOrientationCodes;
+            this.cellGeometryCodes = m.cellGeometryCodes;
+            this.dimensionNameTypeCodes = m.dimensionNameTypeCodes;
+            this.imagingConditionCodes = m.imagingConditionCodes;
+            this.coverageContentTypeCodes = m.coverageContentTypeCodes;
         }
     }
 
@@ -149,5 +159,45 @@ public class MetadataLists implements Serializable {
 
     public void setScopeCodes(List<String> scopeCodes) {
         this.scopeCodes = scopeCodes;
+    }
+    
+    public List<String> getPixelOrientationCodes() {
+        return pixelOrientationCodes;
+    }
+
+    public void setPixelOrientationCodes(List<String> pixelOrientationCodes) {
+        this.pixelOrientationCodes = pixelOrientationCodes;
+    }
+    
+    public List<String> getCellGeometryCodes() {
+        return cellGeometryCodes;
+    }
+
+    public void setCellGeometryCodes(List<String> cellGeometryCodes) {
+        this.cellGeometryCodes = cellGeometryCodes;
+    }
+    
+    public List<String> getDimensionNameTypeCodes() {
+        return dimensionNameTypeCodes;
+    }
+
+    public void setDimensionNameTypeCodes(List<String> dimensionNameTypeCodes) {
+        this.dimensionNameTypeCodes = dimensionNameTypeCodes;
+    }
+    
+    public List<String> getImagingConditionCodes() {
+        return imagingConditionCodes;
+    }
+
+    public void setImagingConditionCodes(List<String> imagingConditionCodes) {
+        this.imagingConditionCodes = imagingConditionCodes;
+    }
+    
+    public List<String> getCoverageContentTypeCodes() {
+        return coverageContentTypeCodes;
+    }
+
+    public void setCoverageContentTypeCodes(List<String> coverageContentTypeCodes) {
+        this.coverageContentTypeCodes = coverageContentTypeCodes;
     }
 }

@@ -69,8 +69,8 @@
                         </div>
 
                         <div class="item-list">
-                            <div ng-repeat="task in wrap.dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
-                                <div class="item registry" ng-class="{selected:task==selected}" ng-click="select(task);">
+                            <div ng-repeat="task in wrap.dataList" ng-class="{'col-xs-6':small}" style="padding-left:0;">
+                                <div class="item registry" ng-class="{selected:task==selected, 'style-small':small}" ng-click="select(task);">
                                     <div class="top">
                                         <span class="item-title" title="{{task.name}}">{{truncate(small,task.name)}} </span>
                                     </div>
@@ -83,7 +83,7 @@
                                             <div ng-if="task.statusList.length > 0">
                                                 <i class="fa fa-paperclip"></i>
                                                 <span ng-if="task.statusList.length > 0">{{task.statusList.length}}</span>
-                                                <span translate="service.edit.dashboard.tasks.list.associated">associated tasks</span>
+                                                <span translate="service.edit.dashboard.tasks.list.associated" ng-class="{hide:small}">associated tasks</span>
                                             </div>
                                             <!--<span ng-if="task.statusList == null ||task.statusList.length == 0" translate="md.listing.no.data">No</span>-->
                                         </div>
@@ -92,7 +92,7 @@
 
                                 <div class="item process-child" style="margin-top:0;" ng-if="task==selected"
                                      ng-repeat="exec in task.statusList | filter:{ status: 'RUNNING'}"
-                                     ng-class="{'selected':process===selectedProcessChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}">
+                                     ng-class="{'selected':process===selectedProcessChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small, 'style-small':small}">
                                     <div class="top">
                                         <div class="progress progress-striped" style="margin:5px;">
                                             <div class="progress-bar progress-bar-success" role="progressbar"

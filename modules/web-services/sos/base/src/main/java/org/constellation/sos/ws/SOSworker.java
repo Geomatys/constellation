@@ -2097,7 +2097,6 @@ public class SOSworker extends AbstractWorker {
             // and we record the position of the piezometer
             final AbstractGeometry position = getSensorPosition(process);
             if (omWriter != null) {
-                omWriter.recordProcedureLocation(id, position);
 
                 //we assign the new capteur id to the observation template
                 temp.setProcedure(id);
@@ -2105,6 +2104,9 @@ public class SOSworker extends AbstractWorker {
                 
                 //we write the observation template in the O&M database
                 omWriter.writeObservationTemplate(temp);
+                
+                omWriter.recordProcedureLocation(id, position);
+                
                 assignedOffering = addSensorToOffering(num, temp, currentVersion);
             } else {
                 LOGGER.warning("unable to record Sensor template and location in O&M datasource: no O&M writer");

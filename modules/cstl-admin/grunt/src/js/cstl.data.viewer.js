@@ -22,6 +22,13 @@ window.DataViewer = {
     maxExtent : undefined, //the maximum extent for the given projection
     addBackground : true,
 
+    initConfig : function() {
+        DataViewer.layers = [];
+        DataViewer.extent = [-180, -85, 180, 85];
+        DataViewer.projection = 'EPSG:3857';
+        DataViewer.addBackground = true;
+    },
+
     initMap : function(mapId){
         //unbind the old map
         if (DataViewer.map) {
@@ -81,7 +88,7 @@ window.DataViewer = {
         return (n === Number.POSITIVE_INFINITY || n === Number.NEGATIVE_INFINITY || isNaN(n));
     },
 
-    zoomToExtent : function(extent,size){
+    zoomToExtent : function(extent,size,postZoom){
         var projection = ol.proj.get(DataViewer.projection);
         var reprojExtent = ol.proj.transform(extent, 'EPSG:4326', DataViewer.projection);
         if(Array.isArray(reprojExtent)){
@@ -94,7 +101,9 @@ window.DataViewer = {
             }
         }
         DataViewer.map.getView().fitExtent(reprojExtent, size);
-        DataViewer.map.getView().setZoom(DataViewer.map.getView().getZoom()+1);
+        if(postZoom) {
+            DataViewer.map.getView().setZoom(DataViewer.map.getView().getZoom()+1);
+        }
     },
 
     createLayer : function(cstlUrlPrefix, layerName, providerId, filter, tiled){
@@ -255,23 +264,19 @@ window.DataViewer = {
                         }))
                     })]
         };
-        // select interaction working on "click"
-        window.selectClick = new ol.interaction.Select({
-            condition: ol.events.condition.click
-        });
-        DataViewer.map.addInteraction(window.selectClick);
 
         var layer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 features: []
             }),
             style: function(feature, resolution) {
-                var selectedFeatures = window.selectClick.getFeatures();
-                if(selectedFeatures && feature === selectedFeatures[0]){
-                    return stylesMap.select;
-                } else {
-                    return stylesMap.default;
+                if(window.selectClick){
+                    var selectedFeatures = window.selectClick.getFeatures();
+                    if(selectedFeatures && feature === selectedFeatures[0]){
+                        return stylesMap.select;
+                    }
                 }
+                return stylesMap.default;
             }
         });
         layer.set('name', layerName);

@@ -18,6 +18,7 @@
  */
 package org.constellation.admin;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
@@ -83,6 +84,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -272,8 +274,28 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @Override
+    public TaskParameter getTaskParameterById(Integer id) {
+        return taskParameterRepository.get(id);
+    }
+
+    @Override
     public TaskParameter addTaskParameter(TaskParameter taskParameter) {
         return taskParameterRepository.create(taskParameter);
+    }
+
+    @Override
+    public void updateTaskParameter(TaskParameter taskParameter) {
+        taskParameterRepository.update(taskParameter);
+    }
+
+    @Override
+    public void deleteTaskParameter(TaskParameter taskParameter) {
+        taskParameterRepository.delete(taskParameter);
+    }
+
+    @Override
+    public List<TaskParameter> findTaskParameterByNameAndProcess(String name, String authority, String code) {
+        return (List<TaskParameter>) taskParameterRepository.findAllByNameAndProcess(name, authority, code);
     }
 
     @Override
@@ -387,11 +409,8 @@ public class ProcessBusiness implements IProcessBusiness {
         } catch (SchedulerException e) {
             throw new ConstellationException(e);
         }
-        LOGGER.info("Scheduler task added : {0}, {1}   type : {2}.{3}", new Object[]{
-                quartzTask.getId(),
-                quartzTask.getTitle(),
-                quartzTask.getDetail().getFactoryIdentifier(),
-                quartzTask.getDetail().getProcessIdentifier()});
+        LOGGER.info("Scheduler task added : "+quartzTask.getId()+", "+quartzTask.getTitle()
+                        +"   type : "+quartzTask.getDetail().getFactoryIdentifier()+"."+quartzTask.getDetail().getProcessIdentifier());
     }
 
     /**
@@ -575,10 +594,12 @@ public class ProcessBusiness implements IProcessBusiness {
                     Date endDate = null;
                     if (trigger.contains("{")) {
                         ObjectMapper jsonMapper = new ObjectMapper();
+                        jsonMapper.configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true);
+
                         Map map = jsonMapper.readValue(trigger, Map.class);
 
                         cronExp = (String) map.get("cron");
-                        long endDateMs = (long) map.get("endDate");
+                        long endDateMs =  ((BigInteger)map.get("endDate")).longValue();
                         if (endDateMs > 0) {
                             endDate = new Date(endDateMs);
                         }

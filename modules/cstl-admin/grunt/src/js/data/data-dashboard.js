@@ -18,10 +18,10 @@
  * limitations under the License.
  */
 
-angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('DataController', function($scope, $routeParams, $location, Dashboard, webService, dataListing, datasetListing, DomainResource,
-                                            provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookies, cfpLoadingBar) {
+                                            provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookieStore, cfpLoadingBar) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -29,8 +29,8 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
         $scope.wrap.matchExactly = true;
 
         $scope.dataCtrl = {
-            cstlUrl : $cookies.cstlUrl,
-            domainId : $cookies.cstlActiveDomainId,
+            cstlUrl : $cookieStore.get('cstlUrl'),
+            domainId : $cookieStore.get('cstlActiveDomainId'),
             advancedDataSearch : false,
             advancedMetadataSearch : false,
             searchTerm : "",
@@ -431,8 +431,10 @@ angular.module('cstl-data-dashboard', ['ngCookies', 'cstl-restapi', 'cstl-servic
                     var layerName = $scope.dataCtrl.selectedDataSetChild.Name;
                     var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
 
-                    dataListing.hideData({providerid: providerId, dataid: layerName},
-                        {value : $scope.dataCtrl.selectedDataSetChild.Namespace},
+                    dataListing.hideData({},
+                        {providerIdentifier:providerId,
+                         dataIdentifier:layerName,
+                         dataNmsp : $scope.dataCtrl.selectedDataSetChild.Namespace},
                         function() {//success
                             Growl('success','Success','Data '+ layerName +' successfully deleted');
                             datasetListing.listAll({}, function(response) {
