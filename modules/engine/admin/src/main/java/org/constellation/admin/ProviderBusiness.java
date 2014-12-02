@@ -6,14 +6,13 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.ProviderType;
-import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.engine.register.*;
-import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
@@ -33,6 +32,7 @@ import org.geotoolkit.observation.ObservationStoreFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.storage.DataStoreFactory;
+import org.geotoolkit.util.FileUtilities;
 import org.opengis.metadata.Identifier;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -82,12 +82,6 @@ public class ProviderBusiness implements IProviderBusiness {
 
     @Inject
     private ProviderRepository providerRepository;
-    
-    @Inject
-    private DatasetRepository datasetRepository;
-
-    @Inject
-    private IDatasetBusiness datasetBusiness;
 
     @Inject
     private org.constellation.security.SecurityManager securityManager;
@@ -131,7 +125,15 @@ public class ProviderBusiness implements IProviderBusiness {
     public void removeAll() {
         final List<Provider> providers = providerRepository.findAll();
         for (Provider p : providers) {
+            final DataProvider dp = DataProviders.getInstance().getProvider(p.getIdentifier());
+            try{
+                DataProviders.getInstance().removeProvider(dp);
+            }catch(ConfigurationException ex){
+                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            }
             providerRepository.delete(p.getId());
+            final File provDir = ConfigDirectory.getDataIntegratedDirectory(p.getIdentifier());
+            FileUtilities.deleteDirectory(provDir);
         }
     }
 
