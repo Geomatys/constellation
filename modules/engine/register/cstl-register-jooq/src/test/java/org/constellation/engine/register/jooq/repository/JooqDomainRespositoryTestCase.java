@@ -103,7 +103,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
         int i = domainRepository.addDataToDomain(data.getId(), domain.getId());
         Assert.assertEquals("Should have inserted 1 record", 1, i);
         int j = domainRepository.removeDataFromDomain(data.getId(), domain.getId());
-        Assert.assertEquals("Should have deleted 1 record", 1, i);
+        Assert.assertEquals("Should have deleted 1 record", 1, j);
         domainRepository.delete(domain.getId());
         dataRepository.delete(data.getId());
         providerRepository.delete(provider.getId());
