@@ -35,15 +35,24 @@ public class SpringHelper {
     public static void setApplicationContext(ApplicationContext applicationContext) {
         SpringHelper.applicationContext = applicationContext;
         SpringHelper.eventBus = applicationContext.getBean(EventBus.class);
+        LOGGER.info("spring application context loaded");
     }
 
     public static void injectDependencies(Object object) {
         if (SpringHelper.applicationContext != null) {
             SpringHelper.applicationContext.getAutowireCapableBeanFactory().autowireBean(object);
-            LOGGER.info("spring application context loaded");
         } else {
             LOGGER.warning("No spring application context available");
         }
+    }
+
+    public static <T> T getBean(Class<T> clazz) {
+        if (SpringHelper.applicationContext != null) {
+             return applicationContext.getBean(clazz);
+        } else {
+            LOGGER.warning("No spring application context available");
+        }
+        return null;
     }
 
     public static void sendEvent(Object event) {
