@@ -936,88 +936,104 @@ p.error-select-one{
     margin-top: 12px;
 }
 .block-association{
-    margin-top:15px;
+  margin-top:15px;
+
+  .block-associated{
+    height: 45px;
+    line-height: 27px;
+    font-size: 30px;
+    font-weight:bold;
+    background-color: rgb(237,237,237);
+    padding: 5px;
+
+    .block-associated-nb{
+      float:left;
+      margin-left: 5px;
+    }
+    .block-associated-title{
+      font-size: 12px;
+      font-weight: normal;
+      float:left;
+      margin-left: 7px;
+    }
+    &.block-associated-style{
+      color:rgb(180,180,180);
+      background: rgb(237,237,237) url('../img/block-associated-style.svg') right bottom no-repeat;
+      border: 3px solid #c6c0ce;
+    }
+    &.block-associated-services{
+      color:rgb(180,180,180);
+      background: rgb(237,237,237) url('../img/block-associated-services.svg') right bottom no-repeat;
+      border: 3px solid #b1c9d1;
+    }
+    &.block-associated-sensor{
+      color:rgb(180,180,180);
+      background: rgb(237,237,237) url('../img/block-associated-sensor.svg') right bottom no-repeat;
+      border: 3px solid #b2dbd3;
+    }
+  }
+
+  .btn-assoc-style{
+    border-radius:0;
+    cursor: pointer;
+    background: #c6c0ce;
+    &:hover{
+      background-color: lighten(#c6c0ce, 10%);
+    }
+    &.selected{
+      background-color: darken(#c6c0ce, 10%);
+    }
+  }
+
+  .btn-assoc-service{
+    border-radius:0;
+    cursor: pointer;
+    background: #b1c9d1;
+    &:hover{
+      background-color: lighten(#b1c9d1, 10%);
+    }
+    &.selected{
+      background-color: darken(#b1c9d1, 10%);
+    }
+  }
+
+  .btn-assoc-sensor{
+    border-radius:0;
+    cursor: pointer;
+    background: #b2dbd3;
+    &:hover{
+      background-color: lighten(#b2dbd3, 10%);
+    }
+    &.selected{
+      background-color: darken(#b2dbd3, 10%);
+    }
+  }
 }
 .btn-block-assos{
   background-color: #C0C0C0;
 }
-.block-association .block-associated{
-    height: 80px;
-    text-align: center;
-    line-height: 45px;
-    font-size:40px;
-    font-weight:bold;
-    background-color: rgb(237,237,237);
-    border:5px solid rgb(218,218,218);
-}
-.block-association .block-associated.block-associated-style{
-    color:rgb(180,180,180);
-    background: rgb(237,237,237) url('../img/block-associated-style.svg') right bottom no-repeat;
-}
-.block-association .block-associated.block-associated-style:hover{
-    border:5px solid #9e96c2;
-    cursor: pointer;
-    color:#9e96c2;
-}
-.block-association .block-associated.block-associated-style.selected{
-    background-color: #cfcbdf;
-    border:5px solid #9e96c2;
-    color:#9e96c2;
+.block-assoc{
+  margin-top:8px;
+  margin-bottom:15px;
+  padding:0;
 }
 
-.block-association .block-associated.block-associated-services{
-    color:rgb(180,180,180);
-    background: rgb(237,237,237) url('../img/block-associated-services.svg') right bottom no-repeat;
-}
-.block-association .block-associated.block-associated-services:hover{
-    border:5px solid #297dab;
-    cursor: pointer;
-    color: #297dab;
-}
-.block-association .block-associated.block-associated-services.selected{
-    background-color: #89BAD5;
-    border: solid 5px #297dab;
-    color: #297dab;
-}
-
-.block-association .block-associated.block-associated-sensor{
-    color:rgb(180,180,180);
-    background: rgb(237,237,237) url('../img/block-associated-sensor.svg') right bottom no-repeat;
-}
-.block-association .block-associated.block-associated-sensor:hover{
-    border: solid 5px #8fcbbf;
-    cursor: pointer;
-    color: #7cc3b5;
-}
-.block-association .block-associated.block-associated-sensor.selected{
-    background-color: #d5ebe7;
-    border: solid 5px #8fcbbf;
-    color: #7cc3b5;
-}
-.dashboard .selected-item .block-header.block-assoc-style{
-    background-color: #9e96c2;
-    border: solid 1px #8f86b9;
-    color: #ffffff;
+.dashboard .selected-item .block-header {
+  &.block-assoc-style {
+    background-color: darken(#c6c0ce, 10%);
+    border: solid 1px darken(#c6c0ce, 15%);
     cursor: inherit;
-}
-
-.dashboard .selected-item .block-header.block-assoc-services{
-    background-color: #297dab;
-    border: solid 1px #297dab;
-    color: #ffffff;
+  }
+  &.block-header.block-assoc-services {
+    background-color: darken(#b1c9d1, 10%);
+    border: solid 1px darken(#b1c9d1, 15%);
     cursor: inherit;
-}
-
-.dashboard .selected-item .block-header.block-assoc-sensor{
-    background-color: #7cc3b5;
-    border: solid 1px #59b3a1;
-    color: #ffffff;
+  }
+  &.block-assoc-sensor {
+    background-color: darken(#b2dbd3, 10%);
+    border: solid 1px darken(#b2dbd3, 15%);
     cursor: inherit;
-}
-.block-association .block-associated .block-associated-title{
-    font-size: 10px;
-    line-height: 15px;
-    font-weight: normal;
+  }
 }
 
 /*
@@ -2460,6 +2476,27 @@ body.modal-open{
     }
   }
 
+  /* Dashboard - right block*/
+
+  .block-association {
+
+    .block-associated {
+      font-size: 25px;
+
+      .block-associated-title {
+        font-size: 10px;
+      }
+    }
+
+    .block-associated-style-service{
+      padding-left: 0;
+      padding-right: 0;
+      .block-associated-title {
+        margin-left: 3px;
+      }
+    }
+  }
+
   /*index-sprite-images*/
   .img-left-block-service, .img-left-block-data, .img-left-block-sensor{
     margin-left:94px;
@@ -2489,18 +2526,7 @@ body.modal-open{
     margin-left: 15px;
     text-align: left;
   }
-  /*Dashboard - left block */
-  .block-association .block-associated .block-associated-title{
-    line-height: 15px;
-    width:80px;
-    margin-left: 5px;
-    width:80px;
-    margin-left: 5px;
-  }
-  .block-association .block-associated{
-    line-height: 35px;
-    font-size:40px;
-  }
+  /*Dashboard - right block */
   .block-association-wms .block-associated .block-associated-title{
      width:auto;
      margin-left: 5px;
@@ -2658,14 +2684,6 @@ body.modal-open{
     margin-top: 30px;
     margin-left: 15px;
     text-align: left;
-  }
-  /*Dashboard - left block */
-  .block-association .block-associated .block-associated-title{
-    line-height: 25px;
-  }
-  .block-association .block-associated{
-    line-height: 35px;
-    font-size:40px;
   }
   /*Dashboard responsive*/
   .item-title{

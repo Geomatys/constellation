@@ -485,27 +485,36 @@
                                             </div>
                                         </div>
                                         <div ng-if="service.type.toLowerCase() === 'wms'">
-                                            <div class=" row block-association block-association-wms"
+                                            <div class="row block-association"
                                                  ng-init="assocStyle=false;">
-                                                <div class="col-sm-12"
-                                                     ng-click="assocStyle=!assocStyle">
-                                                    <div ng-class="{'selected':assocStyle==true}"
-                                                         class="block-associated block-associated-style">
+
+                                                <div class="col-sm-7 col-lg-6 col-lg-offset-1">
+                                                    <div class="block-associated block-associated-style block-associated-style-service">
+                                                        <div class="block-associated-nb">{{selected.TargetStyle.length}}</div>
                                                         <div class="block-associated-title"
                                                              translate="label.related.style">Associated Styles</div>
-                                                        <div>{{selected.TargetStyle.length}}</div>
                                                     </div>
                                                 </div>
+                                                <div class="col-sm-5 col-lg-4" style="margin-top: 4px; padding-left: 0;">
+                                                    <button class="btn btn-block-assos btn-assoc-style"
+                                                            ng-click="assocStyle=!assocStyle;"
+                                                            ng-class="{'selected':assocStyle}"><i class="fa fa-eye"></i></button>
+                                                    <button class="btn btn-block-assos btn-assoc-style"
+                                                            ng-click="showStyleList();"
+                                                            tooltip-html-unsafe="{{'label.new.style' | translate}}"
+                                                            tooltip-placement="bottom"><i class="fa fa-plus"></i></button>
+                                                </div>
                                             </div>
-                                            <div ng-if="assocStyle==true" style="margin-top:15px;">
+
+                                            <div ng-if="assocStyle" class="col-lg-10 col-lg-offset-1 block-assoc">
                                                 <div class="block-header block-assoc-style">
                                                     <strong>
                                                         <span translate="label.related.style">Related style(s)</span>
                                                     </strong>
                                                 </div>
                                                 <div id="linkedList" class="block-content" >
-                                                     <span ng-show="selected.TargetStyle.length == 0"
-                                                         translate="label.no.association">No association</span>
+                                                    <span ng-show="selected.TargetStyle.length == 0"
+                                                            translate="label.no.association">No association</span>
                                                     <div ng-show="selected.TargetStyle.length > 0"
                                                          class="style"
                                                          ng-repeat="style in selected.TargetStyle"
@@ -516,17 +525,6 @@
                                                             <i class="glyphicon glyphicon-trash"></i>
                                                         </button>
                                                         {{truncateTitleBlock(style.Name)}}
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-xs-12">
-                                                            <button type="button"
-                                                                    ng-click="showStyleList();"
-                                                                    class="btn btn-sm pull-right btn-block-assos btn-whitespace">
-                                                                <i class="glyphicon glyphicon-plus"></i>
-                                                                <span translate="label.new.style.select"
-                                                                      style="margin-left:5px;">Add new style</span>
-                                                            </button>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

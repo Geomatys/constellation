@@ -578,124 +578,136 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row block-association"
-                                     ng-init="assocStyle=false; assocService=false; assocSensor=false">
-                                    <div class="col-sm-4"
-                                         ng-click="assocStyle=!assocStyle; assocService=false; assocSensor=false">
-                                        <div ng-class="{'selected':assocStyle==true}"
-                                             class="block-associated block-associated-style">
-                                            <div class="block-associated-title"
-                                                 translate="label.related.style">Associated Styles</div>
-                                            <div>{{dataCtrl.selectedDataSetChild.TargetStyle.length}}</div>
+
+
+                                    <div class="row block-association"
+                                         ng-init="assocStyle=false; assocService=false; assocSensor=false">
+
+                                        <div class="col-sm-7 col-md-6 col-md-offset-1">
+                                            <div class="block-associated block-associated-style">
+                                                <div class="block-associated-nb">{{dataCtrl.selectedDataSetChild.TargetStyle.length}}</div>
+                                                <div class="block-associated-title"
+                                                     translate="label.related.style">Associated Styles</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5 col-md-4" style="margin-top: 4px;">
+                                            <button class="btn btn-block-assos btn-assoc-style"
+                                                    ng-click="assocStyle=!assocStyle; assocService=false; assocSensor=false"
+                                                    ng-class="{'selected':assocStyle}"><i class="fa fa-eye"></i></button>
+                                            <button class="btn btn-block-assos btn-assoc-style"
+                                                    ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
+                                                    ng-click="showStyleList();"
+                                                    tooltip-html-unsafe="{{'label.new.style' | translate}}"
+                                                    tooltip-placement="bottom"><i class="fa fa-plus"></i></button>
                                         </div>
                                     </div>
-                                    <div class="col-sm-4"
-                                         ng-click="assocStyle=false; assocService=!assocService; assocSensor=false">
-                                        <div ng-class="{'selected':assocService==true}"
-                                             class="block-associated block-associated-services">
-                                            <div class="block-associated-title"
-                                                 translate="label.related.service">Associated Styles</div>
-                                            <div>{{dataCtrl.selectedDataSetChild.TargetService.length}}</div>
+
+                                    <div ng-if="assocStyle==true" class="col-md-10 col-md-offset-1 block-assoc">
+                                        <div class="block-header block-assoc-style">
+                                            <strong>
+                                                <span translate="label.related.style">Related style(s)</span>
+                                            </strong>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-4"
-                                         ng-click="assocStyle=false; assocService=false; assocSensor=!assocSensor">
-                                        <div ng-class="{'selected':assocSensor==true}"
-                                             class="block-associated block-associated-sensor">
-                                            <div class="block-associated-title"
-                                                 translate="label.related.sensors">Associated Styles</div>
-                                            <div>{{dataCtrl.selectedDataSetChild.TargetSensor.length}}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div ng-if="assocStyle==true" style="margin-top:15px;">
-                                    <div class="block-header block-assoc-style">
-                                        <strong>
-                                            <span translate="label.related.style">Related style(s)</span>
-                                        </strong>
-                                    </div>
-                                    <div id="linkedList" class="block-content" >
+                                        <div id="linkedList" class="block-content" >
                                         <span ng-show="dataCtrl.selectedDataSetChild.TargetStyle.length == 0"
                                               translate="label.no.association">No association</span>
-                                        <div ng-show="dataCtrl.selectedDataSetChild.TargetStyle.length > 0"
-                                             class="style"
-                                             ng-repeat="style in dataCtrl.selectedDataSetChild.TargetStyle"
-                                             style="margin-bottom:5px;">
-                                            <button type="button"
-                                                    ng-click="unlinkStyle(style.Provider, style.Name, dataCtrl.selectedDataSetChild.Provider, dataCtrl.selectedDataSetChild.Name);"
-                                                    class="btn btn-small btn-block-assos">
-                                                <i class="glyphicon glyphicon-trash"></i>
-                                            </button>
-                                            <button type="button"
-                                                    ng-click="editLinkedStyle(style.Provider, style.Name, dataCtrl.selectedDataSetChild);"
-                                                    class="btn btn-small btn-block-assos">
-                                                <i class="glyphicon glyphicon-pencil"></i>
-                                            </button>
-                                            {{truncateTitleBlock(style.Name)}}
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-xs-12">
+                                            <div ng-show="dataCtrl.selectedDataSetChild.TargetStyle.length > 0"
+                                                 class="style"
+                                                 ng-repeat="style in dataCtrl.selectedDataSetChild.TargetStyle"
+                                                 style="margin-bottom:5px;">
                                                 <button type="button"
-                                                        ng-click="showStyleList();"
-                                                        class="btn btn-sm pull-right btn-block-assos">
-                                                    <i class="glyphicon glyphicon-plus"></i>
-                                                    <span style="margin-left:5px;"
-                                                          translate="label.new.style">Add new style</span>
+                                                        ng-click="unlinkStyle(style.Provider, style.Name, dataCtrl.selectedDataSetChild.Provider, dataCtrl.selectedDataSetChild.Name);"
+                                                        class="btn btn-small btn-block-assos">
+                                                    <i class="glyphicon glyphicon-trash"></i>
                                                 </button>
+                                                <button type="button"
+                                                        ng-click="editLinkedStyle(style.Provider, style.Name, dataCtrl.selectedDataSetChild);"
+                                                        class="btn btn-small btn-block-assos">
+                                                    <i class="glyphicon glyphicon-pencil"></i>
+                                                </button>
+                                                {{truncateTitleBlock(style.Name)}}
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div ng-if="assocService==true" style="margin-top:15px;">
-                                    <div class="block-header block-assoc-services">
-                                        <strong>
-                                            <strong translate="label.related.service">Related service(s)</strong>
-                                        </strong>
+
+
+                                    <div class="row block-association"
+                                         ng-init="assocStyle=false; assocService=false; assocSensor=false">
+                                        <div class="col-sm-7 col-md-6 col-md-offset-1">
+                                            <div class="block-associated block-associated-services">
+                                                <div class="block-associated-nb">{{dataCtrl.selectedDataSetChild.TargetService.length}}</div>
+                                                <div class="block-associated-title"
+                                                     translate="label.related.service">Associated Styles</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5 col-md-4" style="margin-top: 4px;">
+                                            <button class="btn btn-block-assos btn-assoc-service"
+                                                    ng-click="assocStyle=false; assocService=!assocService; assocSensor=false"
+                                                    ng-class="{'selected':assocService}"><i class="fa fa-eye"></i></button>
+                                        </div>
                                     </div>
-                                    <div id="linkedServiceList" class="block-content" >
+
+                                    <div ng-if="assocService==true" class="col-md-10 col-md-offset-1 block-assoc">
+                                        <div class="block-header block-assoc-services">
+                                            <strong>
+                                                <strong translate="label.related.service">Related service(s)</strong>
+                                            </strong>
+                                        </div>
+                                        <div id="linkedServiceList" class="block-content" >
                                         <span ng-show="dataCtrl.selectedDataSetChild.TargetService.length == 0"
                                               translate="label.no.association">No association</span>
-                                        <div ng-show="dataCtrl.selectedDataSetChild.TargetService.length > 0"
-                                             class="style"
-                                             ng-repeat="service in dataCtrl.selectedDataSetChild.TargetService"
-                                             style="line-height:30px;">
-                                            {{truncateTitleBlock(service.name)}}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div ng-if="assocSensor==true" style="margin-top:15px;">
-                                    <div class="block-header block-assoc-sensor">
-                                        <strong>
-                                            <span translate="label.related.sensors">Related sensor(s)</span>
-                                        </strong>
-                                    </div>
-                                    <div id="linkedSensorList" class="block-content" >
-                                        <span ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
-                                              translate="label.no.association">No association</span>
-                                        <div ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length > 0"
-                                             class="style"
-                                             ng-repeat="sensorId in dataCtrl.selectedDataSetChild.TargetSensor"
-                                             style="margin-bottom:5px;">
-                                            <button type="button" ng-click="unlinkSensor(sensorId)"
-                                                    class="btn btn-small btn-block-assos">
-                                                <i class="glyphicon glyphicon-trash"></i>
-                                            </button>
-                                            {{truncateTitleBlock(sensorId)}}
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-xs-12">
-                                                <button type="button"
-                                                        ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
-                                                        ng-click="showSensorsList();"
-                                                        class="btn btn-sm pull-right btn-block-assos">
-                                                    <i class="glyphicon glyphicon-plus"></i>
-                                                    <span style="margin-left:5px;"
-                                                          translate="label.new.sensor">Add new sensor</span>
-                                                </button>
+                                            <div ng-show="dataCtrl.selectedDataSetChild.TargetService.length > 0"
+                                                 class="style"
+                                                 ng-repeat="service in dataCtrl.selectedDataSetChild.TargetService"
+                                                 style="line-height:30px;">
+                                                {{truncateTitleBlock(service.name)}}
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+
+                                    <div class="row block-association"
+                                         ng-init="assocStyle=false; assocService=false; assocSensor=false">
+
+                                        <div class="col-sm-7 col-md-6 col-md-offset-1">
+                                            <div class="block-associated block-associated-sensor">
+                                                <div class="block-associated-nb">{{dataCtrl.selectedDataSetChild.TargetSensor.length}}</div>
+                                                <div class="block-associated-title"
+                                                     translate="label.related.sensors">Associated Styles</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-5 col-md-4" style="margin-top: 4px;">
+                                            <button class="btn btn-block-assos btn-assoc-sensor"
+                                                    ng-click="assocStyle=false; assocService=false; assocSensor=!assocSensor"
+                                                    ng-class="{'selected':assocSensor}"><i class="fa fa-eye"></i></button>
+                                            <button class="btn btn-block-assos btn-assoc-sensor"
+                                                    ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
+                                                    ng-click="showSensorsList();"
+                                                    tooltip-html-unsafe="{{'label.new.sensor' | translate}}"
+                                                    tooltip-placement="bottom"><i class="fa fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div ng-if="assocSensor==true" class="col-md-10 col-md-offset-1 block-assoc">
+                                        <div class="block-header block-assoc-sensor">
+                                            <strong>
+                                                <span translate="label.related.sensors">Related sensor(s)</span>
+                                            </strong>
+                                        </div>
+                                        <div id="linkedSensorList" class="block-content" >
+                                        <span ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
+                                              translate="label.no.association">No association</span>
+                                            <div ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length > 0"
+                                                 class="style"
+                                                 ng-repeat="sensorId in dataCtrl.selectedDataSetChild.TargetSensor"
+                                                 style="margin-bottom:5px;">
+                                                <button type="button" ng-click="unlinkSensor(sensorId)"
+                                                        class="btn btn-small btn-block-assos">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </button>
+                                                {{truncateTitleBlock(sensorId)}}
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
