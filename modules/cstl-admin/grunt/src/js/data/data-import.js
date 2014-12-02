@@ -136,7 +136,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
                                         mdFile: importedMetaData,
                                         providerId: $scope.import.providerId
                                     };
-                                    Growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
+                                    Growl('success','Success','Vector data '+ $scope.import.providerId +' successfully added');
                                     if ($scope.sensor.checked) {
                                         $scope.showAssociate();
                                     } else {
@@ -164,7 +164,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
                                         providerId: $scope.import.providerId
                                     };
                                     if (!fileExtension || fileExtension !== "nc") {
-                                        Growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
+                                        Growl('success','Success','Raster data '+ $scope.import.providerId +' successfully added');
                                         $modalInstance.close({type: $scope.import.uploadType,
                                                               file: $scope.import.providerId,
                                                               metadataFile:$scope.import.metadata,
