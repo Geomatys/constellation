@@ -366,6 +366,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             if (DataViewer.map) {
                 DataViewer.map.setTarget(undefined);
             }
+            DataViewer.initConfig();
             var viewerData = $('#viewerData');
             viewerData.modal("show");
             viewerData.off('shown.bs.modal');
@@ -971,62 +972,34 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     });
                     return;
                 }
-
-                    // just add the data if we are not in the case of the wmts service
-                    if (service.type.toLowerCase() !== 'wmts') {
-                        //using angular.forEach to avoid jsHint warning when decalring function in loop
-                        angular.forEach($scope.selected, function(value, key){
-                            if (service.type.toLowerCase() === 'wms' &&
-                                $scope.conformPyramid &&
-                                value.Type.toLowerCase() !== 'vector') {
-                                // In the case of a wms service and user asked to pyramid the data
-                                dataListing.pyramidConform({dataId:value.Id,
-                                                            providerId: value.Provider,
-                                                            dataName: value.Name}, {}, addLayer, pyramidGenerationError);
-                            } else {
-                                webService.addLayer({type: service.type, id: service.identifier},
-                                                    {layerAlias: value.Name,
-                                                     layerId: value.Name,
-                                                     serviceType: service.type,
-                                                     serviceId: service.identifier,
-                                                     providerId: value.Provider,
-                                                     layerNamespace: value.Namespace},
-                                function(response) {
-                                    Growl('success', 'Success', response.message);
-                                    $modalInstance.close();
-                                },
-                                function(response) {
-                                    Growl('error', 'Error', response.message);
-                                    $modalInstance.dismiss('close');
-                                });
-                            }
-                        });
-                        return;
-                    }else {
-                        //WMTS pyramid
-                        //using angular.forEach to avoid jsHint warning when declaring function in loop
-                        //@TODO move to server side with a single request
-                        angular.forEach($scope.selected, function(layer, key){
-                            dataListing.pyramidScales({providerId: layer.Provider,
-                                                       dataId: layer.Name,
-                                                       crs: $scope.crs},
-                                function(response){//success
-                                    $scope.scales = response.Entry[0].split(',');
-                                    dataListing.pyramidData({provider: layer.Provider,
-                                                             dataName: layer.Name,
-                                                             dataId: layer.Id},
-                                                            {tileFormat: $scope.tileFormat,
-                                                             crs: $scope.crs,
-                                                             scales: $scope.scales,
-                                                             upperCornerX: $scope.upperCornerX,
-                                                             upperCornerY: $scope.upperCornerY},
-                                        addLayer,
-                                        pyramidGenerationError);
-                                },
-                                errorOnPyramid);
-                            $scope.wmtsParams = true;
+                //using angular.forEach to avoid jsHint warning when declaring function in loop
+                angular.forEach($scope.selected, function(value, key){
+                    if (service.type.toLowerCase() === 'wms' &&
+                        $scope.conformPyramid &&
+                        value.Type.toLowerCase() !== 'vector') {
+                        // In the case of a wms service and user asked to pyramid the data
+                        dataListing.pyramidConform({dataId:value.Id,
+                                                    providerId: value.Provider,
+                                                    dataName: value.Name}, {}, addLayer, pyramidGenerationError);
+                    } else {
+                        webService.addLayer({type: service.type, id: service.identifier},
+                                            {layerAlias: value.Name,
+                                             layerId: value.Name,
+                                             serviceType: service.type,
+                                             serviceId: service.identifier,
+                                             providerId: value.Provider,
+                                             layerNamespace: value.Namespace},
+                        function(response) {
+                            Growl('success', 'Success', response.message);
+                            $modalInstance.close();
+                        },
+                        function(response) {
+                            Growl('error', 'Error', response.message);
+                            $modalInstance.dismiss('close');
                         });
                     }
+                });
+                return;
             }
         };
 
