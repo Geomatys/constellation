@@ -74,7 +74,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             return dataset.getMetadataIso();
         }
         final Data data = dataRepository.findByMetadataId(metadataId);
-        if (data != null && data.isVisible()) {
+        if (data != null && data.isIncluded()) {
             return data.getIsoMetadata();
         }
         if (includeService) {
@@ -166,7 +166,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         final List<Data> datas = dataRepository.findAll();
         for (final Data record : datas) {
-            if (record.isVisible() && record.getIsoMetadata() != null) {
+            if (record.isIncluded() && record.getIsoMetadata() != null) {
                 results.add(record.getMetadataId());
             }
         }
@@ -197,7 +197,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (service != null) {
             final List<Data> datas    = dataRepository.getCswLinkedData(service.getId());
             for (Data data : datas) {
-                if (data.getMetadataId() != null && data.isVisible()) {
+                if (data.getMetadataId() != null && data.isIncluded()) {
                     results.add(data.getMetadataId());
                 }
             }
@@ -210,7 +210,7 @@ public class MetadataBusiness implements IMetadataBusiness {
                 if (dxc.isAllData()) {
                     final List<Data> subDatas = dataRepository.findByDatasetId(dxc.getDatasetId());
                     for (Data data : subDatas) {
-                        if (data.getMetadataId() != null && data.isVisible()) {
+                        if (data.getMetadataId() != null && data.isIncluded()) {
                             results.add(data.getMetadataId());
                         }
                     }

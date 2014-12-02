@@ -66,6 +66,7 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.MetadataLists;
+import org.constellation.dto.FileBean;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
@@ -86,10 +87,18 @@ import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.token.TokenUtils;
+import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.PropertyType;
+import org.slf4j.Logger;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import java.nio.file.Paths;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.Restriction;
@@ -103,14 +112,8 @@ import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.DimensionNameType;
 import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.metadata.spatial.PixelOrientation;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -262,7 +265,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         return metadata;
     }
-    
+
     @Override
     public Dataset getDatasetForData(final String providerId, final QName name) throws ConstellationException{
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
@@ -580,7 +583,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             }
         }
     }
-    
+
     @Transactional("txManager")
     private void deleteDatasetIfEmpty(Integer datasetID) {
         if (datasetID != null) {
@@ -650,7 +653,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             data.setSensorable(sensorable);
             data.setType(type);
             data.setSubtype(subType);
-            data.setVisible(visible);
+            data.setIncluded(visible);
             data.setMetadata(metadataXml);
             data.setRendered(rendered);
             return dataRepository.create(data);
@@ -670,33 +673,42 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                                      final String providerIdentifier,
                                      boolean visibility) throws ConfigurationException {
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerIdentifier);
-        data.setVisible(visibility);
+        data.setIncluded(visibility);
         dataRepository.update(data);
-        
+
+        final int providerID = data.getProvider();
+        final int dataID = data.getId();
         if (!visibility) {
             // 1. remove layer involving the data
-            for (Layer layer : layerRepository.findByDataId(data.getId())) {
+            for (Layer layer : layerRepository.findByDataId(dataID)) {
                 layerRepository.delete(layer.getId());
             }
 
             // 2. unlink from csw
-            dataRepository.removeDataFromAllCSW(data.getId());
-            
+            dataRepository.removeDataFromAllCSW(dataID);
+
             // 3. cleanup provider if empty
             boolean remove = true;
-            for (Data pdata : dataRepository.findByProviderId(data.getProvider())) {
-                if (pdata.isVisible()) {
+            for (Data pdata : dataRepository.findByProviderId(providerID)) {
+                if (pdata.isIncluded()) {
                     remove = false;
                     break;
                 }
             }
             if (remove) {
-                providerRepository.delete(data.getProvider());
+                final Provider p = providerRepository.findOne(providerID);
+                final DataProvider dp = DataProviders.getInstance().getProvider(p.getIdentifier());
+                DataProviders.getInstance().removeProvider(dp);
+                providerRepository.delete(providerID);
+
+                // delete associated files in integrated folder. the file name (p.getIdentifier()) is a folder.
+                final File provDir = ConfigDirectory.getDataIntegratedDirectory(p.getIdentifier());
+                FileUtilities.deleteDirectory(provDir);
             }
-            
+
             // Relevant erase dataset when there is no more data in it. for now we remove it
             deleteDatasetIfEmpty(data.getDatasetId());
-            
+
             // update internal CSW index
             updateInternalCSWIndex(data.getMetadataId(), 1, false); // TODO DOMAIN ID
         }
@@ -774,7 +786,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         values.setValues(mapVals);
         return values;
     }
-    
+
     @Override
     public void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException {
         final String metadataString;
@@ -792,7 +804,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         } catch (JAXBException ex) {
             throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
         }
-        
+
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
             data.setIsoMetadata(metadataString);
@@ -805,7 +817,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             throw new TargetNotFoundException("Data :" + dataName + " in provider:" + providerId +  " not found");
         }
     }
-    
+
     @Override
     public String getTemplate(final QName dataName, final String dataType) throws ConfigurationException {
         final String templateName;
@@ -1037,7 +1049,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(restrictionCodes);
         mdList.setRestrictionCodes(restrictionCodes);
-        
+
         final List<String> dimensionNameTypeCodes = new LinkedList<>();
         for (final DimensionNameType cl : DimensionNameType.values()) {
             final String standardName = Types.getStandardName(cl.getClass());
@@ -1047,7 +1059,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(dimensionNameTypeCodes);
         mdList.setDimensionNameTypeCodes(dimensionNameTypeCodes);
-        
+
         final List<String> coverageContentTypeCodes = new LinkedList<>();
         for (final CoverageContentType cl : CoverageContentType.values()) {
             final String standardName = Types.getStandardName(cl.getClass());
@@ -1057,7 +1069,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(coverageContentTypeCodes);
         mdList.setCoverageContentTypeCodes(coverageContentTypeCodes);
-        
+
         final List<String> imagingConditionCodes = new LinkedList<>();
         for (final ImagingCondition cl : ImagingCondition.values()) {
             final String standardName = Types.getStandardName(cl.getClass());
@@ -1067,7 +1079,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(imagingConditionCodes);
         mdList.setImagingConditionCodes(imagingConditionCodes);
-        
+
         final List<String> cellGeometryCodes = new LinkedList<>();
         for (final CellGeometry cl : CellGeometry.values()) {
             final String standardName = Types.getStandardName(cl.getClass());
@@ -1077,7 +1089,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(cellGeometryCodes);
         mdList.setCellGeometryCodes(cellGeometryCodes);
-        
+
         //for pixel orientation codes
         final List<String> pixelOrientationCodes = new LinkedList<>();
         for (final PixelOrientation cl : PixelOrientation.values()) {
@@ -1088,7 +1100,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(pixelOrientationCodes);
         mdList.setPixelOrientationCodes(pixelOrientationCodes);
-        
+
         //for Scope codes
         final List<String> scopeCodes = new LinkedList<>();
         for (final ScopeCode cl : ScopeCode.values()) {
@@ -1099,7 +1111,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(scopeCodes);
         mdList.setScopeCodes(scopeCodes);
-        
+
         return mdList;
     }
 
@@ -1126,8 +1138,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         data.setDatasetId(datasetId);
         dataRepository.update(data);
     }
-    
-    
+
+
     @Override
     @Scheduled(fixedDelay=5*60*1000)
     public void uploadCleaner() {
@@ -1137,9 +1149,51 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         for (File file : listFiles) {
             if(TokenUtils.isExpired(file.getName())) {
                 LOGGER.info(file.getName() + " expired");
-                FileUtilities.deleteDirectory(file);                
+                FileUtilities.deleteDirectory(file);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    public List<FileBean> getFilesFromPath(final String path, final boolean filtered, final boolean onlyXML) throws ConstellationException {
+        final List<FileBean> listBean = new ArrayList<>();
+        final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();
+        final File[] children;
+        if (Paths.get(path).toFile().exists()) {
+            final File nextRoot = new File(path);
+            children = nextRoot.listFiles();
+        }else{
+            throw new ConstellationException("path does not exists!");
+        }
+
+        //loop on subfiles/folders to create bean
+        if (children != null) {
+            for (final File child : children) {
+                final FileBean bean = new FileBean(child.getName(),
+                                                   child.isDirectory(),
+                                                   child.getAbsolutePath(),
+                                                   child.getParentFile().getAbsolutePath());
+                if (!child.isDirectory() || !filtered) {
+                    final int lastIndexPoint = child.getName().lastIndexOf('.');
+                    final String extension = child.getName().substring(lastIndexPoint + 1);
+                    if(onlyXML) {
+                        if ("xml".equalsIgnoreCase(extension)) {
+                            listBean.add(bean);
+                        }
+                    }else {
+                        if (extensions.contains(extension.toLowerCase())) {
+                            listBean.add(bean);
+                        }
+                    }
+                } else {
+                    listBean.add(bean);
+                }
+            }
+        }
+        Collections.sort(listBean);
+        return listBean;
     }
 
 }

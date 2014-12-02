@@ -1,0 +1,36 @@
+<div style="margin-left:0; margin-right:0; height: 150px; padding-top: 22px;margin-bottom: 20px;">
+    <div class="col-sm-4 col-sm-offset-2"
+         style="text-align:center;">
+        <label class="radio data-type-choose"
+               style="height: 120px;"
+               title="{{'service.edit.dashboard.wmts.select.byInternalData.title' | translate}}">
+            <div class="col-sm-12"
+                 style="margin-top: 5px; padding-left:5px;">
+                <img src="img/wmts-internaldata.svg" />
+            </div>
+            <input type="radio"
+                   ng-model="mode.display"
+                   value="internal"
+                   style="display: none;"/>
+            <div translate="service.edit.dashboard.wmts.select.byInternalData"
+                 style="margin-top:10px;">By internal data</div>
+        </label>
+    </div>
+    <div class="col-sm-4"
+         style="text-align:center;">
+        <label class="radio data-type-choose"
+               style="height: 120px;"
+               title="{{'service.edit.dashboard.wmts.select.byMapcontext.title' | translate}}">
+            <div class="col-sm-12" style="margin-top: 5px;">
+                <img ng-if="mode.display!=='mapcontext'"
+                     src="img/wmts-mapcontext.svg" />
+            </div>
+            <input type="radio"
+                   ng-model="mode.display"
+                   value="mapcontext"
+                   style="display: none;"/>
+            <div translate="service.edit.dashboard.wmts.select.byMapcontext"
+                 style="margin-top:10px;">By map context</div>
+        </label>
+    </div>
+</div>

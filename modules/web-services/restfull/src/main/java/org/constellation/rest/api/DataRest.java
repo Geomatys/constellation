@@ -60,11 +60,14 @@ import javax.xml.stream.XMLStreamReader;
 import com.google.common.base.Optional;
 
 import org.apache.sis.geometry.GeneralDirectPosition;
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.dto.MapContextLayersDTO;
+import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.*;
 import org.constellation.configuration.*;
@@ -75,13 +78,11 @@ import org.constellation.dto.ImportedData;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.ProviderData;
-import org.constellation.dto.PyramidParams;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.TaskParameter;
-import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.json.metadata.Template;
@@ -117,7 +118,6 @@ import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.filter.function.string.ToLowerCaseFunction;
 import org.geotoolkit.geometry.Envelopes;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.map.MapBuilder;
@@ -128,12 +128,14 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
 import org.geotoolkit.storage.DataFileStore;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.wms.WebMapClient;
+import org.geotoolkit.wms.map.WMSMapLayer;
+import org.geotoolkit.wms.xml.WMSVersion;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
@@ -147,7 +149,6 @@ import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.w3c.dom.Node;
 
 /**
@@ -170,14 +171,11 @@ public class DataRest {
     private UserRepository userRepository;
 
     @Inject
-    private StyleRepository styleRepository;
-
-    @Inject
     private IStyleBusiness styleBusiness;
 
     @Inject
     private IDataBusiness dataBusiness;
-    
+
     @Inject
     private IDatasetBusiness datasetBusiness;
 
@@ -193,6 +191,8 @@ public class DataRest {
     @Inject
     private TokenService tokenService;
 
+    @Inject
+    private IMapContextBusiness mapContextBusiness;
 
     /**
      * Give metadata CodeLists (example {@link org.opengis.metadata.citation.Role} codes
@@ -210,7 +210,7 @@ public class DataRest {
 
 
     /**
-     * Give subfolder list from a server file path
+     * Give subfolder list of data from a server file path
      *
      * @param path server file path
      * @param filtered {@code True} if we want to keep only known files.
@@ -220,48 +220,19 @@ public class DataRest {
     @Path("datapath/{filtered}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDataFolder(@PathParam("filtered") final Boolean filtered, String path) {
-        final List<FileBean> listBean = new ArrayList<>();
-        final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();
-
-//        final File root = ConfigDirectory.getUserHomeDirectory();
-        final File[] children;
-        if (Paths.get(path).toFile().exists()) {
-            final File nextRoot = new File(path);
-            children = nextRoot.listFiles();
-        }else{
+    public Response getDataFolder(@PathParam("filtered") final Boolean filtered, final String path) {
+        try {
+            final List<FileBean> listBean = dataBusiness.getFilesFromPath(path, filtered, false);
+            return Response.status(200).entity(listBean).build();
+        }catch(Exception ex) {
             Map<String,String> hashMap = new HashMap<>();
-            hashMap.put("msg", "invalid path");
+            hashMap.put("msg", ex.getMessage());
             return Response.status(500).entity(hashMap).build();
         }
-
-        //loop on subfiles/folders to create bean
-        if (children != null) {
-            for (File child : children) {
-                final FileBean bean = new FileBean(child.getName(),
-                                                   child.isDirectory(),
-                                                   child.getAbsolutePath(),
-                                                   child.getParentFile().getAbsolutePath());
-
-                if (!child.isDirectory() || !filtered) {
-                    final int lastIndexPoint = child.getName().lastIndexOf('.');
-                    final String extension = child.getName().substring(lastIndexPoint + 1);
-
-                    if (extensions.contains(extension.toLowerCase()) /*|| "zip".equalsIgnoreCase(extension)*/) {
-                        listBean.add(bean);
-                    }
-
-                } else {
-                    listBean.add(bean);
-                }
-            }
-        }
-        Collections.sort(listBean);
-        return Response.status(200).entity(listBean).build();
     }
 
     /**
-     * Give subfolder list from a server file path
+     * Give subfolder list of metadata xml from a server file path
      *
      * @param path server file path
      * @param filtered {@code True} if we want to keep only known files.
@@ -271,42 +242,15 @@ public class DataRest {
     @Path("metadatapath/{filtered}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getMetaDataFolder(@PathParam("filtered") final Boolean filtered, String path) {
-        final List<FileBean> listBean = new ArrayList<>();
-
-        final File[] children;
-        if (Paths.get(path).toFile().exists()) {
-            final File nextRoot = new File(path);
-            children = nextRoot.listFiles();
-        }else{
+    public Response getMetaDataFolder(@PathParam("filtered") final Boolean filtered, final String path) {
+        try {
+            final List<FileBean> listBean = dataBusiness.getFilesFromPath(path, filtered, true);
+            return Response.status(200).entity(listBean).build();
+        }catch(Exception ex) {
             Map<String,String> hashMap = new HashMap<>();
-            hashMap.put("msg", "invalid path");
+            hashMap.put("msg", ex.getMessage());
             return Response.status(500).entity(hashMap).build();
         }
-
-        //loop on subfiles/folders to create bean
-        if (children != null) {
-            for (File child : children) {
-                final FileBean bean = new FileBean(child.getName(),
-                                                   child.isDirectory(),
-                                                   child.getAbsolutePath(),
-                                                   child.getParentFile().getAbsolutePath());
-
-                if (!child.isDirectory() || !filtered) {
-                    final int lastIndexPoint = child.getName().lastIndexOf('.');
-                    final String extension = child.getName().substring(lastIndexPoint + 1);
-
-                    if ("xml".equalsIgnoreCase(extension)) {
-                        listBean.add(bean);
-                    }
-
-                } else {
-                    listBean.add(bean);
-                }
-            }
-        }
-        Collections.sort(listBean);
-        return Response.status(200).entity(listBean).build();
     }
 
     /**
@@ -348,9 +292,6 @@ public class DataRest {
         }
         return Response.ok(hashMap).build();
     }
-    
-    
-    
 
     /**
      * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
@@ -371,7 +312,7 @@ public class DataRest {
                                @FormDataParam("identifier") String identifier,
                                @FormDataParam("serverMetadataPath") String serverMetadataPath,
                                @Context HttpServletRequest request) {
-    	
+
         final File uploadDirectory = ConfigDirectory.getUploadDirectory(tokenService.extractAuthTokenFromRequest(request));
         Map<String,String> hashMap = new HashMap<>();
         if (identifier != null && ! identifier.isEmpty()){
@@ -452,75 +393,6 @@ public class DataRest {
     /**
      * Import data from upload Directory to integrated directory
      * - change file location from upload to integrated
-     *
-     * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
-     * @param request
-     * @return a {@link javax.ws.rs.core.Response}
-     *
-     * @Deprecated this is deprecated since we are using the method proceedToImport.
-     */
-    @POST
-    @Path("import")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response importData(final ParameterValues values, @Context HttpServletRequest request) {
-        String filePath = values.getValues().get("dataPath");
-        final String metadataFilePath = values.getValues().get("metadataFilePath");
-        final String dataType = values.getValues().get("dataType");
-        final String dataName= values.getValues().get("dataName");
-        final String fsServer = values.getValues().get("fsServer");
-
-        try{
-            final File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
-            final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
-            final ImportedData importedData = new ImportedData();
-            if (fsServer != null && fsServer.equalsIgnoreCase("true")) {
-                importedData.setDataFile(filePath);
-            } else {
-                if (filePath != null) {
-                    filePath = renameDataFile(dataName, filePath);
-                    if (filePath.toLowerCase().endsWith(".zip")) {
-                        final File zipFile = new File(filePath);
-                        final String fileNameWithoutExt = zipFile.getName().substring(0, zipFile.getName().indexOf("."));
-                        final File zipDir = new File(dataIntegratedDirectory, dataName);
-                        if (zipDir.exists()) {
-                            recursiveDelete(zipDir);
-                        }
-                        FileUtilities.unzip(zipFile, zipDir, new CRC32());
-                        filePath = zipDir.getAbsolutePath();
-                    }
-
-                    if (filePath.startsWith(uploadFolder.getAbsolutePath())) {
-                        final File destFile = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName());
-                        Files.move(Paths.get(filePath), Paths.get(destFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
-                        importedData.setDataFile(destFile.getAbsolutePath());
-                    } else {
-                        importedData.setDataFile(filePath);
-                    }
-                }
-            }
-
-            if (metadataFilePath != null){
-                if (metadataFilePath.startsWith(uploadFolder.getAbsolutePath())) {
-                    final File destMd = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName());
-                    Files.move(Paths.get(metadataFilePath), Paths.get(destMd.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
-                    importedData.setMetadataFile(destMd.getAbsolutePath());
-                } else {
-                    importedData.setMetadataFile(metadataFilePath);
-                }
-            }
-
-            return Response.ok(importedData).build();
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Bad configuration for data Integrated directory", e);
-            return Response.status(500).entity(e.getLocalizedMessage()).build();
-        }
-    }
-
-
-    /**
-     * Import data from upload Directory to integrated directory 
-     * - change file location from upload to integrated
      * this method do all chain: init provider and metadata.
      *
      * @param domainId given domain identifier.
@@ -559,17 +431,18 @@ public class DataRest {
             } else {
                 if (filePath != null) {
                     filePath = renameDataFile(dataName, filePath);
+                    final File providerDir = new File(dataIntegratedDirectory, dataName);
+                    if (providerDir.exists()) {
+                        FileUtilities.deleteDirectory(providerDir);
+                    }
+                    providerDir.mkdirs();
                     if (filePath.toLowerCase().endsWith(".zip")) {
                         final File zipFile = new File(filePath);
-                        final File zipDir = new File(dataIntegratedDirectory, dataName);
-                        if (zipDir.exists()) {
-                            recursiveDelete(zipDir);
-                        }
-                        FileUtilities.unzip(zipFile, zipDir, new CRC32());
-                        filePath = zipDir.getAbsolutePath();
+                        FileUtilities.unzip(zipFile, providerDir, new CRC32());
+                        filePath = providerDir.getAbsolutePath();
                     }
                     if (filePath.startsWith(uploadFolder.getAbsolutePath())) {
-                        final File destFile = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName());
+                        final File destFile = new File(providerDir.getAbsolutePath() + File.separator + new File(filePath).getName());
                         Files.move(Paths.get(filePath), Paths.get(destFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
                         importedDataReport.setDataFile(destFile.getAbsolutePath());
                     } else {
@@ -731,7 +604,7 @@ public class DataRest {
         if (paramVal.getValue() instanceof URL) {
             try {
                 final File dataFolder = new File(((URL)paramVal.getValue()).toURI());
-                recursiveDelete(dataFolder);
+                FileUtilities.deleteDirectory(dataFolder);
             } catch (Exception ex) {
                 LOGGER.log(Level.WARNING, "Unable to delete folder "+ paramVal.getValue(), ex);
                 return Response.status(500).entity(ex.getLocalizedMessage()).build();
@@ -740,44 +613,13 @@ public class DataRest {
         return Response.ok(map).build();
     }
 
-    private static void truncateZipFolder(String filePath) throws IOException {
-        File file = new File(filePath);
-        if (file.isDirectory()){
-            if (file.listFiles().length==1 && file.listFiles()[0].isDirectory()){
-                File directoryToDelete = file.listFiles()[0];
-                File[] filesToMove = directoryToDelete.listFiles();
-                for (int i = 0 ; i < filesToMove.length;i++){
-                    Files.move(Paths.get(filesToMove[i].getPath()) ,Paths.get(file.getPath() + File.separator + filesToMove[i].getName()));
-                }
-                directoryToDelete.delete();
-            }
-        }
-    }
-    
-    private static void recursiveDelete(File file) {
-        //to end the recursive loop
-        if (!file.exists())
-            return;
-         
-        //if directory, go inside and call recursively
-        if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
-                //call recursively
-                recursiveDelete(f);
-            }
-        }
-        //call delete to delete files and empty directory
-        file.delete();
-    }
-
     /**
-     * Load data from file selected 
-     
+     * Load data from file selected
      *
      * @param domainId
      * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
      * @return a {@link javax.ws.rs.core.Response} with a {@link org.constellation.dto.DataInformation}
-     * 
+     *
      * @throws javax.xml.bind.JAXBException
      * @throws org.apache.sis.storage.DataStoreException
      * @throws org.opengis.util.NoSuchIdentifierException
@@ -1080,7 +922,6 @@ public class DataRest {
             boolean dataset = false;
             final QName dataName = Util.parseQName(identifier);
             final Dataset ds = dataBusiness.getDatasetForData(provider, dataName);
-            
             String datasetId         = null;
             DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider, dataName);
             if(metadata == null){
@@ -1235,7 +1076,7 @@ public class DataRest {
                 //@TODO fill the DataSetBrief properties for keywords, abstract and dateStamp
             }
         }catch(Exception ex){
-            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
         return dsb;
     }
@@ -1278,7 +1119,7 @@ public class DataRest {
      * N.B : Generated pyramid contains coverage real values, it's not styled for rendering.
      *
      * @param providerId Provider identifier of the data to tile.
-     * @param dataId Data identifier 
+     * @param dataId Data identifier
      * @return
      */
     @POST
@@ -1295,6 +1136,9 @@ public class DataRest {
         if (!cstlUser.isPresent()) {
             throw new ConstellationException("operation not allowed without login");
         }
+
+
+
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
         if (inProvider == null) {
@@ -1317,16 +1161,11 @@ public class DataRest {
         final Object origin = inData.getOrigin();
 
         if(!(origin instanceof CoverageReference)) {
-            final double[] scales = new double[8];
-            final double geospanX = dataEnv.getSpan(0);
-            final int tileSize = 256;
-            scales[0] = geospanX / tileSize;
-            for(int i=1;i<scales.length;i++){
-                scales[i] = (scales[i-1]) / 2.0;
-            }
-            final PyramidParams params = new PyramidParams();
-            params.setScales(scales);
-            return createTiledProvider(dataId,providerId,dataName,params,req);
+            final List<DataBrief> briefs = new ArrayList<>();
+            final QName fullName = new QName("", dataName);
+            final DataBrief db = dataBusiness.getDataBrief(fullName, providerId);
+            briefs.add(db);
+            return pyramidData(null,dataName,briefs,req);
         }
 
         //calculate pyramid scale levels
@@ -1492,118 +1331,159 @@ public class DataRest {
         return Response.ok(ref).build();
     }
 
-    /**
-     * Generates a pyramid on a data in the given provider, create and return this new provider.
-     *
-     * N.B : It creates a styled pyramid, which can be used for display purposes, but not for analysis.
-     *
-     * is not sufficient to determine a custom pyramid zone. Unused.
-     *
-     * @param dataId Data id
-     * @param provider Provider identifier of the data to tile.
-     * @param dataName Data identifier
-     * @param params PyramidParams
-     * @return
-     */
     @POST
-    @Path("pyramid/create/{dataId}/{provider}/{dataName}")
+    @Path("crs/isgeographic/{epsgCode}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response createTiledProvider(@PathParam("dataId") final Integer dataId,
-                                        @PathParam("provider") final String provider,
-                                        @PathParam("dataName") final String dataName,
-                                        final PyramidParams params,
-                                        @Context HttpServletRequest req) {
-        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+    public Response isGeographic(@PathParam("epsgCode") final String epsgCode){
 
+        CoordinateReferenceSystem crs;
+        try {
+            crs = CRS.decode(epsgCode);
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            crs = null;
+        }
+        return Response.ok(crs instanceof GeographicCRS).build();
+    }
+
+    @GET
+    @Path("pyramid/mapcontext/{contextId}/{crs}/{layerName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response pyramidMapContext(@PathParam("crs") final String crs,
+                                @PathParam("layerName") final String layerName,
+                                @PathParam("contextId") final Integer contextId,
+                                @Context HttpServletRequest req) throws ConstellationException{
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
         if (!cstlUser.isPresent()) {
             throw new ConstellationException("operation not allowed without login");
         }
-        String tileFormat = params.getTileFormat();
-        String crs = params.getCrs();
-        double[] scales = params.getScales();
-        
-        //get data
-        final DataProvider inProvider = DataProviders.getInstance().getProvider(provider);
-        if(inProvider==null){
-            return Response.ok("Provider "+provider+" does not exist").status(400).build();
-        }
-        final Data inData = inProvider.get(new DefaultName(dataName));
-        if(inData==null){
-            return Response.ok("Data "+dataName+" does not exist in provider "+provider).status(400).build();
-        }
-        
-        Envelope dataEnv;
-        try {
-            //use data crs
-            dataEnv = inData.getEnvelope();
-        } catch (DataStoreException ex) {
-            return Response.ok("Failed to extract envelope for data "+dataName).status(500).build();
-        }
 
-        //get tile format 
-        if(tileFormat==null || tileFormat.isEmpty()) {
-            tileFormat = "PNG";
-        }
-
-        MutableStyle style = null;
-        try {
-            final org.constellation.engine.register.Data data = dataBusiness.findById(dataId);
-            if(data != null){
-                List<org.constellation.engine.register.Style> list =  styleRepository.findByData(data);
-                if(list != null && !list.isEmpty()){
-                    final org.constellation.engine.register.Style s = list.get(0);
-                    style = styleBusiness.getStyle("sld",s.getName());
-                }
-            }
-        }catch(Exception ex){
-            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-        }
-        
-        //get pyramid CRS, we force longitude first on the pyramids
-        // WMTS is made for display like WMS, so longitude is expected to be on the X axis.
-        // Note : this is not writen in the spec.
-        final CoordinateReferenceSystem coordsys;
         if(crs == null || crs.isEmpty()){
+            return Response.status(500).entity("CRS code is null!").build();
+        }
+
+        if(layerName == null || layerName.isEmpty()){
+            return Response.status(500).entity("layerName is null!").build();
+        }
+
+        if(contextId == null){
+            return Response.status(500).entity("contextId is null!").build();
+        }
+
+        final MapContextLayersDTO mc = mapContextBusiness.findMapContextLayers(contextId);
+
+        if(mc == null || mc.getLayers() == null || mc.getLayers().isEmpty()) {
+            return Response.ok("The given mapcontext to pyramid is empty.").build();
+        }
+
+        final CoordinateReferenceSystem crsOutput;
+        try {
+            crsOutput = CRS.decode(crs,true);
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Invalid CRS code : "+crs, ex);
+            return Response.status(500).entity("Invalid CRS code : " + crs).build();
+        }
+
+        final CoordinateReferenceSystem crsObj;
+        final String mapCtxtCrs = mc.getCrs();
+        if(mapCtxtCrs != null) {
             try {
-                coordsys = ReferencingUtilities.setLongitudeFirst(dataEnv.getCoordinateReferenceSystem());
-            } catch (FactoryException ex) {
-                LOGGER.log(Level.WARNING, "Failed to invert axes (longitude first) on CRS", ex);
-                return Response.ok("Failed to invert axes (longitude first) on CRS : "+ex.getMessage()).status(500).build();
+                crsObj = CRS.decode(mapCtxtCrs,true);
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, "Invalid mapcontext CRS code : "+mapCtxtCrs, ex);
+                return Response.status(500).entity("Invalid mapcontext CRS code : " + mapCtxtCrs).build();
             }
-            try {
-                //reproject data envelope
-                dataEnv = CRS.transform(dataEnv, coordsys);
-            } catch (TransformException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                return Response.ok("Could not transform data envelope to crs "+crs).status(400).build();
+        } else {
+            return Response.status(500).entity("mapcontext CRS code is null!").build();
+        }
+        final GeneralEnvelope env = new GeneralEnvelope(crsObj);
+        env.setRange(0,mc.getWest(),mc.getEast());
+        env.setRange(1,mc.getSouth(),mc.getNorth());
+        GeneralEnvelope globalEnv;
+        try {
+            globalEnv = new GeneralEnvelope(CRS.transform(env,crsOutput));
+        }catch (TransformException ex){
+            globalEnv=null;
+        }
+
+        if(globalEnv == null || globalEnv.isEmpty()){
+            globalEnv = new GeneralEnvelope(CRS.getEnvelope(crsOutput));
+        }
+
+        if(containsInfinity(globalEnv)){
+            globalEnv.intersect(CRS.getEnvelope(crsOutput));
+        }
+
+        final double geospanX = globalEnv.getSpan(0);
+        final int tileSize = 256;
+        final double[] scales = new double[8];
+        scales[0] = geospanX / tileSize;
+        for(int i=1;i<scales.length;i++){
+            scales[i] = scales[i-1] / 2.0;
+        }
+
+        final String tileFormat = "PNG";
+        final MapContext context = MapBuilder.createContext();
+
+        for(final MapContextStyledLayerDTO layer : mc.getLayers()){
+            final String providerIdentifier = layer.getProvider();
+            final String dataName = layer.getName();
+            if(providerIdentifier == null){
+                URL serviceUrl;
+                try{
+                    serviceUrl = new URL(layer.getExternalServiceUrl());
+                }catch(Exception ex){
+                    LOGGER.log(Level.WARNING,"An external wms layer in mapcontext have invalid service url! "+layer.getName());
+                    continue;
+                }
+                //it is a wms layer
+                final String serviceVersion = layer.getExternalServiceVersion() != null ? layer.getExternalServiceVersion() : "1.3.0";
+                final WebMapClient wmsServer = new WebMapClient(serviceUrl, WMSVersion.getVersion(serviceVersion));
+                final WMSMapLayer wmsLayer = new WMSMapLayer(wmsServer, dataName);
+                context.items().add(wmsLayer);
+                continue;
             }
-        }else{
-            try {
-                coordsys = CRS.decode(crs,true);
-            } catch (FactoryException ex) {
-                LOGGER.log(Level.WARNING, "Invalid CRS code : "+crs, ex);
-                return Response.ok("Invalid CRS code : "+crs).status(400).build();
+            //get data
+            final DataProvider inProvider = DataProviders.getInstance().getProvider(providerIdentifier);
+            if(inProvider==null){
+                LOGGER.log(Level.WARNING,"Provider "+providerIdentifier+" does not exist");
+                continue;
             }
+            final Data inData = inProvider.get(new DefaultName(dataName));
+            if(inData==null){
+                LOGGER.log(Level.WARNING,"Data "+dataName+" does not exist in provider "+providerIdentifier);
+                continue;
+            }
+
+            MutableStyle style = null;
             try {
-                //reproject data envelope
-                dataEnv = CRS.transform(dataEnv, coordsys);
-            } catch (TransformException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                return Response.ok("Could not transform data envelope to crs "+crs).status(400).build();
+                final List<StyleBrief> styles = layer.getTargetStyle();
+                if(styles != null && ! styles.isEmpty()){
+                    final String styleName = styles.get(0).getName();
+                    style = styleBusiness.getStyle("sld",styleName);
+                }
+            }catch(Exception ex){
+                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            }
+
+            try {
+                //if style is null, a default style will be used in maplayer.
+                context.items().add(inData.getMapLayer(style, null));
+            } catch (PortrayalException ex) {
+                LOGGER.log(Level.WARNING, "Failed to create map context item for data " + ex.getMessage(), ex);
             }
         }
-        
-        //get pyramid scale levels
-        if(scales==null || scales.length==0){
-            //TODO a way to work on all cases, a default values ?
-            return Response.ok("Scale values missing").status(400).build();
-        }
+
+        final String uuid = UUID.randomUUID().toString();
+        final String providerId = uuid;
+        final String dataName = layerName;
 
         //create the output folder for pyramid
         PyramidalCoverageReference outRef;
-        String pyramidProviderId = RENDERED_PREFIX + UUID.randomUUID().toString();
-        final File providerDirectory = ConfigDirectory.getDataIntegratedDirectory(provider);
+        String pyramidProviderId = RENDERED_PREFIX + uuid;
+        final File providerDirectory = ConfigDirectory.getDataIntegratedDirectory(providerId);
         final File pyramidDirectory = new File(providerDirectory, pyramidProviderId);
         pyramidDirectory.mkdirs();
 
@@ -1619,8 +1499,6 @@ public class DataRest {
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(pyramidDirectory.toURL());
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue("no namespace");
             outProvider = DataProviders.getInstance().createProvider(pyramidProviderId, factory, pparams);
-            // Update the parent attribute of the created provider
-            providerBusiness.updateParent(outProvider.getId(), provider);
         } catch (Exception ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Failed to create pyramid provider " + ex.getMessage()).build();
@@ -1641,46 +1519,27 @@ public class DataRest {
             //set data as RENDERED
             final QName outDataQName = new QName(outRef.getName().getNamespaceURI(), outRef.getName().getLocalPart());
             dataBusiness.updateDataRendered(outDataQName, outProvider.getId(), true);
-
-            //set dataset id for pyramided data
-            final DataBrief dataBrief = dataBusiness.getDataBrief(outDataQName, provider);
-            final Integer datasetId = dataBrief.getDatasetId();
-            dataBusiness.updateDataDataSetId(outDataQName, outProvider.getId(), datasetId);
-
         } catch (Exception ex) {
-            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Failed to create pyramid layer " + ex.getMessage()).build();
         }
 
-
         //prepare the pyramid and mosaics
-        final int tileSize = 256;
         final Dimension tileDim = new Dimension(tileSize, tileSize);
         try {
-            CoverageUtilities.getOrCreatePyramid(outRef, dataEnv, tileDim, scales);
+            CoverageUtilities.getOrCreatePyramid(outRef, globalEnv, tileDim, scales);
         } catch (Exception ex) {
-            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Failed to initialize output pyramid. Cause : " + ex.getMessage()).build();
         }
 
-        /**
-         * TODO : Before launching pyramid update, we should ensure user has not asked for tiles which already exists.
-         */
-        final MapContext context = MapBuilder.createContext();
-        try {
-            //if style is null, a default style will be used in maplayer.
-            context.items().add(inData.getMapLayer(style, null));
-        } catch (PortrayalException ex) {
-            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            return Response.status(500).entity("Failed to create map context layer for data " + ex.getMessage()).build();
-        }
         final ProcessDescriptor desc;
         try {
             desc = ProcessFinder.getProcessDescriptor("engine2d", "mapcontextpyramid");
 
             final ParameterValueGroup input = desc.getInputDescriptor().createValue();
             input.parameter("context").setValue(context);
-            input.parameter("extent").setValue(dataEnv);
+            input.parameter("extent").setValue(globalEnv);
             input.parameter("tilesize").setValue(tileDim);
             input.parameter("scales").setValue(scales);
             input.parameter("container").setValue(outRef);
@@ -1693,72 +1552,323 @@ public class DataRest {
             taskParameter.setDate(System.currentTimeMillis());
             taskParameter.setInputs(ParamUtilities.writeParameter(input));
             taskParameter.setOwner(cstlUser.get().getId());
-            taskParameter.setName("Styled pyramid " + crs + " for " + provider + ":" + dataName+" | "+System.currentTimeMillis());
+            taskParameter.setName("Styled pyramid " + crs + " for " + providerId + ":" + dataName+" | "+System.currentTimeMillis());
             taskParameter.setType("INTERNAL");
             taskParameter = processBusiness.addTaskParameter(taskParameter);
             //add task in scheduler
-            processBusiness.runProcess("Create pyramid " + crs + " for " + provider + ":" + dataName, p, taskParameter.getId(), cstlUser.get().getId());
-
+            processBusiness.runProcess("Create pyramid " + crs + " for " + providerId + ":" + dataName, p, taskParameter.getId(), cstlUser.get().getId());
 
         } catch (NoSuchIdentifierException ex) {
-            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Process engine2d.mapcontextpyramid not found " + ex.getMessage()).build();
         } catch (ConstellationException e) {
             LOGGER.log(Level.WARNING, "Unable to run pyramid process on scheduler");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } catch (Exception ex) {
-            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity("Data cannot be tiled. " + ex.getMessage()).build();
         }
-
         final ProviderData ref = new ProviderData(pyramidProviderId, dataName);
         return Response.ok(ref).build();
     }
 
-    @POST
-    @Path("crs/isgeographic/{epsgCode}")
-    @Produces({MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_JSON})
-    public Response isGeographic(@PathParam("epsgCode") final String epsgCode){
-        
-        CoordinateReferenceSystem crs;
-        try {
-            crs = CRS.decode(epsgCode);
-        } catch (FactoryException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-            crs = null;
-        }
-        return Response.ok(crs instanceof GeographicCRS).build();
+    private static boolean containsInfinity(final GeneralEnvelope env){
+        return Double.isInfinite(env.getLower(0)) || Double.isInfinite(env.getUpper(0)) ||
+               Double.isInfinite(env.getLower(1)) || Double.isInfinite(env.getUpper(1));
     }
 
-    @GET
-    @Path("pyramid/bestscales/{providerId}/{dataId}/{crs}")
+    /**
+     * Generates a pyramid on a list of data and create and return this new provider.
+     *
+     * N.B : It creates a styled pyramid, which can be used for display purposes, but not for analysis.
+     *
+     * @param crs
+     * @param layerName
+     * @param briefs
+     * @param req
+     * @return
+     */
+    @POST
+    @Path("pyramid/create/{crs}/{layerName}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response findBestScales(@PathParam("providerId") final String providerId,
-                                   @PathParam("dataId") final String dataId,
-                                   @PathParam("crs") final String crs){
+    public Response pyramidData(@PathParam("crs") final String crs,
+                                @PathParam("layerName") final String layerName,
+                                final List<DataBrief> briefs,
+                                @Context HttpServletRequest req) throws ConstellationException{
 
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+        if (!cstlUser.isPresent()) {
+            throw new ConstellationException("operation not allowed without login");
+        }
+
+        final CoordinateReferenceSystem coordsys;
+        if(crs != null) {
+            try {
+                coordsys = CRS.decode(crs,true);
+            } catch (FactoryException ex) {
+                LOGGER.log(Level.WARNING, "Invalid CRS code : "+crs, ex);
+                return Response.status(500).entity("Invalid CRS code : " + crs).build();
+            }
+        } else {
+            coordsys = null;
+        }
+
+        if(briefs != null && !briefs.isEmpty()){
+            /**
+             * 1) calculate best scales array.
+             *    loop on each data and determine the largest scales
+             *    that wrap all data.
+             */
+            final List<Double> mergedScales = new LinkedList<>();
+            for(final DataBrief db : briefs){
+                final String providerIdentifier = db.getProvider();
+                final String dataName = db.getName();
+                final Double[] scales;
+                try {
+                    scales = computeScales(providerIdentifier, dataName,crs);
+                }catch(Exception ex) {
+                    LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                    continue;
+                }
+                if(mergedScales.isEmpty()){
+                    mergedScales.addAll(Arrays.asList(scales));
+                }else {
+                    Double max = Math.max(mergedScales.get(0),scales[0]);
+                    Double min = Math.min(mergedScales.get(mergedScales.size()-1),scales[scales.length-1]);
+                    final List<Double> scalesList = new ArrayList<>();
+                    Double scale = max;
+                    while (true) {
+                        if (scale <= min) {
+                            scale = min;
+                        }
+                        scalesList.add(scale);
+                        if (scale <= min) {
+                            break;
+                        }
+                        scale = scale / 2;
+                    }
+                    mergedScales.clear();
+                    mergedScales.addAll(scalesList);
+                }
+            }
+
+            /**
+             * 2) creates the styled pyramid that contains all selected layers
+             *    we need to loop on data and creates a mapcontext
+             *    to send to pyramid process
+             */
+            double[] scales = new double[mergedScales.size()];
+            for (int i = 0; i < scales.length; i++) {
+                scales[i] = mergedScales.get(i);
+            }
+            final String tileFormat = "PNG";
+            String firstDataProv=null;
+            String firstDataName=null;
+            GeneralEnvelope globalEnv = null;
+            final MapContext context = MapBuilder.createContext();
+            for(final DataBrief db : briefs){
+                final String providerIdentifier = db.getProvider();
+                final String dataName = db.getName();
+                if(firstDataProv==null){
+                    firstDataProv = providerIdentifier;
+                    firstDataName = dataName;
+                }
+                //get data
+                final DataProvider inProvider = DataProviders.getInstance().getProvider(providerIdentifier);
+                if(inProvider==null){
+                    LOGGER.log(Level.WARNING,"Provider "+providerIdentifier+" does not exist");
+                    continue;
+                }
+                final Data inData = inProvider.get(new DefaultName(dataName));
+                if(inData==null){
+                    LOGGER.log(Level.WARNING,"Data "+dataName+" does not exist in provider "+providerIdentifier);
+                    continue;
+                }
+
+                Envelope dataEnv;
+                try {
+                    dataEnv = inData.getEnvelope();
+                } catch (DataStoreException ex) {
+                    LOGGER.log(Level.WARNING,"Failed to extract envelope for data "+dataName);
+                    continue;
+                }
+
+                MutableStyle style = null;
+                try {
+                    final List<StyleBrief> styles = db.getTargetStyle();
+                    if(styles != null){
+                        final String styleName = styles.get(0).getName();
+                        style = styleBusiness.getStyle("sld",styleName);
+                    }
+                }catch(Exception ex){
+                    LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+                }
+
+                try {
+                    //if style is null, a default style will be used in maplayer.
+                    context.items().add(inData.getMapLayer(style, null));
+                } catch (PortrayalException ex) {
+                    LOGGER.log(Level.WARNING, "Failed to create map context layer for data " + ex.getMessage(), ex);
+                    continue;
+                }
+
+                if(coordsys != null) {
+                    try {
+                        //reproject data envelope
+                        dataEnv = CRS.transform(dataEnv, coordsys);
+                    } catch (TransformException ex) {
+                        LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                        return Response.status(500).entity("Could not transform data envelope to crs "+crs).build();
+                    }
+                }
+
+                if(globalEnv == null) {
+                    globalEnv = (GeneralEnvelope) dataEnv;
+                }else {
+                    globalEnv.add(dataEnv);
+                }
+            }
+
+            final String uuid = UUID.randomUUID().toString();
+            final String providerId = briefs.size()==1?firstDataProv:uuid;
+            final String dataName = layerName;
+
+            //create the output folder for pyramid
+            PyramidalCoverageReference outRef;
+            String pyramidProviderId = RENDERED_PREFIX + uuid;
+            final File providerDirectory = ConfigDirectory.getDataIntegratedDirectory(providerId);
+            final File pyramidDirectory = new File(providerDirectory, pyramidProviderId);
+            pyramidDirectory.mkdirs();
+
+            //create the output provider
+            final DataProvider outProvider;
+            try {
+                final DataProviderFactory factory = DataProviders.getInstance().getFactory("coverage-store");
+                final ParameterValueGroup pparams = factory.getProviderDescriptor().createValue();
+                ParametersExt.getOrCreateValue(pparams, ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(pyramidProviderId);
+                ParametersExt.getOrCreateValue(pparams, ProviderParameters.SOURCE_TYPE_DESCRIPTOR.getName().getCode()).setValue("coverage-store");
+                final ParameterValueGroup choiceparams = ParametersExt.getOrCreateGroup(pparams, factory.getStoreDescriptor().getName().getCode());
+                final ParameterValueGroup xmlpyramidparams = ParametersExt.getOrCreateGroup(choiceparams, XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.getName().getCode());
+                ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(pyramidDirectory.toURL());
+                ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue("no namespace");
+                outProvider = DataProviders.getInstance().createProvider(pyramidProviderId, factory, pparams);
+                // Update the parent attribute of the created provider
+                if(briefs.size()==1){
+                    providerBusiness.updateParent(outProvider.getId(), providerId);
+                }
+            } catch (Exception ex) {
+                Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                return Response.status(500).entity("Failed to create pyramid provider " + ex.getMessage()).build();
+            }
+
+            try {
+                //create the output pyramid coverage reference
+                CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
+                outRef = (XMLCoverageReference) pyramidStore.create(new DefaultName(dataName));
+                outRef.setPackMode(ViewType.RENDERED);
+                ((XMLCoverageReference) outRef).setPreferredFormat(tileFormat);
+                //this produces an update event which will create the DataRecord
+                outProvider.reload();
+
+                pyramidStore = (CoverageStore) outProvider.getMainStore();
+                outRef = (XMLCoverageReference) pyramidStore.getCoverageReference(outRef.getName());
+
+                //set data as RENDERED
+                final QName outDataQName = new QName(outRef.getName().getNamespaceURI(), outRef.getName().getLocalPart());
+                dataBusiness.updateDataRendered(outDataQName, outProvider.getId(), true);
+
+                //set dataset id for pyramided data
+                if(briefs.size()==1){
+                    final QName origDataQName = new QName(outRef.getName().getNamespaceURI(), firstDataName);
+                    final DataBrief dataBrief = dataBusiness.getDataBrief(origDataQName, providerId);
+                    final Integer datasetId = dataBrief.getDatasetId();
+                    dataBusiness.updateDataDataSetId(outDataQName, outProvider.getId(), datasetId);
+                }
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                return Response.status(500).entity("Failed to create pyramid layer " + ex.getMessage()).build();
+            }
+
+            //prepare the pyramid and mosaics
+            final int tileSize = 256;
+            final Dimension tileDim = new Dimension(tileSize, tileSize);
+            try {
+                CoverageUtilities.getOrCreatePyramid(outRef, globalEnv, tileDim, scales);
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                return Response.status(500).entity("Failed to initialize output pyramid. Cause : " + ex.getMessage()).build();
+            }
+
+            final ProcessDescriptor desc;
+            try {
+                desc = ProcessFinder.getProcessDescriptor("engine2d", "mapcontextpyramid");
+
+                final ParameterValueGroup input = desc.getInputDescriptor().createValue();
+                input.parameter("context").setValue(context);
+                input.parameter("extent").setValue(globalEnv);
+                input.parameter("tilesize").setValue(tileDim);
+                input.parameter("scales").setValue(scales);
+                input.parameter("container").setValue(outRef);
+                final org.geotoolkit.process.Process p = desc.createProcess(input);
+
+                //add task in scheduler
+                TaskParameter taskParameter = new TaskParameter();
+                taskParameter.setProcessAuthority(desc.getIdentifier().getAuthority().toString());
+                taskParameter.setProcessCode(desc.getIdentifier().getCode());
+                taskParameter.setDate(System.currentTimeMillis());
+                taskParameter.setInputs(ParamUtilities.writeParameter(input));
+                taskParameter.setOwner(cstlUser.get().getId());
+                taskParameter.setName("Styled pyramid " + crs + " for " + providerId + ":" + dataName+" | "+System.currentTimeMillis());
+                taskParameter.setType("INTERNAL");
+                taskParameter = processBusiness.addTaskParameter(taskParameter);
+                //add task in scheduler
+                processBusiness.runProcess("Create pyramid " + crs + " for " + providerId + ":" + dataName, p, taskParameter.getId(), cstlUser.get().getId());
+
+            } catch (NoSuchIdentifierException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                return Response.status(500).entity("Process engine2d.mapcontextpyramid not found " + ex.getMessage()).build();
+            } catch (ConstellationException e) {
+                LOGGER.log(Level.WARNING, "Unable to run pyramid process on scheduler");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                return Response.status(500).entity("Data cannot be tiled. " + ex.getMessage()).build();
+            }
+            final ProviderData ref = new ProviderData(pyramidProviderId, dataName);
+            return Response.ok(ref).build();
+        }
+        return Response.ok("The given list of data to pyramid is empty.").build();
+    }
+
+    /**
+     * Returns scales array for data. (for wmts scales)
+     *
+     * @param providerId
+     * @param dataId
+     * @param crs
+     * @return
+     * @throws ConstellationException
+     */
+    private Double[] computeScales(final String providerId, final String dataId, final String crs) throws ConstellationException {
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
         if(inProvider==null){
-            return Response.ok("Provider "+providerId+" does not exist").status(400).build();
+            throw new ConstellationException("Provider "+providerId+" does not exist");
         }
         final Data inData = inProvider.get(new DefaultName(dataId));
         if(inData==null){
-            return Response.ok("Data "+dataId+" does not exist in provider "+providerId).status(400).build();
+            throw new ConstellationException("Data "+dataId+" does not exist in provider "+providerId);
         }
-
         Envelope dataEnv;
         try {
             //use data crs
             dataEnv = inData.getEnvelope();
         } catch (DataStoreException ex) {
-            return Response.ok("Failed to extract envelope for data "+dataId).status(500).build();
+            throw new ConstellationException("Failed to extract envelope for data "+dataId, ex);
         }
         final Object origin = inData.getOrigin();
-        final Object[] scales;
-
+        final Double[] scales;
         Envelope env;
         if(crs == null || crs.isEmpty()){
             env = dataEnv;
@@ -1769,7 +1879,6 @@ public class DataRest {
                 env = dataEnv;
             }
         }
-
         if(origin instanceof CoverageReference){
             //calculate pyramid scale levels
             final CoverageReference inRef = (CoverageReference) inData.getOrigin();
@@ -1779,8 +1888,7 @@ public class DataRest {
                 gg = reader.getGridGeometry(inRef.getImageIndex());
 
             } catch(CoverageStoreException ex) {
-                Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-                return Response.ok("Failed to extract grid geometry for data "+dataId+". "+ex.getMessage()).status(500).build();
+                throw new ConstellationException("Failed to extract grid geometry for data "+dataId+". ",ex);
             }
 
             final double geospanX = env.getSpan(0);
@@ -1802,24 +1910,40 @@ public class DataRest {
                 }
                 scale = scale / 2;
             }
-            scales = new Object[scalesList.size()];
-            for(int i=0;i<scales.length;i++) scales[i] = scalesList.get(i);
-
+            scales = new Double[scalesList.size()];
+            for(int i=0;i<scales.length;i++){
+                scales[i] = scalesList.get(i);
+            }
         }else{
             //featurecollection or anything else, scales can not be defined accurately.
             //vectors have virtually an unlimited resolution
             //we build scales, to obtain 8 levels, this should be enough for a default case
             final double geospanX = env.getSpan(0);
             final int tileSize = 256;
-            scales = new Object[8];
+            scales = new Double[8];
             scales[0] = geospanX / tileSize;
             for(int i=1;i<scales.length;i++){
-                scales[i] = ((Double)scales[i-1]) / 2.0;
+                scales[i] = scales[i-1] / 2.0;
             }
-
         }
-        final String scalesStr = StringUtilities.toCommaSeparatedValues(scales);
-        return Response.ok(new StringList(Collections.singleton(scalesStr))).build();
+        return scales;
+    }
+
+    @GET
+    @Path("pyramid/bestscales/{providerId}/{dataId}/{crs}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response findBestScales(@PathParam("providerId") final String providerId,
+                                   @PathParam("dataId") final String dataId,
+                                   @PathParam("crs") final String crs){
+        try {
+            final Double[] scales = computeScales(providerId,dataId,crs);
+            final String scalesStr = StringUtilities.toCommaSeparatedValues(scales);
+            return Response.ok(new StringList(Collections.singleton(scalesStr))).build();
+        }catch(Exception ex) {
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
+        }
     }
     
     /**
@@ -1888,7 +2012,7 @@ public class DataRest {
                     continue;
                 }
 
-                if (data.isVisible()) {
+                if (data.isIncluded()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
                     final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                     briefs.add(db);
@@ -1911,7 +2035,7 @@ public class DataRest {
             final Provider provider = providerBusiness.getProvider(providerId);
             final List<org.constellation.engine.register.Data> datas = providerBusiness.getDatasFromProviderId(provider.getId());
             for (final org.constellation.engine.register.Data data : datas) {
-                if (data.isVisible()) {
+                if (data.isIncluded()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
                     final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                     briefs.add(db);
@@ -1933,7 +2057,7 @@ public class DataRest {
         final List<org.constellation.engine.register.Data> datas;
         datas = providerBusiness.getDatasFromProviderId(prov.getId());
         for (final org.constellation.engine.register.Data data : datas) {
-            if (data.isVisible()) {
+            if (data.isIncluded()) {
                 final QName name = new QName(data.getNamespace(), data.getName());
                 final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                 briefs.add(db);
@@ -1972,7 +2096,7 @@ public class DataRest {
                     continue;
                 }
 
-                if (data.isVisible()) {
+                if (data.isIncluded()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
                     final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                     briefs.add(db);
@@ -2000,7 +2124,7 @@ public class DataRest {
             final List<org.constellation.engine.register.Data> datas;
             datas = providerBusiness.getDatasFromProviderId(provider.getId());
             for (final org.constellation.engine.register.Data data : datas) {
-                if (data.isVisible()) {
+                if (data.isIncluded()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
                     final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                     if ((published && (db.getTargetService() == null || db.getTargetService().size() == 0)) ||
@@ -2026,7 +2150,7 @@ public class DataRest {
                 final List<org.constellation.engine.register.Data> dataList = dataBusiness.findByDatasetId(ds.getId());
                 final List<DataBrief> briefs = new ArrayList<>();
                 for (final org.constellation.engine.register.Data data : dataList) {
-                    if (data.isVisible()) {
+                    if (data.isIncluded()) {
                         final QName name = new QName(data.getNamespace(), data.getName());
                         final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
                         if ((published && (db.getTargetService() == null || db.getTargetService().size() == 0)) ||
@@ -2065,7 +2189,7 @@ public class DataRest {
             datas = providerBusiness.getDatasFromProviderId(provider.getId());
             for (final org.constellation.engine.register.Data data : datas) {
 
-                if (data.isVisible()) {
+                if (data.isIncluded()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
                     final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                     if ((sensorable && (db.getTargetSensor() == null || db.getTargetSensor().size() == 0)) ||
@@ -2091,7 +2215,7 @@ public class DataRest {
                 final List<org.constellation.engine.register.Data> dataList = dataBusiness.findByDatasetId(ds.getId());
                 final List<DataBrief> briefs = new ArrayList<>();
                 for (final org.constellation.engine.register.Data data : dataList) {
-                    if (data.isVisible()) {
+                    if (data.isIncluded()) {
                         final QName name = new QName(data.getNamespace(), data.getName());
                         final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
                         if ((sensorable && (db.getTargetSensor() == null ||  db.getTargetSensor().isEmpty())) ||
@@ -2428,24 +2552,6 @@ public class DataRest {
         return Response.ok(dataBusiness.getVectorDataColumns(id)).build();
     }
 
-    ///////////////////////////////////////
-    //  UTILITIES
-    //////////////////////////////////////
-
-    private static PyramidalCoverageReference getPyramidLayer(final CoverageStore store, final String dataId) throws DataStoreException {
-        final Set<Name> names = ((CoverageStore) store).getNames();
-        if (names != null && !names.isEmpty()) {
-            for (Name n : names) {
-                if (n.getLocalPart().equals(dataId)) {
-                    final CoverageReference tmpRef = ((CoverageStore) store).getCoverageReference(n);
-                    if (tmpRef instanceof PyramidalCoverageReference) {
-                        return (PyramidalCoverageReference) tmpRef;
-                    }
-                }
-            }
-        }
-        return null;
-    }
 }
 
 

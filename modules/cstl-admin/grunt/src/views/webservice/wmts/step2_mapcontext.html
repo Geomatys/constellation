@@ -1,0 +1,114 @@
+<div class="row" ng-controller="Step1WMTSMapContextController">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-left: 0;padding-right: 0;">
+        <div class="dashboard dashboard-wmts-internal list-style-modal">
+            <div class="navbar sort-navbar" style="margin-bottom: 6px;">
+                <div class="navbar-inner">
+                    <ul class="nav nav-style">
+                        <li ng-click="clickFilter('name')">
+                            <a style="padding:10px;">
+                                <span translate="label.title">Title</span>
+                                <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'name' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'name' && !wrap.orderreverse"></i>
+                            </a>
+                        </li>
+                        <li class="divider-vertical"></li>
+                        <li ng-click="clickFilter('date')">
+                            <a style="padding:10px;">
+                                <span translate="service.edit.dashboard.header.date">Date</span>
+                                <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'date' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'date' && !wrap.orderreverse"></i>
+                            </a>
+                        </li>
+                        <li class="divider-vertical"></li>
+                        <li ng-click="clickFilter('owner')">
+                            <a style="padding:10px;">
+                                <span translate="service.edit.dashboard.header.owner">Owner</span>
+                                <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'owner' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'owner' && !wrap.orderreverse"></i>
+                            </a>
+                        </li>
+                        <li class="divider-vertical"></li>
+                    </ul>
+                    <button type="button" ng-click="wrap.ordertype='name';wrap.orderreverse=false" class="btn btn-xs btn-data">
+                        <i class="fa fa-times"></i>
+                    </button>
+                    <div class="pull-right col-xs-7 col-sm-7 col-md-4 col-lg-4">
+                        <div style="position:relative;">
+                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                            <input type="text"
+                                   ng-model="wrap.filtertext"
+                                   class="search-query form-control form-control-fix"
+                                   style="height: 30px;"
+                                   placeholder="{{'label.search' | translate}}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-inner">
+                <div id="list" data-role="list">
+                    <div class="pagination-wrapper pagination-data">
+                        <div class="col-xs-12" style="padding: 0;">
+                            <strong class="col-xs-8" style="padding-right: 0;">
+                                <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
+                                <span class="nb-results" translate="label.count.mapcontext">available data</span>
+                            </strong>
+                        </div>
+                        <div class="row" style="margin-left: 0; margin-right: 0;">
+                            <div class="col-sm-9" style="padding-left:15px; margin-top: 5px;"
+                                 page-switcher="{page:wrap.currentpage,size:wrap.nbbypage,count:wrap.countdata}"
+                                 on-select-page="displayPage(page)"></div>
+                            <select class="nb-per-page input-small form-control pull-right col-xs-2 "
+                                    style="padding-left: 5px;padding-right: 5px; margin-right: 15px; margin-top: 5px;"
+                                    ng-model="wrap.nbbypage">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item-list">
+                        <div ng-repeat="context in wrap.dataList">
+                            <div class="item mapcontext"
+                                 ng-class="{'selected':context.id==values.selectedContext.id}"
+                                 ng-click="toggleContextSelection(context)">
+                                <div class="top">
+                                    <span class="item-title title-modal"
+                                          title="{{context.name}}">{{truncate(context.name,30)}}</span>
+                                    <span class="pull-right text-right item-list-style"
+                                          style="font-size:14px;"
+                                          translate="label.mapcontext.system">Map context</span>
+                                </div>
+                                <div class="bottom">
+                                    <div class="block">
+                                        <i class="fa fa-calendar"></i>{{context.date | date:'yyyy-MM-dd HH:mm:ss'}}
+                                    </div>
+                                    <div class="block">
+                                        <i class="fa fa-user"></i>{{context.owner}}
+                                    </div>
+                                    <div class="block pull-right">
+                                        <i class="fa fa-paperclip"></i>
+                                            <span ng-if="context.layers == null || context.layers.length == 0"
+                                                  translate="label.no.layers">No layers</span>
+                                            <span ng-if="context.layers.length == 1">
+                                                <span>{{context.layers.length}} </span>
+                                                <span translate="label.layer">layer</span>
+                                            </span>
+                                            <span ng-if="context.layers.length > 1">
+                                                <span>{{context.layers.length}} </span>
+                                                <span translate="label.layers">layers</span>
+                                            </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+        <div id="mapPreviewMapContextForWMTS" style="height: 500px; width:100%;padding: 0;"></div>
+    </div>
+</div>

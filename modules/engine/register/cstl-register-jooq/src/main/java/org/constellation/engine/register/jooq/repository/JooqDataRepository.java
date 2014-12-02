@@ -123,7 +123,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     
     @Override
     public List<Data> findByDatasetId(Integer id) {
-        return dsl.select().from(DATA).where(DATA.DATASET_ID.eq(id)).and(DATA.VISIBLE.eq(Boolean.TRUE)).fetchInto(Data.class);
+        return dsl.select().from(DATA).where(DATA.DATASET_ID.eq(id)).and(DATA.INCLUDED.eq(Boolean.TRUE)).fetchInto(Data.class);
     }
     
     @Override
@@ -164,12 +164,13 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
                 .set(DATA.SENSORABLE, data.isSensorable())
                 .set(DATA.SUBTYPE, data.getSubtype())
                 .set(DATA.TYPE, data.getType())
-                .set(DATA.VISIBLE, data.isVisible())
+                .set(DATA.INCLUDED, data.isIncluded())
                 .set(DATA.DATASET_ID, data.getDatasetId())
                 .set(DATA.FEATURE_CATALOG, data.getFeatureCatalog())
                 .set(DATA.STATS_RESULT, data.getStatsResult())
                 .set(DATA.STATS_STATE, data.getStatsState())
                 .set(DATA.RENDERED, data.isRendered())
+                .set(DATA.HIDDEN, data.isHidden())
                 .where(DATA.ID.eq(data.getId()))
                 .execute();
 

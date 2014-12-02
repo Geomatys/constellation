@@ -30,4 +30,5 @@
   <include file="cstl/db/update/patch-v1.21.xml"/>
   <include file="cstl/db/update/patch-v1.22.xml"/>
   <include file="cstl/db/update/patch-v1.23.xml"/>
+  <include file="cstl/db/update/patch-v1.24.xml"/>
 </databaseChangeLog>

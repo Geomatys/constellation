@@ -25,6 +25,7 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.dto.FileBean;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
@@ -91,6 +92,16 @@ public interface IDataBusiness {
     void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException;
     
     String getTemplate(final QName dataName, final String dataType) throws ConfigurationException;
+
+    /**
+     * Give subfolder list from a server file path
+     *
+     * @param path server file path
+     * @param filtered {@code True} if we want to keep only known files.
+     * @param onlyXML flag to list only xml files used list metadata xml.
+     * @return the file list
+     */
+    List<FileBean> getFilesFromPath(final String path, final boolean filtered, final boolean onlyXML) throws ConstellationException;
 
     /**
      * Returns {@link Data} instance for given data id.

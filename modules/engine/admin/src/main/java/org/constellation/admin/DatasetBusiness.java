@@ -42,6 +42,7 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
 import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.business.IDatasetBusiness;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.CstlUser;
@@ -58,6 +59,7 @@ import org.constellation.security.SecurityManagerHolder;
 import org.constellation.utils.CstlMetadatas;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.geotoolkit.util.FileUtilities;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.context.annotation.Primary;
@@ -526,7 +528,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             }
 
             for (Data data : linkedData) {
-                data.setVisible(false);
+                data.setIncluded(false);
                 data.setDatasetId(null);
                 dataRepository.update(data);
                 involvedProvider.add(data.getProvider());
@@ -538,7 +540,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             for (Integer providerID : involvedProvider) {
                 boolean remove = true;
                 for (Data data : dataRepository.findByProviderId(providerID)) {
-                    if (data.isVisible()) {
+                    if (data.isIncluded()) {
                         remove = false;
                         break;
                     }
@@ -548,6 +550,8 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                     final DataProvider dp = DataProviders.getInstance().getProvider(p.getIdentifier());
                     DataProviders.getInstance().removeProvider(dp);
                     providerRepository.delete(providerID);
+                    final File provDir = ConfigDirectory.getDataIntegratedDirectory(p.getIdentifier());
+                    FileUtilities.deleteDirectory(provDir);
                 }
             }
             // 3. remove internal csw link
