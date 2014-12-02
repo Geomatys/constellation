@@ -10,11 +10,13 @@ import org.slf4j.LoggerFactory;
 
 public class TokenUtils {
 
+    private static final String TOKEN_SEPARATOR = "_";
+
     private final static Logger LOGGER = LoggerFactory.getLogger(TokenUtils.class);
-    
+
     public static final long tokenHalfLife = initTokenHalfLife();
 
-    private static final Pattern TOKEN_PATTERN = Pattern.compile("(\\w+):(\\d+):(\\w+)");
+    private static final Pattern TOKEN_PATTERN = Pattern.compile("(\\w+)_(\\d+)_(\\w+)");
 
     public static String createToken(String username, String secret) {
         /* Expires in one hour */
@@ -22,9 +24,9 @@ public class TokenUtils {
 
         StringBuilder tokenBuilder = new StringBuilder();
         tokenBuilder.append(username);
-        tokenBuilder.append(":");
+        tokenBuilder.append(TOKEN_SEPARATOR);
         tokenBuilder.append(expires);
-        tokenBuilder.append(":");
+        tokenBuilder.append(TOKEN_SEPARATOR);
         tokenBuilder.append(TokenUtils.computeSignature(username, expires, secret));
 
         return tokenBuilder.toString();
@@ -41,7 +43,7 @@ public class TokenUtils {
         }
         return tokenLifeInMinutes;
     }
-    
+
     private static long initTokenHalfLife() {
         long tokenLifeInMinutes = getTokenLife();
         LOGGER.info("Token life set to " + tokenLifeInMinutes + " minutes");
@@ -61,11 +63,11 @@ public class TokenUtils {
     public static String computeSignature(String username, long expires, String secret) {
         StringBuilder signatureBuilder = new StringBuilder();
         signatureBuilder.append(username);
-        signatureBuilder.append(":");
+        signatureBuilder.append(TOKEN_SEPARATOR);
         signatureBuilder.append(expires);
-        signatureBuilder.append(":");
+        signatureBuilder.append(TOKEN_SEPARATOR);
         // signatureBuilder.append(userDetails.getPassword());
-        signatureBuilder.append(":");
+        signatureBuilder.append(TOKEN_SEPARATOR);
         signatureBuilder.append(secret);
 
         MessageDigest digest;
@@ -83,12 +85,14 @@ public class TokenUtils {
             return null;
         }
 
-        String[] parts = authToken.split(":");
+        String[] parts = authToken.split(TOKEN_SEPARATOR);
         return parts[0];
     }
 
     public static boolean validateToken(String authToken, String username, String secret) {
-        String[] parts = authToken.split(":");
+        String[] parts = authToken.split(TOKEN_SEPARATOR);
+        if (parts.length < 3)
+            return false;
         long expires = Long.parseLong(parts[1]);
         String signature = parts[2];
 
@@ -100,11 +104,10 @@ public class TokenUtils {
     }
 
     public static boolean shouldBeExtended(String authToken) {
-        String[] parts = authToken.split(":");
+        String[] parts = authToken.split(TOKEN_SEPARATOR);
         long expires = Long.parseLong(parts[1]);
 
         return expires < System.currentTimeMillis() + tokenHalfLife;
     }
 
-    
 }
