@@ -8,7 +8,9 @@
 <html>
 <head>
     <script src="scripts/jquery.js"></script>
+    <script src="scripts/jquery.tablesorter.js"></script>
     <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/tablesorter.css">
 </head>
 <body>
 <div class="container">
@@ -71,12 +73,17 @@ result :
         </div>
         </div>
     </div>
-<table class="table table-striped">
+<table class="table table-striped tablesorter">
+    <thead>
+    <tr>
 <%              ResultSetMetaData rsmd = rs.getMetaData();
                 for (int i = 1; i<=rsmd.getColumnCount();i++){%>
                     <th><%=rsmd.getColumnLabel(i) %></th>
-<%              }
-                while(rs.next()){%>
+<%              }%>
+    </tr>
+    </thead>
+    <tbody>
+<%              while(rs.next()){%>
 	<tr>
 <%                  for(int i = 1; i<=rsmd.getColumnCount();i++){
                         String s = rs.getString(i);
@@ -87,8 +94,9 @@ result :
                      <%}
                     } %>
 	</tr>
-<%              }
-            } else { %>
+<%              }%>
+    </tbody>
+<%          } else { %>
     nb row affected :  <%=nb %>
 <%          }
         } catch (SQLException ex) {%>
@@ -105,6 +113,9 @@ result :
 </body>
 </html>
 <script>
+    $(document).ready(function(){
+        $(".table").tablesorter();
+    });
     $(function(){
         $("#task").on("click", function(){
             $("#query").val('select * from admin.task');
@@ -182,5 +193,5 @@ result :
             $("#query").val('select * from admin.property');
             $("#sqlForm").submit();
         });
-    })
+    });
 </script>
