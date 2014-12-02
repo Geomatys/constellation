@@ -25,11 +25,9 @@ import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.engine.register.Provider;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.process.*;
 import org.geotoolkit.storage.DataStoreFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.quartz.SchedulerException;
 
 import java.io.IOException;
 import java.util.List;
@@ -92,9 +90,9 @@ public interface IProviderBusiness {
      */
     Provider create(final int domainId, final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException;
 
-    Set<Name> test(String providerIdentifier, ProviderConfiguration configuration) throws DataStoreException;
+    Set<Name> test(String providerIdentifier, ProviderConfiguration configuration) throws DataStoreException, ConfigurationException;
 
-    void update(int domainId, String id, ProviderConfiguration config);
+    void update(int domainId, String id, ProviderConfiguration config) throws ConfigurationException;
 
     org.constellation.engine.register.Provider storeProvider(String providerId, String o, ProviderType type, String factoryName, GeneralParameterValue config) throws IOException;
 

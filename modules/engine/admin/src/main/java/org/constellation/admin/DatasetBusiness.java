@@ -544,6 +544,9 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                     }
                 }
                 if (remove) {
+                    final Provider p = providerRepository.findOne(providerID);
+                    final DataProvider dp = DataProviders.getInstance().getProvider(p.getIdentifier());
+                    DataProviders.getInstance().removeProvider(dp);
                     providerRepository.delete(providerID);
                 }
             }

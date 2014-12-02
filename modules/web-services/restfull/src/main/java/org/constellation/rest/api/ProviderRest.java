@@ -110,9 +110,9 @@ public final class ProviderRest {
                 LOGGER.warning("non data found for provider: " + providerIdentifier);
                 return Response.status(500).build();
             }
-        } catch (DataStoreException e) {
+        } catch (DataStoreException | ConfigurationException e) {
             LOGGER.log(Level.WARNING, "Cannot open provider "+providerIdentifier+" for domain "+domainId, e);
-            return Response.status(500).build();
+            return Response.status(500).entity(e.getMessage()).build();
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -120,7 +120,12 @@ public final class ProviderRest {
     @PUT
     @Path("/{id}")
     public Response update(final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration config) {
-        providerBusiness.update(domainId, id, config);
+        try {
+            providerBusiness.update(domainId, id, config);
+        }catch(ConfigurationException ex){
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.status(500).entity(ex.getMessage()).build();
+        }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 

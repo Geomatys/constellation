@@ -182,7 +182,7 @@ public class ProviderBusiness implements IProviderBusiness {
     }
 
     @Override
-    public Set<Name> test(final String providerIdentifier, final ProviderConfiguration configuration) throws DataStoreException {
+    public Set<Name> test(final String providerIdentifier, final ProviderConfiguration configuration) throws DataStoreException, ConfigurationException {
         final String type = configuration.getType();
         final String subType = configuration.getSubType();
         final Map<String, String> inParams = configuration.getParameters();
@@ -242,8 +242,8 @@ public class ProviderBusiness implements IProviderBusiness {
         ParameterValueGroup sources = sourceDesc.createValue();
         sources.parameter("id").setValue(id);
         sources.parameter("providerType").setValue(type);
-
-        return create(domainId, id, providerService.getName(), fillProviderParameter(type, subType, inParams, sources));
+        sources = fillProviderParameter(type, subType, inParams, sources);
+        return create(domainId, id, providerService.getName(), sources);
     }
 
     /**
@@ -261,7 +261,8 @@ public class ProviderBusiness implements IProviderBusiness {
         return getProvider(id);
     }
 
-    public void update(final int domainId, final String id, final ProviderConfiguration config) {
+    @Override
+    public void update(final int domainId, final String id, final ProviderConfiguration config) throws ConfigurationException {
         final String type = config.getType();
         final String subType = config.getSubType();
         final Map<String, String> inParams = config.getParameters();
@@ -281,7 +282,9 @@ public class ProviderBusiness implements IProviderBusiness {
         }
     }
 
-    protected ParameterValueGroup fillProviderParameter(String type, String subType, Map<String, String> inParams, ParameterValueGroup sources) {
+    protected ParameterValueGroup fillProviderParameter(String type, String subType,
+                                                        Map<String, String> inParams,
+                                                        ParameterValueGroup sources)throws ConfigurationException {
         switch (type) {
             case "sld":
                 final String sldPath = inParams.get("path");
@@ -359,7 +362,11 @@ public class ProviderBusiness implements IProviderBusiness {
                         }
                     }
 
-                    if (!foundProvider && subType!=null && !subType.isEmpty()) {
+                    if(!foundProvider) {
+                        throw new ConfigurationException("No provider found to resolve the data!");
+                    }
+
+                    if (subType!=null && !subType.isEmpty()) {
                         if (url != null) {
                             inParams.put("url",url.toString());
                         }
