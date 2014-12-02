@@ -25,6 +25,13 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
     private String externalLayer;
     private String externalLayerExtent;
 
+    /**
+     * Default constructor needed by jackson when dealing with json.
+     */
+    public MapContextStyledLayerDTO(){
+        super();
+    }
+
     public MapContextStyledLayerDTO(final MapcontextStyledLayer mapContextStyledLayer) {
         super();
         this.id = mapContextStyledLayer.getId();
