@@ -488,40 +488,35 @@
                                             <div class="row block-association"
                                                  ng-init="assocStyle=false;">
 
-                                                <div class="col-sm-7 col-lg-6 col-lg-offset-1">
-                                                    <div class="block-associated block-associated-style block-associated-style-service">
+                                                <div class="col-sm-12 col-md-10 col-md-offset-1">
+                                                    <div class="block-associated block-associated-style block-associated-style-service"
+                                                         ng-click="assocStyle=!assocStyle;">
                                                         <div class="block-associated-nb">{{selected.TargetStyle.length}}</div>
                                                         <div class="block-associated-title"
                                                              translate="label.related.style">Associated Styles</div>
+                                                        <span class="fa icon-assoc-style " ng-class="{'selected':assocStyle, 'fa-chevron-circle-up':assocStyle, 'fa-chevron-circle-down':!assocStyle}"></span>
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-5 col-lg-4" style="margin-top: 4px; padding-left: 0;">
-                                                    <button class="btn btn-block-assos btn-assoc-style"
-                                                            ng-click="assocStyle=!assocStyle;"
-                                                            ng-class="{'selected':assocStyle}"><i class="fa fa-eye"></i></button>
-                                                    <button class="btn btn-block-assos btn-assoc-style"
-                                                            ng-click="showStyleList();"
-                                                            tooltip-html-unsafe="{{'label.new.style' | translate}}"
-                                                            tooltip-placement="bottom"><i class="fa fa-plus"></i></button>
                                                 </div>
                                             </div>
 
-                                            <div ng-if="assocStyle" class="col-lg-10 col-lg-offset-1 block-assoc">
-                                                <div class="block-header block-assoc-style">
-                                                    <strong>
-                                                        <span translate="label.related.style">Related style(s)</span>
-                                                    </strong>
+                                            <div ng-if="assocStyle" class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
+                                                <div class="assoc-add add-style">
+                                                    <button class="btn btn-block-assos btn-assoc-style"
+                                                            ng-click="showStyleList();">
+                                                        <i class="fa fa-plus"></i>
+                                                        <span style="font-size: 12px;" translate="label.new.style">Associate new style</span>
+                                                    </button>
                                                 </div>
                                                 <div id="linkedList" class="block-content" >
                                                     <span ng-show="selected.TargetStyle.length == 0"
                                                             translate="label.no.association">No association</span>
                                                     <div ng-show="selected.TargetStyle.length > 0"
-                                                         class="style"
+                                                         class="style btn-assoc-item"
                                                          ng-repeat="style in selected.TargetStyle"
                                                          style="margin-bottom:5px;">
                                                         <button type="button"
                                                                 ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
-                                                                class="btn btn-small btn-block-assos">
+                                                                class="btn btn-small btn-block-assos btn-block-assos-style">
                                                             <i class="glyphicon glyphicon-trash"></i>
                                                         </button>
                                                         {{truncateTitleBlock(style.Name)}}
