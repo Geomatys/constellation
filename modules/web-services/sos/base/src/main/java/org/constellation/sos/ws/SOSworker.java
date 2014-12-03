@@ -1814,7 +1814,7 @@ public class SOSworker extends AbstractWorker {
     }
     
     public InsertResultResponse insertResult(final InsertResult request) throws CstlServiceException {
-        LOGGER.log(logLevel, "InsertResultTemplate request processing\n");
+        LOGGER.log(logLevel, "InsertResult request processing\n");
         final long start = System.currentTimeMillis();
         verifyBaseRequest(request, true, false);
         final String currentVersion = request.getVersion().toString();
