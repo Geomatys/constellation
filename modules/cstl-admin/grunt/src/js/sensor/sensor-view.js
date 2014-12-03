@@ -122,6 +122,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
             $scope.var.displayGraph=false;
             $scope.var.displayRealTimeGraph=false;
             $scope.var.topic.unsubscribe();
+            $scope.var.sosdata=[];
         };
 
         $scope.showGraph = function() {
@@ -157,15 +158,10 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
 
         $scope.showRealTimeGraph = function() {
             var measuresChecked = getMeasuresChecked();
-            if (measuresChecked.length === 0) {
-                var allMeasures = getAllMeasures();
-                if (allMeasures.length === 1) {
-                    measuresChecked = allMeasures;
-                } else {
-                    // Please select one or more measure(s) in the list
+            if (measuresChecked.length !== 1) {
+                    // Please select only one mesure
                     $scope.var.needToSelectMeasure = true;
                     return;
-                }
             }
             $scope.var.displayMesureSelector = false;
             $scope.var.displayRealTimeGraph = true;
