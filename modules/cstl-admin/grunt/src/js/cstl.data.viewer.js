@@ -325,7 +325,7 @@ window.DataViewer = {
             stylesMap = {
                 'default':[new ol.style.Style({
                     image: new ol.style.Icon(({
-                        anchor: [0.5, 46],
+                        anchor: [0.5, 26],
                         anchorXUnits: 'fraction',
                         anchorYUnits: 'pixels',
                         opacity: 0.75,
@@ -334,7 +334,7 @@ window.DataViewer = {
                 })],
                 'select':[new ol.style.Style({
                     image: new ol.style.Icon(({
-                        anchor: [0.5, 46],
+                        anchor: [0.5, 26],
                         anchorXUnits: 'fraction',
                         anchorYUnits: 'pixels',
                         opacity: 0.75,
