@@ -356,7 +356,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 stmtInsertCompo.close();
             }
         } else if (exist && isPartial) {
-            final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET partial = ?");
+            final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET \"partial\" = ?");
             stmtUpdate.setBoolean(1, false);
             stmtUpdate.executeUpdate();
             stmtUpdate.close();

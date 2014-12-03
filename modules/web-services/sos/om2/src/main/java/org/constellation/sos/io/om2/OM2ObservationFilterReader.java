@@ -556,7 +556,10 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     fields.add(timeField);
                 }
                 for (String f : currentFields) {
-                    fields.add(getFieldForPhenomenon(currentProcedure, f, c));
+                    final Field field = getFieldForPhenomenon(currentProcedure, f, c);
+                    if (!fields.contains(field)) {
+                        fields.add(field);
+                    }
                 }
             } else {
                 fields = readFields(currentProcedure, c);
@@ -624,7 +627,10 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     fields.add(timeField);
                 }
                 for (String f : currentFields) {
-                    fields.add(getFieldForPhenomenon(currentProcedure, f, c));
+                    final Field field = getFieldForPhenomenon(currentProcedure, f, c);
+                    if (!fields.contains(field)) {
+                        fields.add(field);
+                    }
                 }
             } else {
                 fields = readFields(currentProcedure, c);

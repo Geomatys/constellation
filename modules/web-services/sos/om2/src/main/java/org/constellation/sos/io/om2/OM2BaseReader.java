@@ -352,7 +352,18 @@ public class OM2BaseReader {
             }
             return buildAnyScalar(version, null, fieldName, compo);
         }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 89 * hash + java.util.Objects.hashCode(this.fieldType);
+            hash = 89 * hash + java.util.Objects.hashCode(this.fieldName);
+            hash = 89 * hash + java.util.Objects.hashCode(this.fieldDesc);
+            hash = 89 * hash + java.util.Objects.hashCode(this.fieldUom);
+            return hash;
+        }
         
+        @Override
         public boolean equals(final Object obj) {
             if (obj == this) {
                 return true;
@@ -365,6 +376,11 @@ public class OM2BaseReader {
                        Objects.equal(this.fieldUom,  that.fieldUom);
             }
             return false;
+        }
+        
+        @Override
+        public String toString() {
+            return fieldName + ": " + fieldType;
         }
     }
 }
