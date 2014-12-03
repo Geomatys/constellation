@@ -20,6 +20,7 @@ public class LiquidDatabase {
     public static void main(String[] args) throws IOException {
 
         String path = args[0];
+        String update = args[1];
 
         if (!path.startsWith("/tmp/") && !path.contains("target/"))
             throw new IOException("tmp files must be located in /tmp or target folder: " + path);
@@ -32,7 +33,7 @@ public class LiquidDatabase {
         Liquibase liquibase = null;
         try (Connection con = DriverManager.getConnection("jdbc:derby:" + path + " ;create=true")) {
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(con));
-            liquibase = new Liquibase("cstl/db/db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            liquibase = new Liquibase(update, new ClassLoaderResourceAccessor(), database);
             liquibase.update("");
 
             database.close();

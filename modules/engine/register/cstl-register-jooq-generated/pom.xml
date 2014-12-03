@@ -105,6 +105,7 @@
             <classpath />
             <argument>org.constellation.admin.util.LiquidDatabase</argument>
             <argument>${basedir}/target/builddb</argument>
+            <argument>cstl/db/db-changelog.xml</argument>
           </arguments>
         </configuration>
       </plugin>
