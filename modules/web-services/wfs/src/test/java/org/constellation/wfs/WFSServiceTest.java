@@ -40,9 +40,7 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
@@ -121,7 +119,7 @@ public class WFSServiceTest implements ApplicationContextAware {
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
-                
+
                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
                 final String url = "jdbc:derby:memory:TestWFSServiceOM";
@@ -152,7 +150,7 @@ public class WFSServiceTest implements ApplicationContextAware {
 
                 serviceBusiness.create("wfs", "default", config, null, null);
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "wfs", null);
-                
+                DataProviders.getInstance().reload();
                 service = new WFSService();
 
                 Field privateStringField = WebService.class.getDeclaredField("uriContext");
@@ -181,14 +179,6 @@ public class WFSServiceTest implements ApplicationContextAware {
         if (derbyLog.exists()) {
             derbyLog.delete();
         }
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test
