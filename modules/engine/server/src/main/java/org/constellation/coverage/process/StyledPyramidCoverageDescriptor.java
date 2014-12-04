@@ -31,6 +31,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
 /**
@@ -82,10 +83,16 @@ public class StyledPyramidCoverageDescriptor  extends AbstractCstlProcessDescrip
     private static final String DOMAIN_ID_REMARKS = "Identifier of the domain to add data.";
     public static final ParameterDescriptor<Integer> DOMAIN_ID =
             new DefaultParameterDescriptor(DOMAIN_ID_NAME, DOMAIN_ID_REMARKS, Integer.class, null, false);
-    
+
+    public static final String PYRAMID_CRS_NAME = "pyramid-crs";
+    private static final String PYRAMID_CRS_REMARKS = "Output pyramid CRS.";
+    public static final ParameterDescriptor<CoordinateReferenceSystem> PYRAMID_CRS =
+            new DefaultParameterDescriptor(PYRAMID_CRS_NAME, PYRAMID_CRS_REMARKS, CoordinateReferenceSystem.class, null, false);
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{COVERAGE_BASE_NAME, STYLE, IMAGE_FILE_PATH,IMAGE_FILE_FORMAT, PYRAMID_FOLDER, PROVIDER_OUT_ID, DOMAIN_ID, DATASET_ID});
+            new GeneralParameterDescriptor[]{COVERAGE_BASE_NAME, STYLE, IMAGE_FILE_PATH,IMAGE_FILE_FORMAT, PYRAMID_FOLDER,
+                    PROVIDER_OUT_ID, DOMAIN_ID, DATASET_ID, PYRAMID_CRS});
 
     
     public static final String PROVIDER_SOURCE_NAME = "provider_source";

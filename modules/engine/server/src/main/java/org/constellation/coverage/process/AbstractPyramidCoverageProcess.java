@@ -1,8 +1,6 @@
 package org.constellation.coverage.process;
 
-import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.ArraysExt;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProvider;
@@ -79,10 +77,6 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         return store;
     }
 
-    protected CoordinateReferenceSystem getPyramidCRS() {
-        return CommonCRS.defaultGeographic();
-    }
-
     protected CoverageStore getCoverageStoreFromInput(final String imageFile, final String imageType)
             throws ProcessException, MalformedURLException {
         final ParameterValueGroup params = FileCoverageStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
@@ -113,9 +107,8 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
      * Compute bounds of pyramid CRS
      * @return
      */
-    protected Envelope getPyramidWorldEnvelope(){
-        final CoordinateReferenceSystem pyramidCRS = getPyramidCRS();
-        return CRS.getEnvelope(pyramidCRS);
+    protected Envelope getPyramidWorldEnvelope(CoordinateReferenceSystem crs){
+        return CRS.getEnvelope(crs);
     }
 
     /**
@@ -126,9 +119,9 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
      * @throws DataStoreException
      * @throws FactoryException
      */
-    protected double[] getPyramidScales(GridCoverage2D inputCoverage, PyramidalCoverageReference pyramidRef)
+    protected double[] getPyramidScales(GridCoverage2D inputCoverage, PyramidalCoverageReference pyramidRef,
+                                        CoordinateReferenceSystem pyramidCRS)
             throws DataStoreException, FactoryException, TransformException, OutOfDomainOfValidityException {
-        final CoordinateReferenceSystem pyramidCRS = getPyramidCRS();
 
         final PyramidSet pyramidSet = pyramidRef.getPyramidSet();
         final Collection<Pyramid> pyramids = pyramidSet.getPyramids();
@@ -144,13 +137,14 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         if (pyramid != null) {
             scales = pyramid.getScales();
         } else {
-            scales = computeScales(inputCoverage);
+            scales = computeScales(inputCoverage, pyramidCRS);
         }
         return scales;
     }
 
-    private double[] computeScales(GridCoverage2D coverage) throws TransformException, OutOfDomainOfValidityException {
-        final Envelope env = getPyramidWorldEnvelope();
+    private double[] computeScales(GridCoverage2D coverage, final CoordinateReferenceSystem pyramidCRS)
+            throws TransformException, OutOfDomainOfValidityException {
+        final Envelope env = getPyramidWorldEnvelope(pyramidCRS);
         final double spanX = env.getSpan(0);
 
         final GridGeometry2D gg = coverage.getGridGeometry();
