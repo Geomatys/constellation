@@ -162,6 +162,7 @@
     "sensor.metadata.listing.selected.edit.button":"Éditer la métadonnée",
     "sensor.metadata.listing.selected.export.button":"Exporter la métadonnée",
     "data.listing.selected.goto.sensor":"Aller à la page des capteurs",
+    "data.listing.selected.raster.pyramid":"La donnée est pyramidée",
     "sensor.listing.selected.delete.button":"Supprimer le capteur",
     "data.listing.selectAllChild":"Sélectionner toutes les données du jeu",
     "metadata.not.found":"Aucune métadonnée n'a été trouvé !",

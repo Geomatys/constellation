@@ -161,6 +161,7 @@
     "sensor.metadata.listing.selected.edit.button":"Edit sensor metadata",
     "sensor.metadata.listing.selected.export.button":"Export metadata",
     "data.listing.selected.goto.sensor":"Go to sensor page",
+    "data.listing.selected.raster.pyramid":"Tiled pyramid data",
     "sensor.listing.selected.delete.button":"Delete sensor",
     "data.listing.selectAllChild":"Select all data in dataset",
     "metadata.not.found":"Metadata not found!",
