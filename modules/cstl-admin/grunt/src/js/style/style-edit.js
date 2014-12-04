@@ -295,6 +295,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          * The main init function called to prepare the sld editor when opening the modal.
          */
         function initSldPage() {
+            $scope.dataType = null;
             //if we are in data dashboard
             if($scope.selectedLayer) {
                 var timestamp=new Date().getTime();
@@ -315,7 +316,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     //going to raster page
                     $scope.chooseType = true;
                     $scope.page.pageSld = 'views/style/raster.html';
-                    $scope.dataType = 'raster';
+                    $scope.dataType = 'coverage';
                     $scope.providerId = $scope.selectedLayer.Provider;
                     $scope.layerName = layerName;
                 }else if($scope.selectedLayer.Type &&
@@ -340,7 +341,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     //going to raster page
                     $scope.chooseType = true;
                     $scope.page.pageSld = 'views/style/raster.html';
-                    $scope.dataType = 'raster';
+                    $scope.dataType = 'coverage';
                     $scope.providerId = 'generic_world_tif';
                     $scope.layerName = 'cloudsgrey';
                 }else if($scope.selectedStyle.Type &&
@@ -1280,7 +1281,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
         $scope.initRasterType = function() {
             $scope.chooseType = true;
             $scope.page.pageSld = 'views/style/raster.html';
-            $scope.dataType = 'raster';
+            $scope.dataType = 'coverage';
             $scope.providerId = 'generic_world_tif';
             $scope.layerName = 'cloudsgrey';
             $scope.displayCurrentStyle('styledMapOL',null);
@@ -1303,7 +1304,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                             $scope.optionsSLD.autoUniqueValues.attr=$scope.attributesExcludeGeometry[0].name;
                         }
                         //for raster only
-                        if($scope.dataType === 'raster'){
+                        if($scope.dataType === 'coverage'){
                             $scope.dataBands = response.bands;
                             if($scope.dataBands && $scope.dataBands.length > 0){
                                 $scope.optionsSLD.rasterPalette.band.selected = $scope.dataBands[0];
@@ -2040,7 +2041,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                         $scope.providerId, styleName,null,null,false);
                 }else {
-                    layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName, $scope.providerId,null,true);
+                    layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName, $scope.providerId,null,false);
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
@@ -2067,14 +2068,14 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         if($scope.selectedLayer){
                             if($scope.newStyle.rules.length ===0){
                                 layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName,
-                                    $scope.providerId,null,true);
+                                    $scope.providerId,null,false);
                             }else {
                                 layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), $scope.layerName,
                                     $scope.providerId, $scope.newStyle.name, "sld_temp",null,false);
                             }
                         }else {
                             //if there is no selectedLayer ie the sld editor in styles dashboard
-                            if ($scope.dataType.toLowerCase() === 'raster') {
+                            if ($scope.dataType.toLowerCase() === 'coverage') {
                                 //to avoid layer disappear when rules is empty
                                 if($scope.newStyle.rules.length ===0){
                                     layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), $scope.layerName,
@@ -2189,7 +2190,17 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          */
         $scope.initScopeStyle = function() {
             style.listAll({provider: 'sld'}, function(response) {
-                Dashboard($scope, response.styles, true);
+                var stylesArray = [];
+                if(response.styles && response.styles.length>0 && $scope.dataType){
+                    for(var i=0;i<response.styles.length;i++){
+                        if($scope.dataType.toLowerCase() === response.styles[i].Type.toLowerCase()){
+                            stylesArray.push(response.styles[i]);
+                        }
+                    }
+                }else {
+                    stylesArray =response.styles;
+                }
+                Dashboard($scope, stylesArray, true);
             });
         };
 
