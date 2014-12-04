@@ -5,25 +5,24 @@
 	 width="21px" height="21px" viewBox="0 0 21 21" style="enable-background:new 0 0 21 21;" xml:space="preserve">
 <style type="text/css">
 <![CDATA[
-	.st0{fill:#808080;}
+	.st0{fill:none;stroke:#8B8B8B;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 	.st1{fill:#FFFFFF;}
 	.st2{fill:#CCCCCC;}
-	.st3{fill:#A6A6A6;}
+	.st3{fill:none;stroke:#A6A6A6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 ]]>
 </style>
 <circle class="st1" cx="10.5" cy="10.6" r="10.5"/>
-<polygon class="st2" points="7.1,13.7 3.7,13.7 6,12.3 9.4,12.3 "/>
-<polygon class="st2" points="11.3,13.7 7.9,13.7 10.2,12.3 13.6,12.3 "/>
-<polygon class="st2" points="15.6,13.7 12.1,13.7 14.4,12.3 17.9,12.3 "/>
-<polygon class="st2" points="10,11.9 6.5,11.9 8.8,10.4 12.3,10.4 "/>
-<polygon class="st2" points="14.2,11.9 10.8,11.9 13,10.4 16.5,10.4 "/>
-<polygon class="st2" points="18.4,11.9 15,11.9 17.3,10.4 20.7,10.4 "/>
-<polygon class="st2" points="13.3,15.2 15,14.1 11.6,14.1 9.8,15.2 "/>
-<polygon class="st2" points="9,15.2 10.8,14.1 7.3,14.1 5.6,15.2 "/>
-<polygon class="st2" points="4.8,15.2 6.5,14.1 3.1,14.1 1.4,15.2 "/>
-<polygon class="st3" points="7.3,11.6 2.9,11.6 5.8,9.7 10.3,9.7 "/>
-<polygon class="st3" points="13,11.6 8.6,11.6 11.5,9.7 15.9,9.7 "/>
-<polygon class="st3" points="10.9,9.3 6.4,9.3 9.4,7.3 13.8,7.3 "/>
-<polygon class="st3" points="16.5,9.3 12.1,9.3 15,7.3 19.5,7.3 "/>
-<polygon class="st0" points="12,7.5 5.4,7.5 9.8,4.6 16.4,4.6 "/>
+<path class="st2" d="M-251.3,100"/>
+<polygon class="st3" points="10.5,2.9 2.5,12.1 10.5,17.3 18.5,12.1 "/>
+<line class="st3" x1="10.5" y1="2.9" x2="10.5" y2="17.3"/>
+<line class="st0" x1="10.5" y1="2.9" x2="4.8" y2="13.6"/>
+<line class="st0" x1="10.5" y1="2.9" x2="7.4" y2="15.2"/>
+<line class="st0" x1="10.5" y1="2.9" x2="13.4" y2="15.4"/>
+<line class="st0" x1="10.5" y1="2.9" x2="16.2" y2="13.6"/>
+<line class="st0" x1="16.7" y1="10" x2="10.4" y2="13.6"/>
+<line class="st0" x1="14.9" y1="7.9" x2="10.4" y2="10.5"/>
+<line class="st0" x1="13" y1="5.7" x2="10.4" y2="7.2"/>
+<line class="st0" x1="10.4" y1="13.6" x2="4.3" y2="10.1"/>
+<line class="st0" x1="10.4" y1="10.5" x2="5.9" y2="7.9"/>
+<line class="st0" x1="10.4" y1="7.2" x2="8.2" y2="6.1"/>
 </svg>
