@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="version_1.25" author="msidhoum">
+        <createTable schemaName="admin" tableName="data_x_data">
+            <column name="data_id" type="INTEGER" >
+                <constraints nullable="false" />
+            </column>
+            <column name="child_id" type="INTEGER" >
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableSchemaName="admin" referencedTableSchemaName="admin"
+                constraintName="data_x_data_cross_id_fk"
+                baseTableName="data_x_data" baseColumnNames="data_id"
+                referencedTableName="data" referencedColumnNames="id"
+                onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableSchemaName="admin" referencedTableSchemaName="admin"
+                constraintName="data_x_data_cross_id_fk2"
+                baseTableName="data_x_data" baseColumnNames="child_id"
+                referencedTableName="data" referencedColumnNames="id"
+                onDelete="CASCADE"/>
+        <addPrimaryKey columnNames="data_id, child_id"
+                       constraintName="DATA_X_DATA_PK"
+                       schemaName="admin"
+                       tableName="data_x_data"/>
+    </changeSet>
+</databaseChangeLog>
