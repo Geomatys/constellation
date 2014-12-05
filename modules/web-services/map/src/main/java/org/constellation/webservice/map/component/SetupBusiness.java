@@ -76,7 +76,13 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.GraphicalSymbol;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Specific setup for map service
@@ -99,6 +105,10 @@ public class SetupBusiness {
     @Inject
     private IConfigurationBusiness configurationBusiness;
 
+    @Inject
+    @Qualifier("txManager")
+    protected PlatformTransactionManager txManager;
+    
     @PostConstruct
     public void contextInitialized() {
         LOGGER.log(Level.INFO, "=== Initialize Application ===");
@@ -110,18 +120,31 @@ public class SetupBusiness {
         } catch (ClassNotFoundException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
-        WithDefaultResources defaultResourcesDeployed = deployDefaultResources(ConfigDirectory.getDataDirectory().toPath());
+        
+        
+        TransactionTemplate transactionTemplate = new TransactionTemplate(txManager);
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus arg0) {
 
-        LOGGER.log(Level.INFO, "initializing default styles ...");
-        defaultResourcesDeployed.initializeDefaultStyles();
-        LOGGER.log(Level.INFO, "initializing temporary styles ...");
-        defaultResourcesDeployed.initializeDefaultTempStyles();
-        LOGGER.log(Level.INFO, "initializing vector data ...");
-        defaultResourcesDeployed.initializeDefaultVectorData();
-        LOGGER.log(Level.INFO, "initializing raster data ...");
-        defaultResourcesDeployed.initializeDefaultRasterData();
-        LOGGER.log(Level.INFO, "initializing properties ...");
-        defaultResourcesDeployed.initializeDefaultProperties();
+                WithDefaultResources defaultResourcesDeployed = deployDefaultResources(ConfigDirectory.getDataDirectory().toPath());
+                
+                LOGGER.log(Level.INFO, "initializing default styles ...");
+                defaultResourcesDeployed.initializeDefaultStyles();
+                LOGGER.log(Level.INFO, "initializing temporary styles ...");
+                defaultResourcesDeployed.initializeDefaultTempStyles();
+                LOGGER.log(Level.INFO, "initializing vector data ...");
+                defaultResourcesDeployed.initializeDefaultVectorData();
+                LOGGER.log(Level.INFO, "initializing raster data ...");
+                defaultResourcesDeployed.initializeDefaultRasterData();
+                LOGGER.log(Level.INFO, "initializing properties ...");
+                defaultResourcesDeployed.initializeDefaultProperties();
+                
+            }
+        });
+        
+        
     }
 
     /**
@@ -223,7 +246,8 @@ public class SetupBusiness {
                     inputs.parameter(CreateProviderDescriptor.SOURCE_NAME).setValue(source);
                     desc.createProcess(inputs).call();
                 } catch (NoSuchIdentifierException ignore) { // should never
-                                                             // happen
+                                                         // happen
+                    LOGGER.log(Level.SEVERE, "4th dimension", ignore);
                 } catch (ProcessException ex) {
                     LOGGER.log(Level.WARNING, "An error occurred when creating default SLD provider.", ex);
                     return;
