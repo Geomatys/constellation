@@ -60,7 +60,9 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12" style="border-top:solid 1px #ddd;padding-left:0;padding-right:0;margin-bottom: 10px;">
+        <div class="col-xs-12"
+             ng-show="import.metadata"
+             style="border-top:solid 1px #ddd;padding-left:0;padding-right:0;margin-bottom: 10px;">
             <div class="form-group" style="padding: 10px 0 12px 17px; margin-bottom: 0; background-color: #E9E9E9;">
                 <input type="checkbox"
                        ng-model="import.fillMetadata"/>
