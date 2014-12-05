@@ -125,7 +125,7 @@ public class QuartzJobListener implements JobListener {
         @Override
         public void started(ProcessEvent event) {
             taskEntity.setState(TaskState.RUNNING.name());
-            taskEntity.setStart(System.currentTimeMillis());
+            taskEntity.setDateStart(System.currentTimeMillis());
             taskEntity.setMessage(toString(event.getTask()));
             taskEntity.setProgress((double) event.getProgress());
             updateTask(taskEntity);
@@ -158,7 +158,7 @@ public class QuartzJobListener implements JobListener {
         @Override
         public void completed(ProcessEvent event) {
             taskEntity.setState(TaskState.SUCCEED.name());
-            taskEntity.setEnd(System.currentTimeMillis());
+            taskEntity.setDateEnd(System.currentTimeMillis());
             taskEntity.setMessage(toString(event.getTask()));
             taskEntity.setProgress((double) event.getProgress());
             updateTask(taskEntity);
@@ -167,7 +167,7 @@ public class QuartzJobListener implements JobListener {
         @Override
         public void failed(ProcessEvent event) {
             taskEntity.setState(TaskState.FAILED.name());
-            taskEntity.setEnd(System.currentTimeMillis());
+            taskEntity.setDateEnd(System.currentTimeMillis());
             StringWriter errors = new StringWriter();
             if (event.getException() != null) {
                 event.getException().printStackTrace(new PrintWriter(errors));
@@ -190,8 +190,8 @@ public class QuartzJobListener implements JobListener {
             taskStatus.setStatus(taskEntity.getState());
             taskStatus.setMessage(taskEntity.getMessage());
             taskStatus.setPercent(taskEntity.getProgress().floatValue());
-            taskStatus.setStart(taskEntity.getStart());
-            taskStatus.setEnd(taskEntity.getEnd());
+            taskStatus.setStart(taskEntity.getDateStart());
+            taskStatus.setEnd(taskEntity.getDateEnd());
             SpringHelper.sendEvent(taskStatus);
         }
 

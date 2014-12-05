@@ -727,8 +727,8 @@ public class ProcessBusiness implements IProcessBusiness {
         long now = System.currentTimeMillis();
         String msg = "Stopped by server shutdown";
         for (Task runningTask : runningTasks) {
-            if (runningTask.getEnd() == null) {
-                runningTask.setEnd(now);
+            if (runningTask.getDateEnd() == null) {
+                runningTask.setDateEnd(now);
                 runningTask.setState(TaskState.CANCELLED.name());
                 runningTask.setMessage(msg);
                 taskRepository.update(runningTask);

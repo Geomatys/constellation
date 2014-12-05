@@ -66,8 +66,8 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
                 .set(Tables.TASK.TASK_PARAMETER_ID, task.getTaskParameterId())
                 .set(Tables.TASK.TYPE, task.getType())
                 .set(Tables.TASK.STATE, task.getState())
-                .set(Tables.TASK.START, task.getStart())
-                .set(Tables.TASK.END, task.getEnd())
+                .set(Tables.TASK.DATE_START, task.getDateStart())
+                .set(Tables.TASK.DATE_END, task.getDateEnd())
                 .set(Tables.TASK.MESSAGE, task.getMessage())
                 .set(Tables.TASK.OWNER, task.getOwner())
                 .set(Tables.TASK.PROGRESS, task.getProgress())
@@ -77,15 +77,15 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
     @Override
     public List<Task> findRunningTasks() {
         return dsl.select().from(Tables.TASK)
-                .where(Tables.TASK.END.isNull())
+                .where(Tables.TASK.DATE_END.isNull())
                 .fetchInto(Task.class);
     }
 
     @Override
     public List<Task> findRunningTasks(Integer id, Integer offset, Integer limit) {
         return dsl.select().from(Tables.TASK)
-                .where(Tables.TASK.END.isNull().and(Tables.TASK.TASK_PARAMETER_ID.eq(id)))
-                .orderBy(Tables.TASK.END.desc())
+                .where(Tables.TASK.DATE_END.isNull().and(Tables.TASK.TASK_PARAMETER_ID.eq(id)))
+                .orderBy(Tables.TASK.DATE_END.desc())
                 .limit(limit).offset(offset)
                 .fetchInto(Task.class);
     }
@@ -94,7 +94,7 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
     public List<Task> taskHistory(Integer id, Integer offset, Integer limit) {
         return dsl.select().from(Tables.TASK)
                 .where(Tables.TASK.TASK_PARAMETER_ID.eq(id))
-                .orderBy(Tables.TASK.END.desc())
+                .orderBy(Tables.TASK.DATE_END.desc())
                 .limit(limit).offset(offset)
                 .fetchInto(Task.class);
     }

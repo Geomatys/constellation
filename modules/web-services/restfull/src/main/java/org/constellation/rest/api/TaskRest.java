@@ -463,8 +463,8 @@ public final class TaskRest {
         status.setMessage(task.getMessage());
         status.setPercent(task.getProgress() != null ? task.getProgress().floatValue() : 0f);
         status.setStatus(task.getState());
-        status.setStart(task.getStart());
-        status.setEnd(task.getEnd());
+        status.setStart(task.getDateStart());
+        status.setEnd(task.getDateEnd());
 
         final TaskParameter taskParameter = processBusiness.getTaskParameterById(task.getTaskParameterId());
         status.setTitle(taskParameter.getName());
