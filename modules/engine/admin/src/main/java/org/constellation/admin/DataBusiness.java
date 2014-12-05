@@ -933,6 +933,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
         return (DefaultMetadata) XML.unmarshal(metadata);
     }
+    
+    @Override
+    public DefaultMetadata unmarshallMetadata(final File metadata) throws JAXBException {
+        return (DefaultMetadata) XML.unmarshal(metadata);
+    }
 
     @Override
     public MetadataLists getMetadataCodeLists() {

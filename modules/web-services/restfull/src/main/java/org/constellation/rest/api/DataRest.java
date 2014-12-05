@@ -19,7 +19,6 @@
 package org.constellation.rest.api;
 
 import java.awt.*;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,7 +50,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -65,7 +63,6 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.admin.exception.ConstellationException;
@@ -101,7 +98,6 @@ import org.constellation.util.ParamUtilities;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
-import org.constellation.utils.ISOMarshallerPool;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.admin.util.MetadataUtilities;
 import org.geotoolkit.coverage.*;
@@ -112,7 +108,6 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
@@ -364,10 +359,7 @@ public class DataRest {
                                                       final File newFileMetaData) throws ConstellationException{
         Object obj;
         try {
-            final MarshallerPool pool = CSWMarshallerPool.getInstance();
-            final Unmarshaller unmarsh = pool.acquireUnmarshaller();
-            obj = unmarsh.unmarshal(newFileMetaData);
-            pool.recycle(unmarsh);
+            obj = dataBusiness.unmarshallMetadata(newFileMetaData);
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
             throw new ConstellationException("metadata file is incorrect");
@@ -655,9 +647,8 @@ public class DataRest {
         }else{
             metadata = datasFromProviderId.get(0).getIsoMetadata();
         }
-        final MarshallerPool pool = ISOMarshallerPool.getInstance();
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final DefaultMetadata defaultMetadata = (DefaultMetadata) unmarshaller.unmarshal(new ByteArrayInputStream(metadata.getBytes()));
+        
+        final DefaultMetadata defaultMetadata = (DefaultMetadata) dataBusiness.unmarshallMetadata(metadata);
 
         switch (dataType) {
             case "raster":
@@ -704,31 +695,19 @@ public class DataRest {
 
     private void proceedToSaveUploadedMetadata(final String providerId, final String mdPath) throws ConstellationException {
         if (mdPath != null && !mdPath.isEmpty()) {
-            final Object obj = unmarshallMetadata(mdPath);
-            if (!(obj instanceof DefaultMetadata)) {
-                throw new ConstellationException("Cannot save uploaded metadata because it is not recognized as a valid file!");
-            }
-            final DefaultMetadata metadata = (DefaultMetadata) obj;
-            // for now we assume datasetID == providerID
             try {
+                final Object obj = dataBusiness.unmarshallMetadata(new File(mdPath));
+                if (!(obj instanceof DefaultMetadata)) {
+                    throw new ConstellationException("Cannot save uploaded metadata because it is not recognized as a valid file!");
+                }
+                final DefaultMetadata metadata = (DefaultMetadata) obj;
+                // for now we assume datasetID == providerID
+            
                 datasetBusiness.updateMetadata(providerId, -1, metadata);
-            } catch (ConfigurationException ex) {
-                throw new ConstellationException("Error while saving dataset metadata, "+ex.getMessage());
+            } catch (ConfigurationException | JAXBException ex) {
+                throw new ConstellationException("Error while saving dataset metadata, " + ex.getMessage());
             }
         }
-    }
-
-    private Object unmarshallMetadata(final String mdPath) throws ConstellationException {
-        final Object obj;
-        try {
-            final MarshallerPool pool = CSWMarshallerPool.getInstance();
-            final Unmarshaller unmarsh = pool.acquireUnmarshaller();
-            obj = unmarsh.unmarshal(new File(mdPath));
-            pool.recycle(unmarsh);
-        } catch (JAXBException ex) {
-            throw new ConstellationException("Error when trying to unmarshal metadata "+ex.getMessage());
-        }
-        return obj;
     }
 
     /**
@@ -2153,8 +2132,8 @@ public class DataRest {
                     if (data.isIncluded()) {
                         final QName name = new QName(data.getNamespace(), data.getName());
                         final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
-                        if ((published && (db.getTargetService() == null || db.getTargetService().size() == 0)) ||
-                                (!published && db.getTargetService() != null && db.getTargetService().size() > 0)) {
+                        if ((published  && (db.getTargetService() == null ||  db.getTargetService().isEmpty())) ||
+                            (!published &&  db.getTargetService() != null && !db.getTargetService().isEmpty())) {
                             continue;
                         }
                         briefs.add(db);
@@ -2332,21 +2311,16 @@ public class DataRest {
         final Object origin = layer.getOrigin();
         //generate DataInformation
 
-
         DefaultMetadata metadata = null;
         // for now assume that providerID == datasetID
         final Dataset datasetFromDB = datasetBusiness.getDataset(providerId);
         final String metadataFromDB = datasetFromDB.getMetadataIso();
-        final MarshallerPool pool = CSWMarshallerPool.getInstance();
-        try {
-            final Unmarshaller m = pool.acquireUnmarshaller();
-            if (metadataFromDB != null) {
-                final InputStream is = new ByteArrayInputStream(metadataFromDB.getBytes());
-                metadata = (DefaultMetadata) m.unmarshal(is);
+        if (metadataFromDB != null) {
+            try {
+                metadata = dataBusiness.unmarshallMetadata(metadataFromDB);
+            } catch (JAXBException ex) {
+                throw new ConstellationException(ex);
             }
-            pool.recycle(m);
-        } catch (JAXBException ex) {
-            throw new ConstellationException(ex);
         }
         DataInformation information = new DataInformation();
         if (layer instanceof FeatureData) {

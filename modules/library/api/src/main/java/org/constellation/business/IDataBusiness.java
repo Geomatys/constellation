@@ -18,6 +18,7 @@
  */
 package org.constellation.business;
 
+import java.io.File;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
@@ -149,6 +150,7 @@ public interface IDataBusiness {
     String marshallMetadata(final DefaultMetadata metadata) throws JAXBException;
     
     DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException;
+    DefaultMetadata unmarshallMetadata(final File metadata) throws JAXBException;
     
     
     void uploadCleaner();
