@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.util.FileUtilities;
 
 /**
  * RESTful API for dataset metadata.
@@ -120,6 +121,8 @@ public class MetadataRest {
     public Response createDataset(@PathParam("domainId") final int domainId,
                                   final ParameterValues values) {
 
+        final String metafile = values.getValues().get("metadataFilePath");
+        
         final String datasetIdentifier = values.getValues().get("datasetIdentifier");
         if (datasetIdentifier != null && !datasetIdentifier.isEmpty()) {
             try {
@@ -128,9 +131,14 @@ public class MetadataRest {
                     LOGGER.log(Level.WARNING, "Dataset with identifier " + datasetIdentifier + " already exist");
                     return Response.status(Response.Status.CONFLICT).entity("failed").build();
                 }
+                
+                DefaultMetadata metadataISO = null;
+                if (metafile != null) {
+                    metadataISO = dataBusiness.unmarshallMetadata(new File(metafile));
+                }
 
                 Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
-                Dataset dataSet = datasetBusiness.createDataset(datasetIdentifier, null, null, user.get().getId());
+                Dataset dataSet = datasetBusiness.createDataset(datasetIdentifier, metadataISO, user.get().getId());
                 return Response.ok().status(Response.Status.CREATED)
                         .type(MediaType.APPLICATION_JSON)
                         .entity(dataSet)

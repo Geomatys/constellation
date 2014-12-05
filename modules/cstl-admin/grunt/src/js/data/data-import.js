@@ -89,7 +89,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
         $scope.uploaded = function() {
             if ($scope.import.importType === 'empty' && $scope.import.dataName) {
                 //empty dataset case
-                datasetListing.createDataset({values: {"datasetIdentifier":$scope.import.dataName}},function(response){//success
+                datasetListing.createDataset({values: {"datasetIdentifier":$scope.import.dataName, "metadataFilePath":$scope.import.mdPath}},function(response){//success
                     Growl('success','Success','Data set '+ $scope.import.dataName +' successfully created');
                     $modalInstance.close({file: $scope.import.dataName,
                                           type: "import"});
