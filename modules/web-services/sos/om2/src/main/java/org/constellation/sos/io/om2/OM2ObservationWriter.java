@@ -47,9 +47,6 @@ import org.geotoolkit.swe.xml.Quantity;
 import org.geotoolkit.swe.xml.SimpleDataRecord;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
-import org.geotoolkit.swe.xml.v200.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v200.DataRecordType;
-import org.geotoolkit.swe.xml.v200.TextEncodingType;
 import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.opengis.observation.Measure;
@@ -287,16 +284,27 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     }
 
     private void emitResultOnBus(String procedureID, Object result) {
-        if (result instanceof DataArrayPropertyType){
+        if (result instanceof DataArrayProperty){
             OM2ResultEventDTO resultEvent = new OM2ResultEventDTO();
-            resultEvent.setBlockSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getBlockSeparator());
-            resultEvent.setDecimalSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getDecimalSeparator());
-            resultEvent.setTokenSeparator(((TextEncodingType) ((DataArrayPropertyType) result).getDataArray().getEncoding()).getTokenSeparator());
-            resultEvent.setValues(((DataArrayPropertyType)result).getDataArray().getValues());
+            final DataArray array = ((DataArrayProperty) result).getDataArray();
+            final TextBlock encoding = (TextBlock) array.getEncoding();
+            resultEvent.setBlockSeparator(encoding.getBlockSeparator());
+            resultEvent.setDecimalSeparator(encoding.getDecimalSeparator());
+            resultEvent.setTokenSeparator(encoding.getTokenSeparator());
+            resultEvent.setValues(array.getValues());
             List<String> headers = new ArrayList<>();
-            for (org.geotoolkit.swe.xml.v200.Field field : ((DataRecordType)((DataArrayPropertyType)result).getDataArray().getElementType().getAbstractDataComponent().getValue()).getField()){
-                headers.add(field.getName());
+            if (array.getPropertyElementType().getAbstractRecord() instanceof DataRecord) {
+                final DataRecord record = (DataRecord)array.getPropertyElementType().getAbstractRecord();
+                for (DataComponentProperty field : record.getField()) {
+                    headers.add(field.getName());
+                }
+            } else if (array.getPropertyElementType().getAbstractRecord() instanceof SimpleDataRecord) {
+                final SimpleDataRecord record = (SimpleDataRecord)array.getPropertyElementType().getAbstractRecord();
+                for (AnyScalar field : record.getField()) {
+                    headers.add(field.getName());
+                }
             }
+            
             resultEvent.setHeaders(headers);
             resultEvent.setProcedureID(procedureID);
             SpringHelper.sendEvent(resultEvent);
