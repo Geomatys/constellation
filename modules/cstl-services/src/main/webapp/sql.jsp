@@ -30,6 +30,7 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
             <button class="btn btn-primary" id="provider">provider</button>
             <button class="btn btn-primary" id="dataset">dataset</button>
             <button class="btn btn-primary" id="data">data</button>
+            <button class="btn btn-primary" id="data_light">data_light</button>
             <button class="btn btn-primary" id="style">style</button>
             <button class="btn btn-primary" id="styled_data">styled_data</button>
             <button class="btn btn-primary" id="sensor">sensor</button>
@@ -136,6 +137,10 @@ result :
         });
         $("#data").on("click", function(){
             $("#query").val('select * from admin.data');
+            $("#sqlForm").submit();
+        });
+        $("#data_light").on("click", function(){
+            $("#query").val('select id,name,namespace,provider,type,subtype,included,sensorable,dataset_id,rendered,hidden from admin.data');
             $("#sqlForm").submit();
         });
         $("#service").on("click", function(){
