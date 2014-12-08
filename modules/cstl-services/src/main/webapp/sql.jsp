@@ -38,6 +38,7 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
             <button class="btn btn-primary" id="service">service</button>
             <button class="btn btn-primary" id="service_details">service_details</button>
             <button class="btn btn-primary" id="layer">layer</button>
+            <button class="btn btn-primary" id="styled_layer">styled_layer</button>
             <button class="btn btn-primary" id="task">task</button>
             <button class="btn btn-primary" id="task_parameter">task_parameter</button>
             <button class="btn btn-primary" id="cstl_user">cstl_user</button>
@@ -149,6 +150,10 @@ result :
         });
         $("#layer").on("click", function(){
             $("#query").val('select * from admin.layer');
+            $("#sqlForm").submit();
+        });
+        $("#styled_layer").on("click", function(){
+            $("#query").val('select * from admin.styled_layer');
             $("#sqlForm").submit();
         });
         $("#service_details").on("click", function(){
