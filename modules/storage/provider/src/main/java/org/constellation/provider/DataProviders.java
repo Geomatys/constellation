@@ -118,8 +118,29 @@ public final class DataProviders extends Providers implements PropertyChangeList
         fireUpdateEvent();
     }
 
-    public DataProvider createProvider(String id, final DataProviderFactory factory, 
-            final ParameterValueGroup params) throws ConfigurationException{
+    public DataProvider createProvider(final String id,
+                                       final DataProviderFactory factory,
+                                       final ParameterValueGroup params,
+                                       final Integer datasetID) throws ConfigurationException{
+        return createProvider(id,factory,params,datasetID,true);
+
+    }
+
+    /**
+     * Creates provider for given params
+     * @param id provider id
+     * @param factory given provider factory
+     * @param params given parameters
+     * @param datasetID given an existing datasetId to attach with data
+     * @param createDatasetIfNull flag that indicates if a dataset will be created in case of given datasetID is null.
+     * @return
+     * @throws ConfigurationException
+     */
+    public DataProvider createProvider(final String id,
+                                       final DataProviderFactory factory,
+                                       final ParameterValueGroup params,
+                                       final Integer datasetID,
+                                       final boolean createDatasetIfNull) throws ConfigurationException{
         getProviders();
         
         final DataProvider provider = factory.createProvider(id,params);
@@ -127,7 +148,7 @@ public final class DataProviders extends Providers implements PropertyChangeList
         provider.addPropertyListener(this);
         PROVIDERS.add(provider);
         //save the configuration
-        getConfigurator().addProviderConfiguration(id,params);
+        getConfigurator().addProviderConfiguration(id,params, datasetID, createDatasetIfNull);
         fireUpdateEvent();
         return provider;
     }

@@ -184,6 +184,11 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             final String namespace = value(AbstractCoverageStoreFactory.NAMESPACE, storeConf);
             final URL pyramidFolder = value(XMLCoverageStoreFactory.PATH, storeConf);
 
+            Integer datasetID = null;
+            if (datasetBusiness.getDataset(datasetName) == null) {
+                datasetID = datasetBusiness.createDataset(datasetName, null, null, null).getId();
+            }
+
             //create provider configuration
             final String factoryName = ProviderFactoryType.COVERAGE_STORE.getType();
             final DataProviderFactory factory = DataProviders.getInstance().getFactory(factoryName);
@@ -195,18 +200,11 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             final ParameterValueGroup xmlpyramidparams = ParametersExt.getOrCreateGroup(choiceparams, XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.getName().getCode());
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(pyramidFolder);
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue(namespace);
-            outProvider = DataProviders.getInstance().createProvider(providerID, factory, pparams);
+            outProvider = DataProviders.getInstance().createProvider(providerID, factory, pparams, datasetID);
 
             if (domainId != null) {
                 int count = domainRepository.addProviderDataToDomain(providerID, domainId);
                 LOGGER.info("Added " + count + " data to domain " + domainId);
-            }
-            
-            if (datasetName != null) {
-                if (datasetBusiness.getDataset(datasetName) == null) {
-                    datasetBusiness.createDataset(datasetName, null, null, null);
-                }
-                datasetBusiness.addProviderDataToDataset(datasetName, providerID);
             }
 
         } catch (Exception ex) {

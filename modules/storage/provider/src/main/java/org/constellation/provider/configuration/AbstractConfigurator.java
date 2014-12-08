@@ -46,7 +46,15 @@ public abstract class AbstractConfigurator implements Configurator {
     }
 
     @Override
-    public void addProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
+    public void addProviderConfiguration(String providerId, ParameterValueGroup config, Integer datasetId) throws ConfigurationException {
+        throw new ConfigurationException("Configurator does not support edition");
+    }
+
+    @Override
+    public void addProviderConfiguration(final String providerId,
+                                  final ParameterValueGroup config,
+                                  final Integer datasetId,
+                                  final boolean createDatasetIfNull) throws ConfigurationException {
         throw new ConfigurationException("Configurator does not support edition");
     }
 

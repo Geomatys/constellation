@@ -21,13 +21,12 @@ package org.constellation.engine.register.jooq.repository;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.DataI18n;
-import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.*;
 import org.constellation.engine.register.helper.DataHelper;
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
+import org.constellation.engine.register.jooq.tables.records.DataXDataRecord;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.jooq.Condition;
@@ -39,13 +38,10 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.constellation.engine.register.DataXCsw;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_CSW;
 import org.constellation.engine.register.jooq.tables.records.DataXCswRecord;
+
+import static org.constellation.engine.register.jooq.Tables.*;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
@@ -123,7 +119,10 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     
     @Override
     public List<Data> findByDatasetId(Integer id) {
-        return dsl.select().from(DATA).where(DATA.DATASET_ID.eq(id)).and(DATA.INCLUDED.eq(Boolean.TRUE)).fetchInto(Data.class);
+        return dsl.select().from(DATA)
+                .where(DATA.DATASET_ID.eq(id))
+                .and(DATA.INCLUDED.eq(Boolean.TRUE))
+                .and(DATA.HIDDEN.isNull().or(DATA.HIDDEN.isFalse())).fetchInto(Data.class);
     }
     
     @Override
@@ -228,5 +227,21 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     @Override
     public void removeAllDataFromCSW(int serviceID) {
         dsl.delete(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).execute();
+    }
+
+    @Override
+    public void linkDataToData(final int dataId, final int childId) {
+        final DataXData dxd = dsl.select().from(DATA_X_DATA).where(DATA_X_DATA.DATA_ID.eq(dataId)).and(DATA_X_DATA.CHILD_ID.eq(childId)).fetchOneInto(DataXData.class);
+        if (dxd == null) {
+            DataXDataRecord newRecord = dsl.newRecord(DATA_X_DATA);
+            newRecord.setDataId(dataId);
+            newRecord.setChildId(childId);
+            newRecord.store();
+        }
+    }
+
+    @Override
+    public List<Data> getDataLinkedData(final int dataId) {
+        return dsl.select(DATA.fields()).from(DATA).join(DATA_X_DATA).onKey(DATA_X_DATA.CHILD_ID).where(DATA_X_DATA.DATA_ID.eq(dataId)).fetchInto(Data.class);
     }
 }

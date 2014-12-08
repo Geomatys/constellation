@@ -389,11 +389,12 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                 Growl('error', 'Error', 'Unable to remove sensor ' + idToDel + ' from service ' + $scope.service.name);
                             });
                         } else {
-                            webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name},
+                            webService.deleteLayer({type: $scope.service.type,
+                                                    id: $scope.service.identifier,
+                                                    layerid: $scope.selected.Name},
                                                    {value: $scope.selected.Namespace},
-                                function () {
-                                    if ($scope.service.type.toLowerCase() === 'wmts' ||
-                                        $scope.service.type.toLowerCase() === 'wms') {
+                                function () {//on success
+                                    if ($scope.service.type.toLowerCase() === 'wmts') {
                                         $scope.deleteTiledData($scope.service, $scope.selected.Name, $scope.selected.Provider);
                                     }
                                     Growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully deleted from service ' + $scope.service.name);
@@ -884,13 +885,10 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     Growl('warning', 'Warning', 'No map context selected!');
                     return;
                 }
-                console.debug($scope.values.selectedContext);
-                console.debug($scope.crs);
-                console.debug($scope.values.userLayerName);
                 dataListing.pyramidMapContext({"contextId":$scope.values.selectedContext.id,
                                                "crs":$scope.crs,
                                                "layerName":$scope.values.userLayerName},{},
-                    function(response){//success
+                    function(response){//on success
                         if(response.dataId && response.providerId) {
                             webService.addLayer({type: $scope.service.type, id: $scope.service.identifier},
                                 {layerAlias: response.dataId,
@@ -909,7 +907,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                             );
                         }
                     },
-                    function(response){//error
+                    function(response){//on error
                         Growl('error', 'Error', 'Failed to generate pyramid data');
                     }
                 );
@@ -971,18 +969,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     }
                     //to force the browser cache reloading styled layer.
                     layerData.get('params').ts=new Date().getTime();
-                    //attach event loader in modal map viewer
-//                    layerData.on('precompose',function(){
-//                        $scope.$apply(function() {
-//                            window.cfpLoadingBar_parentSelector = '#dataMap';
-//                            cfpLoadingBar.start();
-//                            cfpLoadingBar.inc();
-//                        });
-//                    });
-//                    layerData.on('postcompose',function(){
-//                        cfpLoadingBar.complete();
-//                        window.cfpLoadingBar_parentSelector = null;
-//                    });
                     DataViewer.layers.push(layerData);
                 }
                 provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
@@ -994,7 +980,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                             DataViewer.zoomToExtent(extent,DataViewer.map.getSize(),false);
                         }
                     }, function() {//error
-                        // failed to find a metadata, just load the full map
+                        // failed to find an extent, just load the full map
                         DataViewer.initMap('styledMapPreviewForWMTS');
                     }
                 );
@@ -1003,7 +989,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 DataViewer.map.getView().setZoom(DataViewer.map.getView().getZoom()+1);
             }
         };
-
 
         /**
          * Proceed to select all items of dashboard
@@ -1128,8 +1113,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 if(crsCode === 'EPSG:4326' || crsCode === 'CRS:84') {
                     DataViewer.extent=[-180, -90, 180, 90];
                 }
-                console.debug(minX+','+minY+','+maxX+','+maxY);
-                console.debug(crsCode);
                 if($scope.values.selectedContext.layers && $scope.values.selectedContext.layers.length>0){
                     var layersToView = [];
                     for (var i=0; i<$scope.values.selectedContext.layers.length; i++) {

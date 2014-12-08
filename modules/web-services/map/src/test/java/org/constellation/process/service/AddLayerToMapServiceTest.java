@@ -109,7 +109,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
             Logger.getLogger(AddLayerToMapServiceTest.class.getName()).log(Level.WARNING, null, ex);
         }         
         
-        DataProviders.getInstance().createProvider("shapeProvider",(DataProviderFactory) service, sourceValue);
+        DataProviders.getInstance().createProvider("shapeProvider",(DataProviderFactory) service, sourceValue, null);
     }
     
     @After

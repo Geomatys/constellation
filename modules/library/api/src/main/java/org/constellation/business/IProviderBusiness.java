@@ -19,8 +19,10 @@
 package org.constellation.business;
 
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.api.ProviderType;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.engine.register.Provider;
@@ -111,5 +113,15 @@ public interface IProviderBusiness {
     List<Provider> getProviderChildren(String id);
 
     ProviderPyramidChoiceList listPyramids(final String id, final String layerName) throws DataStoreException;
+
+    /**
+     * Generates a pyramid conform for data.
+     * N.B : Generated pyramid contains coverage real values, it's not styled for rendering.
+     *
+     * @param providerId Provider identifier of the data to tile.
+     * @param dataName the given data name.
+     * @return {@link DataBrief}
+     */
+    DataBrief createPyramidConform(final String providerId,final String dataName, final String namespace,final int userId) throws ConstellationException;
 
 }

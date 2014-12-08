@@ -378,15 +378,17 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     layerName = $scope.dataCtrl.selectedDataSetChild.Name;
                 }
                 var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
+                var pyramidProviderId = $scope.dataCtrl.selectedDataSetChild.PyramidConformProviderId;
                 var layerData;
                 if ($scope.dataCtrl.selectedDataSetChild.TargetStyle && $scope.dataCtrl.selectedDataSetChild.TargetStyle.length > 0) {
                     layerData = DataViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,
                         layerName,
-                        providerId,
+                        pyramidProviderId?pyramidProviderId:providerId,
                         $scope.dataCtrl.selectedDataSetChild.TargetStyle[0].Name,
                         null,null,true);
                 } else {
-                    layerData = DataViewer.createLayer($scope.dataCtrl.cstlUrl, layerName, providerId,null,true);
+                    layerData = DataViewer.createLayer($scope.dataCtrl.cstlUrl, layerName,
+                        pyramidProviderId?pyramidProviderId:providerId,null,true);
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
@@ -430,20 +432,16 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             dlg.result.then(function(cfrm){
                 if(cfrm){
                     var layerName = $scope.dataCtrl.selectedDataSetChild.Name;
-                    var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
-
-                    dataListing.hideData({},
-                        {providerIdentifier:providerId,
-                         dataIdentifier:layerName,
-                         dataNmsp : $scope.dataCtrl.selectedDataSetChild.Namespace},
-                        function() {//success
+                    var dataId = $scope.dataCtrl.selectedDataSetChild.Id;
+                    dataListing.removeData({'dataId':dataId},{},
+                        function() {// on success
                             Growl('success','Success','Data '+ layerName +' successfully deleted');
                             datasetListing.listAll({}, function(response) {
                                 Dashboard($scope, response, true);
                                 $scope.dataCtrl.selectedDataSetChild=null;
                             });
                         },
-                        function() {//error
+                        function() {//on error
                             Growl('error','Error','Data '+ layerName +' deletion failed');
                         }
                     );
@@ -819,37 +817,51 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
     })
 
     .controller('DataModalController', function($scope, dataListing, webService, sos, sensor, Dashboard, $modalInstance,
-                                                 service, exclude, Growl, $modal) {
+                                                 service, exclude, Growl,provider,$cookieStore) {
         /**
-         * To fix angular bug with nested scope.
+         * To fix angular bug caused by nested scope issue in modal.
          */
         $scope.wrap = {};
 
+        $scope.wrap.nbbypage = 5;
+
+        $scope.dataSelect={all:false};
+
         $scope.service = service;
 
+        $scope.exclude = exclude;
+
+        $scope.values = {
+            listSelect : [],
+            selectedSensor : null,
+            selectedSensorsChild : null
+        };
+
+        $scope.dismiss = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.close = function() {
+            $modalInstance.close();
+        };
+
+        $scope.clickFilter = function(ordType){
+            $scope.wrap.ordertype = ordType;
+            $scope.wrap.orderreverse = !$scope.wrap.orderreverse;
+        };
+
         $scope.getDefaultFilter = function() {
-            if (service.type.toLowerCase() === 'wcs') {
+            if ($scope.service.type.toLowerCase() === 'wcs') {
                 return 'coverage';
             }
-            if (service.type.toLowerCase() === 'wfs') {
+            if ($scope.service.type.toLowerCase() === 'wfs') {
                 return 'vector';
             }
             return undefined;
         };
-        $scope.wrap.nbbypage = 5;
-        $scope.exclude = exclude;
 
-        // WMTS params in the last form before closing the popup
-        $scope.wmtsParams = false;
-        $scope.tileFormat = undefined;
-        $scope.crs = "EPSG:3857";
-        $scope.scales = [];
-        $scope.upperCornerX = undefined;
-        $scope.upperCornerY = undefined;
-        $scope.conformPyramid = true;
-
-        $scope.init = function() {
-            if (service.type.toLowerCase() === 'sos') {
+        $scope.initData = function() {
+            if ($scope.service.type.toLowerCase() === 'sos') {
                 sensor.list({}, function(response) {
                     Dashboard($scope, response.children, false);
                 });
@@ -858,28 +870,83 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = $scope.getDefaultFilter();
                 });
+                setTimeout(function(){
+                    $scope.previewData();
+                },200);
             }
         };
 
-        $scope.selectedSensorsChild = null;
+        $scope.previewData = function() {
+            //clear the map
+            if (DataViewer.map) {
+                DataViewer.map.setTarget(undefined);
+            }
+            DataViewer.initConfig();
+            if($scope.values.listSelect.length >0){
+                var layerName,providerId;
+                for(var i=0;i<$scope.values.listSelect.length;i++){
+                    var dataItem = $scope.values.listSelect[i];
+                    if (dataItem.Namespace) {
+                        layerName = '{' + dataItem.Namespace + '}' + dataItem.Name;
+                    } else {
+                        layerName = dataItem.Name;
+                    }
+                    providerId = dataItem.Provider;
+                    var layerData;
+                    if (dataItem.TargetStyle && dataItem.TargetStyle.length > 0) {
+                        layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'),layerName,providerId,
+                            dataItem.TargetStyle[0].Name,null,null,true);
+                    } else {
+                        layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), layerName, providerId,null,true);
+                    }
+                    //to force the browser cache reloading styled layer.
+                    layerData.get('params').ts=new Date().getTime();
+                    DataViewer.layers.push(layerData);
+                }
+                provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
+                    function(response) {//success
+                        DataViewer.initMap('dataChooseMapPreview');
+                        var bbox = response.boundingBox;
+                        if (bbox) {
+                            var extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
+                            DataViewer.zoomToExtent(extent,DataViewer.map.getSize(),false);
+                        }
+                    }, function() {//error
+                        // failed to find an extent, just load the full map
+                        DataViewer.initMap('dataChooseMapPreview');
+                    }
+                );
+            }else {
+                DataViewer.initMap('dataChooseMapPreview');
+                DataViewer.map.getView().setZoom(DataViewer.map.getView().getZoom()+1);
+            }
+        };
+
+        $scope.toggleSelectSensor = function(item) {
+            if (item && $scope.values.selectedSensor && $scope.values.selectedSensor.id === item.id) {
+                $scope.values.selectedSensor = null;
+            } else {
+                $scope.values.selectedSensor = item;
+            }
+        };
 
         $scope.selectSensorsChild = function(item) {
-            if ($scope.selectedSensorsChild === item) {
-                $scope.selectedSensorsChild = null;
+            if (item && $scope.values.selectedSensorsChild && $scope.values.selectedSensorsChild.id === item.id) {
+                $scope.values.selectedSensorsChild = null;
             } else {
-                $scope.selectedSensorsChild = item;
+                $scope.values.selectedSensorsChild = item;
             }
         };
 
-        $scope.dataSelect={all:false};
-        $scope.listSelect=[];
-
         /**
-         * Proceed to select all items of dashboard
-         * depending on the property binded to checkbox.
+         * Proceed to select all items of modal dashboard
+         * depending on the property of checkbox selectAll.
          */
         $scope.selectAllData = function() {
-            $scope.listSelect = ($scope.dataSelect.all) ? $scope.wrap.fullList.slice(0) : [];
+            $scope.values.listSelect = ($scope.dataSelect.all) ? $scope.wrap.fullList.slice(0) : [];
+            if ($scope.service.type.toLowerCase() !== 'sos') {
+                $scope.previewData();
+            }
         };
 
         /**
@@ -887,19 +954,23 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          */
         $scope.toggleDataInArray = function(item){
             var itemExists = false;
-            for (var i = 0; i < $scope.listSelect.length; i++) {
-                if ($scope.listSelect[i].Id === item.Id) {
+            for (var i = 0; i < $scope.values.listSelect.length; i++) {
+                if ($scope.values.listSelect[i].Id === item.Id) {
                     itemExists = true;
-                    $scope.listSelect.splice(i, 1);//remove item
+                    $scope.values.listSelect.splice(i, 1);//remove item
                     break;
                 }
             }
             if(!itemExists){
-                $scope.listSelect.push(item);
+                $scope.values.listSelect.push(item);
             }
-            $scope.dataSelect.all=($scope.listSelect.length === $scope.wrap.fullList.length);
+            $scope.dataSelect.all=($scope.values.listSelect.length === $scope.wrap.fullList.length);
+            if ($scope.service.type.toLowerCase() !== 'sos') {
+                $scope.previewData();
+            }
 
         };
+
         /**
          * Returns true if item is in the selected items list.
          * binding function for css purposes.
@@ -907,99 +978,67 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          * @returns {boolean}
          */
         $scope.isInSelected = function(item){
-            for(var i=0; i < $scope.listSelect.length; i++){
-                if($scope.listSelect[i].Id === item.Id){
+            for(var i=0; i < $scope.values.listSelect.length; i++){
+                if($scope.values.listSelect[i].Id === item.Id){
                     return true;
                 }
             }
             return false;
         };
 
-        $scope.close = function() {
-            $modalInstance.dismiss('close');
+        $scope.setTargetStyle = function(data,index) {
+            var tmp = data.TargetStyle.splice(index,1);
+            data.TargetStyle.unshift(tmp[0]);
+            $scope.previewData();
         };
 
-        function addLayer(tiledProvider) {
-            webService.addLayer({type: service.type, id: service.identifier},
-                                {layerAlias: tiledProvider.dataId,
-                                 layerId: tiledProvider.dataId,
-                                 serviceType: service.type,
-                                 serviceId: service.identifier,
-                                 providerId: tiledProvider.providerId},
-                function () {//success
-                    Growl('success','Success','Layer '+tiledProvider.dataId+' successfully added to service '+service.name);
-                    $modalInstance.close();
-                },
-                function () {
-                    Growl('error','Error','Layer '+tiledProvider.dataId+' failed to be added to service '+service.name);
-                    $modalInstance.dismiss('close');
-                }
-            );
-        }
-
-        function pyramidGenerationError() {
-            Growl('error', 'Error', 'Failed to generate pyramid');
-            $modalInstance.dismiss('close');
-        }
-
-        function errorOnPyramid() {
-               Growl('error', 'Error', 'No scale can automatically be set');
-        }
-
         /**
-         * @FIXME rewrite this function to call rest api outside loop
-         * the server side must provide method to treat pyramid with an array instead of treating for each data item.
-         * @TODO ugly code, the client side should never call rest api inside a loop.
+         * function to add data to service
          */
         $scope.choose = function() {
-            if ($scope.listSelect.length !== 0) {
-                $scope.selected = $scope.listSelect;
-            }
-            if (!$scope.selected) {
-                Growl('warning', 'Warning', 'No data selected');
-                $modalInstance.dismiss('close');
-                return;
-            }
-            else{
-                if ($scope.service.type.toLowerCase() === 'sos') {
-                    var sensorId = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
-                    sos.importSensor({id: service.identifier}, {values: {"sensorId": sensorId}}, function () {
-                        Growl('success', 'Success', 'Sensor ' + sensorId + ' imported in service ' + service.name);
-                        $modalInstance.close();
+            if ($scope.service.type.toLowerCase() === 'sos') {
+                if (!$scope.values.selectedSensor) {
+                    Growl('warning', 'Warning', 'No data selected');
+                    return;
+                }
+                var sensorId = ($scope.values.selectedSensorsChild) ? $scope.values.selectedSensorsChild.id : $scope.values.selectedSensor.id;
+                sos.importSensor({id: $scope.service.identifier}, {values: {"sensorId": sensorId}},
+                    function () {//success
+                        Growl('success', 'Success', 'Sensor ' + sensorId + ' imported in service ' + $scope.service.name+' successfully!');
+                        $scope.close();
                     }, function () {
-                        Growl('error', 'Error', 'Unable to import sensor ' + sensorId + ' in service ' + service.name);
-                        $modalInstance.dismiss('close');
-                    });
+                        Growl('error', 'Error', 'Unable to import sensor ' + sensorId + ' in service ' + $scope.service.name);
+                        $scope.dismiss();
+                    }
+                );
+            }else {
+                if ($scope.values.listSelect.length === 0) {
+                    Growl('warning', 'Warning', 'No data selected!');
                     return;
                 }
                 //using angular.forEach to avoid jsHint warning when declaring function in loop
-                angular.forEach($scope.selected, function(value, key){
-                    if (service.type.toLowerCase() === 'wms' &&
-                        $scope.conformPyramid &&
-                        value.Type.toLowerCase() !== 'vector') {
-                        // In the case of a wms service and user asked to pyramid the data
-                        dataListing.pyramidConform({dataId:value.Id,
-                                                    providerId: value.Provider,
-                                                    dataName: value.Name}, {}, addLayer, pyramidGenerationError);
-                    } else {
-                        webService.addLayer({type: service.type, id: service.identifier},
-                                            {layerAlias: value.Name,
-                                             layerId: value.Name,
-                                             serviceType: service.type,
-                                             serviceId: service.identifier,
-                                             providerId: value.Provider,
-                                             layerNamespace: value.Namespace},
-                        function(response) {
-                            Growl('success', 'Success', response.message);
-                            $modalInstance.close();
-                        },
-                        function(response) {
-                            Growl('error', 'Error', response.message);
-                            $modalInstance.dismiss('close');
-                        });
+                angular.forEach($scope.values.listSelect, function(value, key){
+                    var providerId = value.Provider;
+                    if($scope.service.type.toLowerCase() === 'wms'){
+                        providerId = value.PyramidConformProviderId?value.PyramidConformProviderId:value.Provider;
                     }
+                    webService.addLayer({type: $scope.service.type, id: $scope.service.identifier},
+                                        {layerAlias: value.Name,
+                                         layerId: value.Name,
+                                         serviceType: $scope.service.type,
+                                         serviceId: $scope.service.identifier,
+                                         providerId: providerId,
+                                         layerNamespace: value.Namespace},
+                        function(response) {//on success
+                            Growl('success', 'Success', response.message);
+                            $scope.close();
+                        },
+                        function(response) {//on error
+                            Growl('error', 'Error', response.message);
+                            $scope.dismiss();
+                        }
+                    );
                 });
-                return;
             }
         };
 
@@ -1016,13 +1055,16 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          *  }
          *
          * @param text
+         * @param length
          * @returns {string}
          */
-        $scope.truncate = function(text){
+        $scope.truncate = function(text,length){
             if(text) {
-                return (text.length > 40) ? text.substr(0, 40) + "..." : text;
+                return (text.length > length) ? text.substr(0, length) + "..." : text;
             }
         };
+
+        $scope.initData();
     })
 
     .controller('ModalDataLinkedDomainsController', function($scope, $modalInstance, Growl, dataListing, domains, dataId) {

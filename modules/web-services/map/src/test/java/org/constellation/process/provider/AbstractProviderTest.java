@@ -115,7 +115,7 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
      * @param providerSource
      */
     protected static void addProvider(String id,ParameterValueGroup providerSource) throws ConfigurationException {
-        DataProviders.getInstance().createProvider(id, (DataProviderFactory) DATASTORE_SERVICE, providerSource);
+        DataProviders.getInstance().createProvider(id, (DataProviderFactory) DATASTORE_SERVICE, providerSource, null);
     }
 
     /**

@@ -430,16 +430,23 @@
                                                  style="text-shadow:none;">
                                                 <a ng-href="#/sensors/{{data.TargetSensor[0]}}"
                                                    tooltip-html-unsafe="{{'data.listing.selected.goto.sensor' | translate}}"
-                                                   tooltip-placement="right">
+                                                   tooltip-placement="top">
                                                     <img src="img/icon-sensor-active.svg"
                                                          style="margin-top:0; margin-right:10px;" />
                                                 </a>
+                                                <span ng-class="{'blanc':data.Id==dataCtrl.selectedDataSetChild.Id, 'hide':dataCtrl.smallMode}"
+                                                      class="pull-right text-right item-list-style"
+                                                      style="margin-right:10px; font-weight:bold;"
+                                                      translate="sensor.observation" >Sensor observation</span>
                                             </div>
-                                            <span ng-if="data.TargetSensor.length > 0"
-                                                  ng-class="{'blanc':data.Id==dataCtrl.selectedDataSetChild.Id, 'hide':dataCtrl.smallMode}"
-                                                  class="pull-right text-right item-list-style"
-                                                  style="margin-right:10px; font-weight:bold;"
-                                                  translate="sensor.observation" >Sensor observation</span>
+                                            <div ng-if="data.PyramidConformProviderId != null"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;text-shadow:none;">
+                                                <img src="img/icon-pyramid.svg"
+                                                     class="pull-right"
+                                                     tooltip-html-unsafe="{{'data.listing.selected.raster.pyramid' | translate}}"
+                                                     tooltip-placement="top" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

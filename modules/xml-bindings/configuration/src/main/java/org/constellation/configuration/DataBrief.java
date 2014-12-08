@@ -93,6 +93,9 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="StatsState")
     private String statsState;
 
+    @XmlElement(name="PyramidConformProviderId")
+    private String pyramidConformProviderId;
+
     public Integer getId() {
         return id;
     }
@@ -235,6 +238,14 @@ public final class DataBrief implements Serializable {
 
     public void setStatsState(String statsState) {
         this.statsState = statsState;
+    }
+
+    public String getPyramidConformProviderId() {
+        return pyramidConformProviderId;
+    }
+
+    public void setPyramidConformProviderId(String pyramidConformProviderId) {
+        this.pyramidConformProviderId = pyramidConformProviderId;
     }
 
     @Override

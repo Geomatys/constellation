@@ -23,10 +23,6 @@
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.mdweb.metamodel</groupId>-->
-            <!--<artifactId>mdweb-metamodel-lib-auth</artifactId>-->
-        <!--</dependency>-->
         <dependency>
           <groupId>org.constellation</groupId>
           <artifactId>cstl-token</artifactId>
@@ -57,6 +53,10 @@
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
         <!-- for provider config -->
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverage-xml</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-jaxp-core</artifactId>

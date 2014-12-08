@@ -121,7 +121,7 @@ public final class StyleProviders extends Providers implements PropertyChangeLis
         provider.addPropertyListener(this);
         PROVIDERS.add(provider);
         //save the configuration
-        getConfigurator().addProviderConfiguration(providerId,params);
+        getConfigurator().addProviderConfiguration(providerId,params,null);
         fireUpdateEvent();
         return provider;
     }

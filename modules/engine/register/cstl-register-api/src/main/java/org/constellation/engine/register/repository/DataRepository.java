@@ -70,4 +70,8 @@ public interface DataRepository {
     void removeDataFromAllCSW(final int dataID);
     
     void removeAllDataFromCSW(final int serviceID);
+
+    void linkDataToData(final int dataId, final int childId);
+
+    List<Data> getDataLinkedData(final int dataId);
 }

@@ -48,9 +48,9 @@ public interface IDataBusiness {
     
     void deleteData(QName qName, String id);
 
-    Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, String subType, String metadataXml);
+    Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean included, String subType, String metadataXml);
 
-    Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, Boolean rendered, String subType, String metadataXml);
+    Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean included, Boolean rendered, String subType, String metadataXml);
 
     void removeDataFromProvider(String providerId);
 
@@ -70,7 +70,7 @@ public interface IDataBusiness {
 
     List<Data> searchOnMetadata(String search) throws IOException, ConstellationException;
 
-    void updateDataVisibility(QName name, String providerIdentifier, boolean visibility) throws ConfigurationException;
+    void updateDataIncluded(int dataId, boolean included) throws ConfigurationException;
 
     DataBrief getDataLayer(String layerAlias, String providerid);
 
@@ -146,12 +146,23 @@ public interface IDataBusiness {
      * @param datasetId dataset Id value to set
      */
     void updateDataDataSetId(QName fullName, String providerIdentifier, Integer datasetId);
+
+    /**
+     * Update hidden for data
+     * @param dataId
+     * @param value
+     */
+    void updateHidden(final int dataId, boolean value);
+
+    void linkDataToData(final int dataId, final int childId);
+
+    List<Data> getDataLinkedData(final int dataId);
     
     String marshallMetadata(final DefaultMetadata metadata) throws JAXBException;
     
     DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException;
+
     DefaultMetadata unmarshallMetadata(final File metadata) throws JAXBException;
-    
-    
+
     void uploadCleaner();
 }

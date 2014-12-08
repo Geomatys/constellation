@@ -65,7 +65,22 @@ public interface Configurator {
      * @param config
      * @throws org.constellation.configuration.ConfigurationException
      */
-    void addProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException;
+    void addProviderConfiguration(final String providerId,
+                                  final ParameterValueGroup config,
+                                  final Integer datasetId) throws ConfigurationException;
+
+    /**
+     * Store a new provider configuration.
+     * @param providerId given provider identifier
+     * @param config given param config
+     * @param datasetId given existing datasetId
+     * @param createDatasetIfNull flag that indicates if a dataset will be created in case of given datasetId is null.
+     * @throws org.constellation.configuration.ConfigurationException
+     */
+    void addProviderConfiguration(final String providerId,
+                                  final ParameterValueGroup config,
+                                  final Integer datasetId,
+                                  final boolean createDatasetIfNull) throws ConfigurationException;
     
     /**
      * Save an existing provider updated configuration.

@@ -109,7 +109,7 @@ public final class CreateProvider extends AbstractCstlProcess {
                 }
                 source.parameter("date").setValue(new Date());
                 try {
-                    DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source);
+                    DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source, null);
                     if (domainId != null) {
                         int count = domainRepository.addProviderDataToDomain(id, domainId );
                         LOGGER.info("Added " + count + " data to domain " + domainId);

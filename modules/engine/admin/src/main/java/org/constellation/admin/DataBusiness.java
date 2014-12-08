@@ -508,10 +508,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                     db.setOwner(cstlUser.getLogin());
                 }
             }
+            final String providerId = getProviderIdentifier(data.getProvider());
             db.setName(data.getName());
             db.setNamespace(data.getNamespace());
             db.setDate(new Date(data.getDate()));
-            db.setProvider(getProviderIdentifier(data.getProvider()));
+            db.setProvider(providerId);
             db.setDatasetId(data.getDatasetId());
             db.setType(data.getType());
             db.setSubtype(data.getSubtype());
@@ -520,6 +521,20 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setStatsResult(data.getStatsResult());
             db.setStatsState(data.getStatsState());
             db.setRendered(data.isRendered());
+
+            final List<Data> linkedDataList = getDataLinkedData(data.getId());
+            for(final Data d : linkedDataList){
+                if("pyramid".equalsIgnoreCase(d.getSubtype()) &&
+                   !d.isRendered()){
+                    final String pyramidProvId = getProviderIdentifier(d.getProvider());
+                    db.setPyramidConformProviderId(pyramidProvId);
+                    break;
+                }
+            }
+            //if the data is a pyramid itself. we need to fill the property to enable the picto of pyramided data.
+            if("pyramid".equalsIgnoreCase(data.getSubtype()) && !data.isRendered()){
+                db.setPyramidConformProviderId(providerId);
+            }
 
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
             for (final Style style : styles) {
@@ -663,22 +678,19 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
     /**
      * Update data visibility for given data name and provider identifier.
-     * @param name data name.
-     * @param providerIdentifier provider identifier.
-     * @param visibility value to set
+     * @param dataId the given data Id.
+     * @param included value to set
      * @throws org.constellation.configuration.ConfigurationException
      */
     @Override
-    public void updateDataVisibility(final QName name,
-                                     final String providerIdentifier,
-                                     boolean visibility) throws ConfigurationException {
-        final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerIdentifier);
-        data.setIncluded(visibility);
+    public void updateDataIncluded(final int dataId, boolean included) throws ConfigurationException {
+        final Data data = dataRepository.findById(dataId);
+        data.setIncluded(included);
         dataRepository.update(data);
 
         final int providerID = data.getProvider();
         final int dataID = data.getId();
-        if (!visibility) {
+        if (!included) {
             // 1. remove layer involving the data
             for (Layer layer : layerRepository.findByDataId(dataID)) {
                 layerRepository.delete(layer.getId());
@@ -1144,6 +1156,16 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         dataRepository.update(data);
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void updateHidden(final int dataId, boolean value) {
+        final Data data = dataRepository.findById(dataId);
+        data.setHidden(value);
+        dataRepository.update(data);
+    }
+
 
     @Override
     @Scheduled(fixedDelay=5*60*1000)
@@ -1199,6 +1221,14 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         Collections.sort(listBean);
         return listBean;
+    }
+
+    public void linkDataToData(final int dataId, final int childId) {
+        dataRepository.linkDataToData(dataId, childId);
+    }
+
+    public List<Data> getDataLinkedData(final int dataId){
+        return dataRepository.getDataLinkedData(dataId);
     }
 
 }

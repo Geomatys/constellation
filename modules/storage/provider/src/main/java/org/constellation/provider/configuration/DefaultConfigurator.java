@@ -163,33 +163,64 @@ public final class DefaultConfigurator implements Configurator {
     }
 
     @Override
-    public void addProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
+    public void addProviderConfiguration(final String providerId,
+                                         final ParameterValueGroup config,
+                                         final Integer datasetId) throws ConfigurationException {
+        addProviderConfiguration(providerId, config, datasetId,true);
+    }
+
+    @Override
+    public void addProviderConfiguration(final String providerId,
+                                         final ParameterValueGroup config,
+                                         final Integer datasetId,
+                                         final boolean createDatasetIfNull)
+            throws ConfigurationException {
         
         Provider provider = DataProviders.getInstance().getProvider(providerId);
-        if(provider==null) provider = StyleProviders.getInstance().getProvider(providerId);
+        if(provider==null){
+            provider = StyleProviders.getInstance().getProvider(providerId);
+        }
         final ProviderType type = provider.getProviderType();
         final String factoryName = provider.getFactory().getName();
 
-//        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config)
         try {
             final org.constellation.engine.register.Provider pr = providerBusiness.storeProvider(providerId, null, type, factoryName, config);
-            checkDataUpdate(pr);
+            checkDataUpdate(pr, datasetId, createDatasetIfNull);
         } catch ( IOException ex) {
             throw new ConfigurationException(ex);
         }
     }
 
-    private void checkDataUpdate(final org.constellation.engine.register.Provider pr) throws IOException{
+    private void checkDataUpdate(final org.constellation.engine.register.Provider pr,
+                                 final Integer datasetId) throws IOException{
+        checkDataUpdate(pr,datasetId,true);
+    }
 
-//        final List<DataRecord> list = pr.getData();
+    /**
+     *
+     * @param pr given provider
+     * @param datasetId given dataset identifier to attach to data.
+     * @param createDatasetIfNull flag that indicates if a dataset will be created in case of given datasetId is null.
+     * @throws IOException
+     */
+    private void checkDataUpdate(final org.constellation.engine.register.Provider pr,
+                                 Integer datasetId,
+                                 final boolean createDatasetIfNull) throws IOException{
+
         final List<org.constellation.engine.register.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
         final String type = pr.getType();
         if (type.equals(ProviderType.LAYER.name())) {
             final DataProvider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
 
-            Dataset dataset = datasetRepository.findByIdentifier(pr.getIdentifier());
-            if (dataset == null) {
-                dataset = datasetBusiness.createDataset(pr.getIdentifier(), null, null, pr.getOwner());
+            if (datasetId == null) {
+                final Dataset dataset = datasetRepository.findByIdentifier(pr.getIdentifier());
+                if (dataset == null) {
+                    if(createDatasetIfNull) {
+                        datasetId = datasetBusiness.createDataset(pr.getIdentifier(), null, null, pr.getOwner()).getId();
+                    }
+                }else {
+                    datasetId = dataset.getId();
+                }
             }
 
             // Remove no longer existing layer.
@@ -201,7 +232,8 @@ public final class DefaultConfigurator implements Configurator {
                     if (data.getName().equals(key.getLocalPart())) {
                         found = true;
                         break;
-                    } else if (key.getLocalPart().contains(data.getName()) &&  providerBusiness.getProvider(data.getProvider()).getIdentifier().equalsIgnoreCase(provider.getId())) {
+                    } else if (key.getLocalPart().contains(data.getName()) &&
+                               providerBusiness.getProvider(data.getProvider()).getIdentifier().equalsIgnoreCase(provider.getId())) {
                         //save metadata
                         metadata.put(key.getLocalPart(), data.getMetadata());
                     }
@@ -226,10 +258,9 @@ public final class DefaultConfigurator implements Configurator {
                     }
                 }
                 if (!found) {
-
-                    // Subtype and visibility
+                    // Subtype and included
                     String subType  = null;
-                    boolean visible = true;
+                    boolean included = true;
                     final DataProvider dp = DataProviders.getInstance().getProvider(provider.getId());
                     final DataStore store = dp.getMainStore();
                     if (store instanceof FeatureStore) {
@@ -240,13 +271,13 @@ public final class DefaultConfigurator implements Configurator {
                         } catch (DataStoreException ex) {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
-                        if (fType != null && fType.getGeometryDescriptor() != null && fType.getGeometryDescriptor().getType() != null &&
-                                fType.getGeometryDescriptor().getType().getBinding() != null) {
-                            
+                        if (fType != null && fType.getGeometryDescriptor() != null &&
+                            fType.getGeometryDescriptor().getType() != null &&
+                            fType.getGeometryDescriptor().getType().getBinding() != null) {
                             subType = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
                         } else {
                             // A feature that does not contain geometry, we hide it
-                            visible = false;
+                            included = false;
                         }
                     }
                     
@@ -296,6 +327,7 @@ public final class DefaultConfigurator implements Configurator {
                             } catch (DataStoreException e) {
                                 LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                             }
+                            subType = "pyramid";
                         } else {
                             rendered = Boolean.FALSE;
                         }
@@ -305,8 +337,11 @@ public final class DefaultConfigurator implements Configurator {
                     //do not save the coverage metadata in database, this metadata is obsolete, the full iso metadata is stored later.
                     org.constellation.engine.register.Data data = dataBusiness.create(
                             name, pr.getIdentifier(), provider.getDataType().name(),
-                            provider.isSensorAffectable(), visible, rendered, subType, null);
-                    dataBusiness.updateDataDataSetId(name, pr.getIdentifier(), dataset.getId());
+                            provider.isSensorAffectable(), included, rendered, subType, null);
+
+                    if(datasetId != null) {
+                        dataBusiness.updateDataDataSetId(name, pr.getIdentifier(), datasetId);
+                    }
 
                     //analyse coverage image (min/max/ histogram) with an asynchronous method
                     if (doAnalysis && DataType.COVERAGE.equals(provider.getDataType())) {
@@ -365,7 +400,7 @@ public final class DefaultConfigurator implements Configurator {
             try {
                 final String configString = ParamUtilities.writeParameter(config);
                 pr.setConfig(configString);
-                checkDataUpdate(pr);
+                checkDataUpdate(pr, null, false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
