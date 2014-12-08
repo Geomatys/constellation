@@ -87,7 +87,14 @@ public final class JConstellationFrame extends JFrame{
         } else  {
             url = url.substring(0, url.length() - 2);
         }
-        final ConstellationClient serverV2 = new ConstellationClient(url).auth(login, password);
+        final ConstellationClient serverV2;
+        if ("Form".equals(authType)) {
+            serverV2 = new ConstellationClient(url).auth(login, password);
+        } else if ("Basic".equals(authType)) {
+            serverV2 = new ConstellationClient(url).basicAuth(login, password);
+        } else {
+            throw new IllegalArgumentException("Unexpected auth type:" + authType);
+        }
         
         final JConstellationFrame frame = new JConstellationFrame(serverV2);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
