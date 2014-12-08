@@ -83,6 +83,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -204,6 +205,8 @@ public class StyleBusiness implements IStyleBusiness {
      * @throws ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void createStyle(final String providerId, final MutableStyle style) throws ConfigurationException {
         ensureExistingProvider(providerId);
         createOrUpdateStyle(providerId, style.getName(), style);
@@ -214,6 +217,7 @@ public class StyleBusiness implements IStyleBusiness {
      *
      * @return a {@link List} of {@link StyleBean} instances
      */
+    @Override
     public List<StyleBrief> getAvailableStyles(final String category) {
         final List<StyleBrief> beans = new ArrayList<>();
         final List<Style> styles;
@@ -253,6 +257,7 @@ public class StyleBusiness implements IStyleBusiness {
      *             if the style provider does not exist
      * @return a {@link List} of {@link StyleBean} instances
      */
+    @Override
     public List<StyleBrief> getAvailableStyles(final String providerId, final String category) throws TargetNotFoundException {
         final Provider provider = ensureExistingProvider(providerId);
 
@@ -321,6 +326,7 @@ public class StyleBusiness implements IStyleBusiness {
      * @throws TargetNotFoundException
      *             if the style with the specified identifier can't be found
      */
+    @Override
     public MutableStyle getStyle(final String providerId, final String styleName) throws TargetNotFoundException {
         final Style style = ensureExistingStyle(providerId, styleName);
         return parseStyle(style.getName(), style.getBody());
@@ -337,6 +343,7 @@ public class StyleBusiness implements IStyleBusiness {
      * @return a {@link Function}
      * @throws TargetNotFoundException
      */
+    @Override
     public Function getFunctionColorMap(String providerId, String styleName, String ruleName) throws TargetNotFoundException {
         // get style
         final Style style = ensureExistingStyle(providerId, styleName);
@@ -392,6 +399,7 @@ public class StyleBusiness implements IStyleBusiness {
      * @throws ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
     public StyleReport getStyleReport(final String providerId, final String styleName, final Locale locale) throws ConfigurationException {
         final StyleReport report = new StyleReport();
 
@@ -482,6 +490,8 @@ public class StyleBusiness implements IStyleBusiness {
      * @throws ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void setStyle(final String providerId, final String styleName, final MutableStyle style) throws ConfigurationException {
         ensureExistingStyle(providerId, styleName);
         createOrUpdateStyle(providerId, styleName, style);
@@ -501,6 +511,7 @@ public class StyleBusiness implements IStyleBusiness {
      * @throws ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Transactional
     private synchronized void createOrUpdateStyle(final String providerId, String styleName, final MutableStyle style) throws ConfigurationException {
 
         // Proceed style name.
@@ -559,6 +570,8 @@ public class StyleBusiness implements IStyleBusiness {
      * @throws ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void deleteStyle(final String providerId, final String styleName) throws ConfigurationException {
         ensureNonNull("providerId", providerId);
         ensureNonNull("styleId", styleName);
@@ -584,6 +597,8 @@ public class StyleBusiness implements IStyleBusiness {
      * @throws ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void linkToData(final String styleProvider, final String styleName, final String dataProvider, final QName dataId)
             throws ConfigurationException {
         ensureNonNull("dataProvider", dataProvider);
@@ -618,6 +633,8 @@ public class StyleBusiness implements IStyleBusiness {
      * @throws ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void unlinkFromData(final String styleProvider, final String styleName, final String dataProvider, final QName dataId)
             throws ConfigurationException {
         ensureNonNull("dataProvider", dataProvider);
@@ -635,6 +652,8 @@ public class StyleBusiness implements IStyleBusiness {
         styleRepository.unlinkStyleToData(style.getId(), data.getId());
     }
 
+    @Override
+    @Transactional
     public void removeStyleFromLayer(String serviceIdentifier, String serviceType, String layerName, String styleProviderId,
             String styleName) throws TargetNotFoundException {
         final Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
@@ -644,6 +663,8 @@ public class StyleBusiness implements IStyleBusiness {
 
     }
 
+    @Override
+    @Transactional
     public void createOrUpdateStyleFromLayer(String serviceType, String serviceIdentifier, String layerName, String styleProviderId,
             String styleName) throws TargetNotFoundException {
         final Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
@@ -777,6 +798,8 @@ public class StyleBusiness implements IStyleBusiness {
         return "VECTOR";
     }
 
+    @Override
+    @Transactional
     public void writeStyle(final String name, final Integer providerId, final StyleType type, final MutableStyle body) throws IOException {
         final String login = securityManager.getCurrentUserLogin();
         Style style = new Style();

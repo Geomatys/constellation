@@ -51,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.imageio.spi.ServiceRegistry;
 import javax.inject.Inject;
@@ -87,7 +88,8 @@ public class LayerBusiness implements ILayerBusiness {
     private ServiceRepository serviceRepository;
     @Autowired
     private org.constellation.security.SecurityManager securityManager;
-    
+
+    @Override
     public void add(final AddLayer addLayerData) throws ConfigurationException {
         final String name        = addLayerData.getLayerId();
         // Prevents adding empty layer namespace, put null instead
@@ -98,7 +100,9 @@ public class LayerBusiness implements ILayerBusiness {
         final String serviceType = addLayerData.getServiceType();
         add(name, namespace, providerId, alias, serviceId, serviceType, null);
     }
-    
+
+    @Override
+    @Transactional
     public void add(final String name, String namespace, final String providerId, final String alias,
             final String serviceId, final String serviceType, final org.constellation.configuration.Layer config) throws ConfigurationException {
         
@@ -171,10 +175,14 @@ public class LayerBusiness implements ILayerBusiness {
         }
     }
 
+    @Override
+    @Transactional
     public void updateLayerTitle(LayerSummary layer) throws ConfigurationException {
         layerRepository.updateLayerTitle(layer);
     }
 
+    @Override
+    @Transactional
     public void remove(final String spec, final String serviceId, final String name, final String namespace) throws ConfigurationException {
         final Service service = serviceRepository.findByIdentifierAndType(serviceId, spec.toLowerCase());
         if (service != null) {
@@ -188,7 +196,9 @@ public class LayerBusiness implements ILayerBusiness {
             throw new TargetNotFoundException("Unable to find a service:" + serviceId);
         }
     }
-    
+
+    @Override
+    @Transactional
     public void removeForService(final String spec, final String serviceId) throws ConfigurationException {
         final Service service = serviceRepository.findByIdentifierAndType(serviceId, spec.toLowerCase());
         if (service != null) {
@@ -200,14 +210,17 @@ public class LayerBusiness implements ILayerBusiness {
             throw new TargetNotFoundException("Unable to find a service:" + serviceId);
         }
     }
-    
+
+    @Override
+    @Transactional
     public void removeAll() {
         final List<Layer> layers = layerRepository.findAll();
         for (Layer layer : layers) {
             layerRepository.delete(layer.getId());
         }
     }
-    
+
+    @Override
     public List<org.constellation.configuration.Layer> getLayers(final String serviceType, final String serviceName, final String login) throws ConfigurationException {
         final List<org.constellation.configuration.Layer> response = new ArrayList<>();
         final Service service = serviceRepository.findByIdentifierAndType(serviceName, serviceType.toLowerCase());
@@ -240,6 +253,7 @@ public class LayerBusiness implements ILayerBusiness {
      * @return org.constellation.configuration.Layer
      * @throws ConfigurationException
      */
+    @Override
     public org.constellation.configuration.Layer getLayer(final String spec, final String identifier, final String name,
                                                           final String namespace, final String login) throws ConfigurationException {
         final Service service = serviceRepository.findByIdentifierAndType(identifier, spec.toLowerCase());

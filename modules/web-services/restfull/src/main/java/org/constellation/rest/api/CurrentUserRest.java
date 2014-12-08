@@ -23,6 +23,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.security.SecurityManagerHolder;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,6 +41,7 @@ import javax.ws.rs.core.Response;
  * @version 0.9
  * @since 0.9
  */
+@Component
 @Named
 @Path("/1/account/")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })

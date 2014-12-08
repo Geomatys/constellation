@@ -26,6 +26,8 @@ import org.constellation.engine.register.jooq.tables.records.ProviderRecord;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -90,6 +92,7 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Provider insert(Provider provider) {
         ProviderRecord newRecord = dsl.newRecord(PROVIDER);
         newRecord.setConfig(provider.getConfig());
@@ -103,11 +106,13 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(int id) {
         return dsl.delete(PROVIDER).where(PROVIDER.ID.eq(id)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int deleteByIdentifier(String providerID) {
         return dsl.delete(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerID)).execute();
     }
@@ -124,6 +129,7 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int update(Provider provider) {
         ProviderRecord providerRecord = new ProviderRecord();
         providerRecord.from(provider);

@@ -1,6 +1,8 @@
 package org.constellation.rest.api;
 
 import org.constellation.engine.register.repository.DomainRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -12,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Set;
 
+@Component
 @Path("/1/userXdomain")
 public class UserXDomainRest {
 
@@ -20,6 +23,7 @@ public class UserXDomainRest {
 
     @POST
     @Path("/{domainId}/user/{userId}")
+    @Transactional
     public Response post(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
         domainRepository.addUserToDomain(userId, domainId, roles);
         return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -27,6 +31,7 @@ public class UserXDomainRest {
     
     @PUT
     @Path("/{domainId}/user/{userId}")
+    @Transactional
     public Response put(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
         domainRepository.updateUserInDomain(userId, domainId, roles);
         return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -34,6 +39,7 @@ public class UserXDomainRest {
 
     @DELETE
     @Path("/{domainId}/user/{userId}")
+    @Transactional
     public Response delete(@PathParam("userId") int userId, @PathParam("domainId") int domainId) {
         domainRepository.removeUserFromDomain(userId, domainId);
         return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();

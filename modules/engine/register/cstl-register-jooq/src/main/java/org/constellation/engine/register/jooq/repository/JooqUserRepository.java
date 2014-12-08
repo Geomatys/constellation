@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.invoke.MethodHandles;
@@ -132,7 +133,7 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
     }
 
     @Override
-    @Transactional("txManager")
+    @Transactional(propagation = Propagation.MANDATORY)
     public CstlUser update(CstlUser user, List<String> roles) {
 
         UpdateConditionStep<CstlUserRecord> update = dsl.update(CSTL_USER).set(CSTL_USER.EMAIL, user.getEmail())
@@ -151,7 +152,7 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
     }
 
     @Override
-    @Transactional("txManager")
+    @Transactional(propagation = Propagation.MANDATORY)
     public CstlUser insert(CstlUser user, List<String> roles) {
 
         user.setActive(true);
@@ -177,7 +178,7 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(int userId) {
         int deleteRole = deleteRole(userId);
 
@@ -191,11 +192,13 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int desactivate(int userId) {
         return dsl.update(Tables.CSTL_USER).set(CSTL_USER.ACTIVE, false).where(CSTL_USER.ID.eq(userId)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int activate(int userId) {
         return dsl.update(Tables.CSTL_USER).set(CSTL_USER.ACTIVE, true).where(CSTL_USER.ID.eq(userId)).execute();
     }

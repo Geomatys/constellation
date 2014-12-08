@@ -29,6 +29,8 @@ import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.repository.TaskRepository;
 import org.jooq.util.derby.sys.Sys;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -49,6 +51,7 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
 
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Task create(Task task) {
         TaskRecord newRecord = TaskHelper.copy(task, dsl.newRecord(Tables.TASK));
         newRecord.store();
@@ -61,6 +64,7 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void update(Task task) {
         dsl.update(Tables.TASK)
                 .set(Tables.TASK.TASK_PARAMETER_ID, task.getTaskParameterId())

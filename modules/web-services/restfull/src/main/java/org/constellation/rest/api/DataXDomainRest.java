@@ -5,6 +5,7 @@ import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.PermissionConstants;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+@Component
 @Path("/1/dataXdomain")
 public class DataXDomainRest {
 

@@ -23,6 +23,7 @@ import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.repository.DomainroleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.geotoolkit.util.StringUtilities;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -48,6 +49,7 @@ import javax.ws.rs.core.Response;
  * @version 0.9
  * @since 0.9
  */
+@Component
 @Named
 @Path("/1/user/")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
@@ -87,6 +89,7 @@ public class UserRest  {
     @DELETE
     @Path("{id}")
     @RolesAllowed("cstl-admin")
+    @Transactional
     public Response delete(@PathParam("id") int id) {
         if(userRepository.isLastAdmin(id))
             return Response.serverError().entity("admin.user.last.admin").build();
@@ -95,7 +98,7 @@ public class UserRest  {
     }
 
     @POST
-    @Transactional("txManager")
+    @Transactional
     @RolesAllowed("cstl-admin")
     public Response post(DomainUser userDTO) {
         if (StringUtils.hasText(userDTO.getPassword()))
@@ -108,7 +111,7 @@ public class UserRest  {
     
     
     @PUT
-    @Transactional("txManager")
+    @Transactional
     @RolesAllowed("cstl-admin")
     public Response put(DomainUser userDTO) {
         userRepository.update(userDTO, userDTO.getRoles());

@@ -17,6 +17,8 @@ import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -74,6 +76,7 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void linkStyleToData(int styleId, int dataid) {
         InsertSetMoreStep<StyledDataRecord> insert = dsl.insertInto(STYLED_DATA).set(STYLED_DATA.DATA, dataid).set(STYLED_DATA.STYLE, styleId);
         insert.execute();
@@ -81,11 +84,13 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void unlinkStyleToData(int styleId, int dataid) {
         dsl.delete(STYLED_DATA).where(STYLED_DATA.DATA.eq(dataid).and(STYLED_DATA.STYLE.eq(styleId))).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void linkStyleToLayer(int styleId, int layerId) {
         StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.STYLE.eq(styleId))
                 .fetchOneInto(StyledLayerRecord.class);
@@ -106,12 +111,14 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void unlinkStyleToLayer(int styleId, int layerid) {
         dsl.delete(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerid).and(STYLED_LAYER.STYLE.eq(styleId))).execute();
 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void deleteStyle(int providerId, String name) {
         dsl.delete(STYLE).where(STYLE.PROVIDER.eq(providerId).and(STYLE.NAME.eq(name))).execute();
 
@@ -128,6 +135,7 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int create(Style style) {
         StyleRecord styleRecord = dsl.newRecord(STYLE);
         styleRecord.setBody(style.getBody());
@@ -141,6 +149,7 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Style save(Style s) {
         dsl.update(STYLE)
                 .set(STYLE.DATE, s.getDate())

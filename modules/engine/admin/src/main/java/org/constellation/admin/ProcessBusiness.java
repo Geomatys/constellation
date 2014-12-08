@@ -69,9 +69,15 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -127,6 +133,10 @@ public class ProcessBusiness implements IProcessBusiness {
     @Inject
     private ChainProcessRepository chainRepository;
 
+    @Inject
+    @Qualifier("txManager")
+    protected PlatformTransactionManager txManager;
+
     private Scheduler quartzScheduler;
 
     private DirectoryWatcher directoryWatcher;
@@ -135,7 +145,15 @@ public class ProcessBusiness implements IProcessBusiness {
 
     @PostConstruct
     public void init(){
-        cleanTasksStates();
+
+        //transaction needed for clean tasks in database
+        TransactionTemplate transactionTemplate = new TransactionTemplate(txManager);
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus arg0) {
+                cleanTasksStates();
+            }
+        });
 
         LOGGER.info("=== Starting Constellation Scheduler ===");
         /*
@@ -160,7 +178,7 @@ public class ProcessBusiness implements IProcessBusiness {
             quartzScheduler.start();
 
             //listen and attach a process on all geotk process tasks
-            quartzScheduler.getListenerManager().addJobListener(new QuartzJobListener(this), allJobs());
+            quartzScheduler.getListenerManager().addJobListener(new QuartzJobListener(), allJobs());
 
         } catch (SchedulerException ex) {
             LOGGER.error("=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);
@@ -279,16 +297,19 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @Override
+    @Transactional
     public TaskParameter addTaskParameter(TaskParameter taskParameter) {
         return taskParameterRepository.create(taskParameter);
     }
 
     @Override
+    @Transactional
     public void updateTaskParameter(TaskParameter taskParameter) {
         taskParameterRepository.update(taskParameter);
     }
 
     @Override
+    @Transactional
     public void deleteTaskParameter(TaskParameter taskParameter) {
         taskParameterRepository.delete(taskParameter);
     }
@@ -439,11 +460,13 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @Override
+    @Transactional
     public Task addTask(org.constellation.engine.register.Task task) throws ConstellationException {
         return taskRepository.create(task);
     }
 
     @Override
+    @Transactional
     public void updateTask(org.constellation.engine.register.Task task) throws ConstellationException {
         taskRepository.update(task);
     }
@@ -491,6 +514,7 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @Override
+    @Transactional
     public void createChainProcess(final Chain chain) throws ConstellationException {
         final String code = chain.getName();
         String config = null;
@@ -508,6 +532,7 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @Override
+    @Transactional
     public boolean deleteChainProcess(final String auth, final String code) {
         final ChainProcess chain = chainRepository.findOne(auth, code);
         if (chain != null) {
@@ -693,6 +718,7 @@ public class ProcessBusiness implements IProcessBusiness {
     }
 
     @PreDestroy
+    @Transactional
     public void stop() {
         LOGGER.info("=== Stopping Scheduler ===");
         try {

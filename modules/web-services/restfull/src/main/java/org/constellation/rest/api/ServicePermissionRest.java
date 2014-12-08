@@ -8,6 +8,7 @@ import org.constellation.engine.register.PermissionConstants;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.DomainroleRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+@Component
 @Path("/1/servicepermission")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })

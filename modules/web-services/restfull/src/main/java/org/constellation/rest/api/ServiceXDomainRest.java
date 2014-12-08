@@ -1,6 +1,7 @@
 package org.constellation.rest.api;
 
 import org.constellation.business.IServiceBusiness;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -10,6 +11,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+@Component
 @Path("/1/serviceXdomain")
 public class ServiceXDomainRest {
 

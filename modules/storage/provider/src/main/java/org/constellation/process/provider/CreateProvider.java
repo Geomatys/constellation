@@ -44,6 +44,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Create a new provider in constellation.
@@ -76,6 +77,7 @@ public final class CreateProvider extends AbstractCstlProcess {
     }
 
     @Override
+    @Transactional
     protected void execute() throws ProcessException {
         final String providerType        = value(PROVIDER_TYPE, inputParameters);
         final ParameterValueGroup source = value(SOURCE, inputParameters);

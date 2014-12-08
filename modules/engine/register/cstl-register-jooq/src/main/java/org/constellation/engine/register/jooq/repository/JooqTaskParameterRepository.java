@@ -24,6 +24,8 @@ import org.constellation.engine.register.jooq.tables.records.TaskParameterRecord
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.jooq.Tables;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
@@ -56,6 +58,7 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public TaskParameter create(TaskParameter task ) {
         TaskParameterRecord newRecord = TaskParameterHelper.copy(task, dsl.newRecord(Tables.TASK_PARAMETER));
         newRecord.store();
@@ -68,11 +71,13 @@ public class JooqTaskParameterRepository extends AbstractJooqRespository<TaskPar
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void delete(TaskParameter task) {
         dsl.delete(Tables.TASK_PARAMETER).where(Tables.TASK_PARAMETER.ID.eq(task.getId())).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void update(TaskParameter task) {
         dsl.update(Tables.TASK_PARAMETER)
                 .set(Tables.TASK_PARAMETER.NAME, task.getName())

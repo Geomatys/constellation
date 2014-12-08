@@ -56,6 +56,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -96,6 +97,7 @@ import static org.geotoolkit.sml.xml.SensorMLUtilities.getSmlID;
  * @author Guilhem Legal (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
+@Component
 @Path("/1/sensor/")
 public class SensorRest {
     private static final Logger LOGGER = Logging.getLogger(SensorRest.class);

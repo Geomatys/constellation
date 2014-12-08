@@ -14,6 +14,7 @@ import org.constellation.utils.CstlMetadatas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -36,18 +37,23 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
     @Autowired
     private ServiceRepository serviceRepository;
 
+    @Override
     public File getConfigurationDirectory() {
         return ConfigDirectory.getConfigDirectory();
     }
 
+    @Override
     public File getDataDirectory() {
         return ConfigDirectory.getDataDirectory();
     }
 
+    @Override
     public String getProperty(final String key) {
         return propertyRepository.getValue(key, null);
     }
-    
+
+    @Override
+    @Transactional
     public void setProperty(final String key, final String value) {
         propertyRepository.save(new Property(key, value));
         // update metadata when service URL key is updated

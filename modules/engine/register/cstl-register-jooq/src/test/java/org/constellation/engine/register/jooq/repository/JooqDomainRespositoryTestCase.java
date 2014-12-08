@@ -66,6 +66,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
     }
 
     @Test
+    @Transactional()
     public void crude() {
         Domain domainDTO = new Domain(0, "cadastre", "Domaine du cadastre", false);
         Domain saved = domainRepository.save(domainDTO);
@@ -78,6 +79,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
     }
 
     @Test
+    @Transactional()
     public void testAddUserToDomain() {
         CstlUser user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
         Domain domain = domainRepository.save(TestSamples.newDomain());
@@ -94,6 +96,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
     }
 
     @Test
+    @Transactional()
     public void addDataToDomain() {
         Domain domain = domainRepository.save(TestSamples.newDomain());
         CstlUser user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
@@ -111,18 +114,21 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
     }
 
     @Test
+    @Transactional()
     public void removeDataFromDomain() {
         int i = domainRepository.removeDataFromDomain(2, 1);
         LOGGER.debug("Removed " + i);
     }
 
     @Test
+    @Transactional()
     public void removeAllDataFromDomain() {
         int i = domainRepository.removeAllDataFromDomain(1);
         LOGGER.debug("Removed " + i);
     }
 
     @Test
+    @Transactional()
     public void addDataFromProviderToDomain() {
         int count = domainRepository.addProviderDataToDomain("bluemarble", 1);
         LOGGER.debug("Added " + count + " data to domain");

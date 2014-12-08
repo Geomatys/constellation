@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.constellation.engine.register.jooq.tables.records.DataXCswRecord;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.constellation.engine.register.jooq.Tables.*;
 
@@ -65,20 +67,21 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Data create(Data data) {
-
         DataRecord newRecord = DataHelper.copy(data, dsl.newRecord(DATA));
-
         newRecord.store();
         return newRecord.into(Data.class);
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(int id) {
         return dsl.delete(DATA).where(DATA.ID.eq(id)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(String namespaceURI, String localPart, int providerId) {
         Condition whereClause = buildWhereClause(namespaceURI, localPart, providerId);
         return dsl.delete(DATA).where(whereClause).execute();
@@ -149,6 +152,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void update(Data data) {
 
         dsl.update(DATA)
@@ -202,6 +206,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public DataXCsw addDataToCSW(final int serviceID, final int dataID) {
         final DataXCsw dxc = dsl.select().from(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).and(DATA_X_CSW.DATA_ID.eq(dataID)).fetchOneInto(DataXCsw.class);
         if (dxc == null) {
@@ -215,16 +220,19 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void removeDataFromCSW(int serviceID, int dataID) {
         dsl.delete(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).and(DATA_X_CSW.DATA_ID.eq(dataID)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void removeDataFromAllCSW(int dataID) {
         dsl.delete(DATA_X_CSW).where(DATA_X_CSW.DATA_ID.eq(dataID)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void removeAllDataFromCSW(int serviceID) {
         dsl.delete(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).execute();
     }

@@ -27,6 +27,7 @@ import org.jooq.Result;
 import org.jooq.UpdatableRecord;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
@@ -70,7 +71,7 @@ public class JooqDomainroleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    @Transactional("txManager")
+    @Transactional(propagation = Propagation.MANDATORY)
     public Domainrole createWithPermissions(Domainrole group, List<Permission> permissions) {
 
         Domainrole saved = new Domainrole();
@@ -90,7 +91,7 @@ public class JooqDomainroleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    @Transactional("txManager")
+    @Transactional(propagation = Propagation.MANDATORY)
     public Domainrole updateWithPermissions(Domainrole domainRole, List<Permission> permissions) {
 
         dsl.update(DOMAINROLE).set(DOMAINROLE.NAME, domainRole.getName())
@@ -121,6 +122,7 @@ public class JooqDomainroleRepository extends AbstractJooqRespository<Domainrole
      * Does not delete system entries.
      */
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(int id) {
         return dsl.delete(DOMAINROLE).where(DOMAINROLE.ID.eq(id).and(DOMAINROLE.SYSTEM.eq(false))).execute();
     }

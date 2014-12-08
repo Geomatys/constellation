@@ -132,6 +132,7 @@ import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.stereotype.Component;
 
 /**
  * Manage data sending
@@ -139,6 +140,7 @@ import org.opengis.util.NoSuchIdentifierException;
  * @author Benjamin Garcia (Geomatys)
  * @author Christophe Mourette (Geomatys)
  */
+@Component
 @Path("/1/domain/{domainId}/data/")
 public class DataRest {
 
@@ -1805,7 +1807,7 @@ public class DataRest {
                         final QName name = new QName(data.getNamespace(), data.getName());
                         final DataBrief db = dataBusiness.getDataBrief(name, data.getProvider());
                         if ((published  && (db.getTargetService() == null ||  db.getTargetService().isEmpty())) ||
-                            (!published && db.getTargetService() != null && !db.getTargetService().isEmpty())) {
+                                (!published && db.getTargetService() != null && !db.getTargetService().isEmpty())) {
                             continue;
                         }
                         briefs.add(db);

@@ -509,9 +509,6 @@ public class SetupBusiness {
                 configurationBusiness.setProperty(PropertyConstants.DATA_ANALYSE_KEY, "true");
             }
         }
-
     }
-
-    
 
 }

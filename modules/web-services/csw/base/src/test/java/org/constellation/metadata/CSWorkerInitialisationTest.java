@@ -55,6 +55,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 // JUnit dependencies
 
@@ -104,6 +105,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
      * @throws java.lang.Exception
      */
     @Test
+    @Transactional
     public void initialisationTest() throws Exception {
 
         /**

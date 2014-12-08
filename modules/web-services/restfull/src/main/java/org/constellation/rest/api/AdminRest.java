@@ -28,7 +28,6 @@ import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.*;
-import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.sos.configuration.SOSConfigurer;
@@ -36,6 +35,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ICSWConfigurer;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -57,6 +57,7 @@ import java.util.List;
  * @version 0.9
  * @since 0.9
  */
+@Component
 @Path("/1/admin")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })

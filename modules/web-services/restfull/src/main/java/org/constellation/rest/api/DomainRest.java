@@ -26,6 +26,10 @@ import org.constellation.engine.register.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -46,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 @Path("/1/domain/")
 @RolesAllowed("cstl-admin")
 public class DomainRest {
@@ -200,6 +205,7 @@ public class DomainRest {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
+    @Transactional
     public Response insert(Domain domain) {
         Domain saved = domainRepository.save(domain);
         return Response.ok(saved).build();
@@ -209,6 +215,7 @@ public class DomainRest {
     @Path("{id}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
+    @Transactional
     public Response update(@PathParam("id") int id, Domain domain) {
         domain.setId(id);
         Domain saved = domainRepository.update(domain);
@@ -217,6 +224,7 @@ public class DomainRest {
 
     @DELETE
     @Path("{id}")
+    @Transactional
     public Response delete(@PathParam("id") int id) {
         try {
             domainRepository.delete(id);
@@ -234,7 +242,7 @@ public class DomainRest {
     public Response members(@PathParam("id") int domainId) {
         Map<CstlUser, List<Domainrole>> findUsersWithDomainRoles = userRepository.findUsersWithDomainRoles(domainId);
         
-        List<UserWithDomainRoles> result = new ArrayList<DomainRest.UserWithDomainRoles>();
+        List<UserWithDomainRoles> result = new ArrayList<UserWithDomainRoles>();
         
         for (Map.Entry<CstlUser, List<Domainrole>> e : findUsersWithDomainRoles.entrySet()) {
             result.add(new UserWithDomainRoles(e.getKey(), e.getValue()));

@@ -25,6 +25,7 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -46,10 +47,11 @@ import java.util.logging.Logger;
  * @version 0.9
  * @since 0.9
  */
+@Component
 @Path("/1/portrayal")
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Produces("image/png")
-public final class PortrayalRest {
+public class PortrayalRest {
     
     @Inject
     LayerProviders layerProviders;

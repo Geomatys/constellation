@@ -39,6 +39,7 @@ public class JooqUserRepositoryTestCase extends AbstractJooqTestTestCase {
     }
 
     @Test
+    @Transactional()
     public void crude() throws Throwable {
         
         CstlUser insert = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());

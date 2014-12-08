@@ -35,6 +35,8 @@ import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,6 +79,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void delete(Integer id) {
         dsl.delete(SERVICE_DETAILS).where(SERVICE_DETAILS.ID.eq(id)).execute();
         dsl.delete(SERVICE_EXTRA_CONFIG).where(SERVICE_EXTRA_CONFIG.ID.eq(id)).execute();
@@ -84,6 +87,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Service update(Service service) {
         dsl.update(SERVICE)
                 .set(SERVICE.DATE, service.getDate())
@@ -125,6 +129,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void createOrUpdateServiceDetails(ServiceDetails serviceDetails) {
         final ServiceDetails old = getServiceDetails(serviceDetails.getId(), serviceDetails.getLang());
         if (old!=null){
@@ -158,12 +163,14 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Service updateConfig(Service service) {
         dsl.update(SERVICE).set(SERVICE.CONFIG, service.getConfig()).where(SERVICE.ID.eq(service.getId())).execute();
         return null;
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void updateExtraFile(Service service, String fileName, String config) {
         int updateCount = dsl.update(SERVICE_EXTRA_CONFIG).set(SERVICE_EXTRA_CONFIG.CONTENT, config)
                 .set(SERVICE_EXTRA_CONFIG.FILENAME, fileName).where(SERVICE_EXTRA_CONFIG.ID.eq(service.getId()))
@@ -175,7 +182,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
             newRecord.setId(service.getId());
             newRecord.store();
         }
-
     }
 
     @Override
@@ -207,19 +213,20 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int create(Service service) {
-    	ServiceRecord serviceRecord = dsl.newRecord(SERVICE);
-		serviceRecord.setConfig(service.getConfig());
-		serviceRecord.setDate(service.getDate());
-		serviceRecord.setIdentifier(service.getIdentifier());
-		serviceRecord.setMetadataIso(service.getMetadataIso());
-		serviceRecord.setMetadataId(service.getMetadataId());
-		serviceRecord.setType(service.getType());
-		serviceRecord.setOwner(service.getOwner());
-		serviceRecord.setStatus(service.getStatus());
-		serviceRecord.setVersions(service.getVersions());
-		serviceRecord.store();
-		return serviceRecord.getId().intValue();
+        ServiceRecord serviceRecord = dsl.newRecord(SERVICE);
+        serviceRecord.setConfig(service.getConfig());
+        serviceRecord.setDate(service.getDate());
+        serviceRecord.setIdentifier(service.getIdentifier());
+        serviceRecord.setMetadataIso(service.getMetadataIso());
+        serviceRecord.setMetadataId(service.getMetadataId());
+        serviceRecord.setType(service.getType());
+        serviceRecord.setOwner(service.getOwner());
+        serviceRecord.setStatus(service.getStatus());
+        serviceRecord.setVersions(service.getVersions());
+        serviceRecord.store();
+        return serviceRecord.getId().intValue();
     }
 
     @Override
@@ -247,8 +254,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         return dsl.select().from(DATA).join(LAYER).on(LAYER.DATA.eq(DATA.ID)).join(SERVICE).on(LAYER.SERVICE.eq(SERVICE.ID)).where(SERVICE.ID.eq(id))
         .fetchInto(Data.class);
     }
-
-
 
     @Override
     public List<Service> findByDomain(int domainId) {

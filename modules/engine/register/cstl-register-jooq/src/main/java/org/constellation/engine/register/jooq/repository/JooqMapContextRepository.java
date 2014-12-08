@@ -25,6 +25,8 @@ import org.constellation.engine.register.helper.MapcontextHelper;
 import org.constellation.engine.register.jooq.tables.records.MapcontextRecord;
 import org.constellation.engine.register.repository.MapContextRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -50,6 +52,7 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void setLinkedLayers(int contextId, List<MapcontextStyledLayer> layers) {
         // Remove eventually existing old layers for this map context
         dsl.delete(MAPCONTEXT_STYLED_LAYER).where(MAPCONTEXT_STYLED_LAYER.MAPCONTEXT_ID.eq(contextId)).execute();
@@ -76,6 +79,7 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Mapcontext create(Mapcontext mapContext) {
         MapcontextRecord newRecord = MapcontextHelper.copy(mapContext, dsl.newRecord(MAPCONTEXT));
 
@@ -84,6 +88,7 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int update(Mapcontext mapContext) {
         return dsl.update(MAPCONTEXT)
                    .set(MAPCONTEXT.CRS, mapContext.getCrs())
@@ -99,6 +104,7 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(int id) {
         return dsl.delete(MAPCONTEXT).where(MAPCONTEXT.ID.eq(id)).execute();
     }

@@ -14,13 +14,11 @@
 
   <context:component-scan base-package="org.constellation.services.component" />
 
-  <bean class="org.constellation.rest.api.UserResource" />
-
   <bean id="securityManager" class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance" />
 
   <bean class="org.constellation.admin.ConfigurationServiceInit" init-method="init" autowire="byType" />
 
-  <context:component-scan base-package="org.constellation.admin" />
+  <context:component-scan base-package="org.constellation.admin org.constellation.rest.api" />
 
   <import resource="classpath:cstl/spring/cstl-web-base-context.xml" />
     <!-- Detection of deployed modules -->

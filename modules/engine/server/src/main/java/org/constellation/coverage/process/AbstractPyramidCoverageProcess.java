@@ -38,6 +38,7 @@ import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.referencing.OutOfDomainOfValidityException;
 import org.opengis.referencing.operation.TransformException;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Quentin Boileau (Geomatys)
@@ -176,6 +177,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         return scales;*/
     }
 
+    @Transactional
     protected DataProvider createProvider(String providerID, CoverageStore store, Integer domainId, final String datasetName) throws ProcessException {
         final DataProvider outProvider;
         try {

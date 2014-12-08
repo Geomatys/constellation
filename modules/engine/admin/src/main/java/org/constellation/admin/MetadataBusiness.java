@@ -33,6 +33,7 @@ import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Business facade for metadata.
@@ -87,6 +88,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
+    @Transactional
     public boolean updateMetadata(final String metadataId, final String xml)  {
         final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
         if (dataset != null) {
@@ -221,6 +223,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
+    @Transactional
     public void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier) {
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {
@@ -256,6 +259,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
+    @Transactional
     public void unlinkMetadataIDToCSW(final String metadataId, final String cswIdentifier) {
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {

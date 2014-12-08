@@ -26,12 +26,12 @@ import org.jooq.DeleteConditionStep;
 import org.jooq.Record1;
 import org.jooq.SelectQuery;
 import org.jooq.UpdateConditionStep;
-import org.jooq.UpdateSetMoreStep;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.constellation.engine.register.jooq.Tables.LAYER;
 import static org.constellation.engine.register.jooq.Tables.PROPERTY;
 
 @Component
@@ -60,6 +60,7 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRe
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void save(Property prop) {
         final Property old = findOne(prop.getName());
         if (old == null) {
@@ -82,6 +83,7 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRe
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void delete(Property property) {
         DeleteConditionStep<PropertyRecord> deleteConditionStep = dsl.delete(PROPERTY).where(
                 PROPERTY.NAME.eq(property.getName()));
@@ -105,11 +107,5 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRe
             return defaultValue;
         return fetchOne.value1();
     }
-
-
-   
-
-
-   
 
 }

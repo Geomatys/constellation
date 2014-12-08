@@ -49,6 +49,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.concurrent.Future;
@@ -150,6 +151,7 @@ public class DataCoverageJob implements IDataCoverageJob {
         }
 
         @Override
+        @Transactional
         public void progressing(ProcessEvent event) {
             if (event.getOutput() != null) {
                 final Data data = getData();
@@ -166,6 +168,7 @@ public class DataCoverageJob implements IDataCoverageJob {
         }
 
         @Override
+        @Transactional
         public void completed(ProcessEvent event) {
             final Data data = getData();
             try {
@@ -180,6 +183,7 @@ public class DataCoverageJob implements IDataCoverageJob {
         }
 
         @Override
+        @Transactional
         public void failed(ProcessEvent event) {
             final Data data = getData();
             data.setStatsState(STATE_ERROR);

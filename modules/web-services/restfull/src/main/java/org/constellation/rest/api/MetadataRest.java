@@ -26,14 +26,13 @@ import org.apache.sis.xml.XML;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
-import org.constellation.business.IProviderBusiness;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.repository.UserRepository;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 import javax.inject.Inject;
@@ -46,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.geotoolkit.util.FileUtilities;
 
 /**
  * RESTful API for dataset metadata.
@@ -55,6 +53,7 @@ import org.geotoolkit.util.FileUtilities;
  * @version 0.9
  * @since 0.9
  */
+@Component
 @Path("/1/domain/{domainId}/metadata/")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -64,12 +63,6 @@ public class MetadataRest {
      * Used for debugging purposes.
      */
     private static final Logger LOGGER = Logging.getLogger(MetadataRest.class);
-
-    /**
-     * Injected provider business.
-     */
-    @Inject
-    private IProviderBusiness providerBusiness;
 
     /**
      * Injected dataset business.

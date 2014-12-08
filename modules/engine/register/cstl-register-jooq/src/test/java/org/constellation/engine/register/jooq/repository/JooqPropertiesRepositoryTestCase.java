@@ -24,6 +24,7 @@ import org.constellation.engine.register.repository.PropertyRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,7 @@ public class JooqPropertiesRepositoryTestCase extends AbstractJooqTestTestCase {
     }
     
     @Test
+    @Transactional()
     public void save() {
         Property dto = new Property();
         dto.setName("test");
@@ -61,6 +63,7 @@ public class JooqPropertiesRepositoryTestCase extends AbstractJooqTestTestCase {
     }
 
     @Test
+    @Transactional()
     public void delete() {
         Property dto = new Property();
         dto.setName("test");

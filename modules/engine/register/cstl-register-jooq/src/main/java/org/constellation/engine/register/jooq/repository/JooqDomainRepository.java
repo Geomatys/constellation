@@ -32,6 +32,7 @@ import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -93,6 +94,7 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Domain save(Domain domain) {
         DomainRecord newRecord = dsl.newRecord(DOMAIN);
         newRecord.setDescription(domain.getDescription());
@@ -107,6 +109,8 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
         return null;
     }
 
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int[] addUserToDomain(int userId, int domainId, Set<Integer> roles) {
 
         Collection<UserXDomainXDomainroleRecord> records = new ArrayList<UserXDomainXDomainroleRecord>();
@@ -124,6 +128,8 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     }
 
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int removeUserFromDomain(int userId, int domainId) {
 
         return dsl
@@ -133,17 +139,22 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     }
 
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Domain update(Domain domainDTO) {
         dsl.update(DOMAIN).set(DOMAIN.NAME, domainDTO.getName()).set(DOMAIN.DESCRIPTION, domainDTO.getDescription())
                 .where(DOMAIN.ID.eq(domainDTO.getId())).execute();
         return new Domain(domainDTO.getId(), domainDTO.getName(), domainDTO.getDescription(), domainDTO.isSystem());
     }
 
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(int domainId) {
         return dsl.delete(DOMAIN).where(DOMAIN.ID.eq(domainId)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void addServiceToDomain(int serviceId, int domainId) {
         ServiceXDomainRecord newRecord = dsl.newRecord(SERVICE_X_DOMAIN);
         newRecord.setDomainId(domainId);
@@ -153,6 +164,7 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int removeServiceFromDomain(int serviceId, int domainId) {
         return dsl.delete(SERVICE_X_DOMAIN)
                 .where(SERVICE_X_DOMAIN.SERVICE_ID.eq(serviceId).and(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId)))
@@ -160,11 +172,13 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int removeUserFromAllDomain(int userId) {
         return dsl.delete(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int addDataToDomain(int dataId, int domainId) {
         DataXDomainRecord record = dsl.newRecord(Tables.DATA_X_DOMAIN);
         record.setDataId(dataId);
@@ -173,6 +187,7 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int removeDataFromDomain(int dataId, int domainId) {
         return dsl.delete(DATA_X_DOMAIN)
                 .where(DATA_X_DOMAIN.DATA_ID.eq(dataId).and(DATA_X_DOMAIN.DOMAIN_ID.eq(domainId))).execute();
@@ -180,12 +195,14 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int removeAllDataFromDomain(int domainId) {
         return dsl.delete(DATA_X_DOMAIN).where(DATA_X_DOMAIN.DOMAIN_ID.eq(domainId)).execute();
 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int addProviderDataToDomain(String identifier, int activeDomainId) {
         org.jooq.Field<Integer> field = DSL.val(activeDomainId);
         return dsl
@@ -208,7 +225,7 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
-    @Transactional("txManager")
+    @Transactional(propagation = Propagation.MANDATORY)
     public Set<Integer> updateUserInDomain(int userId, int domainId, Set<Integer> roles) {
         dsl.delete(USER_X_DOMAIN_X_DOMAINROLE)
                 .where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(

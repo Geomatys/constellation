@@ -11,6 +11,8 @@ import org.constellation.engine.register.repository.DomainroleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+@Component
 @Path("/1/domainrole/")
 @RolesAllowed("cstl-admin")
 public class DomainRoleRest {
@@ -141,6 +144,7 @@ public class DomainRoleRest {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
+    @Transactional
     public Response insert(DomainroleWithPermissions domainRole) {
         Domainrole saved = domainRoleRepository.createWithPermissions(domainRole, domainRole.getPermissions());
         return Response.ok(saved).build();
@@ -150,6 +154,7 @@ public class DomainRoleRest {
     @PUT
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
+    @Transactional
     public Response update(@PathParam("id") int id, DomainroleWithPermissions domainRole) {
         Domainrole saved = domainRoleRepository.updateWithPermissions(domainRole, domainRole.getPermissions());
         return Response.ok(saved).build();
@@ -157,6 +162,7 @@ public class DomainRoleRest {
 
     @DELETE
     @Path("{id}")
+    @Transactional
     public Response delete(@PathParam("id") int id) {
         try {
             if(domainRoleRepository.delete(id) == 0) {

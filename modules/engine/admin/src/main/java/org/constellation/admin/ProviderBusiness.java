@@ -51,6 +51,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -141,11 +142,13 @@ public class ProviderBusiness implements IProviderBusiness {
     }
 
     @Override
+    @Transactional
     public void removeProvider(final String identifier) {
         providerRepository.deleteByIdentifier(identifier);
     }
 
     @Override
+    @Transactional
     public void removeAll() {
         final List<Provider> providers = providerRepository.findAll();
         for (Provider p : providers) {
@@ -177,6 +180,7 @@ public class ProviderBusiness implements IProviderBusiness {
     }
 
     @Override
+    @Transactional
     public void updateParent(String providerIdentifier, String newParentIdentifier) {
         final Provider provider = getProvider(providerIdentifier);
         provider.setParent(newParentIdentifier);
@@ -190,6 +194,7 @@ public class ProviderBusiness implements IProviderBusiness {
 
 
     @Override
+    @Transactional
     public Provider storeProvider(final String identifier, final String parent, final ProviderType type, final String serviceName,
                                   final GeneralParameterValue config) throws IOException {
         Provider provider = new Provider();
@@ -226,6 +231,7 @@ public class ProviderBusiness implements IProviderBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public Provider create(final int domainId, final String id, final DataStoreFactory spi, ParameterValueGroup spiConfiguration) throws ConfigurationException {
         if (getProvider(id) != null) {
             throw new ConfigurationException("A provider already exists for name "+id);
@@ -258,6 +264,7 @@ public class ProviderBusiness implements IProviderBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public Provider create(final int domainId, final String id, final ProviderConfiguration config) throws ConfigurationException {
         final String type = config.getType();
         final String subType = config.getSubType();
@@ -276,6 +283,7 @@ public class ProviderBusiness implements IProviderBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public Provider create(final int domainId, final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException {
         final DataProviderFactory providerSPI = DataProviders.getInstance().getFactory(providerSPIName);
         /////

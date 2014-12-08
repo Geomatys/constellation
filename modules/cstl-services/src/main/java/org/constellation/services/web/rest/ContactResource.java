@@ -60,7 +60,7 @@ public class ContactResource {
 
 	@RequestMapping(value = "/admin/contact", method = RequestMethod.PUT)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@Transactional("txManager")
+	@Transactional
 	public void put(@RequestBody HashMap<String, Object> contact) {
 
 		Properties properties = JSonUtils.toProperties(contact);

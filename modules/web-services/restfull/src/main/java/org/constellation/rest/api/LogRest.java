@@ -22,6 +22,7 @@ package org.constellation.rest.api;
 import org.constellation.configuration.ConfigDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -47,6 +48,7 @@ import java.nio.file.Paths;
  * @author olivier.nouguier@geomatys.com
  * 
  */
+@Component
 @Path("/1/log/")
 public class LogRest {
 

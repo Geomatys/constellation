@@ -1,6 +1,7 @@
 package org.constellation.rest.api;
 
 import org.constellation.engine.register.repository.UserRepository;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -11,8 +12,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
+@Component
 @Path("/1/general")
 public class GeneralRest {
 

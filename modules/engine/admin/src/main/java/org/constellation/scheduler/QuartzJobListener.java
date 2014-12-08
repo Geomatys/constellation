@@ -52,12 +52,10 @@ public class QuartzJobListener implements JobListener {
 
     private static final Logger LOGGER = Logging.getLogger(QuartzJobListener.class);
     public static final String PROPERTY_TASK = "task";
-    private final IProcessBusiness processBusiness;
+    private IProcessBusiness processBusiness;
 
-    public QuartzJobListener(IProcessBusiness processBusiness) {
-        this.processBusiness = processBusiness;
-     }
-
+    public QuartzJobListener() {
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     // Quartz listener /////////////////////////////////////////////////////////
@@ -70,6 +68,10 @@ public class QuartzJobListener implements JobListener {
 
     @Override
     public synchronized void jobToBeExecuted(JobExecutionContext jec) {
+        if (processBusiness == null) {
+            this.processBusiness = SpringHelper.getBean(IProcessBusiness.class);
+        }
+
         final Job job = jec.getJobInstance();
         if(!(job instanceof ProcessJob)) return;
         
@@ -87,7 +89,7 @@ public class QuartzJobListener implements JobListener {
         taskEntity.setType(""); // TODO
         processBusiness.addTask(taskEntity);
 
-        final ProcessListener listener = new StateListener(taskEntity.getIdentifier(), processBusiness, quartzTask.getTitle() );
+        final ProcessListener listener = new StateListener(taskEntity.getIdentifier(), quartzTask.getTitle() );
         pj.addListener(listener);
         LOGGER.log(Level.INFO, "Run task "+taskEntity.getIdentifier());
     }
@@ -112,12 +114,14 @@ public class QuartzJobListener implements JobListener {
     
         private final String taskId;
         private final String title;
-        private final IProcessBusiness processBusiness;
         private final org.constellation.engine.register.Task taskEntity;
+        private IProcessBusiness processBusiness;
 
-        public StateListener(String taskId, IProcessBusiness processBusiness, String title) {
+        public StateListener(String taskId, String title) {
             this.taskId = taskId;
-            this.processBusiness = processBusiness;
+            if (processBusiness == null) {
+                this.processBusiness = SpringHelper.getBean(IProcessBusiness.class);
+            }
             this.taskEntity = processBusiness.getTask(taskId);
             this.title = title;
         }
@@ -178,7 +182,9 @@ public class QuartzJobListener implements JobListener {
         }
 
         private void updateTask(Task taskEntity) {
-
+            if (processBusiness == null) {
+                this.processBusiness = SpringHelper.getBean(IProcessBusiness.class);
+            }
             //update in database
             processBusiness.updateTask(taskEntity);
 

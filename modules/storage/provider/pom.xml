@@ -98,6 +98,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Spring-tx for transaction support in DefaultConfigurator -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <!--<dependency>-->
             <!--<groupId>org.constellation.engine</groupId>-->

@@ -53,9 +53,6 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
     @Inject
     private ConfigurationService configurationService;
     
-    @Inject
-    private ProviderRepository providerRepository;
-    
     /**
      * Spring application context.
      */

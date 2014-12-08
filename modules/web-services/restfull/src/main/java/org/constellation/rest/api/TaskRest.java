@@ -46,6 +46,8 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -77,10 +79,11 @@ import java.util.Map;
  * 
  * @author Johann Sorel (Geomatys)
  */
+@Component
 @Path("/1/task")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public final class TaskRest {
+public class TaskRest {
     private static final DateFormat TASK_DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
     @Inject
@@ -278,6 +281,7 @@ public final class TaskRest {
     @GET
     @Path("params/duplicate/{id}")
     @RolesAllowed("cstl-admin")
+    @Transactional
     public Response duplicateParamsTask(final @PathParam("id") Integer taskParameterIdForTemplate, @Context HttpServletRequest req) throws ConfigurationException {
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 

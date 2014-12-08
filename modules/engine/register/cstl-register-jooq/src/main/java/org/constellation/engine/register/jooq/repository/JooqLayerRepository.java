@@ -27,6 +27,8 @@ import org.constellation.engine.register.repository.LayerRepository;
 import org.jooq.DeleteConditionStep;
 import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,11 +45,13 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int deleteServiceLayer(Service service) {
         return dsl.delete(LAYER).where(LAYER.SERVICE.eq(service.getId())).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Layer save(Layer layer) {
         LayerRecord newRecord = dsl.newRecord(LAYER);
         newRecord.setOwner(layer.getOwner());
@@ -67,6 +71,7 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
 
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int update(Layer layer) {
         LayerRecord layerRecord = new LayerRecord();
         layerRecord.from(layer);
@@ -81,6 +86,7 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void updateLayerTitle(LayerSummary layer) {
         dsl.update(LAYER).set(LAYER.TITLE, layer.getTitle())
                 .where(LAYER.ID.eq(layer.getId()))
@@ -88,8 +94,8 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void delete(int layerId) {
-
         final DeleteConditionStep<LayerRecord> delete = dsl.delete(LAYER).where(LAYER.ID.eq(layerId));
         delete.execute();
     }

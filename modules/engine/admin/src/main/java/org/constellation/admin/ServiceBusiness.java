@@ -97,6 +97,8 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public Object create(final String serviceType, final String identifier, Object configuration, Details details, final Integer domainId)
             throws ConfigurationException {
 
@@ -168,6 +170,8 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void start(final String serviceType, final String identifier) throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -197,6 +201,8 @@ public class ServiceBusiness implements IServiceBusiness {
         }
     }
 
+    @Override
+    @Transactional
     public void start(final String serviceType) throws ConfigurationException {
 
         final List<Service> services = serviceRepository.findByType(serviceType);
@@ -231,6 +237,8 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void stop(final String serviceType, final String identifier) throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -263,6 +271,7 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Transactional
     public void restart(final String serviceType, final String identifier, final boolean closeFirst) throws ConfigurationException {
 
         if (identifier == null || "".equals(identifier)) {
@@ -288,6 +297,8 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void rename(final String serviceType, final String identifier, final String newIdentifier) throws ConfigurationException {
         final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
         if (service != null) {
@@ -329,6 +340,8 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void delete(final String serviceType, final String identifier) throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -359,6 +372,8 @@ public class ServiceBusiness implements IServiceBusiness {
         }
     }
 
+    @Override
+    @Transactional
     public void deleteAll() throws ConfigurationException {
         final List<Service> services = serviceRepository.findAll();
         for (Service service : services) {
@@ -381,6 +396,7 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Transactional
     public void configure(final String serviceType, final String identifier, Details details, Object configuration)
             throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
@@ -419,6 +435,7 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
     public Object getConfiguration(final String serviceType, final String identifier) throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -435,11 +452,13 @@ public class ServiceBusiness implements IServiceBusiness {
         return null;
     }
 
+    @Override
     public Object getExtraConfiguration(final String serviceType, final String identifier, final String fileName)
             throws ConfigurationException {
         return getExtraConfiguration(serviceType, identifier, fileName, GenericDatabaseMarshallerPool.getInstance());
     }
 
+    @Override
     public Object getExtraConfiguration(final String serviceType, final String identifier, final String fileName, final MarshallerPool pool)
             throws ConfigurationException {
         try {
@@ -459,6 +478,8 @@ public class ServiceBusiness implements IServiceBusiness {
         return null;
     }
 
+    @Override
+    @Transactional
     public void setExtraConfiguration(final String serviceType, final String identifier, final String fileName, final Object config,
             final MarshallerPool pool) {
         final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
@@ -475,6 +496,7 @@ public class ServiceBusiness implements IServiceBusiness {
      * @param spec
      * @return a {@link Map} of {@link ServiceStatus} status
      */
+    @Override
     public Map<String, ServiceStatus> getStatus(final String spec) {
         final List<Service> services = serviceRepository.findByType(spec);
         final Map<String, ServiceStatus> status = new HashMap<>();
@@ -484,6 +506,7 @@ public class ServiceBusiness implements IServiceBusiness {
         return status;
     }
 
+    @Override
     public List<String> getServiceIdentifiers(final String spec) {
         return serviceRepository.findIdentifiersByType(spec);
     }
@@ -547,6 +570,7 @@ public class ServiceBusiness implements IServiceBusiness {
         }
     }
 
+    @Override
     public org.constellation.engine.register.Service getServiceByIdentifierAndType(String serviceType, String identifier) {
         return serviceRepository.findByIdentifierAndType(identifier, serviceType);
     }
@@ -564,6 +588,7 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
     public Details getInstanceDetails(final String serviceType, final String identifier, final String language)
             throws ConfigurationException {
         final Service service = this.ensureExistingInstance(serviceType, identifier);
@@ -603,6 +628,8 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException
      *             if the operation has failed for any reason
      */
+    @Override
+    @Transactional
     public void setInstanceDetails(final String serviceType, final String identifier, final Details details, final String language,
             final boolean default_) throws ConfigurationException {
         final Service service = this.ensureExistingInstance(serviceType, identifier);
@@ -623,6 +650,7 @@ public class ServiceBusiness implements IServiceBusiness {
      * @throws TargetNotFoundException
      *             if the service with specified identifier does not exist
      */
+    @Override
     public Service ensureExistingInstance(final String spec, final String identifier) throws TargetNotFoundException {
         Service service = serviceRepository.findByIdentifierAndType(identifier, spec);
         if (!WSEngine.serviceInstanceExist(spec.toUpperCase(), identifier)) {
@@ -661,12 +689,14 @@ public class ServiceBusiness implements IServiceBusiness {
     }
 
     // Domain links
-
+    @Override
+    @Transactional
     public void addServiceToDomain(int serviceId, int domainId) {
         domainRepository.addServiceToDomain(serviceId, domainId);
     }
 
-    @Transactional("txManager")
+    @Override
+    @Transactional
     public synchronized void removeServiceFromDomain(int serviceId, int domainId) {
         List<Domain> findByLinkedService = domainRepository.findByLinkedService(serviceId);
         if (findByLinkedService.size() == 1) {
@@ -676,6 +706,7 @@ public class ServiceBusiness implements IServiceBusiness {
         domainRepository.removeServiceFromDomain(serviceId, domainId);
     }
 
+    @Override
     public List<ServiceDTO> getAllServicesByDomainId(int domainId, String lang) throws ConfigurationException {
         List<ServiceDTO> serviceDTOs = new ArrayList<>();
         List<Service> services = serviceRepository.findByDomain(domainId);
@@ -687,6 +718,7 @@ public class ServiceBusiness implements IServiceBusiness {
         return serviceDTOs;
     }
 
+    @Override
     public List<ServiceDTO> getAllServicesByDomainIdAndType(int domainId, String lang, String type) throws ConfigurationException {
         List<ServiceDTO> serviceDTOs = new ArrayList<>();
         List<Service> services = serviceRepository.findByDomainAndType(domainId, type);
@@ -715,6 +747,7 @@ public class ServiceBusiness implements IServiceBusiness {
         return serviceDTO;
     }
 
+    @Override
     public Instance getI18nInstance(String serviceType, String identifier, String lang) {
         Instance instance = new Instance();
         final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);

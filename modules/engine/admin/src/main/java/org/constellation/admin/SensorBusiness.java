@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -52,33 +53,39 @@ public class SensorBusiness implements ISensorBusiness {
 
     @Inject
     private DataRepository dataRepository;
-    
+
+    @Override
     public Sensor getSensor(final String id) {
         return sensorRepository.findByIdentifier(id);
     }
-    
+
+    @Override
     public List<Sensor> getAll() {
         return sensorRepository.findAll();
     }
-    
+
+    @Override
     public List<Data> getLinkedData(final Sensor sensor){
         return sensorRepository.getLinkedDatas(sensor);
     }
-    
+
+    @Override
     public List<Sensor> getChildren(final Sensor sensor) {
         return sensorRepository.getChildren(sensor);
     }
-    
+
+    @Override
+    @Transactional
     public void delete(final String identifier) {
         sensorRepository.delete(identifier);
     }
 
+    @Override
+    @Transactional
     public void linkDataToSensor(QName dataName, String providerId, String sensorIdentifier) {
-
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         final Sensor sensor = sensorRepository.findByIdentifier(sensorIdentifier);
         sensorRepository.linkDataToSensor(data.getId(),sensor.getId());
-
     }
 
     /**
@@ -88,6 +95,8 @@ public class SensorBusiness implements ISensorBusiness {
      * @param providerId given provider identifier for data.
      * @param sensorIdentifier given sensor identifier that will be unlinked.
      */
+    @Override
+    @Transactional
     public void unlinkDataToSensor(final QName dataName,
                                    final String providerId,
                                    final String sensorIdentifier) throws TargetNotFoundException {
@@ -113,6 +122,8 @@ public class SensorBusiness implements ISensorBusiness {
         return create(identifier,type,parent,null);
     }
 
+    @Override
+    @Transactional
     public Sensor create(final String identifier, final String type, final String parent, final String metadata) {
         Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
         Sensor sensor = new Sensor();
@@ -126,6 +137,8 @@ public class SensorBusiness implements ISensorBusiness {
         return sensorRepository.create(sensor);
     }
 
+    @Override
+    @Transactional
     public void update(Sensor sensor) {
         sensorRepository.update(sensor);
     }

@@ -185,7 +185,7 @@ public class JooqConfigurationService implements ConfigurationService {
 //
 //    }
 //
-    @Transactional("txManager")
+    @Transactional
     public Object getConfiguration(String serviceType, String serviceID, String fileName, MarshallerPool pool)
             throws JAXBException, FileNotFoundException {
         final org.constellation.engine.register.Service rec = serviceRepository.findByIdentifierAndType(serviceID,
@@ -262,6 +262,7 @@ public class JooqConfigurationService implements ConfigurationService {
     }
 
     @Override
+    @Transactional
     public void deleteData(String namespaceURI, String localPart, String providerIdentifier) {
         Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider == null) {
@@ -273,6 +274,7 @@ public class JooqConfigurationService implements ConfigurationService {
     }
 
     @Override
+    @Transactional
     public void deleteProvider(String providerID) {
         providerRepository.deleteByIdentifier(providerID);
 

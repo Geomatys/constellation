@@ -6,6 +6,8 @@ import org.constellation.engine.register.helper.SensorHelper;
 import org.constellation.engine.register.jooq.tables.records.SensorRecord;
 import org.constellation.engine.register.repository.SensorRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -48,21 +50,25 @@ public class JooqSensorRepository extends AbstractJooqRespository<SensorRecord, 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void delete(String identifier) {
         dsl.delete(SENSOR).where(SENSOR.IDENTIFIER.eq(identifier)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void linkDataToSensor(Integer dataId , Integer sensorId) {
         dsl.insertInto(SENSORED_DATA).set(SENSORED_DATA.DATA, dataId).set(SENSORED_DATA.SENSOR, sensorId).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void unlinkDataToSensor(Integer dataId, Integer sensorId) {
         dsl.delete(SENSORED_DATA).where(SENSORED_DATA.DATA.eq(dataId)).and(SENSORED_DATA.SENSOR.eq(sensorId)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Sensor create(Sensor sensor) {
         SensorRecord sensorRecord = dsl.newRecord(SENSOR);
         SensorHelper.copy(sensor,sensorRecord);
@@ -71,6 +77,7 @@ public class JooqSensorRepository extends AbstractJooqRespository<SensorRecord, 
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void update(Sensor sensor) {
         dsl.update(SENSOR)
                 .set(SENSOR.IDENTIFIER, sensor.getIdentifier())

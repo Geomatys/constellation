@@ -28,6 +28,8 @@ import org.constellation.engine.register.jooq.tables.records.DatasetXCswRecord;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -42,6 +44,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Dataset insert(Dataset dataset) {
         DatasetRecord newRecord = dsl.newRecord(DATASET);
         newRecord.setIdentifier(dataset.getIdentifier());
@@ -55,6 +58,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int update(Dataset dataset) {
         DatasetRecord datasetRecord = new DatasetRecord();
         datasetRecord.from(dataset);
@@ -99,6 +103,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void remove(int id) {
         dsl.delete(DATASET).where(DATASET.ID.eq(id)).execute();
     }
@@ -123,16 +128,19 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void removeDatasetFromCSW(int serviceID, int datasetID) {
         dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(serviceID)).and(DATASET_X_CSW.DATASET_ID.eq(datasetID)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void removeDatasetFromAllCSW(int datasetID) {
         dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.DATASET_ID.eq(datasetID)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void removeAllDatasetFromCSW(int serviceID) {
         dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(serviceID)).execute();
     }

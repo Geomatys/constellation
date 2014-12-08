@@ -26,6 +26,7 @@ import org.constellation.dto.CRSCoverageList;
 import org.constellation.utils.CRSUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -48,6 +49,7 @@ import java.util.logging.Logger;
  * @since 0.9
  *
  */
+@Component
 @Path("/1/crs")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

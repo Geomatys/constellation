@@ -75,6 +75,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.FactoryException;
+import org.springframework.stereotype.Component;
 
 /**
  * RestFull API for provider management/operations.
@@ -83,10 +84,11 @@ import org.opengis.util.FactoryException;
  * @version 0.9
  * @since 0.9
  */
+@Component
 @Path("/1/domain/{domainId}/provider")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public final class ProviderRest {
+public class ProviderRest {
 
     private static final Logger LOGGER = Logging.getLogger(ProviderRest.class);
 

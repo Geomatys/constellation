@@ -19,7 +19,6 @@
 package org.constellation.rest.api;
 
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.MapContextBusiness;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.business.IMapContextBusiness;
@@ -39,6 +38,7 @@ import org.geotoolkit.wms.xml.AbstractLayer;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.opengis.util.FactoryException;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3._2005.atom.CategoryType;
 import org.w3._2005.atom.DateTimeType;
@@ -70,6 +70,7 @@ import java.util.logging.Level;
  *
  * @author Cédric Briançon (Geomatys)
  */
+@Component
 @Path("/1/context/")
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
@@ -97,14 +98,14 @@ public class MapContextRest {
     }
 
     @PUT
-    @Transactional("txManager")
+    @Transactional
     public Response create(final Mapcontext mapContext) {
         final Mapcontext mapContextCreated = contextRepository.create(mapContext);
         return Response.ok(mapContextCreated).build();
     }
 
     @POST
-    @Transactional("txManager")
+    @Transactional
     public Response update(final Mapcontext mapContext) {
         contextRepository.update(mapContext);
         return Response.ok(mapContext).build();
@@ -112,7 +113,7 @@ public class MapContextRest {
 
     @DELETE
     @Path("{id}")
-    @Transactional("txManager")
+    @Transactional
     public Response delete(@PathParam("id") final int contextId) {
         contextRepository.delete(contextId);
         return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();

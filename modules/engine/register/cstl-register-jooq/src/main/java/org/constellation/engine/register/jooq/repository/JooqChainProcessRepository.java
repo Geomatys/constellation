@@ -26,6 +26,8 @@ import static org.constellation.engine.register.jooq.Tables.CHAIN_PROCESS;
 import org.constellation.engine.register.jooq.tables.records.ChainProcessRecord;
 import org.constellation.engine.register.repository.ChainProcessRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -44,6 +46,7 @@ public class JooqChainProcessRepository extends AbstractJooqRespository<ChainPro
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public ChainProcess create(ChainProcess chain) {
         ChainProcessRecord newRecord = ChainProcessHelper.copy(chain, dsl.newRecord(CHAIN_PROCESS));
         newRecord.store();
@@ -51,11 +54,13 @@ public class JooqChainProcessRepository extends AbstractJooqRespository<ChainPro
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(int id) {
         return dsl.delete(CHAIN_PROCESS).where(CHAIN_PROCESS.ID.eq(id)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(String auth, String code) {
         return dsl.delete(CHAIN_PROCESS).where(CHAIN_PROCESS.AUTH.eq(auth)).and(CHAIN_PROCESS.CODE.eq(code)).execute();
     }

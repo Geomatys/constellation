@@ -79,6 +79,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Symbolizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Node;
 
 /**
@@ -90,7 +91,7 @@ public final class DefaultConfigurator implements Configurator {
 
     @Autowired
     private IProviderBusiness providerBusiness;
-    
+
     @Autowired
     private IDataBusiness dataBusiness;
 
@@ -108,7 +109,7 @@ public final class DefaultConfigurator implements Configurator {
 
     @Autowired
     private IDatasetBusiness datasetBusiness;
-    
+
     public DefaultConfigurator() {
         SpringHelper.injectDependencies(this);
     }
@@ -129,7 +130,7 @@ public final class DefaultConfigurator implements Configurator {
         }
         return entries;
     }
-    
+
     @Override
     public List<ProviderInformation> getProviderInformations() throws ConfigurationException {
         final List<org.constellation.engine.register.Provider> records = providerBusiness.getProviders();
@@ -146,7 +147,7 @@ public final class DefaultConfigurator implements Configurator {
         }
         return entries;
     }
-    
+
     @Override
     public ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException {
         final org.constellation.engine.register.Provider record = providerBusiness.getProvider(providerId);
@@ -163,6 +164,7 @@ public final class DefaultConfigurator implements Configurator {
     }
 
     @Override
+    @Transactional
     public void addProviderConfiguration(final String providerId,
                                          final ParameterValueGroup config,
                                          final Integer datasetId) throws ConfigurationException {
@@ -170,12 +172,13 @@ public final class DefaultConfigurator implements Configurator {
     }
 
     @Override
+    @Transactional
     public void addProviderConfiguration(final String providerId,
                                          final ParameterValueGroup config,
                                          final Integer datasetId,
                                          final boolean createDatasetIfNull)
             throws ConfigurationException {
-        
+
         Provider provider = DataProviders.getInstance().getProvider(providerId);
         if(provider==null){
             provider = StyleProviders.getInstance().getProvider(providerId);
@@ -233,7 +236,7 @@ public final class DefaultConfigurator implements Configurator {
                         found = true;
                         break;
                     } else if (key.getLocalPart().contains(data.getName()) &&
-                               providerBusiness.getProvider(data.getProvider()).getIdentifier().equalsIgnoreCase(provider.getId())) {
+                            providerBusiness.getProvider(data.getProvider()).getIdentifier().equalsIgnoreCase(provider.getId())) {
                         //save metadata
                         metadata.put(key.getLocalPart(), data.getMetadata());
                     }
@@ -272,15 +275,15 @@ public final class DefaultConfigurator implements Configurator {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
                         if (fType != null && fType.getGeometryDescriptor() != null &&
-                            fType.getGeometryDescriptor().getType() != null &&
-                            fType.getGeometryDescriptor().getType().getBinding() != null) {
+                                fType.getGeometryDescriptor().getType() != null &&
+                                fType.getGeometryDescriptor().getType().getBinding() != null) {
                             subType = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
                         } else {
                             // A feature that does not contain geometry, we hide it
                             included = false;
                         }
                     }
-                    
+
                     // Metadata
                     String metadataXml = null;
                     final String currentMetadata = metadata.get(name.getLocalPart());
@@ -392,8 +395,9 @@ public final class DefaultConfigurator implements Configurator {
             }
         }
     }
-    
+
     @Override
+    @Transactional
     public void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
         final org.constellation.engine.register.Provider pr = providerBusiness.getProvider(providerId);
         if (pr != null) {
@@ -409,9 +413,10 @@ public final class DefaultConfigurator implements Configurator {
     }
 
     @Override
+    @Transactional
     public void removeProviderConfiguration(String providerId) throws ConfigurationException {
         dataBusiness.removeDataFromProvider(providerId);
         providerBusiness.removeProvider(providerId);
     }
-        
+
 }

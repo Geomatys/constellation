@@ -41,6 +41,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -77,10 +78,13 @@ public class MapContextBusiness implements IMapContextBusiness {
     @Inject
     private StyledLayerRepository styledLayerRepository;
 
+    @Override
+    @Transactional
     public void setMapItems(final int contextId, final List<MapcontextStyledLayer> layers) {
         mapContextRepository.setLinkedLayers(contextId, layers);
     }
 
+    @Override
     public List<MapContextLayersDTO> findAllMapContextLayers() {
         final List<MapContextLayersDTO> ctxtLayers = new ArrayList<>();
         final List<Mapcontext> ctxts = mapContextRepository.findAll();
@@ -92,6 +96,7 @@ public class MapContextBusiness implements IMapContextBusiness {
         return ctxtLayers;
     }
 
+    @Override
     public MapContextLayersDTO findMapContextLayers(int contextId) {
         final Mapcontext ctxt = mapContextRepository.findById(contextId);
         final List<MapcontextStyledLayer> styledLayers = mapContextRepository.getLinkedLayers(contextId);
@@ -99,6 +104,7 @@ public class MapContextBusiness implements IMapContextBusiness {
         return new MapContextLayersDTO(ctxt, styledLayersDto);
     }
 
+    @Override
     public String findStyleName(Integer styleId) {
         return styleRepository.findById(styleId).getName();
     }
@@ -166,6 +172,7 @@ public class MapContextBusiness implements IMapContextBusiness {
      * @return
      * @throws FactoryException
      */
+    @Override
     public ParameterValues getExtent(int contextId) throws FactoryException {
         final ParameterValues values = new ParameterValues();
         final Mapcontext context = mapContextRepository.findById(contextId);
@@ -201,6 +208,7 @@ public class MapContextBusiness implements IMapContextBusiness {
      * @return
      * @throws FactoryException
      */
+    @Override
     public ParameterValues getExtentForLayers(final List<MapcontextStyledLayer> styledLayers) throws FactoryException {
         final GeneralEnvelope env = getEnvelopeForLayers(styledLayers, null);
 

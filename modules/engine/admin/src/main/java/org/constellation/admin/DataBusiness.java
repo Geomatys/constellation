@@ -27,7 +27,16 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
@@ -308,6 +317,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param metadata given {@link DefaultMetadata} to save.
      * @throws ConstellationException is thrown for JAXBException.
      */
+    @Transactional
     public void saveMetadata(final String providerId,
                              final QName name,
                              final DefaultMetadata metadata) throws ConstellationException {
@@ -516,7 +526,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             final List<Data> linkedDataList = getDataLinkedData(data.getId());
             for(final Data d : linkedDataList){
                 if("pyramid".equalsIgnoreCase(d.getSubtype()) &&
-                   !d.isRendered()){
+                        !d.isRendered()){
                     final String pyramidProvId = getProviderIdentifier(d.getProvider());
                     db.setPyramidConformProviderId(pyramidProvId);
                     break;
@@ -583,6 +593,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param providerIdentifier given provider identifier.
      */
     @Override
+    @Transactional
     public void deleteData(final QName name, final String providerIdentifier) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
@@ -596,7 +607,6 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
     }
 
-    @Transactional("txManager")
     private void deleteDatasetIfEmpty(Integer datasetID) {
         if (datasetID != null) {
             List<Data> datas = dataRepository.findAllByDatasetId(datasetID);
@@ -611,6 +621,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * Proceed to remove all data.
      */
     @Override
+    @Transactional
     public void deleteAll() {
         final List<Data> datas = dataRepository.findAll();
         for (final Data data : datas) {
@@ -632,6 +643,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param metadata metadata of data.
      */
     @Override
+    @Transactional
     public Data create(final QName name, final String providerIdentifier,
                        final String type, final boolean sensorable,
                        final boolean visible, final String subType, final String metadata) {
@@ -650,6 +662,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param metadataXml metadata of data.
      */
     @Override
+    @Transactional
     public Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, Boolean rendered, String subType, String metadataXml) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
@@ -680,6 +693,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @throws org.constellation.configuration.ConfigurationException
      */
     @Override
+    @Transactional
     public void updateDataIncluded(final int dataId, boolean included) throws ConfigurationException {
         final Data data = dataRepository.findById(dataId);
         data.setIncluded(included);
@@ -729,6 +743,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param domainId given domain Id.
      */
     @Override
+    @Transactional
     public void addDataToDomain(final int dataId, final int domainId) {
         domainRepository.addDataToDomain(dataId, domainId);
     }
@@ -740,8 +755,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param domainId given domain id.
      * @throws CstlConfigurationRuntimeException
      */
-    @Transactional("txManager")
     @Override
+    @Transactional
     public synchronized void removeDataFromDomain(final int dataId,
                                                   final int domainId)throws CstlConfigurationRuntimeException {
         final List<Domain> findByLinkedService = domainRepository.findByLinkedData(dataId);
@@ -756,8 +771,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * Synchronized method.
      * @param providerID given provider identifier.
      */
-    @Transactional("txManager")
     @Override
+    @Transactional
     public synchronized void removeDataFromProvider(final String providerID) {
         final Provider p = providerRepository.findByIdentifier(providerID);
         if (p != null) {
@@ -797,6 +812,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     @Override
+    @Transactional
     public void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException {
         final String metadataString;
         try {
@@ -900,6 +916,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * IMPORTANT : Should call only once at server startup after all spring context is initialized.
      */
     @Override
+    @Transactional
     public void computeEmptyDataStatistics() {
         final List<Data> dataList = dataRepository.findAll();
 
@@ -942,7 +959,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
         return (DefaultMetadata) XML.unmarshal(metadata);
     }
-    
+
     @Override
     public DefaultMetadata unmarshallMetadata(final File metadata) throws JAXBException {
         return (DefaultMetadata) XML.unmarshal(metadata);
@@ -1133,10 +1150,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * {@inheritDoc }
      */
     @Override
+    @Transactional
     public void updateDataRendered(final QName fullName, final String providerIdentifier, boolean isRendered) {
         final Data data = dataRepository.findDataFromProvider(fullName.getNamespaceURI(),
-                                                              fullName.getLocalPart(),
-                                                              providerIdentifier);
+                fullName.getLocalPart(),
+                providerIdentifier);
         data.setRendered(isRendered);
         dataRepository.update(data);
     }
@@ -1145,10 +1163,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * {@inheritDoc }
      */
     @Override
+    @Transactional
     public void updateDataDataSetId(final QName fullName, final String providerIdentifier, final Integer datasetId) {
         final Data data = dataRepository.findDataFromProvider(fullName.getNamespaceURI(),
-                                                              fullName.getLocalPart(),
-                                                              providerIdentifier);
+                fullName.getLocalPart(),
+                providerIdentifier);
         data.setDatasetId(datasetId);
         dataRepository.update(data);
     }
@@ -1157,6 +1176,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * {@inheritDoc }
      */
     @Override
+    @Transactional
     public void updateHidden(final int dataId, boolean value) {
         final Data data = dataRepository.findById(dataId);
         data.setHidden(value);
@@ -1196,9 +1216,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         if (children != null) {
             for (final File child : children) {
                 final FileBean bean = new FileBean(child.getName(),
-                                                   child.isDirectory(),
-                                                   child.getAbsolutePath(),
-                                                   child.getParentFile().getAbsolutePath());
+                        child.isDirectory(),
+                        child.getAbsolutePath(),
+                        child.getParentFile().getAbsolutePath());
                 if (!child.isDirectory() || !filtered) {
                     final int lastIndexPoint = child.getName().lastIndexOf('.');
                     final String extension = child.getName().substring(lastIndexPoint + 1);
@@ -1220,10 +1240,12 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         return listBean;
     }
 
+    @Transactional
     public void linkDataToData(final int dataId, final int childId) {
         dataRepository.linkDataToData(dataId, childId);
     }
 
+    @Transactional
     public List<Data> getDataLinkedData(final int dataId){
         return dataRepository.getDataLinkedData(dataId);
     }

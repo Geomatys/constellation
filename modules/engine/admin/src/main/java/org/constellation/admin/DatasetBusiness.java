@@ -64,6 +64,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -170,12 +171,14 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * @return {@link Dataset}.
      */
     @Override
+    @Transactional
     public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) {
         Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner, System.currentTimeMillis(), null);
         return datasetRepository.insert(ds);
     }
 
     @Override
+    @Transactional
     public Dataset createDataset(String identifier, DefaultMetadata metadata, Integer owner) throws ConfigurationException {
         String metadataString = null;
         String metadataId = null;
@@ -275,6 +278,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * @throws ConfigurationException
      */
     @Override
+    @Transactional
     public void updateMetadata(final String datasetIdentifier, final Integer domainId,
                                final DefaultMetadata metadata) throws ConfigurationException {
         String metadataString = null;
@@ -315,6 +319,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * @param metadataXml metadata as xml string content.
      * @throws ConfigurationException
      */
+    @Transactional
     public void updateMetadata(final String datasetIdentifier, final Integer domainId,
                                final String metaId, final String metadataXml) throws ConfigurationException {
         final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
@@ -336,6 +341,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * @throws ConfigurationException
      */
     @Override
+    @Transactional
     public void saveMetadata(final String providerId, final String dataType) throws ConfigurationException {
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
         DefaultMetadata extractedMetadata;
@@ -455,6 +461,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * @param datas given data to link.
      */
     @Override
+    @Transactional
     public void linkDataTodataset(final Dataset ds, final List<Data> datas) {
         for (final Data data : datas) {
             data.setDatasetId(ds.getId());
@@ -488,6 +495,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     }
 
     @Override
+    @Transactional
     public void addProviderDataToDataset(final String datasetId, final String providerId) throws ConfigurationException {
         final Dataset ds = datasetRepository.findByIdentifier(datasetId);
         if (ds != null) {
@@ -507,6 +515,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     }
 
     @Override
+    @Transactional
     public void removeDataset(String datasetIdentifier, int domainId) throws ConfigurationException {
         final Dataset ds = datasetRepository.findByIdentifier(datasetIdentifier);
         if (ds != null) {
