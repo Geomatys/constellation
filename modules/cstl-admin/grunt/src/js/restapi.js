@@ -207,6 +207,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'metadata':         {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/metadata/:providerId;jsessionid='},
             'dataDesc':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/dataDescription;jsessionid='},
             'dataGeoExtent':    {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/dataGeographicExtent;jsessionid='},
+            'mergedDataExtent': {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/mergedDataGeographicExtent;jsessionid='},
             'isGeophysic':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/isGeophysic;jsessionid='},
             'verifyCRS':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:id/crs'},
             'createPRJ':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/:id/createprj'},

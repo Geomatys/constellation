@@ -971,16 +971,16 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     layerData.get('params').ts=new Date().getTime();
                     DataViewer.layers.push(layerData);
                 }
-                provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
-                    function(response) {//success
+                provider.mergedDataExtent({},$scope.values.listSelect,
+                    function(response) {// on success
                         DataViewer.initMap('styledMapPreviewForWMTS');
-                        var bbox = response.boundingBox;
-                        if (bbox) {
+                        if(response && response.boundingBox) {
+                            var bbox = response.boundingBox;
                             var extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
                             DataViewer.zoomToExtent(extent,DataViewer.map.getSize(),false);
                         }
-                    }, function() {//error
-                        // failed to find an extent, just load the full map
+                    }, function() {//on error
+                        // failed to calculate an extent, just load the full map
                         DataViewer.initMap('styledMapPreviewForWMTS');
                     }
                 );

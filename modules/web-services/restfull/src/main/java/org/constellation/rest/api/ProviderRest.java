@@ -40,6 +40,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
@@ -49,6 +51,7 @@ import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.ParameterValues;
@@ -275,6 +278,48 @@ public final class ProviderRest {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
+    }
+
+    @POST
+    @Path("mergedDataGeographicExtent")
+    public Response mergedDataGeographicExtent(final List<DataBrief> briefs) {
+        final Map<String,double[]> result = new HashMap<>();
+        if(briefs == null || briefs.isEmpty()){
+            return Response.ok(result).build();
+        }
+        GeneralEnvelope globalEnv = null;
+        for(final DataBrief db : briefs){
+            final String id = db.getProvider();
+            final String layerName;
+            if (db.getNamespace()!=null) {
+                layerName = '{' + db.getNamespace() + '}' + db.getName();
+            } else {
+                layerName = db.getName();
+            }
+            try {
+                final DataDescription ddesc = layerProviders.getDataGeographicExtent(id, layerName);
+                final double[] bbox = ddesc.getBoundingBox();
+                final GeneralEnvelope dataEnv = new GeneralEnvelope(CRS.decode("CRS:84"));
+                dataEnv.setRange(0,bbox[0],bbox[2]);
+                dataEnv.setRange(1,bbox[1],bbox[3]);
+                if(globalEnv == null) {
+                    globalEnv = dataEnv;
+                }else {
+                    globalEnv.add(dataEnv);
+                }
+            }catch(Exception ex){
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+        }
+        if(globalEnv != null){
+            double[] bbox = new double[4];
+            bbox[0]=globalEnv.getMinimum(0);
+            bbox[1]=globalEnv.getMinimum(1);
+            bbox[2]=globalEnv.getMaximum(0);
+            bbox[3]=globalEnv.getMaximum(1);
+            result.put("boundingBox",bbox);
+        }
+        return Response.ok(result).build();
     }
 
     /**
