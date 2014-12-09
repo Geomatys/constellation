@@ -489,24 +489,22 @@
                                                  ng-init="assocStyle=false;">
 
                                                 <div class="col-sm-12 col-md-10 col-md-offset-1">
-                                                    <div class="block-associated block-associated-style block-associated-style-service"
-                                                         ng-click="assocStyle=!assocStyle;">
+                                                    <div class="block-associated block-associated-style block-associated-style-service">
                                                         <div class="block-associated-nb">{{selected.TargetStyle.length}}</div>
                                                         <div class="block-associated-title"
                                                              translate="label.related.style">Associated Styles</div>
-                                                        <span class="fa icon-assoc-style " ng-class="{'selected':assocStyle, 'fa-chevron-circle-up':assocStyle, 'fa-chevron-circle-down':!assocStyle}"></span>
+                                                        <span class="fa icon-assoc-style "
+                                                              ng-class="{'selected':assocStyle, 'fa-chevron-circle-up':assocStyle, 'fa-chevron-circle-down':!assocStyle}"
+                                                              ng-click="assocStyle=!assocStyle;"></span>
+                                                        <span class="fa icon-assoc-style fa-plus "
+                                                              tooltip-placement="bottom"
+                                                              tooltip-html-unsafe="{{'label.new.style' | translate }}"
+                                                              ng-click="showStyleList();"></span>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div ng-if="assocStyle" class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
-                                                <div class="assoc-add add-style">
-                                                    <button class="btn btn-block-assos btn-assoc-style"
-                                                            ng-click="showStyleList();">
-                                                        <i class="fa fa-plus"></i>
-                                                        <span style="font-size: 12px;" translate="label.new.style">Associate new style</span>
-                                                    </button>
-                                                </div>
                                                 <div id="linkedList" class="block-content" >
                                                     <span ng-show="selected.TargetStyle.length == 0"
                                                             translate="label.no.association">No association</span>

@@ -591,24 +591,22 @@
                                          ng-init="assocStyle=false; assocService=false; assocSensor=false">
 
                                         <div class="col-sm-12 col-md-10 col-md-offset-1">
-                                            <div class="block-associated block-associated-style"
-                                                 ng-click="assocStyle=!assocStyle; assocService=false; assocSensor=false">
+                                            <div class="block-associated block-associated-style">
                                                 <div class="block-associated-nb">{{dataCtrl.selectedDataSetChild.TargetStyle.length}}</div>
                                                 <div class="block-associated-title"
                                                      translate="label.related.style">Associated Styles</div>
-                                                <span class="fa icon-assoc-style " ng-class="{'selected':assocStyle, 'fa-chevron-circle-up':assocStyle, 'fa-chevron-circle-down':!assocStyle}"></span>
+                                                <span class="fa icon-assoc-style "
+                                                      ng-class="{'selected':assocStyle, 'fa-chevron-circle-up':assocStyle, 'fa-chevron-circle-down':!assocStyle}"
+                                                      ng-click="assocStyle=!assocStyle; assocService=false; assocSensor=false"></span>
+                                                <span class="fa icon-assoc-style fa-plus "
+                                                      tooltip-placement="bottom"
+                                                      tooltip-html-unsafe="{{'label.new.style' | translate }}"
+                                                      ng-click="showStyleList();"></span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div ng-if="assocStyle==true" class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
-                                        <div class="assoc-add add-style">
-                                            <button class="btn btn-block-assos btn-assoc-style"
-                                                    ng-click="showStyleList();">
-                                                <i class="fa fa-plus"></i>
-                                                <span style="font-size: 12px;" translate="label.new.style">Associate new style</span>
-                                            </button>
-                                        </div>
                                         <div id="linkedList" class="block-content" >
                                         <span ng-show="dataCtrl.selectedDataSetChild.TargetStyle.length == 0"
                                               translate="label.no.association">No association</span>
@@ -635,12 +633,13 @@
                                     <div class="row block-association"
                                          ng-init="assocStyle=false; assocService=false; assocSensor=false">
                                         <div class="col-sm-12 col-md-10 col-md-offset-1">
-                                            <div class="block-associated block-associated-services"
-                                                 ng-click="assocStyle=false; assocService=!assocService; assocSensor=false">
+                                            <div class="block-associated block-associated-services">
                                                 <div class="block-associated-nb">{{dataCtrl.selectedDataSetChild.TargetService.length}}</div>
                                                 <div class="block-associated-title"
                                                      translate="label.related.service">Associated Styles</div>
-                                                <span class="fa icon-assoc-service " ng-class="{'selected':assocService, 'fa-chevron-circle-up':assocService, 'fa-chevron-circle-down':!assocService}"></span>
+                                                <span class="fa icon-assoc-service "
+                                                      ng-class="{'selected':assocService, 'fa-chevron-circle-up':assocService, 'fa-chevron-circle-down':!assocService}"
+                                                      ng-click="assocStyle=false; assocService=!assocService; assocSensor=false"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -662,21 +661,23 @@
                                          ng-init="assocStyle=false; assocService=false; assocSensor=false">
 
                                         <div class="col-sm-12 col-md-10 col-md-offset-1">
-                                            <div class="block-associated block-associated-sensor"
-                                                 ng-click="assocStyle=false; assocService=false; assocSensor=!assocSensor">
+                                            <div class="block-associated block-associated-sensor">
                                                 <div class="block-associated-nb">{{dataCtrl.selectedDataSetChild.TargetSensor.length}}</div>
                                                 <div class="block-associated-title"
                                                      translate="label.related.sensors">Associated Styles</div>
-                                                <span class="fa icon-assoc-sensor " ng-class="{'selected':assocSensor, 'fa-chevron-circle-up':assocSensor, 'fa-chevron-circle-down':!assocSensor}"></span>
+                                                <span class="fa icon-assoc-sensor "
+                                                      ng-class="{'selected':assocSensor, 'fa-chevron-circle-up':assocSensor, 'fa-chevron-circle-down':!assocSensor}"
+                                                      ng-click="assocStyle=false; assocService=false; assocSensor=!assocSensor"></span>
+                                                <span class="fa icon-assoc-sensor fa-plus"
+                                                      ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
+                                                      tooltip-placement="bottom"
+                                                      tooltip-html-unsafe="{{'label.new.sensor' | translate }}"
+                                                      ng-click="showSensorsList();"></span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div ng-if="assocSensor==true" class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
-                                        <div class="assoc-add add-sensor" ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0">
-                                            <button class="btn btn-block-assos btn-assoc-sensor"
-                                                    ng-click="showSensorsList();"><i class="fa fa-plus"></i> <span style="font-size: 12px;" translate="label.new.sensor"> Associate new sensor</span></button>
-                                        </div>
                                         <div id="linkedSensorList" class="block-content" >
                                         <span ng-show="dataCtrl.selectedDataSetChild.TargetSensor.length === 0"
                                               translate="label.no.association">No association</span>
