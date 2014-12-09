@@ -30,20 +30,20 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
         $scope.domainId = $cookieStore.get('cstlActiveDomainId');
         $scope.hideScroll = true;
 
+        $scope.values = {
+            selectedLayer : null
+        };
+
         $scope.init = function() {
             mapcontext.listLayers({}, function(response) {//success
                 Dashboard($scope, response, true);
                 $scope.wrap.ordertype='name';
                 $scope.wrap.filtertext='';
             }, function() {//error
-                Growl('error','Error','Unable to show layers list!');
+                Growl('error','Error','Unable to get list of map context!');
             });
             angular.element($window).bind("scroll", function() {
-                if (this.pageYOffset < 220) {
-                    $scope.hideScroll = true;
-                } else {
-                    $scope.hideScroll = false;
-                }
+                $scope.hideScroll = (this.pageYOffset < 220);
                 $scope.$apply();
             });
         };
@@ -58,17 +58,15 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                 $scope.wrap.orderreverse=false;
                 $scope.wrap.filtertext='';
             }, function() {//error
-                Growl('error','Error','Unable to show mapcontext list!');
+                Growl('error','Error','Unable to restore list of map context!');
             });
         };
 
-        $scope.selectedLayer = null;
-
         $scope.selectContextChild = function(item) {
-            if ($scope.selectedLayer === item) {
-                $scope.selectedLayer = null;
+            if (item && $scope.values.selectedLayer && $scope.values.selectedLayer.id === item.id) {
+                $scope.values.selectedLayer = null;
             } else {
-                $scope.selectedLayer = item;
+                $scope.values.selectedLayer = item;
             }
         };
 

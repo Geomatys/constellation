@@ -124,7 +124,7 @@
                                     </div>
                                     <div class="bottom">
                                         <div class="block">
-                                            <i class="fa fa-user"></i>{{context.owner}}
+                                            <i class="fa fa-user"></i>{{context.userOwner}}
                                         </div>
                                         <div class="block pull-right">
                                             <i class="fa fa-paperclip"></i>
@@ -145,49 +145,49 @@
                                      ng-repeat="layer in context.layers"
                                      style="padding-left:0;">
                                     <div class="item child compo layer"
-                                         ng-class="{'selected':layer.id==selectedLayer.id,'mapcontext': layer.externalLayer,'coverage':layer.Type.toLowerCase()==='coverage' || layer.Type.toLowerCase()==='raster','vector':layer.Type.toLowerCase()==='observation-store'||layer.Type.toLowerCase()==='vector', 'style-small':small}"
+                                         ng-class="{'selected':layer.id==values.selectedLayer.id,'mapcontext': layer.externalLayer,'coverage':layer.Type.toLowerCase()==='coverage' || layer.Type.toLowerCase()==='raster','vector':layer.Type.toLowerCase()==='observation-store'||layer.Type.toLowerCase()==='vector', 'style-small':small}"
                                          ng-click="selectContextChild(layer);">
                                         <div class="top">
                                             <span class="item-title" title="{{layer.Name}}">{{truncate(small,layer.Name)}}</span>
                                             <span ng-if="!small"
                                                   class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector': (layer.Type) ? layer.Type : 'WMS'}}</span>
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer.id!=selectedLayer.id"
+                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer.id!=values.selectedLayer.id"
                                                  src="img/vector-multipoint-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Subtype=='Geometry' && layer.id!=selectedLayer.id"
+                                            <img ng-if="layer.Subtype=='Geometry' && layer.id!=values.selectedLayer.id"
                                                  src="img/vector-multigeometry-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px; width:22px" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer.id!=selectedLayer.id"
+                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer.id!=values.selectedLayer.id"
                                                  src="img/vector-poly-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer.id!=selectedLayer.id"
+                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer.id!=values.selectedLayer.id"
                                                  src="img/vector-polyline-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.externalLayer && layer.id!==selectedLayer.id"
+                                            <img ng-if="layer.externalLayer && layer.id!==values.selectedLayer.id"
                                                  src="img/layer-external.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer.id==selectedLayer.id"
+                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer.id==values.selectedLayer.id"
                                                  src="img/vector-multipoint-mapcontext-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer.id==selectedLayer.id"
+                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer.id==values.selectedLayer.id"
                                                  src="img/vector-poly-mapcontext-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Subtype=='Geometry' && layer.id==selectedLayer.id"
+                                            <img ng-if="layer.Subtype=='Geometry' && layer.id==values.selectedLayer.id"
                                                  src="img/vector-multigeometry-mapcontext-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px; width:22px" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer.id==selectedLayer.id"
+                                            <img ng-if="layer.Type.toLowerCase()=='vector'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer.id==values.selectedLayer.id"
                                                  src="img/vector-polyline-mapcontext-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.externalLayer && layer.id==selectedLayer.id"
+                                            <img ng-if="layer.externalLayer && layer.id==values.selectedLayer.id"
                                                  src="img/layer-external-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
@@ -224,23 +224,23 @@
                                 <i class="fa fa-chevron-down pull-right"></i>
                             </div>
                             <div class="block-content">
-                                <div class="row description-block">
+                                <div class="row description-block" ng-if="selected.description">
                                     <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-tag.svg" alt="" />
+                                        <img src="img/block-content-description.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">{{selected.description}}</div>
                                 </div>
-                                <div class="row description-block">
+                                <div class="row description-block" ng-if="selected.userOwner">
                                     <div class="col-sm-3 col-md-2">
                                         <img src="img/block-content-owner.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.owner}}</span>
+                                        <span>{{selected.userOwner}}</span>
                                     </div>
                                 </div>
                                 <div class="row description-block" ng-if="selected.keywords">
                                     <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-description.svg" alt="" />
+                                        <img src="img/block-content-tag.svg" alt="" />
                                     </div>
                                     <div class="col-sm-9 col-md-10 description-text">{{selected.keywords}}</div>
                                 </div>

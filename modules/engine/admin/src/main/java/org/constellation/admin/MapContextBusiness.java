@@ -18,6 +18,7 @@
  */
 package org.constellation.admin;
 
+import com.google.common.base.Optional;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
@@ -78,6 +79,9 @@ public class MapContextBusiness implements IMapContextBusiness {
     @Inject
     private StyledLayerRepository styledLayerRepository;
 
+    @Inject
+    private UserRepository userRepository;
+
     @Override
     @Transactional
     public void setMapItems(final int contextId, final List<MapcontextStyledLayer> layers) {
@@ -91,7 +95,17 @@ public class MapContextBusiness implements IMapContextBusiness {
         for (final Mapcontext ctxt : ctxts) {
             final List<MapcontextStyledLayer> styledLayers = mapContextRepository.getLinkedLayers(ctxt.getId());
             final List<MapContextStyledLayerDTO> styledLayersDto = generateLayerDto(styledLayers);
-            ctxtLayers.add(new MapContextLayersDTO(ctxt, styledLayersDto));
+            final MapContextLayersDTO mapcontext = new MapContextLayersDTO(ctxt, styledLayersDto);
+
+            //getOwner and set userName to pojo.
+            final Optional<CstlUser> user = userRepository.findById(ctxt.getOwner());
+            if (user != null && user.isPresent()) {
+                final CstlUser cstlUser = user.get();
+                if(cstlUser!=null){
+                    mapcontext.setUserOwner(cstlUser.getLogin());
+                }
+            }
+            ctxtLayers.add(mapcontext);
         }
         return ctxtLayers;
     }

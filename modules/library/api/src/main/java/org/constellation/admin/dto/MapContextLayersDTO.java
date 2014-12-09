@@ -25,6 +25,8 @@ import java.util.List;
 public class MapContextLayersDTO extends Mapcontext {
     private List<MapContextStyledLayerDTO> layers;
 
+    private String userOwner;
+
     public MapContextLayersDTO() {
         super();
     }
@@ -41,5 +43,13 @@ public class MapContextLayersDTO extends Mapcontext {
 
     public void setLayers(List<MapContextStyledLayerDTO> layers) {
         this.layers = layers;
+    }
+
+    public String getUserOwner() {
+        return userOwner;
+    }
+
+    public void setUserOwner(String userOwner) {
+        this.userOwner = userOwner;
     }
 }

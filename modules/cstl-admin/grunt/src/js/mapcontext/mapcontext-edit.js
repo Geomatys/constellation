@@ -20,7 +20,8 @@
 
 angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('MapContextModalController', function($scope, $modalInstance, mapcontext, webService, style, Growl, $translate, ctxtToEdit, layersForCtxt, $cookieStore, $modal) {
+    .controller('MapContextModalController', function($scope, $modalInstance, mapcontext, webService, style, Growl,
+                                                      $translate, ctxtToEdit, layersForCtxt, $cookieStore) {
         // item to save in the end
         $scope.ctxt = {};
         // defines if we are in adding or edition mode

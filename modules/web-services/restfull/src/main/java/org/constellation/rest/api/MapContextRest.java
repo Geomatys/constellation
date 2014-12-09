@@ -18,14 +18,17 @@
  */
 package org.constellation.rest.api;
 
+import com.google.common.base.Optional;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.business.IMapContextBusiness;
 import org.constellation.dto.ParameterValues;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.repository.MapContextRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.Providers;
 import org.geotoolkit.georss.xml.v100.WhereType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
@@ -85,6 +88,9 @@ public class MapContextRest {
     @Inject
     private MapContextRepository contextRepository;
 
+    @Inject
+    private UserRepository userRepository;
+
     @GET
     @Path("list")
     public Response findAll() {
@@ -99,7 +105,13 @@ public class MapContextRest {
 
     @PUT
     @Transactional
-    public Response create(final Mapcontext mapContext) {
+    public Response create(final Mapcontext mapContext,@Context HttpServletRequest req) {
+        //set owner
+        final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
+        if (!cstlUser.isPresent()) {
+            return Response.status(500).entity("operation not allowed without login").build();
+        }
+        mapContext.setOwner(cstlUser.get().getId());
         final Mapcontext mapContextCreated = contextRepository.create(mapContext);
         return Response.ok(mapContextCreated).build();
     }
