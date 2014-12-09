@@ -652,7 +652,7 @@
                                                  class="style btn-assoc-item"
                                                  ng-repeat="service in dataCtrl.selectedDataSetChild.TargetService"
                                                  style="line-height:30px;">
-                                                {{truncateTitleBlock(service.name)}}
+                                                ({{service.protocol[0]}}) {{truncateTitleBlock(service.name)}}
                                             </div>
                                         </div>
                                     </div>
