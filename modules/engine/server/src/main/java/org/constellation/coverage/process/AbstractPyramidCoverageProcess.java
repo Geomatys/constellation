@@ -1,6 +1,7 @@
 package org.constellation.coverage.process;
 
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.SpringHelper;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProvider;
@@ -38,7 +39,10 @@ import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.referencing.OutOfDomainOfValidityException;
 import org.opengis.referencing.operation.TransformException;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 /**
  * @author Quentin Boileau (Geomatys)
@@ -177,8 +181,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         return scales;*/
     }
 
-    @Transactional
-    protected DataProvider createProvider(String providerID, CoverageStore store, Integer domainId, final String datasetName) throws ProcessException {
+    protected DataProvider createProvider(final String providerID, CoverageStore store, final Integer domainId, final String datasetName) throws ProcessException {
         final DataProvider outProvider;
         try {
             //get store configuration
@@ -188,7 +191,12 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
 
             Integer datasetID = null;
             if (datasetBusiness.getDataset(datasetName) == null) {
-                datasetID = datasetBusiness.createDataset(datasetName, null, null, null).getId();
+                datasetID = SpringHelper.executeInTransaction(new TransactionCallback<Integer>() {
+                    @Override
+                    public Integer doInTransaction(TransactionStatus transactionStatus) {
+                        return datasetBusiness.createDataset(datasetName, null, null, null).getId();
+                    }
+                });
             }
 
             //create provider configuration
@@ -205,8 +213,13 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             outProvider = DataProviders.getInstance().createProvider(providerID, factory, pparams, datasetID);
 
             if (domainId != null) {
-                int count = domainRepository.addProviderDataToDomain(providerID, domainId);
-                LOGGER.info("Added " + count + " data to domain " + domainId);
+                SpringHelper.executeInTransaction(new TransactionCallbackWithoutResult() {
+                    @Override
+                    protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                        int count = domainRepository.addProviderDataToDomain(providerID, domainId);
+                        LOGGER.info("Added " + count + " data to domain " + domainId);
+                    }
+                });
             }
 
         } catch (Exception ex) {
