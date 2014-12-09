@@ -91,16 +91,23 @@ public class TokenUtils {
 
     public static boolean validateToken(String authToken, String username, String secret) {
         String[] parts = authToken.split(TOKEN_SEPARATOR);
-        if (parts.length < 3)
+        if (parts.length < 3) {
+            LOGGER.warn("Token malformed: " + authToken);
             return false;
+        }
         long expires = Long.parseLong(parts[1]);
         String signature = parts[2];
 
         if (expires < System.currentTimeMillis()) {
+            LOGGER.info("Token expired: " + authToken);
             return false;
         }
 
-        return signature.equals(TokenUtils.computeSignature(username, expires, secret));
+        if(signature.equals(TokenUtils.computeSignature(username, expires, secret))) {
+            return true;
+        }
+        LOGGER.info("Token missmatch: " + authToken);
+        return false;
     }
 
     public static boolean shouldBeExtended(String authToken) {
