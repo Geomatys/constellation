@@ -133,10 +133,6 @@ public class ProcessBusiness implements IProcessBusiness {
     @Inject
     private ChainProcessRepository chainRepository;
 
-    @Inject
-    @Qualifier("txManager")
-    protected PlatformTransactionManager txManager;
-
     private Scheduler quartzScheduler;
 
     private DirectoryWatcher directoryWatcher;
@@ -147,8 +143,7 @@ public class ProcessBusiness implements IProcessBusiness {
     public void init(){
 
         //transaction needed for clean tasks in database
-        TransactionTemplate transactionTemplate = new TransactionTemplate(txManager);
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+        SpringHelper.executeInTransaction(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus arg0) {
                 cleanTasksStates();

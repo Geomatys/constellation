@@ -48,6 +48,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.SpringHelper;
 import org.constellation.api.PropertyConstants;
 import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IStyleBusiness;
@@ -105,10 +106,6 @@ public class SetupBusiness {
     @Inject
     private IConfigurationBusiness configurationBusiness;
 
-    @Inject
-    @Qualifier("txManager")
-    protected PlatformTransactionManager txManager;
-    
     @PostConstruct
     public void contextInitialized() {
         LOGGER.log(Level.INFO, "=== Initialize Application ===");
@@ -120,10 +117,8 @@ public class SetupBusiness {
         } catch (ClassNotFoundException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
-        
-        
-        TransactionTemplate transactionTemplate = new TransactionTemplate(txManager);
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+
+        SpringHelper.executeInTransaction(new TransactionCallbackWithoutResult() {
             
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus arg0) {
@@ -143,8 +138,6 @@ public class SetupBusiness {
                 
             }
         });
-        
-        
     }
 
     /**

@@ -21,6 +21,10 @@ package org.constellation.admin;
 import com.google.common.eventbus.EventBus;
 import org.apache.sis.util.logging.Logging;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.logging.Logger;
 
@@ -61,6 +65,22 @@ public class SpringHelper {
         } else {
             LOGGER.warning("No event bus available");
         }
+    }
+
+    /**
+     * Execute TransactionCallback in a transaction.
+     * @param callback
+     * @return
+     */
+    public static <T> T executeInTransaction(TransactionCallback<T> callback) {
+        if (SpringHelper.applicationContext != null) {
+            PlatformTransactionManager txManager = applicationContext.getBean("transactionManager", PlatformTransactionManager.class);
+            TransactionTemplate transactionTemplate = new TransactionTemplate(txManager);
+            return transactionTemplate.execute(callback);
+        }  else {
+            LOGGER.warning("No spring application context available");
+        }
+        return null;
     }
 
 }
