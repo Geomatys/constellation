@@ -80,7 +80,7 @@ public class ServiceReloadAction extends Action {
             try {
                 final Instance inst = (Instance) ((Map.Entry)target).getKey();
                 final String type = (String) ((Map.Entry)target).getValue();
-                serverV2.services.restart(Specification.valueOf(type), inst.getIdentifier(), false);
+                serverV2.services.restart(Specification.valueOf(type.toUpperCase()), inst.getIdentifier(), false);
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {

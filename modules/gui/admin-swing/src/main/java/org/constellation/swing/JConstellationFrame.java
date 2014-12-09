@@ -96,11 +96,16 @@ public final class JConstellationFrame extends JFrame{
             throw new IllegalArgumentException("Unexpected auth type:" + authType);
         }
         
-        final JConstellationFrame frame = new JConstellationFrame(serverV2);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        if (serverV2 == null)  {
+            JOptionPane.showMessageDialog(null, "Unable to authentificate to remote server",
+                        "Authentication Failed", JOptionPane.ERROR_MESSAGE);
+        } else {
+            final JConstellationFrame frame = new JConstellationFrame(serverV2);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(800, 600);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        }
     }
     
     public static void main(String[] args) throws MalformedURLException {

@@ -39,12 +39,10 @@ public final class WebdavService implements ResourceFactory {
 
     private static final Logger LOGGER = Logging.getLogger(WebdavService.class);
 
-    private final Map<String, Worker> workersMap;
-            
     private final String contextPath;
     
     public WebdavService() {
-        workersMap = WSEngine.getWorkersMap(Specification.WEBDAV.name());
+        final Map<String, Worker> workersMap = WSEngine.getWorkersMap(Specification.WEBDAV.name());
         
         // all worker MUST have the same contextPath
         if (!workersMap.isEmpty()) {
@@ -58,6 +56,7 @@ public final class WebdavService implements ResourceFactory {
     @Override
     public Resource getResource(final String host, final String url) {
         LOGGER.log(Level.INFO, "getResource host={0} url={1}", new Object[]{host, url});
+        final Map<String, Worker> workersMap = WSEngine.getWorkersMap(Specification.WEBDAV.name());
         if (workersMap.isEmpty()) {
             return null;
         }
