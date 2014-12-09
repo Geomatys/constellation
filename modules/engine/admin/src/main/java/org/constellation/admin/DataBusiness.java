@@ -27,15 +27,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
@@ -497,7 +489,6 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         final List<DataBrief> dataBriefs = new ArrayList<>();
         for (final Data data : datas) {
             final List<Style> styles = styleRepository.findByData(data);
-            final List<Service> services = serviceRepository.findByDataId(data.getId());
 
             final DataBrief db = new DataBrief();
             db.setId(data.getId());
@@ -556,16 +547,22 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             }
             db.setTargetStyle(styleBriefs);
 
-            final List<ServiceProtocol> serviceProtocols = new ArrayList<>(0);
+            final List<Service> services = serviceRepository.findByDataId(data.getId());
+            for(final Data d : linkedDataList){
+                final List<Service> servicesLinked = serviceRepository.findByDataId(d.getId());
+                services.addAll(servicesLinked);
+            }
+            //use HashSet to avoid duplicated objects.
+            final Set<ServiceProtocol> serviceProtocols = new HashSet<>();
             for (final Service service : services) {
-                final List<String> protocol = new ArrayList<>(0);
+                final List<String> protocol = new ArrayList<>();
                 final ServiceDef.Specification spec = ServiceDef.Specification.valueOf(service.getType().toUpperCase());
                 protocol.add(spec.name());
                 protocol.add(spec.fullName);
                 final ServiceProtocol sp = new ServiceProtocol(service.getIdentifier(), protocol);
                 serviceProtocols.add(sp);
             }
-            db.setTargetService(serviceProtocols);
+            db.setTargetService(new ArrayList<>(serviceProtocols));
             dataBriefs.add(db);
         }
         return dataBriefs;

@@ -70,6 +70,24 @@ public class ServiceProtocol {
     public void setProtocol(List<String> protocol) {
         this.protocol = protocol;
     }
-    
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ServiceProtocol that = (ServiceProtocol) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (protocol != null ? !protocol.equals(that.protocol) : that.protocol != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (protocol != null ? protocol.hashCode() : 0);
+        return result;
+    }
 }
