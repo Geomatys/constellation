@@ -499,7 +499,6 @@ public class DataRest {
                         dataBusiness.linkDataToData(d.getId(),db.getId());
                     }catch(ConstellationException ex) {
                         LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-                        continue;
                     }
                 }
 

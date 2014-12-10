@@ -133,6 +133,7 @@ public class MapContextRest {
 
     @POST
     @Path("layers/{id}")
+    @Transactional
     public Response setMapItems(@PathParam("id") final int contextId, final List<MapcontextStyledLayer> layers) {
         contextBusiness.setMapItems(contextId, layers);
         return Response.status(201).type(MediaType.TEXT_PLAIN_TYPE).build();
