@@ -52,6 +52,7 @@ public interface DataRepository {
     
     DataWithI18N getDescription(Data data);
 
+    List<Data> findStatisticLess();
 
     Data findByNameAndNamespaceAndProviderId(String localPart, String namespaceURI, Integer providerId);
 

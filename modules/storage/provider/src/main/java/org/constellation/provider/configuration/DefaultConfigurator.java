@@ -345,11 +345,6 @@ public final class DefaultConfigurator implements Configurator {
                     if(datasetId != null) {
                         dataBusiness.updateDataDataSetId(name, pr.getIdentifier(), datasetId);
                     }
-
-                    //analyse coverage image (min/max/ histogram) with an asynchronous method
-                    if (doAnalysis && DataType.COVERAGE.equals(provider.getDataType())) {
-                        dataCoverageJob.asyncUpdateDataStatistics(data.getId());
-                    }
                 }
             }
         } else {

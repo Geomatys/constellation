@@ -252,4 +252,11 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     public List<Data> getDataLinkedData(final int dataId) {
         return dsl.select(DATA.fields()).from(DATA).join(DATA_X_DATA).onKey(DATA_X_DATA.CHILD_ID).where(DATA_X_DATA.DATA_ID.eq(dataId)).fetchInto(Data.class);
     }
+
+    @Override
+    public List<Data> findStatisticLess() {
+        return dsl.select().from(DATA)
+                .where(DATA.TYPE.eq("COVERAGE"))
+                .and(DATA.RENDERED.isNull().or(DATA.RENDERED.isFalse())).fetchInto(Data.class);
+    }
 }

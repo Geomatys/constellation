@@ -123,9 +123,16 @@ public interface IDataBusiness {
     /**
      * Run {@link org.constellation.business.IDataCoverageJob#asyncUpdateDataStatistics(int)}
      * on each coverage type data without computed statistics.
+     * @param isInit flag that define if it's a startup call.
+     *               If true, statistic of all data in ERROR and PENDING will be also computed
      */
-    void computeEmptyDataStatistics();
-    
+    void computeEmptyDataStatistics(boolean isInit);
+
+    /**
+     * Search for data without statistics
+     */
+    void updateDataStatistics();
+
     MetadataLists getMetadataCodeLists();
 
     /**

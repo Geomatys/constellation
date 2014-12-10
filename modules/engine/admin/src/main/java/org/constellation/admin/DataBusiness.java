@@ -98,6 +98,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import java.nio.file.Paths;
 import org.opengis.metadata.citation.DateType;
@@ -119,6 +120,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 
 /**
@@ -913,26 +915,41 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
     /**
      * {@inheritDoc}
-     * IMPORTANT : Should call only once at server startup after all spring context is initialized.
      */
     @Override
-    @Transactional
-    public void computeEmptyDataStatistics() {
-        final List<Data> dataList = dataRepository.findAll();
+    @Scheduled(cron = "1 * * * * *")
+    public void updateDataStatistics() {
+        computeEmptyDataStatistics(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void computeEmptyDataStatistics(boolean isInit) {
+        final List<Data> dataList = dataRepository.findStatisticLess();
 
         List<Integer> dataWithoutStats = new ArrayList<>();
-        for (Data data : dataList) {
+        for (final Data data : dataList) {
 
             //compute statistics only on coverage data not rendered and without previous statistic computed.
             if (DataType.COVERAGE.name().equals(data.getType()) &&
                     (data.isRendered() == null || !data.isRendered())) {
 
                 String state = data.getStatsState();
-                if ("PENDING".equalsIgnoreCase(state)) {
-                    data.setStatsState(null);
-                    data.setStatsResult(null);
-                    dataRepository.update(data);
-                    dataWithoutStats.add(data.getId());
+                if (isInit) {
+                    //rerun statistic for error and pending states
+                    if ("PENDING".equalsIgnoreCase(state) || "ERROR".equalsIgnoreCase(state)) {
+                        data.setStatsState(null);
+                        data.setStatsResult(null);
+                        SpringHelper.executeInTransaction(new TransactionCallbackWithoutResult() {
+                            @Override
+                            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                                dataRepository.update(data);
+                            }
+                        });
+                        dataWithoutStats.add(data.getId());
+                    }
                 }
 
                 if (state == null || state.isEmpty()) {
@@ -945,6 +962,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             dataCoverageJob.asyncUpdateDataStatistics(dataId);
         }
     }
+
 
     protected MarshallerPool getMarshallerPool() {
         return null; //in constellation this should always return null, since this method can be overrided by sub-project.

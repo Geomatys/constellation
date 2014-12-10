@@ -58,7 +58,7 @@ public class AnalyseListener implements ServletContextListener {
 
             if (doAnalysis && dataBusiness != null) {
                 LOGGER.log(Level.FINE, "Start data analysis");
-                dataBusiness.computeEmptyDataStatistics();
+                dataBusiness.computeEmptyDataStatistics(true);
             }
         }
     }

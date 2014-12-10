@@ -46,7 +46,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import javax.inject.Inject;
 import java.util.concurrent.Future;
@@ -94,14 +95,19 @@ public class DataCoverageJob implements IDataCoverageJob {
     public Future<ImageStatistics> asyncUpdateDataStatistics(final int dataId) {
 
         Data data = dataRepository.findById(dataId);
+        if (data == null) {
+            LOGGER.log(Level.WARNING, "Can't compute coverage statistics on data id " + dataId +
+                    " because data is not found in database.");
+            return null;
+        }
         try {
-            if (data != null && DataType.COVERAGE.name().equals(data.getType())
+            if (DataType.COVERAGE.name().equals(data.getType())
                     && (data.isRendered() == null || !data.isRendered())
                     && data.getStatsState() == null) {
                 LOGGER.log(Level.INFO, "Start computing data " + dataId + " "+data.getName()+" coverage statistics.");
 
                 data.setStatsState(STATE_PENDING);
-                dataRepository.update(data);
+                updateData(data);
 
                 final Provider provider = providerRepository.findOne(data.getProvider());
                 final DataProvider dataProvider = DataProviders.getInstance().getProvider(provider.getIdentifier());
@@ -130,10 +136,19 @@ public class DataCoverageJob implements IDataCoverageJob {
             if (!lastData.getStatsState().equals(STATE_ERROR)) {
                 data.setStatsState(STATE_ERROR);
                 //data.setStatsResult(Exceptions.formatStackTrace(e));
-                dataRepository.update(data);
+                updateData(data);
             }
         }
         return null;
+    }
+
+    private void updateData(final Data data) {
+        SpringHelper.executeInTransaction(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                dataRepository.update(data);
+            }
+        });
     }
 
     /**
@@ -148,44 +163,46 @@ public class DataCoverageJob implements IDataCoverageJob {
         }
 
         @Override
-        @Transactional
         public void progressing(ProcessEvent event) {
             if (event.getOutput() != null) {
                 final Data data = getData();
                 try {
                     data.setStatsState(STATE_PARTIAL);
                     data.setStatsResult(statisticsAsString(event));
-                    dataRepository.update(data);
+                    updateData(data);
                 } catch (JsonProcessingException e) {
                     data.setStatsState(STATE_ERROR);
                     data.setStatsResult("Error during statistic serializing.");
-                    dataRepository.update(data);
+                    updateData(data);
                 }
             }
         }
 
         @Override
-        @Transactional
         public void completed(ProcessEvent event) {
             final Data data = getData();
             try {
                 data.setStatsState(STATE_COMPLETED);
                 data.setStatsResult(statisticsAsString(event));
-                dataRepository.update(data);
+                updateData(data);
+                LOGGER.log(Level.INFO, "Data " + dataId + " " + data.getName() + " coverage statistics completed.");
             } catch (JsonProcessingException e) {
                 data.setStatsState(STATE_ERROR);
                 data.setStatsResult("Error during statistic serializing.");
-                dataRepository.update(data);
+                updateData(data);
             }
         }
 
         @Override
-        @Transactional
         public void failed(ProcessEvent event) {
             final Data data = getData();
             data.setStatsState(STATE_ERROR);
             //data.setStatsResult(Exceptions.formatStackTrace(event.getException()));
-            dataRepository.update(data);
+            updateData(data);
+            Exception exception = event.getException();
+            LOGGER.log(Level.WARNING, "Error during coverage statistic update for data " + dataId +
+                    " "+data.getName() + " : " + exception.getMessage(), exception);
+
         }
 
         private Data getData() {
