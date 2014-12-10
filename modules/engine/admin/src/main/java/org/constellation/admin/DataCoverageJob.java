@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.sis.storage.DataStore;
-import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.ImageStatisticSerializer;
 import org.constellation.api.DataType;
@@ -39,11 +38,9 @@ import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.ProcessEvent;
-import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessListenerAdapter;
 import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.geotoolkit.process.coverage.statistics.Statistics;
-import org.geotoolkit.util.Exceptions;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
@@ -101,7 +98,7 @@ public class DataCoverageJob implements IDataCoverageJob {
             if (data != null && DataType.COVERAGE.name().equals(data.getType())
                     && (data.isRendered() == null || !data.isRendered())
                     && data.getStatsState() == null) {
-                LOGGER.log(Level.INFO, "Start computing data " + dataId + " coverage statistics.");
+                LOGGER.log(Level.INFO, "Start computing data " + dataId + " "+data.getName()+" coverage statistics.");
 
                 data.setStatsState(STATE_PENDING);
                 dataRepository.update(data);
@@ -125,8 +122,8 @@ public class DataCoverageJob implements IDataCoverageJob {
                     return new AsyncResult<>(value(OUTCOVERAGE, out));
                 }
             }
-        } catch (DataStoreException | ProcessException e) {
-            LOGGER.log(Level.WARNING, "Error during coverage statistic update for data " + dataId + " : " + e.getMessage(), e);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during coverage statistic update for data " + dataId + " "+data.getName() + " : " + e.getMessage(), e);
 
             //update data
             Data lastData = dataRepository.findById(dataId);
