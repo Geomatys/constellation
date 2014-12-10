@@ -90,6 +90,7 @@ public class LayerBusiness implements ILayerBusiness {
     private org.constellation.security.SecurityManager securityManager;
 
     @Override
+    @Transactional
     public void add(final AddLayer addLayerData) throws ConfigurationException {
         final String name        = addLayerData.getLayerId();
         // Prevents adding empty layer namespace, put null instead
