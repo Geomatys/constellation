@@ -296,6 +296,7 @@ public class ProviderBusiness implements IProviderBusiness {
     }
 
     @Override
+    @Transactional
     public void update(final int domainId, final String id, final ProviderConfiguration config) throws ConfigurationException {
         final String type = config.getType();
         final String subType = config.getSubType();
@@ -502,6 +503,7 @@ public class ProviderBusiness implements IProviderBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public DataBrief createPyramidConform(final String providerId, final String dataName, final String namespace, final int userOwnerId) throws ConstellationException {
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
@@ -526,8 +528,8 @@ public class ProviderBusiness implements IProviderBusiness {
             throw new ConstellationException("Cannot create pyramid conform for no raster data, it is not supported yet!");
         }
 
-        //calculate pyramid scale levels
-        final CoverageReference inRef = (CoverageReference) inData.getOrigin();
+        //init coverage reference and grid geometry
+        final CoverageReference inRef = (CoverageReference) origin;
         final GeneralGridGeometry gg;
         try {
             final GridCoverageReader reader = inRef.acquireReader();
