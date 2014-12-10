@@ -35,8 +35,6 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
         if (ctxtToEdit) {
             $scope.addMode = false;
             $scope.ctxt = ctxtToEdit;
-            // remove property layers if it exists for serialization
-            delete $scope.ctxt.layers;
 
             if (ctxtToEdit.keywords) {
                 $scope.tag.keywords = ctxtToEdit.keywords.split(',');

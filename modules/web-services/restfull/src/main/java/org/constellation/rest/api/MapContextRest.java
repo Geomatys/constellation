@@ -105,7 +105,7 @@ public class MapContextRest {
 
     @PUT
     @Transactional
-    public Response create(final Mapcontext mapContext,@Context HttpServletRequest req) {
+    public Response create(final MapContextLayersDTO mapContext,@Context HttpServletRequest req) {
         //set owner
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
         if (!cstlUser.isPresent()) {
@@ -118,7 +118,7 @@ public class MapContextRest {
 
     @POST
     @Transactional
-    public Response update(final Mapcontext mapContext) {
+    public Response update(final MapContextLayersDTO mapContext) {
         contextRepository.update(mapContext);
         return Response.ok(mapContext).build();
     }
