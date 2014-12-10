@@ -22,7 +22,6 @@ package org.constellation.rest.api;
 import com.google.common.base.Optional;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.XML;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
@@ -179,7 +178,8 @@ public class MetadataRest {
         try{
             final DefaultMetadata metadata  =  datasetBusiness.getMetadata(datasetIdentifier, domainId);
             if (metadata != null) {
-                metadata.prune();final String xmlStr = XML.marshal(metadata);
+                metadata.prune();
+                final String xmlStr = dataBusiness.marshallMetadata(metadata);
                 return Response.ok(xmlStr, MediaType.APPLICATION_XML_TYPE)
                         .header("Content-Disposition", "attachment; filename=\"" + datasetIdentifier + ".xml\"").build();
             }
