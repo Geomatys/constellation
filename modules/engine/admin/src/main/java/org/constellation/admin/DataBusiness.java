@@ -933,7 +933,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         for (final Data data : dataList) {
 
             //compute statistics only on coverage data not rendered and without previous statistic computed.
-            if (DataType.COVERAGE.name().equals(data.getType()) &&
+            if (DataType.COVERAGE.name().equals(data.getType()) && !"pyramid".equalsIgnoreCase(data.getSubtype()) &&
                     (data.isRendered() == null || !data.isRendered())) {
 
                 String state = data.getStatsState();
