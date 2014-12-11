@@ -34,11 +34,21 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
             selectedLayer : null
         };
 
-        $scope.init = function() {
+        $scope.initMapContextDashboard = function() {
             mapcontext.listLayers({}, function(response) {//success
                 Dashboard($scope, response, true);
                 $scope.wrap.ordertype='name';
                 $scope.wrap.filtertext='';
+                if($scope.selected) {
+                    for(var i=0;i<response.length;i++){
+                        if($scope.selected.id === response[i].id){
+                            $scope.selected = response[i];
+                            break;
+                        }
+                    }
+                }else {
+                    $scope.selected = null;
+                }
             }, function() {//error
                 Growl('error','Error','Unable to get list of map context!');
             });
@@ -88,7 +98,7 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
             });
 
             modal.result.then(function() {
-                $scope.init();
+                $scope.initMapContextDashboard();
             });
         };
 
@@ -105,7 +115,7 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                     var ctxtName = $scope.selected.name;
                     mapcontext.delete({id: $scope.selected.id}, function () {
                         Growl('success', 'Success', 'Map context ' + ctxtName + ' successfully removed');
-                        $scope.init();
+                        $scope.initMapContextDashboard();
                         $scope.selected=null;
                     }, function () {
                         Growl('error', 'Error', 'Unable to remove map context ' + ctxtName);
@@ -125,7 +135,7 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
             });
 
             modal.result.then(function() {
-                $scope.init();
+                $scope.initMapContextDashboard();
             });
         };
 
@@ -194,4 +204,6 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                 }
             }
         };
+
+        $scope.initMapContextDashboard();
     });

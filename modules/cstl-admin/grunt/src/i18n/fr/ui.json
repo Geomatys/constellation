@@ -597,7 +597,7 @@
     "mapcontext.modal.tab.layers": "Couches",
     "mapcontext.modal.title": "Ajouter/Éditer un contexte cartographique",
     "mapcontext.modal.validate": "Valider",
-    "mapcontext.modal.associate": "Associer",
+    "mapcontext.modal.associate": "Associer le style",
     "mapcontext.modal.validate.layer":"Ajouter cette couche",
     "mapcontext.modal.select.style.list":"Le style suivi d'une étoile est le style courant",
     "mapcontext.modal.select.style.empty": "Il n'y a aucun style associé",

@@ -23,23 +23,14 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
     .controller('MapContextModalController', function($scope, $modalInstance, mapcontext, webService, style, Growl,
                                                       $translate, ctxtToEdit, layersForCtxt, $cookieStore) {
         // item to save in the end
-        $scope.ctxt = {};
+        $scope.ctxt = ctxtToEdit || {};
         // defines if we are in adding or edition mode
-        $scope.addMode = true;
+        $scope.addMode = ctxtToEdit ? false:true;
 
         $scope.tag = {
             text: '',
-            keywords: []
+            keywords: (ctxtToEdit && ctxtToEdit.keywords) ? ctxtToEdit.keywords.split(','): []
         };
-
-        if (ctxtToEdit) {
-            $scope.addMode = false;
-            $scope.ctxt = ctxtToEdit;
-
-            if (ctxtToEdit.keywords) {
-                $scope.tag.keywords = ctxtToEdit.keywords.split(',');
-            }
-        }
 
         // handle display mode for this modal popup
         $scope.mode = {
@@ -59,15 +50,26 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             serviceUrl: null
         };
 
-        $scope.selected = {};
+        $scope.selection = {
+            layer:null,
+            service:null,
+            item:null,
+            extLayer:null
+        };
 
         $scope.styles = {
             existing: [],
             selected: null
         };
 
-        $scope.close = function () {
+        $scope.servicesLayers = [];
+
+        $scope.dismiss = function () {
             $modalInstance.dismiss('close');
+        };
+
+        $scope.close = function () {
+            $modalInstance.close();
         };
 
         $scope.getCurrentLang = function() {
@@ -80,25 +82,38 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             });
         };
 
-        $scope.select = function(layer,service) {
-            $scope.selected.layer = layer;
-            $scope.selected.service = service;
+        $scope.selectLayer = function(layer,service) {
+            if (layer && $scope.selection.layer && $scope.selection.layer.Id === layer.Id) {
+                $scope.selection.layer = null;
+                $scope.selection.service = null;
+            } else {
+                $scope.selection.layer = layer;
+                $scope.selection.service = service;
+            }
         };
 
         $scope.selectItem = function(item) {
-            if ($scope.selected.item === item) {
-                $scope.selected.item = null;
+            if ($scope.selection.item === item) {
+                $scope.selection.item = null;
             } else {
-                $scope.selected.item = item;
+                $scope.selection.item = item;
             }
         };
 
         $scope.selectExtLayer = function(extLayer) {
-            $scope.selected.extLayer = extLayer;
+            if (extLayer && $scope.selection.extLayer && $scope.selection.extLayer.Name === extLayer.Name) {
+                $scope.selection.extLayer = null;
+            } else {
+                $scope.selection.extLayer = extLayer;
+            }
         };
 
         $scope.selectStyle = function(item) {
-            $scope.styles.selected = item;
+            if (item && $scope.styles.selected && $scope.styles.selected.Id === item.Id) {
+                $scope.styles.selected = null;
+            } else {
+                $scope.styles.selected = item;
+            }
         };
 
         $scope.addTag = function() {
@@ -126,9 +141,9 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
         $scope.validate = function () {
             // Verify on which step the user is.
             if ($scope.mode.display==='general') {
-                if ($scope.ctxt.name === undefined || $scope.ctxt.name === null || $scope.ctxt.name === '') {
+                if (!$scope.ctxt.name) {
                     $scope.mode.errorNoGivenName = true;
-                    Growl('error', 'Error', 'Name should be filled');
+                    Growl('warning', 'Warning', 'You must specify a name');
                     return;
                 }
 
@@ -148,46 +163,47 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         handleLayersForContext(ctxtCreated);
                     }, function () {
                         Growl('error', 'Error', 'Unable to create map context');
-                        $modalInstance.dismiss('close');
+                        $scope.dismiss();
                     });
                 } else {
                     mapcontext.update({}, $scope.ctxt, function (ctxtUpdated) {
                         handleLayersForContext(ctxtUpdated);
                     }, function () {
                         Growl('error', 'Error', 'Unable to update map context');
-                        $modalInstance.dismiss('close');
+                        $scope.dismiss();
                     });
                 }
-            } else if ($scope.mode.display==='addChooseSource') {
-                $scope.mode.display = 'chooseLayer';
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
-                if ($scope.selected.extLayer) {
+                if ($scope.selection.extLayer) {
                     var llExtent = '';
-                    if ($scope.selected.extLayer.EX_GeographicBoundingBox) {
-                        var exCaps130 = $scope.selected.extLayer.EX_GeographicBoundingBox;
-                        llExtent = exCaps130.westBoundLongitude +','+ exCaps130.southBoundLatitude +','+ exCaps130.eastBoundLongitude +','+ exCaps130.northBoundLatitude;
-                    } else if ($scope.selected.extLayer.LatLonBoundingBox) {
-                        var exCaps111 = $scope.selected.extLayer.LatLonBoundingBox;
+                    if ($scope.selection.extLayer.EX_GeographicBoundingBox) {
+                        var exCaps130 = $scope.selection.extLayer.EX_GeographicBoundingBox;
+                        llExtent = exCaps130.westBoundLongitude +','+
+                                   exCaps130.southBoundLatitude +','+
+                                   exCaps130.eastBoundLongitude +','+
+                                   exCaps130.northBoundLatitude;
+                    } else if ($scope.selection.extLayer.LatLonBoundingBox) {
+                        var exCaps111 = $scope.selection.extLayer.LatLonBoundingBox;
                         llExtent = exCaps111.minx +','+ exCaps111.miny +','+ exCaps111.maxx +','+ exCaps111.maxy;
                     }
 
                     var extStyle = '';
-                    if ($scope.selected.extLayer.Style) {
-                        for (var j=0; j < $scope.selected.extLayer.Style.length; j++) {
+                    if ($scope.selection.extLayer.Style) {
+                        for (var j=0; j < $scope.selection.extLayer.Style.length; j++) {
                             if (j > 0) {
                                 extStyle += ',';
                             }
-                            var capsStyle = $scope.selected.extLayer.Style[j];
+                            var capsStyle = $scope.selection.extLayer.Style[j];
                             extStyle += capsStyle.Name;
                         }
                     }
 
                     var layerExt = {
-                        externalLayer: $scope.selected.extLayer.Name,
+                        externalLayer: $scope.selection.extLayer.Name,
                         externalLayerExtent: llExtent,
                         externalServiceUrl: $scope.external.serviceUrl,
-                        externalServiceVersion: ($scope.selected.extLayer.EX_GeographicBoundingBox) ? '1.3.0' : '1.1.1',
+                        externalServiceVersion: ($scope.selection.extLayer.EX_GeographicBoundingBox) ? '1.3.0' : '1.1.1',
                         externalStyle: extStyle,
                         opacity: 100
                     };
@@ -196,16 +212,16 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         visible: true
                     };
                     $scope.layers.toAdd.push(layerExtToAdd);
-                    $scope.selected = {};
-                } else if ($scope.selected.layer) {
+                    $scope.selection = {};
+                } else if ($scope.selection.layer) {
                     var layerToAdd = {
-                        layer: $scope.selected.layer,
-                        service: $scope.selected.service,
+                        layer: $scope.selection.layer,
+                        service: $scope.selection.service,
                         visible: true
                     };
                     layerToAdd.layer.opacity = 100;
                     $scope.layers.toAdd.push(layerToAdd);
-                    $scope.selected = {};
+                    $scope.selection = {};
                 }
                 // Go back to first screen
                 $scope.mode.display = 'general';
@@ -253,7 +269,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
 
         $scope.cancel = function() {
             if ($scope.mode.display==='general') {
-                $scope.close();
+                $scope.dismiss();
             } else {
                 $scope.mode.display = 'general';
             }
@@ -265,10 +281,10 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
 
             mapcontext.setLayers({id: ctxt.id}, $scope.layers.toSend, function () {
                 Growl('success', 'Success', 'Map context created');
-                $modalInstance.close();
+                $scope.close();
             }, function () {
                 Growl('error', 'Error', 'Unable to add layers to map context');
-                $modalInstance.dismiss('close');
+                $scope.dismiss();
             });
         }
 
@@ -287,6 +303,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
 
         $scope.goToAddLayerToContext = function() {
             $scope.mode.display = 'addChooseSource';
+            $scope.selection = {};
         };
 
         $scope.toggleUpDownSelected = function() {
@@ -301,29 +318,31 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
         };
 
         $scope.orderUp = function(i) {
+            var skipBg = (DataViewer.addBackground)?i+1:i;
             if (i > 0) {
                 var previous = $scope.layers.toAdd[i - 1];
                 $scope.layers.toAdd[i - 1] = $scope.layers.toAdd[i];
                 $scope.layers.toAdd[i] = previous;
 
                 // Now switch layer order for the map
-                var item0 = DataViewer.map.getLayers().item(i-1);
-                var item1 = DataViewer.map.getLayers().item(i);
-                DataViewer.map.getLayers().setAt(i-1, item1);
-                DataViewer.map.getLayers().setAt(i,   item0);
+                var item0 = DataViewer.map.getLayers().item(skipBg-1);
+                var item1 = DataViewer.map.getLayers().item(skipBg);
+                DataViewer.map.getLayers().setAt(skipBg-1, item1);
+                DataViewer.map.getLayers().setAt(skipBg,   item0);
             }
         };
         $scope.orderDown = function(i) {
+            var skipBg = (DataViewer.addBackground)?i+1:i;
             if (i < $scope.layers.toAdd.length - 1) {
                 var next = $scope.layers.toAdd[i + 1];
                 $scope.layers.toAdd[i + 1] = $scope.layers.toAdd[i];
                 $scope.layers.toAdd[i] = next;
 
                 // Now switch layer order for the map
-                var item0 = DataViewer.map.getLayers().item(i);
-                var item1 = DataViewer.map.getLayers().item(i+1);
-                DataViewer.map.getLayers().setAt(i,   item1);
-                DataViewer.map.getLayers().setAt(i+1, item0);
+                var item0 = DataViewer.map.getLayers().item(skipBg);
+                var item1 = DataViewer.map.getLayers().item(skipBg+1);
+                DataViewer.map.getLayers().setAt(skipBg,   item1);
+                DataViewer.map.getLayers().setAt(skipBg+1, item0);
             }
         };
 
@@ -445,14 +464,29 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             if (layersToView.length === 0) {
                 return;
             }
-            DataViewer.addBackground = false;
+
+            if($scope.ctxt && $scope.ctxt.crs){
+                var crsCode = $scope.ctxt.crs;
+                DataViewer.projection = crsCode;
+                DataViewer.addBackground= crsCode==='EPSG:3857';
+                if(crsCode === 'EPSG:4326' || crsCode === 'CRS:84') {
+                    DataViewer.extent=[-180, -90, 180, 90];
+                }
+            }
+
+            //DataViewer.addBackground = false;
             DataViewer.initMap('mapContextMap');
 
             if (firstTime) {
-                if($scope.ctxt && $scope.ctxt.west && $scope.ctxt.south && $scope.ctxt.east && $scope.ctxt.north) {
+                if($scope.ctxt && $scope.ctxt.west && $scope.ctxt.south && $scope.ctxt.east && $scope.ctxt.north && $scope.ctxt.crs) {
                     var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
                     setTimeout(function(){
                         DataViewer.map.updateSize();
+                        //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
+                        if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
+                            var projection = ol.proj.get($scope.ctxt.crs);
+                            extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                        }
                         DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
                     },300);
                 }
@@ -473,6 +507,11 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
             setTimeout(function(){
                 DataViewer.map.updateSize();
+                //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
+                if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
+                    var projection = ol.proj.get($scope.ctxt.crs);
+                    extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                }
                 DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
             },300);
         }

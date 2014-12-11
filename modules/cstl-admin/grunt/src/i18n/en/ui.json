@@ -542,7 +542,7 @@
     "mapcontext.modal.tab.layers": "Layers",
     "mapcontext.modal.title": "Add/Edit map context",
     "mapcontext.modal.validate": "Validate",
-    "mapcontext.modal.associate": "Associate",
+    "mapcontext.modal.associate": "Associate the style",
     "mapcontext.modal.validate.layer":"Add this layer",
     "mapcontext.modal.select.style.list":"Style followed by a star is the current style",
     "mapcontext.modal.select.style.empty": "There is no style associated",
