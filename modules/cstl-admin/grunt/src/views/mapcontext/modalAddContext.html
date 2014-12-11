@@ -2,7 +2,6 @@
      ng-class="{'modal-dialog-sld':mode.display==='general' || mode.display==='addChooseStyle' || (mode.display==='chooseLayer' && mode.source==='interne') || (mode.display==='chooseLayer' && mode.source==='externe' && mode.dispWmsLayers===true)}">
     <div class="modal-content">
         <div class="modal-header">
-            mode.display = {{mode.display}}
             <button type="button" class="close" ng-click="dismiss()">×</button>
             <h4 class="modal-title"
                 ng-if="mode.display!=='addChooseSource'&& mode.display!=='chooseLayer' && mode.display!=='addChooseStyle'"
@@ -354,7 +353,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6" ng-init="viewMap(true)">
+                <div class="col-sm-6">
                     <div id="mapContextMap"
                          style="height: 460px; width:460px; margin-top: 38px; border: 1px solid #DDD;"></div>
                 </div>
@@ -365,7 +364,7 @@
                          style="text-align:center;">
                         <label class="radio data-type-choose"
                                ng-class="{'type-selected':mode.source==='interne'}"
-                               ng-click="mode.source='interne';mode.display='chooseLayer'">
+                               ng-click="goToInternalSource()">
                             <div class="col-sm-12"
                                  style="margin-top: 5px; padding-left:5px;">
                                 <img ng-if="mode.source!=='interne'"
@@ -395,8 +394,7 @@
                 </div>
             </div>
             <div ng-if="mode.display==='chooseLayer'">
-                <div ng-if="mode.source==='interne'"
-                     ng-init="initInternalWmsServices()">
+                <div ng-if="mode.source==='interne'">
                     <div class="row dashboard"
                          style="margin-top: 10px;">
                         <div class="col-xs-8">

@@ -72,11 +72,20 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             $modalInstance.close();
         };
 
+
+        $scope.initScopeMapContextEditor = function() {
+            setTimeout(function(){
+                $scope.viewMap(true);
+            },500);
+        };
+
         $scope.getCurrentLang = function() {
             return $translate.use();
         };
 
-        $scope.initInternalWmsServices = function() {
+        $scope.goToInternalSource = function() {
+            $scope.mode.source='interne';
+            $scope.mode.display='chooseLayer';
             webService.listServiceLayers({lang: $scope.getCurrentLang()}, function(response) {
                 $scope.servicesLayers = response;
             });
@@ -163,14 +172,12 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         handleLayersForContext(ctxtCreated);
                     }, function () {
                         Growl('error', 'Error', 'Unable to create map context');
-                        $scope.dismiss();
                     });
                 } else {
                     mapcontext.update({}, $scope.ctxt, function (ctxtUpdated) {
                         handleLayersForContext(ctxtUpdated);
                     }, function () {
                         Growl('error', 'Error', 'Unable to update map context');
-                        $scope.dismiss();
                     });
                 }
             } else if ($scope.mode.display==='chooseLayer') {
@@ -226,7 +233,9 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 // Go back to first screen
                 $scope.mode.display = 'general';
 
-                $scope.viewMap(false);
+                setTimeout(function(){
+                    $scope.viewMap(false);
+                },200);
 
             } else if ($scope.mode.display==='addChooseStyle') {
                 if ($scope.layers.toStyle.layer.externalStyle) {
@@ -263,7 +272,9 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     $scope.layers.toStyle.layer.styleName = $scope.styles.selected.Name;
                 }
                 $scope.mode.display = 'general';
-                $scope.viewMap(false);
+                setTimeout(function(){
+                    $scope.viewMap(false);
+                },200);
             }
         };
 
@@ -284,7 +295,6 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 $scope.close();
             }, function () {
                 Growl('error', 'Error', 'Unable to add layers to map context');
-                $scope.dismiss();
             });
         }
 
@@ -433,38 +443,31 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             }
         };
 
-        $scope.viewMap = function(firstTime) {
-            if (!$scope.layers.toAdd || $scope.layers.toAdd.length===0) {
-                return;
-            }
+        $scope.viewMap = function(zoomOnMapContextExtent) {
             DataViewer.initConfig();
-            var cstlUrl = $cookieStore.get('cstlUrl');
-
-            var layersToView = [];
-            for (var i=0; i<$scope.layers.toAdd.length; i++) {
-                var l = $scope.layers.toAdd[i];
-                if (l.visible) {
-                    var layerData;
-                    if (l.layer.externalServiceUrl) {
-                        layerData = (l.layer.externalStyle) ?
-                            DataViewer.createLayerExternalWMSWithStyle(l.layer.externalServiceUrl, l.layer.externalLayer, l.layer.externalStyle.split(',')[0]) :
-                            DataViewer.createLayerExternalWMS(l.layer.externalServiceUrl, l.layer.externalLayer);
-                    } else {
-                        var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
-                        layerData = (l.layer.styleName) ?
-                            DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
-                            DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
+            if ($scope.layers.toAdd && $scope.layers.toAdd.length>0) {
+                var cstlUrl = $cookieStore.get('cstlUrl');
+                var layersToView = [];
+                for (var i=0; i<$scope.layers.toAdd.length; i++) {
+                    var l = $scope.layers.toAdd[i];
+                    if (l.visible) {
+                        var layerData;
+                        if (l.layer.externalServiceUrl) {
+                            layerData = (l.layer.externalStyle) ?
+                                DataViewer.createLayerExternalWMSWithStyle(l.layer.externalServiceUrl, l.layer.externalLayer, l.layer.externalStyle.split(',')[0]) :
+                                DataViewer.createLayerExternalWMS(l.layer.externalServiceUrl, l.layer.externalLayer);
+                        } else {
+                            var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
+                            layerData = (l.layer.styleName) ?
+                                DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
+                                DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
+                        }
+                        layerData.setOpacity(l.layer.opacity / 100);
+                        layersToView.push(layerData);
                     }
-                    layerData.setOpacity(l.layer.opacity / 100);
-                    layersToView.push(layerData);
                 }
+                DataViewer.layers = layersToView;
             }
-
-            DataViewer.layers = layersToView;
-            if (layersToView.length === 0) {
-                return;
-            }
-
             if($scope.ctxt && $scope.ctxt.crs){
                 var crsCode = $scope.ctxt.crs;
                 DataViewer.projection = crsCode;
@@ -473,25 +476,20 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     DataViewer.extent=[-180, -90, 180, 90];
                 }
             }
-
-            //DataViewer.addBackground = false;
             DataViewer.initMap('mapContextMap');
-
-            if (firstTime) {
+            if (zoomOnMapContextExtent) {
                 if($scope.ctxt && $scope.ctxt.west && $scope.ctxt.south && $scope.ctxt.east && $scope.ctxt.north && $scope.ctxt.crs) {
                     var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
-                    setTimeout(function(){
-                        DataViewer.map.updateSize();
-                        //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
-                        if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
-                            var projection = ol.proj.get($scope.ctxt.crs);
-                            extent = ol.proj.transform(extent, projection,'EPSG:4326');
-                        }
-                        DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
-                    },300);
+                    DataViewer.map.updateSize();
+                    //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
+                    if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
+                        var projection = ol.proj.get($scope.ctxt.crs);
+                        extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                    }
+                    DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
                 }
             } else {
-                fillLayersToSend();
+                fillLayersToSend(null);
                 mapcontext.extentForLayers({}, $scope.layers.toSend, function(response) {
                     useExtentForLayers(response.values);
                 });
@@ -505,15 +503,13 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             $scope.ctxt.east = Number(values.east);
             $scope.ctxt.north = Number(values.north);
             var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
-            setTimeout(function(){
-                DataViewer.map.updateSize();
-                //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
-                if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
-                    var projection = ol.proj.get($scope.ctxt.crs);
-                    extent = ol.proj.transform(extent, projection,'EPSG:4326');
-                }
-                DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
-            },300);
+            DataViewer.map.updateSize();
+            //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
+            if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
+                var projection = ol.proj.get($scope.ctxt.crs);
+                extent = ol.proj.transform(extent, projection,'EPSG:4326');
+            }
+            DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
         }
 
         $scope.applyExtent = function() {
@@ -555,4 +551,77 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 } else {return text;}
             }
         };
+
+        $scope.initScopeMapContextEditor();
+    })
+    .controller('MapContextViewerModalController', function($scope,$modalInstance,ctxtToEdit,layersForCtxt,$cookieStore) {
+        // item to save in the end
+        $scope.ctxt = ctxtToEdit || {};
+
+        $scope.layers = {
+            toAdd: layersForCtxt || [],
+            toSend: [], // List of layers really sent
+            toStyle: null // Layer on which to apply the selected style
+        };
+
+        $scope.dismiss = function () {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.close = function () {
+            $modalInstance.close();
+        };
+
+        $scope.initScope = function() {
+            setTimeout(function(){
+                $scope.showMap();
+            },200);
+        };
+
+        $scope.showMap = function() {
+            DataViewer.initConfig();
+            if ($scope.layers.toAdd && $scope.layers.toAdd.length>0) {
+                var cstlUrl = $cookieStore.get('cstlUrl');
+                var layersToView = [];
+                for (var i=0; i<$scope.layers.toAdd.length; i++) {
+                    var l = $scope.layers.toAdd[i];
+                    if (l.visible) {
+                        var layerData;
+                        if (l.layer.externalServiceUrl) {
+                            layerData = (l.layer.externalStyle) ?
+                                DataViewer.createLayerExternalWMSWithStyle(l.layer.externalServiceUrl, l.layer.externalLayer, l.layer.externalStyle.split(',')[0]) :
+                                DataViewer.createLayerExternalWMS(l.layer.externalServiceUrl, l.layer.externalLayer);
+                        } else {
+                            var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
+                            layerData = (l.layer.styleName) ?
+                                DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
+                                DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
+                        }
+                        layerData.setOpacity(l.layer.opacity / 100);
+                        layersToView.push(layerData);
+                    }
+                }
+                DataViewer.layers = layersToView;
+            }
+            if($scope.ctxt && $scope.ctxt.crs){
+                var crsCode = $scope.ctxt.crs;
+                DataViewer.projection = crsCode;
+                DataViewer.addBackground= crsCode==='EPSG:3857';
+                if(crsCode === 'EPSG:4326' || crsCode === 'CRS:84') {
+                    DataViewer.extent=[-180, -90, 180, 90];
+                }
+            }
+            DataViewer.initMap('mapContextViewerMap');
+            if($scope.ctxt && $scope.ctxt.west && $scope.ctxt.south && $scope.ctxt.east && $scope.ctxt.north && $scope.ctxt.crs) {
+                var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
+                DataViewer.map.updateSize();
+                //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
+                if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
+                    var projection = ol.proj.get($scope.ctxt.crs);
+                    extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                }
+                DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
+            }
+        };
+        $scope.initScope();
     });

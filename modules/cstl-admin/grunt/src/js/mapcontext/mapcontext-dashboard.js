@@ -142,7 +142,7 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
         $scope.showMapContext = function() {
             $modal.open({
                 templateUrl: 'views/mapcontext/modalViewer.html',
-                controller: 'MapContextModalController',
+                controller: 'MapContextViewerModalController',
                 resolve: {
                     ctxtToEdit: function () { return angular.copy($scope.selected); },
                     layersForCtxt: function() { return $scope.resolveLayers(); }
