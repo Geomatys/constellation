@@ -872,7 +872,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 });
                 setTimeout(function(){
                     $scope.previewData();
-                },200);
+                },300);
             }
         };
 
