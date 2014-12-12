@@ -497,6 +497,7 @@
     "label.next":"Suivant",
     "label.show.style": "Afficher les styles",
     "label.show.sensor": "Afficher les capteurs",
+    "label.show.services": "Afficher les services",
     "dialog.message.confirm.delete.dataset":"Êtes vous sûre de vouloir supprimer le jeu de données ?",
     "dialog.message.confirm.delete.data":"Êtes vous sûre de vouloir supprimer la donnée ?",
     "dialog.message.confirm.delete.mapcontext":"Êtes vous sûre de vouloir supprimer la composition cartographique ?",

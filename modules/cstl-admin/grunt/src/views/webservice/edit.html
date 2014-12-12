@@ -489,18 +489,21 @@
                                                  ng-init="assocStyle=false;">
 
                                                 <div class="col-sm-12 col-md-10 col-md-offset-1">
-                                                    <div class="block-associated block-associated-style block-associated-style-service">
+                                                    <div class="block-associated block-associated-style block-associated-style-service"
+                                                         ng-click="assocStyle=!assocStyle;">
                                                         <div class="block-associated-nb">{{selected.TargetStyle.length}}</div>
                                                         <div class="block-associated-title"
                                                              translate="label.related.style">Associated Styles</div>
                                                         <span class="fa icon-assoc-style "
                                                               ng-class="{'selected':assocStyle, 'fa-chevron-circle-up':assocStyle, 'fa-chevron-circle-down':!assocStyle}"
-                                                              ng-click="assocStyle=!assocStyle;"></span>
-                                                        <span class="fa icon-assoc-style fa-plus "
                                                               tooltip-placement="bottom"
-                                                              tooltip-html-unsafe="{{'label.new.style' | translate }}"
-                                                              ng-click="showStyleList();"></span>
+                                                              tooltip-html-unsafe="{{'label.show.style' | translate }}"></span>
                                                     </div>
+                                                    <span class="fa icon-assoc-style fa-plus "
+                                                          style="right:70px;"
+                                                          tooltip-placement="bottom"
+                                                          tooltip-html-unsafe="{{'label.new.style' | translate }}"
+                                                          ng-click="showStyleList();"></span>
                                                 </div>
                                             </div>
 

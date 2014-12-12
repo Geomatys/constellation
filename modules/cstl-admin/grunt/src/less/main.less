@@ -948,7 +948,7 @@ p.error-select-one{
     font-weight:bold;
     background-color: rgb(237,237,237);
     padding: 5px;
-
+    cursor:default;
     .block-associated-nb{
       float:left;
       margin-left: 45px;
@@ -987,39 +987,6 @@ p.error-select-one{
       background-color: darken(#c6c0ce, 10%);
     }
   }
-  .icon-assoc-style{
-    float: right;
-    margin-right: 10px;
-    &:hover{
-      color: #c6c0ce;
-      cursor: pointer;
-    }
-    &.selected{
-      color: #c6c0ce;
-    }
-  }
-  .icon-assoc-service{
-    float: right;
-    margin-right: 10px;
-    &:hover{
-      color: #b1c9d1;
-      cursor: pointer;
-    }
-    &.selected{
-      color: #b1c9d1;
-    }
-  }
-  .icon-assoc-sensor{
-    float: right;
-    margin-right: 10px;
-    &:hover{
-      color: #b2dbd3;
-      cursor: pointer;
-    }
-    &.selected{
-      color: #b2dbd3;
-    }
-  }
 
   .btn-assoc-service{
     border-radius:0;
@@ -1044,7 +1011,55 @@ p.error-select-one{
       background-color: darken(#b2dbd3, 10%);
     }
   }
+
+  .tooltip{
+    font-weight: normal;
+  }
 }
+
+.icon-assoc-style{
+  position: absolute;
+  top: 10px;
+  right: 33px;
+  font-size: 30px;
+  color: #b4b4b4;
+  &:hover{
+    color: #c6c0ce;
+    cursor: pointer;
+  }
+  &.selected{
+    color: #c6c0ce;
+  }
+}
+.icon-assoc-service{
+  position: absolute;
+  top: 10px;
+  right: 33px;
+  font-size: 30px;
+  color: #b4b4b4;
+  &:hover{
+    color: #b1c9d1;
+    cursor: pointer;
+  }
+  &.selected{
+    color: #b1c9d1;
+  }
+}
+.icon-assoc-sensor{
+  position: absolute;
+  top: 10px;
+  right: 33px;
+  font-size: 30px;
+  color: #b4b4b4;
+  &:hover{
+    color: #b2dbd3;
+    cursor: pointer;
+  }
+  &.selected{
+    color: #b2dbd3;
+  }
+}
+
 .btn-block-assos{
   background-color: transparent;
   padding: 3px 10px 3px 0px;

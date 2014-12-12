@@ -451,6 +451,7 @@
     "label.next":"Next",
     "label.show.style": "Show styles",
     "label.show.sensor": "Show sensors",
+    "label.show.services": "Show services",
     "dialog.message.confirm.delete.dataset":"Are you sure to delete the selected dataset?",
     "dialog.message.confirm.delete.data":"Are you sure to delete the selected data?",
     "dialog.message.confirm.delete.mapcontext":"Are you sure to delete the selected map context?",
