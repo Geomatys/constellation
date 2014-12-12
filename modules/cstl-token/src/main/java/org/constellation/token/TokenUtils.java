@@ -16,7 +16,7 @@ public class TokenUtils {
 
     public static final long tokenHalfLife = initTokenHalfLife();
 
-    private static final Pattern TOKEN_PATTERN = Pattern.compile("(\\w+)_(\\d+)_(\\w+)");
+    private static final Pattern TOKEN_PATTERN = Pattern.compile("(\\w+)_(\\d+)_(\\w+)_(\\d+)");
 
     public static String createToken(String username, String secret) {
         /* Expires in one hour */
@@ -28,7 +28,8 @@ public class TokenUtils {
         tokenBuilder.append(expires);
         tokenBuilder.append(TOKEN_SEPARATOR);
         tokenBuilder.append(TokenUtils.computeSignature(username, expires, secret));
-
+        tokenBuilder.append(TOKEN_SEPARATOR);
+        tokenBuilder.append(tokenHalfLife);
         return tokenBuilder.toString();
     }
 
@@ -91,7 +92,7 @@ public class TokenUtils {
 
     public static boolean validateToken(String authToken, String username, String secret) {
         String[] parts = authToken.split(TOKEN_SEPARATOR);
-        if (parts.length < 3) {
+        if (parts.length < 4) {
             LOGGER.warn("Token malformed: " + authToken);
             return false;
         }
