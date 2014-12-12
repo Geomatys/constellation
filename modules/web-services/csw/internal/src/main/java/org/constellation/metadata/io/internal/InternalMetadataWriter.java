@@ -123,7 +123,9 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
 
     @Override
     public void destroy() {
-        
+        if (indexer != null) {
+            indexer.destroy();
+        }
     }
 
     @Override
