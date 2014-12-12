@@ -28,20 +28,11 @@ import java.util.Locale;
 import java.util.Date;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opengis.metadata.citation.Responsibility;
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.constraint.Constraints;
-import org.opengis.metadata.constraint.LegalConstraints;
+import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.metadata.extent.GeographicExtent;
-import org.opengis.metadata.identification.DataIdentification;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.metadata.quality.ConformanceResult;
-import org.opengis.metadata.quality.Result;
-import org.opengis.metadata.spatial.SpatialRepresentation;
-import org.opengis.metadata.spatial.VectorSpatialRepresentation;
+import org.opengis.metadata.extent.GeographicDescription;
 import org.opengis.referencing.ReferenceSystem;
 import org.opengis.temporal.Period;
 import org.opengis.util.CodeList;
@@ -73,7 +64,12 @@ import org.opengis.temporal.PeriodDuration;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class MetadataUpdater {
-
+    /**
+     * @deprecated "Log and continue" is not appropriate since the user can not know that his data is lost
+     * (especially when the client is a web browser and the logging occurs on the server). This field needs
+     * to be deleted and the logging replaced by an exception or any other mechanism reporting error to the
+     * user.
+     */
     private static final Logger LOGGER = Logging.getLogger(MetadataUpdater.class);
 
     /**
@@ -110,29 +106,21 @@ final class MetadataUpdater {
      */
     private Object value;
 
-    private final Map<Class, Class> specialized;
-
-    MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values) {
-        this(standard, values, null);
-    }
+    /**
+     * The GeoAPI interfaces substitution.
+     * For example {@code Identification} is typically interpreted as {@code DataIdentification}.
+     */
+    private final Map<Class<?>, Class<?>> specialized;
 
     /**
-     * Creates a new updater which will use the entries from the given map.
-     * The given map shall not be empty.
+     * Creates a new updater which will use the entries from the given values map.
+     * The given {@code values} map shall not be empty.
      */
-    MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values, final Map<Class, Class> specialized) {
+    MetadataUpdater(final MetadataStandard standard, final SortedMap<NumerotedPath,Object> values,
+            Map<Class<?>, Class<?>> specialized)
+    {
         this.standard = standard;
-        if (specialized == null) {
-            this.specialized = new  HashMap<>();
-            this.specialized.put(Responsibility.class,        ResponsibleParty.class);
-            this.specialized.put(Identification.class,        DataIdentification.class);
-            this.specialized.put(GeographicExtent.class,      GeographicBoundingBox.class);
-            this.specialized.put(SpatialRepresentation.class, VectorSpatialRepresentation.class);
-            this.specialized.put(Constraints.class,           LegalConstraints.class);
-            this.specialized.put(Result.class,                ConformanceResult.class);
-        } else {
-            this.specialized = specialized;
-        }
+        this.specialized = specialized;
         if (standard == SensorMLStandard.SYSTEM) {
             factory = SYSTEM;
         } else if (standard == SensorMLStandard.COMPONENT) {
@@ -208,7 +196,7 @@ final class MetadataUpdater {
                     }
                 } else {
                     existingChildren = Collections.emptyIterator();
-                    final Class<?> type = specialize(getType(metadata, identifier));
+                    final Class<?> type = specialize(getType(metadata, identifier), np.path[childBase + 1]);
                     if (type == null) {
                         throw new ParseException("Can not find " +
                                 metadata.getClass().getSimpleName() + '.' + identifier + " property.");
@@ -226,8 +214,6 @@ final class MetadataUpdater {
 
     /**
      * Puts the current value for the given property in the given metadata object.
-     *
-     * @param value {@link String}, {@link Number} or {@code List<Object>}.
      */
     private void put(final Object metadata, final String identifier) throws ParseException {
         Object value = this.value; // Protect the field value from change.
@@ -235,7 +221,7 @@ final class MetadataUpdater {
         if (value instanceof CharSequence && ((CharSequence) value).length() == 0) {
             value = null;
         } else if (value != null) {
-            final Class<?> type = getType(metadata, identifier);
+            Class<?> type = getType(metadata, identifier);
             /*
              * Note: if (type == null), then the call to 'values.put(identifier, value)' at the end of this
              * method is likely to fail. However that 'put' method provides a more accurate error message.
@@ -273,9 +259,11 @@ final class MetadataUpdater {
         }
         if (type == PeriodDuration.class && value instanceof String) {
             try {
-                return new PeriodDurationType((String)value);
+                return new PeriodDurationType((String) value);
             } catch (IllegalArgumentException ex) {
-                LOGGER.warning("Bad period duration value:" + value + " (property:" + identifier + ")");
+                // TODO: "log and continue" is not appropriate here, since the user can not know that his data is lost.
+                LOGGER.log(Level.WARNING, "Bad period duration value: {0} (property: {1})",
+                        new Object[] {value, identifier});
             }
         }
         if (!CharSequence.class.isAssignableFrom(type) && (value instanceof CharSequence)) {
@@ -345,12 +333,27 @@ final class MetadataUpdater {
      * HACK - for some abstract types returned by {@link #getType(Object, String)},
      * returns a hard-coded subtype to use instead.
      *
+     * @param child The identifier of the main child element.
+     *
      * @todo We need a more generic mechanism.
      */
-    @SuppressWarnings("deprecation")
-    private Class<?> specialize(Class<?> type) {
-        if (specialized.containsKey(type)){
-            type = specialized.get(type);
+    private Class<?> specialize(Class<?> type, final String child) {
+        final Class<?> c = specialized.get(type);
+        if (c != null) {
+            assert type.isAssignableFrom(c) : c;
+            if (c == GeographicBoundingBox.class) {
+                /*
+                 * HACK - the 'specialized' map mechanism allows to specify only one sub-type,
+                 *        while a metadata form could contain children of different types.
+                 *        For now we use hard-coded checks, but we will need a more generic
+                 *        mechanism here too.
+                 */
+                switch (child) {
+                    case "polygon":              return BoundingPolygon.class;
+                    case "geographicIdentifier": return GeographicDescription.class;
+                }
+            }
+            type = c;
         }
         return type;
     }

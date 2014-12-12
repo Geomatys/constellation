@@ -114,16 +114,16 @@ import org.apache.sis.util.logging.Logging;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class TemplateApplicator {
-    
+
     public static final Logger LOGGER = Logging.getLogger(TemplateApplicator.class);
-            
+
     /**
      * A path to be handled in a special way.
      */
     private static final String[] REFERENCE_SYSTEM_CODE = {"referenceSystemIdentifier", "code"};
-    
+
     private static final String[] REFERENCE_SYSTEM_CODESPACE = {"referenceSystemIdentifier", "codeSpace"};
-    
+
     private static final String[] REFERENCE_SYSTEM_VERSION = {"referenceSystemIdentifier", "version"};
 
     /**
@@ -405,13 +405,16 @@ final class TemplateApplicator {
         if (size > maxOccurs) {
             nodes.subList(maxOccurs, size).clear();
         }
-        final NumerotedPath ignore = template.ignore;
+        final NumerotedPath[] ignore = template.ignore;
         if (ignore != null) {
             final Iterator<ValueNode> it = nodes.iterator();
             while (it.hasNext()) {
                 final ValueNode node = it.next();
-                if (node.pathEquals(ignore)) {
-                    it.remove();
+                for (final NumerotedPath p : ignore) {
+                    if (node.pathEquals(p)) {
+                        it.remove();
+                        break;
+                    }
                 }
             }
         }
@@ -468,7 +471,7 @@ final class TemplateApplicator {
         }
         return null;
     }
-    
+
     /**
      * Special case for {@link #REFERENCE_SYSTEM_CODESPACE}.
      */
@@ -481,7 +484,7 @@ final class TemplateApplicator {
         }
         return null;
     }
-    
+
     /**
      * Special case for {@link #REFERENCE_SYSTEM_VERSION}.
      */

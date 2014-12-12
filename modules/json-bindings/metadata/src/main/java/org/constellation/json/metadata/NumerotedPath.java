@@ -25,6 +25,7 @@ import org.apache.sis.util.CharSequences;
 
 /**
  * A path together with an index for each component in the path.
+ * Path indices begin at 1 (value 0 means "no index").
  * This is used as keys for storing metadata values in a map.
  *
  * <p><b>Implementation note:</b>
@@ -41,8 +42,24 @@ final class NumerotedPath implements Comparable<NumerotedPath> {
 
     /**
      * The index of each elements in the path.
+     * Indices begin at 1. Value 0 means "no index".
      */
     final int[] indices;
+
+    /**
+     * Creates new keys for the given node and indices.
+     *
+     * @param path    The template containing the path.
+     * @param indices The index of each elements in the path.
+     */
+    static NumerotedPath[] parse(final String[] path, final String indices) throws ParseException {
+        final CharSequence[] elements = CharSequences.split(indices, ',');
+        final NumerotedPath[] paths = new NumerotedPath[elements.length];
+        for (int i=0; i<paths.length; i++) {
+            paths[i] = new NumerotedPath(path, elements[i]);
+        }
+        return paths;
+    }
 
     /**
      * Creates a new key for the given node and indices specified in a space-separated list.
@@ -50,7 +67,7 @@ final class NumerotedPath implements Comparable<NumerotedPath> {
      * @param path    The template containing the path.
      * @param indices The index of each elements in the path.
      */
-    NumerotedPath(final String[] path, final String indices) throws ParseException {
+    private NumerotedPath(final String[] path, final CharSequence indices) throws ParseException {
         this.path = path;
         Throwable cause = null;
         try {

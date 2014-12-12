@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import org.opengis.metadata.citation.Party;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.DateType;
+import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
@@ -226,5 +227,19 @@ public final strictfp class TemplateTest {
         final DefaultMetadata metadata = new DefaultMetadata();
         Template.getInstance("profile_inspire_vector").read(readAllLines("vector_test.json"), metadata, false);
         assertFalse(metadata.isEmpty());
+    }
+
+    /**
+     * Tests with geographic elements of different types.
+     *
+     * @throws IOException if an error occurred while reading the test JSON file.
+     */
+    @Test
+    public void testGeographicElements() throws IOException {
+        final List<String> lines = readAllLines("profile_dataset.json");
+        final Template template = new Template(MetadataStandard.ISO_19115, lines, null);
+        final DefaultMetadata metadata = new DefaultMetadata();
+        template.read(lines, metadata, false);
+        assertTrue(metadata.isEmpty());
     }
 }

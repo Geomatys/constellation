@@ -60,9 +60,9 @@ final class TemplateNode {
     final String[] path;
 
     /**
-     * If there is a path or ignore, that path. Otherwise {@code null}.
+     * If there is paths to ignore, those paths. Otherwise {@code null}.
      */
-    final NumerotedPath ignore;
+    final NumerotedPath[] ignore;
 
     /**
      * The value of the {@code "defaultValue"} element found in the node, or {@code null}.
@@ -204,7 +204,7 @@ final class TemplateNode {
         this.content            = content.toArray();
         this.children           = children.isEmpty() ? null : children.toArray(new TemplateNode[children.size()]);
         this.path               = (path != null) ? parser.sharedPath(path) : null;
-        this.ignore             = (ignore != null) ? new NumerotedPath(this.path, ignore) : null;
+        this.ignore             = (ignore != null) ? NumerotedPath.parse(this.path, ignore) : null;
         this.defaultValue       = defaultValue;
         this.valueIndex         = valueIndex;
         this.pathIndex          = pathIndex;

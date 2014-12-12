@@ -33,6 +33,7 @@ public class Field implements Serializable {
     private int multiplicity;
     private String help;
     private String path;
+    private String type;
     private String render;
     private String defaultValue;
     private String value;
@@ -73,6 +74,14 @@ public class Field implements Serializable {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getRender() {

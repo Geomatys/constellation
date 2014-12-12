@@ -30,8 +30,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opengis.util.FactoryException;
 import org.apache.sis.metadata.AbstractMetadata;
-import org.apache.sis.util.CharSequences;
 import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.util.CharSequences;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.json.metadata.binding.*;
 
@@ -43,8 +43,14 @@ import org.constellation.json.metadata.binding.*;
  * @author Martin Desruisseaux (Geomatys)
  */
 final class FormReader {
+    /**
+     * @deprecated "Log and continue" is not appropriate since the user can not know that his data is lost
+     * (especially when the client is a web browser and the logging occurs on the server). This field needs
+     * to be deleted and the logging replaced by an exception or any other mechanism reporting error to the
+     * user.
+     */
     private final static Logger LOGGER = Logging.getLogger(FormReader.class);
-    
+
     /**
      * For iterating over the lines of the JSON file to parse.
      */
@@ -77,18 +83,24 @@ final class FormReader {
      */
     private final SortedMap<NumerotedPath,Object> values;
 
-    private final Map<Class, Class> specialized;
-    
+    /**
+     * The GeoAPI interfaces substitution.
+     * For example {@code Identification} is typically interpreted as {@code DataIdentification}.
+     */
+    private final Map<Class<?>, Class<?>> specialized;
+
     /**
      * Creates a new form reader.
      */
-    FormReader(final LineReader parser, final int maxDepth, final boolean skipNulls, final Map<Class, Class> specialized) {
-        this.parser    = parser;
-        this.indices   = new int[maxDepth];
-        this.skipNulls = skipNulls;
+    FormReader(final LineReader parser, final int maxDepth, final boolean skipNulls,
+            final Map<Class<?>, Class<?>> specialized)
+    {
+        this.parser      = parser;
+        this.indices     = new int[maxDepth];
+        this.skipNulls   = skipNulls;
+        this.specialized = specialized;
         isNextLineRequested = true;
         values = new TreeMap<>();
-        this.specialized = specialized;
     }
 
     /**
@@ -162,6 +174,7 @@ final class FormReader {
         }
         final String[] components = (String[]) CharSequences.split(path, Keywords.PATH_SEPARATOR);
         if (components.length > indices.length) {
+            // TODO: "log and continue" is not appropriate here, since the user can not know that his data is lost.
             LOGGER.log(Level.WARNING, "Error parsing path:{0}", path);
         }
         Arrays.fill(indices, 0, components.length, 0);
@@ -214,7 +227,7 @@ final class FormReader {
                         throw new ConcurrentModificationException();
                     }
                 }
-                if (value != null) { // 'null' can means an empty list, but not null element in the list.
+                if (value != null) { // 'null' can mean an empty list, but not null element in the list.
                     list.add(value);
                 }
             } else if (values.put(key, value) != null) {

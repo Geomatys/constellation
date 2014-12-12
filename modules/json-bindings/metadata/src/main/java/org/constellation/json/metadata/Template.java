@@ -28,6 +28,18 @@ import java.util.Collections;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import org.opengis.metadata.citation.Responsibility;
+import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.constraint.Constraints;
+import org.opengis.metadata.constraint.LegalConstraints;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.extent.GeographicExtent;
+import org.opengis.metadata.identification.DataIdentification;
+import org.opengis.metadata.identification.Identification;
+import org.opengis.metadata.quality.ConformanceResult;
+import org.opengis.metadata.quality.Result;
+import org.opengis.metadata.spatial.SpatialRepresentation;
+import org.opengis.metadata.spatial.VectorSpatialRepresentation;
 import org.apache.sis.metadata.MetadataStandard;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.constellation.json.metadata.binding.RootObj;
@@ -80,6 +92,21 @@ import org.constellation.json.metadata.binding.RootObj;
  * @author Martin Desruisseaux (Geomatys)
  */
 public class Template {
+    /**
+     * The default value to give to the {@code specialized} of {@link FormReader} constructor.
+     */
+    private static final Map<Class<?>, Class<?>> DEFAULT_SPECIALIZED;
+    static {
+        final Map<Class<?>, Class<?>> specialized = new HashMap<>();
+        specialized.put(Responsibility.class,        ResponsibleParty.class);
+        specialized.put(Identification.class,        DataIdentification.class);
+        specialized.put(GeographicExtent.class,      GeographicBoundingBox.class);
+        specialized.put(SpatialRepresentation.class, VectorSpatialRepresentation.class);
+        specialized.put(Constraints.class,           LegalConstraints.class);
+        specialized.put(Result.class,                ConformanceResult.class);
+        DEFAULT_SPECIALIZED = specialized;
+    }
+
     /**
      * Pre-defined instances. This map shall not be modified after class initialization,
      * in order to allow concurrent access without synchronization.
@@ -147,8 +174,12 @@ public class Template {
      * The maximal length of {@link TemplateNode#path} arrays.
      */
     final int depth;
-    
-    private final Map<Class, Class> specialized;
+
+    /**
+     * The GeoAPI interfaces substitution.
+     * For example {@code Identification} is typically interpreted as {@code DataIdentification}.
+     */
+    private final Map<Class<?>, Class<?>> specialized;
 
     /**
      * Creates a pre-defined template from a resource file of the given name.
@@ -162,7 +193,7 @@ public class Template {
     {
         root = new TemplateNode(new LineReader(standard, template, sharedLines, sharedPaths), true, null);
         this.depth = depth;
-        this.specialized = null;
+        specialized = DEFAULT_SPECIALIZED;
         /*
          * Do not validate the path (root.validatePath(null)). We will do that in JUnit tests instead,
          * in order to avoid consuming CPU for a verification of a static resource.
@@ -176,31 +207,19 @@ public class Template {
      *
      * @param  standard The standard used by the metadata objects to write.
      * @param  template The JSON lines to use as a template.
+     * @param  specialized The GeoAPI type substitution map, or {@code null} or the default map.
+     *         For example {@code Identification} shall typically be interpreted as {@code DataIdentification}.
      * @throws IOException if an error occurred while parsing the JSON template.
      *
      * @see #getInstance(String)
      */
-    public Template(final MetadataStandard standard, final Iterable<String> template) throws IOException {
-        this(standard, template, null);
-    }
-
-    /**
-     * Creates a new template with the given lines.
-     * This constructor is for use of custom templates.
-     * Consider using one of the predefined templates returned by {@link #getInstance(String)} instead.
-     *
-     * @param  standard The standard used by the metadata objects to write.
-     * @param  template The JSON lines to use as a template.
-     * @param  specialized
-     * @throws IOException if an error occurred while parsing the JSON template.
-     *
-     * @see #getInstance(String)
-     */
-    public Template(final MetadataStandard standard, final Iterable<String> template, final Map<Class, Class> specialized) throws IOException {
+    public Template(final MetadataStandard standard, final Iterable<String> template,
+            final Map<Class<?>, Class<?>> specialized) throws IOException
+    {
         root = new TemplateNode(new LineReader(standard, template, new HashMap<String,String>(),
                 new HashMap<String,String[]>()), true, null);
         depth = root.validatePath(null);
-        this.specialized = specialized;
+        this.specialized = (specialized != null) ? specialized : DEFAULT_SPECIALIZED;
     }
 
     /**
@@ -282,7 +301,10 @@ public class Template {
         r.read(json);
         r.writeToMetadata(root.standard, destination);
     }
-    
+
+    /**
+     * @todo current implementation is unsafe (not thread-safe, no check for existing instances).
+     */
     public static void addTemplate(final String name, Template t) {
         INSTANCES.put(name, t);
     }
