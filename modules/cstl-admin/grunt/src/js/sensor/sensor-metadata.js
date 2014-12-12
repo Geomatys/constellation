@@ -341,16 +341,23 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
 
         /**
          * Returns the title value of metadata.
-         * Note that this way is not generic,
-         * we need to find another way to retrieve the title for
-         * more generic metadata to support sensorML and ISO and others.
-         * //@FIXME do it more generic
+         * a field should be marked with tag=title in json template.
          * @returns {string} the title value located in json model.
          */
         $scope.getMetadataTitle = function() {
             if($scope.metadataValues && $scope.metadataValues.length>0){
-                //@FIXME get field with jsonPath
-                return $scope.metadataValues[0].root.children[0].superblock.children[0].block.children[2].field.value;
+                for(var i=0;i<$scope.metadataValues[0].root.children.length;i++){
+                    var sb = $scope.metadataValues[0].root.children[i];
+                    for(var j=0;j<sb.superblock.children.length;j++){
+                        var b = sb.superblock.children[j];
+                        for(var k=0;k<b.block.children.length;k++){
+                            var f = b.block.children[k];
+                            if(f.field.tag === 'title'){
+                                return f.field.value;
+                            }
+                        }
+                    }
+                }
             }
             return null;
         };

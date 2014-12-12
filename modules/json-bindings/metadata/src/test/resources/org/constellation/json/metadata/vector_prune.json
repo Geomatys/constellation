@@ -21,6 +21,7 @@
 								"help":"metadata.field.title_help",
 								"path":"identificationInfo[1].citation.title",
 								"render":"text",
+                                "tag":"title",
 								"obligation":"M",
 								"defaultValue":null,
 								"value":"Data \"title\""
