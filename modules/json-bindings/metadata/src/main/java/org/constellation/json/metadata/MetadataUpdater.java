@@ -462,8 +462,8 @@ final class MetadataUpdater {
                     String propName = np.path[np.path.length - 1];
                     Class subType = getType(rs, propName);
                     asMap(rs).put(propName, convert(propName, subType, value));
-                    next();
                 }
+		next();
                 return true;
             }
         }
