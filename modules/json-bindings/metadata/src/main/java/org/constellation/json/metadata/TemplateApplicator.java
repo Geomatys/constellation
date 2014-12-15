@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.logging.Logger;
+import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.Metadata;
 import org.opengis.temporal.Position;
@@ -351,10 +352,13 @@ final class TemplateApplicator {
             final String identifier = template.path[pathOffset];
             if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_CODE) && metadata instanceof Metadata) {
                 value = referenceSystemCode((Metadata) metadata); // Special case.
+                pathOffset = template.path.length;
             } else if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_CODESPACE) && metadata instanceof Metadata) {
                 value = referenceSystemCodeSpace((Metadata) metadata); // Special case.
+                pathOffset = template.path.length;
             } else if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_VERSION) && metadata instanceof Metadata) {
                 value = referenceSystemVersion((Metadata) metadata); // Special case.
+                pathOffset = template.path.length;
             } else if (metadata instanceof TemporalPrimitive) {
                 value = extent((TemporalPrimitive) metadata, identifier); // Special case.
             } else {
@@ -464,9 +468,16 @@ final class TemplateApplicator {
      */
     private static String referenceSystemCode(final Metadata metadata) {
         for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
-            for (final Identifier id : r.getIdentifiers()) {
-                final String code = id.getCode();
-                if (code != null) return code;
+            if (r instanceof ReferenceSystemMetadata) {
+                if(r.getName() != null) {
+                    final String code = r.getName().getCode();
+                    if (code != null) return code;
+                }
+            } else {
+                for (final Identifier id : r.getIdentifiers()) {
+                    final String code = id.getCode();
+                    if (code != null) return code;
+                }
             }
         }
         return null;
@@ -477,9 +488,16 @@ final class TemplateApplicator {
      */
     private static String referenceSystemCodeSpace(final Metadata metadata) {
         for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
-            for (final Identifier id : r.getIdentifiers()) {
-                final String code = id.getCodeSpace();
-                if (code != null) return code;
+            if (r instanceof ReferenceSystemMetadata) {
+                if(r.getName() != null) {
+                    final String codespace = r.getName().getCodeSpace();
+                    if (codespace != null) return codespace;
+                }
+            } else {
+                for (final Identifier id : r.getIdentifiers()) {
+                    final String code = id.getCodeSpace();
+                    if (code != null) return code;
+                }
             }
         }
         return null;
@@ -490,9 +508,16 @@ final class TemplateApplicator {
      */
     private static String referenceSystemVersion(final Metadata metadata) {
         for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
-            for (final Identifier id : r.getIdentifiers()) {
-                final String code = id.getVersion();
-                if (code != null) return code;
+            if (r instanceof ReferenceSystemMetadata) {
+                if (r.getName() != null) {
+                    final String code = r.getName().getVersion();
+                    if (code != null) return code;
+                }
+            } else {
+                for (final Identifier id : r.getIdentifiers()) {
+                    final String code = id.getVersion();
+                    if (code != null) return code;
+                }
             }
         }
         return null;

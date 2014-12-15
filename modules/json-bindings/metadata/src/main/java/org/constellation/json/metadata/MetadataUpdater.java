@@ -442,8 +442,28 @@ final class MetadataUpdater {
                 if (!next()) break;
             }
             if (moved) {
-                ((DefaultMetadata) metadata).setReferenceSystemInfo((code == null) ? Collections.<ReferenceSystem>emptySet() :
-                        Collections.<ReferenceSystem>singleton(new ReferenceSystemMetadata(new ImmutableIdentifier(null, codeSpace, code, version, null))));
+                DefaultMetadata meta = ((DefaultMetadata) metadata);
+                if (code == null) {
+                    meta.setReferenceSystemInfo(Collections.<ReferenceSystem>emptySet());
+                } else if (!meta.getReferenceSystemInfo().isEmpty() && meta.getReferenceSystemInfo().iterator().next() instanceof ReferenceSystemMetadata) {
+                    ReferenceSystemMetadata rs = (ReferenceSystemMetadata) meta.getReferenceSystemInfo().iterator().next();
+                    rs.setName(new ImmutableIdentifier(null, codeSpace, code, version, null));
+                } else {
+                   meta.setReferenceSystemInfo(Collections.<ReferenceSystem>singleton(new ReferenceSystemMetadata(new ImmutableIdentifier(null, codeSpace, code, version, null))));
+                }
+                return true;
+            } else {
+                /**
+                 * hack for other property in referenceSystem (in sub-project extension)
+                 */
+                DefaultMetadata meta = ((DefaultMetadata) metadata);
+                if (!meta.getReferenceSystemInfo().isEmpty()) {
+                    ReferenceSystem rs = meta.getReferenceSystemInfo().iterator().next();
+                    String propName = np.path[np.path.length - 1];
+                    Class subType = getType(rs, propName);
+                    asMap(rs).put(propName, convert(propName, subType, value));
+                    next();
+                }
                 return true;
             }
         }
