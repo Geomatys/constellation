@@ -25,6 +25,7 @@ angular.module('CstlAdminDep', [
     'pascalprecht.translate',
     'rzModule',
     'angular-loading-bar',
+    'ngIdle',
     'ui.ace',
     'ui.bootstrap.modal',
     'ui.bootstrap.buttons',
@@ -39,6 +40,8 @@ angular.module('CstlAdminDep', [
     'ui.bootstrap.popover',
     'ui.bootstrap.tpls-typeahead',
     'ui.bootstrap.typeahead',
+    'ui.bootstrap.tpls-progressbar',
+    'ui.bootstrap.progressbar',
     // Constellation modules.
     'cstl-directives',
     'cstl-restapi',

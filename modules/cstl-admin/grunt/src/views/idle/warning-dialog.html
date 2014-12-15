@@ -1,0 +1,24 @@
+<div class="modal-dialog modal-dialog-resp-height">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4>
+                <i style="margin-right:4px" class="fa fa-warning"></i>
+                <span translate="idle.title.entering.inactive">You'll lose your connection after inactivity</span>
+            </h4>
+        </div>
+        <div class="modal-body"
+             ng-idle-countdown="countdown"
+             ng-init="countdown=60">
+            <p>
+                <span translate="idle.title.you.will.loggedout">You'll be logged out in</span>
+                <span class="label label-warning" style="font-size: 10px;">{{countdown}}</span>
+                <span ng-pluralize="" count="countdown" when="{'one': 'second', 'other': 'seconds' }"></span>.
+            </p>
+            <progressbar max="60"
+                         value="countdown"
+                         animate="true"
+                         class="progress-striped active"
+                         type="warning"></progressbar>
+        </div>
+    </div>
+</div>

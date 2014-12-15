@@ -251,6 +251,12 @@
     "edition.style.placeholder.number": "Entrez un nombre entier...",
     "edition.style.placeholder.value": "Entrez une valeur...",
 
+    "idle.title.timedout":"Vous avez été déconnecté en raison d'inactivité !",
+    "idle.title.gotologin":"Aller à la page d'authentification",
+    "idle.title.click.here":"Cliquer ici",
+    "idle.title.you.will.loggedout":"Vous serez déconnecté dans",
+    "idle.title.entering.inactive":"Vous aller perde la connexion suite à votre inactivité",
+
     "footer": "Ceci est votre pied de page",
 
     "global.browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/\">mettre à jour votre navigateur</a> pour une meilleure expérience.",

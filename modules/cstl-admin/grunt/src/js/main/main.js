@@ -24,7 +24,53 @@ var dataNotReady = function(){alert("data not ready");};
 
 angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('HeaderController', function ($rootScope, $scope, $http, TokenService, Account) {
+    .controller('HeaderController', function ($rootScope, $scope, $http, TokenService, Account, $idle, $modal) {
+
+        function closeModals() {
+            if ($scope.warning) {
+                $scope.warning.close();
+                $scope.warning = null;
+            }
+
+            if ($scope.timedout) {
+                $scope.timedout.close();
+                $scope.timedout = null;
+            }
+        }
+
+        $scope.$on('$idleStart', function() {
+            // the user appears to have gone idle
+            closeModals();
+            $scope.warning = $modal.open({
+                templateUrl: 'views/idle/warning-dialog.html',
+                windowClass: 'modal-warning'
+            });
+        });
+
+        $scope.$on('$idleTimeout', function() {
+            // the user has timed out (meaning idleDuration + warningDuration has passed without any activity)
+            // this is where you'd log them
+            closeModals();
+            $scope.timedout = $modal.open({
+                templateUrl: 'views/idle/timedout-dialog.html',
+                windowClass: 'modal-danger'
+            });
+        });
+
+        $scope.$on('$idleEnd', function() {
+            // the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog
+            closeModals();
+            //renew token
+            TokenService.renew();
+        });
+
+        $scope.$on('$keepalive', function() {
+            // keep the user's session alive
+            //renew token
+            TokenService.renew();
+        });
+
+
         $http.get("app/conf").success(function(data){
             $scope.logout = function(){
               $http.delete('@cstl/api/user/logout').then(function() {

@@ -22,7 +22,9 @@ var cstlAdminApp = angular.module('CstlAdminApp', ['CstlAdminDep']);
 
 cstlAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider', '$translatePartialLoaderProvider',
-        function ($routeProvider, $httpProvider, $translateProvider, $translatePartialLoaderProvider) {
+        '$keepaliveProvider','$idleProvider',
+        function ($routeProvider, $httpProvider, $translateProvider, $translatePartialLoaderProvider,
+                  $keepaliveProvider, $idleProvider) {
     	 $httpProvider.defaults.useXDomain = true;
 
          $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
@@ -176,18 +178,37 @@ cstlAdminApp
 
             // remember language
             $translateProvider.useCookieStorage();
+
+
+            var tokenDuration = 30*60; //default is 30min halftime
+            //The idle timeout duration in seconds.
+            // After this amount of time passes without the user performing an action
+            // that triggers one of the watched DOM events, the user is considered idle.
+
+            var cookieToken = $.cookie('authToken');
+            if(cookieToken && cookieToken.indexOf('_') !==-1){
+                var splitArr = cookieToken.split('_');
+                tokenDuration = splitArr[splitArr.length-1]/1000;
+            }
+            $idleProvider.idleDuration(tokenDuration*2);
+
+            //The warning duration in seconds.
+            // Once a user becomes idle, the warning countdown starts at this value
+            // and ticks down until it reaches 0, after which the user is considered timed out.
+            $idleProvider.warningDuration(60); //1min for warning
+
+            //Must be greater than 0 seconds.
+            // This specifies how often the keepalive event
+            // is triggered and the HTTP request is issued.
+            $keepaliveProvider.interval(tokenDuration);
+
         }])
-        .run(['$rootScope', '$location', 'TokenService', 'Account', 'StompService',
-            function($rootScope, $location, TokenService, Account, StompService) {
+        .run(['$rootScope', '$location', 'TokenService', 'Account', 'StompService','$idle',
+            function($rootScope, $location, TokenService, Account, StompService,$idle) {
 
             $rootScope.authenticated=true;
           
             $rootScope.authToken = TokenService.get();
-          
-            $rootScope.$on('event:auth-cstl-request', function(){
-              TokenService.renew();
-            });
-          
 
             // Call when the 401 response is returned by the client
             $rootScope.$on('event:auth-loginRequired', function() {
@@ -203,5 +224,8 @@ cstlAdminApp
                 //disconnect form websocket to avoid BrokenPipe error on server
                 StompService.disconnect();
             });
+
+            //starts watching for idleness, or resets the idle/warning state and continues watching.
+            $idle.watch();
 
         }]);

@@ -207,15 +207,11 @@ angular.module('cstl-services', ['cstl-restapi'])
               return $.cookie(CstlConfig['cookie.auth.token']);
             },
             renew: function() {
-              var now = new Date().getTime();
-              if(now > lastCall + tokenHalfLife){
-                lastCall = now;
                 $http.get('@cstl/api/user/extendToken').success(function(token){
                   $.cookie(CstlConfig['cookie.auth.token'], token, { path : '/' });
                   $rootScope.authToken = token;
                   console.log("Token extended: " + token);
                 });
-              }
             },
             clear: function(){
               $.removeCookie(CstlConfig['cookie.auth.token'], { path: '/' });

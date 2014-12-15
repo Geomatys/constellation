@@ -918,6 +918,12 @@
     "logs.table.name": "Name",
     "logs.table.level": "Level",
 
+    "idle.title.timedout":"You've been logged out due to inactivity!",
+    "idle.title.gotologin":"Go to login page",
+    "idle.title.click.here":"Click here",
+    "idle.title.you.will.loggedout":"You'll be logged out in",
+    "idle.title.entering.inactive":"You'll lose your connection after inactivity",
+
     "footer": "This is your footer",
 
     "main.menu.ws.create.title": "Web services",
