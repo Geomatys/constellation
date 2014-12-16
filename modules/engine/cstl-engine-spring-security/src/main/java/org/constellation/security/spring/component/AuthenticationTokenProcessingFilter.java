@@ -41,14 +41,20 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         if (userDetails == null)
             userDetails = fromBasicAuth(httpRequest);
 
-        if (userDetails != null) {
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-                    userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+
+            if (userDetails != null) {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+                        userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
+            chain.doFilter(request, response);
+        } finally {
+            SecurityContextHolder.getContext().setAuthentication(null);
         }
 
-        chain.doFilter(request, response);
     }
 
     private UserDetails fromBasicAuth(HttpServletRequest httpRequest) {
@@ -97,5 +103,4 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         return (HttpServletRequest) request;
     }
 
-   
 }
