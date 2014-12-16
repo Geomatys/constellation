@@ -12,6 +12,7 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
     private Integer id;
     private Integer mapcontextId;
     private Integer layerId;
+    private Integer dataId;
     private String serviceIdentifier;
     private String serviceVersions;
     private Integer styleId;
@@ -19,6 +20,7 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
     private int order;
     private int opacity;
     private boolean visible;
+    private boolean iswms;
     private String externalStyle;
     private String externalServiceUrl;
     private String externalServiceVersion;
@@ -46,6 +48,8 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.externalServiceVersion = mapContextStyledLayer.getExternalServiceVersion();
         this.externalLayer = mapContextStyledLayer.getExternalLayer();
         this.externalLayerExtent = mapContextStyledLayer.getExternalLayerExtent();
+        this.dataId = mapContextStyledLayer.getDataId();
+        this.iswms = mapContextStyledLayer.isIswms();
 
         super.setName(externalLayer);
         super.setAlias(externalLayer);
@@ -69,6 +73,8 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.externalServiceVersion = mapContextStyledLayer.getExternalServiceVersion();
         this.externalLayer = mapContextStyledLayer.getExternalLayer();
         this.externalLayerExtent = mapContextStyledLayer.getExternalLayerExtent();
+        this.dataId = mapContextStyledLayer.getDataId();
+        this.iswms = mapContextStyledLayer.isIswms();
     }
 
     public Integer getId() {
@@ -191,9 +197,27 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.serviceVersions = serviceVersions;
     }
 
+    public Integer getDataId() {
+        return dataId;
+    }
+
+    public void setDataId(Integer dataId) {
+        this.dataId = dataId;
+    }
+
+    public boolean isIswms() {
+        return iswms;
+    }
+
+    public void setIswms(boolean iswms) {
+        this.iswms = iswms;
+    }
+
     public MapcontextStyledLayer getMapcontextStyledLayer() {
-        return new MapcontextStyledLayer(this.id, this.mapcontextId, this.layerId, this.styleId, this.order, this.opacity, this.visible,
-                this.externalLayer, this.externalLayerExtent, this.externalServiceUrl, this.externalServiceVersion, this.externalStyle);
+        return new MapcontextStyledLayer(this.id, this.mapcontextId, this.layerId,
+                this.styleId, this.order, this.opacity, this.visible,this.externalLayer,
+                this.externalLayerExtent, this.externalServiceUrl, this.externalServiceVersion,
+                this.externalStyle, this.iswms, this.dataId);
     }
 
     @Override
