@@ -328,9 +328,6 @@ public class ProviderBusiness implements IProviderBusiness {
                 break;
 
             case "feature-store":
-
-                // TODO : What's going on here ? We should have received parameters matching a specific factory, not some
-                // randomly named parameters.
                 boolean foundProvider = false;
                 try {
                     
@@ -338,12 +335,12 @@ public class ProviderBusiness implements IProviderBusiness {
                     URL url = null;
                     if (filePath != null) {
                         url = filePath.toUri().toURL();
-                        final File folder = filePath.toFile();
+                        final File file = filePath.toFile();
                         final File[] candidates;
-                        if (folder.isDirectory()) {
-                            candidates = folder.listFiles();
+                        if (file.isDirectory()) {
+                            candidates = file.listFiles();
                         } else {
-                            candidates = new File[]{folder};
+                            candidates = new File[]{file};
                         }
 
                         search:
@@ -357,19 +354,17 @@ public class ProviderBusiness implements IProviderBusiness {
                                 if (factory instanceof FileFeatureStoreFactory) {
                                     final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
                                     for (String tempExtension : fileFactory.getFileExtensions()) {
-                                        if (candidateName.endsWith(tempExtension)) {
-                                            if (!tempExtension.endsWith("mif") && !tempExtension.endsWith("mid") &&
-                                                !tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf") && candidates.length > 1) {
-                                                //found a factory which can handle it
-                                                final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
-                                                        factory.getParametersDescriptor().getName().getCode());
-                                                params.parameter("url").setValue(url);
-                                                params.parameter("namespace").setValue("no namespace");
-                                                foundProvider = true;
-                                                //TODO we should add all files which define a possible feature-store
-                                                //but the web interfaces do not handle that yet, so we limit to one for now.
-                                                break search;
+                                        if (candidateName.endsWith(tempExtension) && !tempExtension.endsWith("dbf")) {
+                                            //found a factory which can handle it
+                                            final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
+                                            factory.getParametersDescriptor().getName().getCode());
+                                            if(candidates.length>1 && file.isDirectory()){
+                                                url = new URL(url.toString()+candidateName);
                                             }
+                                            params.parameter("url").setValue(url);
+                                            params.parameter("namespace").setValue("no namespace");
+                                            foundProvider = true;
+                                            break search;
                                         }
                                     }
                                 } else {
@@ -385,8 +380,6 @@ public class ProviderBusiness implements IProviderBusiness {
                                             params.parameter("url").setValue(url);
                                             params.parameter("namespace").setValue("no namespace");
                                             foundProvider = true;
-                                            //TODO we should add all files which define a possible feature-store
-                                            //but the web interfaces do not handle that yet, so we limit to one for now.
                                             break search;
                                         }
                                     } catch (Exception ex) {
@@ -407,8 +400,7 @@ public class ProviderBusiness implements IProviderBusiness {
                         }
                         final FeatureStoreFactory featureFactory = FeatureStoreFinder.getFactoryById(subType);
                         final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
-                        final ParameterValueGroup choice =
-                                sources.groups("choice").get(0).addGroup(cvgConfig.getDescriptor().getName().getCode());
+                        final ParameterValueGroup choice = ParametersExt.getOrCreateGroup(sources.groups("choice").get(0),cvgConfig.getDescriptor().getName().getCode());
                         Parameters.copy(cvgConfig, choice);
                     }
                 } catch (MalformedURLException e) {
