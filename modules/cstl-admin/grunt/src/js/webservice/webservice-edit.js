@@ -87,7 +87,46 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             };
         });
 
-        $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id, lang:$scope.getCurrentLang()});
+        $scope.getVersionsForType = function() {
+            if ($scope.type === 'wms') {
+                return [{ 'id': '1.1.1','checked':false}, { 'id': '1.3.0','checked':false}];
+            }
+            if ($scope.type === 'wfs') {
+                return [{ 'id': '1.1.0','checked':false}, { 'id': '2.0.0','checked':false}];
+            }
+            if ($scope.type === 'wcs') {
+                return [{ 'id': '1.0.0','checked':false}];
+            }
+            if ($scope.type === 'wmts') {
+                return [{ 'id': '1.0.0','checked':false}];
+            }
+            if ($scope.type === 'csw') {
+                return [{ 'id': '2.0.0','checked':false}, { 'id': '2.0.2','checked':false}];
+            }
+            if ($scope.type === 'sos') {
+                return [{ 'id': '1.0.0','checked':false}, { 'id': '2.0.0','checked':false}];
+            }
+            if ($scope.type === 'wps') {
+                return [{ 'id': '1.0.0','checked':false}];
+            }
+            return [];
+        };
+
+        $scope.metadata = webService.metadata({type: $scope.type,
+                                               id:$routeParams.id,
+                                               lang:$scope.getCurrentLang()},
+            function(response){//on success
+                $scope.versions = $scope.getVersionsForType();
+                if($scope.versions.length>0){
+                    for(var i=0;i<$scope.versions.length;i++){
+                        var version = $scope.versions[i];
+                        version.checked = ($scope.metadata.versions.indexOf(version.id)!==-1);
+                    }
+                }
+            },function(response){//on error
+                Growl('error','Error','Unable to get service metadata');
+            }
+        );
 
         $scope.tabdata = true;
         $scope.tabdesc = false;
@@ -161,44 +200,14 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             $scope.selected=null;
         };
 
-        $scope.getVersionsForType = function() {
-            if ($scope.type === 'wms') {
-                return [{ 'id': '1.1.1'}, { 'id': '1.3.0' }];
-            }
-            if ($scope.type === 'wfs') {
-                return [{ 'id': '1.1.0'}, { 'id': '2.0.0' }];
-            }
-            if ($scope.type === 'wcs') {
-                return [{ 'id': '1.0.0'}];
-            }
-            if ($scope.type === 'wmts') {
-                return [{ 'id': '1.0.0'}];
-            }
-            if ($scope.type === 'csw') {
-                return [{ 'id': '2.0.0'}, { 'id': '2.0.2'}];
-            }
-            if ($scope.type === 'sos') {
-                return [{ 'id': '1.0.0'}, { 'id': '2.0.0'}];
-            }
-            if ($scope.type === 'wps') {
-                return [{ 'id': '1.0.0'}];
-            }
-            return [];
-        };
-        $scope.versions = $scope.getVersionsForType();
 
         // define which version to set
         $scope.selectedVersion = function (){
             var selVersions = $filter('filter')($scope.versions, {checked: true});
-            var strVersions = [];
+            $scope.metadata.versions = [];
             for(var i=0; i < selVersions.length; i++) {
                 $scope.metadata.versions.push(selVersions[i].id);
             }
-        };
-
-        // define which version is Selected
-        $scope.versionIsSelected = function(currentVersion){
-            return $.inArray(currentVersion, $scope.metadata.versions) > -1;
         };
 
         $scope.addTag = function() {
@@ -917,7 +926,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
     })
 
     .controller('Step1WMTSInternalDataController', function($scope, dataListing, webService, Dashboard,Growl,
-                                                            cfpLoadingBar, provider, $cookieStore) {
+                                                            provider, $cookieStore) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -1064,7 +1073,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
     })
 
     .controller('Step1WMTSMapContextController', function($scope, dataListing, webService, Dashboard,Growl,
-                                                            cfpLoadingBar, provider, $cookieStore,mapcontext) {
+                                                            provider, $cookieStore,mapcontext) {
         /**
          * To fix angular bug with nested scope.
          */

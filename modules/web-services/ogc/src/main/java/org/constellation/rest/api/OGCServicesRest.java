@@ -356,9 +356,9 @@ public final class OGCServicesRest {
      */
     @GET
     @Path("{id}/metadata/{lang}")
-    public Response getDetails(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final @PathParam("lang") String lang) throws ConfigurationException {
-        serviceBusiness.ensureExistingInstance(serviceType, id);
-        // todo add language parameter
+    public Response getDetails(final @PathParam("spec") String serviceType,
+                               final @PathParam("id") String id,
+                               final @PathParam("lang") String lang) throws ConfigurationException {
         return ok(serviceBusiness.getInstanceDetails(serviceType, id, lang));
     }
 
