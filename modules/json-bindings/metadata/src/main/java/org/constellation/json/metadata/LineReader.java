@@ -183,7 +183,11 @@ final class LineReader {
                 } else if (line.charAt(position) == '"' && line.charAt(length-1) == '"') {
                     final int p = position + 1;
                     position = length;
-                    return CharSequences.replace(line.substring(p, length - 1), "\\\"", "\"").toString();
+                    CharSequence cs = line.substring(p, length - 1);
+                    cs = CharSequences.replace(cs, "\\\"", "\"");
+                    cs = CharSequences.replace(cs, "\\n",  "\n");
+                    cs = CharSequences.replace(cs, "\\t",  "\t");
+                    return cs.toString();
                 } else try {
                     final Number value = Numbers.narrowestNumber(line.substring(position, length));
                     position = length;

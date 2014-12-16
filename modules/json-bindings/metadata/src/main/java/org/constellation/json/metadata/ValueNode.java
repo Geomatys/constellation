@@ -133,7 +133,11 @@ final class ValueNode extends ArrayList<ValueNode> {
             } else if (value instanceof Charset) {
                 out.append(((Charset) value).name());
             } else {
-                out.append(CharSequences.replace(value.toString(), "\"", "\\\"").toString());
+                CharSequence cs = value.toString();
+                cs = CharSequences.replace(cs, "\"", "\\\"");
+                cs = CharSequences.replace(cs, "\t", "\\t");
+                cs = CharSequences.replace(cs, "\n", "\\n");
+                out.append(cs);
             }
             out.append('"');
             return;
