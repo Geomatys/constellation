@@ -597,7 +597,7 @@
     "mapcontext.modal.label.internal": "Interne",
     "mapcontext.modal.label.keywords": "Mots clés",
     "mapcontext.modal.label.name": "Nom",
-    "mapcontext.modal.select.source": "Sélectionner la source de votre couche",
+    "mapcontext.modal.select.source": "Sélectionner la source de donnée",
     "mapcontext.modal.select.layer" : "Sélectionner la couche à ajouter",
     "mapcontext.modal.select.style" : "Sélectionner le style à associer",
     "mapcontext.modal.tab.info": "Informations",

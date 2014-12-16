@@ -536,7 +536,7 @@
     "mapcontext.modal.label.internal": "Internal",
     "mapcontext.modal.label.keywords": "Keywords",
     "mapcontext.modal.label.name": "Name",
-    "mapcontext.modal.select.source": "Select your layer source",
+    "mapcontext.modal.select.source": "Select the layer data source",
     "mapcontext.modal.select.layer" : "Select layer to add",
     "mapcontext.modal.select.style" : "Select style to associate",
     "mapcontext.modal.tab.info": "Information",
