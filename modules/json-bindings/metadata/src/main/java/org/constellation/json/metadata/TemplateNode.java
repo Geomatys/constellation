@@ -107,6 +107,8 @@ final class TemplateNode {
      * does not have an opening bracket.
      */
     private final String separator;
+    
+    final String render;
 
     /**
      * Creates a new node for the given lines.
@@ -122,6 +124,7 @@ final class TemplateNode {
         final List<TemplateNode> children = new ArrayList<>();
         String  path         = null;
         String  ignore       = null;
+        String render        = null;
         Object  defaultValue = null;
         int     valueIndex   = -1;
         int     pathIndex    = -1;
@@ -143,6 +146,8 @@ final class TemplateNode {
                 }
             } else if (parser.regionMatches(Keywords.IGNORE)) {
                 ignore = (String) parser.getValue();
+            } else if (parser.regionMatches(Keywords.RENDER)) {
+                render = (String) parser.getValue();
             } else if (parser.regionMatches(Keywords.DEFAULT_VALUE)) {
                 defaultValue = parser.getValue();
             } else if (parser.regionMatches(Keywords.VALUE)) {
@@ -212,6 +217,7 @@ final class TemplateNode {
         this.hasTrailingComma   = parser.hasTrailingComma();
         this.lengthWithoutComma = parser.length();
         this.separator          = separator;
+        this.render             = render;
     }
 
     /**

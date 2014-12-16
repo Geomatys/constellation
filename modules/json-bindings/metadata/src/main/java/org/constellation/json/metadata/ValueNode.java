@@ -32,6 +32,7 @@ import org.opengis.util.Enumerated;
 import org.apache.sis.measure.Angle;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.CharSequences;
+import static org.constellation.json.metadata.Keywords.DATE_READ_ONLY;
 
 
 /**
@@ -48,6 +49,11 @@ final class ValueNode extends ArrayList<ValueNode> {
      * Usage of this format shall be synchronized on {@code DATE_FORMAT}.
      */
     static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    static {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+    
+    static final DateFormat DATE_HOUR_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
     static {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
@@ -118,8 +124,14 @@ final class ValueNode extends ArrayList<ValueNode> {
                 out.append(Types.getStandardName(value.getClass())).append('.')
                    .append(Types.getCodeName((Enumerated) value));
             } else if (value instanceof Date) {
-                synchronized (DATE_FORMAT) {
-                    p = DATE_FORMAT.format(value);
+                if (DATE_READ_ONLY.equals(template.render)) {
+                    synchronized (DATE_HOUR_FORMAT) {
+                        p = DATE_HOUR_FORMAT.format(value);
+                    }
+                } else {
+                    synchronized (DATE_FORMAT) {
+                        p = DATE_FORMAT.format(value);
+                    }
                 }
                 out.append(p);
             } else if (value instanceof Locale) {

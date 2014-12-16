@@ -39,7 +39,7 @@ final class Keywords {
     static final String PATH = "\"path\"";
 
     /**
-     * The keyword for the path attribute in JSON file, including quotes.
+     * The keyword for the ignore attribute in JSON file, including quotes.
      */
     static final String IGNORE = "\"ignore\"";
 
@@ -59,14 +59,21 @@ final class Keywords {
     static final String VALUE = "\"value\"";
 
     /**
-     * The keyword for the value attribute in JSON file, including quotes.
+     * The keyword for the children attribute in JSON file, including quotes.
      */
     static final String CHILDREN = "\"children\"";
+    
+    /**
+     * The keyword for the render attribute in JSON file, including quotes.
+     */
+    static final String RENDER = "\"render\"";
 
     /**
      * The prefix in values (not keywords) when the value is missing.
      */
     static final String NIL_REASON = "nilReason:";
+    
+    static final String DATE_READ_ONLY = "DATE.readonly";
 
     /**
      * Do not allow (for now) instantiation of this class.

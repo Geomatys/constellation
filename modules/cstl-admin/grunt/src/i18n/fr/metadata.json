@@ -219,6 +219,11 @@
     "MD_CoverageContentTypeCode.image":"Image de la valeur",
     "MD_CoverageContentTypeCode.thematicClassification":"Classification thématique",
     "MD_CoverageContentTypeCode.physicalMeasurement":"Mesure physique",
+    "MD_CoverageContentTypeCode.auxillaryInformation" : "Information auxilliaire ",
+    "MD_CoverageContentTypeCode.coordinate" : "Coordonnées",
+    "MD_CoverageContentTypeCode.modelResult" : "Resultat du modèle",
+    "MD_CoverageContentTypeCode.qualityInformation" : "Information sur la qualité",
+    "MD_CoverageContentTypeCode.referenceInformation" : "Information sur la référence",
 
     "MD_DatatypeCode.class":"Classe orientée objet",
     "MD_DatatypeCode.codelist":"Liste de valeur",

@@ -218,8 +218,13 @@
 
     "MD_CoverageContentTypeCode.image":"Image",
     "MD_CoverageContentTypeCode.thematicClassification":"Thematic Classification",
-    "MD_CoverageContentTypeCode.physicalMeasurement":"PhysicalMeasurement",
-
+    "MD_CoverageContentTypeCode.physicalMeasurement":"Physical Measurement",
+    "MD_CoverageContentTypeCode.auxillaryInformation" : "Auxillary information",
+    "MD_CoverageContentTypeCode.coordinate" : "Coordinate",
+    "MD_CoverageContentTypeCode.modelResult" : "Model result",
+    "MD_CoverageContentTypeCode.qualityInformation" : "Quality information",
+    "MD_CoverageContentTypeCode.referenceInformation" : "Reference information",
+    
     "MD_DatatypeCode.class":"Object-oriented class",
     "MD_DatatypeCode.codelist":"CodeList",
     "MD_DatatypeCode.enumeration":"Enumeration",
