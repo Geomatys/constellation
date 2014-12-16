@@ -66,6 +66,10 @@ window.DataViewer = {
             controls: ol.control.defaults().extend([
                 new ol.control.ScaleLine({
                     units: 'metric'
+                }),
+                new ol.control.Zoom({
+                    zoomInTipLabel:'Zoom in',
+                    zoomOutTipLabel:'Zoom out'
                 })
             ]),
             layers: DataViewer.layers,
