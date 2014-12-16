@@ -326,6 +326,8 @@ public final class DefaultConfigurator implements Configurator {
                                 ViewType packMode = ((PyramidalCoverageReference) origin).getPackMode();
                                 if (ViewType.RENDERED.equals(packMode)) {
                                     rendered = Boolean.TRUE;
+                                } else {
+                                    rendered = Boolean.FALSE;
                                 }
                             } catch (DataStoreException e) {
                                 LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
