@@ -298,6 +298,7 @@ public final class DefaultConfigurator implements Configurator {
                                 int i = fcr.getImageIndex();
                                 final GridCoverageReader reader = fcr.acquireReader();
                                 final SpatialMetadata sm = reader.getCoverageMetadata(i);
+                                fcr.recycle(reader);
                                 if (sm != null) {
                                     final Node coverageRootNode = sm.getAsTree(SpatialMetadataFormat.GEOTK_FORMAT_NAME);
                                     MetadataMapBuilder.setCounter(0);

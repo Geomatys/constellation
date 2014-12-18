@@ -333,6 +333,7 @@ public final class MetadataUtilities {
                     final GridCoverageReader reader = cr.acquireReader();
                     final GeneralGridGeometry gridGeom = reader.getGridGeometry(cr.getImageIndex());
                     final CoordinateReferenceSystem crs = gridGeom.getCoordinateReferenceSystem();
+                    cr.recycle(reader);
                     if(candidat == null && crs != null){
                         candidat = crs;
                     }

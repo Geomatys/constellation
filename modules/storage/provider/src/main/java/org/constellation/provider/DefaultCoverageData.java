@@ -99,7 +99,7 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         } catch (CancellationException ex) {
             throw new IOException(ex.getMessage(),ex);
         }finally{
-            reader.dispose();
+            ref.recycle(reader);
         }
 
     }
@@ -303,7 +303,7 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         } catch (CancellationException ex) {
             throw new DataStoreException(ex);
         } finally {
-            reader.dispose();
+            ref.recycle(reader);
         }
     }
 
@@ -331,7 +331,7 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         } catch (CancellationException ex) {
             throw new DataStoreException(ex);
         } finally {
-            reader.dispose();
+            ref.recycle(reader);
         }
     }
 

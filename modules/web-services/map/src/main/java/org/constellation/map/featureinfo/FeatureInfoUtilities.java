@@ -397,11 +397,7 @@ public final class FeatureInfoUtilities extends Static {
             return null;
         } finally {
             if (reader!= null) {
-                try {
-                    reader.dispose();
-                } catch (CoverageStoreException e) {
-                    context.getMonitor().exceptionOccured(e, Level.INFO);
-                }
+                ref.recycle(reader);
             }
         }
 

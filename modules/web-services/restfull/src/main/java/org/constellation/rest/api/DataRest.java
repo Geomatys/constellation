@@ -1542,12 +1542,12 @@ public class DataRest {
         }
         if(origin instanceof CoverageReference){
             //calculate pyramid scale levels
-            final CoverageReference inRef = (CoverageReference) inData.getOrigin();
+            final CoverageReference inRef = (CoverageReference) origin;
             final GeneralGridGeometry gg;
             try{
                 final GridCoverageReader reader = inRef.acquireReader();
                 gg = reader.getGridGeometry(inRef.getImageIndex());
-
+                inRef.recycle(reader);
             } catch(CoverageStoreException ex) {
                 throw new ConstellationException("Failed to extract grid geometry for data "+dataId+". ",ex);
             }

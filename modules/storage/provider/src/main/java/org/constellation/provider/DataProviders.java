@@ -185,6 +185,7 @@ public final class DataProviders extends Providers implements PropertyChangeList
                 final GridCoverageReader coverageReader = coverageReference.acquireReader();
                 final CoordinateReferenceSystem coordinateReferenceSystem = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
                 nameCoordinateReferenceSystemHashMap.put(name,coordinateReferenceSystem);
+                coverageReference.recycle(coverageReader);
             }
         }
         return nameCoordinateReferenceSystemHashMap;

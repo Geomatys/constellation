@@ -504,8 +504,6 @@ public final class LayerProviders {
 
         final CoverageDataDescription description = new CoverageDataDescription();
 
-        final CoverageReference ref = (CoverageReference)layer.getOrigin();
-        final GridCoverageReader reader = ref.acquireReader();
         if(full) {
             final ImageStatistics stats = dataBusiness.getDataStatistics(dataId);
             if(stats!=null) {
@@ -522,10 +520,13 @@ public final class LayerProviders {
         }
 
         // Geographic extent description.
+        final CoverageReference ref = (CoverageReference)layer.getOrigin();
+        final GridCoverageReader reader = ref.acquireReader();
         final Envelope envelope = reader.getGridGeometry(ref.getImageIndex()).getEnvelope();
+        ref.recycle(reader);
+
         fillGeographicDescription(envelope, description);
 
-        ref.recycle(reader);
         return description;
     }
 

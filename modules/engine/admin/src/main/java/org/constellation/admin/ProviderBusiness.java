@@ -526,7 +526,7 @@ public class ProviderBusiness implements IProviderBusiness {
         try {
             final GridCoverageReader reader = inRef.acquireReader();
             gg = reader.getGridGeometry(inRef.getImageIndex());
-
+            inRef.recycle(reader);
         } catch (CoverageStoreException ex) {
             throw new ConstellationException("Failed to extract grid geometry for data " + dataName + ". " + ex.getMessage(),ex);
         }
@@ -599,6 +599,7 @@ public class ProviderBusiness implements IProviderBusiness {
         try {
             final GridCoverageReader reader = inRef.acquireReader();
             final List<GridSampleDimension> sampleDimensions = reader.getSampleDimensions(inRef.getImageIndex());
+            inRef.recycle(reader);
             if (sampleDimensions != null) {
                 final int nbBand = sampleDimensions.size();
                 double[] fillValue = new double[nbBand];
