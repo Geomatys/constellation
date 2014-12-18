@@ -350,14 +350,14 @@ final class TemplateApplicator {
                 throw new ParseException("Path offset out of band :" + paths);
             }
             final String identifier = template.path[pathOffset];
-            if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_CODE) && metadata instanceof Metadata) {
-                value = referenceSystemCode((Metadata) metadata); // Special case.
+            if ((identifier.equals("referenceSystemInfo") || identifier.equals("referenceSystemIdentifier")) && template.endsWith(REFERENCE_SYSTEM_CODE) && (metadata instanceof Metadata || metadata instanceof ReferenceSystem)) {
+                value = referenceSystemCode(metadata); // Special case.
                 pathOffset = template.path.length;
-            } else if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_CODESPACE) && metadata instanceof Metadata) {
-                value = referenceSystemCodeSpace((Metadata) metadata); // Special case.
+            } else if ((identifier.equals("referenceSystemInfo") || identifier.equals("referenceSystemIdentifier")) && template.endsWith(REFERENCE_SYSTEM_CODESPACE) && (metadata instanceof Metadata || metadata instanceof ReferenceSystem)) {
+                value = referenceSystemCodeSpace(metadata); // Special case.
                 pathOffset = template.path.length;
-            } else if (identifier.equals("referenceSystemInfo") && template.endsWith(REFERENCE_SYSTEM_VERSION) && metadata instanceof Metadata) {
-                value = referenceSystemVersion((Metadata) metadata); // Special case.
+            } else if ((identifier.equals("referenceSystemInfo") || identifier.equals("referenceSystemIdentifier")) && template.endsWith(REFERENCE_SYSTEM_VERSION) && (metadata instanceof Metadata || metadata instanceof ReferenceSystem)) {
+                value = referenceSystemVersion(metadata); // Special case.
                 pathOffset = template.path.length;
             } else if (metadata instanceof TemporalPrimitive) {
                 value = extent((TemporalPrimitive) metadata, identifier); // Special case.
@@ -466,18 +466,29 @@ final class TemplateApplicator {
     /**
      * Special case for {@link #REFERENCE_SYSTEM_CODE}.
      */
-    private static String referenceSystemCode(final Metadata metadata) {
-        for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
-            if (r instanceof ReferenceSystemMetadata) {
-                if(r.getName() != null) {
-                    final String code = r.getName().getCode();
-                    if (code != null) return code;
-                }
-            } else {
-                for (final Identifier id : r.getIdentifiers()) {
-                    final String code = id.getCode();
-                    if (code != null) return code;
-                }
+    private static String referenceSystemCode(final Object obj) {
+        if (obj instanceof Metadata) {
+            final Metadata metadata = (Metadata) obj;
+            for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
+                String code = referenceSystemCode(r);
+                if (code != null) return code;
+            }
+        } else if (obj instanceof ReferenceSystem) {
+            return referenceSystemCode((ReferenceSystem)obj);
+        }
+        return null;
+    }
+    
+    private static String referenceSystemCode(final ReferenceSystem r) {
+        if (r instanceof ReferenceSystemMetadata) {
+            if(r.getName() != null) {
+                final String code = r.getName().getCode();
+                if (code != null) return code;
+            }
+        } else {
+            for (final Identifier id : r.getIdentifiers()) {
+                final String code = id.getCode();
+                if (code != null) return code;
             }
         }
         return null;
@@ -486,18 +497,29 @@ final class TemplateApplicator {
     /**
      * Special case for {@link #REFERENCE_SYSTEM_CODESPACE}.
      */
-    private static String referenceSystemCodeSpace(final Metadata metadata) {
-        for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
-            if (r instanceof ReferenceSystemMetadata) {
-                if(r.getName() != null) {
-                    final String codespace = r.getName().getCodeSpace();
-                    if (codespace != null) return codespace;
-                }
-            } else {
-                for (final Identifier id : r.getIdentifiers()) {
-                    final String code = id.getCodeSpace();
-                    if (code != null) return code;
-                }
+    private static String referenceSystemCodeSpace(final Object obj) {
+        if (obj instanceof Metadata) {
+            final Metadata metadata = (Metadata) obj;
+            for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
+                String code = referenceSystemCodeSpace(r);
+                if (code != null) return code;
+            }
+        } else if (obj instanceof ReferenceSystem) {
+            return referenceSystemCodeSpace((ReferenceSystem)obj);
+        }
+        return null;
+    }
+    
+    private static String referenceSystemCodeSpace(final ReferenceSystem r) {
+        if (r instanceof ReferenceSystemMetadata) {
+            if(r.getName() != null) {
+                final String codespace = r.getName().getCodeSpace();
+                if (codespace != null) return codespace;
+            }
+        } else {
+            for (final Identifier id : r.getIdentifiers()) {
+                final String codespace = id.getCodeSpace();
+                if (codespace != null) return codespace;
             }
         }
         return null;
@@ -506,18 +528,29 @@ final class TemplateApplicator {
     /**
      * Special case for {@link #REFERENCE_SYSTEM_VERSION}.
      */
-    private static String referenceSystemVersion(final Metadata metadata) {
-        for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
-            if (r instanceof ReferenceSystemMetadata) {
-                if (r.getName() != null) {
-                    final String code = r.getName().getVersion();
-                    if (code != null) return code;
-                }
-            } else {
-                for (final Identifier id : r.getIdentifiers()) {
-                    final String code = id.getVersion();
-                    if (code != null) return code;
-                }
+    private static String referenceSystemVersion(final Object obj) {
+        if (obj instanceof Metadata) {
+            final Metadata metadata = (Metadata) obj;
+            for (final ReferenceSystem r : metadata.getReferenceSystemInfo()) {
+                String code = referenceSystemVersion(r);
+                if (code != null) return code;
+            }
+        } else if (obj instanceof ReferenceSystem) {
+            return referenceSystemVersion((ReferenceSystem)obj);
+        }
+        return null;
+    }
+    
+    private static String referenceSystemVersion(final ReferenceSystem r) {
+        if (r instanceof ReferenceSystemMetadata) {
+            if(r.getName() != null) {
+                final String version = r.getName().getVersion();
+                if (version != null) return version;
+            }
+        } else {
+            for (final Identifier id : r.getIdentifiers()) {
+                final String version = id.getVersion();
+                if (version != null) return version;
             }
         }
         return null;

@@ -28,6 +28,9 @@ import java.util.Locale;
 import java.util.Date;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opengis.metadata.extent.BoundingPolygon;
@@ -53,6 +56,7 @@ import org.geotoolkit.sml.xml.v101.ValidTime;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gts.xml.PeriodDurationType;
+import org.opengis.metadata.Metadata;
 import org.opengis.temporal.PeriodDuration;
 
 
@@ -163,6 +167,10 @@ final class MetadataUpdater {
         do {
             final String identifier = np.path[childBase];
             if (!identifier.equals(previousIdentifier)) {
+                // special case for removal
+                if (existingChildren != null && existingChildren.hasNext()) {
+                    specialMetadataCaseRemove(metadata, previousIdentifier, existingChildren);
+                }
                 existingChildren = null;
                 previousIdentifier = identifier;
             }
@@ -191,7 +199,7 @@ final class MetadataUpdater {
                 final Object child;
                 if (existingChildren != null && existingChildren.hasNext()) {
                     child = existingChildren.next();
-                    if (specialMetadataCases(child.getClass(), metadata, identifier)) {
+                    if (specialMetadataCases(child.getClass(), metadata, identifier, true, child)) {
                         continue;
                     }
                 } else {
@@ -201,7 +209,7 @@ final class MetadataUpdater {
                         throw new ParseException("Can not find " +
                                 metadata.getClass().getSimpleName() + '.' + identifier + " property.");
                     }
-                    if (specialMetadataCases(type, metadata, identifier)) {
+                    if (specialMetadataCases(type, metadata, identifier, false, null)) {
                         continue;
                     }
                     child = factory.create(type, Collections.<String,Object>emptyMap());
@@ -365,7 +373,7 @@ final class MetadataUpdater {
      *
      * @return {@code true} if we applied a special case.
      */
-    private boolean specialMetadataCases(final Class<?> type, final Object metadata, final String identifier) throws ParseException {
+    private boolean specialMetadataCases(final Class<?> type, final Object metadata, final String identifier, boolean modify, final Object child) throws ParseException, FactoryException {
         if (metadata instanceof DefaultTemporalExtent && identifier.equals("extent")) {
             /*
              * Properties:
@@ -431,42 +439,61 @@ final class MetadataUpdater {
             String code      = null;
             String codeSpace = null;
             String version   = null;
-            while (np.path.length >= 2 && np.path[np.path.length - 2].equals("referenceSystemIdentifier")) {
-                switch (np.path[np.path.length - 1]) {
-                    case "code": code = (String) value; break;
-                    case "codeSpace": codeSpace = (String) value; break;
-                    case "version": version = (String) value; break;
-                    default: throw new ParseException("Unsupported property: \"" + np + "\".");
+            int indice       =  np.indices[0];
+            final Map<String, Object> extraParameters = new HashMap<>();
+            
+            while (np.path.length >= 2 && np.path[0].equals("referenceSystemInfo") && np.indices[0] == indice) {
+                if (np.path[np.path.length - 2].equals("referenceSystemIdentifier")) {
+                    switch (np.path[np.path.length - 1]) {
+                        case "code": code = (String) value; break;
+                        case "codeSpace": codeSpace = (String) value; break;
+                        case "version": version = (String) value; break;
+                        default: throw new ParseException("Unsupported property: \"" + np + "\".");
+                    }
+                } else {
+                    extraParameters.put(np.path[np.path.length - 1], value);
                 }
                 moved = true;
                 if (!next()) break;
             }
             if (moved) {
                 DefaultMetadata meta = ((DefaultMetadata) metadata);
-                if (code == null) {
-                    meta.setReferenceSystemInfo(Collections.<ReferenceSystem>emptySet());
-                } else if (!meta.getReferenceSystemInfo().isEmpty() && meta.getReferenceSystemInfo().iterator().next() instanceof ReferenceSystemMetadata) {
-                    ReferenceSystemMetadata rs = (ReferenceSystemMetadata) meta.getReferenceSystemInfo().iterator().next();
-                    rs.setName(new ImmutableIdentifier(null, codeSpace, code, version, null));
+                if (modify) {
+                    ReferenceSystemMetadata rs = (ReferenceSystemMetadata) child;
+                    if (code == null) {
+                        meta.getReferenceSystemInfo().remove(rs);
+                    } else {
+                        rs.setName(new ImmutableIdentifier(null, codeSpace, code, version, null));
+                    }
+                    for (Entry<String,Object> entry : extraParameters.entrySet()) {
+                        final String propName = entry.getKey();
+                        Class subType = getType(rs, propName);
+                        asMap(rs).put(propName, convert(propName, subType, entry.getValue()));
+                    }
                 } else {
-                   meta.setReferenceSystemInfo(Collections.<ReferenceSystem>singleton(new ReferenceSystemMetadata(new ImmutableIdentifier(null, codeSpace, code, version, null))));
+                    ReferenceSystemMetadata rs = (ReferenceSystemMetadata) factory.create(type, Collections.<String,Object>emptyMap());
+                    rs.setName(new ImmutableIdentifier(null, codeSpace, code, version, null));
+                    for (Entry<String,Object> entry : extraParameters.entrySet()) {
+                        final String propName = entry.getKey();
+                        Class subType = getType(rs, propName);
+                        asMap(rs).put(propName, convert(propName, subType, entry.getValue()));
+                    }
+                    meta.getReferenceSystemInfo().add(rs);
                 }
-                return true;
-            } else {
-                /**
-                 * hack for other property in referenceSystem (in sub-project extension)
-                 */
-                DefaultMetadata meta = ((DefaultMetadata) metadata);
-                if (!meta.getReferenceSystemInfo().isEmpty()) {
-                    ReferenceSystem rs = meta.getReferenceSystemInfo().iterator().next();
-                    String propName = np.path[np.path.length - 1];
-                    Class subType = getType(rs, propName);
-                    asMap(rs).put(propName, convert(propName, subType, value));
-                }
-		next();
                 return true;
             }
         }
         return false;
+    }
+    
+    private void specialMetadataCaseRemove(final Object metadata, final String identifier, final Iterator existingChildren) throws ParseException, FactoryException {
+        if (identifier.equals("referenceSystemInfo") && (metadata instanceof Metadata)) {
+            final List<ReferenceSystem> toRemove = new ArrayList<>();
+            while (existingChildren.hasNext()) {
+                final ReferenceSystem rs = (ReferenceSystem) existingChildren.next();
+                toRemove.add(rs);
+            }
+            ((Metadata)metadata).getReferenceSystemInfo().removeAll(toRemove);
+        }
     }
 }
