@@ -546,7 +546,10 @@
     "mapcontext.modal.associate": "Associate the style",
     "mapcontext.modal.validate.layer":"Add this layer",
     "mapcontext.modal.select.style.list":"Style followed by a star is the current style",
-    "mapcontext.modal.select.style.empty": "There is no style associated",
+    "mapcontext.modal.select.style.empty": "There is no existing style for the layer",
+    "mapcontext.label.add":"Add map context",
+    "mapcontext.tab.source.cstlwms":"Constellation WMS",
+    "mapcontext.tab.source.externalwms":"External WMS",
 
     "menu.administration.label": "Administration",
     "menu.data.label": "Data",

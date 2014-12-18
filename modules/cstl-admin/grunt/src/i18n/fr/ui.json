@@ -607,7 +607,10 @@
     "mapcontext.modal.associate": "Associer le style",
     "mapcontext.modal.validate.layer":"Ajouter cette couche",
     "mapcontext.modal.select.style.list":"Le style suivi d'une étoile est le style courant",
-    "mapcontext.modal.select.style.empty": "Il n'y a aucun style associé",
+    "mapcontext.modal.select.style.empty": "Il n'y a aucun style disponible pour cette couche",
+    "mapcontext.label.add":"Ajouter une composition",
+    "mapcontext.tab.source.cstlwms":"WMS Constellation",
+    "mapcontext.tab.source.externalwms":"WMS externe",
 
     "md.iso.abstract": "Résumé",
     "md.iso.data.date": "Date des données",
