@@ -8,7 +8,7 @@
                ng-click="addMapContext()"
                style="margin-top:8px;padding:15px 19px;">
                 <span class="fa fa-plus" style="margin-right:5px;"></span>
-                <span translate="label.add">Add</span>
+                <span translate="mapcontext.label.add">Add map context</span>
             </a>
         </div>
     </div>
@@ -150,45 +150,25 @@
                                         <div class="top">
                                             <span class="item-title" title="{{layer.Name}}">{{truncate(small,layer.Name)}}</span>
                                             <span ng-if="!small"
-                                                  class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector': (layer.Type) ? layer.Type : 'WMS'}}</span>
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer.id!=values.selectedLayer.id"
-                                                 src="img/vector-multipoint-mapcontext.svg"
+                                                  class="pull-right text-right item-list-style">{{layer.Type ? layer.Type : ''}} {{layer.iswms ? 'WMS':''}}</span>
+                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint')"
+                                                 ng-src="{{layer.id!=values.selectedLayer.id?'img/vector-multipoint-mapcontext.svg':'img/vector-multipoint-mapcontext-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Subtype=='Geometry' && layer.id!=values.selectedLayer.id"
-                                                 src="img/vector-multigeometry-mapcontext.svg"
+                                            <img ng-if="layer.Subtype=='Geometry'"
+                                                 ng-src="{{layer.id!=values.selectedLayer.id?'img/vector-multigeometry-mapcontext.svg':'img/vector-multigeometry-mapcontext-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px; width:22px" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer.id!=values.selectedLayer.id"
-                                                 src="img/vector-poly-mapcontext.svg"
+                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon')"
+                                                 ng-src="{{layer.id!=values.selectedLayer.id?'img/vector-poly-mapcontext.svg':'img/vector-poly-mapcontext-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer.id!=values.selectedLayer.id"
-                                                 src="img/vector-polyline-mapcontext.svg"
+                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString')"
+                                                 ng-src="{{layer.id!=values.selectedLayer.id?'img/vector-polyline-mapcontext.svg':'img/vector-polyline-mapcontext-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.externalLayer && layer.id!==values.selectedLayer.id"
-                                                 src="img/layer-external.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer.id==values.selectedLayer.id"
-                                                 src="img/vector-multipoint-mapcontext-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer.id==values.selectedLayer.id"
-                                                 src="img/vector-poly-mapcontext-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Subtype=='Geometry' && layer.id==values.selectedLayer.id"
-                                                 src="img/vector-multigeometry-mapcontext-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px; width:22px" />
-                                            <img ng-if="layer.Type.toLowerCase()=='vector'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer.id==values.selectedLayer.id"
-                                                 src="img/vector-polyline-mapcontext-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.externalLayer && layer.id==values.selectedLayer.id"
-                                                 src="img/layer-external-selected.svg"
+                                            <img ng-if="layer.externalLayer"
+                                                 ng-src="{{layer.id!==values.selectedLayer.id?'img/layer-external.svg':'img/layer-external-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                         </div>

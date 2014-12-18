@@ -1,0 +1,185 @@
+<div class="row" ng-controller="WMSSourceMapContextController">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-left: 0;padding-right: 0;">
+
+        <ul class="nav nav-tabs" ng-init="chosenTab = 'cstlWMS'">
+            <li ng-class="{active: chosenTab==='cstlWMS'}">
+                <a ng-click="chosenTab = 'cstlWMS'" data-toggle="tab">
+                    <span translate="mapcontext.tab.source.cstlwms" >Constellation WMS</span>
+                </a>
+            </li>
+            <li ng-class="{active: chosenTab==='extWMS'}">
+                <a ng-click="chosenTab = 'extWMS'" data-toggle="tab">
+                    <span translate="mapcontext.tab.source.externalwms" >External WMS</span>
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='cstlWMS'}">
+                <div class="dashboard list-style-modal" style="height: 460px;">
+                    <div class="dash-inner">
+                        <div id="list" data-role="list">
+                            <div class="item-list">
+                                <div style="margin-top: 10px;">
+                                    <accordion close-others="false">
+                                        <accordion-group ng-repeat="serviceLayer in servicesLayers"
+                                                         is-open="status.open">
+                                            <accordion-heading>
+                                                <div style="text-transform: uppercase;cursor: pointer;">
+                                                    <i class="pull-left glyphicon"
+                                                       ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                                    <span style="margin-left: 10pt;font-size: 14px;">Service {{serviceLayer.name}}</span>
+                                                </div>
+                                            </accordion-heading>
+                                            <div>
+                                                <div class="dash-inner row">
+                                                    <div data-role="list">
+                                                        <div ng-repeat="layer in serviceLayer.layers">
+                                                            <div class="item"
+                                                                 ng-class="{'selected':layer==selection.layer,coverage:layer.Type.toLowerCase()==='coverage' || layer.Type.toLowerCase()==='raster',vector:layer.Type.toLowerCase()==='observation-store' || layer.Type.toLowerCase()==='vector'}"
+                                                                 ng-click="selectLayer(layer, serviceLayer);previewWMSLayer();">
+                                                                <div class="top">
+                                                                    <span class="item-title"
+                                                                          title="{{layer.Name}}">{{truncate(layer.Name,40)}}</span>
+                                                                    <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
+                                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint')"
+                                                                         ng-src="{{(selection.layer && layer.Id==selection.layer.Id)?'img/vector-multipoint-selected.svg':'img/vector-multipoint.svg'}}"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layer.Subtype=='Geometry'"
+                                                                         ng-src="{{(selection.layer && layer.Id==selection.layer.Id)?'img/vector-multigeometry-selected.svg':'img/vector-multigeometry.svg'}}"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px; width:22px" />
+                                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon')"
+                                                                         ng-src="{{(selection.layer && layer.Id==selection.layer.Id)?'img/vector-poly-selected.svg':'img/vector-poly.svg'}}"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString')"
+                                                                         ng-src="{{(selection.layer && layer.Id==selection.layer.Id)?'img/vector-polyline-selected.svg':'img/vector-polyline.svg'}}"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                </div>
+                                                                <div class="bottom">
+                                                                    <div class="block">
+                                                                        <i class="fa fa-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
+                                                                    </div>
+                                                                    <div class="block">
+                                                                        <i class="fa fa-user"></i>{{layer.Owner}}
+                                                                    </div>
+                                                                    <div class="block pull-right" ng-if="layer.TargetStyle.length==0">
+                                                                        <i class="fa fa-paint-brush" title="Style SLD"></i>default
+                                                                    </div>
+                                                                    <div class="block pull-right" ng-if="layer.TargetStyle.length==1">
+                                                                        <i class="fa fa-paint-brush" title="Style SLD"></i>{{truncate(layer.TargetStyle[0].Name,15)}}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="btn-group pull-right" style="margin-top: -34px;"
+                                                                 ng-if="layer.TargetStyle.length>1">
+                                                                <button type="button"
+                                                                        class="btn btn-sm btn-default dropdown-toggle"
+                                                                        data-toggle="dropdown"
+                                                                        style="margin-right: 6px; margin-top: 4px; padding: 4px; z-index: 1;"
+                                                                        title="Style SLD">
+                                                                    <span style="font-size: 11px;">
+                                                                        <i class="fa fa-paint-brush" style="margin-right:6px;"></i>{{truncate(layer.TargetStyle[0].Name,20)}}
+                                                                    </span>
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" role="menu" style="font-size: 12px;text-shadow: none;z-index: 2;">
+                                                                    <li ng-repeat="targetStyle in layer.TargetStyle"
+                                                                        ng-click="setTargetStyle(layer,$index);">
+                                                                        <a><span>{{truncate(targetStyle.Name,30)}}</span></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </accordion-group>
+                                    </accordion>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='extWMS'}">
+                <div class="form-group col-xs-12" style="margin-top:10px;">
+                    <label  for="inputwmsurl"
+                            class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label"
+                            style="padding-right:10px;"
+                           translate="service.menu.url.label">Service URL</label>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"
+                         style="padding-left:0;">
+                        <input type="text"
+                               class="form-control form-control-fix"
+                               id="inputwmsurl"
+                               ng-model="external.serviceUrl"/>
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2"
+                         style="padding-left:2px;padding-right:0;">
+                        <button type="button"
+                                class="btn btn-default"
+                                ng-click="searchAndDisplayWmsLayers()">
+                            <span translate="label.validate">Validate</span>
+                        </button>
+                    </div>
+                </div>
+                <div ng-if="mode.dispWmsLayers"
+                     class="col-xs-12"
+                     style="margin-top:50px;height: 400px;overflow-x: hidden;overflow-y: auto;">
+                    <div class="dashboard">
+                        <div class="dash-inner">
+                            <div data-role="list">
+                                <div class="item-list">
+                                    <div ng-repeat="extLayer in external.layers">
+                                        <div class="item coverage"
+                                             ng-class="{'selected':selection.extLayer && extLayer.Name==selection.extLayer.Name}"
+                                             ng-click="selectExtLayer(extLayer);previewWMSLayer();">
+                                            <div class="top">
+                                                <span class="item-title"
+                                                      title="{{extLayer.Name}}">{{extLayer.Name}}</span>
+                                                <span class="pull-right text-right item-list-style">WMS</span>
+                                            </div>
+                                            <div class="bottom">
+                                                <div class="block pull-right" ng-if="extLayer.Style.length==0">
+                                                    <i class="fa fa-paint-brush" title="Style SLD"></i>default
+                                                </div>
+                                                <div class="block pull-right" ng-if="extLayer.Style.length==1">
+                                                    <i class="fa fa-paint-brush" title="Style SLD"></i>{{truncate(extLayer.Style[0].Name,15)}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="btn-group pull-right" style="margin-top: -34px;"
+                                             ng-if="extLayer.Style.length>1">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-default dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    style="margin-right: 6px; margin-top: 4px; padding: 4px; z-index: 1;"
+                                                    title="Style SLD">
+                                                <span style="font-size: 11px;">
+                                                    <i class="fa fa-paint-brush" style="margin-right:6px;"></i>{{truncate(extLayer.Style[0].Name,20)}}
+                                                </span>
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" style="font-size: 12px;text-shadow: none;z-index: 2;">
+                                                <li ng-repeat="targetStyle in extLayer.Style"
+                                                    ng-click="setExtTargetStyle(extLayer,$index);">
+                                                    <a><span>{{truncate(targetStyle.Name,30)}}</span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+        <div id="wmsDataSourcePreview" style="height: 500px; width:100%;padding: 0;"></div>
+    </div>
+</div>

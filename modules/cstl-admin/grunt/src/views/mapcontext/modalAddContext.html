@@ -1,5 +1,5 @@
 <div class="modal-dialog modal-dialog-resp-height"
-     ng-class="{'modal-dialog-sld':mode.display==='general' || mode.display==='addChooseStyle' || (mode.display==='chooseLayer' && mode.source==='interne') || (mode.display==='chooseLayer' && mode.source==='externe' && mode.dispWmsLayers===true)}">
+     ng-class="{'modal-dialog-sld':mode.display==='general' || mode.display==='addChooseStyle' || mode.display==='chooseLayer'}">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="dismiss()">×</button>
@@ -21,7 +21,8 @@
                 <div class="col-sm-6">
                     <div class="row" ng-show="mode.display==='general'">
                         <ul class="nav nav-tabs">
-                            <li id="infoTab" ng-class="{active:mode.selTab==='tabInfo'}">
+                            <li id="infoTab"
+                                ng-class="{active:mode.selTab==='tabInfo'}">
                                 <a ng-click="mode.selTab='tabInfo'"
                                    data-toggle="tab"
                                    style="padding-bottom: 5px; padding-top: 5px; margin-top: 6px;">
@@ -157,72 +158,54 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div ng-if="layers.toAdd.length > 0">
-                                    <div class="dash-inner row dashboard"
-                                         ng-init="small=false">
+                                <div ng-if="layers.toAdd && layers.toAdd.length > 0">
+                                    <div class="dash-inner row dashboard">
                                         <div data-role="list">
                                             <div class="item-list">
-                                                <div ng-repeat="layerToAdd in layers.toAdd">
+                                                <div class="row no-padding" ng-repeat="layerToAdd in layers.toAdd">
                                                     <div class="row">
-                                                        <div class="col-xs-2" style="padding-top:30px;">
+                                                        <div class="col-xs-2" style="padding-top:12px;">
                                                             <button ng-click="changeVisibility(layerToAdd)"
                                                                     class="btn btn-sm"
                                                                     ng-class="{'btn-visibility-layer-true':layerToAdd.visible, 'btn-visibility-layer-false':!layerToAdd.visible}">
-                                                                <span ng-if="!layerToAdd.visible"
-                                                                      class="fa fa-eye-slash"></span>
-                                                                <span ng-if="layerToAdd.visible"
-                                                                      class="fa fa-eye"></span>
+                                                                <span class="fa"
+                                                                      ng-class="{'fa-eye':layerToAdd.visible,'fa-eye-slash':!layerToAdd.visible}"></span>
+                                                            </button>
+                                                            <button ng-click="zoomToLayerExtent(layerToAdd)"
+                                                                    class="btn btn-sm btn-visibility-layer-true"
+                                                                    style="margin-left: 15px; margin-top: 5px;">
+                                                                <span class="fa fa-search"></span>
                                                             </button>
                                                         </div>
                                                         <div class="col-xs-8 no-padding"
                                                              ng-click="selectItem(layerToAdd)">
                                                             <div class="item layer compo style-small"
-                                                                 ng-class="{'selected':layerToAdd===selection.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toLowerCase()==='coverage',vector:layerToAdd.layer.Type.toLowerCase()==='observation-store' || layerToAdd.layer.Type.toLowerCase()==='vector'}">
+                                                                 ng-class="{'selected':layerToAdd===selection.item,'mapcontext':layerToAdd.layer.externalLayer,'coverage':layerToAdd.layer.Type.toLowerCase()==='coverage','vector':layerToAdd.layer.Type.toLowerCase()==='observation-store' || layerToAdd.layer.Type.toLowerCase()==='vector'}">
                                                                 <div class="top edit-mapcontext-modale">
                                                                     <span class="item-title"
-                                                                          title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? truncate(mode.display,layerToAdd.layer.Name) : truncate(mode.display,layerToAdd.layer.externalLayer)}}</span>
+                                                                          title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? truncate(layerToAdd.layer.Name,30) : truncate(layerToAdd.layer.externalLayer,30)}}</span>
                                                                 </div>
                                                                 <div class="bottom">
-                                                                            <span class="pull-right text-right item-list-style"
-                                                                                  style="margin-right: 7px;">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':(layerToAdd.layer.Type) ? layerToAdd.layer.Type : 'WMS'}}</span>
-                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd!=selection.item"
-                                                                                 src="img/vector-multipoint-mapcontext.svg"
+                                                                    <span class="pull-right text-right item-list-style"
+                                                                          style="margin-right: 7px;">{{layerToAdd.layer.Type ? layerToAdd.layer.Type : ''}} {{layerToAdd.isWms ? 'WMS':''}}</span>
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint')"
+                                                                                 ng-src="{{layerToAdd!=selection.item ? 'img/vector-multipoint-mapcontext.svg':'img/vector-multipoint-mapcontext-selected.svg'}}"
                                                                                  class="pull-right"
                                                                                  style="margin-top:4px; margin-right:10px;" />
-                                                                            <img ng-if="layerToAdd.layer.Subtype=='Geometry' && layerToAdd!=selection.item"
-                                                                                 src="img/vector-multigeometry-mapcontext.svg"
+                                                                            <img ng-if="layerToAdd.layer.Subtype=='Geometry'"
+                                                                                 ng-src="{{layerToAdd!=selection.item ? 'img/vector-multigeometry-mapcontext.svg':'img/vector-multigeometry-mapcontext-selected.svg'}}"
                                                                                  class="pull-right"
                                                                                  style="margin-top:4px; margin-right:10px; width:22px" />
-                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon') && layerToAdd!=selection.item"
-                                                                                 src="img/vector-poly-mapcontext.svg"
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon')"
+                                                                                 ng-src="{{layerToAdd!=selection.item ? 'img/vector-poly-mapcontext.svg':'img/vector-poly-mapcontext-selected.svg'}}"
                                                                                  class="pull-right"
                                                                                  style="margin-top:4px; margin-right:10px;" />
-                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString') && layerToAdd!=selection.item"
-                                                                                 src="img/vector-polyline-mapcontext.svg"
+                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString')"
+                                                                                 ng-src="{{layerToAdd!=selection.item ? 'img/vector-polyline-mapcontext.svg':'img/vector-polyline-mapcontext-selected.svg'}}"
                                                                                  class="pull-right"
                                                                                  style="margin-top:4px; margin-right:10px;" />
-                                                                            <img ng-if="layerToAdd.layer.externalLayer && layerToAdd!==selection.item"
-                                                                                 src="img/layer-external.svg"
-                                                                                 class="pull-right"
-                                                                                 style="margin-top:4px; margin-right:10px;" />
-                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR' && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd==selection.item"
-                                                                                 src="img/vector-multipoint-mapcontext-selected.svg"
-                                                                                 class="pull-right"
-                                                                                 style="margin-top:4px; margin-right:10px;" />
-                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR' && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon') && layerToAdd==selection.item"
-                                                                                 src="img/vector-poly-mapcontext-selected.svg"
-                                                                                 class="pull-right"
-                                                                                 style="margin-top:4px; margin-right:10px;" />
-                                                                            <img ng-if="layerToAdd.layer.Subtype=='Geometry' && layerToAdd==selection.item"
-                                                                                 src="img/vector-multigeometry-mapcontext-selected.svg"
-                                                                                 class="pull-right"
-                                                                                 style="margin-top:4px; margin-right:10px; width:22px" />
-                                                                            <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString') && layerToAdd==selection.item"
-                                                                                 src="img/vector-polyline-mapcontext-selected.svg"
-                                                                                 class="pull-right"
-                                                                                 style="margin-top:4px; margin-right:10px;" />
-                                                                            <img ng-if="layerToAdd.layer.externalLayer && layerToAdd==selection.item"
-                                                                                 src="img/layer-external-selected.svg"
+                                                                            <img ng-if="layerToAdd.layer.externalLayer"
+                                                                                 ng-src="{{layerToAdd!==selection.item ? 'img/layer-external.svg':'img/layer-external-selected.svg'}}"
                                                                                  class="pull-right"
                                                                                  style="margin-top:4px; margin-right:10px;" />
                                                                     <div class="hidden-xs hidden-md hidden-lg">
@@ -254,17 +237,14 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-xs-1 no-padding">
-                                                            <div class="btn btn-sm"
-                                                                 popover-placement="bottom"
-                                                                 popover="{{viewLayerInfo(layerToAdd)}}"
-                                                                 popover-trigger="mouseenter"
-                                                                 style="margin-top:15px;">
-                                                                <span class="glyphicon glyphicon-info-sign"></span>
-                                                            </div>
+                                                        <div class="col-xs-1 no-padding" style="padding-top:10px;">
                                                             <div class="btn btn-sm"
                                                                  ng-click="deleteMapItem(layerToAdd)">
                                                                 <span class="glyphicon glyphicon-trash"></span>
+                                                            </div>
+                                                            <div class="btn btn-sm"
+                                                                 ng-click="goToStyleMapItem(layerToAdd)">
+                                                                <span class="fa fa-paint-brush"></span>
                                                             </div>
                                                         </div>
                                                         <div class="col-xs-1 no-padding"
@@ -289,16 +269,8 @@
                                                         <div class="col-xs-6 no-padding">
                                                             <input class="slider-mapcontext-layer"
                                                                    type="range"
-                                                                   ng-model="layerToAdd.layer.opacity"
+                                                                   ng-model="layerToAdd.opacity"
                                                                    ng-change="updateOpacity(layerToAdd)"/>
-                                                        </div>
-                                                    </div>
-                                                    <div ng-if="selection.item === layerToAdd"
-                                                         class="col-xs-1"
-                                                         style="margin-left: 3px; margin-right:17px;">
-                                                        <div class="btn btn-sm"
-                                                             ng-click="goToStyleMapItem(layerToAdd)">
-                                                            <span class="glyphicon glyphicon-pencil"></span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -309,22 +281,19 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="mode.display==='addChooseStyle'">
+                    <div ng-if="mode.display==='addChooseStyle'" style="height: 470px;margin-top: 27px;overflow-x: hidden;overflow-y: auto;">
                         <div ng-if="styles.existing.length>0">
-                            <p translate="mapcontext.modal.select.style.list"
-                               style="margin-top:10px; margin-bottom:0;">Style followed by a star is the current style</p>
-                            <div class="dash-inner row dashboard"
-                                 ng-init="small=false">
+                            <div class="dash-inner row dashboard">
                                 <div data-role="list">
                                     <div class="item-list">
                                         <div ng-repeat="styleItem in styles.existing"
                                              class="row">
-                                            <div class="item col-xs-11 style-small"
-                                                 ng-class="{'selected': styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage'), 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector', 'style-compo-layer':styleItem.Type == null || styleItem.Type == undefined}"
-                                                 ng-click="selectStyle(styleItem)">
+                                            <div class="item col-xs-12 style-small"
+                                                 ng-class="{'selected': (styles.selected && styles.selected.Name===styleItem.Name),'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage'),'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector','style-compo-layer':!styleItem.Type}"
+                                                 ng-click="selectStyle(styleItem);showMapWithStyle(styleItem);">
                                                 <div class="top">
                                                     <span class="item-title"
-                                                          title="{{styleItem.Name}}">{{truncate(mode.display,styleItem.Name)}}</span>
+                                                          title="{{styleItem.Name}}">{{truncate(styleItem.Name,30)}}</span>
                                                     <span class="pull-right text-right item-list-style">{{(styleItem.Type) ? styleItem.Type : 'WMS'}}</span>
                                                 </div>
                                                 <div class="bottom"
@@ -337,19 +306,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-xs-1"
-                                                 style="margin-top: 37px; padding-right: 0;">
-                                                <span class="glyphicon glyphicon-star"
-                                                      ng-show="selection.item.layer.styleName===styleItem.Name"></span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div ng-if="styles.existing.length==0">
-                            <p translate="mapcontext.modal.select.style.empty"
-                               style="margin-top:10px; margin-bottom:0;">No associated style</p>
+                            <p style="margin-top:10px; margin-bottom:0;"
+                               translate="mapcontext.modal.select.style.empty">No associated style</p>
                         </div>
                     </div>
                 </div>
@@ -363,14 +327,10 @@
                     <div class="col-sm-4 col-sm-offset-2"
                          style="text-align:center;">
                         <label class="radio data-type-choose"
-                               ng-class="{'type-selected':mode.source==='interne'}"
                                ng-click="goToInternalSource()">
                             <div class="col-sm-12"
                                  style="margin-top: 5px; padding-left:5px;">
-                                <img ng-if="mode.source!=='interne'"
-                                     src="img/icon/internal.svg" />
-                                <img ng-if="mode.source==='interne'"
-                                     src="img/icon/internal-selected.svg" />
+                                <img src="img/icon/internal.svg" />
                             </div>
                             <div translate="mapcontext.modal.label.internal"
                                  style="margin-top:10px;">Internal</div>
@@ -379,211 +339,21 @@
                     <div class="col-sm-4"
                          style="text-align:center;">
                         <label class="radio data-type-choose"
-                               ng-class="{'type-selected':mode.source==='externe'}"
                                ng-click="mode.source='externe';mode.display='chooseLayer'">
                             <div class="col-sm-12" style="margin-top: 5px;">
-                                <img ng-if="mode.source!=='externe'"
-                                     src="img/icon/external.svg" />
-                                <img ng-if="mode.source==='externe'"
-                                     src="img/icon/external-selected.svg" />
+                                <img src="img/icon/external.svg" />
                             </div>
-                            <div translate="mapcontext.modal.label.external"
-                                 style="margin-top:10px;">External</div>
+                            <div style="margin-top:10px;">WMS</div>
                         </label>
                     </div>
                 </div>
             </div>
             <div ng-if="mode.display==='chooseLayer'">
                 <div ng-if="mode.source==='interne'">
-                    <div class="row dashboard"
-                         style="margin-top: 10px;">
-                        <div class="col-xs-8">
-                            <div ng-repeat="serviceLayer in servicesLayers"
-                                 class="services-layers-dashboard">
-                                <div class="title">
-                                    <i class="fa fa-chevron-down"></i>
-                                    <span>Service {{serviceLayer.name}}</span>
-                                </div>
-                                <div class="dash-inner row" ng-init="small=false">
-                                    <div data-role="list">
-                                        <div class="item-list">
-                                            <div class="item"
-                                                 ng-repeat="layer in serviceLayer.layers"
-                                                 ng-class="{'selected':layer==selection.layer,coverage:layer.Type.toLowerCase()==='coverage' || layer.Type.toLowerCase()==='raster',vector:layer.Type.toLowerCase()==='observation-store' || layer.Type.toLowerCase()==='vector', 'col-xs-6':small==true}"
-                                                 ng-click="selectLayer(layer, serviceLayer)">
-                                                <div class="top">
-                                                    <span class="item-title"
-                                                          title="{{layer.Name}}">{{truncate(mode.display,layer.Name)}}</span>
-                                                    <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
-                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selection.layer"
-                                                         src="img/vector-multipoint.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="layer.Subtype=='Geometry' && layer!=selection.layer"
-                                                         src="img/vector-multigeometry.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px; width:22px" />
-                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selection.layer"
-                                                         src="img/vector-poly.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selection.layer"
-                                                         src="img/vector-polyline.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selection.layer"
-                                                         src="img/vector-multipoint-selected.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selection.layer"
-                                                         src="img/vector-poly-selected.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="layer.Subtype=='Geometry' && layer==selection.layer"
-                                                         src="img/vector-multigeometry-selected.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px; width:22px" />
-                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selection.layer"
-                                                         src="img/vector-polyline-selected.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                </div>
-                                                <div class="bottom">
-                                                    <div class="block">
-                                                        <i class="fa fa-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
-                                                    </div>
-                                                    <div class="block">
-                                                        <i class="fa fa-user"></i>{{layer.Owner}}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-4">
-                            <div id="selectionLayer">
-                                <div class="alert alert-info alert-data"
-                                     ng-show="selection.layer == null">
-                                    <h4 translate="label.no.selected.data">No selected data</h4>
-                                    <p translate="msg.no.selected.data"
-                                       style="font-weight:normal;">Click on a data to display more information</p>
-                                </div>
-                                <div class="selected-item"
-                                     id="selected-item"
-                                     ng-hide="selection.layer == null">
-                                    <div class="block-header"
-                                         ng-click="toggleUpDownSelected()">
-                                        <strong class="item-title title-bloc-service"
-                                                title="{{selection.layer.Name}}">{{selection.layer.Name}}</strong>
-                                        <i class="fa fa-chevron-down pull-right"></i>
-                                    </div>
-                                    <div class="block-content"
-                                         ng-class="{'block-vector':selection.layer.Type.toLowerCase()==='observation-store' || selection.layer.Type.toLowerCase()==='vector','block-raster':selection.layer.Type.toLowerCase()==='coverage' || selection.layer.Type.toLowerCase()==='raster'}">
-                                        <div class="row description-block">
-                                            <div class="col-sm-3 col-md-2">
-                                                <img src="img/block-content-service.svg" alt="" />
-                                            </div>
-                                            <div class="col-sm-9 col-md-10 description-text">
-                                                <span>{{selection.service.name}}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row description-block">
-                                            <div class="col-sm-3 col-md-2">
-                                                <img src="img/block-content-owner.svg" alt="" />
-                                            </div>
-                                            <div class="col-sm-9 col-md-10 description-text">
-                                                <span>{{selection.layer.Owner}}</span>
-                                            </div>
-                                        </div>
-                                        <div class="row description-block">
-                                            <div class="col-sm-3 col-md-2">
-                                                <img src="img/block-content-date.svg" alt="" />
-                                            </div>
-                                            <div class="col-sm-9 col-md-10 description-text">
-                                                <span>{{selection.layer.Date | date:'yyyy-MM-dd'}}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div ng-include="'views/mapcontext/internal_source.html'"></div>
                 </div>
                 <div ng-if="mode.source==='externe'">
-                    <div style="margin-top: 10px;">
-                        <div class="row">
-                            <div class="col-xs-3"
-                                 style="margin-top:7px;">
-                                <label class="control-label"
-                                       translate="service.menu.url.label">Service URL</label>
-                            </div>
-                            <div class="col-xs-7">
-                                <input type="text"
-                                       class="form-control"
-                                       ng-model="external.serviceUrl"/>
-                            </div>
-                            <div class="col-xs-2">
-                                <button type="button"
-                                        class="btn"
-                                        ng-click="searchAndDisplayWmsLayers()">
-                                    <span translate="label.validate">Validate</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div ng-if="mode.dispWmsLayers">
-                        <hr/>
-                        <div style="margin-top:15px;">
-                            <div class="dashboard row">
-                                <div class="col-xs-8">
-                                    <div data-role="list">
-                                        <div class="item-list">
-                                            <div class="item coverage"
-                                                 ng-repeat="extLayer in external.layers"
-                                                 ng-class="{'selected':extLayer==selection.extLayer}"
-                                                 ng-click="selectExtLayer(extLayer)">
-                                                <div class="top">
-                                                    <span class="item-title"
-                                                          title="{{extLayer.Name}}">{{extLayer.Name}}</span>
-                                                    <span class="pull-right text-right item-list-style">WMS</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div id="selectionExtLayer">
-                                        <div class="alert alert-info alert-data"
-                                             ng-show="selection.extLayer == null">
-                                            <h4 translate="label.no.selected.data">No selected data</h4>
-                                            <p translate="msg.no.selected.data"
-                                               style="font-weight:normal;">Click on a data to display more information</p>
-                                        </div>
-                                        <div class="selected-item"
-                                             ng-hide="selection.extLayer == null">
-                                            <div class="block-header"
-                                                 ng-click="toggleUpDownExtSelected()">
-                                                <strong class="item-title title-bloc-service"
-                                                        title="{{selection.extLayer.Name}}">{{selection.extLayer.Name}}</strong>
-                                                <i class="fa fa-chevron-down pull-right"></i>
-                                            </div>
-                                            <div class="block-content">
-                                                <h6>Name</h6>
-                                                <span>{{selection.extLayer.Name}}</span>
-                                                <div class="separator"></div>
-                                                <h6>Styles</h6>
-                                                <div ng-repeat="style in selection.extLayer.Style">
-                                                    <div>{{style.Name}}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div ng-include="'views/mapcontext/wms_source.html'"></div>
                 </div>
             </div>
         </div>
@@ -593,7 +363,7 @@
                     class="btn btn-default"
                     ng-click="cancel()"
                     translate="mapcontext.modal.cancel">Cancel</button>
-            <button ng-if="mode.display=='general' || (mode.display == 'addChooseStyle' && styles.existing.length>0 && styles.selected) || (mode.display=='chooseLayer' && selection.layer) || (mode.display=='chooseLayer' && selection.extLayer)"
+            <button ng-if="mode.display=='general' || (mode.display == 'addChooseStyle' && styles.existing.length>0 && styles.selected) || (mode.display=='chooseLayer' && selection.layer) || (mode.display=='chooseLayer' && selection.extLayer) || (mode.display=='chooseLayer' && selection.internalData)"
                     type="button"
                     id="submitButton"
                     class="btn btn-add"

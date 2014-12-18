@@ -154,11 +154,28 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
             var lays = [];
             for (var i=0; i<$scope.selected.layers.length; i++) {
                 var lay = $scope.selected.layers[i];
-                lays.push(
-                    {layer: lay,
-                        visible: lay.visible
+                var styleObj;
+                if(lay.externalServiceUrl){
+                    if(lay.externalStyle){
+                        styleObj = {"Name":lay.externalStyle.split(',')[0]};
                     }
-                );
+                }else if(lay.TargetStyle && lay.TargetStyle.length>0 && lay.externalStyle){
+                    var styleToMatch = lay.externalStyle.split(',')[0];
+                    for(var j=0;j<lay.TargetStyle.length;j++){
+                        var candidat =lay.TargetStyle[j];
+                        if(styleToMatch === candidat.Name){
+                            styleObj = candidat;
+                            break;
+                        }
+                    }
+                }
+                lays.push({
+                    "layer": lay,
+                    "visible": lay.visible,
+                    "opacity": lay.opacity,
+                    "isWms": lay.iswms,
+                    "styleObj": styleObj
+                });
             }
             lays.sort(function (a, b) {
                 return a.layer.layerOrder - b.layer.layerOrder;

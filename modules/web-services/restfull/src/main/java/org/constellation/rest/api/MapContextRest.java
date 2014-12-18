@@ -22,11 +22,16 @@ import com.google.common.base.Optional;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
+import org.constellation.business.IDataBusiness;
 import org.constellation.business.IMapContextBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
+import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.MapContextRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.Providers;
@@ -90,6 +95,12 @@ public class MapContextRest {
 
     @Inject
     private UserRepository userRepository;
+
+    @Inject
+    private IDataBusiness dataBusiness;
+
+    @Inject
+    private IProviderBusiness providerBusiness;
 
     @GET
     @Path("list")
@@ -166,7 +177,7 @@ public class MapContextRest {
             return Response.ok("Failed to extract envelope for these layers. "+ex.getMessage()).status(500).build();
         }
         if (values == null) {
-            return Response.status(500).build();
+            return Response.status(500).entity("Cannot calculate envelope for layers, maybe the layers array sent is empty!").build();
         }
         return Response.ok(values).build();
     }
@@ -269,8 +280,12 @@ public class MapContextRest {
                 layerBBox = styledLayer.getExternalLayerExtent();
             } else {
                 final String reqUrl = hsr.getRequestURL().toString();
-                urlWms = reqUrl.split("/api")[0] +"/WS/wms/"+ styledLayer.getServiceIdentifier();
-                defStyle = (styledLayer.getStyleId() != null) ? contextBusiness.findStyleName(styledLayer.getStyleId()) : "";
+                if(styledLayer.isIswms()){
+                    urlWms = reqUrl.split("/api")[0] +"/WS/wms/"+ styledLayer.getServiceIdentifier();
+                }else {
+                    urlWms = reqUrl.split("/api")[0] +"/api/1/portrayal/portray/style";
+                }
+                defStyle = (styledLayer.getExternalStyle() != null) ? styledLayer.getExternalStyle() : "";
                 ParameterValues extentValues = null;
                 try {
                     extentValues = contextBusiness.getExtentForLayers(Collections.singletonList(styledLayer.getMapcontextStyledLayer()));
@@ -284,22 +299,59 @@ public class MapContextRest {
                 }
             }
 
-            final OperationType opCaps = new OperationType();
-            opCaps.setCode("GetCapabilities");
-            opCaps.setMethod(MethodCodeType.GET);
-            final StringBuilder capsUrl = new StringBuilder();
-            capsUrl.append(urlWms).append("?REQUEST=GetCapabilities&SERVICE=WMS");
-            opCaps.setHref(capsUrl.toString());
-            offering.getOperationOrContentOrStyleSet().add(OBJ_OWC_FACT.createOfferingTypeOperation(opCaps));
+            if(styledLayer.isIswms()){
+                final OperationType opCaps = new OperationType();
+                opCaps.setCode("GetCapabilities");
+                opCaps.setMethod(MethodCodeType.GET);
+                final StringBuilder capsUrl = new StringBuilder();
+                capsUrl.append(urlWms).append("?REQUEST=GetCapabilities&SERVICE=WMS");
+                opCaps.setHref(capsUrl.toString());
+                offering.getOperationOrContentOrStyleSet().add(OBJ_OWC_FACT.createOfferingTypeOperation(opCaps));
+            }
 
             final OperationType opGetMap = new OperationType();
             opGetMap.setCode("GetMap");
             opGetMap.setMethod(MethodCodeType.GET);
             final StringBuilder getMapUrl = new StringBuilder();
-            getMapUrl.append(urlWms).append("?REQUEST=GetMap&SERVICE=WMS&FORMAT=image/png&TRANSPARENT=true&WIDTH=1024&HEIGHT=768&CRS=CRS:84&BBOX=")
-                    .append(layerBBox).append("&LAYERS=").append(layerName)
-                    .append("&STYLES=").append(defStyle)
-                    .append("&VERSION=1.3.0");
+            if(styledLayer.isIswms()){
+                //external wms or internal wms layer
+                getMapUrl.append(urlWms).append("?REQUEST=GetMap&SERVICE=WMS&FORMAT=image/png&TRANSPARENT=true&WIDTH=1024&HEIGHT=768&CRS=CRS:84&BBOX=")
+                        .append(layerBBox)
+                        .append("&LAYERS=").append(layerName)
+                        .append("&STYLES=").append(defStyle)
+                        .append("&VERSION=1.3.0");
+            }else {
+                //internal data
+                final Integer dataID = styledLayer.getDataId();
+                String layerDataName = layerName;
+                String provider="";
+                try {
+                    final Data data = dataBusiness.findById(dataID);
+                    final String namespace = data.getNamespace();
+                    final String dataName = data.getName();
+                    if(namespace!= null && !namespace.isEmpty()){
+                        layerDataName = "{"+namespace+"}"+dataName;
+                    }else {
+                        layerDataName = dataName;
+                    }
+                    final Integer providerID = data.getProvider();
+                    final Provider p = providerBusiness.getProvider(providerID);
+                    provider = p.getIdentifier();
+                }catch(ConfigurationException ex){
+                    Providers.LOGGER.log(Level.INFO, ex.getMessage(), ex);
+                }
+                getMapUrl.append(urlWms).append("?REQUEST=GetMap&SERVICE=WMS&FORMAT=image/png&TRANSPARENT=true&WIDTH=1024&HEIGHT=768&CRS=CRS:84&BBOX=")
+                        .append(layerBBox)
+                        .append("&LAYERS=").append(layerDataName)
+                        .append("&STYLES=").append(defStyle)
+                        .append("&SLD_VERSION=1.1.0")
+                        .append("&PROVIDER=").append(provider)
+                        .append("&VERSION=1.3.0");
+                if(defStyle!=null && !defStyle.isEmpty()){
+                    getMapUrl.append("&SLDID=").append(defStyle)
+                             .append("&SLDPROVIDER=sld");
+                }
+            }
             opGetMap.setHref(getMapUrl.toString());
             offering.getOperationOrContentOrStyleSet().add(OBJ_OWC_FACT.createOfferingTypeOperation(opGetMap));
 

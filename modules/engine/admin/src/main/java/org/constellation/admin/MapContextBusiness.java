@@ -127,8 +127,10 @@ public class MapContextBusiness implements IMapContextBusiness {
         final List<MapContextStyledLayerDTO> styledLayersDto = new ArrayList<>();
         for (final MapcontextStyledLayer styledLayer : styledLayers) {
             final MapContextStyledLayerDTO dto;
-            if (styledLayer.getLayerId() != null) {
-                final org.constellation.engine.register.Layer layer = layerRepository.findById(styledLayer.getLayerId());
+            final Integer layerID = styledLayer.getLayerId();
+            final Integer dataID = styledLayer.getDataId();
+            if (layerID != null) {
+                final org.constellation.engine.register.Layer layer = layerRepository.findById(layerID);
                 final Data data = dataRepository.findById(layer.getData());
                 final Provider provider = providerRepository.findOne(data.getProvider());
                 final QName name = new QName(layer.getNamespace(), layer.getName());
@@ -169,7 +171,42 @@ public class MapContextBusiness implements IMapContextBusiness {
                 final Service serviceRecord = serviceRepository.findById(layerRecord.getService());
                 dto.setServiceIdentifier(serviceRecord.getIdentifier());
                 dto.setServiceVersions(serviceRecord.getVersions());
-            } else {
+            } else if (dataID != null) {
+                final Data data = dataRepository.findById(dataID);
+                final Provider provider = providerRepository.findOne(data.getProvider());
+                final QName dataName = new QName(data.getNamespace(), data.getName());
+                final DataBrief db = dataBusiness.getDataBrief(dataName, provider.getId());
+                final org.constellation.configuration.Layer layerConfig = new org.constellation.configuration.Layer(styledLayer.getLayerId(), dataName);
+                layerConfig.setAlias(data.getName());
+                layerConfig.setDate(new Date(data.getDate()));
+                layerConfig.setOwner(data.getOwner());
+                layerConfig.setProviderID(provider.getIdentifier());
+                layerConfig.setProviderType(provider.getType());
+
+                // Fill styles
+                final List<Integer> stylesIds = styleRepository.getStyleIdsForData(dataID);
+                final List<DataReference> drs = new ArrayList<>();
+                for (final Integer styleId : stylesIds) {
+                    final Style s = styleRepository.findById(styleId);
+                    if (s == null) {
+                        continue;
+                    }
+                    final DataReference dr = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", s.getName());
+                    drs.add(dr);
+                }
+                layerConfig.setStyles(drs);
+
+                dto = new MapContextStyledLayerDTO(styledLayer, layerConfig, db);
+
+                if (styledLayer.getStyleId() != null) {
+                    // Extract style information for this layer
+                    final Style style = styleRepository.findById(styledLayer.getStyleId());
+                    if (style != null) {
+                        dto.setStyleName(style.getName());
+                    }
+                }
+
+            } else{
                 dto = new MapContextStyledLayerDTO(styledLayer);
             }
 
@@ -248,10 +285,16 @@ public class MapContextBusiness implements IMapContextBusiness {
             if (!styledLayer.isLayerVisible()) {
                 continue;
             }
-
-            if (styledLayer.getLayerId() != null) {
-                final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
-                final Data data = dataRepository.findById(layerRecord.getData());
+            Integer layerID = styledLayer.getLayerId();
+            Integer dataID = styledLayer.getDataId();
+            if (layerID != null || dataID != null) {
+                final Data data;
+                if(layerID != null) {
+                    final Layer layerRecord = layerRepository.findById(layerID);
+                    data = dataRepository.findById(layerRecord.getData());
+                }else {
+                    data = dataRepository.findById(dataID);
+                }
                 final Provider provider = providerRepository.findOne(data.getProvider());
 
                 final QName dataName = Util.parseQName(data.getName());
@@ -296,7 +339,7 @@ public class MapContextBusiness implements IMapContextBusiness {
             } else {
                 final String extLayerExtent = styledLayer.getExternalLayerExtent();
                 if (extLayerExtent != null && !extLayerExtent.isEmpty()) {
-                    final String[] layExtent = styledLayer.getExternalLayerExtent().split(",");
+                    final String[] layExtent = extLayerExtent.split(",");
                     final GeneralEnvelope tempEnv = new GeneralEnvelope(CRS.decode("CRS:84"));
                     tempEnv.setRange(0, Double.parseDouble(layExtent[0]), Double.parseDouble(layExtent[2]));
                     tempEnv.setRange(1, Double.parseDouble(layExtent[1]), Double.parseDouble(layExtent[3]));
