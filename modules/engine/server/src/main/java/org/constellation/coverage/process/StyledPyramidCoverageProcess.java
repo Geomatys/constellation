@@ -22,13 +22,21 @@ package org.constellation.coverage.process;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.business.IStyleBusiness;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Provider;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Providers;
 import org.constellation.util.StyleReference;
-import org.geotoolkit.coverage.*;
+import org.geotoolkit.coverage.AbstractCoverageStoreFactory;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.GridCoverageStack;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
@@ -38,32 +46,39 @@ import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
-import org.geotoolkit.process.ForwardProcessListener;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.referencing.OutOfDomainOfValidityException;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.xml.namespace.QName;
 import java.awt.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Set;
 import java.util.logging.Level;
 
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.IMAGE_FILE_FORMAT;
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.PYRAMID_CRS;
-import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.*;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.DOMAIN;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.IN_COVERAGE_REF;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.ORIGINAL_DATA;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.OUT_PYRAMID_PROVIDER_CONF;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.PROVIDER_OUT_ID;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.PYRAMID_DATASET;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.PYRAMID_FOLDER;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.PYRAMID_NAME;
+import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.STYLE;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
-import org.geotoolkit.referencing.OutOfDomainOfValidityException;
-import org.opengis.referencing.operation.TransformException;
 
 /**
  *
@@ -71,8 +86,6 @@ import org.opengis.referencing.operation.TransformException;
  * @author Quentin Boileau (Geomatys)
  */
 public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess {
-    @Autowired
-    private DomainRepository domainRepository;
 
     @Autowired
     private IStyleBusiness styleBusiness;
@@ -84,54 +97,68 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
     /**
      * Quick constructor to create process
      *
-     * @param pyramidFolder
+     * @param inCoverageRef
+     * @param pyramidName
      * @param providerID
-     * @param imageFilePath
-     * @param coverageBaseName
+     * @param pyramidFolder
+     * @param domain
+     * @param dataset
+     * @param pyramidCRS
      * @param styleRef
-     * @param domainId
      */
-    public StyledPyramidCoverageProcess (final File pyramidFolder, final String providerID, final String imageFilePath, final String imageFileFormat,
-                                         final String coverageBaseName, final StyleReference styleRef, final Integer domainId, final String dataset,
-                                         final CoordinateReferenceSystem pyramidCRS) {
-        this(StyledPyramidCoverageDescriptor.INSTANCE, toParameters(pyramidFolder, providerID, imageFilePath, imageFileFormat,
-                coverageBaseName, styleRef, domainId, dataset, pyramidCRS));
+    public StyledPyramidCoverageProcess (final CoverageReference inCoverageRef,
+                                         final Data orinigalData,
+                                         final String pyramidName,
+                                         final String providerID,
+                                         final File pyramidFolder,
+                                         final Domain domain,
+                                         final Dataset dataset,
+                                         final CoordinateReferenceSystem pyramidCRS,
+                                         final StyleReference styleRef) {
+        this(StyledPyramidCoverageDescriptor.INSTANCE, toParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder,
+                domain, dataset, pyramidCRS, styleRef));
     }
 
-    private static ParameterValueGroup toParameters(final File pyramidFolder, final String providerID, final String imageFilePath, final String imageFileFormat,
-                                                    final String coverageBaseName, final StyleReference styleRef, final Integer domainId, final String dataset,
-                                                    final CoordinateReferenceSystem pyramidCRS){
+    private static ParameterValueGroup toParameters(final CoverageReference inCoverageRef,
+                                                    final Data orinigalData,
+                                                    final String pyramidName,
+                                                    final String providerID,
+                                                    final File pyramidFolder,
+                                                    final Domain domain,
+                                                    final Dataset dataset,
+                                                    final CoordinateReferenceSystem pyramidCRS,
+                                                    final StyleReference styleRef){
         final ParameterValueGroup params = StyledPyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
-        getOrCreate(StyledPyramidCoverageDescriptor.PROVIDER_OUT_ID, params).setValue(providerID);
-        getOrCreate(StyledPyramidCoverageDescriptor.IMAGE_FILE_PATH, params).setValue(imageFilePath);
-        getOrCreate(StyledPyramidCoverageDescriptor.IMAGE_FILE_FORMAT, params).setValue(imageFileFormat);
-        getOrCreate(StyledPyramidCoverageDescriptor.COVERAGE_BASE_NAME, params).setValue(coverageBaseName);
-        getOrCreate(StyledPyramidCoverageDescriptor.PYRAMID_FOLDER, params).setValue(pyramidFolder);
-        getOrCreate(StyledPyramidCoverageDescriptor.STYLE, params).setValue(styleRef);
-        getOrCreate(StyledPyramidCoverageDescriptor.DOMAIN_ID, params).setValue(domainId);
-        getOrCreate(StyledPyramidCoverageDescriptor.DATASET_ID, params).setValue(dataset);
-        getOrCreate(StyledPyramidCoverageDescriptor.PYRAMID_CRS, params).setValue(pyramidCRS);
-        getOrCreate(PYRAMID_CRS, params).setValue(pyramidCRS);
+        fillParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder, domain, dataset, pyramidCRS, params);
+        getOrCreate(STYLE, params).setValue(styleRef);
         return params;
     }
 
     @Override
     protected void execute() throws ProcessException {
-        final String providerID       = value(PROVIDER_OUT_ID, inputParameters);
-        final String imageFilePath    = value(IMAGE_FILE_PATH, inputParameters);
-        final String imageFileFormat  = value(IMAGE_FILE_FORMAT, inputParameters);
-        final StyleReference styleRef = value(STYLE, inputParameters);
-        final File pyramidFolder      = value(PYRAMID_FOLDER, inputParameters);
-        final String coverageBaseName = value(COVERAGE_BASE_NAME, inputParameters);
-        final Integer domainId        = value(DOMAIN_ID, inputParameters);
-        final String datasetName      = value(DATASET_ID, inputParameters);
+        final CoverageReference inCovRef = value(IN_COVERAGE_REF, inputParameters);
         final CoordinateReferenceSystem pyramidCRS = value(PYRAMID_CRS, inputParameters);
+        final Data originalData         = value(ORIGINAL_DATA, inputParameters);
+        final String providerID         = value(PROVIDER_OUT_ID, inputParameters);
+        final File pyramidFolder        = value(PYRAMID_FOLDER, inputParameters);
+        final Domain domain             = value(DOMAIN, inputParameters);
+        final Dataset dataset           = value(PYRAMID_DATASET, inputParameters);
+        final StyleReference styleRef   = value(STYLE, inputParameters);
+        String pyramidName              = value(PYRAMID_NAME, inputParameters);
+        final Integer domainId          = domain != null ? domain.getId() : null;
 
-        DataProvider provider = DataProviders.getInstance().getProvider(providerID);
+        if (pyramidName == null) {
+            pyramidName = inCovRef.getName().getLocalPart();
+        }
+
+        Provider providerEntity = providerBusiness.getProvider(providerID);
+        DataProvider dataProvider = null;
         CoverageStore outputCoverageStore = null;
         Name referenceName = null;
-        if (provider != null) {
-            final DataStore mainStore = provider.getMainStore();
+
+        if (providerEntity != null) {
+            dataProvider = DataProviders.getInstance().getProvider(providerID);
+            final DataStore mainStore = dataProvider.getMainStore();
             if (!(mainStore instanceof CoverageStore)) {
                 throw new ProcessException("Provider "+providerID+" reference a non coverage type store", this, null);
             }
@@ -147,7 +174,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
 
             try {
                 final Set<Name> names = outputCoverageStore.getNames();
-                referenceName = new DefaultName(namespace, coverageBaseName);
+                referenceName = new DefaultName(namespace, pyramidName);
 
                 final CoverageReference coverageReference;
                 if (names.contains(referenceName)) {
@@ -167,20 +194,12 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         if (outputCoverageStore == null) {
             //create XMLCoverageStore
             try {
-                final File finalPyramidFolder = new File(pyramidFolder, coverageBaseName);
-                referenceName = new DefaultName(coverageBaseName);
+                final File finalPyramidFolder = new File(pyramidFolder, pyramidName);
+                referenceName = new DefaultName(pyramidName);
                 outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, PNG_FORMAT,  ViewType.RENDERED);
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
             }
-        }
-
-        // get input CoverageStore
-        final CoverageStore inputCoverageStore;
-        try {
-            inputCoverageStore = getCoverageStoreFromInput(imageFilePath, imageFileFormat);
-        } catch (MalformedURLException e) {
-            throw new ProcessException(e.getMessage(), this, e);
         }
 
         //get layer style
@@ -195,32 +214,41 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         try {
             final PyramidalCoverageReference outCovRef = (PyramidalCoverageReference) getOrCreateCRef(outputCoverageStore, referenceName);
             final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
-            final Set<Name> inputNames = inputCoverageStore.getNames();
-            for (Name name : inputNames) {
-                final CoverageReference ref = inputCoverageStore.getCoverageReference(name);
-                final GridCoverageReader reader = ref.acquireReader();
-                final GridCoverageReadParam readParam = new GridCoverageReadParam();
-                readParam.setDeferred(true);
-                final GridCoverage coverage = reader.read(ref.getImageIndex(), readParam);
-                ref.recycle(reader);
 
-                if (coverage instanceof GridCoverageStack) {
-                    throw new ProcessException("CoverageStack implementation not supported.", this, null);
-                }
+            final GridCoverageReader reader = inCovRef.acquireReader();
+            final GridCoverageReadParam readParam = new GridCoverageReadParam();
+            readParam.setDeferred(true);
+            final GridCoverage coverage = reader.read(inCovRef.getImageIndex(), readParam);
+            inCovRef.recycle(reader);
 
-                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
-                pyramidStyledData(ref, pyramidEnv, scales, coverageBaseName, outCovRef, style);
+            if (coverage instanceof GridCoverageStack) {
+                throw new ProcessException("CoverageStack implementation not supported.", this, null);
             }
+
+            final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
+            pyramidStyledData(inCovRef, pyramidEnv, scales, outCovRef, style);
+
         } catch (DataStoreException | FactoryException | OutOfDomainOfValidityException | TransformException e) {
             throw new ProcessException(e.getMessage(), this, e);
         }
 
         //finally create provider from store configuration
-        if (provider == null) {
-            provider = createProvider(providerID, outputCoverageStore, domainId, datasetName);
+        if (dataProvider == null) {
+            dataProvider = createProvider(providerID, outputCoverageStore, domainId, dataset.getId());
         }
 
-        getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(provider.getSource());
+        if (providerEntity == null) {
+            providerEntity = providerBusiness.getProvider(providerID);
+        }
+
+        // link original data with the tiled data.
+        if (originalData != null) {
+            final QName qName = new QName(referenceName.getNamespaceURI(), referenceName.getLocalPart());
+            final DataBrief pyramidDataBrief = dataBusiness.getDataBrief(qName, providerEntity.getId());
+            dataBusiness.linkDataToData(originalData.getId(), pyramidDataBrief.getId());
+        }
+
+        getOrCreate(OUT_PYRAMID_PROVIDER_CONF, outputParameters).setValue(dataProvider.getSource());
     }
 
     /**
@@ -228,12 +256,11 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
      * @param reference
      * @param dataEnv
      * @param scales
-     * @param coverageBaseName
      * @param outputRef
      * @param style
      * @throws ProcessException
      */
-    private void pyramidStyledData(CoverageReference reference, Envelope dataEnv, double[] scales, String coverageBaseName,
+    private void pyramidStyledData(CoverageReference reference, Envelope dataEnv, double[] scales,
                                    PyramidalCoverageReference outputRef, MutableStyle style) throws ProcessException {
         final MapContext context = MapBuilder.createContext();
         final CoverageMapLayer layer = MapBuilder.createCoverageLayer(reference, style);

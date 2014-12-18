@@ -1,7 +1,13 @@
 package org.constellation.coverage.process;
 
+import org.apache.sis.measure.NumberRange;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.SpringHelper;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProvider;
@@ -9,7 +15,13 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactoryType;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.coverage.*;
+import org.geotoolkit.coverage.AbstractCoverageStoreFactory;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.coverage.Pyramid;
+import org.geotoolkit.coverage.PyramidSet;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.filestore.FileCoverageStoreFactory;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.GridGeometry2D;
@@ -17,32 +29,36 @@ import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.internal.coverage.CoverageUtilities;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.OutOfDomainOfValidityException;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.geotoolkit.internal.coverage.CoverageUtilities;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import org.apache.sis.measure.NumberRange;
-import org.constellation.business.IDatasetBusiness;
 
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.DOMAIN;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.IN_COVERAGE_REF;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.ORIGINAL_DATA;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PROVIDER_OUT_ID;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_CRS;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_DATASET;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_FOLDER;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_NAME;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
-import org.geotoolkit.referencing.OutOfDomainOfValidityException;
-import org.opengis.referencing.operation.TransformException;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 /**
  * @author Quentin Boileau (Geomatys)
@@ -53,7 +69,10 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
     private DomainRepository domainRepository;
     
     @Autowired
-    private IDatasetBusiness datasetBusiness;
+    protected IDataBusiness dataBusiness;
+
+    @Autowired
+    protected IProviderBusiness providerBusiness;
 
     protected static final String PNG_FORMAT = "PNG";
     protected static final String TIFF_FORMAT = "TIFF";
@@ -62,6 +81,20 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
     public AbstractPyramidCoverageProcess(ProcessDescriptor desc, ParameterValueGroup parameter) {
         super(desc, parameter);
     }
+
+    protected static void fillParameters(CoverageReference inCoverageRef, Data orinigalData, String pyramidName,
+                                         String providerID, File pyramidFolder, Domain domain, Dataset dataset,
+                                         CoordinateReferenceSystem pyramidCRS, ParameterValueGroup params) {
+        getOrCreate(IN_COVERAGE_REF, params).setValue(inCoverageRef);
+        getOrCreate(ORIGINAL_DATA, params).setValue(orinigalData);
+        getOrCreate(PYRAMID_NAME, params).setValue(pyramidName);
+        getOrCreate(PROVIDER_OUT_ID, params).setValue(providerID);
+        getOrCreate(PYRAMID_FOLDER, params).setValue(pyramidFolder);
+        getOrCreate(DOMAIN, params).setValue(domain);
+        getOrCreate(PYRAMID_DATASET, params).setValue(dataset);
+        getOrCreate(PYRAMID_CRS, params).setValue(pyramidCRS);
+    }
+
 
     protected CoverageStore createXMLCoverageStore(final File pyramidFolder, final Name layerName, String tileFormat, ViewType type)
             throws DataStoreException, ProcessException, MalformedURLException {
@@ -80,19 +113,6 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         covRef.setPackMode(type);
         covRef.setPreferredFormat(tileFormat);
         return store;
-    }
-
-    protected CoverageStore getCoverageStoreFromInput(final String imageFile, final String imageType)
-            throws ProcessException, MalformedURLException {
-        final ParameterValueGroup params = FileCoverageStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
-        getOrCreate(FileCoverageStoreFactory.PATH, params).setValue(new File(imageFile).toURI().toURL());
-        getOrCreate(FileCoverageStoreFactory.TYPE, params).setValue(imageType);
-
-        try {
-            return CoverageStoreFinder.open(params);
-        } catch (DataStoreException ex) {
-            throw new ProcessException("Error while opening output datastore", this, ex);
-        }
     }
 
     protected CoverageReference getOrCreateCRef(CoverageStore coverageStore, Name coverageName) throws DataStoreException {
@@ -181,23 +201,24 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         return scales;*/
     }
 
-    protected DataProvider createProvider(final String providerID, CoverageStore store, final Integer domainId, final String datasetName) throws ProcessException {
+    /**
+     * Create provider and data and link them to already existing dataset.
+     *
+     * @param providerID
+     * @param store
+     * @param domainId
+     * @param datasetId
+     * @return new provider
+     * @throws ProcessException
+     */
+    protected DataProvider createProvider(final String providerID, CoverageStore store, final Integer domainId,
+                                          final Integer datasetId) throws ProcessException {
         final DataProvider outProvider;
         try {
             //get store configuration
             final ParameterValueGroup storeConf = store.getConfiguration();
             final String namespace = value(AbstractCoverageStoreFactory.NAMESPACE, storeConf);
             final URL pyramidFolder = value(XMLCoverageStoreFactory.PATH, storeConf);
-
-            Integer datasetID = null;
-            if (datasetBusiness.getDataset(datasetName) == null) {
-                datasetID = SpringHelper.executeInTransaction(new TransactionCallback<Integer>() {
-                    @Override
-                    public Integer doInTransaction(TransactionStatus transactionStatus) {
-                        return datasetBusiness.createDataset(datasetName, null, null, null).getId();
-                    }
-                });
-            }
 
             //create provider configuration
             final String factoryName = ProviderFactoryType.COVERAGE_STORE.getType();
@@ -210,7 +231,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             final ParameterValueGroup xmlpyramidparams = ParametersExt.getOrCreateGroup(choiceparams, XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.getName().getCode());
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(pyramidFolder);
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue(namespace);
-            outProvider = DataProviders.getInstance().createProvider(providerID, factory, pparams, datasetID);
+            outProvider = DataProviders.getInstance().createProvider(providerID, factory, pparams, datasetId);
 
             if (domainId != null) {
                 SpringHelper.executeInTransaction(new TransactionCallbackWithoutResult() {
