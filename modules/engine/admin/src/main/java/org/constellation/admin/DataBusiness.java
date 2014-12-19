@@ -1215,10 +1215,12 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         LOGGER.debug("Cleaner");
         java.nio.file.Path uploadDirectory = ConfigDirectory.getUploadDirectory();
         File[] listFiles = uploadDirectory.toFile().listFiles();
-        for (File file : listFiles) {
-            if(TokenUtils.isExpired(file.getName())) {
-                LOGGER.info(file.getName() + " expired");
-                FileUtilities.deleteDirectory(file);
+        if (listFiles != null) {
+            for (File file : listFiles) {
+                if (TokenUtils.isExpired(file.getName())) {
+                    LOGGER.info(file.getName() + " expired");
+                    FileUtilities.deleteDirectory(file);
+                }
             }
         }
     }
