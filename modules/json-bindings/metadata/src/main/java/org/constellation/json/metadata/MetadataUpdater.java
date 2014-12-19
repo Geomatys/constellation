@@ -471,8 +471,15 @@ final class MetadataUpdater {
                         asMap(rs).put(propName, convert(propName, subType, entry.getValue()));
                     }
                 } else {
-                    ReferenceSystemMetadata rs = (ReferenceSystemMetadata) factory.create(type, Collections.<String,Object>emptyMap());
-                    rs.setName(new ImmutableIdentifier(null, codeSpace, code, version, null));
+                    ReferenceSystemMetadata rs;
+                    if (ReferenceSystemMetadata.class.isAssignableFrom(type)) {
+                        rs = (ReferenceSystemMetadata) factory.create(type, Collections.<String,Object>emptyMap());
+                    } else {
+                        rs = new ReferenceSystemMetadata();
+                    }
+                    if (code != null) {
+                        rs.setName(new ImmutableIdentifier(null, codeSpace, code, version, null));
+                    }
                     for (Entry<String,Object> entry : extraParameters.entrySet()) {
                         final String propName = entry.getKey();
                         Class subType = getType(rs, propName);
