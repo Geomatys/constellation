@@ -120,7 +120,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
+import java.util.logging.Level;
+import javax.xml.parsers.ParserConfigurationException;
+import org.geotoolkit.image.io.plugin.DimapImageReader;
+import org.geotoolkit.metadata.dimap.DimapAccessor;
+import org.geotoolkit.util.DomUtilities;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -1266,6 +1273,17 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Transactional
     public List<Data> getDataLinkedData(final int dataId){
         return dataRepository.getDataLinkedData(dataId);
+    }
+
+    @Override
+    public DefaultMetadata getMetadataFromDimap(File metadataFile) throws ConfigurationException {
+        try {
+            Document doc = DomUtilities.read(metadataFile);
+            final DefaultMetadata metadata = DimapAccessor.fillMetadata(doc.getDocumentElement(), null);
+            return metadata;
+        } catch (ParserConfigurationException | SAXException  | IOException ex) {
+            throw new ConfigurationException("Error while parsing dimap file", ex);
+        }
     }
 
 }

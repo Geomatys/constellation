@@ -59,6 +59,10 @@
         </dependency>
         <dependency>
             <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverage-dimap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-jaxp-core</artifactId>
         </dependency>
         <dependency>

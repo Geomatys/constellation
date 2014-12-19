@@ -331,11 +331,20 @@ public class DataRest {
     private void extractIdentifierFromMetadataFile(final Map<String,String> hashMap,
                                                    final File newFileMetaData) throws ConstellationException{
         Object obj;
-        try {
-            obj = dataBusiness.unmarshallMetadata(newFileMetaData);
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
-            throw new ConstellationException("metadata file is incorrect");
+        if (newFileMetaData.getName().endsWith(".dim")) {
+            try {
+                obj = dataBusiness.getMetadataFromDimap(newFileMetaData);
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, "Error when trying to read dimap metadata", ex);
+                throw new ConstellationException("Dimap metadata file is incorrect");
+            }
+        } else {
+            try {
+                obj = dataBusiness.unmarshallMetadata(newFileMetaData);
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
+                throw new ConstellationException("metadata file is incorrect");
+            }
         }
         if (!(obj instanceof DefaultMetadata)) {
             throw new ConstellationException("metadata file is incorrect");
@@ -617,7 +626,12 @@ public class DataRest {
     private void proceedToSaveUploadedMetadata(final String providerId, final String mdPath) throws ConstellationException {
         if (mdPath != null && !mdPath.isEmpty()) {
             try {
-                final DefaultMetadata metadata = dataBusiness.unmarshallMetadata(new File(mdPath));
+                final DefaultMetadata metadata;
+                if (mdPath.endsWith(".dim")){
+                    metadata = dataBusiness.getMetadataFromDimap(new File(mdPath));
+                } else {
+                    metadata = dataBusiness.unmarshallMetadata(new File(mdPath));
+                }
                 if (metadata == null) {
                     throw new ConstellationException("Cannot save uploaded metadata because it is not recognized as a valid file!");
                 }

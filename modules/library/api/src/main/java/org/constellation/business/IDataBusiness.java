@@ -170,6 +170,8 @@ public interface IDataBusiness {
     DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException;
 
     DefaultMetadata unmarshallMetadata(final File metadata) throws JAXBException;
+    
+    DefaultMetadata getMetadataFromDimap(final File metadata)throws ConfigurationException;
 
     void uploadCleaner();
 }
