@@ -122,6 +122,16 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          * the result is stored with Dashboard service.
          */
         $scope.callSearch = function(){
+            //don't worry, To be removed soon
+            if($scope.dataCtrl.searchTerm.toLowerCase() === 'noel2014' && !window.eastereggs) {
+                window.eastereggs=true;
+                $("<img id='perenoel' src='http://www.gifgratis.net/gifs_animes/pere_noel/180.gif' style='position:absolute;z-index:99999;'/>").appendTo(document.body);
+                $(document).mousemove(function(e){
+                    $('#perenoel').css({left:(e.pageX+10), top:(e.pageY+10)});
+                });
+                return;
+            }//end of easter egg
+
             $scope.wrap.filtertext='';
             if ($scope.dataCtrl.searchTerm){
                 datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchTerm+'*'}},
