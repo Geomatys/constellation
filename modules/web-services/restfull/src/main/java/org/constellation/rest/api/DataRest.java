@@ -80,7 +80,10 @@ import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.json.metadata.Template;
+import org.constellation.json.metadata.binding.BlockObj;
+import org.constellation.json.metadata.binding.FieldObj;
 import org.constellation.json.metadata.binding.RootObj;
+import org.constellation.json.metadata.binding.SuperBlockObj;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -847,11 +850,16 @@ public class DataRest {
                 //update dateStamp for metadata
                 metadata.setDateStamp(new Date());
 
+                //calculate completion rating
+                final int rating = calculateMDCompletion(metadataValues);
+
                 //Save metadata
                 if (dataset) {
                     datasetBusiness.updateMetadata(ds.getIdentifier(), -1, metadata);
+                    datasetBusiness.updateMDCompletion(ds.getId(),rating);
                 } else {
                     dataBusiness.updateMetadata(provider, dataName, -1, metadata);
+                    dataBusiness.updateMDCompletion(provider,dataName,rating);
                 }
             }
         } catch (ConfigurationException ex) {
@@ -859,6 +867,31 @@ public class DataRest {
             throw new ConstellationException(ex);
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    private int calculateMDCompletion(final RootObj metadataValues) {
+        int result = 0;
+        int fieldsCount=0;
+        int fieldValueCount=0;
+        final List<SuperBlockObj> superblocks = metadataValues.getRoot().getChildren();
+        for(final SuperBlockObj sb:superblocks){
+            final List<BlockObj> blocks = sb.getSuperblock().getChildren();
+            for(final BlockObj b:blocks){
+                final List<FieldObj> fields = b.getBlock().getChildren();
+                for(final FieldObj f:fields){
+                    fieldsCount++;
+                    final String value = f.getField().getValue();
+                    if(value != null && !value.isEmpty()){
+                        fieldValueCount++;
+                    }
+
+                }
+            }
+        }
+        if(fieldsCount>0){
+            result = Math.round(fieldValueCount*100/fieldsCount);
+        }
+        return result;
     }
 
     @POST
@@ -886,8 +919,14 @@ public class DataRest {
                 //update dateStamp for metadata
                 metadata.setDateStamp(new Date());
 
+                //calculate completion rating
+                final int rating = calculateMDCompletion(metadataValues);
+
                 //Save metadata
                 datasetBusiness.updateMetadata(identifier, -1, metadata);
+
+                final Dataset ds = datasetBusiness.getDataset(identifier);
+                datasetBusiness.updateMDCompletion(ds.getId(),rating);
             }
         } catch (ConfigurationException ex) {
             LOGGER.warning("Error while saving dataset metadata");
@@ -958,13 +997,22 @@ public class DataRest {
             if(dataBriefList!=null && !dataBriefList.isEmpty()){
                 type = dataBriefList.get(0).getType();
             }
-            dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), type, owner, dataBriefList,dataset.getDate());
+            dsb = new DataSetBrief(dataset.getId(),
+                    dataset.getIdentifier(),
+                    type, owner,
+                    dataBriefList,
+                    dataset.getDate(),
+                    dataset.getMdCompletion());
         }else {
             String type = null;
             if(!children.isEmpty()){
                 type = children.get(0).getType();
             }
-            dsb = new DataSetBrief(dataset.getId(),dataset.getIdentifier(), type, owner, children, dataset.getDate());
+            dsb = new DataSetBrief(dataset.getId(),
+                    dataset.getIdentifier(),
+                    type, owner, children,
+                    dataset.getDate(),
+                    dataset.getMdCompletion());
         }
         return dsb;
     }

@@ -61,4 +61,6 @@ public interface IDatasetBusiness {
     void addProviderDataToDataset(final String datasetId, final String providerId) throws ConfigurationException;
     
     String getTemplate(final String datasetId, final String dataType) throws ConfigurationException;
+
+    void updateMDCompletion(final Integer datasetID, final Integer rating);
 }

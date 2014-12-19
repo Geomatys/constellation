@@ -120,9 +120,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
-import java.util.logging.Level;
 import javax.xml.parsers.ParserConfigurationException;
-import org.geotoolkit.image.io.plugin.DimapImageReader;
 import org.geotoolkit.metadata.dimap.DimapAccessor;
 import org.geotoolkit.util.DomUtilities;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -531,6 +529,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setStatsResult(data.getStatsResult());
             db.setStatsState(data.getStatsState());
             db.setRendered(data.isRendered());
+            db.setMdCompletion(data.getMdCompletion());
 
             final List<Data> linkedDataList = getDataLinkedData(data.getId());
             for(final Data d : linkedDataList){
@@ -850,6 +849,14 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         } else {
             throw new TargetNotFoundException("Data :" + dataName + " in provider:" + providerId +  " not found");
         }
+    }
+
+    @Override
+    @Transactional
+    public void updateMDCompletion(final String providerId, final QName dataName, final Integer rating) {
+        final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
+        data.setMdCompletion(rating);
+        dataRepository.update(data);
     }
 
     @Override

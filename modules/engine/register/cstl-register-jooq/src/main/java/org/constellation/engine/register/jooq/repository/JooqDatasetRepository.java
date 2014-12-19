@@ -69,6 +69,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
                 .set(DATASET.METADATA_ID, dataset.getMetadataId())
                 .set(DATASET.DATE, dataset.getDate())
                 .set(DATASET.FEATURE_CATALOG, dataset.getFeatureCatalog())
+                .set(DATASET.MD_COMPLETION,dataset.getMdCompletion())
                 .where(DATASET.ID.eq(dataset.getId()));
 
         return set.execute();

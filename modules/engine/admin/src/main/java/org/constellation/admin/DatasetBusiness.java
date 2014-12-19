@@ -173,7 +173,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Override
     @Transactional
     public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) {
-        Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner, System.currentTimeMillis(), null);
+        final Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner, System.currentTimeMillis(), null,0);
         return datasetRepository.insert(ds);
     }
 
@@ -308,6 +308,14 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
+    }
+
+    @Override
+    @Transactional
+    public void updateMDCompletion(final Integer datasetID, final Integer rating) {
+        final Dataset dataset = datasetRepository.findById(datasetID);
+        dataset.setMdCompletion(rating);
+        datasetRepository.update(dataset);
     }
 
     /**

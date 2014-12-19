@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="version_1.28" author="msidhoum">
+        <addColumn schemaName="admin" tableName="data">
+            <column name="md_completion" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="dataset">
+            <column name="md_completion" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

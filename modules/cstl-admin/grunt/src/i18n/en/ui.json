@@ -165,6 +165,7 @@
     "sensor.listing.selected.delete.button":"Delete sensor",
     "data.listing.selectAllChild":"Select all data in dataset",
     "metadata.not.found":"Metadata not found!",
+    "data.listing.metadata.completion":"Completion rate of metadata",
 
     "disclaimer.cstl.website":"Constellation-SDI website",
     "disclaimer.cstl.github":"Constellation-SDI github",

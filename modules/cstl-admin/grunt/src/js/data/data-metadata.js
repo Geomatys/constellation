@@ -604,8 +604,13 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
         $scope.template = template;
         $scope.current = {};
         $scope.theme = theme;
-        $scope.close = function() {
+
+        $scope.dismiss = function () {
             $modalInstance.dismiss('close');
+        };
+
+        $scope.close = function () {
+            $modalInstance.close();
         };
 
         $controller('EditMetadataController', {$scope: $scope});

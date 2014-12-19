@@ -166,6 +166,7 @@
     "sensor.listing.selected.delete.button":"Supprimer le capteur",
     "data.listing.selectAllChild":"Sélectionner toutes les données du jeu",
     "metadata.not.found":"Aucune métadonnée n'a été trouvé !",
+    "data.listing.metadata.completion":"Taux de complétion de la métadonnée",
 
     "disclaimer.cstl.website":"Site de Constellation-SDI",
     "disclaimer.cstl.github":"Github de Constellation-SDI",

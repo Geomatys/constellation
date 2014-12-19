@@ -52,17 +52,20 @@ public class DataSetBrief implements Serializable {
     private String resume;
     @XmlElement(name="Date")
     private Long date;
+    @XmlElement(name="MdCompletion")
+    private Integer mdCompletion;
 
     public DataSetBrief() {}
 
     public DataSetBrief(final Integer id, final String name, final String type, final String owner,
-                        final List<DataBrief> children, final Long date) {
+                        final List<DataBrief> children, final Long date, final Integer mdCompletion) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.owner = owner;
         this.children = children;
         this.date = date;
+        this.mdCompletion = mdCompletion;
     }
 
     public String getName() {
@@ -127,6 +130,14 @@ public class DataSetBrief implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getMdCompletion() {
+        return mdCompletion;
+    }
+
+    public void setMdCompletion(Integer mdCompletion) {
+        this.mdCompletion = mdCompletion;
     }
 
     @Override

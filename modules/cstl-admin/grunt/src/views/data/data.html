@@ -346,12 +346,22 @@
                                             <div class="block">
                                                 <i class="fa fa-user"></i>{{dataset.Owner}}
                                             </div>
-                                            <!--a ng-if="selectedDS && (dataset.id==selectedDS.id)"
-                                               ng-click="selectall=!selectall"
-                                               class="pull-right"
-                                               ng-class="{'selectall-normal':selectall==false, 'selectall-selected':selectall==true}"
-                                               tooltip-html-unsafe="{{'data.listing.selectAllChild' | translate}}"
-                                               tooltip-placement="right"></a-->
+                                            <div class="block" style="height:30px;text-shadow:none;position:relative;"
+                                                 ng-if="dataset.MdCompletion">
+                                                <div style="width:60px;margin-top:10px;"
+
+                                                     tooltip-html-unsafe="{{'data.listing.metadata.completion' | translate}}"
+                                                     tooltip-placement="top">
+                                                    <progressbar max="100"
+                                                                 value="dataset.MdCompletion"
+                                                                 animate="true"
+                                                                 class="progress-striped"
+                                                                 style="margin: 0;height:12px;"
+                                                                 type="{{dataset.MdCompletion<25?'danger':dataset.MdCompletion<50?'warning':dataset.MdCompletion<75?'info':'success'}}">
+                                                        <span style="font-size: 10px;position: absolute;top:0;left:12px;">{{dataset.MdCompletion}}%</span>
+                                                    </progressbar>
+                                                </div>
+                                            </div>
                                             <div class="block pull-right">
                                                 <i class="fa fa-paperclip"></i>
                                                 <span ng-if="dataset.Children.length == 0"
@@ -381,36 +391,20 @@
                                             <span ng-if="data.Type=='COVERAGE' && data.subtype=='multiDimentions'"
                                                   class="pull-right coverage-type-nd item-list-style"
                                                   style="color:#30718c;">nD </span>
-                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data.Id!=dataCtrl.selectedDataSetChild.Id"
-                                                 src="img/vector-multipoint.svg"
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint')"
+                                                 ng-src="{{data.Id!=dataCtrl.selectedDataSetChild.Id?'img/vector-multipoint.svg':'img/vector-multipoint-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry' && data.Id!=dataCtrl.selectedDataSetChild.Id"
-                                                 src="img/vector-multigeometry.svg"
+                                            <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry'"
+                                                 ng-src="{{data.Id!=dataCtrl.selectedDataSetChild.Id?'img/vector-multigeometry.svg':'img/vector-multigeometry-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px; width:22px;" />
-                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data.Id!=dataCtrl.selectedDataSetChild.Id"
-                                                 src="img/vector-poly.svg"
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon')"
+                                                 ng-src="{{data.Id!=dataCtrl.selectedDataSetChild.Id?'img/vector-poly.svg':'img/vector-poly-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data.Id!=dataCtrl.selectedDataSetChild.Id"
-                                                 src="img/vector-polyline.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data.Id==dataCtrl.selectedDataSetChild.Id"
-                                                 src="img/vector-multipoint-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry' && data.Id==dataCtrl.selectedDataSetChild.Id"
-                                                 src="img/vector-multigeometry-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px; width:22px;" />
-                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data.Id==dataCtrl.selectedDataSetChild.Id"
-                                                 src="img/vector-poly-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data.Id==dataCtrl.selectedDataSetChild.Id"
-                                                 src="img/vector-polyline-selected.svg"
+                                            <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString')"
+                                                 ng-src="{{data.Id!=dataCtrl.selectedDataSetChild.Id?'img/vector-polyline.svg':'img/vector-polyline-selected.svg'}}"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                         </div>
@@ -420,6 +414,23 @@
                                             </div>
                                             <div class="block">
                                                 <i class="fa fa-user"></i>{{data.Owner}}
+                                            </div>
+                                            <div class="block"
+                                                 style="height:30px;text-shadow:none;position:relative;"
+                                                 ng-if="dataset.MdCompletion || data.MdCompletion">
+                                                <div style="width:60px;margin-top:10px;"
+                                                     tooltip-html-unsafe="{{'data.listing.metadata.completion' | translate}}"
+                                                     tooltip-placement="top"
+                                                     ng-init="completion=data.MdCompletion?data.MdCompletion:dataset.MdCompletion">
+                                                    <progressbar max="100"
+                                                                 value="completion"
+                                                                 animate="true"
+                                                                 class="progress-striped"
+                                                                 style="margin: 0;height:12px;"
+                                                                 type="{{completion<25?'danger':completion<50?'warning':completion<75?'info':'success'}}">
+                                                        <span style="font-size: 10px;position: absolute;top:0;left:12px;">{{completion}}%</span>
+                                                    </progressbar>
+                                                </div>
                                             </div>
                                             <img ng-if="data.Sensorable===true && data.TargetSensor.length === 0"
                                                  src="img/icon-sensor-non-active.svg"

@@ -91,6 +91,8 @@ public interface IDataBusiness {
     List<Data> findByDatasetId(final Integer datasetId);
 
     void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException;
+
+    void updateMDCompletion(final String providerId, final QName dataName, final Integer rating);
     
     String getTemplate(final QName dataName, final String dataType) throws ConfigurationException;
 

@@ -575,7 +575,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          * @param theme
          */
         function openModalEditor(provider,identifier,type,template,theme){
-            $modal.open({
+            var modalEditor = $modal.open({
                 templateUrl: 'views/data/modalEditMetadata.html',
                 controller: 'EditMetadataModalController',
                 resolve: {
@@ -585,6 +585,11 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     'template':function(){return template;},
                     'theme':function(){return theme;}
                 }
+            });
+            modalEditor.result.then(function(){
+                datasetListing.listAll({}, function(response) {
+                    Dashboard($scope, response, true);
+                });
             });
         }
 
