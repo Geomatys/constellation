@@ -1,3 +1,21 @@
+Features
+========
+
+Inputs
+------
+ * GeoJSON
+ * ESRI Shapefile
+ * Database (PostgreSQL / PostGIS, H2, ...)
+ * SensorML
+ * WFS API
+
+Outputs
+-------
+ * WFS
+ * WPS 
+ * ...
+
+
 To run:
 -------
  * git clone <repository URL>
