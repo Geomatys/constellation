@@ -1113,6 +1113,32 @@
     <build>
         <pluginManagement>
             <plugins>
+<plugin>
+  <groupId>org.eclipse.jetty</groupId>
+  <artifactId>jetty-maven-plugin</artifactId>
+  <version>9.2.2.v20140723</version>
+    <configuration>
+        <war>${project.basedir}/modules/cstl-sdi/target/constellation.war</war>
+      
+<!--
+    </webApp>
+    <contextHandlers>
+      <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+        <war>${project.basedir}/modules/cstl-sdi/target/constellation.war</war>        
+        <contextPath>/sdi</contextPath>
+      </contextHandler>
+      <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+        <war>${project.basedir}/modules/cstl-services/target/constellation.war</war>        
+        <contextPath>/services</contextPath>
+      </contextHandler>
+      <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+        <war>${project.basedir}/modules/cstl-admin/target/cstl-admin.war</war>        
+        <contextPath>/admin</contextPath>
+      </contextHandler>
+    </contextHandlers>-->
+  </configuration>
+</plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
