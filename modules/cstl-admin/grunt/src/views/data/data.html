@@ -340,11 +340,27 @@
                                             <span class="pull-right text-right item-list-style">{{'dataset.label' | translate}}</span>
                                         </div>
                                         <div class="bottom">
-                                            <div class="block">
-                                                <i class="fa fa-calendar"></i>{{dataset.Date | date:'yyyy-MM-dd'}}
+                                            <div ng-class="{'hidden':!dataCtrl.smallMode}">
+                                                    <div class="block tooltipicon"
+                                                         style="margin-top:0;">
+                                                        <i class="fa fa-calendar"
+                                                           tooltip data-placement="bottom"
+                                                           title="{{dataset.Date | date:'yyyy-MM-dd'}}"></i>
+                                                    </div>
+                                                    <div class="block tooltipicon"
+                                                         style="margin-top:0;">
+                                                        <i class="fa fa-user"
+                                                           tooltip data-placement="bottom"
+                                                           title="{{dataset.Owner}}"></i>
+                                                    </div>
                                             </div>
-                                            <div class="block">
-                                                <i class="fa fa-user"></i>{{dataset.Owner}}
+                                            <div ng-class="{'hidden':dataCtrl.smallMode}">
+                                                <div class="block">
+                                                    <i class="fa fa-calendar"></i>{{dataset.Date | date:'yyyy-MM-dd'}}
+                                                </div>
+                                                <div class="block">
+                                                    <i class="fa fa-user"></i>{{dataset.Owner}}
+                                                </div>
                                             </div>
                                             <div class="block" style="height:30px;text-shadow:none;position:relative;"
                                                  ng-if="dataset.MdCompletion">
@@ -409,12 +425,30 @@
                                                  style="margin-top:6px; margin-right:10px;" />
                                         </div>
                                         <div class="bottom">
-                                            <div class="block">
-                                                <i class="fa fa-calendar"></i>{{data.Date | date:'yyyy-MM-dd'}}
+
+                                            <div ng-class="{'hidden':!dataCtrl.smallMode}">
+                                                <div class="block tooltipicon"
+                                                     style="margin-top:0;">
+                                                    <i class="fa fa-calendar"
+                                                       tooltip data-placement="bottom"
+                                                       title="{{data.Date | date:'yyyy-MM-dd'}}"></i>
+                                                </div>
+                                                <div class="block tooltipicon"
+                                                     style="margin-top:0;">
+                                                    <i class="fa fa-user"
+                                                       tooltip data-placement="bottom"
+                                                       title="{{data.Owner}}"></i>
+                                                </div>
                                             </div>
-                                            <div class="block">
-                                                <i class="fa fa-user"></i>{{data.Owner}}
+                                            <div ng-class="{'hidden':dataCtrl.smallMode}">
+                                                <div class="block">
+                                                    <i class="fa fa-calendar"></i>{{data.Date | date:'yyyy-MM-dd'}}
+                                                </div>
+                                                <div class="block">
+                                                    <i class="fa fa-user"></i>{{data.Owner}}
+                                                </div>
                                             </div>
+
                                             <div class="block"
                                                  style="height:30px;text-shadow:none;position:relative;"
                                                  ng-if="dataset.MdCompletion || data.MdCompletion">
