@@ -245,11 +245,27 @@
                                                              style="margin-top:6px; margin-right:10px;" />
                                                     </div>
                                                     <div class="bottom">
-                                                        <div class="block">
-                                                            <i class="fa fa-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
+                                                        <div ng-class="{'hidden':!small}">
+                                                            <div class="block tooltipicon"
+                                                                 style="margin-top:0;">
+                                                                <i class="fa fa-calendar"
+                                                                   tooltip data-placement="bottom"
+                                                                   title="{{layer.Date | date:'yyyy-MM-dd'}}"></i>
+                                                            </div>
+                                                            <div class="block tooltipicon"
+                                                                 style="margin-top:0;">
+                                                                <i class="fa fa-user"
+                                                                   tooltip data-placement="bottom"
+                                                                   title="{{layer.Owner}}"></i>
+                                                            </div>
                                                         </div>
-                                                        <div class="block">
-                                                            <i class="fa fa-user"></i>{{layer.Owner}}
+                                                        <div ng-class="{'hidden':small}">
+                                                            <div class="block">
+                                                                <i class="fa fa-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
+                                                            </div>
+                                                            <div class="block">
+                                                                <i class="fa fa-user"></i>{{layer.Owner}}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -267,11 +283,27 @@
                                                             <span class="pull-right text-right item-list-style">METADATA</span>
                                                         </div>
                                                         <div class="bottom">
-                                                            <div class="block">
-                                                                <i class="fa fa-calendar"></i>{{cswdata.createDate | date:'yyyy-MM-dd'}}
+                                                            <div ng-class="{'hidden':!small}">
+                                                                <div class="block tooltipicon"
+                                                                     style="margin-top:0;">
+                                                                    <i class="fa fa-calendar"
+                                                                       tooltip data-placement="bottom"
+                                                                       title="{{cswdata.createDate | date:'yyyy-MM-dd'}}"></i>
+                                                                </div>
+                                                                <div class="block tooltipicon"
+                                                                     style="margin-top:0;">
+                                                                    <i class="fa fa-user"
+                                                                       tooltip data-placement="bottom"
+                                                                       title="{{cswdata.creator}}"></i>
+                                                                </div>
                                                             </div>
-                                                            <div class="block">
-                                                                <i class="fa fa-user"></i>{{cswdata.creator}}
+                                                            <div ng-class="{'hidden':small}">
+                                                                <div class="block">
+                                                                    <i class="fa fa-calendar"></i>{{cswdata.createDate | date:'yyyy-MM-dd'}}
+                                                                </div>
+                                                                <div class="block">
+                                                                    <i class="fa fa-user"></i>{{cswdata.creator}}
+                                                                </div>
                                                             </div>
                                                             <div class="block pull-right">
                                                                 <i class="fa fa-paperclip"></i>
@@ -296,11 +328,27 @@
                                                                   style="font-size:14px;">{{relatedData.Type}}</span>
                                                         </div>
                                                         <div class="bottom">
-                                                            <div class="block">
-                                                                <i class="fa fa-calendar"></i>{{relatedData.Date | date:'yyyy-MM-dd'}}
+                                                            <div ng-class="{'hidden':!small}">
+                                                                <div class="block tooltipicon"
+                                                                     style="margin-top:0;">
+                                                                    <i class="fa fa-calendar"
+                                                                       tooltip data-placement="bottom"
+                                                                       title="{{relatedData.Date | date:'yyyy-MM-dd'}}"></i>
+                                                                </div>
+                                                                <div class="block tooltipicon"
+                                                                     style="margin-top:0;">
+                                                                    <i class="fa fa-user"
+                                                                       tooltip data-placement="bottom"
+                                                                       title="{{relatedData.Owner}}"></i>
+                                                                </div>
                                                             </div>
-                                                            <div class="block">
-                                                                <i class="fa fa-user"></i>{{relatedData.Owner}}
+                                                            <div ng-class="{'hidden':small}">
+                                                                <div class="block">
+                                                                    <i class="fa fa-calendar"></i>{{relatedData.Date | date:'yyyy-MM-dd'}}
+                                                                </div>
+                                                                <div class="block">
+                                                                    <i class="fa fa-user"></i>{{relatedData.Owner}}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -324,11 +372,27 @@
                                                                   translate="label.sensor">sensor</span>
                                                         </div>
                                                         <div class="bottom">
-                                                            <div class="block">
-                                                                <i class="fa fa-calendar"></i>{{sosdata.createDate | date:'yyyy-MM-dd'}}
+                                                            <div ng-class="{'hidden':!small}">
+                                                                <div class="block tooltipicon"
+                                                                     style="margin-top:0;">
+                                                                    <i class="fa fa-calendar"
+                                                                       tooltip data-placement="bottom"
+                                                                       title="{{sosdata.createDate | date:'yyyy-MM-dd'}}"></i>
+                                                                </div>
+                                                                <div class="block tooltipicon"
+                                                                     style="margin-top:0;">
+                                                                    <i class="fa fa-user"
+                                                                       tooltip data-placement="bottom"
+                                                                       title="{{sosdata.creator}}"></i>
+                                                                </div>
                                                             </div>
-                                                            <div class="block">
-                                                                <i class="fa fa-user"></i>{{sosdata.creator}}
+                                                            <div ng-class="{'hidden':small}">
+                                                                <div class="block">
+                                                                    <i class="fa fa-calendar"></i>{{sosdata.createDate | date:'yyyy-MM-dd'}}
+                                                                </div>
+                                                                <div class="block">
+                                                                    <i class="fa fa-user"></i>{{sosdata.creator}}
+                                                                </div>
                                                             </div>
                                                             <div class="block pull-right">
                                                                 <i class="fa fa-paperclip"></i>
@@ -353,11 +417,27 @@
                                                                   translate="label.sensor">sensor</span>
                                                         </div>
                                                         <div class="bottom">
-                                                            <div class="block">
-                                                                <i class="fa fa-calendar"></i>{{soschild.createDate | date:'yyyy-MM-dd'}}
+                                                            <div ng-class="{'hidden':!small}">
+                                                                <div class="block tooltipicon"
+                                                                     style="margin-top:0;">
+                                                                    <i class="fa fa-calendar"
+                                                                       tooltip data-placement="bottom"
+                                                                       title="{{soschild.createDate | date:'yyyy-MM-dd'}}"></i>
+                                                                </div>
+                                                                <div class="block tooltipicon"
+                                                                     style="margin-top:0;">
+                                                                    <i class="fa fa-user"
+                                                                       tooltip data-placement="bottom"
+                                                                       title="{{soschild.creator}}"></i>
+                                                                </div>
                                                             </div>
-                                                            <div class="block">
-                                                                <i class="fa fa-user"></i>{{soschild.creator}}
+                                                            <div ng-class="{'hidden':small}">
+                                                                <div class="block">
+                                                                    <i class="fa fa-calendar"></i>{{soschild.createDate | date:'yyyy-MM-dd'}}
+                                                                </div>
+                                                                <div class="block">
+                                                                    <i class="fa fa-user"></i>{{soschild.creator}}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>

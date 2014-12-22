@@ -75,10 +75,19 @@
                                         <span class="item-title" title="{{task.name}}">{{truncate(small,task.name)}} </span>
                                     </div>
                                     <div class="bottom">
-                                        <div class="block">
-                                            <i class="fa fa-calendar"></i>{{task.date | date:'yyyy-MM-dd'}}
+                                        <div ng-class="{'hidden':!small}">
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;">
+                                                <i class="fa fa-calendar"
+                                                   tooltip data-placement="bottom"
+                                                   title="{{task.date | date:'yyyy-MM-dd'}}"></i>
+                                            </div>
                                         </div>
-
+                                        <div ng-class="{'hidden':small}">
+                                            <div class="block">
+                                                <i class="fa fa-calendar"></i>{{task.date | date:'yyyy-MM-dd'}}
+                                            </div>
+                                        </div>
                                         <div class="block pull-right">
                                             <div ng-if="task.statusList.length > 0">
                                                 <i class="fa fa-paperclip"></i>

@@ -149,11 +149,27 @@
                                          style="margin-top:6px; margin-right:10px;" />
                                 </div>
                                 <div class="bottom">
-                                    <div class="block">
-                                        <i class="fa fa-calendar"></i>{{style.Date | date:'yyyy-MM-dd'}}
+                                    <div ng-class="{'hidden':!small}">
+                                        <div class="block tooltipicon"
+                                             style="margin-top:0;">
+                                            <i class="fa fa-calendar"
+                                               tooltip data-placement="bottom"
+                                               title="{{style.Date | date:'yyyy-MM-dd'}}"></i>
+                                        </div>
+                                        <div class="block tooltipicon"
+                                             style="margin-top:0;">
+                                            <i class="fa fa-user"
+                                               tooltip data-placement="bottom"
+                                               title="{{style.Owner}}"></i>
+                                        </div>
                                     </div>
-                                    <div class="block">
-                                        <i class="fa fa-user"></i>{{style.Owner}}
+                                    <div ng-class="{'hidden':small}">
+                                        <div class="block">
+                                            <i class="fa fa-calendar"></i>{{style.Date | date:'yyyy-MM-dd'}}
+                                        </div>
+                                        <div class="block">
+                                            <i class="fa fa-user"></i>{{style.Owner}}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

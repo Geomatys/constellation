@@ -137,11 +137,27 @@
                                               translate="label.sensor">sensor</span>
                                     </div>
                                     <div class="bottom">
-                                        <div class="block">
-                                            <i class="fa fa-calendar"></i>{{sosdata.createDate | date:'yyyy-MM-dd'}}
+                                        <div ng-class="{'hidden':!sensorCtrl.smallMode}">
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;">
+                                                <i class="fa fa-calendar"
+                                                   tooltip data-placement="bottom"
+                                                   title="{{sosdata.createDate | date:'yyyy-MM-dd'}}"></i>
+                                            </div>
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;">
+                                                <i class="fa fa-user"
+                                                   tooltip data-placement="bottom"
+                                                   title="{{sosdata.owner}}"></i>
+                                            </div>
                                         </div>
-                                        <div class="block">
-                                            <i class="fa fa-user"></i>{{sosdata.owner}}
+                                        <div ng-class="{'hidden':sensorCtrl.smallMode}">
+                                            <div class="block">
+                                                <i class="fa fa-calendar"></i>{{sosdata.createDate | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="fa fa-user"></i>{{sosdata.owner}}
+                                            </div>
                                         </div>
                                         <div class="block pull-right">
                                             <i class="fa fa-paperclip"></i>
@@ -165,11 +181,27 @@
                                               translate="label.sensor">sensor</span>
                                     </div>
                                     <div class="bottom">
-                                        <div class="block">
-                                            <i class="fa fa-calendar"></i>{{soschild.createDate | date:'yyyy-MM-dd'}}
+                                        <div ng-class="{'hidden':!sensorCtrl.smallMode}">
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;">
+                                                <i class="fa fa-calendar"
+                                                   tooltip data-placement="bottom"
+                                                   title="{{soschild.createDate | date:'yyyy-MM-dd'}}"></i>
+                                            </div>
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;">
+                                                <i class="fa fa-user"
+                                                   tooltip data-placement="bottom"
+                                                   title="{{soschild.owner}}"></i>
+                                            </div>
                                         </div>
-                                        <div class="block">
-                                            <i class="fa fa-user"></i>{{soschild.owner}}
+                                        <div ng-class="{'hidden':sensorCtrl.smallMode}">
+                                            <div class="block">
+                                                <i class="fa fa-calendar"></i>{{soschild.createDate | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="fa fa-user"></i>{{soschild.owner}}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
