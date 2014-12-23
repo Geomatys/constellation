@@ -129,11 +129,27 @@
                                                 <span class="pull-right text-right item-list-style">{{style.Type}}</span>
                                             </div>
                                             <div class="bottom">
-                                                <div class="block">
-                                                    <i class="fa fa-calendar"></i>{{style.Date | date:'yyyy-MM-dd'}}
+                                                <div class="hidden-md hidden-lg">
+                                                    <div class="block tooltipicon"
+                                                         style="margin-top:0;">
+                                                        <i class="fa fa-calendar"
+                                                           tooltip data-placement="right"
+                                                           title="{{style.Date | date:'yyyy-MM-dd'}}"></i>
+                                                    </div>
+                                                    <div class="block tooltipicon"
+                                                         style="margin-top:0;">
+                                                        <i class="fa fa-user"
+                                                           tooltip data-placement="right"
+                                                           title="{{style.Owner}}"></i>
+                                                    </div>
                                                 </div>
-                                                <div class="block">
-                                                    <i class="fa fa-user"></i>{{style.Owner}}
+                                                <div class="hidden-xs hidden-sm">
+                                                    <div class="block">
+                                                        <i class="fa fa-calendar"></i>{{style.Date | date:'yyyy-MM-dd'}}
+                                                    </div>
+                                                    <div class="block">
+                                                        <i class="fa fa-user"></i>{{style.Owner}}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
