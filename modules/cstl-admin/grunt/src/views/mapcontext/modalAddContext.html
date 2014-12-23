@@ -161,12 +161,12 @@
                                 <div ng-if="layers.toAdd && layers.toAdd.length > 0">
                                     <div class="dash-inner row dashboard">
                                         <div data-role="list">
-                                            <div class="item-list">
+                                            <div class="item-list mapcontext-layer-list">
                                                 <div class="row no-padding" ng-repeat="layerToAdd in layers.toAdd">
                                                     <div class="row">
-                                                        <div class="col-xs-2" style="padding-top:12px;">
+                                                        <div class="col-xs-2 col15 " style="padding-top:12px;">
                                                             <button ng-click="changeVisibility(layerToAdd)"
-                                                                    class="btn btn-sm"
+                                                                    class="btn btn-sm btn-visibility"
                                                                     ng-class="{'btn-visibility-layer-true':layerToAdd.visible, 'btn-visibility-layer-false':!layerToAdd.visible}">
                                                                 <span class="fa"
                                                                       ng-class="{'fa-eye':layerToAdd.visible,'fa-eye-slash':!layerToAdd.visible}"></span>
@@ -177,7 +177,7 @@
                                                                 <span class="fa fa-search"></span>
                                                             </button>
                                                         </div>
-                                                        <div class="col-xs-8 no-padding"
+                                                        <div class="col-xs-8 col-sm-7 col-md-8 no-padding"
                                                              ng-click="selectItem(layerToAdd)">
                                                             <div class="item layer compo style-small"
                                                                  ng-class="{'selected':layerToAdd===selection.item,'mapcontext':layerToAdd.layer.externalLayer,'coverage':layerToAdd.layer.Type.toLowerCase()==='coverage','vector':layerToAdd.layer.Type.toLowerCase()==='observation-store' || layerToAdd.layer.Type.toLowerCase()==='vector'}">
@@ -237,7 +237,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-xs-1 no-padding" style="padding-top:10px;">
+                                                        <div class="col-xs-1 no-padding col05" style="padding-top:10px;">
                                                             <div class="btn btn-sm"
                                                                  ng-click="deleteMapItem(layerToAdd)">
                                                                 <span class="glyphicon glyphicon-trash"></span>
@@ -247,7 +247,7 @@
                                                                 <span class="fa fa-paint-brush"></span>
                                                             </div>
                                                         </div>
-                                                        <div class="col-xs-1 no-padding"
+                                                        <div class="col-xs-1 no-padding col05"
                                                              style="padding-top:12px;">
                                                             <a class="btn btn-sm"
                                                                ng-click="orderUp($index)"
