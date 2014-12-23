@@ -720,6 +720,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
          */
         $scope.wrap = {};
         $scope.wrap.nbbypage = 5;
+        $scope.searchVisible=false;
 
         $scope.clickFilter = function(ordType){
             $scope.wrap.ordertype = ordType;
