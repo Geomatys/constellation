@@ -249,22 +249,32 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          * This is the mapping code->css class for awesome font in symbolizer point selection.
          */
         $scope.fontsMapping={
-            '#0xf072':'fa-plane',
-            '#0xf0e7':'fa-bolt',
-            '#0xf06e':'fa-eye',
-            '#0xf024':'fa-flag',
-            '#0xf112':'fa-reply',
-            '#0xf0e9':'fa-umbrella',
-            '#0xf041':'fa-map-marker',
-            '#0xf06d':'fa-fire',
-            '#0xf002':'fa-search',
-            '#0xf007':'fa-user',
-            '#0xf071':'fa-warning',
-            '#0xf0ad':'fa-wrench',
-            '#0xf09e':'fa-rss',
-            '#0xf13d':'fa-anchor',
-            '#0xf06c':'fa-leaf',
-            '#0xf0c2':'fa-cloud'
+            '0xf105':'fa-angle-right',
+            '0xf101':'fa-angle-double-right',
+            '0xf061':'fa-arrow-right',
+            '0xf178':'fa-long-arrow-right',
+            '0xf124':'fa-location-arrow',
+            '0xf1ae':'fa-child',
+            '0xf1b0':'fa-paw',
+            '0xf087':'fa-thumbs-o-up',
+            '0xf043':'fa-tint',
+            '0xf072':'fa-plane',
+            '0xf0e7':'fa-bolt',
+            '0xf06e':'fa-eye',
+            '0xf024':'fa-flag',
+            '0xf112':'fa-reply',
+            '0xf0e9':'fa-umbrella',
+            '0xf041':'fa-map-marker',
+            '0xf06d':'fa-fire',
+            '0xf002':'fa-search',
+            '0xf007':'fa-user',
+            '0xf071':'fa-warning',
+            '0xf0ad':'fa-wrench',
+            '0xf09e':'fa-rss',
+            '0xf13d':'fa-anchor',
+            '0xf06c':'fa-leaf',
+            '0xf0c2':'fa-cloud',
+            '0xf118':'fa-smile-o'
         };
         $scope.fontsCodes = [];
         for(var code in $scope.fontsMapping){
@@ -1439,12 +1449,12 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
         };
 
         /**
-         * Returns true if the given string value is ttf://fontName#code.
+         * Returns true if the given string value is like ttf:fontName?char=code.
          * @param value
          * @returns {*|boolean}
          */
         $scope.isTTFValue = function(value) {
-            return (value && value.indexOf('ttf://') !== -1);
+            return (value && value.indexOf('ttf:') !== -1);
         };
 
         /**
@@ -1454,7 +1464,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          */
         $scope.resolveClassForCode = function(value) {
             if($scope.isTTFValue(value)){
-                return $scope.fontsMapping[value.substring(value.indexOf('#'))];
+                return $scope.fontsMapping[value.substring(value.indexOf('=')+1)];
             }
             return '';
         };

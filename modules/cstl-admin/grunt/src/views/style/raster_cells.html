@@ -68,22 +68,13 @@
                             <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'cross'">
                                 <a class="symbolIconItem"><img class="img_icone" src="img/icone_cross.png"/></a>
                             </li>
-                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'arrow'">
-                                <a class="symbolIconItem"><img class="img_icone" src="img/icone_arrow.png"/></a>
-                            </li>
-                            <li ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'hatch'">
-                                <a class="symbolIconItem"><img class="img_icone" src="img/icone_hatch.png"/></a>
-                            </li>
-                            <li ng-repeat="item in fontsCodes"
-                                ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'ttf://FontAwesome'+item">
-                                <a class="symbolIconItem"><i class="fa" ng-class="fontsMapping[item]"></i></a>
+                            <li ng-repeat="code in fontsCodes"
+                                ng-click="optionsSLD.rasterCells.pointSymbol.graphic.mark.geometry = 'ttf:FontAwesome?char='+code">
+                                <a class="symbolIconItem"><i class="fa" ng-class="fontsMapping[code]"></i></a>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <!--div class="col-xs-4 col-sm-8 col-md-4 col-sm-offset-4 col-md-offset-0">
-                    <button class="btn btn-default btn-block" type="button">Importer</button>
-                </div-->
             </div>
             <div class="form-group">
                 <label class="col-xs-5 col-sm-5 col-md-5 col-lg-5 control-label"
