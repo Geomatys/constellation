@@ -6,10 +6,12 @@
         </div>
         <div class="modal-body">
             <form id="uploadSensor" class="form-horizontal">
-                <!-- Upload data -->
                 <label class="col-sm-2 col-xs-3" translate="label.sensor">Sensor</label>
                 <div class="btn-lg tooltipicon">
-                    <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.sensor.add' | translate }}" ></span>
+                    <span type="button"
+                          class="glyphicon glyphicon-info-sign"
+                          tooltip data-placement="right"
+                          title="{{'tooltip.sensor.add' | translate }}" ></span>
                 </div>
                 <div class="fileinput fileinput-new" style="margin-top:5px;"  data-provides="fileinput">
                     <div class="input-group">
@@ -21,14 +23,20 @@
                                     <span class="fileinput-new" translate="data.modal.select">Select file</span>
                                     <span class="fileinput-exists" translate="data.modal.change">Change</span>
                                     <input type="file" name="data"></span>
-                        <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
+                        <a class="input-group-addon btn btn-default fileinput-exists"
+                           data-dismiss="fileinput"
+                           translate="data.modal.remove">Remove</a>
                     </div>
                 </div>
             </form>
         </div>
         <div class="modal-footer">
-            <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="data.modal.cancel">Cancel</button>
-            <button type="button" id="submitButton" class="btn btn-add" ng-click="uploadData()" translate="data.modal.end">Finish</button>
+            <button type="button" id="cancelButton"
+                    class="btn btn-default" ng-click="close()"
+                    translate="data.modal.cancel">Cancel</button>
+            <button type="button" id="submitButton"
+                    class="btn btn-add" ng-click="uploadData()"
+                    translate="data.modal.end">Finish</button>
         </div>
     </div>
 </div>

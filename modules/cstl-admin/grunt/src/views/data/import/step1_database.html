@@ -2,43 +2,54 @@
     <form class="form">
         <fieldset>
             <div class="form-group row">
-                <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>
+                <label class="col-sm-12 control-label new-service-form-label"
+                       translate="service.config.source.database.url">Database URL</label>
                 <div class="col-xs-11">
                     <input type="text" class="form-control" ng-model="import.db.url">
                 </div>
                 <div class="btn-lg tooltipicon">
-                    <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.source.url' | translate }}" ></span>
+                    <span type="button" class="glyphicon glyphicon-info-sign"
+                          tooltip data-placement="bottom"
+                          title="{{'tooltip.service.source.url' | translate }}" ></span>
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.port">Database port</label>
+                <label class="col-sm-12 control-label new-service-form-label"
+                       translate="service.config.source.database.port">Database port</label>
                 <div class="col-xs-11">
                     <input type="text" class="form-control" ng-model="import.db.port">
                 </div>
                 <div class="btn-lg tooltipicon">
-                    <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="bottom" title="{{'tooltip.service.create.port' | translate }}" ></span>
+                    <span type="button" class="glyphicon glyphicon-info-sign"
+                          tooltip data-placement="bottom"
+                          title="{{'tooltip.service.create.port' | translate }}" ></span>
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.name">Database name</label>
+                <label class="col-sm-12 control-label new-service-form-label"
+                       translate="service.config.source.database.name">Database name</label>
                 <div class="col-xs-11">
                     <input type="text" class="form-control" ng-model="import.db.name">
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.username">User name</label>
+                <label class="col-sm-12 control-label new-service-form-label"
+                       translate="service.config.source.database.username">User name</label>
                 <div class="col-xs-11">
                     <input type="text" class="form-control" ng-model="import.db.user">
                 </div>
             </div>
             <div class="form-group row">
-                <label class="col-sm-12 control-label new-service-form-label" translate="service.config.source.database.password">Password</label>
+                <label class="col-sm-12 control-label new-service-form-label"
+                       translate="service.config.source.database.password">Password</label>
                 <div class="col-xs-11">
                     <input type="password" class="form-control" ng-model="import.db.password">
                 </div>
             </div>
             <div style="text-align:center">
-                <button type="button" id="testDBButton" ng-show="!(import.testConnected)" class="btn btn-add ng-scope" ng-click="testDB();" translate="service.config.source.database.test">Test</button>
+                <button type="button" id="testDBButton" ng-show="!(import.testConnected)"
+                        class="btn btn-add ng-scope" ng-click="testDB();"
+                        translate="service.config.source.database.test">Test</button>
             </div>
         </fieldset>
     </form>

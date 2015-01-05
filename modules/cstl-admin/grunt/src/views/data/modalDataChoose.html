@@ -16,32 +16,40 @@
                                     <li ng-click="clickFilter('Name')">
                                         <a style="padding:10px;">
                                             <span translate="label.title">Title</span>
-                                            <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'Name' && wrap.orderreverse"></i>
-                                            <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'Name' && !wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-up"
+                                               ng-if="wrap.ordertype === 'Name' && wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-down"
+                                               ng-if="wrap.ordertype === 'Name' && !wrap.orderreverse"></i>
                                         </a>
                                     </li>
                                     <li class="divider-vertical"></li>
                                     <li ng-click="clickFilter('Date')">
                                         <a style="padding:10px;">
                                             <span translate="service.edit.dashboard.header.date">Date</span>
-                                            <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'Date' && wrap.orderreverse"></i>
-                                            <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'Date' && !wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-up"
+                                               ng-if="wrap.ordertype === 'Date' && wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-down"
+                                               ng-if="wrap.ordertype === 'Date' && !wrap.orderreverse"></i>
                                         </a>
                                     </li>
                                     <li class="divider-vertical"></li>
                                     <li ng-click="clickFilter('Owner')">
                                         <a style="padding:10px;">
                                             <span translate="service.edit.dashboard.header.owner">Owner</span>
-                                            <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'Owner' && wrap.orderreverse"></i>
-                                            <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'Owner' && !wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-up"
+                                               ng-if="wrap.ordertype === 'Owner' && wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-down"
+                                               ng-if="wrap.ordertype === 'Owner' && !wrap.orderreverse"></i>
                                         </a>
                                     </li>
                                     <li class="divider-vertical"></li>
                                     <li ng-click="clickFilter('Type')">
                                         <a style="padding:10px;">
                                             <span translate="service.edit.dashboard.header.type">Type</span>
-                                            <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'Type' && wrap.orderreverse"></i>
-                                            <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'Type' && !wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-up"
+                                               ng-if="wrap.ordertype === 'Type' && wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-down"
+                                               ng-if="wrap.ordertype === 'Type' && !wrap.orderreverse"></i>
                                         </a>
                                     </li>
                                     <li class="divider-vertical"></li>
@@ -51,11 +59,14 @@
                                         class="btn btn-xs btn-data">
                                     <i class="fa fa-times"></i>
                                 </button>
-                                <button type="button" ng-click="searchVisible= !searchVisible" class="btn btn-xs btn-data">
+                                <button type="button"
+                                        ng-click="searchVisible= !searchVisible"
+                                        class="btn btn-xs btn-data">
                                     <i class="fa fa-search"></i>
                                 </button>
                                 <div class="pull-right col-xs-5 col-sm-5 col-md-3 col-lg-4"
-                                     style="padding-right:0;padding-left: 10px;" ng-if="searchVisible">
+                                     style="padding-right:0;padding-left: 10px;"
+                                     ng-if="searchVisible">
                                     <div style="position:relative;">
                                         <input type="text"
                                                ng-model="wrap.filtertext"
@@ -72,7 +83,8 @@
                                     <div class="col-xs-12" style="padding: 0;">
                                         <strong class="col-xs-8" style="padding-right: 0;">
                                             <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
-                                            <span class="nb-results" translate="label.count.data">available data</span>
+                                            <span class="nb-results"
+                                                  translate="label.count.data">available data</span>
                                         </strong>
                                         <div ng-if="service.type.toLowerCase() !== 'sos'"
                                              class="pull-right col-xs-4"
@@ -110,36 +122,20 @@
                                                     <span class="item-title title-modal">{{truncate(data.Name,40)}}</span>
                                                     <span class="pull-right text-right item-list-style"
                                                           style="font-size:14px;">{{data.Type}}</span>
-                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && !isInSelected(data)"
-                                                         src="img/vector-multipoint.svg"
+                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint')"
+                                                         ng-src="{{isInSelected(data)?'img/vector-multipoint-selected.svg':'img/vector-multipoint.svg'}}"
                                                          class="pull-right"
                                                          style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && !isInSelected(data)"
-                                                         src="img/vector-poly.svg"
+                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon')"
+                                                         ng-src="{{isInSelected(data)?'img/vector-poly-selected.svg':'img/vector-poly.svg'}}"
                                                          class="pull-right"
                                                          style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && !isInSelected(data)"
-                                                         src="img/vector-polyline.svg"
+                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString')"
+                                                         ng-src="{{isInSelected(data)?'img/vector-polyline-selected.svg':'img/vector-polyline.svg'}}"
                                                          class="pull-right"
                                                          style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="data.Subtype=='Geometry' && !isInSelected(data)"
-                                                         src="img/vector-multigeometry.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px; width:22px;" />
-                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && isInSelected(data)"
-                                                         src="img/vector-multipoint-selected.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && isInSelected(data)"
-                                                         src="img/vector-poly-selected.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && isInSelected(data)"
-                                                         src="img/vector-polyline-selected.svg"
-                                                         class="pull-right"
-                                                         style="margin-top:6px; margin-right:10px;" />
-                                                    <img ng-if="data.Subtype=='Geometry' && isInSelected(data)"
-                                                         src="img/vector-multigeometry-selected.svg"
+                                                    <img ng-if="data.Subtype=='Geometry'"
+                                                         ng-src="{{isInSelected(data)?'img/vector-multigeometry-selected.svg':'img/vector-multigeometry.svg'}}"
                                                          class="pull-right"
                                                          style="margin-top:6px; margin-right:10px; width:22px;" />
                                                 </div>

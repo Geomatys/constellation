@@ -211,36 +211,20 @@
                                                         <span class="item-title"
                                                               title="{{layer.Name}}">{{layer.Title ? truncate(small,layer.Title) : truncate(small,layer.Name)}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
-                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected"
-                                                             src="img/vector-multipoint.svg"
+                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint')"
+                                                             ng-src="{{layer!=selected?'img/vector-multipoint.svg':'img/vector-multipoint-selected.svg'}}"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="layer.Subtype=='Geometry' && layer!=selected"
-                                                             src="img/vector-multigeometry.svg"
+                                                        <img ng-if="layer.Subtype=='Geometry'"
+                                                             ng-src="{{layer!=selected?'img/vector-multigeometry.svg':'img/vector-multigeometry-selected.svg'}}"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px; width:22px" />
-                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected"
-                                                             src="img/vector-poly.svg"
+                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon')"
+                                                             ng-src="{{layer!=selected?'img/vector-poly.svg':'img/vector-poly-selected.svg'}}"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected"
-                                                             src="img/vector-polyline.svg"
-                                                             class="pull-right"
-                                                             style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selected"
-                                                             src="img/vector-multipoint-selected.svg"
-                                                             class="pull-right"
-                                                             style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selected"
-                                                             src="img/vector-poly-selected.svg"
-                                                             class="pull-right"
-                                                             style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="layer.Subtype=='Geometry' && layer==selected"
-                                                             src="img/vector-multigeometry-selected.svg"
-                                                             class="pull-right"
-                                                             style="margin-top:6px; margin-right:10px; width:22px" />
-                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selected"
-                                                             src="img/vector-polyline-selected.svg"
+                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString')"
+                                                             ng-src="{{layer!=selected?'img/vector-polyline.svg':'img/vector-polyline-selected.svg'}}"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
                                                     </div>

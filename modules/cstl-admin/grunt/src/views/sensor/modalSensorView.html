@@ -13,10 +13,11 @@
                             <input type="checkbox" ng-model="measure.checked" ng-change="clickMeasure(measure)"> {{measure.id}}
                         </label>
                     </div>
-                    <!-- Error no measure selected -->
-            <div class="row" ng-if="var.needToSelectMeasure === true">
-                <p style="font-size:13px;" class="error" translate="service.edit.dashboard.measures.error.select.one">You need to select one measure in the list</p>
-            </div>
+                    <div class="row" ng-if="var.needToSelectMeasure === true">
+                        <p style="font-size:13px;"
+                           class="error"
+                           translate="service.edit.dashboard.measures.error.select.one">You need to select one measure in the list</p>
+                    </div>
                 </div>
                 <div class="col-sm-8 sos_edit_blocs">
                     <label class="control-label" translate="service.edit.dashboard.area">Geographical area</label>
@@ -25,38 +26,57 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Graph -->
             <div class="row" ng-if="var.displayGraph === true">
                 <div class="col-sm-12">
                     <div class="sos_edit_graph" id="graph" ng-init="test=false">
-                        <div ng-class="{'sos_edit_graph_date-selected':test==true, 'sos_edit_graph_date':test==false}" style="padding:0; right:15px;position:absolute; text-align:right;">
-                            <div class="btn-lg calendar-button" style="cursor:pointer;" ng-click="test=!test"><span class="glyphicon glyphicon-calendar"></span></div>
-                            <div ng-show="test==true" class="form-inline form-calendar" style="width:381px;">
-                                <label class="control-label" translate="service.edit.dashboard.date.from">From</label>
-                                <input type="text" class="form-control" style="width:160px;" datetimepicker ng-model="var.start"/>
-                                <label class="control-label" translate="service.edit.dashboard.date.to"> to</label>
-                                <input type="text" class="form-control" style="width:160px;" datetimepicker ng-model="var.end"/>
+                        <div ng-class="{'sos_edit_graph_date-selected':test==true, 'sos_edit_graph_date':test==false}"
+                             style="padding:0; right:15px;position:absolute; text-align:right;">
+                            <div class="btn-lg calendar-button"
+                                 style="cursor:pointer;"
+                                 ng-click="test=!test">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </div>
+                            <div ng-show="test==true"
+                                 class="form-inline form-calendar"
+                                 style="width:381px;">
+                                <label class="control-label"
+                                       translate="service.edit.dashboard.date.from">From</label>
+                                <input type="text"
+                                       class="form-control"
+                                       style="width:160px;"
+                                       datetimepicker ng-model="var.start"/>
+                                <label class="control-label"
+                                       translate="service.edit.dashboard.date.to"> to</label>
+                                <input type="text"
+                                       class="form-control"
+                                       style="width:160px;"
+                                       datetimepicker ng-model="var.end"/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- RealTimeGraph -->
             <div class="row" ng-show="var.displayRealTimeGraph === true">
                 <div class="col-sm-12">
                     <div id="sos_realtime_graph" style="width:840px; height:300px;"> </div>
                 </div>
             </div>
-        <!--</div>-->
-
-
-    </div>
+        </div>
         <div class="modal-footer" style="border-top:none;">
-            <button type="button" ng-show="var.displayMesureSelector === false" class="btn btn-default" ng-click="displaySelector()" translate="label.return">Back</button>
-            <button type="button" class="btn btn-default" ng-click="close()" translate="data.modal.close">Close</button>
-            <button type="button" class="btn btn-add" ng-show="var.displayMesureSelector === true" ng-click="showGraph()" translate="service.edit.dashboard.button.graph.show">Show graph</button>
-            <button type="button" class="btn btn-add" ng-show="var.displayMesureSelector === true" ng-click="showRealTimeGraph()" translate="service.edit.dashboard.button.realtime.graph.show">Show realtime graph</button>
+            <button type="button" ng-show="var.displayMesureSelector === false"
+                    class="btn btn-default" ng-click="displaySelector()"
+                    translate="label.return">Back</button>
+            <button type="button" class="btn btn-default"
+                    ng-click="close()"
+                    translate="data.modal.close">Close</button>
+            <button type="button" class="btn btn-add"
+                    ng-show="var.displayMesureSelector === true"
+                    ng-click="showGraph()"
+                    translate="service.edit.dashboard.button.graph.show">Show graph</button>
+            <button type="button" class="btn btn-add"
+                    ng-show="var.displayMesureSelector === true"
+                    ng-click="showRealTimeGraph()"
+                    translate="service.edit.dashboard.button.realtime.graph.show">Show realtime graph</button>
         </div>
     </div>
 </div>

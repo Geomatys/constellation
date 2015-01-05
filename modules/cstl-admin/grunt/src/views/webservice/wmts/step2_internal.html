@@ -95,38 +95,22 @@
                                  data-name="{{data.Provider+':'+data.Name}}">
                                 <div class="top">
                                     <span class="item-title title-modal">{{truncate(data.Name,40)}}</span>
-                                                <span class="pull-right text-right item-list-style"
-                                                      style="font-size:14px;">{{data.Type}}</span>
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && !isInSelected(data)"
-                                         src="img/vector-multipoint.svg"
+                                    <span class="pull-right text-right item-list-style"
+                                          style="font-size:14px;">{{data.Type}}</span>
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint')"
+                                         ng-src="{{isInSelected(data)?'img/vector-multipoint-selected.svg':'img/vector-multipoint.svg'}}"
                                          class="pull-right"
                                          style="margin-top:6px; margin-right:10px;" />
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && !isInSelected(data)"
-                                         src="img/vector-poly.svg"
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon')"
+                                         ng-src="{{isInSelected(data)?'img/vector-poly-selected.svg':'img/vector-poly.svg'}}"
                                          class="pull-right"
                                          style="margin-top:6px; margin-right:10px;" />
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && !isInSelected(data)"
-                                         src="img/vector-polyline.svg"
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString')"
+                                         ng-src="{{isInSelected(data)?'img/vector-polyline-selected.svg':'img/vector-polyline.svg'}}"
                                          class="pull-right"
                                          style="margin-top:6px; margin-right:10px;" />
-                                    <img ng-if="data.Subtype=='Geometry' && !isInSelected(data)"
-                                         src="img/vector-multigeometry.svg"
-                                         class="pull-right"
-                                         style="margin-top:6px; margin-right:10px; width:22px;" />
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && isInSelected(data)"
-                                         src="img/vector-multipoint-selected.svg"
-                                         class="pull-right"
-                                         style="margin-top:6px; margin-right:10px;" />
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && isInSelected(data)"
-                                         src="img/vector-poly-selected.svg"
-                                         class="pull-right"
-                                         style="margin-top:6px; margin-right:10px;" />
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && isInSelected(data)"
-                                         src="img/vector-polyline-selected.svg"
-                                         class="pull-right"
-                                         style="margin-top:6px; margin-right:10px;" />
-                                    <img ng-if="data.Subtype=='Geometry' && isInSelected(data)"
-                                         src="img/vector-multigeometry-selected.svg"
+                                    <img ng-if="data.Subtype=='Geometry'"
+                                         ng-src="{{isInSelected(data)?'img/vector-multigeometry-selected.svg':'img/vector-multigeometry.svg'}}"
                                          class="pull-right"
                                          style="margin-top:6px; margin-right:10px; width:22px;" />
                                 </div>
