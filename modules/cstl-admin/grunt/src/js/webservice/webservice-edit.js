@@ -31,8 +31,8 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
 
         $scope.tagText = '';
         $scope.type = $routeParams.type;
-        $scope.url = $cookieStore.get('cstlUrl') + "WS/" + $routeParams.type + "/" + $routeParams.id;
         $scope.cstlUrl = $cookieStore.get('cstlUrl');
+        $scope.url = $scope.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
         $scope.urlBoxSize = Math.min($scope.url.length,100);
         $scope.domainId = $cookieStore.get('cstlActiveDomainId');
         $scope.writeOperationAvailable = $scope.type === 'csw' || $scope.type === 'sos' || $scope.type === 'wfs';
@@ -571,7 +571,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                                              data,
                                 function(response){//success
                                     var wmtsValues = {
-                                        "url":$cookieStore.get('cstlUrl') +'WS/wmts/'+ $scope.service.identifier,
+                                        "url":$scope.cstlUrl +'WS/wmts/'+ $scope.service.identifier,
                                         "resolutions": response.resolutions,
                                         "matrixSet":response.matrixSet,
                                         "matrixIds":response.matrixIds,
@@ -590,19 +590,19 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
                         if($scope.service.type.toLowerCase() === 'wms') {
                             //create wms layer
-                            layerData = DataViewer.createLayerWMSWithStyle($cookieStore.get('cstlUrl'), layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
+                            layerData = DataViewer.createLayerWMSWithStyle($scope.cstlUrl, layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
                         }else {
                             //create portrayal layer
-                            layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'), layerName, providerId,
+                            layerData = DataViewer.createLayerWithStyle($scope.cstlUrl, layerName, providerId,
                                 $scope.selected.TargetStyle[0].Name,null,null,true);
                         }
                     } else {
                         if($scope.service.type.toLowerCase() === 'wms') {
                             //create wms layer
-                            layerData = DataViewer.createLayerWMS($cookieStore.get('cstlUrl'), layerName, $scope.service.identifier);
+                            layerData = DataViewer.createLayerWMS($scope.cstlUrl, layerName, $scope.service.identifier);
                         }else {
                             //create portrayal layer
-                            layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), layerName, providerId,null,true);
+                            layerData = DataViewer.createLayer($scope.cstlUrl, layerName, providerId,null,true);
                         }
                     }
 
@@ -958,6 +958,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             if (DataViewer.map) {
                 DataViewer.map.setTarget(undefined);
             }
+            var cstlUrl = $cookieStore.get('cstlUrl');
             DataViewer.initConfig();
             if($scope.values.listSelect.length >0){
                 var layerName,providerId;
@@ -971,10 +972,10 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     providerId = dataItem.Provider;
                     var layerData;
                     if (dataItem.TargetStyle && dataItem.TargetStyle.length > 0) {
-                        layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'),layerName,providerId,
+                        layerData = DataViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
                                                                     dataItem.TargetStyle[0].Name,null,null,true);
                     } else {
-                        layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), layerName, providerId,null,true);
+                        layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,true);
                     }
                     //to force the browser cache reloading styled layer.
                     layerData.get('params').ts=new Date().getTime();
@@ -1122,20 +1123,37 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 if(crsCode === 'EPSG:4326' || crsCode === 'CRS:84') {
                     DataViewer.extent=[-180, -90, 180, 90];
                 }
+                var cstlUrl = $cookieStore.get('cstlUrl');
                 if($scope.values.selectedContext.layers && $scope.values.selectedContext.layers.length>0){
                     var layersToView = [];
                     for (var i=0; i<$scope.values.selectedContext.layers.length; i++) {
                         var layer = $scope.values.selectedContext.layers[i];
                         if (layer.visible) {
                             var layerData;
-                            if (layer.externalServiceUrl) {//external wms layer
-                                layerData = (layer.externalStyle) ?
-                                    DataViewer.createLayerExternalWMSWithStyle(layer.externalServiceUrl, layer.externalLayer, layer.externalStyle.split(',')[0]) :
-                                    DataViewer.createLayerExternalWMS(layer.externalServiceUrl, layer.externalLayer);
-                            } else {//internal wms layer
-                                layerData = (layer.styleName) ?
-                                    DataViewer.createLayerWMSWithStyle($cookieStore.get('cstlUrl'), layer.Name, layer.serviceIdentifier, layer.styleName) :
-                                    DataViewer.createLayerWMS($cookieStore.get('cstlUrl'), layer.Name, layer.serviceIdentifier);
+                            if(layer.iswms){
+                                if (layer.externalServiceUrl) {//external wms layer
+                                    layerData = (layer.externalStyle) ?
+                                        DataViewer.createLayerExternalWMSWithStyle(layer.externalServiceUrl, layer.externalLayer, layer.externalStyle.split(',')[0]) :
+                                        DataViewer.createLayerExternalWMS(layer.externalServiceUrl, layer.externalLayer);
+                                } else {//internal wms layer
+                                    layerData = (layer.styleName) ?
+                                        DataViewer.createLayerWMSWithStyle(cstlUrl, layer.Name, layer.serviceIdentifier, layer.styleName) :
+                                        DataViewer.createLayerWMS(cstlUrl, layer.Name, layer.serviceIdentifier);
+                                }
+                            }else {
+                                var layerName,providerId;
+                                if (layer.Namespace) {
+                                    layerName = '{' + layer.Namespace + '}' + layer.Name;
+                                } else {
+                                    layerName = layer.Name;
+                                }
+                                providerId = layer.Provider;
+                                if (layer.externalStyle || layer.styleName) {
+                                    layerData = DataViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
+                                        layer.externalStyle?layer.externalStyle:layer.styleName,null,null,true);
+                                } else {
+                                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,true);
+                                }
                             }
                             layerData.setOpacity(layer.opacity / 100);
                             layersToView.push(layerData);
