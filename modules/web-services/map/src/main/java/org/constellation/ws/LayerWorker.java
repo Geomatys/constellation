@@ -164,6 +164,13 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     protected Layer getConfigurationLayer(final QName layerName, final String login) {
+
+        try {
+            return layerBusiness.getLayer(this.specification.name(), getId(), layerName.getLocalPart(), layerName.getNamespaceURI(), login);
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.FINE, "No layer is exactly named as queried. Search using alias will start now", e);
+        }
+
         if (layerName != null) {
             final List<Layer> layers = getConfigurationLayers(login);
             for (Layer layer : layers) {
@@ -221,10 +228,14 @@ public abstract class LayerWorker extends AbstractWorker {
         return layerRefs;
     }
 
+    protected Data getLayerReference(final Layer layer) throws CstlServiceException {
+        return DataProviders.getInstance().get(new DefaultName(layer.getName()), layer.getProviderID(), layer.getDate());
+    }
+
     protected Data getLayerReference(final String login, final QName layerName) throws CstlServiceException {
         return getLayerReference(login, new DefaultName(layerName));
     }
-    
+
     /**
      * Search layer real name and return the LayerDetails from LayerProvider.
      * @param login
@@ -244,7 +255,7 @@ public abstract class LayerWorker extends AbstractWorker {
             }
             if (layerRef == null) {throw new CstlServiceException("Unable to find  the Layer named:" + layerName + " in the provider proxy", NO_APPLICABLE_CODE);}
         } else {
-            throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
+            throw new CstlServiceException("Unknown Layer name:" + layerName, LAYER_NOT_DEFINED);
         }
         return layerRef;
     }
@@ -259,13 +270,14 @@ public abstract class LayerWorker extends AbstractWorker {
             return null;
         }
 
-        final List<QName> layerNames = getConfigurationLayerNames(login);
-        if (layerNames == null) {
-            return null;
-        }
-
         final Layer directLayer = getConfigurationLayer(name, login);
         if (directLayer == null) {
+
+            final List<QName> layerNames = getConfigurationLayerNames(login);
+            if (layerNames == null) {
+                return null;
+            }
+
             //search with only localpart
             for (QName layerName : layerNames) {
                 if (layerName.getLocalPart().equals(name.getLocalPart())) {

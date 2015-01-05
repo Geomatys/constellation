@@ -480,7 +480,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final List<Layer> layers = getConfigurationLayers(userLogin);
         try {
             for (Layer configLayer : layers) {
-                final Data layer = getLayerReference(userLogin, configLayer.getName());
+                final Data layer = getLayerReference(configLayer);
 
                 if (layer.getType().equals(Data.TYPE.FEATURE)) {
                     continue;

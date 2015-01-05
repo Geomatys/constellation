@@ -316,7 +316,9 @@ public class LayerBusiness implements ILayerBusiness {
             final LayerContext context = readMapConfiguration(service.getConfig());
             final MapFactory mapfactory = getMapFactory(context.getImplementation());
             final LayerSecurityFilter securityFilter = mapfactory.getSecurityFilter();
-            Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace);
+            Layer layer = (namespace != null)?
+                    layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace) :
+                    layerRepository.findByServiceIdAndLayerName(service.getId(), name);
             org.constellation.configuration.Layer layerConfig = toLayerConfig(login, securityFilter, layer);
             if (layerConfig != null) {
                 return layerConfig;
@@ -337,6 +339,7 @@ public class LayerBusiness implements ILayerBusiness {
      * @throws ConfigurationException
      */
     private org.constellation.configuration.Layer toLayerConfig(String login, LayerSecurityFilter securityFilter, Layer layer) throws ConfigurationException {
+        if (layer == null) return null;
         final Data data          = dataRepository.findById(layer.getData());
         final Provider provider  = providerRepository.findOne(data.getProvider());
         final QName name         = new QName(layer.getNamespace(), layer.getName());

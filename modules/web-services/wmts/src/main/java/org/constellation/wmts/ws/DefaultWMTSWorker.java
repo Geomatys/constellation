@@ -235,118 +235,127 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
 
         // If the getCapabilities response is in cache, we just return it.
-        final AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
+        AbstractCapabilitiesCore cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
         if (cachedCapabilities != null) {
             return (Capabilities) cachedCapabilities.applySections(sections);
         }
 
+        /* We synchronize Computing, because every thread will compute the same thing, its useless to waste CPU. One will
+         * do the job, the others will wait.
+         */
+        synchronized (this) {
+
+            cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
+            if (cachedCapabilities != null) {
+                return (Capabilities) cachedCapabilities.applySections(sections);
+            }
         /*
          * BUILD NEW CAPABILITIES DOCUMENT
          */
-        tmsBindingLock.writeLock().lock();
-        try {
-            tmsIdBinding.clear();
-        } finally {
-            tmsBindingLock.writeLock().unlock();
-        }
-
-        // we load the skeleton capabilities
-        final Details skeleton = getStaticCapabilitiesObject("wmts", null);
-        final Capabilities skeletonCapabilities = (Capabilities) WMTSConstant.createCapabilities("1.0.0", skeleton);
-
-         //we prepare the response document
-        final ServiceIdentification si = skeletonCapabilities.getServiceIdentification();
-        final ServiceProvider       sp = skeletonCapabilities.getServiceProvider();
-        final OperationsMetadata    om = (OperationsMetadata) WMTSConstant.OPERATIONS_METADATA.clone();
-        // TODO
-        final List<Themes>      themes = new ArrayList<>();
-
-        //we update the URL
-        om.updateURL(getServiceUrl());
-
-        // Build the list of layers
-        final List<LayerType> outputLayers = new ArrayList<>();
-        // and the list of matrix set
-        final HashMap<String, TileMatrixSet> tileSets = new HashMap<>();
-
-        final List<Layer> declaredLayers = getConfigurationLayers(userLogin);
-
-       for (final Layer configLayer : declaredLayers) {
-           final Data details = getLayerReference(userLogin, configLayer.getName());
-           final String name;
-           if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
-               name = configLayer.getAlias().trim().replaceAll(" ", "_");
-           } else {
-               name = configLayer.getName().getLocalPart();
-           }
-
-            final Object origin = details.getOrigin();
-            if(!(origin instanceof PyramidalCoverageReference)){
-                //WMTS only handle PyramidalModel
-                LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", name);
-                continue;
+            tmsBindingLock.writeLock().lock();
+            try {
+                tmsIdBinding.clear();
+            } finally {
+                tmsBindingLock.writeLock().unlock();
             }
 
-            try{
-                final PyramidalCoverageReference pmodel = (PyramidalCoverageReference) origin;
-                final PyramidSet set = pmodel.getPyramidSet();
+            // we load the skeleton capabilities
+            final Details skeleton = getStaticCapabilitiesObject("wmts", null);
+            final Capabilities skeletonCapabilities = (Capabilities) WMTSConstant.createCapabilities("1.0.0", skeleton);
 
-                final Envelope env = set.getEnvelope();
-                if (env == null) {
-                    throw new CstlServiceException("No valid extent for layer "+name);
+            //we prepare the response document
+            final ServiceIdentification si = skeletonCapabilities.getServiceIdentification();
+            final ServiceProvider sp = skeletonCapabilities.getServiceProvider();
+            final OperationsMetadata om = (OperationsMetadata) WMTSConstant.OPERATIONS_METADATA.clone();
+            // TODO
+            final List<Themes> themes = new ArrayList<>();
+
+            //we update the URL
+            om.updateURL(getServiceUrl());
+
+            // Build the list of layers
+            final List<LayerType> outputLayers = new ArrayList<>();
+            // and the list of matrix set
+            final HashMap<String, TileMatrixSet> tileSets = new HashMap<>();
+
+            final List<Layer> declaredLayers = getConfigurationLayers(userLogin);
+
+            for (final Layer configLayer : declaredLayers) {
+                final Data details = getLayerReference(configLayer);
+                final String name;
+                if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
+                    name = configLayer.getAlias().trim().replaceAll(" ", "_");
+                } else {
+                    name = configLayer.getName().getLocalPart();
                 }
+
+                final Object origin = details.getOrigin();
+                if (!(origin instanceof PyramidalCoverageReference)) {
+                    //WMTS only handle PyramidalModel
+                    LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", name);
+                    continue;
+                }
+
+                try {
+                    final PyramidalCoverageReference pmodel = (PyramidalCoverageReference) origin;
+                    final PyramidSet set = pmodel.getPyramidSet();
+
+                    final Envelope env = set.getEnvelope();
+                    if (env == null) {
+                        throw new CstlServiceException("No valid extent for layer " + name);
+                    }
                 /* We get pyramid set CRS components to identify additional dimensions. We remove horizontal component
                  * from the list to ease further operations, and prepare WMTS dimension descriptors. Dimension allowed
                  * values will be filled when we'll browse mosaics to build tile matrix capabilities.
                  */
-                final HashMap<Integer, Dimension> dims = new HashMap<>();
-                final Map<Integer, CoordinateReferenceSystem> splittedCRS =
-                        ReferencingUtilities.indexedDecompose(env.getCoordinateReferenceSystem());
-                final Iterator<Map.Entry<Integer,CoordinateReferenceSystem>> iterator = splittedCRS.entrySet().iterator();
-                while(iterator.hasNext()) {
-                    final Map.Entry<Integer,CoordinateReferenceSystem> entry = iterator.next();
-                    final CoordinateReferenceSystem tmpCRS = entry.getValue();
-                    // If it's not a single dimension, It's not an additional dimension.
-                    if (tmpCRS.getCoordinateSystem().getDimension() > 1) {
-                        iterator.remove();
-                    } else {
-                        // TODO : we have no check for multiple temporal dimensions (is it possible to have more than one ?)
-                        final Dimension dimension;
-                        if (tmpCRS instanceof TemporalCRS) {
-                            // current value is a special wmts case.
-                            dimension = new Dimension(TIME_NAME, TIME_UNIT, "current");
+                    final HashMap<Integer, Dimension> dims = new HashMap<>();
+                    final Map<Integer, CoordinateReferenceSystem> splittedCRS =
+                            ReferencingUtilities.indexedDecompose(env.getCoordinateReferenceSystem());
+                    final Iterator<Map.Entry<Integer, CoordinateReferenceSystem>> iterator = splittedCRS.entrySet().iterator();
+                    while (iterator.hasNext()) {
+                        final Map.Entry<Integer, CoordinateReferenceSystem> entry = iterator.next();
+                        final CoordinateReferenceSystem tmpCRS = entry.getValue();
+                        // If it's not a single dimension, It's not an additional dimension.
+                        if (tmpCRS.getCoordinateSystem().getDimension() > 1) {
+                            iterator.remove();
                         } else {
-                            final String dimName;
-                            final CoordinateSystemAxis axis = tmpCRS.getCoordinateSystem().getAxis(0);
-                            // vertical dimension name is fixed by 1.0.0 draft.
-                            if (tmpCRS instanceof VerticalCRS) {
-                                dimName = ELEVATION_NAME;
+                            // TODO : we have no check for multiple temporal dimensions (is it possible to have more than one ?)
+                            final Dimension dimension;
+                            if (tmpCRS instanceof TemporalCRS) {
+                                // current value is a special wmts case.
+                                dimension = new Dimension(TIME_NAME, TIME_UNIT, "current");
                             } else {
-                                dimName = axis.getName().getCode();
+                                final String dimName;
+                                final CoordinateSystemAxis axis = tmpCRS.getCoordinateSystem().getAxis(0);
+                                // vertical dimension name is fixed by 1.0.0 standard.
+                                if (tmpCRS instanceof VerticalCRS) {
+                                    dimName = ELEVATION_NAME;
+                                } else {
+                                    dimName = axis.getName().getCode();
+                                }
+                                dimension = new Dimension(dimName, axis.getUnit().toString(), "current");
                             }
-                            dimension = new Dimension(dimName, axis.getUnit().toString(), "current");
+                            dims.put(entry.getKey(), dimension);
                         }
-                        dims.put(entry.getKey(), dimension);
                     }
-                }
 
-                final int xAxis = Math.max(0, CoverageUtilities.getMinOrdinate(env.getCoordinateReferenceSystem()));
-                final int yAxis = xAxis + 1;
-                final BoundingBoxType bbox = new WGS84BoundingBoxType(
-                        getCRSCode(env.getCoordinateReferenceSystem()),
-                        env.getMinimum(xAxis),
-                        env.getMinimum(yAxis),
-                        env.getMaximum(xAxis),
-                        env.getMaximum(yAxis));
+                    final int xAxis = Math.max(0, CoverageUtilities.getMinOrdinate(env.getCoordinateReferenceSystem()));
+                    final int yAxis = xAxis + 1;
+                    final BoundingBoxType bbox = new WGS84BoundingBoxType(
+                            getCRSCode(env.getCoordinateReferenceSystem()),
+                            env.getMinimum(xAxis),
+                            env.getMinimum(yAxis),
+                            env.getMaximum(xAxis),
+                            env.getMaximum(yAxis));
 
 
-                final LayerType outputLayer = new LayerType(
-                        name,
-                        name,
-                        name,
-                        bbox,
-                        WMTSConstant.DEFAULT_STYLES,
-                        new ArrayList<>(dims.values()));
+                    final LayerType outputLayer = new LayerType(
+                            name,
+                            name,
+                            name,
+                            bbox,
+                            WMTSConstant.DEFAULT_STYLES,
+                            new ArrayList<>(dims.values()));
 
                 try {
                     final Envelope crs84Env = CRS.transform(env, CommonCRS.defaultGeographic());
@@ -360,87 +369,63 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     LOGGER.log(Level.FINE, "Input envelope cannot be reprojected in CRS:84.");
                 }
 
-                final List<String> pformats = set.getFormats();
-                outputLayer.setFormat(pformats);
+                    final List<String> pformats = set.getFormats();
+                    outputLayer.setFormat(pformats);
 
-                final List<URLTemplateType> resources = new ArrayList<>();
-                for (String pformat : pformats) {
-                    String url = getServiceUrl();
-                    url = url.substring(0, url.length() - 1) + "/" + name + "/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}.{format}";
-                    final URLTemplateType tileURL = new URLTemplateType(pformat, "tile", url);
-                    resources.add(tileURL);
-                }
-                outputLayer.setResourceURL(resources);
+                    final List<URLTemplateType> resources = new ArrayList<>();
+                    for (String pformat : pformats) {
+                        String url = getServiceUrl();
+                        url = url.substring(0, url.length() - 1) + "/" + name + "/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}.{format}";
+                        final URLTemplateType tileURL = new URLTemplateType(pformat, "tile", url);
+                        resources.add(tileURL);
+                    }
+                    outputLayer.setResourceURL(resources);
 
-                for (Pyramid pr : set.getPyramids()) {
-                    final TileMatrixSet tms = new TileMatrixSet();
-                    tms.setIdentifier(new CodeType(pr.getId()));
-                    tms.setSupportedCRS(getCRSCode(pr.getCoordinateReferenceSystem()));
+                    for (Pyramid pr : set.getPyramids()) {
+                        final TileMatrixSet tms = new TileMatrixSet();
+                        tms.setIdentifier(new CodeType(pr.getId()));
+                        tms.setSupportedCRS(getCRSCode(pr.getCoordinateReferenceSystem()));
 
-                    final List<TileMatrix> tm = new ArrayList<>();
-                    final double[] scales = pr.getScales();
-                    for(int i=0; i<scales.length; i++){
-                        final Iterator<GridMosaic> mosaicIt = pr.getMosaics(i).iterator();
-                        if (!mosaicIt.hasNext()) {
-                            continue;
-                        }
-                        final GridMosaic mosaic = mosaicIt.next();
-                        DirectPosition upperLeft = mosaic.getUpperLeftCorner();
-                        double scale = mosaic.getScale();
-                        //convert scale in the strange WMTS scale denominator
-                        scale = WMTSUtilities.toScaleDenominator(pr.getCoordinateReferenceSystem(), scale);
-                        final TileMatrix matrix = new TileMatrix();
-                        matrix.setIdentifier(new CodeType(mosaic.getId()));
-                        matrix.setScaleDenominator(scale);
-                        matrix.setMatrixDimension(mosaic.getGridSize());
-                        matrix.setTileDimension(mosaic.getTileSize());
-                        matrix.getTopLeftCorner().add(upperLeft.getOrdinate(xAxis));
-                        matrix.getTopLeftCorner().add(upperLeft.getOrdinate(yAxis));
-                        tm.add(matrix);
-
-                        // Fill dimensions. We iterate over all mosaics of the current scale to find all slices.
-                        int timeIndex = -1;
-                        MathTransform toJavaTime = null;
-                        for (Map.Entry<Integer, CoordinateReferenceSystem> entry : splittedCRS.entrySet()) {
-                            String strValue;
-                            // For temporal values, we convert it into timestamp, then to an ISO 8601 date.
-                            final List<String> currentDimValues = dims.get(entry.getKey()).getValue();
-                            if (entry.getValue() instanceof TemporalCRS) {
-                                timeIndex = entry.getKey();
-                                double value = upperLeft.getOrdinate(entry.getKey());
-                                if (!CRS.equalsApproximatively(JAVA_TIME, entry.getValue())) {
-                                    final double[] tmpArray = new double[]{value};
-                                    toJavaTime = CRS.findMathTransform(entry.getValue(), JAVA_TIME);
-                                    toJavaTime.transform(tmpArray, 0, tmpArray, 0, 1);
-                                    value = tmpArray[0];
-                                }
-
-                                strValue = ISO_8601_FORMATTER.format(new Date((long) value));
-
-                            } else {
-                                strValue = String.valueOf(upperLeft.getOrdinate(entry.getKey()));
+                        final List<TileMatrix> tm = new ArrayList<>();
+                        final double[] scales = pr.getScales();
+                        for (int i = 0; i < scales.length; i++) {
+                            final Iterator<GridMosaic> mosaicIt = pr.getMosaics(i).iterator();
+                            if (!mosaicIt.hasNext()) {
+                                continue;
                             }
+                            final GridMosaic mosaic = mosaicIt.next();
+                            DirectPosition upperLeft = mosaic.getUpperLeftCorner();
+                            double scale = mosaic.getScale();
+                            //convert scale in the strange WMTS scale denominator
+                            scale = WMTSUtilities.toScaleDenominator(pr.getCoordinateReferenceSystem(), scale);
+                            final TileMatrix matrix = new TileMatrix();
+                            matrix.setIdentifier(new CodeType(mosaic.getId()));
+                            matrix.setScaleDenominator(scale);
+                            matrix.setMatrixDimension(mosaic.getGridSize());
+                            matrix.setTileDimension(mosaic.getTileSize());
+                            matrix.getTopLeftCorner().add(upperLeft.getOrdinate(xAxis));
+                            matrix.getTopLeftCorner().add(upperLeft.getOrdinate(yAxis));
+                            tm.add(matrix);
 
-                            if (strValue != null && !currentDimValues.contains(strValue)) {
-                                currentDimValues.add(strValue);
-                            }
-                        }
-
-                        while (mosaicIt.hasNext()) {
-                            upperLeft = mosaicIt.next().getUpperLeftCorner();
+                            // Fill dimensions. We iterate over all mosaics of the current scale to find all slices.
+                            int timeIndex = -1;
+                            MathTransform toJavaTime = null;
+                            final SimpleDateFormat dateFormatter = (SimpleDateFormat) ISO_8601_FORMATTER.clone();
                             for (Map.Entry<Integer, CoordinateReferenceSystem> entry : splittedCRS.entrySet()) {
-                                String strValue = null;
+                                String strValue;
                                 // For temporal values, we convert it into timestamp, then to an ISO 8601 date.
                                 final List<String> currentDimValues = dims.get(entry.getKey()).getValue();
-                                if (timeIndex == entry.getKey()) {
+                                if (entry.getValue() instanceof TemporalCRS) {
+                                    timeIndex = entry.getKey();
                                     double value = upperLeft.getOrdinate(entry.getKey());
-                                    if (toJavaTime != null) {
+                                    if (!CRS.equalsApproximatively(JAVA_TIME, entry.getValue())) {
                                         final double[] tmpArray = new double[]{value};
+                                        toJavaTime = CRS.findMathTransform(entry.getValue(), JAVA_TIME);
                                         toJavaTime.transform(tmpArray, 0, tmpArray, 0, 1);
                                         value = tmpArray[0];
                                     }
 
-                                    strValue = ISO_8601_FORMATTER.format(new Date((long) value));
+                                    strValue = dateFormatter.format(new Date((long) value));
 
                                 } else {
                                     strValue = String.valueOf(upperLeft.getOrdinate(entry.getKey()));
@@ -450,9 +435,34 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                     currentDimValues.add(strValue);
                                 }
                             }
+
+                            while (mosaicIt.hasNext()) {
+                                upperLeft = mosaicIt.next().getUpperLeftCorner();
+                                for (Map.Entry<Integer, CoordinateReferenceSystem> entry : splittedCRS.entrySet()) {
+                                    String strValue = null;
+                                    // For temporal values, we convert it into timestamp, then to an ISO 8601 date.
+                                    final List<String> currentDimValues = dims.get(entry.getKey()).getValue();
+                                    if (timeIndex == entry.getKey()) {
+                                        double value = upperLeft.getOrdinate(entry.getKey());
+                                        if (toJavaTime != null) {
+                                            final double[] tmpArray = new double[]{value};
+                                            toJavaTime.transform(tmpArray, 0, tmpArray, 0, 1);
+                                            value = tmpArray[0];
+                                        }
+
+                                        strValue = dateFormatter.format(new Date((long) value));
+
+                                    } else {
+                                        strValue = String.valueOf(upperLeft.getOrdinate(entry.getKey()));
+                                    }
+
+                                    if (strValue != null && !currentDimValues.contains(strValue)) {
+                                        currentDimValues.add(strValue);
+                                    }
+                                }
+                            }
                         }
-                    }
-                    tms.setTileMatrix(tm);
+                        tms.setTileMatrix(tm);
 
                     /*
                      * Once our tile matrix set is defined, we must check if we've got one which is equal to the newly
@@ -465,54 +475,55 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                      * to avoid mistakes. We store a binding between the new identifier and the old one to be able to
                      * retrieve pyramid at getTile request.
                      */
-                    TileMatrixSet previousDefined = tileSets.get(pr.getId());
-                    boolean equalSets = false;
-                    if (previousDefined == null || !(equalSets = areEqual(tms, previousDefined))) {
-                        for (final TileMatrixSet tmpSet : tileSets.values()) {
-                            if (areEqual(tms, tmpSet)) {
-                                equalSets = true;
-                                previousDefined = tmpSet;
-                                break;
+                        TileMatrixSet previousDefined = tileSets.get(pr.getId());
+                        boolean equalSets = false;
+                        if (previousDefined == null || !(equalSets = areEqual(tms, previousDefined))) {
+                            for (final TileMatrixSet tmpSet : tileSets.values()) {
+                                if (areEqual(tms, tmpSet)) {
+                                    equalSets = true;
+                                    previousDefined = tmpSet;
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    if (previousDefined == null) {
-                        tileSets.put(pr.getId(), tms);
+                        if (previousDefined == null) {
+                            tileSets.put(pr.getId(), tms);
 
-                    } else if (equalSets) {
-                        tms.setIdentifier(previousDefined.getIdentifier());
+                        } else if (equalSets) {
+                            tms.setIdentifier(previousDefined.getIdentifier());
 
-                    } else {
-                        // Two different matrix sets with same identifier. We'll change the name of the new one.
-                        final String tmsUUID = UUID.randomUUID().toString();
-                        tms.setIdentifier(new CodeType(tmsUUID));
-                        tileSets.put(tmsUUID, tms);
+                        } else {
+                            // Two different matrix sets with same identifier. We'll change the name of the new one.
+                            final String tmsUUID = UUID.randomUUID().toString();
+                            tms.setIdentifier(new CodeType(tmsUUID));
+                            tileSets.put(tmsUUID, tms);
 
-                        tmsBindingLock.writeLock().lock();
-                        try {
-                            tmsIdBinding.put(tmsUUID, pr.getId());
-                        } finally {
-                            tmsBindingLock.writeLock().unlock();
+                            tmsBindingLock.writeLock().lock();
+                            try {
+                                tmsIdBinding.put(tmsUUID, pr.getId());
+                            } finally {
+                                tmsBindingLock.writeLock().unlock();
+                            }
                         }
+
+                        final TileMatrixSetLink tmsl = new TileMatrixSetLink(tms.getIdentifier().getValue());
+                        outputLayer.addTileMatrixSetLink(tmsl);
                     }
 
-                    final TileMatrixSetLink tmsl = new TileMatrixSetLink(tms.getIdentifier().getValue());
-                    outputLayer.addTileMatrixSetLink(tmsl);
+                    outputLayers.add(outputLayer);
+                } catch (Exception ex) {
+                    LOGGER.log(Level.WARNING, "Cannot build matrix list of the following layer : " + name, ex);
                 }
-
-                outputLayers.add(outputLayer);
-            } catch(Exception ex) {
-                LOGGER.log(Level.WARNING, "Cannot build matrix list of the following layer : " + name,ex);
             }
-        }
-        final ContentsType cont = new ContentsType(outputLayers, new ArrayList<>(tileSets.values()));
+            final ContentsType cont = new ContentsType(outputLayers, new ArrayList<>(tileSets.values()));
 
-        // put full capabilities in cache
-        final Capabilities c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
-        putCapabilitiesInCache("1.0.0", null, c);
-        LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
-        return (Capabilities) c.applySections(sections);
+            // put full capabilities in cache
+            final Capabilities c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
+            putCapabilitiesInCache("1.0.0", null, c);
+            LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
+            return (Capabilities) c.applySections(sections);
+        }
     }
 
     /**

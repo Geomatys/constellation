@@ -343,7 +343,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<Layer> layers = getConfigurationLayers(userLogin);
 
        for (Layer configLayer : layers) {
-            final Data layer = getLayerReference(userLogin, configLayer.getName());
+            final Data layer = getLayerReference(configLayer);
 
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
                 continue;
