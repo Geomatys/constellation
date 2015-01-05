@@ -61,13 +61,13 @@
                                                                 <div class="bottom">
                                                                     <div class="hidden-md hidden-lg">
                                                                         <div class="block tooltipicon"
-                                                                             style="margin-top:0;">
+                                                                             style="margin-top:0;text-shadow: none;">
                                                                             <i class="fa fa-calendar"
                                                                                tooltip data-placement="right"
                                                                                title="{{layer.Date | date:'yyyy-MM-dd'}}"></i>
                                                                         </div>
                                                                         <div class="block tooltipicon"
-                                                                             style="margin-top:0;">
+                                                                             style="margin-top:0;text-shadow: none;">
                                                                             <i class="fa fa-user"
                                                                                tooltip data-placement="right"
                                                                                title="{{layer.Owner}}"></i>
@@ -81,11 +81,15 @@
                                                                             <i class="fa fa-user"></i>{{layer.Owner}}
                                                                         </div>
                                                                     </div>
-                                                                    <div class="block pull-right" ng-if="layer.TargetStyle.length==0">
-                                                                        <i class="fa fa-paint-brush" title="Style SLD"></i>default
+                                                                    <div class="block pull-right"
+                                                                         ng-if="layer.TargetStyle.length==0">
+                                                                        <i class="fa fa-paint-brush"
+                                                                           title="Style SLD"></i>default
                                                                     </div>
-                                                                    <div class="block pull-right" ng-if="layer.TargetStyle.length==1">
-                                                                        <i class="fa fa-paint-brush" title="Style SLD"></i>{{truncate(layer.TargetStyle[0].Name,15)}}
+                                                                    <div class="block pull-right"
+                                                                         ng-if="layer.TargetStyle.length==1">
+                                                                        <i class="fa fa-paint-brush"
+                                                                           title="Style SLD"></i>{{truncate(layer.TargetStyle[0].Name,15)}}
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -94,14 +98,16 @@
                                                                 <button type="button"
                                                                         class="btn btn-sm btn-default dropdown-toggle"
                                                                         data-toggle="dropdown"
-                                                                        style="margin-right: 6px; margin-top: 4px; padding: 4px; z-index: 1;"
+                                                                        style="margin-right:6px;margin-top:4px;padding:4px;z-index: 1;"
                                                                         title="Style SLD">
                                                                     <span style="font-size: 11px;">
                                                                         <i class="fa fa-paint-brush" style="margin-right:6px;"></i>{{truncate(layer.TargetStyle[0].Name,20)}}
                                                                     </span>
                                                                     <span class="caret"></span>
                                                                 </button>
-                                                                <ul class="dropdown-menu" role="menu" style="font-size: 12px;text-shadow: none;z-index: 2;">
+                                                                <ul class="dropdown-menu"
+                                                                    role="menu"
+                                                                    style="font-size: 12px;text-shadow: none;z-index: 2;">
                                                                     <li ng-repeat="targetStyle in layer.TargetStyle"
                                                                         ng-click="setTargetStyle(layer,$index);">
                                                                         <a><span>{{truncate(targetStyle.Name,30)}}</span></a>
@@ -154,7 +160,7 @@
                                              ng-click="selectExtLayer(extLayer);previewWMSLayer();">
                                             <div class="top">
                                                 <span class="item-title"
-                                                      title="{{extLayer.Name}}">{{extLayer.Name}}</span>
+                                                      title="{{extLayer.Name}}">{{truncate(extLayer.Name,30)}}</span>
                                                 <span class="pull-right text-right item-list-style">WMS</span>
                                             </div>
                                             <div class="bottom">
@@ -174,11 +180,13 @@
                                                     style="margin-right: 6px; margin-top: 4px; padding: 4px; z-index: 1;"
                                                     title="Style SLD">
                                                 <span style="font-size: 11px;">
-                                                    <i class="fa fa-paint-brush" style="margin-right:6px;"></i>{{truncate(extLayer.Style[0].Name,20)}}
+                                                    <i class="fa fa-paint-brush"
+                                                       style="margin-right:6px;"></i>{{truncate(extLayer.Style[0].Name,20)}}
                                                 </span>
                                                 <span class="caret"></span>
                                             </button>
-                                            <ul class="dropdown-menu" role="menu" style="font-size: 12px;text-shadow: none;z-index: 2;">
+                                            <ul class="dropdown-menu" role="menu"
+                                                style="font-size: 12px;text-shadow: none;z-index: 2;">
                                                 <li ng-repeat="targetStyle in extLayer.Style"
                                                     ng-click="setExtTargetStyle(extLayer,$index);">
                                                     <a><span>{{truncate(targetStyle.Name,30)}}</span></a>
