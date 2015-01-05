@@ -27,6 +27,7 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.GridGeometry2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.internal.coverage.CoverageUtilities;
@@ -104,14 +105,14 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         getOrCreate(XMLCoverageStoreFactory.PATH, storeParams).setValue(pyramidFolder.toURI().toURL());
         getOrCreate(XMLCoverageStoreFactory.CACHE_TILE_STATE, storeParams).setValue(true);
 
-        final CoverageStore store = CoverageStoreFinder.open(storeParams);
+        final XMLCoverageStore store = (XMLCoverageStore) CoverageStoreFinder.open(storeParams);
         if (store == null) {
             throw new ProcessException("Can't initialize XMLCoverageStore.", this, null);
         }
 
-        final XMLCoverageReference covRef = (XMLCoverageReference)store.create(layerName);
-        covRef.setPackMode(type);
-        covRef.setPreferredFormat(tileFormat);
+        //create reference
+        store.create(layerName, type, tileFormat);
+
         return store;
     }
 

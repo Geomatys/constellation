@@ -28,6 +28,7 @@ import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
@@ -557,13 +558,12 @@ public class ProviderBusiness implements IProviderBusiness {
             getOrCreate(XMLCoverageStoreFactory.PATH, storeParams).setValue(pyramidDirectory.toURI().toURL());
             getOrCreate(XMLCoverageStoreFactory.CACHE_TILE_STATE, storeParams).setValue(true);
 
-            CoverageStore outStore = CoverageStoreFinder.open(storeParams);
+            XMLCoverageStore outStore = (XMLCoverageStore) CoverageStoreFinder.open(storeParams);
             if (outStore == null) {
                 throw new ConstellationException("Failed to create pyramid layer ");
             }
             Name name = new DefaultName(namespace,dataName);
-            XMLCoverageReference covRef = (XMLCoverageReference)outStore.create(name);
-            covRef.setPackMode(ViewType.GEOPHYSICS);
+            XMLCoverageReference covRef = (XMLCoverageReference)outStore.create(name, ViewType.GEOPHYSICS, "TIFF");
 
             // create provider
             final DataProviderFactory factory = DataProviders.getInstance().getFactory("coverage-store");
@@ -577,14 +577,14 @@ public class ProviderBusiness implements IProviderBusiness {
             outProvider = DataProviders.getInstance().createProvider(pyramidProviderId, factory, pparams, datasetID);
 
             name = covRef.getName();
-            outStore = (CoverageStore) outProvider.getMainStore();
+            outStore = (XMLCoverageStore) outProvider.getMainStore();
             outRef = (XMLCoverageReference) outStore.getCoverageReference(name);
 
             // Update the parent attribute of the created provider
             updateParent(outProvider.getId(), providerId);
 
             final QName qName = new QName(name.getNamespaceURI(), name.getLocalPart());
-            //set rendered atrribute to false to indicates that this pyramid can have stats.
+            //set rendered attribute to false to indicates that this pyramid can have stats.
             dataBusiness.updateDataRendered(qName, outProvider.getId(), false);
 
             //set hidden value to true for the pyramid conform data
