@@ -236,15 +236,15 @@
 
                                     <div ng-class="{'hidden':!dataCtrl.smallMode}">
                                         <div class="block tooltipicon"
-                                             style="margin-top:0;">
+                                             style="margin-top:0;text-shadow: none;">
                                             <i class="fa fa-calendar"
-                                               tooltip data-placement="bottom"
+                                               tooltip data-placement="top"
                                                title="{{dataset.Date | date:'yyyy-MM-dd'}}"></i>
                                         </div>
                                         <div class="block tooltipicon"
-                                             style="margin-top:0;">
+                                             style="margin-top:0;text-shadow: none;">
                                             <i class="fa fa-user"
-                                               tooltip data-placement="bottom"
+                                               tooltip data-placement="top"
                                                title="{{dataset.Owner}}"></i>
                                         </div>
                                     </div>
@@ -260,7 +260,6 @@
                                     <div class="block" style="height:30px;text-shadow:none;position:relative;"
                                          ng-if="dataset.MdCompletion">
                                         <div style="width:60px;margin-top:10px;"
-
                                              tooltip-html-unsafe="{{'data.listing.metadata.completion' | translate}}"
                                              tooltip-placement="top">
                                             <progressbar max="100"
@@ -305,18 +304,17 @@
                                           style="font-size:14px;">{{relatedData.Type}}</span>
                                 </div>
                                 <div class="bottom">
-
                                     <div ng-class="{'hidden':!dataCtrl.smallMode}">
                                         <div class="block tooltipicon"
-                                             style="margin-top:0;">
+                                             style="margin-top:0;text-shadow: none;">
                                             <i class="fa fa-calendar"
-                                               tooltip data-placement="bottom"
+                                               tooltip data-placement="top"
                                                title="{{relatedData.Date | date:'yyyy-MM-dd'}}"></i>
                                         </div>
                                         <div class="block tooltipicon"
-                                             style="margin-top:0;">
+                                             style="margin-top:0;text-shadow: none;">
                                             <i class="fa fa-user"
-                                               tooltip data-placement="bottom"
+                                               tooltip data-placement="top"
                                                title="{{relatedData.Owner}}"></i>
                                         </div>
                                     </div>
@@ -328,7 +326,6 @@
                                             <i class="fa fa-user"></i>{{relatedData.Owner}}
                                         </div>
                                     </div>
-
                                     <div class="block"
                                          style="height:30px;text-shadow:none;position:relative;"
                                          ng-if="dataset.MdCompletion || relatedData.MdCompletion">
