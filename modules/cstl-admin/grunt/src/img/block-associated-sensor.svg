@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="41.9px" height="45px" viewBox="0 0 41.9 45" enable-background="new 0 0 41.9 45" xml:space="preserve">
-<g>
-	<path fill="#B2DBD3" d="M25.619,37.3c-2.1-1.899-2.3-5-0.5-7.1c1.801-2.101,5-2.3,7.101-0.5c2.1,1.899,2.3,5,0.5,7.1
-		C30.92,38.9,27.719,39.1,25.619,37.3z"/>
-	<path fill="#B2DBD3" d="M26.219,24.7L25.619,22c-6,1.2-9.8,7.1-8.5,13.1l2.7-0.6C18.92,30,21.719,25.6,26.219,24.7z"/>
-	<path opacity="0.75" fill="#B2DBD3" enable-background="new    " d="M22.219,17.3l-0.601-2.7c-9,1.9-14.699,10.7-12.8,19.7l2.7-0.6
-		C9.92,26.2,14.719,18.9,22.219,17.3z"/>
-	<path opacity="0.5" fill="#B2DBD3" enable-background="new    " d="M18.019,10l-0.5-2.8C5.42,9.8-2.281,21.6,0.319,33.6l2.8-0.6
-		C0.92,22.5,7.619,12.2,18.019,10z"/>
-</g>
-<path opacity="0.25" fill="#B2DBD3" enable-background="new    " d="M-0.181,7.3v4.1c3.5-4.3,8.4-7.5,14.2-8.7L13.42,0
-	C8.019,1.1,3.42,3.7-0.181,7.3L-0.181,7.3z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="41.9" height="45" viewBox="0 0 41.9 45"><g fill="#B2DBD3"><path d="M25.62 37.3c-2.1-1.9-2.3-5-.5-7.1 1.8-2.1 5-2.3 7.1-.5 2.1 1.9 2.3 5 .5 7.1-1.8 2.1-5 2.3-7.1.5zM26.22 24.7l-.6-2.7c-6 1.2-9.8 7.1-8.5 13.1l2.7-.6c-.9-4.5 1.9-8.9 6.4-9.8z"/><path opacity=".75" enable-background="new" d="M22.22 17.3l-.602-2.7c-9 1.9-14.7 10.7-12.8 19.7l2.7-.6c-1.598-7.5 3.2-14.8 10.7-16.4z"/><path opacity=".5" enable-background="new" d="M18.02 10l-.5-2.8C5.42 9.8-2.28 21.6.32 33.6l2.8-.6c-2.2-10.5 4.5-20.8 14.9-23z"/></g><path opacity=".25" fill="#B2DBD3" enable-background="new" d="M-.18 7.3v4.1c3.5-4.3 8.4-7.5 14.2-8.7l-.6-2.7c-5.4 1.1-10 3.7-13.6 7.3z"/></svg>

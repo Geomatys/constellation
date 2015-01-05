@@ -1,14 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="45px" height="45px" viewBox="0 0 45 45" enable-background="new 0 0 45 45" xml:space="preserve">
-<g>
-	<polyline fill="none" stroke="#878787" stroke-width="6" stroke-linejoin="round" stroke-miterlimit="10" points="20.23,2.98 
-		3.12,2.98 3.12,41.46 41.62,41.46 41.62,24.36 	"/>
-	<g>
-		<polygon fill="#878787" points="44.79,0 27.23,0 44.79,17.57 		"/>
-		
-			<rect x="25.15" y="4.02" transform="matrix(-0.7076 -0.7066 0.7066 -0.7076 35.4352 48.671)" fill="#878787" width="5.27" height="25.97"/>
-	</g>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45"><path fill="none" stroke="#878787" stroke-width="6" stroke-linejoin="round" stroke-miterlimit="10" d="M20.23 2.98H3.12v38.48h38.5v-17.1"/><g fill="#878787"><path d="M44.79 0H27.23l17.56 17.57zM20.48 28.055l-3.73-3.723L35.1 5.955l3.73 3.724z"/></g></svg>

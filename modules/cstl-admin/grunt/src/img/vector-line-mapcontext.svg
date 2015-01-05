@@ -1,16 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="22px" height="22px" viewBox="0 0 22 22" enable-background="new 0 0 22 22" xml:space="preserve">
-<line fill="none" stroke="#93908D" stroke-width="2" x1="4.04" y1="4.04" x2="17.96" y2="17.96"/>
-<g>
-	<g>
-		<rect x="2" y="2" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="4.08" height="4.08"/>
-		<path fill="#93908D" d="M5.08,3v2.08H3V3H5.08 M7.08,1H1v6.08h6.08V1L7.08,1z"/>
-	</g>
-	<g>
-		<rect x="15.92" y="15.92" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="4.08" height="4.08"/>
-		<path fill="#93908D" d="M19,16.92V19h-2.08v-2.08H19 M21,14.92h-6.08V21H21V14.92L21,14.92z"/>
-	</g>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><path fill="none" stroke="#93908D" stroke-width="2" d="M4.04 4.04l13.92 13.92"/><path fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" d="M2 2h4.08v4.08H2z"/><path fill="#93908D" d="M5.08 3v2.08H3V3h2.08m2-2H1v6.08h6.08V1z"/><path fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" d="M15.92 15.92H20V20h-4.08z"/><path fill="#93908D" d="M19 16.92V19h-2.08v-2.08H19m2-2h-6.08V21H21v-6.08z"/></svg>

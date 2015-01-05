@@ -1,28 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="22px" height="22px" viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
-<style type="text/css"><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><style type="text/css"><![CDATA[
 	.st1{fill:#B2AFAC;}	.st2{fill:#93908D;}
-]]></style>
-<g>
-	<rect x="3.3" y="2.59" fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" width="15.93" height="15.93"/>
-	<rect x="3.3" y="2.59" fill="none" stroke="#93908D" stroke-width="2" width="15.93" height="15.93"/>
-	<g>
-		<rect x="17.12" y="0.55" class="st1" width="4.08" height="4.08"/>
-		<path class="st2" d="M20.2,1.55v2.08h-2.08V1.55H20.2 M22.2-0.45h-6.08v6.08h6.08V-0.45L22.2-0.45z"/>
-	</g>
-	<g>
-		<rect x="17.12" y="16.47" class="st1" width="4.08" height="4.08"/>
-		<path class="st2" d="M20.2,17.47v2.08h-2.08v-2.08H20.2 M22.2,15.47h-6.08v6.08h6.08V15.47L22.2,15.47z"/>
-	</g>
-	<g>
-		<rect x="1.26" y="16.47" class="st1" width="4.08" height="4.08"/>
-		<path class="st2" d="M4.34,17.47v2.08H2.26v-2.08H4.34 M6.34,15.47H0.26v6.08h6.08V15.47L6.34,15.47z"/>
-	</g>
-	<g>
-		<rect x="1.26" y="0.55" class="st1" width="4.08" height="4.08"/>
-		<path class="st2" d="M4.34,1.55v2.08H2.26V1.55H4.34 M6.34-0.45H0.26v6.08h6.08V-0.45L6.34-0.45z"/>
-	</g>
-</g>
-</svg>
+]]></style><path fill="#B2AFAC" stroke="#D6D6D4" stroke-miterlimit="10" d="M3.3 2.59h15.93v15.93H3.3z"/><path fill="none" stroke="#93908D" stroke-width="2" d="M3.3 2.59h15.93v15.93H3.3z"/><path class="st1" d="M17.12.55h4.08v4.08h-4.08z"/><path class="st2" d="M20.2 1.55v2.08h-2.08V1.55h2.08m2-2h-6.08v6.08h6.08V-.45z"/><path class="st1" d="M17.12 16.47h4.08v4.08h-4.08z"/><path class="st2" d="M20.2 17.47v2.08h-2.08v-2.08h2.08m2-2h-6.08v6.08h6.08v-6.08z"/><path class="st1" d="M1.26 16.47h4.08v4.08H1.26z"/><path class="st2" d="M4.34 17.47v2.08H2.26v-2.08h2.08m2-2H.26v6.08h6.08v-6.08z"/><path class="st1" d="M1.26.55h4.08v4.08H1.26z"/><path class="st2" d="M4.34 1.55v2.08H2.26V1.55h2.08m2-2H.26v6.08h6.08V-.45z"/></svg>

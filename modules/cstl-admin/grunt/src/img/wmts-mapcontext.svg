@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="45px" height="45px" viewBox="0 0 45 45" enable-background="new 0 0 45 45" xml:space="preserve">
-<g>
-	<g>
-		<polygon fill="#B2B2B2" points="0.123,13.371 22.282,22.964 44.443,13.371 22.282,3.774 		"/>
-	</g>
-	<g>
-		<polygon fill="#B2B2B2" points="22.282,26.492 8.608,20.567 0.123,22.964 22.282,32.562 44.443,22.964 36.652,20.417 		"/>
-	</g>
-	<g>
-		<polygon fill="#B2B2B2" points="22.282,36.082 8.608,30.16 0.123,32.562 22.282,42.159 44.443,32.562 36.652,30.014 		"/>
-	</g>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45"><path fill="#B2B2B2" d="M.123 13.37l22.16 9.594 22.16-9.593-22.16-9.596zM22.282 26.492L8.608 20.567.123 22.964l22.16 9.598 22.16-9.598-7.79-2.547zM22.282 36.082L8.608 30.16.123 32.562l22.16 9.597 22.16-9.598-7.79-2.548z"/></svg>

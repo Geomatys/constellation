@@ -1,30 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="872px" height="72px" viewBox="0 0 872 72" style="enable-background:new 0 0 872 72;" xml:space="preserve">
-<style type="text/css"><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" width="872" height="72" viewBox="0 0 872 72"><style type="text/css"><![CDATA[
 	.st0{fill:#EFF6F7;}	.st1{opacity:0.3;} .st2{fill:#6AB2D1;} .st3{fill:#D6ECF6;} .st4{fill:#3E98C0;} .st5{fill:#A2C3D5;}
-]]></style>
-<rect x="-1" y="-0.6" class="st3" width="872" height="72"/>
-<polygon class="st0" points="520.3,0.1 483.5,70.5 -0.7,70.7 -0.6,0.1 "/>
-<g class="st1">
-	<g>
-		<polygon class="st5" points="696.5,59.2 648.5,59.2 680.2,47.6 728.2,47.6"/>
-		<polygon class="st5" points="755.4,59.2 707.5,59.2 739.2,47.6 787.1,47.6"/>
-		<polygon class="st5" points="814.3,59.2 766.4,59.2 798.1,47.6 846.1,47.6"/>
-		<polygon class="st5" points="736.3,44.2 688.4,44.2 720.1,32.5 768,32.5"/>
-		<polygon class="st5" points="795.2,44.2 747.3,44.2 779,32.5 827,32.5"/>
-		<polygon class="st5" points="871,32.5 838,32.5 806.2,44.2 854.2,44.2 871,38"/>
-		<polygon class="st5" points="782,71.4 806.2,62.5 758.3,62.5 734,71.4"/>
-		<polygon class="st5" points="723,71.4 747.3,62.5 699.3,62.5 675.1,71.4"/>
-		<polygon class="st5" points="664.1,71.4 688.4,62.5 640.4,62.5 616.2,71.4"/>
-	</g>
-	<g>
-		<polygon class="st2" points="699.5,52 637.7,52 678.6,36.3 740.4,36.3"/>
-		<polygon class="st2" points="778.5,52 716.7,52 757.6,36.3 819.4,36.3"/>
-		<polygon class="st2" points="748.6,32.9 686.8,32.9 727.7,17.1 789.5,17.1"/>
-		<polygon class="st2" points="827.7,32.9 765.9,32.9 806.8,17.1 868.6,17.1"/>
-	</g>
-	<polygon class="st4" points="764.7,27.8 673.2,27.8 733.7,4.5 825.2,4.5"/>
-</g>
-</svg>
+]]></style><path class="st3" d="M-1-.6h872v72H-1z"/><path class="st0" d="M520.3.1l-36.8 70.4-484.2.2L-.6.1z"/><g class="st1"><path class="st5" d="M696.5 59.2h-48l31.7-11.6h48zM755.4 59.2h-47.9l31.7-11.6h47.9zM814.3 59.2h-47.9l31.7-11.6h48zM736.3 44.2h-47.9l31.7-11.7H768zM795.2 44.2h-47.9L779 32.5h48zM871 32.5h-33l-31.8 11.7h48L871 38zM782 71.4l24.2-8.9h-47.9L734 71.4zM723 71.4l24.3-8.9h-48l-24.2 8.9zM664.1 71.4l24.3-8.9h-48l-24.2 8.9z"/><path class="st2" d="M699.5 52h-61.8l40.9-15.7h61.8zM778.5 52h-61.8l40.9-15.7h61.8zM748.6 32.9h-61.8l40.9-15.8h61.8zM827.7 32.9h-61.8l40.9-15.8h61.8z"/><path class="st4" d="M764.7 27.8h-91.5l60.5-23.3h91.5z"/></g></svg>

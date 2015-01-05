@@ -1,11 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="14px" height="12px" viewBox="0 0 14 12" style="enable-background:new 0 0 14 12;" xml:space="preserve">
-<style type="text/css"><![CDATA[.st0{fill:#707070;}]]></style>
-<g>
-	<g><polygon class="st0" points="0.6,3.2 7,6 13.3,3.2 7,0.5"/></g>
-	<g><polygon class="st0" points="7,7 3.1,5.3 0.6,6 7,8.8 13.3,6 11.1,5.3"/></g>
-	<g><polygon class="st0" points="7,9.8 3.1,8.1 0.6,8.8 7,11.5 13.3,8.8 11.1,8"/></g>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="12" viewBox="0 0 14 12"><style type="text/css"><![CDATA[.st0{fill:#707070;}]]></style><path class="st0" d="M.6 3.2L7 6l6.3-2.8L7 .5zM7 7L3.1 5.3.6 6 7 8.8 13.3 6l-2.2-.7zM7 9.8L3.1 8.1l-2.5.7L7 11.5l6.3-2.7-2.2-.8z"/></svg>
