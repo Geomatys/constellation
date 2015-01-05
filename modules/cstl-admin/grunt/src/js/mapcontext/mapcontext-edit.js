@@ -585,19 +585,20 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                 layerName = dataItem.Name;
                             }
                             providerId = dataItem.Provider;
+                            var type = dataItem.Type?dataItem.Type.toLowerCase():null;
                             if(layerStyleObj && layerStyleObj.layer.layer.Name === dataItem.Name){
                                 if(layerStyleObj.style && layerStyleObj.style.Name){
                                     layerData = DataViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
-                                        layerStyleObj.style.Name,null,null,true);
+                                        layerStyleObj.style.Name,null,null,type!=='vector');
                                 }else {
-                                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,true);
+                                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,type!=='vector');
                                 }
                             }else {
                                 if (layObj.styleObj || dataItem.styleName) {
                                     layerData = DataViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
-                                        layObj.styleObj?layObj.styleObj.Name:dataItem.styleName,null,null,true);
+                                        layObj.styleObj?layObj.styleObj.Name:dataItem.styleName,null,null,type!=='vector');
                                 } else {
-                                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,true);
+                                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,type!=='vector');
                                 }
                             }
                         }
@@ -753,12 +754,13 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     layerName = dataItem.Name;
                 }
                 providerId = dataItem.Provider;
+                var type = dataItem.Type?dataItem.Type.toLowerCase():null;
                 var layerData;
                 if (dataItem.TargetStyle && dataItem.TargetStyle.length > 0) {
                     layerData = DataViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
-                        dataItem.TargetStyle[0].Name,null,null,true);
+                        dataItem.TargetStyle[0].Name,null,null,type!=='vector');
                 } else {
-                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,true);
+                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,type!=='vector');
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
@@ -1032,6 +1034,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         } else {//internal data layer
                             var layerName,providerId;
                             var dataItem = layObj.layer;
+                            var type = dataItem.Type?dataItem.Type.toLowerCase():null;
                             if (dataItem.Namespace) {
                                 layerName = '{' + dataItem.Namespace + '}' + dataItem.Name;
                             } else {
@@ -1040,9 +1043,9 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                             providerId = dataItem.Provider;
                             if (layObj.styleObj || dataItem.styleName) {
                                 layerData = DataViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
-                                    layObj.styleObj?layObj.styleObj.Name:dataItem.styleName,null,null,true);
+                                    layObj.styleObj?layObj.styleObj.Name:dataItem.styleName,null,null,type!=='vector');
                             } else {
-                                layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,true);
+                                layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,type!=='vector');
                             }
                         }
                         layerData.setOpacity(layObj.opacity / 100);

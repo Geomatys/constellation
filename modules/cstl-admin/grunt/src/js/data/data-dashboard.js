@@ -380,15 +380,16 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
                 var pyramidProviderId = $scope.dataCtrl.selectedDataSetChild.PyramidConformProviderId;
                 var layerData;
+                var type = $scope.dataCtrl.selectedDataSetChild.Type.toLowerCase();
                 if ($scope.dataCtrl.selectedDataSetChild.TargetStyle && $scope.dataCtrl.selectedDataSetChild.TargetStyle.length > 0) {
                     layerData = DataViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,
                         layerName,
                         pyramidProviderId?pyramidProviderId:providerId,
                         $scope.dataCtrl.selectedDataSetChild.TargetStyle[0].Name,
-                        null,null,true);
+                        null,null,type!=='vector');
                 } else {
                     layerData = DataViewer.createLayer($scope.dataCtrl.cstlUrl, layerName,
-                        pyramidProviderId?pyramidProviderId:providerId,null,true);
+                        pyramidProviderId?pyramidProviderId:providerId,null,type!=='vector');
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();

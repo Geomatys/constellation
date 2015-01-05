@@ -337,8 +337,6 @@ angular.module('cstl-process-plan', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 $scope.task.trigger = null;
             }
 
-            console.debug($scope.task.trigger);
-
             // no need to re-schedule if trigger unchanged
             if ($scope.task.triggerType !== oldTriggerType || $scope.task.trigger !== oldTrigger) {
                 //Update task
