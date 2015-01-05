@@ -41,7 +41,7 @@
                         <div class="tab-content">
                             <div class="tab-pane"
                                  ng-class="{active:mode.selTab==='tabInfo'}"
-                                 style="padding-top: 13px;">
+                                 style="padding-top: 13px;height:460px;overflow-x:hidden;overflow-y:auto;">
                                 <form class="form-horizontal form-style" role="form">
                                     <div class="form-group"
                                          ng-class="{'has-error':mode.errorNoGivenName}">
@@ -63,7 +63,6 @@
                                                       ng-model="ctxt.description"></textarea>
                                         </div>
                                     </div>
-                                    <hr/>
                                     <div class="form-group">
                                         <label class="col-sm-4 col-md-3 control-label"
                                                translate="mapcontext.modal.label.crs">CRS</label>
@@ -115,7 +114,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <hr/>
                                     <div class="form-group">
                                         <label class="col-sm-4 col-md-3 control-label new-service-form-label"
                                                translate="mapcontext.modal.label.keywords">Keywords</label>
@@ -319,7 +317,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div id="mapContextMap"
-                         style="height: 460px; width:460px; margin-top: 38px; border: 1px solid #DDD;"></div>
+                         style="height: 460px; width:100%;margin-top: 20px;border: 1px solid #DDD;"></div>
                 </div>
             </div>
             <div ng-if="mode.display==='addChooseSource'">
