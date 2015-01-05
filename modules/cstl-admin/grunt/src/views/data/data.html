@@ -362,21 +362,6 @@
                                                     <i class="fa fa-user"></i>{{dataset.Owner}}
                                                 </div>
                                             </div>
-                                            <div class="block" style="height:30px;text-shadow:none;position:relative;"
-                                                 ng-if="dataset.MdCompletion">
-                                                <div style="width:60px;margin-top:10px;"
-                                                     tooltip-html-unsafe="{{'data.listing.metadata.completion' | translate}}"
-                                                     tooltip-placement="top">
-                                                    <progressbar max="100"
-                                                                 value="dataset.MdCompletion"
-                                                                 animate="true"
-                                                                 class="progress-striped"
-                                                                 style="margin: 0;height:12px;"
-                                                                 type="{{dataset.MdCompletion<25?'danger':dataset.MdCompletion<50?'warning':dataset.MdCompletion<75?'info':'success'}}">
-                                                        <span style="font-size: 10px;position: absolute;top:0;left:12px;">{{dataset.MdCompletion}}%</span>
-                                                    </progressbar>
-                                                </div>
-                                            </div>
                                             <div class="block pull-right">
                                                 <i class="fa fa-paperclip"></i>
                                                 <span ng-if="dataset.Children.length == 0"
@@ -444,24 +429,6 @@
                                                 </div>
                                                 <div class="block">
                                                     <i class="fa fa-user"></i>{{data.Owner}}
-                                                </div>
-                                            </div>
-
-                                            <div class="block"
-                                                 style="height:30px;text-shadow:none;position:relative;"
-                                                 ng-if="dataset.MdCompletion || data.MdCompletion">
-                                                <div style="width:60px;margin-top:10px;"
-                                                     tooltip-html-unsafe="{{'data.listing.metadata.completion' | translate}}"
-                                                     tooltip-placement="top"
-                                                     ng-init="completion=data.MdCompletion?data.MdCompletion:dataset.MdCompletion">
-                                                    <progressbar max="100"
-                                                                 value="completion"
-                                                                 animate="true"
-                                                                 class="progress-striped"
-                                                                 style="margin: 0;height:12px;"
-                                                                 type="{{completion<25?'danger':completion<50?'warning':completion<75?'info':'success'}}">
-                                                        <span style="font-size: 10px;position: absolute;top:0;left:12px;">{{completion}}%</span>
-                                                    </progressbar>
                                                 </div>
                                             </div>
                                             <img ng-if="data.Sensorable===true && data.TargetSensor.length === 0"
