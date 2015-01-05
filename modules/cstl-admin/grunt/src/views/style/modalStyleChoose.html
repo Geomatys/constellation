@@ -28,7 +28,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="modal-body modal-body-style" style="overflow-y: auto;">
             <div ng-show="isSelectedChooser('new') || isSelectedChooser('edit') || isSelectedChooser('duplicate')">
                 <div>
@@ -117,8 +116,12 @@
                                                 <span class="caret"></span>
                                             </button>
                                             <ul class="dropdown-menu" role="menu" style="font-size: 12px;text-shadow: none;z-index: 2;">
-                                                <li ng-click="editChooseStyle(style);"><a><span translate="edition.style.label.edit">Edit</span></a></li>
-                                                <li ng-click="duplicateChooseStyle(style);"><a disabled="disabled"><span translate="sldeditor.edition.duplicate">Duplicate</span></a></li>
+                                                <li ng-click="editChooseStyle(style);">
+                                                    <a><span translate="edition.style.label.edit">Edit</span></a>
+                                                </li>
+                                                <li ng-click="duplicateChooseStyle(style);">
+                                                    <a disabled="disabled"><span translate="sldeditor.edition.duplicate">Duplicate</span></a>
+                                                </li>
                                             </ul>
                                         </div>
                                         <div class="item style-{{style.Type | lowercase}} style-small"
@@ -131,13 +134,13 @@
                                             <div class="bottom">
                                                 <div class="hidden-md hidden-lg">
                                                     <div class="block tooltipicon"
-                                                         style="margin-top:0;">
+                                                         style="margin-top:0;text-shadow: none;">
                                                         <i class="fa fa-calendar"
                                                            tooltip data-placement="right"
                                                            title="{{style.Date | date:'yyyy-MM-dd'}}"></i>
                                                     </div>
                                                     <div class="block tooltipicon"
-                                                         style="margin-top:0;">
+                                                         style="margin-top:0;text-shadow: none;">
                                                         <i class="fa fa-user"
                                                            tooltip data-placement="right"
                                                            title="{{style.Owner}}"></i>

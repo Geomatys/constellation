@@ -5,13 +5,13 @@
             <button type="button" class="close" ng-click="dismiss()">×</button>
             <h4 class="modal-title" translate="service.edit.dashboard.action.add.data">Add data</h4>
         </div>
-        <div class="modal-body modal-body-style" style="overflow-y: auto;">
+        <div class="modal-body modal-body-style">
             <div class="row">
                 <div style="padding-left: 0;padding-right: 0;"
                      ng-class="{'col-xs-6 col-sm-6 col-md-6 col-lg-6':service.type.toLowerCase() != 'sos'}">
                     <div class="dashboard list-style-modal">
                         <div class="navbar sort-navbar" style="margin-bottom: 6px;">
-                            <div class="navbar-inner">
+                            <div class="navbar-inner" style="padding-right: 10px;">
                                 <ul class="nav nav-style">
                                     <li ng-click="clickFilter('Name')">
                                         <a style="padding:10px;">
@@ -54,7 +54,8 @@
                                 <button type="button" ng-click="searchVisible= !searchVisible" class="btn btn-xs btn-data">
                                     <i class="fa fa-search"></i>
                                 </button>
-                                <div class="pull-right col-xs-7 col-sm-7 col-md-4 col-lg-5" style="padding-right:0;" ng-if="searchVisible">
+                                <div class="pull-right col-xs-5 col-sm-5 col-md-3 col-lg-4"
+                                     style="padding-right:0;padding-left: 10px;" ng-if="searchVisible">
                                     <div style="position:relative;">
                                         <input type="text"
                                                ng-model="wrap.filtertext"
@@ -145,13 +146,13 @@
                                                 <div class="bottom">
                                                     <div class="hidden-md hidden-lg">
                                                         <div class="block tooltipicon"
-                                                             style="margin-top:0;">
+                                                             style="margin-top:0;text-shadow: none;">
                                                             <i class="fa fa-calendar"
                                                                tooltip data-placement="right"
                                                                title="{{data.Date | date:'yyyy-MM-dd'}}"></i>
                                                         </div>
                                                         <div class="block tooltipicon"
-                                                             style="margin-top:0;">
+                                                             style="margin-top:0;text-shadow: none;">
                                                             <i class="fa fa-user"
                                                                tooltip data-placement="right"
                                                                title="{{data.Owner}}"></i>

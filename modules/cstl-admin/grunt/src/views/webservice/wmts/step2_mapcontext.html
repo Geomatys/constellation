@@ -35,9 +35,10 @@
                     <button type="button" ng-click="searchVisible= !searchVisible" class="btn btn-xs btn-data">
                         <i class="fa fa-search"></i>
                     </button>
-                    <div class="pull-right col-xs-7 col-sm-7 col-md-5 col-lg-6" style="padding-right:0;" ng-if="searchVisible">
+                    <div class="pull-right col-xs-7 col-sm-7 col-md-4 col-lg-5"
+                         style="padding-right:0;padding-left:10px;"
+                         ng-if="searchVisible">
                         <div style="position:relative;">
-                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
                             <input type="text"
                                    ng-model="wrap.filtertext"
                                    class="search-query form-control form-control-fix"
@@ -86,13 +87,13 @@
                                 <div class="bottom">
                                     <div class="hidden-md hidden-lg">
                                         <div class="block tooltipicon"
-                                             style="margin-top:0;">
+                                             style="margin-top:0;text-shadow: none;">
                                             <i class="fa fa-calendar"
                                                tooltip data-placement="right"
                                                title="{{context.date | date:'yyyy-MM-dd'}}"></i>
                                         </div>
                                         <div class="block tooltipicon"
-                                             style="margin-top:0;">
+                                             style="margin-top:0;text-shadow: none;">
                                             <i class="fa fa-user"
                                                tooltip data-placement="right"
                                                title="{{context.userOwner}}"></i>

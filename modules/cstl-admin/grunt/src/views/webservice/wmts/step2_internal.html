@@ -2,7 +2,7 @@
     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-left: 0;padding-right: 0;">
         <div class="dashboard dashboard-wmts-internal list-style-modal">
             <div class="navbar sort-navbar" style="margin-bottom: 6px;">
-                <div class="navbar-inner">
+                <div class="navbar-inner" style="padding-right: 10px;">
                     <ul class="nav nav-style">
                         <li ng-click="clickFilter('Name')">
                             <a style="padding:10px;">
@@ -43,9 +43,10 @@
                     <button type="button" ng-click="searchVisible= !searchVisible" class="btn btn-xs btn-data">
                         <i class="fa fa-search"></i>
                     </button>
-                    <div class="pull-right col-xs-7 col-sm-7 col-md-4 col-lg-5" style="padding-right:0;" ng-if="searchVisible">
+                    <div class="pull-right col-xs-7 col-sm-7 col-md-3 col-lg-4"
+                         style="padding-left:10px;padding-right:0;"
+                         ng-if="searchVisible">
                         <div style="position:relative;">
-                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
                             <input type="text"
                                    ng-model="wrap.filtertext"
                                    class="search-query form-control form-control-fix"
@@ -76,7 +77,7 @@
                                  page-switcher="{page:wrap.currentpage,size:wrap.nbbypage,count:wrap.countdata}"
                                  on-select-page="displayPage(page)"></div>
                             <select class="nb-per-page input-small form-control pull-right col-xs-2 "
-                                    style="padding-left: 5px;padding: 5px; margin-right: 0; margin-top: 5px;"
+                                    style="padding:5px;margin-right:0;margin-top:5px;"
                                     ng-model="wrap.nbbypage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -132,13 +133,13 @@
                                 <div class="bottom">
                                     <div class="hidden-md hidden-lg">
                                         <div class="block tooltipicon"
-                                             style="margin-top:0;">
+                                             style="margin-top:0;text-shadow: none;">
                                             <i class="fa fa-calendar"
                                                tooltip data-placement="right"
                                                title="{{data.Date | date:'yyyy-MM-dd'}}"></i>
                                         </div>
                                         <div class="block tooltipicon"
-                                             style="margin-top:0;">
+                                             style="margin-top:0;text-shadow: none;">
                                             <i class="fa fa-user"
                                                tooltip data-placement="right"
                                                title="{{data.Owner}}"></i>
