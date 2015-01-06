@@ -249,6 +249,16 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
 
         $scope.uploadData = function() {
             var $form = $('#uploadDataForm');
+            var fileInput = $form.find('input:file');
+            if(!fileInput || !fileInput.get(0).files || fileInput.get(0).files.length===0){
+                return;
+            }
+            var fileSize = fileInput.get(0).files[0].size/1000000;
+            if(fileSize > 200){
+                Growl('error', 'Error', 'The file size exceed the limitation of 200Mo per file.');
+                return;
+            }
+
             var formData = new FormData($form[0]);
             $scope.loader.upload = true;
             $.ajax({

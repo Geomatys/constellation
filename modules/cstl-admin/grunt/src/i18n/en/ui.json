@@ -1068,7 +1068,7 @@
     "tooltip.service.source.url":"Fill only the domain name",
     "tooltip.service.source.connexion":"Connection between multiple databases",
     "tooltip.service.source.sensormlfolder":"Path of the file on server",
-    "tooltip.data.add.choicedata.local":"Supported formats:<br/> Shape (in a zip file)<br/>NetCDF<br/>TIF (GeoTIFF)",
+    "tooltip.data.add.choicedata.local":"<b>File size max</b>: 200 Mo<br/><b>Supported formats</b>:<br/>Vector data shape/mif-mid (zip file)<br/>Raster data tif/netcdf/grib/srtm/hgt<br/>",
     "tooltip.data.add.choicedata.server":"Most supported formats: shp, NetCDF, tif",
     "tooltip.data.add.choicemetadata.server":"Metadata format : XML",
     "tooltip.sensor.add":"Supported formats: a sensorML file (*.xml) or a zip file.",
