@@ -1087,6 +1087,8 @@
     "task.history.state":"Etat",
     "task.history.error.msg":"Message d'erreur",
     "tasks.history.show.error":"Voir le message d'erreur",
+    "task.start":"Date de début:",
+    "task.end":"Date de fin:",
 
     "mapcontext.information.title":"Compositions cartographiques disponibles",
 

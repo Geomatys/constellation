@@ -1113,6 +1113,8 @@
     "task.history.state":"State",
     "task.history.error.msg":"Error message",
     "tasks.history.show.error":"Show error message",
+    "task.start":"Start date:",
+    "task.end":"End date:",
 
     "mapcontext.information.title":"Available map context",
 

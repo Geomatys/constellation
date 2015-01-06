@@ -1,12 +1,30 @@
-<div class="modal-dialog modal-dialog-resp-height">
+<div class="modal-dialog modal-dialog-resp-height modal-dialog-responsive">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title">{{'task.history.error.msg' | translate}} - {{taskStatus.title}} - {{taskStatus.end | date:"dd/MM/yyyy-h:mma"}}</h4>
+            <h4 class="modal-title">{{taskStatus.title}} - {{taskStatus.status}}</h4>
         </div>
         <div class="modal-body modal-body-style" style="padding-top: 15px; overflow: auto;">
-            <!-- WRITE CONTENT HERE -->
-            <pre>{{taskStatus.message}}</pre>
+
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <span translate="task.start" style="font-weight: bold;">Start date</span>
+                    <span>{{taskStatus.start | date:"dd/MM/yyyy-h:mma"}}</span>
+                </div>
+                <div class="col-xs-12 col-md-6">
+                    <span translate="task.end" style="font-weight: bold;">Start end</span>
+                    <span>{{taskStatus.end | date:"dd/MM/yyyy-h:mma"}}</span>
+                </div>
+            </div>
+
+            <div ng-if="taskStatus.message != null">
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col-xs-12 col-md-6">
+                        <span translate="task.history.error.msg" style="font-weight: bold;">Error message</span>:
+                    </div>
+                </div>
+                <pre class="code-pre">{{taskStatus.message}}</pre>
+            </div>
         </div>
         <div class="modal-footer">
             <button type="button" id="cancelButton" class="btn btn-default" ng-click="cancel()" translate="mapcontext.modal.cancel">Cancel</button>
