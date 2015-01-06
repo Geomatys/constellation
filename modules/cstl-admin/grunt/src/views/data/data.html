@@ -40,7 +40,9 @@
 
 <div class="tab-content" ng-if="dataCtrl.currentTab==='tabdata'">
     <div class="tab-pane" ng-class="{'active':dataCtrl.currentTab==='tabdata'}" style="padding-top:0;">
-        <div id="dataDashboard" class="row" ng-init="init(); dataCtrl.published=null; dataCtrl.observation=null">
+        <div id="dataDashboard"
+             class="row"
+             ng-init="init(); dataCtrl.published=null; dataCtrl.observation=null">
             <div class="col-sm-12">
             <div class="frame dashboard">
                 <div class="navbar navbar-default" style="margin-bottom: 0px;">
@@ -408,7 +410,7 @@
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                         </div>
-                                        <div class="bottom">
+                                        <div class="bottom" ng-init="isPyramid=checkIsPyramid(data);">
                                             <div ng-class="{'hidden':!dataCtrl.smallMode}">
                                                 <div class="block tooltipicon"
                                                      style="margin-top:0;text-shadow: none;">
@@ -449,7 +451,7 @@
                                                       style="margin-right:10px; font-weight:bold;"
                                                       translate="sensor.observation" >Sensor observation</span>
                                             </div>
-                                            <div ng-if="data.PyramidConformProviderId != null"
+                                            <div ng-if="isPyramid"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;text-shadow:none;">
                                                 <img src="img/icon-pyramid.svg"

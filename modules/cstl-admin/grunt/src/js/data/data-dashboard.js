@@ -422,6 +422,16 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             });
         };
 
+        /**
+         * Returns if the data is a pyramid (tiled data)
+         * this function is overrided by sub-projects.
+         * @param data
+         * @returns {boolean}
+         */
+        $scope.checkIsPyramid = function(data){
+            return data.PyramidConformProviderId !== null;
+        };
+
         $scope.deleteData = function() {
             var dlg = $modal.open({
                 templateUrl: 'views/modal-confirm.html',
