@@ -224,7 +224,7 @@ public class DataCoverageJob implements IDataCoverageJob {
                 final SimpleModule module = new SimpleModule();
                 module.addSerializer(ImageStatistics.class, new ImageStatisticSerializer()); //custom serializer
                 mapper.registerModule(module);
-                mapper.enable(SerializationFeature.INDENT_OUTPUT); //json pretty print
+                //mapper.enable(SerializationFeature.INDENT_OUTPUT); //json pretty print
                 return mapper.writeValueAsString(statistics);
             }
             return null;
