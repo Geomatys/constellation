@@ -737,8 +737,12 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
         $scope.template = template;
         $scope.theme = 'csw';
 
-        $scope.close = function() {
+        $scope.dismiss = function () {
             $modalInstance.dismiss('close');
+        };
+
+        $scope.close = function () {
+            $modalInstance.close();
         };
 
         $scope.loadMetadataValues = function(){
