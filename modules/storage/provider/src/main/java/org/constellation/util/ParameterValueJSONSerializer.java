@@ -42,12 +42,49 @@ import java.util.List;
  */
 public class ParameterValueJSONSerializer extends JsonSerializer<GeneralParameterValue> {
 
+    /**
+     * Flag that indicate if root ParameterValueGroup is omitted or included in
+     * output JSON.
+     */
+    private boolean excludeRootGroup = true;
+
+    public ParameterValueJSONSerializer() {
+    }
+
+    /**
+     *
+     * @param excludeRootGroup Flag that indicate if root ParameterValueGroup is omitted or included in
+     * output JSON.
+     */
+    public ParameterValueJSONSerializer(boolean excludeRootGroup) {
+        this.excludeRootGroup = excludeRootGroup;
+    }
+
     @Override
     public void serialize(GeneralParameterValue parameterValue, JsonGenerator writer, SerializerProvider serializerProvider)
             throws IOException, JsonProcessingException {
-        writeGeneralParameterValue(parameterValue, writer);
-    }
 
+        if (excludeRootGroup) {
+
+            if (parameterValue instanceof ParameterValueGroup) {
+                ParameterValueGroup rootGroup = (ParameterValueGroup) parameterValue;
+                List<GeneralParameterValue> values = rootGroup.values();
+
+                if (values != null && !values.isEmpty()) {
+                    writer.writeStartArray();
+                    for (GeneralParameterValue value : values) {
+                        writeGeneralParameterValue(value, writer);
+                    }
+                    writer.writeEndArray();
+                }
+
+            } else {
+                writeGeneralParameterValue(parameterValue, writer);
+            }
+        } else {
+            writeGeneralParameterValue(parameterValue, writer);
+        }
+    }
 
     private void writeGeneralParameterValue(final GeneralParameterValue generalParameterValue, JsonGenerator writer)
             throws IOException, JsonProcessingException {
