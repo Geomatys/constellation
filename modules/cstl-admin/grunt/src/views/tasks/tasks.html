@@ -195,8 +195,7 @@
                                                <td>{{status.end | date:"dd/MM/yyyy h:mma"}}</td>
                                                <td>{{status.status}}</td>
                                                <td>
-                                                   <span ng-show="status.status === 'FAILED' || status.status === 'CANCELLED'"
-                                                         ng-click="showMessage(status)"
+                                                   <span ng-click="showMessage(status)"
                                                          title="{{'tasks.history.show.error' | translate }}" tooltip
                                                          style="display: inline-block; cursor: pointer;">
                                                        <i class="glyphicon glyphicon-info-sign"/>

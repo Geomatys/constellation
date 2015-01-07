@@ -83,6 +83,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                         status.status = event.status;
                         status.message = event.message;
                         status.end = event.end;
+                        status.output = event.output;
                     });
                 } else {
                     // New execution
@@ -214,13 +215,9 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         };
 
         $scope.statusHistoryFilter = function(status) {
-            if (status.status === 'FAILED' ||
+            return (status.status === 'FAILED' ||
                 status.status === 'CANCELLED' ||
-                status.status === 'SUCCEED') {
-                return true;
-            }
-
-            return false;
+                status.status === 'SUCCEED');
         };
 
         $scope.truncate = function(small, text){

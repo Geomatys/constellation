@@ -17,7 +17,16 @@
                 </div>
             </div>
 
-            <div ng-if="taskStatus.message != null">
+            <div ng-if="showOutputs">
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col-xs-12 col-md-6">
+                        <span style="font-weight: bold;">Output</span>:
+                    </div>
+                </div>
+                <pre class="code-pre">{{taskStatus.output}}</pre>
+            </div>
+
+            <div ng-if="showMessage">
                 <div class="row" style="margin-top: 15px;">
                     <div class="col-xs-12 col-md-6">
                         <span translate="task.history.error.msg" style="font-weight: bold;">Error message</span>:
@@ -25,6 +34,7 @@
                 </div>
                 <pre class="code-pre">{{taskStatus.message}}</pre>
             </div>
+
         </div>
         <div class="modal-footer">
             <button type="button" id="cancelButton" class="btn btn-default" ng-click="cancel()" translate="mapcontext.modal.cancel">Cancel</button>

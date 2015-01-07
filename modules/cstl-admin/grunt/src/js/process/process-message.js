@@ -21,7 +21,33 @@
 angular.module('cstl-process-message', ['ui.bootstrap.modal'])
 
     .controller('ModalStatusMessageController', function($scope, $modalInstance, taskStatus) {
+
+        /**
+         * @param candidate
+         * @return {boolean} true if candidate is NOT null and NOT empty, false otherwise.
+         */
+        function checkNullEmpty(candidate) {
+            if (candidate !== null) {
+                if (angular.isString(candidate)) {
+                    return candidate.length > 0;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function init() {
+            if ($scope.taskStatus.output !== null && angular.isString($scope.taskStatus.output)) {
+                $scope.taskStatus.output = angular.fromJson($scope.taskStatus.output);
+            }
+
+            $scope.showOutputs = checkNullEmpty($scope.taskStatus.output);
+            $scope.showMessage = checkNullEmpty($scope.taskStatus.message);
+        }
+
         $scope.taskStatus = taskStatus;
         $scope.close = $scope.cancel = $modalInstance.close;
+
+        init();
     });
 
