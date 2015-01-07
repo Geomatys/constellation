@@ -223,7 +223,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
         //the following is a fix to wrap the variable from the good scope.
         $scope.wrapScope = {
             filterText : $scope.wrap.filtertext,
-            nbbypage : $scope.wrap.nbbypage || 10
+            nbbypage : $scope.wrap.nbbypage || 5
         };
         $scope.$watch('wrapScope.filterText', function() {
             $scope.wrap.filtertext =$scope.wrapScope.filterText;
