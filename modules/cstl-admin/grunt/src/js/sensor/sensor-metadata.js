@@ -52,8 +52,12 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
         };
         $scope.loadMetadataValues();
 
-        $scope.close = function() {
+        $scope.dismiss = function () {
             $modalInstance.dismiss('close');
+        };
+
+        $scope.close = function () {
+            $modalInstance.close();
         };
 
         $scope.isValidField = function(input){
