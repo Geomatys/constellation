@@ -20,16 +20,19 @@
 package org.constellation.scheduler;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.engine.register.Task;
+import org.constellation.util.ParamUtilities;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.process.quartz.ProcessJob;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -165,6 +168,16 @@ public class QuartzJobListener implements JobListener {
             taskEntity.setDateEnd(System.currentTimeMillis());
             taskEntity.setMessage(toString(event.getTask()));
             taskEntity.setProgress((double) event.getProgress());
+
+            ParameterValueGroup output = event.getOutput();
+            if (output != null) {
+                try {
+                    taskEntity.setTaskOutput(ParamUtilities.writeParameterJSON(output));
+                } catch (JsonProcessingException e) {
+                    LOGGER.log(Level.WARNING, "Process output serialization failed", e);
+                }
+            }
+
             updateTask(taskEntity);
         }
 
@@ -198,6 +211,8 @@ public class QuartzJobListener implements JobListener {
             taskStatus.setPercent(taskEntity.getProgress().floatValue());
             taskStatus.setStart(taskEntity.getDateStart());
             taskStatus.setEnd(taskEntity.getDateEnd());
+            taskStatus.setOutput(taskEntity.getTaskOutput());
+
             SpringHelper.sendEvent(taskStatus);
         }
 

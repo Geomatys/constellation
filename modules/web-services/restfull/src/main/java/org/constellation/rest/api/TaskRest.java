@@ -469,6 +469,7 @@ public class TaskRest {
         status.setStatus(task.getState());
         status.setStart(task.getDateStart());
         status.setEnd(task.getDateEnd());
+        status.setOutput(task.getTaskOutput());
 
         final TaskParameter taskParameter = processBusiness.getTaskParameterById(task.getTaskParameterId());
         status.setTitle(taskParameter.getName());

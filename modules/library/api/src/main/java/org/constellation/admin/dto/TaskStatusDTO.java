@@ -35,6 +35,7 @@ public class TaskStatusDTO {
     private String schedule;
     private Long start;
     private Long end;
+    private String output;
 
     public TaskStatusDTO() {
     }
@@ -109,5 +110,13 @@ public class TaskStatusDTO {
 
     public void setEnd(Long end) {
         this.end = end;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
     }
 }

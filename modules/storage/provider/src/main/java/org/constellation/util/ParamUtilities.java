@@ -18,13 +18,19 @@
  */
 package org.constellation.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.io.IOUtils;
 import org.apache.sis.util.Static;
+import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 import org.slf4j.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -146,5 +152,13 @@ public final class ParamUtilities extends Static {
         } catch (XMLStreamException ex) {
             throw new IOException("An error occurred while writing ParameterDescriptorGroup XML.", ex);
         }
+    }
+
+    public static String writeParameterJSON(ParameterValueGroup output) throws JsonProcessingException {
+        final ObjectMapper mapper = new ObjectMapper();
+        final SimpleModule module = new SimpleModule();
+        module.addSerializer(GeneralParameterValue.class, new ParameterValueJSONSerializer()); //custom serializer
+        mapper.registerModule(module);
+        return mapper.writeValueAsString(output);
     }
 }
