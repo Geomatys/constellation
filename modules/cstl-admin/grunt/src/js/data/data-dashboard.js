@@ -67,6 +67,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             } else {
                 $scope.dataCtrl.selectedDataSetChild = item;
             }
+            $scope.showDataDashboardMap();
         };
 
         /**
@@ -261,6 +262,10 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     Growl('error','Error','Unable to load list of dataset!');
                 });
             }
+            //display dashboard map
+            setTimeout(function(){
+                $scope.showDataDashboardMap();
+            },300);
             //display button that allow to scroll to top of the page from a certain height.
             angular.element($window).bind("scroll", function() {
                 $scope.dataCtrl.hideScroll = this.pageYOffset < 220;
@@ -360,7 +365,86 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             }
         };
 
-        // Map methods
+        $scope.showDataDashboardMap = function() {
+            if (DataDashboardViewer.map) {
+                DataDashboardViewer.map.setTarget(undefined);
+            }
+            DataDashboardViewer.initConfig();
+            DataDashboardViewer.fullScreenControl = true;
+            var mapId = $scope.dataCtrl.currentTab === 'tabdata' ? 'dataPreviewMap' : 'metadataPreviewMap';
+            var selectedData = $scope.dataCtrl.selectedDataSetChild;
+            if(selectedData) {
+                var layerName;
+                if (selectedData.Namespace) {
+                    layerName = '{' + selectedData.Namespace + '}' + selectedData.Name;
+                } else {
+                    layerName = selectedData.Name;
+                }
+                var providerId = selectedData.Provider;
+                if($scope.dataCtrl.currentTab === 'tabdata') {
+                    var layerData;
+                    var pyramidProviderId = selectedData.PyramidConformProviderId;
+                    var type = selectedData.Type.toLowerCase();
+                    if (selectedData.TargetStyle && selectedData.TargetStyle.length > 0) {
+                        layerData = DataDashboardViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,layerName,
+                            pyramidProviderId?pyramidProviderId:providerId,
+                            selectedData.TargetStyle[0].Name,
+                            null,null,type!=='vector');
+                    } else {
+                        layerData = DataDashboardViewer.createLayer($scope.dataCtrl.cstlUrl, layerName,
+                            pyramidProviderId?pyramidProviderId:providerId,null,type!=='vector');
+                    }
+                    //to force the browser cache reloading styled layer.
+                    layerData.get('params').ts=new Date().getTime();
+                    DataDashboardViewer.layers = [layerData];
+                }
+
+                provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
+                    function(response) {//success
+                        var bbox = response.boundingBox;
+
+                        var overlay= null;
+                        if (bbox) {
+                            DataDashboardViewer.extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
+                            if($scope.dataCtrl.currentTab === 'tabmetadata') {
+                                var minX = bbox[0];
+                                var minY = bbox[1];
+                                var maxX = bbox[2];
+                                var maxY = bbox[3];
+                                var coordinates = [[[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]]];
+                                var polygon = new ol.geom.Polygon(coordinates);
+                                polygon = polygon.transform('EPSG:4326',DataDashboardViewer.projection);
+                                var extentFeature = new ol.Feature(polygon);
+                                var stroke = new ol.style.Stroke({
+                                    color: '#66AADD',
+                                    width: 2.25
+                                });
+                                var styles = [
+                                    new ol.style.Style({
+                                        stroke: stroke
+                                    })
+                                ];
+                                overlay = new ol.FeatureOverlay({
+                                    features : [extentFeature],
+                                    style : styles
+                                });
+                            }
+                        }
+                        DataDashboardViewer.initMap(mapId);
+                        if(overlay) {
+                            DataDashboardViewer.map.addOverlay(overlay);
+                            //overlay.setMap(DataDashboardViewer.map);
+                        }
+                    }, function() {//error
+                        // failed to find a metadata, just load the full map
+                        DataDashboardViewer.initMap(mapId);
+                    }
+                );
+            }else {
+                DataDashboardViewer.initMap(mapId);
+            }
+        };
+
         $scope.showData = function() {
             //clear the map
             if (DataViewer.map) {
@@ -429,7 +513,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          * @returns {boolean}
          */
         $scope.checkIsPyramid = function(data){
-            return data.PyramidConformProviderId !== null;
+            return (data && data.PyramidConformProviderId);
         };
 
         $scope.deleteData = function() {

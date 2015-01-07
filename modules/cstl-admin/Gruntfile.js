@@ -45,6 +45,7 @@ module.exports = function(grunt) {
                         "cstlAdminApp":true,
                         "DataViewer":true,
                         "WmtsViewer":true,
+                        "DataDashboardViewer":true,
                         "Netcdf":true
                     }
                 },
