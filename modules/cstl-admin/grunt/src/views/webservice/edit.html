@@ -88,7 +88,7 @@
                             <div class="frame dashboard">
                                 <div class="navbar title">
                                     <div class="navbar-inner">
-                                        <div ng-if="type !== 'csw' && type !== 'sos'"
+                                        <div ng-if="type !== 'csw' && type !== 'sos' && type !== 'wps'"
                                              class="brand"
                                              translate="service.edit.dashboard.layer.title">Layers list</div>
                                         <div ng-if="type === 'csw'"
@@ -97,6 +97,9 @@
                                         <div ng-if="type === 'sos'"
                                              class="brand"
                                              translate="service.edit.dashboard.sensors.list">Sensors list</div>
+                                        <div ng-if="type === 'wps'"
+                                             class="brand"
+                                             translate="service.edit.dashboard.process.list">Process list</div>
                                     </div>
                                 </div>
                                 <div class="navbar sort-navbar">
@@ -205,26 +208,26 @@
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
                                                 <div class="item"
                                                      ng-repeat="layer in wrap.dataList"
-                                                     ng-class="{selected:layer==selected,coverage:layer.Type.toLowerCase()==='coverage',vector:layer.Type.toLowerCase()==='observation-store' || layer.Type.toLowerCase()==='vector', 'col-xs-6':small, 'style-small':small}"
-                                                     ng-click="select(layer)">
+                                                     ng-class="{selected:layer.Id==selected.Id,coverage:layer.Type.toLowerCase()==='coverage',vector:layer.Type.toLowerCase()==='observation-store' || layer.Type.toLowerCase()==='vector', 'col-xs-6':small, 'style-small':small}"
+                                                     ng-click="select(layer);showLayerDashboardMap();">
                                                     <div class="top">
                                                         <span class="item-title"
                                                               title="{{layer.Name}}">{{layer.Title ? truncate(small,layer.Title) : truncate(small,layer.Name)}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                         <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint')"
-                                                             ng-src="{{layer!=selected?'img/vector-multipoint.svg':'img/vector-multipoint-selected.svg'}}"
+                                                             ng-src="{{layer.Id!=selected.Id?'img/vector-multipoint.svg':'img/vector-multipoint-selected.svg'}}"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
                                                         <img ng-if="layer.Subtype=='Geometry'"
-                                                             ng-src="{{layer!=selected?'img/vector-multigeometry.svg':'img/vector-multigeometry-selected.svg'}}"
+                                                             ng-src="{{layer.Id!=selected.Id?'img/vector-multigeometry.svg':'img/vector-multigeometry-selected.svg'}}"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px; width:22px" />
                                                         <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon')"
-                                                             ng-src="{{layer!=selected?'img/vector-poly.svg':'img/vector-poly-selected.svg'}}"
+                                                             ng-src="{{layer.Id!=selected.Id?'img/vector-poly.svg':'img/vector-poly-selected.svg'}}"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
                                                         <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString')"
-                                                             ng-src="{{layer!=selected?'img/vector-polyline.svg':'img/vector-polyline-selected.svg'}}"
+                                                             ng-src="{{layer.Id!=selected.Id?'img/vector-polyline.svg':'img/vector-polyline-selected.svg'}}"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
                                                     </div>
@@ -454,6 +457,12 @@
                                     <span translate="service.edit.dashboard.wmts.action.addnewlayer.button">Add new layer</span>
                                 </a>
                             </div>
+                            <div id="wmtsPreviewMap" class="dashboardmap data-dashboardmap"
+                                 style="padding:0;"
+                                 ng-if="service.type.toLowerCase() === 'wmts'"></div>
+                            <div id="layerPreviewMap" class="dashboardmap data-dashboardmap"
+                                 style="padding:0;"
+                                 ng-if="service.type.toLowerCase() !== 'wmts' && service.type.toLowerCase() !== 'sos' && service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps'"></div>
                             <div id="selection">
                                 <div class="alert alert-info alert-data"
                                      ng-class="{'alert-csw':type==='csw','alert-sos':type==='sos'}"
@@ -551,7 +560,6 @@
                                         <div ng-if="service.type.toLowerCase() === 'wms'">
                                             <div class="row block-association"
                                                  ng-init="assocStyle=false;">
-
                                                 <div class="col-sm-12 col-md-10 col-md-offset-1">
                                                     <div class="block-associated block-associated-style block-associated-style-service"
                                                          ng-click="assocStyle=!assocStyle;">
@@ -570,7 +578,6 @@
                                                           ng-click="showStyleList();"></span>
                                                 </div>
                                             </div>
-
                                             <div ng-if="assocStyle" class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
                                                 <div id="linkedList" class="block-content" >
                                                     <span ng-show="selected.TargetStyle.length == 0"

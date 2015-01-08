@@ -168,7 +168,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         for (var i=0; i<response.BriefNode.length; i++) {
                             mdIds.push(response.BriefNode[i].identifier);
                         }
-
                         dataListing.dataForMetadata({}, mdIds,
                             function(response) { $scope.relatedDatas = response; },
                             function() { Growl('error','Error','Unable to get related data for metadata'); }
@@ -181,11 +180,17 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     $scope.layers = sensors.children;
 
                 }, function() { Growl('error','Error','Unable to list sensors'); });
+            } else if ($scope.type === 'wps') {
+                $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
+                //@TODO get process list
             } else {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
                 $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
+                    setTimeout(function(){
+                        $scope.showLayerDashboardMap();
+                    },300);
                 });
             }
         };
@@ -198,6 +203,9 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             $scope.wrap.orderreverse=false;
             $scope.wrap.filtertext='';
             $scope.selected=null;
+            if($scope.type !== 'csw' && $scope.type !== 'sos' && $scope.type !== 'wps') {
+                $scope.showLayerDashboardMap();
+            }
         };
 
 
@@ -295,7 +303,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
 
         // Show Logs methods
         $scope.showLogs = function(service) {
-
             $modal.open({
                 templateUrl: 'views/webservice/modalLogs.html',
                 controller: 'WebServiceUtilsController',
@@ -307,7 +314,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             });
         };
 
-
         $scope.reload = function(service){
             webService.restart({type: service.type, id: service.identifier}, {value: true},
                 function() { Growl('success','Success','Service '+ service.name +' successfully reloaded'); },
@@ -315,13 +321,13 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             );
         };
 
-
         $scope.startOrStop = function(service){
             if(service.status==='STARTED'){
                 webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.service.status = "NOT_STARTED";
                         Growl('success','Success','Service '+ service.name +' successfully stopped');
+                        $scope.showLayerDashboardMap();
                     }
                 }, function() { Growl('error','Error','Service '+ service.name +' stop failed'); });
             }else{
@@ -329,6 +335,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     if (response.status==="Success") {
                         $scope.service.status = "STARTED";
                         Growl('success','Success','Service '+ service.name +' successfully started');
+                        $scope.showLayerDashboardMap();
                     }
                 }, function() { Growl('error','Error','Service '+ service.name +' start failed'); });
             }
@@ -344,11 +351,12 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     service: function() { return $scope.service; }
                 }
             });
-
             modal.result.then(function() {
                 if ($scope.type.toLowerCase() !== 'sos') {
                     $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
                         Dashboard($scope, response, true);
+                        $scope.selected = null;
+                        $scope.showLayerDashboardMap();
                     });
                 } else {
                     $scope.initScope();
@@ -364,13 +372,14 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     service: function() { return $scope.service; }
                 }
             });
-
             modal.result.then(function() {
                 $scope.layers = webService.layers({type: $scope.type,
                                                    id: $routeParams.id},
                                                    {},
                     function (response) {//success
                         Dashboard($scope, response, true);
+                        $scope.selected = null;
+                        $scope.showLayerDashboardMap();
                     }
                 );
             });
@@ -411,6 +420,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                     function (response) {
                                         Dashboard($scope, response, true);
                                         $scope.selected=null;
+                                        $scope.showLayerDashboardMap();
                                     });
                                 },
                                 function () {
@@ -513,10 +523,14 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id},{},function (response) {
                     Dashboard($scope, response, true);
                     $scope.wrap.ordertype='Name';
+                    $scope.showLayerDashboardMap();
                 });
             });
         };
 
+        /**
+         * binding action to delete metadata from csw service dashboard page.
+         */
         $scope.deleteMetadata = function() {
             if ($scope.selected) {
                 var dlg = $modal.open({
@@ -541,6 +555,97 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         );
                     }
                 });
+            }
+        };
+
+        $scope.showLayerDashboardMap = function() {
+            if($scope.type !== 'sos' && $scope.type !== 'csw' && $scope.type !== 'wps') {
+                if($scope.type === 'wmts') {
+                    if (WmtsLayerDashboardViewer.map) {
+                        WmtsLayerDashboardViewer.map.setTarget(undefined);
+                    }
+                    WmtsLayerDashboardViewer.initConfig();
+                    WmtsLayerDashboardViewer.fullScreenControl = true;
+                    if($scope.service.status !== "STARTED"){
+                        WmtsLayerDashboardViewer.initMap('wmtsPreviewMap');
+                        return;
+                    }
+                    if($scope.selected) {
+                        var wmtslayerName = $scope.selected.Name;
+                        // Get wmts values: resolutions, extent, matrixSet and matrixIds
+                        textService.capa($scope.service.type.toLowerCase(),
+                                $scope.service.identifier,
+                                $scope.service.versions[0])
+                            .success(function(data, status, headers, config) {
+                                webService.extractWMTSLayerInfo({"type":$scope.service.type,
+                                        "id":$scope.service.identifier,
+                                        "layerName":wmtslayerName,
+                                        "crs":WmtsLayerDashboardViewer.projection},
+                                    data,
+                                    function(response){//success
+                                        var wmtsValues = {
+                                            "url":$scope.cstlUrl +'WS/wmts/'+ $scope.service.identifier,
+                                            "resolutions": response.resolutions,
+                                            "matrixSet":response.matrixSet,
+                                            "matrixIds":response.matrixIds,
+                                            "style":response.style,
+                                            "dataExtent":response.dataExtent
+                                        };
+                                        var layerwmts = WmtsLayerDashboardViewer.createLayer(wmtslayerName, $scope.service.identifier, wmtsValues);
+                                        WmtsLayerDashboardViewer.layers = [layerwmts];
+                                        WmtsLayerDashboardViewer.initMap('wmtsPreviewMap');
+                                        WmtsLayerDashboardViewer.map.getView().fitExtent(wmtsValues.dataExtent,WmtsLayerDashboardViewer.map.getSize());
+                                    });
+                            });
+                    }else {
+                        WmtsLayerDashboardViewer.initMap('wmtsPreviewMap');
+                    }
+                }else {
+                    if (LayerDashboardViewer.map) {
+                        LayerDashboardViewer.map.setTarget(undefined);
+                    }
+                    LayerDashboardViewer.initConfig();
+                    LayerDashboardViewer.fullScreenControl = true;
+                    if($scope.service.status !== "STARTED"){
+                        LayerDashboardViewer.initMap('layerPreviewMap');
+                        return;
+                    }
+                    if($scope.selected) {
+                        var layerName = $scope.selected.Name;
+                        var layerData;
+                        var providerId = $scope.selected.Provider;
+                        if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
+                            if($scope.service.type.toLowerCase() === 'wms') {
+                                layerData = LayerDashboardViewer.createLayerWMSWithStyle($scope.cstlUrl, layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
+                            }else {
+                                layerData = LayerDashboardViewer.createLayerWithStyle($scope.cstlUrl, layerName, providerId,
+                                    $scope.selected.TargetStyle[0].Name,null,null,true);
+                            }
+                        } else {
+                            if($scope.service.type.toLowerCase() === 'wms') {
+                                layerData = LayerDashboardViewer.createLayerWMS($scope.cstlUrl, layerName, $scope.service.identifier);
+                            }else {
+                                layerData = LayerDashboardViewer.createLayer($scope.cstlUrl, layerName, providerId,null,true);
+                            }
+                        }
+                        LayerDashboardViewer.layers = [layerData];
+                        provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
+                            function(response) {//success
+                                var bbox = response.boundingBox;
+                                if (bbox) {
+                                    var extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
+                                    LayerDashboardViewer.extent = extent;
+                                }
+                                LayerDashboardViewer.initMap('layerPreviewMap');
+                            }, function() {//error
+                                // failed to find a metadata, just load the full map
+                                LayerDashboardViewer.initMap('layerPreviewMap');
+                            }
+                        );
+                    }else {
+                        LayerDashboardViewer.initMap('layerPreviewMap');
+                    }
+                }
             }
         };
 

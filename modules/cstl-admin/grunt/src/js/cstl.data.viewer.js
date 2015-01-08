@@ -29,6 +29,7 @@ window.buildDataViewer = function () {
             this.extent = [-180, -85, 180, 85];
             this.projection = 'EPSG:3857';
             this.addBackground = true;
+            this.fullScreenControl = false;
         },
 
         initMap : function(mapId){
@@ -379,3 +380,4 @@ window.buildDataViewer = function () {
 };
 window.DataViewer = window.buildDataViewer();
 window.DataDashboardViewer = window.buildDataViewer();
+window.LayerDashboardViewer = window.buildDataViewer();

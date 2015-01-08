@@ -433,6 +433,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                                 {values: {layerId: selected.Name, spId: 'sld', styleName: item.Name}},
                                 function() {
                                     selected.TargetStyle.push(item);
+                                    $scope.showLayerDashboardMap();
                                     Growl('success','Success','Style updated for layer '+ selected.Name);
                                 }, function() { Growl('error','Error','Unable to update style for layer '+ selected.Name); }
                             );
@@ -448,6 +449,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                                 }
                             }, function () {
                                 selected.TargetStyle.push(item);
+                                $scope.showDataDashboardMap();
                             });
                         }
                     }
@@ -466,6 +468,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                                     break;
                                 }
                             }
+                            $scope.showLayerDashboardMap();
                         }, function() { Growl('error','Error','Unable to update style for layer '+ selected.Name); }
                     );
                 } else {
@@ -483,6 +486,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                         if (index >= 0) {
                             selected.TargetStyle.splice(index, 1);
                         }
+                        $scope.showDataDashboardMap();
                     }
                 }
             },

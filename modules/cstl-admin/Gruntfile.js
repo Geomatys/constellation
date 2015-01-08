@@ -46,6 +46,8 @@ module.exports = function(grunt) {
                         "DataViewer":true,
                         "WmtsViewer":true,
                         "DataDashboardViewer":true,
+                        "LayerDashboardViewer":true,
+                        "WmtsLayerDashboardViewer":true,
                         "Netcdf":true
                     }
                 },
