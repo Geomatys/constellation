@@ -291,6 +291,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             }, function() {//error
                 Growl('error','Error','Unable to load list of dataset!');
             });
+            $scope.showDataDashboardMap();
         };
 
         /**
@@ -320,6 +321,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     Growl('error','Error','Unable to load list of dataset!');
                 });
             }
+            $scope.showDataDashboardMap();
         };
 
         /**
@@ -534,6 +536,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                             datasetListing.listAll({}, function(response) {
                                 Dashboard($scope, response, true);
                                 $scope.dataCtrl.selectedDataSetChild=null;
+                                $scope.showDataDashboardMap();
                             });
                         },
                         function() {//on error
@@ -563,6 +566,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                             Dashboard($scope, response, true);
                             $scope.dataCtrl.selectedDataSetChild=null;
                             $scope.selectedDS = null;
+                            $scope.showDataDashboardMap();
                         });
                     },function(response){//error
                         Growl('error','Error','Dataset '+ $scope.selectedDS.Name +' deletion failed');
