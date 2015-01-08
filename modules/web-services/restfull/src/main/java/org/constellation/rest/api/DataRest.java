@@ -76,6 +76,8 @@ import org.constellation.dto.ProviderData;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.Mapcontext;
+import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.repository.UserRepository;
@@ -1317,6 +1319,7 @@ public class DataRest {
 
     /**
      * Generates a pyramid on a list of data and create and return this new provider.
+     * Creates btw a mapcontext that contains internal data.
      * N.B : It creates a styled pyramid, which can be used for display purposes, but not for analysis.
      */
     @POST
@@ -1513,6 +1516,38 @@ public class DataRest {
                 for(final DataBrief db : briefs){
                     dataBusiness.linkDataToData(db.getId(),pyramidDataBrief.getId());
                 }
+
+                //insert a mapcontext for this wmts pyramid of data
+                final MapContextLayersDTO mapContext = new MapContextLayersDTO();
+                mapContext.setOwner(cstlUser.get().getId());
+                mapContext.setCrs(crs);
+                mapContext.setKeywords("");
+                mapContext.setWest(globalEnv.getLower(0));
+                mapContext.setSouth(globalEnv.getLower(1));
+                mapContext.setEast(globalEnv.getUpper(0));
+                mapContext.setNorth(globalEnv.getUpper(1));
+                mapContext.setName(dataName+" (wmts context)");
+                final Mapcontext mapContextCreated = mapContextBusiness.create(mapContext);
+                final List<MapcontextStyledLayer> mapcontextlayers = new ArrayList<>();
+                final Integer mapcontextId = mapContextCreated.getId();
+                for(final DataBrief db : briefs) {
+                    final MapcontextStyledLayer mcStyledLayer = new MapcontextStyledLayer();
+                    mcStyledLayer.setDataId(db.getId());
+                    final List<StyleBrief> styles = db.getTargetStyle();
+                    if(styles != null && !styles.isEmpty()){
+                        final String styleName = styles.get(0).getName();
+                        mcStyledLayer.setExternalStyle(styleName);
+                        mcStyledLayer.setStyleId(styles.get(0).getId());
+                    }
+                    mcStyledLayer.setIswms(false);
+                    mcStyledLayer.setLayerId(null);
+                    mcStyledLayer.setLayerOpacity(100);
+                    mcStyledLayer.setLayerOrder(briefs.indexOf(db));
+                    mcStyledLayer.setLayerVisible(true);
+                    mcStyledLayer.setMapcontextId(mapcontextId);
+                    mapcontextlayers.add(mcStyledLayer);
+                }
+                mapContextBusiness.setMapItems(mapcontextId, mapcontextlayers);
             } catch (Exception ex) {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                 return Response.status(500).entity("Failed to create pyramid layer " + ex.getMessage()).build();

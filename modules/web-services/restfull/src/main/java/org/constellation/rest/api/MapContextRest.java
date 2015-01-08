@@ -123,7 +123,7 @@ public class MapContextRest {
             return Response.status(500).entity("operation not allowed without login").build();
         }
         mapContext.setOwner(cstlUser.get().getId());
-        final Mapcontext mapContextCreated = contextRepository.create(mapContext);
+        final Mapcontext mapContextCreated = contextBusiness.create(mapContext);
         return Response.ok(mapContextCreated).build();
     }
 

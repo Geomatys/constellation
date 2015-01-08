@@ -20,6 +20,7 @@ package org.constellation.business;
 
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.dto.ParameterValues;
+import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
 import org.opengis.util.FactoryException;
 
@@ -30,6 +31,8 @@ import java.util.List;
  */
 public interface IMapContextBusiness {
     List<MapContextLayersDTO> findAllMapContextLayers();
+
+    Mapcontext create(final MapContextLayersDTO mapContext);
 
     void setMapItems(final int contextId, final List<MapcontextStyledLayer> layers);
 

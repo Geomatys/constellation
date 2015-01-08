@@ -89,6 +89,12 @@ public class MapContextBusiness implements IMapContextBusiness {
     }
 
     @Override
+    @Transactional
+    public Mapcontext create(final MapContextLayersDTO mapContext) {
+        return mapContextRepository.create(mapContext);
+    }
+
+    @Override
     public List<MapContextLayersDTO> findAllMapContextLayers() {
         final List<MapContextLayersDTO> ctxtLayers = new ArrayList<>();
         final List<Mapcontext> ctxts = mapContextRepository.findAll();
