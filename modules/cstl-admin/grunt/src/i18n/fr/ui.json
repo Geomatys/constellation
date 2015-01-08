@@ -808,6 +808,7 @@
     "service.rights.group.write":"Ecriture",
     "service.edit.dashboard.layer.title": "Liste des couches",
     "service.edit.dashboard.metadata.title": "Liste des métadonnées",
+    "service.edit.dashboard.process.list": "Liste des processus",
     "service.edit.dashboard.tabs.data": "Données",
     "service.edit.dashboard.tabs.description": "Description du service",
     "service.edit.dashboard.tabs.metadata": "Métadonnées du service",

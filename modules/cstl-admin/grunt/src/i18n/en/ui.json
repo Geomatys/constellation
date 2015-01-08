@@ -662,6 +662,7 @@
     "service.description.tab.metadata.title": "Service metadata",
     "service.edit.dashboard.layer.title": "Layers list",
     "service.edit.dashboard.metadata.title": "Metadata list",
+    "service.edit.dashboard.process.list": "Process list",
     "service.edit.dashboard.tabs.data": "Data",
     "service.edit.dashboard.tabs.description": "Service Description",
     "service.edit.dashboard.tabs.metadata": "Service Metadata",
