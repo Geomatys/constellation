@@ -447,67 +447,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             }
         };
 
-        $scope.showData = function() {
-            //clear the map
-            if (DataViewer.map) {
-                DataViewer.map.setTarget(undefined);
-            }
-            DataViewer.initConfig();
-            var viewerData = $('#viewerData');
-            viewerData.modal("show");
-            viewerData.off('shown.bs.modal');
-            viewerData.on('shown.bs.modal', function (e) {
-                var layerName;
-                if ($scope.dataCtrl.selectedDataSetChild && $scope.dataCtrl.selectedDataSetChild.Namespace) {
-                    layerName = '{' + $scope.dataCtrl.selectedDataSetChild.Namespace + '}' + $scope.dataCtrl.selectedDataSetChild.Name;
-                } else {
-                    layerName = $scope.dataCtrl.selectedDataSetChild.Name;
-                }
-                var providerId = $scope.dataCtrl.selectedDataSetChild.Provider;
-                var pyramidProviderId = $scope.dataCtrl.selectedDataSetChild.PyramidConformProviderId;
-                var layerData;
-                var type = $scope.dataCtrl.selectedDataSetChild.Type.toLowerCase();
-                if ($scope.dataCtrl.selectedDataSetChild.TargetStyle && $scope.dataCtrl.selectedDataSetChild.TargetStyle.length > 0) {
-                    layerData = DataViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,
-                        layerName,
-                        pyramidProviderId?pyramidProviderId:providerId,
-                        $scope.dataCtrl.selectedDataSetChild.TargetStyle[0].Name,
-                        null,null,type!=='vector');
-                } else {
-                    layerData = DataViewer.createLayer($scope.dataCtrl.cstlUrl, layerName,
-                        pyramidProviderId?pyramidProviderId:providerId,null,type!=='vector');
-                }
-                //to force the browser cache reloading styled layer.
-                layerData.get('params').ts=new Date().getTime();
-
-                //attach event loader in modal map viewer
-                layerData.on('precompose',function(){
-                    $scope.$apply(function() {
-                        window.cfpLoadingBar_parentSelector = '#dataMap';
-                        cfpLoadingBar.start();
-                        cfpLoadingBar.inc();
-                    });
-                });
-                layerData.on('postcompose',function(){
-                    cfpLoadingBar.complete();
-                    window.cfpLoadingBar_parentSelector = null;
-                });
-                DataViewer.layers = [layerData];
-                provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
-                    function(response) {//success
-                        var bbox = response.boundingBox;
-                        if (bbox) {
-                            DataViewer.extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
-                        }
-                        DataViewer.initMap('dataMap');
-                    }, function() {//error
-                        // failed to find a metadata, just load the full map
-                        DataViewer.initMap('dataMap');
-                    }
-                );
-            });
-        };
-
         /**
          * Returns if the data is a pyramid (tiled data)
          * this function is overrided by sub-projects.
