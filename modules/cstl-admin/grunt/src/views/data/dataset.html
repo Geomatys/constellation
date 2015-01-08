@@ -174,9 +174,9 @@
             </form>
         </div>
         <div class="dash-inner row" style="padding-bottom: 10pt;">
-            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"
-                 ng-init="dataCtrl.smallMode=false"
-                 style="padding-right: 0;">
+            <div class="pull-left"
+                 style="width: 60%;"
+                 ng-init="dataCtrl.smallMode=false">
                 <div id="list" data-role="list">
                     <div class="pagination-wrapper pagination-csw">
                         <strong class="col-md-6">
@@ -298,8 +298,7 @@
                                 <div class="top">
                                     <span class="item-title csw-title"
                                           title="{{relatedData.Name}}">{{truncate(dataCtrl.smallMode,relatedData.Name)}}</span>
-                                    <span class="pull-right text-right item-list-style"
-                                          style="font-size:14px;">{{relatedData.Type}}</span>
+                                    <span class="pull-right text-right item-list-style">{{relatedData.Type}}</span>
                                 </div>
                                 <div class="bottom">
                                     <div ng-class="{'hidden':!dataCtrl.smallMode}">
@@ -347,7 +346,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-left: 0;">
+            <div class="pull-left"
+                 style="width: 40%;">
                 <div id="metadataPreviewMap" class="dashboardmap metadata-dashboardmap"></div>
                 <div id="selection">
                     <div class="alert alert-info alert-csw"
