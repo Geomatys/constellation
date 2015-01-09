@@ -49,6 +49,10 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                 }else {
                     $scope.selected = null;
                 }
+                //display dashboard map
+                setTimeout(function(){
+                    $scope.showMapContextDashboardMap();
+                },300);
             }, function() {//error
                 Growl('error','Error','Unable to get list of map context!');
             });
@@ -115,8 +119,8 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                     var ctxtName = $scope.selected.name;
                     mapcontext.delete({id: $scope.selected.id}, function () {
                         Growl('success', 'Success', 'Map context ' + ctxtName + ' successfully removed');
-                        $scope.initMapContextDashboard();
                         $scope.selected=null;
+                        $scope.initMapContextDashboard();
                     }, function () {
                         Growl('error', 'Error', 'Unable to remove map context ' + ctxtName);
                     });
@@ -139,15 +143,81 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
             });
         };
 
-        $scope.showMapContext = function() {
-            $modal.open({
-                templateUrl: 'views/mapcontext/modalViewer.html',
-                controller: 'MapContextViewerModalController',
-                resolve: {
-                    ctxtToEdit: function () { return angular.copy($scope.selected); },
-                    layersForCtxt: function() { return $scope.resolveLayers(); }
+        $scope.showMapContextDashboardMap = function() {
+            if (MapContextDashboardViewer.map) {
+                MapContextDashboardViewer.map.setTarget(undefined);
+            }
+            MapContextDashboardViewer.initConfig();
+            MapContextDashboardViewer.fullScreenControl = true;
+            var selectedContext = $scope.selected;
+            if(selectedContext) {
+                var mapcontextLayers = $scope.resolveLayers();
+                if (mapcontextLayers && mapcontextLayers.length>0) {
+                    var cstlUrl = $cookieStore.get('cstlUrl');
+                    var layersToView = [];
+                    for (var i=0; i<mapcontextLayers.length; i++) {
+                        var layObj = mapcontextLayers[i];
+                        if (layObj.visible) {
+                            var layerData;
+                            if (layObj.isWms) {//wms layer external and internal
+                                if(layObj.layer.externalServiceUrl) {
+                                    layerData = (layObj.layer.externalStyle) ?
+                                        MapContextDashboardViewer.createLayerExternalWMSWithStyle(layObj.layer.externalServiceUrl,
+                                            layObj.layer.externalLayer, layObj.layer.externalStyle.split(',')[0]) :
+                                        MapContextDashboardViewer.createLayerExternalWMS(layObj.layer.externalServiceUrl, layObj.layer.externalLayer);
+                                }else {
+                                    var serviceName = (layObj.layer.serviceIdentifier) ? layObj.layer.serviceIdentifier : layObj.service.identifier;
+                                    if(layObj.layer.externalStyle){
+                                        layerData = MapContextDashboardViewer.createLayerWMSWithStyle(cstlUrl, layObj.layer.Name, serviceName, layObj.layer.externalStyle.split(',')[0]);
+                                    }else {
+                                        layerData = MapContextDashboardViewer.createLayerWMS(cstlUrl, layObj.layer.Name, serviceName);
+                                    }
+                                }
+                            } else {//internal data layer
+                                var layerName,providerId;
+                                var dataItem = layObj.layer;
+                                var type = dataItem.Type?dataItem.Type.toLowerCase():null;
+                                if (dataItem.Namespace) {
+                                    layerName = '{' + dataItem.Namespace + '}' + dataItem.Name;
+                                } else {
+                                    layerName = dataItem.Name;
+                                }
+                                providerId = dataItem.Provider;
+                                if (layObj.styleObj || dataItem.styleName) {
+                                    layerData = MapContextDashboardViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
+                                        layObj.styleObj?layObj.styleObj.Name:dataItem.styleName,null,null,type!=='vector');
+                                } else {
+                                    layerData = MapContextDashboardViewer.createLayer(cstlUrl, layerName, providerId,null,type!=='vector');
+                                }
+                            }
+                            layerData.setOpacity(layObj.opacity / 100);
+                            layersToView.push(layerData);
+                        }
+                    }
+                    MapContextDashboardViewer.layers = layersToView;
                 }
-            });
+                if(selectedContext.crs){
+                    var crsCode = selectedContext.crs;
+                    MapContextDashboardViewer.projection = crsCode;
+                    MapContextDashboardViewer.addBackground= crsCode==='EPSG:3857';
+                    if(crsCode === 'EPSG:4326' || crsCode === 'CRS:84') {
+                        MapContextDashboardViewer.extent=[-180, -90, 180, 90];
+                    }
+                }
+                MapContextDashboardViewer.initMap('mapcontextPreviewMap');
+                if(selectedContext.west && selectedContext.south && selectedContext.east && selectedContext.north && selectedContext.crs) {
+                    var extent = [selectedContext.west,selectedContext.south,selectedContext.east,selectedContext.north];
+                    MapContextDashboardViewer.map.updateSize();
+                    //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
+                    if(selectedContext.crs !== 'EPSG:4326' && selectedContext.crs !=='CRS:84'){
+                        var projection = ol.proj.get(selectedContext.crs);
+                        extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                    }
+                    MapContextDashboardViewer.zoomToExtent(extent, MapContextDashboardViewer.map.getSize(),true);
+                }
+            }else {
+                MapContextDashboardViewer.initMap('mapcontextPreviewMap');
+            }
         };
 
         $scope.resolveLayers = function() {

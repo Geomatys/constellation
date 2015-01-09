@@ -360,7 +360,6 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 var previous = $scope.layers.toAdd[i - 1];
                 $scope.layers.toAdd[i - 1] = $scope.layers.toAdd[i];
                 $scope.layers.toAdd[i] = previous;
-
                 // Now switch layer order for the map
                 var item0 = DataViewer.map.getLayers().item(skipBg-1);
                 var item1 = DataViewer.map.getLayers().item(skipBg);
@@ -374,7 +373,6 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 var next = $scope.layers.toAdd[i + 1];
                 $scope.layers.toAdd[i + 1] = $scope.layers.toAdd[i];
                 $scope.layers.toAdd[i] = next;
-
                 // Now switch layer order for the map
                 var item0 = DataViewer.map.getLayers().item(skipBg);
                 var item1 = DataViewer.map.getLayers().item(skipBg+1);
@@ -716,9 +714,6 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
         $scope.initScopeMapContextEditor();
     })
     .controller('InternalSourceMapContextController', function($scope, dataListing, Dashboard,Growl,provider, $cookieStore) {
-        /**
-         * To fix angular bug with nested scope.
-         */
         $scope.wrap = {};
         $scope.wrap.nbbypage = 5;
         $scope.searchVisible=false;
@@ -983,96 +978,4 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
 
         $scope.initWmsSourceMapContext();
 
-    })
-    .controller('MapContextViewerModalController', function($scope,$modalInstance,ctxtToEdit,layersForCtxt,$cookieStore) {
-        // item to save in the end
-        $scope.ctxt = ctxtToEdit || {};
-
-        $scope.layers = {
-            toAdd: layersForCtxt || [],
-            toSend: [], // List of layers really sent
-            toStyle: null // Layer on which to apply the selected style
-        };
-
-        $scope.dismiss = function () {
-            $modalInstance.dismiss('close');
-        };
-
-        $scope.close = function () {
-            $modalInstance.close();
-        };
-
-        $scope.initScope = function() {
-            setTimeout(function(){
-                $scope.showMap();
-            },300);
-        };
-
-        $scope.showMap = function() {
-            DataViewer.initConfig();
-            if ($scope.layers.toAdd && $scope.layers.toAdd.length>0) {
-                var cstlUrl = $cookieStore.get('cstlUrl');
-                var layersToView = [];
-                for (var i=0; i<$scope.layers.toAdd.length; i++) {
-                    var layObj = $scope.layers.toAdd[i];
-                    if (layObj.visible) {
-                        var layerData;
-                        if (layObj.isWms) {//wms layer external and internal
-                            if(layObj.layer.externalServiceUrl) {
-                                layerData = (layObj.layer.externalStyle) ?
-                                    DataViewer.createLayerExternalWMSWithStyle(layObj.layer.externalServiceUrl,
-                                        layObj.layer.externalLayer, layObj.layer.externalStyle.split(',')[0]) :
-                                    DataViewer.createLayerExternalWMS(layObj.layer.externalServiceUrl, layObj.layer.externalLayer);
-                            }else {
-                                var serviceName = (layObj.layer.serviceIdentifier) ? layObj.layer.serviceIdentifier : layObj.service.identifier;
-                                if(layObj.layer.externalStyle){
-                                    layerData = DataViewer.createLayerWMSWithStyle(cstlUrl, layObj.layer.Name, serviceName, layObj.layer.externalStyle.split(',')[0]);
-                                }else {
-                                    layerData = DataViewer.createLayerWMS(cstlUrl, layObj.layer.Name, serviceName);
-                                }
-                            }
-                        } else {//internal data layer
-                            var layerName,providerId;
-                            var dataItem = layObj.layer;
-                            var type = dataItem.Type?dataItem.Type.toLowerCase():null;
-                            if (dataItem.Namespace) {
-                                layerName = '{' + dataItem.Namespace + '}' + dataItem.Name;
-                            } else {
-                                layerName = dataItem.Name;
-                            }
-                            providerId = dataItem.Provider;
-                            if (layObj.styleObj || dataItem.styleName) {
-                                layerData = DataViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
-                                    layObj.styleObj?layObj.styleObj.Name:dataItem.styleName,null,null,type!=='vector');
-                            } else {
-                                layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,type!=='vector');
-                            }
-                        }
-                        layerData.setOpacity(layObj.opacity / 100);
-                        layersToView.push(layerData);
-                    }
-                }
-                DataViewer.layers = layersToView;
-            }
-            if($scope.ctxt && $scope.ctxt.crs){
-                var crsCode = $scope.ctxt.crs;
-                DataViewer.projection = crsCode;
-                DataViewer.addBackground= crsCode==='EPSG:3857';
-                if(crsCode === 'EPSG:4326' || crsCode === 'CRS:84') {
-                    DataViewer.extent=[-180, -90, 180, 90];
-                }
-            }
-            DataViewer.initMap('mapContextViewerMap');
-            if($scope.ctxt && $scope.ctxt.west && $scope.ctxt.south && $scope.ctxt.east && $scope.ctxt.north && $scope.ctxt.crs) {
-                var extent = [$scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north];
-                DataViewer.map.updateSize();
-                //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
-                if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
-                    var projection = ol.proj.get($scope.ctxt.crs);
-                    extent = ol.proj.transform(extent, projection,'EPSG:4326');
-                }
-                DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
-            }
-        };
-        $scope.initScope();
     });

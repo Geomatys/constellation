@@ -48,6 +48,7 @@ module.exports = function(grunt) {
                         "DataDashboardViewer":true,
                         "LayerDashboardViewer":true,
                         "WmtsLayerDashboardViewer":true,
+                        "MapContextDashboardViewer":true,
                         "Netcdf":true
                     }
                 },

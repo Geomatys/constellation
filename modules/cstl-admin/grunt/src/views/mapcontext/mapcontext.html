@@ -114,7 +114,7 @@
                                  style="padding-left:0;">
                                 <div class="item mapcontext"
                                      ng-class="{'selected':context.id==selected.id, 'style-small':small}"
-                                     ng-click="select(context);selectContextChild(null);">
+                                     ng-click="select(context);selectContextChild(null);showMapContextDashboardMap();">
                                     <div class="top">
                                         <span class="item-title"
                                               title="{{context.name}}">{{truncate(small,context.name)}}</span>
@@ -213,6 +213,7 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
+                    <div id="mapcontextPreviewMap" class="dashboardmap mapcontext-dashboardmap"></div>
                     <div id="selection">
                         <div class="alert alert-info alert-mapcontext"
                              ng-class="{hide: selected}">
@@ -271,17 +272,6 @@
                                                     data-placement="bottom"
                                                     title="{{'layer.listing.selected.edit.button' | translate }}" tooltip>
                                                 <i class="glyphicon glyphicon-pencil"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <button class="btn btn-mapcontext"
-                                                    type="button"
-                                                    ng-click="showMapContext()"
-                                                    data-placement="bottom"
-                                                    title="{{'layer.listing.selected.data.button' | translate }}" tooltip>
-                                                <i class="fa fa-eye"></i>
                                             </button>
                                         </span>
                                     </div>
