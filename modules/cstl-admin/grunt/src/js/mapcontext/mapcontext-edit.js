@@ -325,6 +325,12 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             $scope.layers.toSend = [];
             for (var i = 0; i < $scope.layers.toAdd.length; i++) {
                 var layObj = $scope.layers.toAdd[i];
+                var externalStyle;
+                if(layObj.layer.externalServiceUrl){
+                    externalStyle = (layObj.layer.externalStyle) ? layObj.layer.externalStyle : (layObj.styleObj)?layObj.styleObj.Name:null;
+                }else {
+                    externalStyle = (layObj.styleObj) ? layObj.styleObj.Name:(layObj.layer.externalStyle) ? layObj.layer.externalStyle : null;
+                }
                 $scope.layers.toSend.push({
                     mapcontextId: (ctxt) ? ctxt.id : null,
                     layerId: (layObj.isWms)? (layObj.layer.Id) ? layObj.layer.Id : layObj.layer.layerId : null,
@@ -338,7 +344,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     externalServiceVersion: layObj.layer.externalServiceVersion,
                     externalLayer: layObj.layer.externalLayer,
                     externalLayerExtent: layObj.layer.externalLayerExtent,
-                    externalStyle: (layObj.layer.externalStyle) ? layObj.layer.externalStyle : (layObj.styleObj)?layObj.styleObj.Name:null
+                    externalStyle: externalStyle
                 });
             }
         }
