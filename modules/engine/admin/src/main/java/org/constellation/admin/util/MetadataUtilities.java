@@ -304,6 +304,10 @@ public final class MetadataUtilities {
                 final GridCoverageReader reader = cr.acquireReader();
                 try {
                     final Metadata meta = reader.getMetadata();
+                    //@FIXME
+                    // this merge is bad here to build a fully dataset
+                    // metadata that should contains all data children information
+                    //see issue JIRA CSTL-1151
                     metadata = mergeMetadata(metadata,(DefaultMetadata)meta);
                 }catch(Exception ex){
                     LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
