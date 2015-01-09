@@ -570,6 +570,10 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 final List<Service> servicesLinked = serviceRepository.findByDataId(d.getId());
                 services.addAll(servicesLinked);
             }
+            
+            // add csw link
+            
+            
             //use HashSet to avoid duplicated objects.
             final Set<ServiceProtocol> serviceProtocols = new HashSet<>();
             for (final Service service : services) {
@@ -1028,6 +1032,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         for (final Locale locale : Locales.ALL.getAvailableLanguages()) {
             localeCodes.add("LanguageCode."+locale.getISO3Language());
         }
+        // add missing locale (FRE)
+        localeCodes.add("LanguageCode.fre");
         Collections.sort(localeCodes);
         mdList.setLocaleCodes(localeCodes);
 

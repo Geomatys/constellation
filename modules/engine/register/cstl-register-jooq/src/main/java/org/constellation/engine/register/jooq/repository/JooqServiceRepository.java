@@ -47,6 +47,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_CSW;
 import static org.constellation.engine.register.jooq.Tables.LAYER;
 import static org.constellation.engine.register.jooq.Tables.SERVICE;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_DETAILS;
@@ -68,7 +69,11 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     public List<Service> findByDataId(int dataId) {
             SelectConditionStep<Record> from = dsl.select().from(SERVICE).join(Tables.LAYER).onKey()
                 .where(Tables.LAYER.DATA.eq(dataId));
-        return from.fetchInto(Service.class);
+        final List<Service> layerServices = from.fetchInto(Service.class);
+        
+        final List<Service> cswServices = dsl.select(SERVICE.fields()).from(SERVICE).join(DATA_X_CSW).onKey(DATA_X_CSW.CSW_ID).where(DATA_X_CSW.DATA_ID.eq(dataId)).fetchInto(Service.class);
+        layerServices.addAll(cswServices);
+        return layerServices;
     }
 
     @Override
