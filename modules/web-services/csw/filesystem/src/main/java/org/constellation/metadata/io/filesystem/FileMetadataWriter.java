@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -53,9 +54,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import javax.inject.Inject;
+import javax.xml.stream.XMLInputFactory;
+import org.constellation.admin.SpringHelper;
+import org.constellation.business.IMetadataBusiness;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.xml.sax.InputSource;
 
 // JAXB dependencies
 //geotoolkit dependencies
@@ -82,6 +88,13 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
 
     protected final String serviceID;
     
+    @Inject
+    protected IMetadataBusiness metadataBusiness;
+    
+    protected final DocumentBuilderFactory dbf;
+
+    protected final XMLInputFactory xif = XMLInputFactory.newFactory();
+    
     /**
      * Build a new File metadata writer, with the specified indexer.
      *
@@ -91,12 +104,15 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
      * @throws org.constellation.metadata.io.MetadataIoException
      */
     public FileMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException {
+        SpringHelper.injectDependencies(this);
         this.indexer = indexer;
         this.serviceID = serviceID;
         dataDirectory = configuration.getDataDirectory();
         if (dataDirectory == null || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
     }
 
     /**
@@ -397,5 +413,27 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
             indexer.destroy();
         }
         MetadataDatasource.close(serviceID);
+    }
+
+    @Override
+    public boolean canImportInternalData() {
+        return true;
+    }
+
+    @Override
+    public void linkInternalMetadata(String metadataID) throws MetadataIoException {
+        final String xml = metadataBusiness.searchMetadata(metadataID, true);
+        if (xml != null) {
+            try {
+                final InputSource source = new InputSource(new StringReader(xml));
+                final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+                final Document document = docBuilder.parse(source);
+                final Node n = document.getDocumentElement();
+                storeMetadata(n);
+                metadataBusiness.linkMetadataIDToCSW(metadataID, metadataID);
+            } catch (SAXException | IOException | ParserConfigurationException ex) {
+                throw new MetadataIoException(ex);
+            }
+        }
     }
 }

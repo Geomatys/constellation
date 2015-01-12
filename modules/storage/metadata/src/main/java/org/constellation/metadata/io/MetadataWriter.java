@@ -97,4 +97,8 @@ public interface MetadataWriter {
      * @param logLevel
      */
     void setLogLevel(Level logLevel);
+    
+    boolean canImportInternalData();
+    
+    void linkInternalMetadata(final String metadataID) throws MetadataIoException;
 }

@@ -18,9 +18,15 @@
  */
 package org.constellation.metadata.io.internal;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -35,7 +41,10 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.utils.Utils;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -57,6 +66,10 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
     
     protected final String id;
     
+    protected final DocumentBuilderFactory dbf;
+
+    protected final XMLInputFactory xif = XMLInputFactory.newFactory();
+    
     public InternalMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException {
         SpringHelper.injectDependencies(this);
         this.indexer = indexer;
@@ -64,6 +77,8 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
             this.partial = Boolean.parseBoolean(configuration.getParameter("partial"));
         }
         this.id = serviceID;
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
     }
     
     @Override
@@ -131,5 +146,33 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
     @Override
     public boolean updateMetadata(String metadataID, Map<String, Object> properties) throws MetadataIoException {
         throw new MetadataIoException("The update by properties is not supported in internal metadata.");
+    }
+
+    @Override
+    public boolean canImportInternalData() {
+        return partial;
+    }
+
+    @Override
+    public void linkInternalMetadata(final String metadataID) throws MetadataIoException {
+        final String xml = metadataBusiness.searchMetadata(metadataID, displayServiceMetadata);
+        if (xml != null) {
+            try {
+                final InputSource source = new InputSource(new StringReader(xml));
+                final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+                final Document document = docBuilder.parse(source);
+                final Node n =  document.getDocumentElement();
+
+                if (indexer != null) {
+                    indexer.removeDocument(metadataID);
+                    indexer.indexDocument(n);
+                }
+                if (partial) {
+                    metadataBusiness.linkMetadataIDToCSW(metadataID, id);
+                }
+            } catch (SAXException | IOException | ParserConfigurationException ex) {
+                throw new MetadataIoException(ex);
+            }
+        }
     }
 }

@@ -127,6 +127,18 @@ public class CSWServicesRest {
     public Response importRecord(final @PathParam("id") String id, final @PathParam("fileName") String fileName, final File record) throws Exception {
         return ok(getConfigurer().importRecords(id, record, fileName));
     }
+    
+    @PUT
+    @Path("{id}/records/data/{dataID}")
+    public Response importInternalData(final @PathParam("id") String id, final @PathParam("dataID") String metadataID) throws Exception {
+        return ok(getConfigurer().importInternalData(id, metadataID));
+    }
+    
+    @GET
+    @Path("{id}/importInternaldata")
+    public Response canImportInternalData(final @PathParam("id") String id) throws Exception {
+        return ok(getConfigurer().canImportInternalData(id));
+    }
 
     @GET
     @Path("{id}/records/{count: \\w+}-{startIndex: \\w+}")

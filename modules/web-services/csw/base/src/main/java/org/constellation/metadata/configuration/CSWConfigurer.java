@@ -57,6 +57,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
@@ -360,7 +361,28 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
             }
         }
     }
+    
+    public AcknowlegementType importInternalData(String id, String metadataID) throws ConfigurationException {
+        LOGGER.info("Importing internal data");
+        final AbstractIndexer indexer = getIndexer(id, null);
+        try {
+            final MetadataWriter writer = getWriter(id, indexer);
+            writer.linkInternalMetadata(metadataID);
+            final String msg = "The specified internal metadata have been imported in the CSW";
+            return new AcknowlegementType("Success", msg);
+        } catch (MetadataIoException ex) {
+            throw new ConfigurationException(ex);
+        } finally {
+            if (indexer != null) {
+                indexer.destroy();
+            }
+        }
+    }
 
+    public boolean canImportInternalData(String id) throws ConfigurationException {
+        final MetadataWriter writer = getWriter(id, null);
+        return writer.canImportInternalData();
+    }
    
     @Override
     public AcknowlegementType removeRecords(final String id, final String identifierList) throws ConfigurationException {
@@ -636,7 +658,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
         }
         return null;
     }
-
+    
     /**
      * Build a new Indexer for the specified service ID.
      *
