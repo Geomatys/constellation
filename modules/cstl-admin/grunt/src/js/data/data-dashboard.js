@@ -936,11 +936,12 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     }
                     providerId = dataItem.Provider;
                     var layerData;
+                    var type = dataItem.Type?dataItem.Type.toLowerCase():null;
                     if (dataItem.TargetStyle && dataItem.TargetStyle.length > 0) {
                         layerData = DataViewer.createLayerWithStyle($cookieStore.get('cstlUrl'),layerName,providerId,
-                            dataItem.TargetStyle[0].Name,null,null,true);
+                            dataItem.TargetStyle[0].Name,null,null,type!=='vector');
                     } else {
-                        layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), layerName, providerId,null,true);
+                        layerData = DataViewer.createLayer($cookieStore.get('cstlUrl'), layerName, providerId,null,type!=='vector');
                     }
                     //to force the browser cache reloading styled layer.
                     layerData.get('params').ts=new Date().getTime();
