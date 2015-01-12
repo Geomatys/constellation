@@ -67,6 +67,7 @@
     <!--<module>mdweb</module>-->
     <module>generic</module>
     <module>om2</module>
+    <module>internal</module>
   </modules>
 
 </project>
