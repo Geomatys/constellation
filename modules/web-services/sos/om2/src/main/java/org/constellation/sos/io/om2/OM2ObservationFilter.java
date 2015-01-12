@@ -109,8 +109,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         try {
             this.source = db.getDataSource();
             // try if the connection is valid
-            final Connection c = this.source.getConnection();
-            c.close();
+            try (final Connection c = this.source.getConnection()) {}
         } catch (SQLException ex) {
             throw new DataStoreException("SQLException while initializing the observation filter:" +'\n'+
                                            "cause:" + ex.getMessage());
@@ -142,9 +141,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     public void initFilterGetResult(final String procedure, final QName resultModel) {
         firstFilter = false;
         currentProcedure = procedure;
-        try {
-            final Connection c                          = source.getConnection();
-            c.setReadOnly(true);
+        try(final Connection c = source.getConnection()) {
             final int pid = getPIDFromProcedure(procedure, c);
             sqlRequest = new StringBuilder("SELECT m.* "
                                          + "FROM \"om\".\"observations\" o, \"mesures\".\"mesure" + pid + "\" m "
@@ -152,7 +149,6 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
 
             //we add to the request the property of the template
             sqlRequest.append(" AND \"procedure\"='").append(procedure).append("'");
-            c.close();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "Error while initailizing getResultFilter", ex);
         }
@@ -243,8 +239,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     
     private Set<String> getFieldsForPhenomenon(final String phenomenon) {
         final Set<String> results = new HashSet<>();
-        try {
-            final Connection c = source.getConnection();
+        try(final Connection c = source.getConnection()) {
             final Phenomenon phen = getPhenomenon("1.0.0", phenomenon, c);
             if (phen instanceof CompositePhenomenon) {
                 final CompositePhenomenon compo = (CompositePhenomenon) phen;
@@ -414,21 +409,16 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     @Override
     public List<ObservationResult> filterResult() throws DataStoreException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
-        try {
-            final List<ObservationResult> results = new ArrayList<>();
-            final Connection c                    = source.getConnection();
+        try(final Connection c                    = source.getConnection();
             final Statement currentStatement      = c.createStatement();
-            final ResultSet result                = currentStatement.executeQuery(sqlRequest.toString());
+            final ResultSet result                = currentStatement.executeQuery(sqlRequest.toString())) {
+            final List<ObservationResult> results = new ArrayList<>();
             while (result.next()) {
                 results.add(new ObservationResult(result.getString(1),
                                                   result.getTimestamp(2),
                                                   result.getTimestamp(3)));
             }
-            result.close();
-            currentStatement.close();
-            c.close();
             return results;
-
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
@@ -442,11 +432,10 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     @Override
     public Set<String> filterObservation() throws DataStoreException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
-        try {
-            final Set<String> results        = new LinkedHashSet<>();
-            final Connection c               = source.getConnection();
+        try(final Connection c               = source.getConnection();
             final Statement currentStatement = c.createStatement();
-            final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString());
+            final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString())) {
+            final Set<String> results        = new LinkedHashSet<>();
             final List<String> procedures    = new ArrayList<>();
             while (result.next()) {
                 final String procedure = result.getString("procedure");
@@ -455,9 +444,6 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
                     procedures.add(procedure);
                 }
             }
-            result.close();
-            currentStatement.close();
-            c.close();
             return results;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
@@ -471,17 +457,13 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     @Override
     public Set<String> filterFeatureOfInterest() throws DataStoreException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
-        try {
-            final Set<String> results        = new LinkedHashSet<>();
-            final Connection c               = source.getConnection();
+        try(final Connection c               = source.getConnection();
             final Statement currentStatement = c.createStatement();
-            final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString());
+            final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString())) {
+            final Set<String> results        = new LinkedHashSet<>();
             while (result.next()) {
                 results.add(result.getString("id"));
             }
-            result.close();
-            currentStatement.close();
-            c.close();
             return results;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
@@ -555,11 +537,8 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     }
     
     public Field getTimeField(final String procedure) throws DataStoreException {
-        try {
-            final Connection c               = source.getConnection();
-            final Field result = getTimeField(procedure, c);
-            c.close();
-            return result;
+        try(final Connection c = source.getConnection()) {
+            return getTimeField(procedure, c);
         } catch (SQLException ex) {
             throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }

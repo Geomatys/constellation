@@ -55,8 +55,7 @@ public class OM2DatabaseCreator {
             throw new IllegalArgumentException("The DataSource is null");
         }
         
-        final Connection con  = dataSource.getConnection();
-        try {
+        try(final Connection con  = dataSource.getConnection()) {
             if (isPostgres && postgisInstall != null) {
                 final PostgisInstaller pgInstaller = new PostgisInstaller(con);
                 // not needed in pg 9.1
@@ -77,49 +76,33 @@ public class OM2DatabaseCreator {
             LOGGER.info("O&M 2 database created");
 
             sr.close(false);
-        } finally {
-            con.close();
         }
     }
     
     public static boolean structurePresent(final DataSource source) {
         if (source != null) {
-            Connection con = null;
-            try  {
-                con = source.getConnection();
-                final Statement stmt = con.createStatement();
-                ResultSet result = stmt.executeQuery("SELECT * FROM \"version\"");
+            try (final Connection con = source.getConnection();
+                 final Statement stmt = con.createStatement();
+                 ResultSet result = stmt.executeQuery("SELECT * FROM \"version\"")) {
+
                 boolean exist = result.next();
-                result.close();
                 if (!exist) {
-                    stmt.close();
                     return false;
                 }
-                
-                result = stmt.executeQuery("SELECT * FROM \"om\".\"observed_properties\"");
-                result.next();
-                result.close();
-                stmt.close();
+
+                try(final ResultSet resultObs = stmt.executeQuery("SELECT * FROM \"om\".\"observed_properties\"")) {
+                    resultObs.next();
+                }
                 return true;
             } catch(SQLException ex) {
                 LOGGER.log(Level.FINER, "missing table in OM database", ex);
-            } finally {
-                if (con != null) {
-                    try {
-                        con.close();
-                    } catch (SQLException ex) {
-                        LOGGER.log(Level.WARNING, "unable to close connection", ex);
-                    }
-                }
             }
         }
         return false;
     }
-    
+
     public static boolean validConnection(final DataSource source) {
-        try {
-            final Connection con = source.getConnection();
-            con.close();
+        try (final Connection con = source.getConnection()) {
             return true;
         } catch (SQLException ex) {
             LOGGER.log(Level.FINER, "unable to connect", ex);

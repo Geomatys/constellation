@@ -125,8 +125,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         try {
             this.source = db.getDataSource();
             // try if the connection is valid
-            final Connection c = this.source.getConnection();
-            c.close();
+            try(final Connection c = this.source.getConnection()) {}
         } catch (SQLException ex) {
             throw new DataStoreException(ex);
         }
@@ -152,17 +151,14 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public List<String> getOfferingNames(final String version) throws DataStoreException {
-        try {
-            final Connection c         = source.getConnection();
-            final Statement stmt       = c.createStatement();
+        try(final Connection c         = source.getConnection();
+            final Statement stmt       = c.createStatement()) {
             final List<String> results = new ArrayList<>();
-            final ResultSet rs         = stmt.executeQuery("SELECT \"identifier\" FROM \"om\".\"offerings\"");
-            while (rs.next()) {
-                results.add(rs.getString(1));
+            try(final ResultSet rs         = stmt.executeQuery("SELECT \"identifier\" FROM \"om\".\"offerings\"")) {
+                while (rs.next()) {
+                    results.add(rs.getString(1));
+                }
             }
-            rs.close();
-            stmt.close();
-            c.close();
             return results;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving offering names.", ex);
@@ -186,21 +182,19 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public ObservationOffering getObservationOffering(final String offeringName, final String version) throws DataStoreException {
-        try {
-            final Connection c           = source.getConnection();
-            final String id;
-            final String name;
-            final String description;
-            final TemporalGeometricPrimitive time;
-            final String procedure;
-            final List<String> phen200             = new ArrayList<>();
-            final List<PhenomenonProperty> phen100 = new ArrayList<>();
-            final List<String> foi                 = new ArrayList<>();
-            try {
-                final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"offerings\" WHERE \"identifier\"=?");
+        final String id;
+        final String name;
+        final String description;
+        final TemporalGeometricPrimitive time;
+        final String procedure;
+        final List<String> phen200             = new ArrayList<>();
+        final List<PhenomenonProperty> phen100 = new ArrayList<>();
+        final List<String> foi                 = new ArrayList<>();
+
+        try(final Connection c = source.getConnection()) {
+            try(final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"offerings\" WHERE \"identifier\"=?")) {
                 stmt.setString(1, offeringName);
-                final ResultSet rs           = stmt.executeQuery();
-                try {
+                try(final ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         id                 = rs.getString(1);
                         description        = rs.getString(2);
@@ -218,34 +212,29 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                     } else {
                         return null;
                     }
-                } finally {
-                    rs.close();
-                    stmt.close();
                 }
 
-                final PreparedStatement stmt2 = c.prepareStatement("SELECT \"phenomenon\" FROM \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=?");
-                stmt2.setString(1, offeringName);
-                final ResultSet rs2           = stmt2.executeQuery();
-                while (rs2.next()) {
-                    final String href = rs2.getString(1);
-                    phen200.add(href);
-                    phen100.add(new PhenomenonPropertyType(href));
-                } 
-                rs2.close();
-                stmt2.close();
+                try(final PreparedStatement stmt2 = c.prepareStatement("SELECT \"phenomenon\" FROM \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=?")) {
+                    stmt2.setString(1, offeringName);
+                    try(final ResultSet rs2 = stmt2.executeQuery()) {
+                        while (rs2.next()) {
+                            final String href = rs2.getString(1);
+                            phen200.add(href);
+                            phen100.add(new PhenomenonPropertyType(href));
+                        }
+                    }
+                }
 
-                final PreparedStatement stmt3 = c.prepareStatement("SELECT \"foi\" FROM \"om\".\"offering_foi\" WHERE \"id_offering\"=?");
-                stmt3.setString(1, offeringName);
-                final ResultSet rs3           = stmt3.executeQuery();
-                while (rs3.next()) {
-                    foi.add(rs3.getString(1));
-                } 
-                rs3.close();
-                stmt3.close();
-
-            } finally {
-                c.close();
+                try(final PreparedStatement stmt3 = c.prepareStatement("SELECT \"foi\" FROM \"om\".\"offering_foi\" WHERE \"id_offering\"=?")) {
+                    stmt3.setString(1, offeringName);
+                    try(final ResultSet rs3 = stmt3.executeQuery()) {
+                        while (rs3.next()) {
+                            foi.add(rs3.getString(1));
+                        }
+                    }
+                }
             }
+
             final List<String> responseFormat         = RESPONSE_FORMAT.get(version);
             final List<QName> resultModel             = Arrays.asList(OBSERVATION_QNAME, MEASUREMENT_QNAME);
             final List<String> resultModelV200        = Arrays.asList(OBSERVATION_MODEL);
@@ -290,17 +279,14 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public List<String> getProcedureNames() throws DataStoreException {
-        try {
-            final Connection c         = source.getConnection();
-            final Statement stmt       = c.createStatement();
+        try(final Connection c   = source.getConnection();
+            final Statement stmt = c.createStatement();
+            final ResultSet rs   = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"procedures\"")) {
+
             final List<String> results = new ArrayList<>();
-            final ResultSet rs         = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"procedures\"");
             while (rs.next()) {
                 results.add(rs.getString(1));
             }
-            rs.close();
-            stmt.close();
-            c.close();
             return results;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving procedure names.", ex);
@@ -312,17 +298,13 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public List<String> getPhenomenonNames() throws DataStoreException {
-        try {
-            final Connection c         = source.getConnection();
+        try(final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
+            final ResultSet rs         = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"observed_properties\"")) {
             final List<String> results = new ArrayList<>();
-            final ResultSet rs         = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"observed_properties\"");
             while (rs.next()) {
                 results.add(rs.getString(1));
             }
-            rs.close();
-            stmt.close();
-            c.close();
             return results;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving phenomenon names.", ex);
@@ -334,21 +316,18 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public Collection<String> getProceduresForPhenomenon(final String observedProperty) throws DataStoreException {
-        try {
-            final Connection c           = source.getConnection();
-            final List<String> results   = new ArrayList<>();
+        try(final Connection c           = source.getConnection();
             final PreparedStatement stmt = c.prepareStatement("SELECT DISTINCT \"procedure\" "
                                                             + "FROM \"om\".\"offerings\", \"om\".\"offering_observed_properties\""
                                                             + "WHERE \"identifier\"=\"id_offering\""
-                                                            + "AND \"phenomenon\"=?");
+                                                            + "AND \"phenomenon\"=?")) {
+            final List<String> results   = new ArrayList<>();
             stmt.setString(1, observedProperty);
-            final ResultSet rs =  stmt.executeQuery();
-            while (rs.next()) {
-                results.add(rs.getString(1));
+            try(final ResultSet rs =  stmt.executeQuery()) {
+                while (rs.next()) {
+                    results.add(rs.getString(1));
+                }
             }
-            rs.close();
-            stmt.close();
-            c.close();
             return results;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving procedure names.", ex);
@@ -360,41 +339,38 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public Collection<String> getPhenomenonsForProcedure(final String sensorID) throws DataStoreException {
-        try {
-            final Connection c          = source.getConnection();
-            final Set<String> results   = new HashSet<>();
+        try(final Connection c          = source.getConnection();
             final PreparedStatement stmt = c.prepareStatement("SELECT \"phenomenon\" "
                                                             + "FROM \"om\".\"offerings\", \"om\".\"offering_observed_properties\""
                                                             + "WHERE \"identifier\"=\"id_offering\""
-                                                            + "AND \"procedure\"=?");
+                                                            + "AND \"procedure\"=?")) {
+            final Set<String> results   = new HashSet<>();
             stmt.setString(1, sensorID);
-            final ResultSet rs =  stmt.executeQuery();
-            while (rs.next()) {
-                results.add(rs.getString(1));
+            try(final ResultSet rs =  stmt.executeQuery()) {
+                while (rs.next()) {
+                    results.add(rs.getString(1));
+                }
             }
-            rs.close();
-            stmt.close();
-            
+
             //look for composite phenomenons
-            final PreparedStatement stmtC = c.prepareStatement("SELECT \"component\" "
+            try(final PreparedStatement stmtC = c.prepareStatement("SELECT \"component\" "
                                                              + "FROM \"om\".\"components\""
-                                                             + "WHERE \"phenomenon\"=?");
-            for (String pheno : results) {
-                stmtC.setString(1, pheno);
-                final ResultSet rsC =  stmtC.executeQuery();
-                boolean composite = false;
-                while (rsC.next()) {
-                    composite = true;
-                    results.add(rsC.getString(1));
-                }
-                rsC.close();
-                if (composite) {
-                    results.remove(pheno);
+                                                             + "WHERE \"phenomenon\"=?")) {
+                for (String pheno : results) {
+                    stmtC.setString(1, pheno);
+                    try(final ResultSet rsC = stmtC.executeQuery()) {
+                        boolean composite = false;
+                        while (rsC.next()) {
+                            composite = true;
+                            results.add(rsC.getString(1));
+                        }
+                        if (composite) {
+                            results.remove(pheno);
+                        }
+                    }
                 }
             }
-            stmtC.close();
-            
-            c.close();
+
             return results;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving procedure names.", ex);
@@ -414,17 +390,13 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public List<String> getFeatureOfInterestNames() throws DataStoreException {
-        try {
-            final Connection c         = source.getConnection();
+        try(final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
+            final ResultSet rs         = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"sampling_features\"")) {
             final List<String> results = new ArrayList<>();
-            final ResultSet rs         = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"sampling_features\"");
             while (rs.next()) {
                 results.add(rs.getString(1));
             }
-            rs.close();
-            stmt.close();
-            c.close();
             return results;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving phenomenon names.", ex);
@@ -436,14 +408,8 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws DataStoreException {
-        try {
-            final Connection c = source.getConnection();
-            c.setReadOnly(true);
-            try {
-                return getFeatureOfInterest(samplingFeatureName, version, c);
-            } finally {
-                c.close();
-            }
+        try(final Connection c = source.getConnection()) {
+            return getFeatureOfInterest(samplingFeatureName, version, c);
         } catch (SQLException ex) {
             throw new DataStoreException(ex.getMessage(), ex);
         }
@@ -451,25 +417,22 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
 
     @Override
     public AbstractGeometry getSensorLocation(final String sensorID, final String version) throws DataStoreException {
-        try {
-            final Connection c = source.getConnection();
-            c.setReadOnly(true);
-            
+        try(final Connection c = source.getConnection()) {
+
             final byte[] b;
             final int srid;
-            final PreparedStatement stmt;
-            if (isPostgres) {
-                stmt  = c.prepareStatement("SELECT st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
-            } else {
-                stmt  = c.prepareStatement("SELECT \"shape\", \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
-            }
-            stmt.setString(1, sensorID);
-            final ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                b    = rs.getBytes(1);
-                srid = rs.getInt(2);
-            } else {
-                return null;
+            try(final PreparedStatement stmt = (isPostgres) ?
+                    c.prepareStatement("SELECT st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?") :
+                    c.prepareStatement("SELECT \"shape\", \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?")) {
+                stmt.setString(1, sensorID);
+                try(final ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        b = rs.getBytes(1);
+                        srid = rs.getInt(2);
+                    } else {
+                        return null;
+                    }
+                }
             }
             final CoordinateReferenceSystem crs;
             if (srid != 0) {
@@ -484,7 +447,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             } else {
                 return null;
             }
-            c.close();
+
             final String gmlVersion = getGMLVersion(version);
             return JTStoGeometry.toGML(gmlVersion, geom, crs);
         } catch (SQLException | FactoryException  | ParseException ex) {
@@ -498,27 +461,24 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     @Override
     public TemporalGeometricPrimitive getTimeForProcedure(final String version, final String sensorID) throws DataStoreException {
         TemporalGeometricPrimitive result = null;
-        try {
-            final Connection c          = source.getConnection();
+        try(final Connection c          = source.getConnection();
             final PreparedStatement stmt = c.prepareStatement("SELECT \"time_begin\", \"time_end\" "
                                                             + "FROM \"om\".\"offerings\" "
-                                                            + "WHERE \"procedure\"=?");
+                                                            + "WHERE \"procedure\"=?")) {
             stmt.setString(1, sensorID);
-            final ResultSet rs =  stmt.executeQuery();
-            if (rs.next()) {
-                final Timestamp begin = rs.getTimestamp(1);
-                final Timestamp end   = rs.getTimestamp(2);
-                if (begin != null && end == null) {
-                    result = SOSXmlFactory.buildTimeInstant(version, begin);
-                } else if (begin == null && end != null){
-                    result = SOSXmlFactory.buildTimeInstant(version, begin);
-                } else if (begin != null && end != null) {
-                    result = SOSXmlFactory.buildTimePeriod(version, begin, end);
+            try(final ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    final Timestamp begin = rs.getTimestamp(1);
+                    final Timestamp end = rs.getTimestamp(2);
+                    if (begin != null && end == null) {
+                        result = SOSXmlFactory.buildTimeInstant(version, begin);
+                    } else if (begin == null && end != null) {
+                        result = SOSXmlFactory.buildTimeInstant(version, begin);
+                    } else if (begin != null && end != null) {
+                        result = SOSXmlFactory.buildTimePeriod(version, begin, end);
+                    }
                 }
             }
-            rs.close();
-            stmt.close();
-            c.close();
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving procedure time.", ex);
         }
@@ -530,84 +490,74 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public Observation getObservation(String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws DataStoreException {
-        try {
-            final Connection c         = source.getConnection();
-            c.setReadOnly(true);
-            try {
-                final String observationID;
-                if (identifier.startsWith(observationIdBase)) {
-                    observationID = identifier.substring(observationIdBase.length());
-                } else if (identifier.startsWith(observationTemplateIdBase)) {
-                    final String procedureID     = sensorIdBase + identifier.substring(observationTemplateIdBase.length());
-                    final PreparedStatement stmt = c.prepareStatement("SELECT \"id\", \"identifier\" FROM \"om\".\"observations\" WHERE \"procedure\"=?");
+        try(final Connection c = source.getConnection()) {
+            final String observationID;
+            if (identifier.startsWith(observationIdBase)) {
+                observationID = identifier.substring(observationIdBase.length());
+            } else if (identifier.startsWith(observationTemplateIdBase)) {
+                final String procedureID     = sensorIdBase + identifier.substring(observationTemplateIdBase.length());
+                try(final PreparedStatement stmt = c.prepareStatement("SELECT \"id\", \"identifier\" FROM \"om\".\"observations\" WHERE \"procedure\"=?")) {
                     stmt.setString(1, procedureID);
-                    final ResultSet rs = stmt.executeQuery();
-                    final String oid;
-                    if (rs.next()) {
-                        oid = rs.getString(1);
-                        identifier = rs.getString(2);
-                    } else {
-                        oid = null;
+                    try(final ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            observationID = rs.getString(1);
+                            identifier = rs.getString(2);
+                        } else {
+                            return null;
+                        }
                     }
-                    rs.close();
-                    stmt.close();
-                    if (oid == null) {
+                }
+            } else {
+                observationID = identifier;
+            }
+
+            final String obsID = "obs-" + observationID;
+            final String timeID = "time-" + observationID;
+            final String observedProperty;
+            final String procedure;
+            final String foi;
+            final TemporalGeometricPrimitive time;
+
+            try(final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"om\".\"observations\" WHERE \"identifier\"=?")) {
+                stmt.setString(1, identifier);
+                try(final ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        final String b = rs.getString(3);
+                        final String e = rs.getString(4);
+                        if (b != null && e == null) {
+                            time = buildTimeInstant(version, timeID, b.replace(' ', 'T'));
+                        } else if (b != null && e != null) {
+                            time = buildTimePeriod(version, timeID, b.replace(' ', 'T'), e.replace(' ', 'T'));
+                        } else {
+                            time = null;
+                        }
+                        observedProperty = rs.getString(5);
+                        procedure = rs.getString(6);
+                        foi = rs.getString(7);
+                    } else {
                         return null;
                     }
-                    observationID = oid;
-                } else {
-                    observationID = identifier;
                 }
+            }
 
-                final String obsID = "obs-" + observationID;
-                final String timeID = "time-" + observationID;
-                final String observedProperty;
-                final String procedure;
-                final String foi;
-                final TemporalGeometricPrimitive time;
-                
-                final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"om\".\"observations\" WHERE \"identifier\"=?");
-                stmt.setString(1, identifier);
-                final ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    final String b  = rs.getString(3);
-                    final String e  = rs.getString(4);
-                    if (b != null && e == null) {
-                        time = buildTimeInstant(version, timeID, b.replace(' ', 'T'));
-                    } else if (b != null && e != null) {
-                        time = buildTimePeriod(version, timeID, b.replace(' ', 'T'), e.replace(' ', 'T'));
-                    } else {
-                        time = null;
-                    }
-                    observedProperty = rs.getString(5);
-                    procedure        = rs.getString(6);
-                    foi              = rs.getString(7);
-                    
-                } else {
-                    return null;
-                }
-                
-                final SamplingFeature feature = getFeatureOfInterest(foi, version, c);
-                final FeatureProperty prop    = buildFeatureProperty(version, feature);
-                final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
-                
-                final String name;
-                if (ResponseModeType.RESULT_TEMPLATE.equals(mode)) {
-                    final String procedureID = procedure.substring(sensorIdBase.length());
-                    name = observationTemplateIdBase + procedureID;
-                } else {
-                    name = identifier;
-                }
+            final SamplingFeature feature = getFeatureOfInterest(foi, version, c);
+            final FeatureProperty prop    = buildFeatureProperty(version, feature);
+            final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
 
-                if (resultModel.equals(MEASUREMENT_QNAME)) {
-                    final Object result = getResult(identifier, resultModel, version); 
-                    return OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, time);
-                } else {
-                    final Object result = getResult(identifier, resultModel, version);
-                    return OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, result, time);
-                }
-            } finally {
-                c.close();
+            final String name;
+            if (ResponseModeType.RESULT_TEMPLATE.equals(mode)) {
+                final String procedureID = procedure.substring(sensorIdBase.length());
+                name = observationTemplateIdBase + procedureID;
+            } else {
+                name = identifier;
+            }
+
+            if (resultModel.equals(MEASUREMENT_QNAME)) {
+                final Object result = getResult(identifier, resultModel, version);
+                return OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, time);
+            } else {
+                final Object result = getResult(identifier, resultModel, version);
+                return OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, result, time);
             }
             
         } catch (SQLException ex) {
@@ -620,14 +570,8 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public Object getResult(final String identifier, final QName resultModel, final String version) throws DataStoreException {
-        try {
-            final Connection c = source.getConnection();
-            c.setReadOnly(true);
-            try {
-                return getResult(identifier, resultModel, version, c);
-            } finally {
-                c.close();
-            }
+        try(final Connection c = source.getConnection()) {
+            return getResult(identifier, resultModel, version, c);
         } catch (SQLException ex) {
             throw new DataStoreException(ex.getMessage(), ex);
         }
@@ -658,31 +602,30 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         final StringBuilder values = new StringBuilder();
         
         
-        final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m, \"om\".\"observations\" o "
+        try(final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m, \"om\".\"observations\" o "
                                                          + "WHERE \"id_observation\" = o.\"id\" "
                                                          + "AND o.\"identifier\"=?"
-                                                         + "ORDER BY m.\"id\"");
-        
-        stmt.setString(1, identifier);
-        final ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            for (int i = 0; i < fields.size(); i++) {
-                String value = rs.getString(i + 3);
-                Field field = fields.get(i);
-                // for time TODO remove when field will be typed
-                if (field.fieldType.equals("Time")) {
-                    value = value.replace(' ', 'T'); 
-                    value = value.substring(0, value.length() - 2);
+                                                         + "ORDER BY m.\"id\"")) {
+            stmt.setString(1, identifier);
+            try(final ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    for (int i = 0; i < fields.size(); i++) {
+                        String value = rs.getString(i + 3);
+                        Field field = fields.get(i);
+                        // for time TODO remove when field will be typed
+                        if (field.fieldType.equals("Time")) {
+                            value = value.replace(' ', 'T');
+                            value = value.substring(0, value.length() - 2);
+                        }
+                        values.append(value).append(encoding.getTokenSeparator());
+                    }
+                    values.deleteCharAt(values.length() - 1);
+                    values.append(encoding.getBlockSeparator());
+                    nbValue++;
                 }
-                values.append(value).append(encoding.getTokenSeparator());
             }
-            values.deleteCharAt(values.length() - 1);
-            values.append(encoding.getBlockSeparator());
-            nbValue++;
         }
-        rs.close();
-        stmt.close();
-        
+
         final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, scal);
 
         return buildDataArrayProperty(version, arrayID, nbValue, arrayID, record, encoding, values.toString());
@@ -695,23 +638,21 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         final String uom           = fields.get(0).fieldUom;
         final double value;
         final String name;
-        try {
-            final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m, \"om\".\"observations\" o "
+        try(final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m, \"om\".\"observations\" o "
                                                              + "WHERE \"id_observation\" = o.\"id\" "
                                                              + "AND o.\"identifier\"=?"
-                                                             + "ORDER BY m.\"id\"");
+                                                             + "ORDER BY m.\"id\"")) {
             stmt.setString(1, identifier);
-            final ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                name   = "measure-00" + rs.getString("id");
-                value  = Double.parseDouble(rs.getString(3));
-            } else {
-                return null;
+            try(final ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    name = "measure-00" + rs.getString("id");
+                    value = Double.parseDouble(rs.getString(3));
+                } else {
+                    return null;
+                }
             }
         } catch (NumberFormatException ex) {
             throw new DataStoreException("Unable ta parse the result value as a double");
-        } finally {
-            c.close();
         }
         return buildMeasure(version, name, uom, value);
     }
@@ -723,23 +664,16 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     public Observation getTemplateForProcedure(final String procedure, final String version) throws DataStoreException {
         // TODO generate template from procedue description
         Observation template = null;
-        try {
-            final Connection c = source.getConnection();
-            c.setReadOnly(true);
-            try {
-                final Statement stmt       = c.createStatement();
-                final ResultSet rs         = stmt.executeQuery("SELECT \"identifier\" FROM \"om\".\"observations\" WHERE \"procedure\"='" + procedure + "'");
+        try(final Connection c = source.getConnection()) {
+            try(final Statement stmt = c.createStatement();
+                final ResultSet rs   = stmt.executeQuery("SELECT \"identifier\" FROM \"om\".\"observations\" WHERE \"procedure\"='" + procedure + "'")) {
                 String identifier = null;
                 if (rs.next()) {
                     identifier = rs.getString(1);
                 }
-                rs.close();
-                stmt.close();
                 if (identifier != null) {
                     template = getObservation(identifier, OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, version);
                 }
-            } finally {
-                c.close();
             }
         } catch (SQLException ex) {
             throw new DataStoreException(ex.getMessage(), ex);
@@ -768,19 +702,15 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public String getNewObservationId() throws DataStoreException {
-        try {
-            final Connection c         = source.getConnection();
+        try(final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
-            final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"om\".\"observations\"");
+            final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"om\".\"observations\"")) {
             int resultNum;
             if (rs.next()) {
                 resultNum = rs.getInt(1) + 1;
             } else {
                 resultNum = 1;
             }
-            rs.close();
-            stmt.close();
-            c.close();
             return observationIdBase + resultNum;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while looking for available observation id.", ex);
@@ -792,31 +722,28 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws DataStoreException {
-        try {
-            final Connection c           = source.getConnection();
+        try(final Connection c           = source.getConnection();
             final PreparedStatement stmt = c.prepareStatement("SELECT min(\"time_begin\"), max(\"time_end\") "
                                                             + "FROM \"om\".\"observations\""
-                                                            + "WHERE \"foi\"=?");
+                                                            + "WHERE \"foi\"=?")) {
             stmt.setString(1, samplingFeatureName);
-            final ResultSet rs           = stmt.executeQuery();
-            final TemporalGeometricPrimitive time;
-            if (rs.next()) {
-                final Timestamp b  = rs.getTimestamp(1);
-                final Timestamp e  = rs.getTimestamp(2);
-                if (b != null && e == null) {
-                    time = buildTimeInstant(version, b);
-                } else if (b != null && e != null) {
-                    time = buildTimePeriod(version, b, e);
+            try (final ResultSet rs = stmt.executeQuery()) {
+                final TemporalGeometricPrimitive time;
+                if (rs.next()) {
+                    final Timestamp b = rs.getTimestamp(1);
+                    final Timestamp e = rs.getTimestamp(2);
+                    if (b != null && e == null) {
+                        time = buildTimeInstant(version, b);
+                    } else if (b != null && e != null) {
+                        time = buildTimePeriod(version, b, e);
+                    } else {
+                        time = null;
+                    }
                 } else {
                     time = null;
                 }
-            } else {
-                time = null;
+                return time;
             }
-            rs.close();
-            stmt.close();
-            c.close();
-            return time;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving phenomenon names.", ex);
         }
@@ -827,10 +754,9 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public List<String> getEventTime() throws DataStoreException {
-        try {
-            final Connection c         = source.getConnection();
+        try(final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
-            final ResultSet rs         = stmt.executeQuery("SELECT max(\"time_begin\"), min(\"time_end\") FROM \"om\".\"offerings\"");
+            final ResultSet rs         = stmt.executeQuery("SELECT max(\"time_begin\"), min(\"time_end\") FROM \"om\".\"offerings\"")) {
             final List<String> results = new ArrayList<>();
             if (rs.next()) {
                 String s = rs.getString(1);
@@ -842,9 +768,6 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                     results.add(s);
                 }
             } 
-            rs.close();
-            stmt.close();
-            c.close();
             return results;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while retrieving phenomenon names.", ex);

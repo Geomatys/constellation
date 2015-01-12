@@ -132,17 +132,13 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     @Override
     public String writeObservationTemplate(final ObservationTemplate template) throws DataStoreException {
         if (template.getObservation() != null) {
-            return writeObservation((AbstractObservation)template.getObservation());
+            return writeObservation(template.getObservation());
         } else  {
-            try {
-                final Connection c = source.getConnection();
-                c.setAutoCommit(false);
+            try(final Connection c = source.getConnection()) {
                 writeProcedure(template.getProcedure(), c);
                 for (PhenomenonProperty phen : template.getFullObservedProperties()) {
                     writePhenomenon(phen, c, true);
                 }
-                c.commit();
-                c.close();
                 return null;
             } catch (SQLException ex) {
                 throw new DataStoreException("Error while inserting observations.", ex);
@@ -155,13 +151,9 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      */
     @Override
     public String writeObservation(final Observation observation) throws DataStoreException {
-        try {
-            final Connection c      = source.getConnection();
-            c.setAutoCommit(false);
+        try(final Connection c = source.getConnection()) {
             final int generatedID   = getNewObservationId();
             final String oid        = writeObservation(observation, c, generatedID);
-            c.commit();
-            c.close();
             return oid;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observations.", ex);
@@ -174,19 +166,12 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     @Override
     public List<String> writeObservations(final List<Observation> observations) throws DataStoreException {
         final List<String> results = new ArrayList<>();
-        try {
-            final Connection c           = source.getConnection();
-            c.setAutoCommit(false);
+        try(final Connection c = source.getConnection()) {
             int generatedID = getNewObservationId();
-            try {
-                for (Observation observation : observations) {
-                    final String oid = writeObservation(observation, c, generatedID);
-                    c.commit();
-                    results.add(oid);
-                    generatedID++;
-                }
-            } finally {
-                c.close();
+            for (Observation observation : observations) {
+                final String oid = writeObservation(observation, c, generatedID);
+                results.add(oid);
+                generatedID++;
             }
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observations.", ex);
@@ -198,8 +183,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     
     
     private String writeObservation(final Observation observation, final Connection c, final int generatedID) throws DataStoreException {
-        try {
-            final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?,?)");
+        try(final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?,?)")) {
             final String observationName;
             int oid;
             if (observation.getName() == null) {
@@ -272,8 +256,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             }
             
             stmt.executeUpdate();
-            stmt.close();
-            
+
             writeResult(oid, pid, procedureID, observation.getResult(), samplingTime, c);
             emitResultOnBus(procedureID, observation.getResult());
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
@@ -313,9 +296,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
     @Override
     public void writePhenomenons(final List<Phenomenon> phenomenons) throws DataStoreException {
-        try {
-            final Connection c           = source.getConnection();
-            c.setAutoCommit(false);
+        try(final Connection c = source.getConnection()) {
             for (Phenomenon phenomenon : phenomenons) {
                 if (phenomenon instanceof InternalPhenomenon) {
                     final InternalPhenomenon internal = (InternalPhenomenon)phenomenon;
@@ -324,8 +305,6 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 final PhenomenonProperty phenomenonP = SOSXmlFactory.buildPhenomenonProperty("1.0.0", (org.geotoolkit.swe.xml.Phenomenon) phenomenon);
                 writePhenomenon(phenomenonP, c, false);
             }
-            c.commit();
-            c.close();
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting phenomenons.", ex);
         }
@@ -335,54 +314,53 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         final String phenomenonId = getPhenomenonId(phenomenonP);
         if (phenomenonId == null) return null;
         
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\", \"partial\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
-        stmtExist.setString(1, phenomenonId);
-        final ResultSet rs = stmtExist.executeQuery();
-        boolean exist = false;
-        boolean isPartial = false;
-        if (rs.next()) {
-            isPartial = rs.getBoolean("partial");
-            exist = true;
-        }
-        rs.close();
-        if (!exist) {
-            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"observed_properties\" VALUES(?,?)");
-            stmtInsert.setString(1, phenomenonId);
-            stmtInsert.setBoolean(2, partial);
-            stmtInsert.executeUpdate();
-            stmtInsert.close();
-            if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
-                final CompositePhenomenon composite = (CompositePhenomenon) phenomenonP.getPhenomenon();
-                final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)");
-                for (PhenomenonProperty child : composite.getRealComponent()) {
-                    final String childID = getPhenomenonId(child);
-                    writePhenomenon(child, c, false);
-                    stmtInsertCompo.setString(1, phenomenonId);
-                    stmtInsertCompo.setString(2, childID);
-                    stmtInsertCompo.executeUpdate();
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?")) {
+            stmtExist.setString(1, phenomenonId);
+            boolean exist = false;
+            boolean isPartial = false;
+            try(final ResultSet rs = stmtExist.executeQuery()) {
+                if (rs.next()) {
+                    isPartial = rs.getBoolean("partial");
+                    exist = true;
                 }
-                stmtInsertCompo.close();
             }
-        } else if (exist && isPartial) {
-            final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET \"partial\" = ?");
-            stmtUpdate.setBoolean(1, false);
-            stmtUpdate.executeUpdate();
-            stmtUpdate.close();
-            if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
-                final CompositePhenomenon composite = (CompositePhenomenon) phenomenonP.getPhenomenon();
-                final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)");
-                for (PhenomenonProperty child : composite.getRealComponent()) {
-                    final String childID = getPhenomenonId(child);
-                    writePhenomenon(child, c, false);
-                    stmtInsertCompo.setString(1, phenomenonId);
-                    stmtInsertCompo.setString(2, childID);
-                    stmtInsertCompo.executeUpdate();
+            if (!exist) {
+                try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"observed_properties\" VALUES(?,?)")) {
+                    stmtInsert.setString(1, phenomenonId);
+                    stmtInsert.setBoolean(2, partial);
+                    stmtInsert.executeUpdate();
+                }    
+                if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
+                    final CompositePhenomenon composite = (CompositePhenomenon) phenomenonP.getPhenomenon();
+                    try(final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)")) {
+                        for (PhenomenonProperty child : composite.getRealComponent()) {
+                            final String childID = getPhenomenonId(child);
+                            writePhenomenon(child, c, false);
+                            stmtInsertCompo.setString(1, phenomenonId);
+                            stmtInsertCompo.setString(2, childID);
+                            stmtInsertCompo.executeUpdate();
+                        }
+                    }
                 }
-                stmtInsertCompo.close();
+            } else if (exist && isPartial) {
+                try(final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET \"partial\" = ?")) {
+                    stmtUpdate.setBoolean(1, false);
+                    stmtUpdate.executeUpdate();
+                }
+                if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
+                    final CompositePhenomenon composite = (CompositePhenomenon) phenomenonP.getPhenomenon();
+                    try(final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)")) {
+                        for (PhenomenonProperty child : composite.getRealComponent()) {
+                            final String childID = getPhenomenonId(child);
+                            writePhenomenon(child, c, false);
+                            stmtInsertCompo.setString(1, phenomenonId);
+                            stmtInsertCompo.setString(2, childID);
+                            stmtInsertCompo.executeUpdate();
+                        }
+                    }
+                }
             }
         }
-        
-        stmtExist.close();
         return phenomenonId;
     }
     
@@ -399,80 +377,78 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     }
     
     private int writeProcedure(final String procedureID, final Connection c) throws SQLException {
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"pid\" FROM  \"om\".\"procedures\" WHERE \"id\"=?");
-        stmtExist.setString(1, procedureID);
-        final ResultSet rs = stmtExist.executeQuery();
         int pid;
-        if (!rs.next()) {
-            final Statement stmt = c.createStatement();
-            final ResultSet rs2 = stmt.executeQuery("SELECT max(\"pid\") FROM \"om\".\"procedures\"");
-            pid = 0;
-            if (rs2.next()) {
-                pid = rs2.getInt(1) + 1;
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"procedures\" WHERE \"id\"=?")) {
+            stmtExist.setString(1, procedureID);
+            try(final ResultSet rs = stmtExist.executeQuery()) {
+                if (!rs.next()) {
+                    try(final Statement stmt = c.createStatement();
+                        final ResultSet rs2 = stmt.executeQuery("SELECT max(\"pid\") FROM \"om\".\"procedures\"")) {
+                        pid = 0;
+                        if (rs2.next()) {
+                            pid = rs2.getInt(1) + 1;
+                        }
+                    }
+
+                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES(?,?,?,?)")) {
+                        stmtInsert.setString(1, procedureID);
+                        stmtInsert.setNull(2, java.sql.Types.BINARY);
+                        stmtInsert.setNull(3, java.sql.Types.INTEGER);
+                        stmtInsert.setInt(4, pid);
+                        stmtInsert.executeUpdate();
+                    }
+                } else {
+                    pid = rs.getInt(1);
+                }
             }
-            rs2.close();
-            stmt.close();
-            
-            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES(?,?,?,?)");
-            stmtInsert.setString(1, procedureID);
-            stmtInsert.setNull(2, java.sql.Types.BINARY);
-            stmtInsert.setNull(3, java.sql.Types.INTEGER);
-            stmtInsert.setInt(4, pid);
-            stmtInsert.executeUpdate();
-            stmtInsert.close();
-        } else {
-            pid = rs.getInt(1);
         }
-        rs.close();
-        stmtExist.close();
         return pid;
     }
     
     private void writeFeatureOfInterest(final SamplingFeature foi, final Connection c) throws SQLException {
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"sampling_features\" WHERE \"id\"=?");
-        stmtExist.setString(1, foi.getId());
-        final ResultSet rs = stmtExist.executeQuery();
-        if (!rs.next()) {
-            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"sampling_features\" VALUES(?,?,?,?,?,?)");
-            stmtInsert.setString(1, foi.getId());
-            stmtInsert.setString(2, (foi.getName() != null) ? foi.getName().getCode() : null);
-            stmtInsert.setString(3, foi.getDescription());
-            stmtInsert.setNull(4, java.sql.Types.VARCHAR); // TODO
-            
-            if (foi.getGeometry() != null) {
-                try {
-                    WKBWriter writer = new WKBWriter();
-                    final Geometry geom = GeometrytoJTS.toJTS((AbstractGeometry)foi.getGeometry());
-                    final int SRID = geom.getSRID();
-                    stmtInsert.setBytes(5, writer.write(geom));
-                    stmtInsert.setInt(6, SRID);
-                } catch (FactoryException ex) {
-                    LOGGER.log(Level.WARNING, "unable to transform the geometry to JTS", ex);
-                    stmtInsert.setNull(5, java.sql.Types.VARBINARY);
-                    stmtInsert.setNull(6, java.sql.Types.INTEGER);
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"sampling_features\" WHERE \"id\"=?")) {
+            stmtExist.setString(1, foi.getId());
+            try(final ResultSet rs = stmtExist.executeQuery()) {
+                if (!rs.next()) {
+                    try (final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"sampling_features\" VALUES(?,?,?,?,?,?)")) {
+                        stmtInsert.setString(1, foi.getId());
+                        stmtInsert.setString(2, (foi.getName() != null) ? foi.getName().getCode() : null);
+                        stmtInsert.setString(3, foi.getDescription());
+                        stmtInsert.setNull(4, java.sql.Types.VARCHAR); // TODO
+
+                        if (foi.getGeometry() != null) {
+                            try {
+                                WKBWriter writer = new WKBWriter();
+                                final Geometry geom = GeometrytoJTS.toJTS((AbstractGeometry) foi.getGeometry());
+                                final int SRID = geom.getSRID();
+                                stmtInsert.setBytes(5, writer.write(geom));
+                                stmtInsert.setInt(6, SRID);
+                            } catch (FactoryException ex) {
+                                LOGGER.log(Level.WARNING, "unable to transform the geometry to JTS", ex);
+                                stmtInsert.setNull(5, java.sql.Types.VARBINARY);
+                                stmtInsert.setNull(6, java.sql.Types.INTEGER);
+                            }
+                        } else {
+                            stmtInsert.setNull(5, java.sql.Types.VARBINARY);
+                            stmtInsert.setNull(6, java.sql.Types.INTEGER);
+                        }
+                        stmtInsert.executeUpdate();
+                    }
                 }
-            } else {
-                stmtInsert.setNull(5, java.sql.Types.VARBINARY);
-                stmtInsert.setNull(6, java.sql.Types.INTEGER);
             }
-            
-            stmtInsert.executeUpdate();
-            stmtInsert.close();
-        } 
-        rs.close();
-        stmtExist.close();
+        }
     }
     
     private void writeResult(final int oid, final int pid, final String procedureID, final Object result, final TemporalObject samplingTime, final Connection c) throws SQLException, DataStoreException {
         if (result instanceof Measure) {
             buildMeasureTable(procedureID, pid, c);
-            final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"mesures\".\"mesure" + pid + "\" VALUES(?,?,?)");
-            final Measure measure = (Measure) result;
-            stmt.setInt(1, oid);
-            stmt.setInt(2, 1);
-            stmt.setDouble(3, measure.getValue());
-            stmt.executeUpdate();
-            stmt.close();
+            try(final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"mesures\".\"mesure" + pid + "\" VALUES(?,?,?)")) {
+                final Measure measure = (Measure) result;
+                stmt.setInt(1, oid);
+                stmt.setInt(2, 1);
+                stmt.setDouble(3, measure.getValue());
+                stmt.executeUpdate();
+            }
         } else if (result instanceof DataArrayProperty) {
             final DataArray array = ((DataArrayProperty) result).getDataArray();
             if (!(array.getEncoding() instanceof TextBlock)) {
@@ -569,166 +545,163 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             offeringID  = "offering-" + procedureID;
         }
        
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"identifier\"=?");
-        stmtExist.setString(1, offeringID);
-        final ResultSet rs = stmtExist.executeQuery();
-        
-        // INSERT
-        if (!rs.next()) {
-            final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)");
-            stmtInsert.setString(1, offeringID);
-            stmtInsert.setString(2, "Offering for procedure:" + procedureID);
-            stmtInsert.setString(3, offeringID);
-            if (samplingTime instanceof Period) {
-                final Period period  = (Period)samplingTime;
-                final Date beginDate = period.getBeginning().getPosition().getDate();
-                final Date endDate   = period.getEnding().getPosition().getDate();
-                if (beginDate != null) {
-                    stmtInsert.setTimestamp(4, new Timestamp(beginDate.getTime()));
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"identifier\"=?")) {
+            stmtExist.setString(1, offeringID);
+            try(final ResultSet rs = stmtExist.executeQuery()) {
+                // INSERT
+                if (!rs.next()) {
+                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)")) {
+                        stmtInsert.setString(1, offeringID);
+                        stmtInsert.setString(2, "Offering for procedure:" + procedureID);
+                        stmtInsert.setString(3, offeringID);
+                        if (samplingTime instanceof Period) {
+                            final Period period = (Period) samplingTime;
+                            final Date beginDate = period.getBeginning().getPosition().getDate();
+                            final Date endDate = period.getEnding().getPosition().getDate();
+                            if (beginDate != null) {
+                                stmtInsert.setTimestamp(4, new Timestamp(beginDate.getTime()));
+                            } else {
+                                stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
+                            }
+                            if (endDate != null) {
+                                stmtInsert.setTimestamp(5, new Timestamp(endDate.getTime()));
+                            } else {
+                                stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
+                            }
+                        } else if (samplingTime instanceof Instant) {
+                            final Instant instant = (Instant) samplingTime;
+                            final Date date = instant.getPosition().getDate();
+                            if (date != null) {
+                                stmtInsert.setTimestamp(4, new Timestamp(date.getTime()));
+                            } else {
+                                stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
+                            }
+                            stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
+                        } else {
+                            stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
+                            stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
+                        }
+                        stmtInsert.setString(6, procedureID);
+                        stmtInsert.executeUpdate();
+                    }
+
+                    if (phenoID != null) {
+                        try(final PreparedStatement stmtInsertOP = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)")) {
+                            stmtInsertOP.setString(1, offeringID);
+                            stmtInsertOP.setString(2, phenoID);
+                            stmtInsertOP.executeUpdate();
+                        }
+                    }
+
+                    if (foiID != null) {
+                        try(final PreparedStatement stmtInsertFOI = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)")) {
+                            stmtInsertFOI.setString(1, offeringID);
+                            stmtInsertFOI.setString(2, foiID);
+                            stmtInsertFOI.executeUpdate();
+                        }
+                    }
+
+                    // UPDATE
                 } else {
-                    stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
-                }
-                if (endDate != null) {
-                    stmtInsert.setTimestamp(5, new Timestamp(endDate.getTime()));
-                } else {
-                    stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
-                }
-            } else if (samplingTime instanceof Instant) {
-                final Instant instant = (Instant)samplingTime;
-                final Date date       = instant.getPosition().getDate();
-                if (date != null) {
-                    stmtInsert.setTimestamp(4, new Timestamp(date.getTime()));
-                } else {
-                    stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
-                }
-                stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
-            } else {
-                stmtInsert.setNull(4, java.sql.Types.TIMESTAMP);
-                stmtInsert.setNull(5, java.sql.Types.TIMESTAMP);
-            }
-            stmtInsert.setString(6, procedureID);
-            stmtInsert.executeUpdate();
-            stmtInsert.close();
+                    /*
+                     * update time bound
+                     */
+                    final Timestamp timeBegin = rs.getTimestamp(4);
+                    final long offBegin;
+                    if (timeBegin != null) {
+                        offBegin = timeBegin.getTime();
+                    } else {
+                        offBegin = Long.MAX_VALUE;
+                    }
+                    final Timestamp timeEnd = rs.getTimestamp(5);
+                    final long offEnd;
+                    if (timeEnd != null) {
+                        offEnd = timeEnd.getTime();
+                    } else {
+                        offEnd = -Long.MAX_VALUE;
+                    }
+
+                    if (samplingTime instanceof Period) {
+                        final Period period = (Period) samplingTime;
+                        final Date beginDate = period.getBeginning().getPosition().getDate();
+                        final Date endDate = period.getEnding().getPosition().getDate();
+                        if (beginDate != null) {
+                            final long obsBeginTime = beginDate.getTime();
+                            if (obsBeginTime < offBegin) {
+                                try(final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?")) {
+                                    beginStmt.setTimestamp(1, new Timestamp(obsBeginTime));
+                                    beginStmt.executeUpdate();
+                                }
+                            }
+                        }
+                        if (endDate != null) {
+                            final long obsEndTime = endDate.getTime();
+                            if (obsEndTime > offEnd) {
+                                try(final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?")) {
+                                    endStmt.setTimestamp(1, new Timestamp(obsEndTime));
+                                    endStmt.executeUpdate();
+                                }
+                            }
+                        }
+                    } else if (samplingTime instanceof Instant) {
+                        final Instant instant = (Instant) samplingTime;
+                        final Date date = instant.getPosition().getDate();
+                        if (date != null) {
+                            final long obsTime = date.getTime();
+                            if (obsTime < offBegin) {
+                                try(final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?")) {
+                                    beginStmt.setTimestamp(1, new Timestamp(obsTime));
+                                    beginStmt.executeUpdate();
+                                }
+                            }
+                            if (obsTime > offEnd) {
+                                try(final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?")) {
+                                    endStmt.setTimestamp(1, new Timestamp(obsTime));
+                                    endStmt.executeUpdate();
+                                }
+                            }
+                        }
+                    }
             
-            if (phenoID != null) {
-                final PreparedStatement stmtInsertOP = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
-                stmtInsertOP.setString(1, offeringID);
-                stmtInsertOP.setString(2, phenoID);
-                stmtInsertOP.executeUpdate();
-                stmtInsertOP.close();
-            }
-            
-            if (foiID != null) {
-                final PreparedStatement stmtInsertFOI = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)");
-                stmtInsertFOI.setString(1, offeringID);
-                stmtInsertFOI.setString(2, foiID);
-                stmtInsertFOI.executeUpdate();
-                stmtInsertFOI.close();
-            }
-            
-        // UPDATE
-        } else {
-            
-            /*
-             * update time bound
-             */ 
-            final Timestamp timeBegin = rs.getTimestamp(4);
-            final long offBegin;
-            if (timeBegin != null) {
-                offBegin = timeBegin.getTime();
-            } else {
-                offBegin = Long.MAX_VALUE;
-            }
-            final Timestamp timeEnd   = rs.getTimestamp(5);
-            final long offEnd;
-            if (timeEnd != null) {
-                offEnd = timeEnd.getTime();
-            } else {
-                offEnd = -Long.MAX_VALUE;
-            }
-            
-            if (samplingTime instanceof Period) {
-                final Period period  = (Period) samplingTime;
-                final Date beginDate = period.getBeginning().getPosition().getDate();
-                final Date endDate   = period.getEnding().getPosition().getDate();
-                if (beginDate != null) {
-                    final long obsBeginTime = beginDate.getTime();
-                    if (obsBeginTime < offBegin) {
-                        final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?");
-                        beginStmt.setTimestamp(1, new Timestamp(obsBeginTime));
-                        beginStmt.executeUpdate();
-                        beginStmt.close();
+                    /*
+                     * Phenomenon
+                     */
+                    if (phenoID != null) {
+                        try(final PreparedStatement phenoStmt = c.prepareStatement("SELECT \"phenomenon\" FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?")) {
+                            phenoStmt.setString(1, offeringID);
+                            phenoStmt.setString(2, phenoID);
+                            try(final ResultSet rsp = phenoStmt.executeQuery()) {
+                                if (!rsp.next()) {
+                                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)")) {
+                                        stmtInsert.setString(1, offeringID);
+                                        stmtInsert.setString(2, phenoID);
+                                        stmtInsert.executeUpdate();
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-                if (endDate != null) {
-                    final long obsEndTime = endDate.getTime();
-                    if (obsEndTime > offEnd) {
-                        final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?");
-                        endStmt.setTimestamp(1, new Timestamp(obsEndTime));
-                        endStmt.executeUpdate();
-                        endStmt.close();
+                /*
+                 * Feature Of interest
+                 */
+                if (foiID != null) {
+                    try(final PreparedStatement foiStmt = c.prepareStatement("SELECT \"foi\" FROM  \"om\".\"offering_foi\" WHERE \"id_offering\"=? AND \"foi\"=?")) {
+                        foiStmt.setString(1, offeringID);
+                        foiStmt.setString(2, foiID);
+                        try(final ResultSet rsf = foiStmt.executeQuery()) {
+                            if (!rsf.next()) {
+                                try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)")) {
+                                    stmtInsert.setString(1, offeringID);
+                                    stmtInsert.setString(2, foiID);
+                                    stmtInsert.executeUpdate();
+                                }
+                            }
+                        }
                     }
                 }
-            } else if (samplingTime instanceof Instant) {
-                final Instant instant = (Instant) samplingTime;
-                final Date date       = instant.getPosition().getDate();
-                if (date != null) {
-                    final long obsTime = date.getTime();
-                    if (obsTime < offBegin) {
-                        final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?");
-                        beginStmt.setTimestamp(1, new Timestamp(obsTime));
-                        beginStmt.executeUpdate();
-                        beginStmt.close();
-                    }
-                    if (obsTime > offEnd) {
-                        final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?");
-                        endStmt.setTimestamp(1, new Timestamp(obsTime));
-                        endStmt.executeUpdate();
-                        endStmt.close();
-                    }
-                }
-            }
-            
-            /*
-             * Phenomenon
-             */
-            if (phenoID != null) {
-                final PreparedStatement phenoStmt = c.prepareStatement("SELECT \"phenomenon\" FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?");
-                phenoStmt.setString(1, offeringID);
-                phenoStmt.setString(2, phenoID);
-                final ResultSet rsp = phenoStmt.executeQuery();
-                if (!rsp.next()) {
-                    final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
-                    stmtInsert.setString(1, offeringID);
-                    stmtInsert.setString(2, phenoID);
-                    stmtInsert.executeUpdate();
-                    stmtInsert.close();
-                }
-                rsp.close();
-                phenoStmt.close();
-            }
-            
-            /*
-             * Feature Of interest
-             */
-            if (foiID != null) {
-                final PreparedStatement foiStmt = c.prepareStatement("SELECT \"foi\" FROM  \"om\".\"offering_foi\" WHERE \"id_offering\"=? AND \"foi\"=?");
-                foiStmt.setString(1, offeringID);
-                foiStmt.setString(2, foiID);
-                final ResultSet rsf = foiStmt.executeQuery();
-                if (!rsf.next()) {
-                    final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)");
-                    stmtInsert.setString(1, offeringID);
-                    stmtInsert.setString(2, foiID);
-                    stmtInsert.executeUpdate();
-                    stmtInsert.close();
-                }
-                rsf.close();
-                foiStmt.close();
             }
         }
-        rs.close();
-        stmtExist.close();
     }
 
     /**
@@ -736,9 +709,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      */
     @Override
     public String writeOffering(final ObservationOffering offering) throws DataStoreException {
-        try {
-            final Connection c           = source.getConnection();
-            final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)");
+        try(final Connection c           = source.getConnection();
+             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)")) {
             stmt.setString(1, offering.getId());
             stmt.setString(2, offering.getDescription());
             stmt.setString(3, (offering.getName() != null) ? offering.getName().getCode() : null);
@@ -768,28 +740,27 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             }
             stmt.setString(6, offering.getProcedures().get(0));
             stmt.executeUpdate();
-            stmt.close();
-            final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
-            for (String op : offering.getObservedProperties()) {
-                if (op != null) {
-                    opstmt.setString(1, offering.getId());
-                    opstmt.setString(2, op);
-                    opstmt.executeUpdate();
+
+            try(final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)")) {
+                for (String op : offering.getObservedProperties()) {
+                    if (op != null) {
+                        opstmt.setString(1, offering.getId());
+                        opstmt.setString(2, op);
+                        opstmt.executeUpdate();
+                    }
                 }
             }
-            opstmt.close();
-            
-            final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)");
-            for (String foi : offering.getFeatureOfInterestIds()) {
-                if (foi != null) {
-                    foistmt.setString(1, offering.getId());
-                    foistmt.setString(2, foi);
-                    foistmt.executeUpdate();
+
+            try(final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)")) {
+                for (String foi : offering.getFeatureOfInterestIds()) {
+                    if (foi != null) {
+                        foistmt.setString(1, offering.getId());
+                        foistmt.setString(2, foi);
+                        foistmt.executeUpdate();
+                    }
                 }
             }
-            foistmt.close();
-            
-            c.close();
+
             return offering.getId();
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting offering.", ex);
@@ -801,28 +772,26 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      */
     @Override
     public void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws DataStoreException {
-        try {
-            final Connection c           = source.getConnection();
+        try(final Connection c = source.getConnection()) {
             if (offProc != null) {
                 // single pricedure in v2.0.0
             }
             if (offPheno != null) {
-                final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
-                for (String op : offPheno) {
-                    opstmt.setString(1, offeringID);
-                    opstmt.setString(2, op);
-                    opstmt.executeUpdate();
+                try(final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)")) {
+                    for (String op : offPheno) {
+                        opstmt.setString(1, offeringID);
+                        opstmt.setString(2, op);
+                        opstmt.executeUpdate();
+                    }
                 }
-                opstmt.close();
             }
             if (offSF != null) {
-                final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)");
-                foistmt.setString(1, offeringID);
-                foistmt.setString(2, offSF);
-                foistmt.executeUpdate();
-                foistmt.close();
+                try(final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)")) {
+                    foistmt.setString(1, offeringID);
+                    foistmt.setString(2, offSF);
+                    foistmt.executeUpdate();
+                }
             }
-            c.close();
         } catch (SQLException e) {
             throw new DataStoreException(e.getMessage(), e);
         }
@@ -842,10 +811,9 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     @Override
     public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws DataStoreException {
         if (position != null) {
-            try {
-                final Connection c     = source.getConnection();
+            try(final Connection c     = source.getConnection();
+                PreparedStatement ps   = c.prepareStatement("UPDATE \"om\".\"procedures\" SET \"shape\"=?, \"crs\"=? WHERE id=?")) {
                 final WKBWriter writer = new WKBWriter();
-                PreparedStatement ps   = c.prepareStatement("UPDATE \"om\".\"procedures\" SET \"shape\"=?, \"crs\"=? WHERE id=?");
                 ps.setString(3, physicalID);
                 final Geometry pt = GeometrytoJTS.toJTS(position);
                 ps.setBytes(1, writer.write(pt));
@@ -855,7 +823,6 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 }
                 ps.setInt(2, srid);
                 ps.execute();
-                c.close();
             } catch (SQLException | FactoryException e) {
                 throw new DataStoreException(e.getMessage(), e);
             }
@@ -866,19 +833,15 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     private int getNewObservationId() throws DataStoreException {
-        try {
-            final Connection c         = source.getConnection();
+        try(final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
-            final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"om\".\"observations\"");
+            final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"om\".\"observations\"")) {
             int resultNum;
             if (rs.next()) {
                 resultNum = rs.getInt(1) + 1;
             } else {
                 resultNum = 1;
             }
-            rs.close();
-            stmt.close();
-            c.close();
             return resultNum;
         } catch (SQLException ex) {
             throw new DataStoreException("Error while looking for available observation id.", ex);
@@ -890,31 +853,21 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      */
     @Override
     public void removeObservationForProcedure(final String procedureID) throws DataStoreException {
-        try {
-            final Connection c              = source.getConnection();
-            c.setAutoCommit(false);
+        try(final Connection c = source.getConnection()) {
             final int pid = getPIDFromProcedure(procedureID, c);
             if (pid == -1) {
-                c.close();
                 LOGGER.log(Level.FINE, "Unable to find a procedure:{0}", procedureID);
                 return;
             }
             //NEW
-            try {
-                final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
+            try(final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
+                final PreparedStatement stmtObs  = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE \"procedure\"=?")) {
                 stmtMes.setString(1, procedureID);
                 stmtMes.executeUpdate();
-                stmtMes.close();
-            } catch (SQLException ex) {
-                LOGGER.warning("Error while trunkating mesure" + pid + " table. Maybe this table is missing");
+
+                stmtObs.setString(1, procedureID);
+                stmtObs.executeUpdate();
             }
-            final PreparedStatement stmtObs  = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE \"procedure\"=?");
-            stmtObs.setString(1, procedureID);
-            stmtObs.executeUpdate();
-            stmtObs.close();
-            
-            c.commit();
-            c.close();
         } catch (SQLException ex) {
             throw new DataStoreException("Error while removing observation for procedure.", ex);
         }
@@ -927,76 +880,71 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     public void removeProcedure(final String procedureID) throws DataStoreException {
         try {
             removeObservationForProcedure(procedureID);
-            final Connection c              = source.getConnection();
-            c.setAutoCommit(false);
-            final int pid = getPIDFromProcedure(procedureID, c);
-            
-            final PreparedStatement stmtObsP = c.prepareStatement("DELETE FROM \"om\".\"offering_observed_properties\" "
-                                                                + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
-            final PreparedStatement stmtFoi  = c.prepareStatement("DELETE FROM \"om\".\"offering_foi\" "
-                                                                + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
-            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"offerings\" WHERE \"procedure\"=?");
-            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"procedures\" WHERE \"id\"=?");
-            final PreparedStatement stmtProcDesc = c.prepareStatement("DELETE FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=?");
-            
-            stmtObsP.setString(1, procedureID);
-            stmtObsP.executeUpdate();
-            stmtObsP.close();
-            stmtFoi.setString(1, procedureID);
-            stmtFoi.executeUpdate();
-            stmtFoi.close();
-            stmtMes.setString(1, procedureID);
-            stmtMes.executeUpdate();
-            stmtMes.close();
-            stmtProcDesc.setString(1, procedureID);
-            stmtProcDesc.executeUpdate();
-            stmtProcDesc.close();
-            stmtObs.setString(1, procedureID);
-            stmtObs.executeUpdate();
-            stmtObs.close();
-            
-            // remove measure table
-            if (pid == -1) {
-                c.close();
-                LOGGER.log(Level.FINE, "Unable to find a procedure:{0}", procedureID);
-                return;
-            }
-            final Statement stmtDrop = c.createStatement();
-            stmtDrop.executeUpdate("DROP TABLE \"mesures\".\"mesure" + pid + "\"");
-            stmtDrop.close();
-                    
-            //look for unused observed properties (execute the statement 2 times for remaining components)
-            final Statement stmtOP = c.createStatement();
-            for (int i = 0; i < 2; i++) {
-                final ResultSet rs = stmtOP.executeQuery(" SELECT \"id\" FROM \"om\".\"observed_properties\""
-                                                       + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"observed_property\" FROM \"om\".\"observations\") " 
-                                                       + " AND    \"id\" NOT IN (SELECT DISTINCT \"phenomenon\"        FROM \"om\".\"offering_observed_properties\")"
-                                                       + " AND    \"id\" NOT IN (SELECT DISTINCT \"component\"         FROM \"om\".\"components\")");
+            try(final Connection c = source.getConnection()) {
+                final int pid = getPIDFromProcedure(procedureID, c);
 
-                while (rs.next()) {
-                    stmtOP.addBatch("DELETE FROM \"om\".\"components\" WHERE \"phenomenon\"='" + rs.getString(1) + "';");
-                    stmtOP.addBatch("DELETE FROM \"om\".\"observed_properties\" WHERE \"id\"='" + rs.getString(1) + "';");
+                try (final PreparedStatement stmtObsP = c.prepareStatement("DELETE FROM \"om\".\"offering_observed_properties\" "
+                        + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
+                     final PreparedStatement stmtFoi = c.prepareStatement("DELETE FROM \"om\".\"offering_foi\" "
+                             + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
+                     final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"offerings\" WHERE \"procedure\"=?");
+                     final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"procedures\" WHERE \"id\"=?");
+                     final PreparedStatement stmtProcDesc = c.prepareStatement("DELETE FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=?")) {
+
+                    stmtObsP.setString(1, procedureID);
+                    stmtObsP.executeUpdate();
+
+                    stmtFoi.setString(1, procedureID);
+                    stmtFoi.executeUpdate();
+
+                    stmtMes.setString(1, procedureID);
+                    stmtMes.executeUpdate();
+
+                    stmtProcDesc.setString(1, procedureID);
+                    stmtProcDesc.executeUpdate();
+
+                    stmtObs.setString(1, procedureID);
+                    stmtObs.executeUpdate();
                 }
-                rs.close();
-                stmtOP.executeBatch();
+
+                // remove measure table
+                if (pid == -1) {
+                    LOGGER.log(Level.FINE, "Unable to find a procedure:{0}", procedureID);
+                    return;
+                }
+
+                try (final Statement stmtDrop = c.createStatement()) {
+                    stmtDrop.executeUpdate("DROP TABLE \"mesures\".\"mesure" + pid + "\"");
+                }
+
+                //look for unused observed properties (execute the statement 2 times for remaining components)
+                try (final Statement stmtOP = c.createStatement()) {
+                    for (int i = 0; i < 2; i++) {
+                        try (final ResultSet rs = stmtOP.executeQuery(" SELECT \"id\" FROM \"om\".\"observed_properties\""
+                                + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"observed_property\" FROM \"om\".\"observations\") "
+                                + " AND    \"id\" NOT IN (SELECT DISTINCT \"phenomenon\"        FROM \"om\".\"offering_observed_properties\")"
+                                + " AND    \"id\" NOT IN (SELECT DISTINCT \"component\"         FROM \"om\".\"components\")")) {
+                            while (rs.next()) {
+                                stmtOP.addBatch("DELETE FROM \"om\".\"components\" WHERE \"phenomenon\"='" + rs.getString(1) + "';");
+                                stmtOP.addBatch("DELETE FROM \"om\".\"observed_properties\" WHERE \"id\"='" + rs.getString(1) + "';");
+                            }
+                        }
+                        stmtOP.executeBatch();
+                    }
+
+                    //look for unused foi
+                    try(final Statement stmtFOI = c.createStatement();
+                    final ResultSet rs2 = stmtFOI.executeQuery(" SELECT \"id\" FROM \"om\".\"sampling_features\""
+                            + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"observations\") " +
+                            " AND    \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"offering_foi\")")) {
+
+                        while (rs2.next()) {
+                            stmtFOI.addBatch("DELETE FROM \"om\".\"sampling_features\" WHERE \"id\"='" + rs2.getString(1) + "';");
+                        }
+                        stmtFOI.executeBatch();
+                    }
+                }
             }
-            stmtOP.close();
-            
-            //look for unused foi
-            final Statement stmtFOI = c.createStatement();
-            final ResultSet rs2 = stmtFOI.executeQuery(" SELECT \"id\" FROM \"om\".\"sampling_features\""
-                                                     + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"observations\") " +
-                                                       " AND    \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"offering_foi\")");
-            
-            while (rs2.next()) {
-                stmtFOI.addBatch("DELETE FROM \"om\".\"sampling_features\" WHERE \"id\"='" + rs2.getString(1) + "';");
-            }
-            rs2.close();
-            stmtFOI.executeBatch();
-            stmtFOI.close();
-            
-            c.commit();
-            c.close();
         } catch (SQLException ex) {
             throw new DataStoreException("Error while removing procedure.", ex);
         }
@@ -1007,22 +955,16 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      */
     @Override
     public void removeObservation(final String observationID) throws DataStoreException {
-        try {
-            final Connection c              = source.getConnection();
-            c.setAutoCommit(false);
+        try(final Connection c              = source.getConnection()) {
             final int pid                   = getPIDFromObservation(observationID, c);
-            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE identifier=?)");
-            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE identifier=?");
-            
-            stmtMes.setString(1, observationID);
-            stmtMes.executeUpdate();
-            stmtMes.close();
-            stmtObs.setString(1, observationID);
-            stmtObs.executeUpdate();
-            stmtObs.close();
-            
-            c.commit();
-            c.close();
+            try(final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE identifier=?)");
+            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE identifier=?")) {
+                stmtMes.setString(1, observationID);
+                stmtMes.executeUpdate();
+
+                stmtObs.setString(1, observationID);
+                stmtObs.executeUpdate();
+            }
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observation.", ex);
         }
@@ -1030,19 +972,16 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     
     private boolean measureTableExist(final int pid) throws SQLException {
         final String tableName = "mesure" + pid;
-        final Connection c      = source.getConnection();
-        c.setReadOnly(false);
         boolean exist = false;
-        final Statement stmt = c.createStatement();
-        try {
-            final ResultSet rs = stmt.executeQuery("SELECT \"id\" FROM \"mesures\".\"" + tableName + "\"");
-            rs.close();
-            exist = true;
-        } catch (SQLException ex) {
-            LOGGER.log(Level.FINER, "Error while looking for measure table existence (normal error if table does not exist).", ex);
+        try(final Connection c = source.getConnection()) {
+            try(final Statement stmt = c.createStatement()) {
+                try(final ResultSet rs = stmt.executeQuery("SELECT \"id\" FROM \"mesures\".\"" + tableName + "\"")) {
+                    exist = true;
+                }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.FINER, "Error while looking for measure table existence (normal error if table does not exist).", ex);
+            }
         }
-        stmt.close();
-        c.close();
         return exist;
     }
     
@@ -1141,35 +1080,34 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             }
             sb.setCharAt(sb.length() - 1, ' ');
             sb.append(");");
-            final Statement stmt = c.createStatement();
-            stmt.executeUpdate(sb.toString());
-            stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_pk PRIMARY KEY (\"id_observation\", \"id\")");
-            stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName+ "_obs_fk FOREIGN KEY (\"id_observation\") REFERENCES \"om\".\"observations\"(\"id\")");
-            stmt.close();
-            
-            //fill procedure_descriptions table
-            final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)");
-            int order = 1;
-            for (Field field : fields) {
-                insertFieldStmt.setString(1, procedureID);
-                insertFieldStmt.setInt(2, order);
-                insertFieldStmt.setString(3, field.fieldName);
-                insertFieldStmt.setString(4, field.fieldType);
-                if (field.fieldDesc != null) {
-                    insertFieldStmt.setString(5, field.fieldDesc);
-                } else {
-                    insertFieldStmt.setNull(5, java.sql.Types.VARCHAR);
-                }
-                if (field.fieldUom != null) {
-                    insertFieldStmt.setString(6, field.fieldUom);
-                } else {
-                    insertFieldStmt.setNull(6, java.sql.Types.VARCHAR);
-                }
-                insertFieldStmt.executeUpdate();
-                order++;
+            try(final Statement stmt = c.createStatement()) {
+                stmt.executeUpdate(sb.toString());
+                stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_pk PRIMARY KEY (\"id_observation\", \"id\")");
+                stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_obs_fk FOREIGN KEY (\"id_observation\") REFERENCES \"om\".\"observations\"(\"id\")");
             }
-            insertFieldStmt.close();
-            
+
+            //fill procedure_descriptions table
+            try(final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)")) {
+                int order = 1;
+                for (Field field : fields) {
+                    insertFieldStmt.setString(1, procedureID);
+                    insertFieldStmt.setInt(2, order);
+                    insertFieldStmt.setString(3, field.fieldName);
+                    insertFieldStmt.setString(4, field.fieldType);
+                    if (field.fieldDesc != null) {
+                        insertFieldStmt.setString(5, field.fieldDesc);
+                    } else {
+                        insertFieldStmt.setNull(5, java.sql.Types.VARCHAR);
+                    }
+                    if (field.fieldUom != null) {
+                        insertFieldStmt.setString(6, field.fieldUom);
+                    } else {
+                        insertFieldStmt.setNull(6, java.sql.Types.VARCHAR);
+                    }
+                    insertFieldStmt.executeUpdate();
+                    order++;
+                }
+            }
         }
     }
     
@@ -1188,23 +1126,22 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 sb.append("\"value\" double precision);");
             }
             
-            final Statement stmt = c.createStatement();
-            stmt.executeUpdate(sb.toString());
-            stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_pk PRIMARY KEY (\"id_observation\", \"id\")");
-            stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName+ "_obs_fk FOREIGN KEY (\"id_observation\") REFERENCES \"om\".\"observations\"(\"id\")");
-            stmt.close();
-            
+            try(final Statement stmt = c.createStatement()) {
+                stmt.executeUpdate(sb.toString());
+                stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_pk PRIMARY KEY (\"id_observation\", \"id\")");
+                stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_obs_fk FOREIGN KEY (\"id_observation\") REFERENCES \"om\".\"observations\"(\"id\")");
+            }
+
             //fill procedure_descriptions table
-            final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)");
-            insertFieldStmt.setString(1, procedureID);
-            insertFieldStmt.setInt(2, 1);
-            insertFieldStmt.setString(3, "value");
-            insertFieldStmt.setString(4, "Quantity");
-            insertFieldStmt.setNull(5, java.sql.Types.VARCHAR);
-            insertFieldStmt.setNull(6, java.sql.Types.VARCHAR); // TODO
-            insertFieldStmt.executeUpdate();
-            insertFieldStmt.close();
-            
+            try(final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)")) {
+                insertFieldStmt.setString(1, procedureID);
+                insertFieldStmt.setInt(2, 1);
+                insertFieldStmt.setString(3, "value");
+                insertFieldStmt.setString(4, "Quantity");
+                insertFieldStmt.setNull(5, java.sql.Types.VARCHAR);
+                insertFieldStmt.setNull(6, java.sql.Types.VARCHAR); // TODO
+                insertFieldStmt.executeUpdate();
+            }
         }
     }
     
@@ -1213,69 +1150,70 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         final StringTokenizer tokenizer = new StringTokenizer(values, encoding.getBlockSeparator());
         int n = 1;
         int sqlCpt = 0;
-        final Statement stmtSQL = c.createStatement();
-        StringBuilder sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" VALUES ");
-        while (tokenizer.hasMoreTokens()) {
-            String block       = tokenizer.nextToken();
+        try(final Statement stmtSQL = c.createStatement()) {
+            StringBuilder sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" VALUES ");
+            while (tokenizer.hasMoreTokens()) {
+                String block = tokenizer.nextToken();
 
-            sql.append('(').append(oid).append(',').append(n).append(',');
-            for (int i = 0; i < fields.size(); i++) {
-                final Field field = fields.get(i);
-                String value;
-                if (i == fields.size() - 1) {
-                    value     = block;
-                } else {
-                    int separator = block.indexOf(encoding.getTokenSeparator());
-                    value = block.substring(0, separator);
-                    block = block.substring(separator + 1);
-                }
-
-                //format time
-                if (field.fieldType.equals("Time") && value != null && !value.isEmpty()) {
-                    try {
-                        final long millis = new ISODateParser().parseToMillis(value);
-                        value = "'" + new Timestamp(millis).toString() + "'";
-                    } catch (IllegalArgumentException ex) {
-                        throw new SQLException("Bad format of timestamp for:" + value);
+                sql.append('(').append(oid).append(',').append(n).append(',');
+                for (int i = 0; i < fields.size(); i++) {
+                    final Field field = fields.get(i);
+                    String value;
+                    if (i == fields.size() - 1) {
+                        value = block;
+                    } else {
+                        int separator = block.indexOf(encoding.getTokenSeparator());
+                        value = block.substring(0, separator);
+                        block = block.substring(separator + 1);
                     }
-                } else if (field.fieldType.equals("Text")) {
-                    value =  "'" + value + "'";
+
+                    //format time
+                    if (field.fieldType.equals("Time") && value != null && !value.isEmpty()) {
+                        try {
+                            final long millis = new ISODateParser().parseToMillis(value);
+                            value = "'" + new Timestamp(millis).toString() + "'";
+                        } catch (IllegalArgumentException ex) {
+                            throw new SQLException("Bad format of timestamp for:" + value);
+                        }
+                    } else if (field.fieldType.equals("Text")) {
+                        value = "'" + value + "'";
+                    }
+
+                    if (value != null && !value.isEmpty()) {
+                        sql.append(value).append(",");
+                    } else {
+                        sql.append("NULL,");
+                    }
                 }
-                
-                if (value != null && !value.isEmpty()) {
-                    sql.append(value).append(",");
-                } else {
-                    sql.append("NULL,");
+                sql.setCharAt(sql.length() - 1, ' ');
+                sql.append("),\n");
+                n++;
+                sqlCpt++;
+                if (sqlCpt > 99) {
+                    sql.setCharAt(sql.length() - 2, ' ');
+                    if (isPostgres) {
+                        sql.setCharAt(sql.length() - 1, ';');
+                    } else {
+                        sql.setCharAt(sql.length() - 1, ' ');
+                    }
+
+                    stmtSQL.addBatch(sql.toString());
+                    sqlCpt = 0;
+                    sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" VALUES ");
                 }
             }
-            sql.setCharAt(sql.length() - 1, ' ');
-            sql.append("),\n");
-            n++;
-            sqlCpt++;
-            if (sqlCpt > 99) {
+            if (sqlCpt > 0) {
                 sql.setCharAt(sql.length() - 2, ' ');
-                if (isPostgres){
+                if (isPostgres) {
                     sql.setCharAt(sql.length() - 1, ';');
                 } else {
                     sql.setCharAt(sql.length() - 1, ' ');
                 }
-
                 stmtSQL.addBatch(sql.toString());
-                sqlCpt = 0;
-                sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" VALUES ");
             }
+            stmtSQL.executeBatch();
+
         }
-        if (sqlCpt > 0) {
-            sql.setCharAt(sql.length() - 2, ' ');
-           if (isPostgres){
-                sql.setCharAt(sql.length() - 1, ';');
-            } else {
-                sql.setCharAt(sql.length() - 1, ' ');
-            }
-            stmtSQL.addBatch(sql.toString());
-        }
-        stmtSQL.executeBatch();
-        stmtSQL.close();
     }
     
      /**

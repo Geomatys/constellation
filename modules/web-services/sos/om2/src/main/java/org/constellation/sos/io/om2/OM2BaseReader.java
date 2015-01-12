@@ -131,37 +131,36 @@ public class OM2BaseReader {
             final String sampledFeature;
             final byte[] b;
             final int srid;
-            final PreparedStatement stmt;
-            if (isPostgres) {
-                stmt  = c.prepareStatement("SELECT \"id\", \"name\", \"description\", \"sampledfeature\", st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
-            } else {
-                stmt  = c.prepareStatement("SELECT * FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
+            try (final PreparedStatement stmt = (isPostgres) ?
+                c.prepareStatement("SELECT \"id\", \"name\", \"description\", \"sampledfeature\", st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"sampling_features\" WHERE \"id\"=?") :
+                c.prepareStatement("SELECT * FROM \"om\".\"sampling_features\" WHERE \"id\"=?")) {
+                stmt.setString(1, id);
+                try (final ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        name = rs.getString(2);
+                        description = rs.getString(3);
+                        sampledFeature = rs.getString(4);
+                        b = rs.getBytes(5);
+                        srid = rs.getInt(6);
+                    } else {
+                        return null;
+                    }
+                }
+                final CoordinateReferenceSystem crs;
+                if (srid != 0) {
+                    crs = CRS.decode("urn:ogc:def:crs:EPSG:" + srid);
+                } else {
+                    crs = defaultCRS;
+                }
+                final Geometry geom;
+                if (b != null) {
+                    WKBReader reader = new WKBReader();
+                    geom = reader.read(b);
+                } else {
+                    geom = null;
+                }
+                return buildFoi(version, id, name, description, sampledFeature, geom, crs);
             }
-            stmt.setString(1, id);
-            final ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                name           = rs.getString(2);
-                description    = rs.getString(3);
-                sampledFeature = rs.getString(4);
-                b              = rs.getBytes(5);
-                srid           = rs.getInt(6);
-            } else {
-                return null;
-            }
-            final CoordinateReferenceSystem crs;
-            if (srid != 0) {
-                crs = CRS.decode("urn:ogc:def:crs:EPSG:" + srid);
-            } else {
-                crs = defaultCRS;
-            }
-            final Geometry geom;
-            if (b != null) {
-                WKBReader reader = new WKBReader();
-                geom             = reader.read(b);
-            } else {
-                geom = null;
-            } 
-            return buildFoi(version, id, name, description, sampledFeature, geom, crs);
             
         } catch (ParseException ex) {
             throw new DataStoreException(ex.getMessage(), ex);
@@ -214,26 +213,26 @@ public class OM2BaseReader {
                 return buildPhenomenon(version, id, observedProperty);
             } else {
                 // look for composite phenomenon
-                final PreparedStatement stmt = c.prepareStatement("SELECT \"component\" FROM \"om\".\"components\" WHERE \"phenomenon\"=?");
-                stmt.setString(1, observedProperty);
-                final ResultSet rs = stmt.executeQuery();
-                final List<Phenomenon> phenomenons = new ArrayList<>();
-                while (rs.next()) {
-                    final String name = rs.getString(1);
-                    final String phenID;
-                    if (name.startsWith(phenomenonIdBase)) {
-                        phenID = name.substring(phenomenonIdBase.length());
-                    } else {
-                        phenID = null;
+                try (final PreparedStatement stmt = c.prepareStatement("SELECT \"component\" FROM \"om\".\"components\" WHERE \"phenomenon\"=?")) {
+                    stmt.setString(1, observedProperty);
+                    try(final ResultSet rs = stmt.executeQuery()) {
+                        final List<Phenomenon> phenomenons = new ArrayList<>();
+                        while (rs.next()) {
+                            final String name = rs.getString(1);
+                            final String phenID;
+                            if (name.startsWith(phenomenonIdBase)) {
+                                phenID = name.substring(phenomenonIdBase.length());
+                            } else {
+                                phenID = null;
+                            }
+                            phenomenons.add(buildPhenomenon(version, phenID, name));
+                        }
+                        if (phenomenons.isEmpty()) {
+                            return buildPhenomenon(version, id, observedProperty);
+                        } else {
+                            return buildCompositePhenomenon(version, id, observedProperty, phenomenons);
+                        }
                     }
-                    phenomenons.add(buildPhenomenon(version, phenID, name));
-                }
-                rs.close();
-                stmt.close();
-                if (phenomenons.isEmpty()) {
-                    return buildPhenomenon(version, id, observedProperty);
-                } else {
-                    return buildCompositePhenomenon(version, id, observedProperty, phenomenons);
                 }
             }
         } catch (SQLException ex) {
@@ -243,85 +242,88 @@ public class OM2BaseReader {
     
     protected List<Field> readFields(final String procedureID, final Connection c) throws SQLException {
         final List<Field> results = new ArrayList<>();
-        final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? ORDER BY \"order\"");
-        stmt.setString(1, procedureID);
-        final ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            results.add(new Field(rs.getString("field_type"),
-                      rs.getString("field_name"),
-                      rs.getString("field_definition"),
-                      rs.getString("uom")));
+        try(final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? ORDER BY \"order\"")) {
+            stmt.setString(1, procedureID);
+            try(final ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    results.add(new Field(rs.getString("field_type"),
+                            rs.getString("field_name"),
+                            rs.getString("field_definition"),
+                            rs.getString("uom")));
+                }
+                return results;
+            }
         }
-        rs.close();
-        return results;
     }
 
     protected Field getTimeField(final String procedureID, final Connection c) throws SQLException {
-        Field result = null;
-        final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND \"field_type\"='Time' ORDER BY \"order\"");
-        stmt.setString(1, procedureID);
-        final ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            result = new Field(rs.getString("field_type"),
-                      rs.getString("field_name"),
-                      rs.getString("field_definition"),
-                      rs.getString("uom"));
+        try(final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND \"field_type\"='Time' ORDER BY \"order\"")) {
+            stmt.setString(1, procedureID);
+            try (final ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Field(rs.getString("field_type"),
+                            rs.getString("field_name"),
+                            rs.getString("field_definition"),
+                            rs.getString("uom"));
+                }
+                return null;
+            }
         }
-        return result;
     }
     
     protected Field getFieldForPhenomenon(final String procedureID, final String phenomenon, final Connection c) throws SQLException {
-        Field result = null;
-        final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND \"field_name\"= ?");
-        stmt.setString(1, procedureID);
-        stmt.setString(2, phenomenon);
-        final ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            result = new Field(rs.getString("field_type"),
-                      rs.getString("field_name"),
-                      rs.getString("field_definition"),
-                      rs.getString("uom"));
+        try(final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND \"field_name\"= ?")) {
+            stmt.setString(1, procedureID);
+            stmt.setString(2, phenomenon);
+            try(final ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Field(rs.getString("field_type"),
+                            rs.getString("field_name"),
+                            rs.getString("field_definition"),
+                            rs.getString("uom"));
+                }
+                return null;
+            }
         }
-        return result;
     }
     
     protected int getPIDFromObservation(final String obsIdentifier, final Connection c) throws SQLException {
-        final PreparedStatement stmt = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"observations\", \"om\".\"procedures\" p WHERE \"identifier\"=? AND \"procedure\"=p.\"id\"");
-        stmt.setString(1, obsIdentifier);
-        final ResultSet rs = stmt.executeQuery();
-        int pid = -1;
-        if (rs.next()) {
-            pid = rs.getInt(1);
+        try(final PreparedStatement stmt = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"observations\", \"om\".\"procedures\" p WHERE \"identifier\"=? AND \"procedure\"=p.\"id\"")) {
+            stmt.setString(1, obsIdentifier);
+            try(final ResultSet rs = stmt.executeQuery()) {
+                int pid = -1;
+                if (rs.next()) {
+                    pid = rs.getInt(1);
+                }
+                return pid;
+            }
         }
-        rs.close();
-        stmt.close();
-        return pid;
     }
     
     protected int getPIDFromProcedure(final String procedure, final Connection c) throws SQLException {
-        final PreparedStatement stmt = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
-        stmt.setString(1, procedure);
-        final ResultSet rs = stmt.executeQuery();
-        int pid = -1;
-        if (rs.next()) {
-            pid = rs.getInt(1);
+        try(final PreparedStatement stmt = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"procedures\" WHERE \"id\"=?")) {
+            stmt.setString(1, procedure);
+            try(final ResultSet rs = stmt.executeQuery()) {
+                int pid = -1;
+                if (rs.next()) {
+                    pid = rs.getInt(1);
+                }
+                return pid;
+            }
         }
-        rs.close();
-        stmt.close();
-        return pid;
     }
     
     protected String getProcedureFromObservation(final String obsIdentifier, final Connection c) throws SQLException {
-        final PreparedStatement stmt = c.prepareStatement("SELECT \"procedure\" FROM \"om\".\"observations\" WHERE \"identifier\"=?");
-        stmt.setString(1, obsIdentifier);
-        final ResultSet rs = stmt.executeQuery();
-        String pid = null;
-        if (rs.next()) {
-            pid = rs.getString(1);
+        try(final PreparedStatement stmt = c.prepareStatement("SELECT \"procedure\" FROM \"om\".\"observations\" WHERE \"identifier\"=?")) {
+            stmt.setString(1, obsIdentifier);
+            try(final ResultSet rs = stmt.executeQuery()) {
+                String pid = null;
+                if (rs.next()) {
+                    pid = rs.getString(1);
+                }
+                return pid;
+            }
         }
-        rs.close();
-        stmt.close();
-        return pid;
     }
     
     protected static class Field {
