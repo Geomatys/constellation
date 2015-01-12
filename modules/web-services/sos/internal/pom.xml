@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration of "sec-services" module from Constellation project.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.constellation.web-services</groupId>
+    <artifactId>cstl-web-sos</artifactId>
+    <version>0.9-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Module description.
+  -->
+  <groupId>org.constellation.web-services</groupId>
+  <artifactId>cstl-web-sos-internal</artifactId>
+  <packaging>jar</packaging>
+  <name>Web service for an OGC SOS Internal</name>
+  <description>
+   Internal SensorML reader/writer for Sensor Observation Service.
+  </description>
+
+
+
+  <!--
+    Developers and contributors.
+  -->
+  <developers>
+    <developer>
+      <id>glegal</id>
+      <name>Guilhem Legal</name>
+      <email>guilhem.legal@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+
+  <!--
+    Required dependencies for building. These dependencies will be included
+    in the JARs' list that maven will put in the directory "target/binaries".
+  -->
+  <dependencies>
+    <!-- constellation dependencies -->
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-sos-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.constellation.testing</groupId>
+      <artifactId>cstl-test-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-sos-base</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine.register</groupId>
+        <artifactId>cstl-register-jooq</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-spring-security</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>
