@@ -614,18 +614,19 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         var layerName = $scope.selected.Name;
                         var layerData;
                         var providerId = $scope.selected.Provider;
+                        var type = $scope.selected.Type?$scope.selected.Type.toLowerCase():null;
                         if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
                             if($scope.service.type.toLowerCase() === 'wms') {
                                 layerData = LayerDashboardViewer.createLayerWMSWithStyle($scope.cstlUrl, layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
                             }else {
                                 layerData = LayerDashboardViewer.createLayerWithStyle($scope.cstlUrl, layerName, providerId,
-                                    $scope.selected.TargetStyle[0].Name,null,null,true);
+                                    $scope.selected.TargetStyle[0].Name,null,null,type!=='vector');
                             }
                         } else {
                             if($scope.service.type.toLowerCase() === 'wms') {
                                 layerData = LayerDashboardViewer.createLayerWMS($scope.cstlUrl, layerName, $scope.service.identifier);
                             }else {
-                                layerData = LayerDashboardViewer.createLayer($scope.cstlUrl, layerName, providerId,null,true);
+                                layerData = LayerDashboardViewer.createLayer($scope.cstlUrl, layerName, providerId,null,type!=='vector');
                             }
                         }
                         LayerDashboardViewer.layers = [layerData];
@@ -1165,11 +1166,12 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                     layerName = layer.Name;
                                 }
                                 providerId = layer.Provider;
+                                var type = layer.Type?layer.Type.toLowerCase():null;
                                 if (layer.externalStyle || layer.styleName) {
                                     layerData = DataViewer.createLayerWithStyle(cstlUrl,layerName,providerId,
-                                        layer.externalStyle?layer.externalStyle:layer.styleName,null,null,true);
+                                        layer.externalStyle?layer.externalStyle:layer.styleName,null,null,type!=='vector');
                                 } else {
-                                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,true);
+                                    layerData = DataViewer.createLayer(cstlUrl, layerName, providerId,null,type!=='vector');
                                 }
                             }
                             layerData.setOpacity(layer.opacity / 100);
