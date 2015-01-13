@@ -21,7 +21,7 @@
 angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('DataController', function($scope, $routeParams, $location, Dashboard, webService, dataListing, datasetListing, DomainResource,
-                                            provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookieStore, cfpLoadingBar) {
+                                            provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookieStore) {
         /**
          * To fix angular bug with nested scope.
          */

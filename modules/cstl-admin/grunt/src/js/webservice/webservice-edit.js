@@ -23,7 +23,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
     .controller('WebServiceEditController', function($rootScope, $scope, $routeParams , webService, dataListing, provider,
                                                      csw, sos, $modal, textService, Dashboard, Growl, $filter,
                                                      DomainResource,StyleSharedService, style, $cookieStore, $translate,
-                                                     $window, cfpLoadingBar) {
+                                                     $window) {
         /**
          * To fix angular bug with nested scope.
          */
