@@ -471,34 +471,22 @@ public class WPSWorker extends AbstractWorker {
 
         //configure webdav if not exist
         try {
-            serviceBusiness.getConfiguration("webdav", webdavName);
-        } catch (ConfigurationException e) {
-            final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
-            webdavCtx.setId(webdavName);
-            try {
-                if (SecurityManagerHolder.getInstance().isAuthenticated()) {
-                    serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
-                } else {
-                    serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
-                    /*try {
-                        ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
-                            @Override
-                            public String getCurrentUserLogin() {
-                                return "admin";
-                            }
-                        });
-                    } finally {
-                        ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
-                    }*/
-                }
-                // /!\ CASE SENSITIVE /!\
+            Object configuration = serviceBusiness.getConfiguration("webdav", webdavName);
+
+            if (configuration == null) {
+                final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
+                webdavCtx.setId(webdavName);
+                serviceBusiness.create("webdav", webdavName, webdavCtx, new Details(),null);
+
                 final Worker worker = WSEngine.buildWorker("WEBDAV", webdavName);
                 WSEngine.addServiceInstance("WEBDAV", webdavName, worker);
-            } catch (ConfigurationException ex) {
-                LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
-                return false;
             }
+
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
+            return false;
         }
+        
         return true;
     }
 
