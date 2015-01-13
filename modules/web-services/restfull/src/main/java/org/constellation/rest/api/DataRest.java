@@ -410,7 +410,8 @@ public class DataRest {
             } else {
                 if (filePath != null) {
                     filePath = renameDataFile(dataName, filePath);
-                    final File providerDir = new File(dataIntegratedDirectory, dataName);
+                    final java.nio.file.Path intDirPath = dataIntegratedDirectory.toPath();
+                    final File providerDir = intDirPath.resolve(Paths.get(dataName, dataName)).toFile();
                     if (providerDir.exists()) {
                         FileUtilities.deleteDirectory(providerDir);
                     }
