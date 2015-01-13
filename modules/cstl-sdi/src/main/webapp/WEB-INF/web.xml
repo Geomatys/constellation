@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" metadata-complete="true"
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" metadata-complete="true"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_0.xsd"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
   <display-name>constellation</display-name>
-  <!-- Constellation initialisation, plus copy possible file-system configuration to database. -->
+
     <listener>
         <listener-class>org.constellation.GeotkInstaller</listener-class>
     </listener>
-
 
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -25,7 +24,6 @@
     <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
   </listener>
 
-  <!-- Constellation initialisation, plus copy possible file-system configuration to database. -->
   <listener>
     <listener-class>org.constellation.setup.CstlInstaller</listener-class>
   </listener>
@@ -45,23 +43,23 @@
     <listener>
         <listener-class>org.constellation.admin.listener.AnalyseListener</listener-class>
     </listener>
-  <context-param>
-   <description>Constellation run in a single webapp</description>
-   <param-name>cstl-uberwar</param-name>
-   <param-value>true</param-value>
-  </context-param>
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>
-    WEB-INF/applicationContext.xml
-    WEB-INF/admin-context.xml
-    
-    </param-value>
-  </context-param>
-  <context-param>
-    <param-name>spring.profiles.active</param-name>
-    <param-value>standard,derby</param-value>
-</context-param>
+
+    <context-param>
+        <description>Constellation run in a single webapp</description>
+        <param-name>cstl-uberwar</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            WEB-INF/applicationContext.xml
+            WEB-INF/admin-context.xml
+        </param-value>
+    </context-param>
+    <context-param>
+        <param-name>spring.profiles.active</param-name>
+        <param-value>standard,derby</param-value>
+    </context-param>
 
   <!-- Filter to allow AJAX cross-origin requests -->
   <filter>
@@ -166,11 +164,15 @@
     <url-pattern>/spring/*</url-pattern>
   </servlet-mapping>
 
-
-  <!-- SOAP enabling In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in 
-    the web-app tag (at the top of this document) In Tomcat : 1) Uncomment the WSServletContextListener listener. 2) Rename the 
-    file sun-jaxws.xml.backup in sun-jaxws.xml and uncomment the endpoint you want to enable. > <listener> <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class> 
-    </listener -->
+    <!-- SOAP enabling In Glassfish: To enable SOAP service in glassfish remove
+    the property 'metadata-complete="true"' in the web-app tag (at the top of
+    this document) In Tomcat :
+    1) Uncomment the WSServletContextListener listener.
+    2) Rename the file sun-jaxws.xml.backup in sun-jaxws.xml and uncomment the
+    endpoint you want to enable. >
+    <listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener-->
 
   <!-- webdav server servlet -->
   <servlet>
@@ -189,7 +191,7 @@
 
   <session-config>
     <session-timeout>30</session-timeout>
-    <!-- <tracking-mode>URL</tracking-mode> -->
+    <!--tracking-mode>URL</tracking-mode-->
   </session-config>
 
 </web-app>

@@ -96,6 +96,12 @@
         <version>2.4</version>
         <configuration>
             <warName>constellation</warName>
+            <webResources>
+                <resource>
+                    <filtering>true</filtering>
+                    <directory>${basedir}/src/main/webapp</directory>
+                </resource>
+            </webResources>
           <overlays>
             <overlay>
               <!-- empty groupId/artifactId represents the current build -->

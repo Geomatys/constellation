@@ -5,7 +5,6 @@
          version="3.0">
   <display-name>constellation</display-name>
 
-    <!-- Initialize Geotk components (readers, processes, etc). -->
     <listener>
         <listener-class>org.constellation.GeotkInstaller</listener-class>
     </listener>
@@ -18,12 +17,9 @@
     <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
   </listener>
   <listener>
-    <listener-class>
-      org.springframework.security.web.session.HttpSessionEventPublisher
-    </listener-class>
+    <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
   </listener>
 
-  <!-- Constellation initialisation -->
   <listener>
     <listener-class>org.constellation.setup.CstlInstaller</listener-class>
   </listener>
@@ -43,10 +39,11 @@
     <listener>
         <listener-class>org.constellation.admin.listener.AnalyseListener</listener-class>
     </listener>
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>WEB-INF/applicationContext.xml</param-value>
-  </context-param>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>WEB-INF/applicationContext.xml</param-value>
+    </context-param>
     <context-param>
         <param-name>spring.profiles.active</param-name>
         <param-value>standard,derby</param-value>
@@ -83,6 +80,7 @@
     <filter-name>securityFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+
   <filter>
     <description>Filter that exposes ogcServiceType and ogcServiceName to logging appender.</description>
     <display-name>MDC Log4j filter</display-name>
@@ -93,9 +91,6 @@
     <filter-name>MDCFilter</filter-name>
     <url-pattern>/WS/*</url-pattern>
   </filter-mapping>
-
-
-
 
   <filter>
     <filter-name>encodingFilter</filter-name>
@@ -110,7 +105,6 @@
       <param-value>true</param-value>
     </init-param>
   </filter>
-
   <filter-mapping>
     <filter-name>encodingFilter</filter-name>
     <url-pattern>/spring/*</url-pattern>
@@ -158,13 +152,15 @@
     <url-pattern>/spring/*</url-pattern>
   </servlet-mapping>
 
-
-  <!-- SOAP enabling In Glassfish: To enable SOAP service in glassfish remove 
-    the property 'metadata-complete="true"' in the web-app tag (at the top of 
-    this document) In Tomcat : 1) Uncomment the WSServletContextListener listener. 
-    2) Rename the file sun-jaxws.xml.backup in sun-jaxws.xml and uncomment the 
-    endpoint you want to enable. > <listener> <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class> 
-    </listener -->
+    <!-- SOAP enabling In Glassfish: To enable SOAP service in glassfish remove
+    the property 'metadata-complete="true"' in the web-app tag (at the top of
+    this document) In Tomcat :
+    1) Uncomment the WSServletContextListener listener.
+    2) Rename the file sun-jaxws.xml.backup in sun-jaxws.xml and uncomment the
+    endpoint you want to enable. >
+    <listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener-->
 
   <!-- webdav server servlet -->
   <servlet>
@@ -183,7 +179,7 @@
 
   <session-config>
     <session-timeout>30</session-timeout>
-<!--     <tracking-mode>URL</tracking-mode> -->
+    <!--tracking-mode>URL</tracking-mode-->
   </session-config>
 
 </web-app>
