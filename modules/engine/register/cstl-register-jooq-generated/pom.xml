@@ -157,6 +157,15 @@
               <excludes></excludes>
               <inputSchema>ADMIN</inputSchema>
             </database>
+            <generate>
+              <relations>true</relations>
+              <records>true</records>
+              <!-- Warning: jOOQ's generated DAOs have final methods which can not be extended by proxy
+                   classes. It is recommended to inject components extending jOOQ's generated DAOs using
+                   interfaces (contracts) rather that implementation classes. -->
+              <daos>true</daos>
+              <fluentSetters>true</fluentSetters>
+            </generate>
             <target>
               <packageName>org.constellation.engine.register.jooq</packageName>
               <directory>target/generated-sources/jooq</directory>
