@@ -181,10 +181,10 @@ public class LegendTemplate implements Serializable {
 
         if (mainFontColor != null && !mainFontColor.isEmpty()) {
             final Color mainColor = Color.decode(mainFontColor);
-            return new DefaultLegendTemplate(dispBackground, gap, glyphSize, mainF, layerVisible, secondF, mainColor,
+            return new DefaultLegendTemplate(dispBackground, gap, glyphSize, secondF, layerVisible, mainF, mainColor,
                     mainFontOpacity != null ? mainFontOpacity : 255f, false);
         }
-        return new DefaultLegendTemplate(dispBackground, gap, glyphSize, mainF, layerVisible, secondF);
+        return new DefaultLegendTemplate(dispBackground, gap, glyphSize, secondF, layerVisible, mainF);
     }
     
 }
