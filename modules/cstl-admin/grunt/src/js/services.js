@@ -531,6 +531,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                     if (scope) {
                         style.listAll({provider: 'sld'}, function(response) {
                             scope.wrap.fullList = response.styles;
+                            scope.previewStyledData(null,false);
                         });
                     }
                 });
@@ -548,6 +549,9 @@ angular.module('cstl-services', ['cstl-restapi'])
                         exclude: function() {  return null; },
                         stylechooser: function(){return 'edit';}
                     }
+                });
+                modal.result.then(function(item) {
+                    scope.showDataDashboardMap();
                 });
             }
         };
