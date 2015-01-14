@@ -304,9 +304,9 @@
                                             class="col-xs-7 col-sm-7 col-md-6 col-lg-6 currentScale"></em>
                                     </div>
                                     <hr style="margin-bottom:10px;"/>
-                                    <div class="form-group" ng-show="!optionsSLD.showFilterTextArea">
+                                    <div class="form-group">
                                         <div class="col-xs-12">
-                                            <div>
+                                            <div class="col-xs-7" style="padding: 0px;">
                                                 <label style="cursor: pointer;">
                                                     <strong translate="sldeditor.edition.filterEnabled">Filter by attribute field</strong>
                                                     <input type="checkbox"
@@ -314,6 +314,16 @@
                                                            ng-model="optionsSLD.filtersEnabled"
                                                            ng-click="optionsSLD.filtersEnabled = !optionsSLD.filtersEnabled; applyFilter();"/>
                                                 </label>
+                                            </div>
+                                            <div class="col-xs-5" style="padding: 0px;">
+                                                <select class="form-control form-control-fix"
+                                                        ng-model="optionsSLD.filterMode"
+                                                        ng-change="setFilterMode();">
+                                                    <option value="simple"
+                                                            translate="sldeditor.edition.filterModeSimple">Mode simple literal</option>
+                                                    <option value="expert"
+                                                            translate="sldeditor.edition.filterModeExpert">Complex expression</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -350,7 +360,8 @@
                                                         <input type="text"
                                                                class="form-control form-control-fix"
                                                                ng-model="filter.value"
-                                                               ng-change="applyFilter();"/>
+                                                               ng-change="applyFilter();"
+                                                               debounce="200"/>
                                                     </td>
                                                     <td>
                                                         <select class="form-control form-control-fix"
@@ -373,7 +384,8 @@
                                             <textarea id="inputFilterComplex"
                                                       class="form-control form-control-fix"
                                                       rows="3"
-                                                      ng-model="optionsSLD.selectedRule.filter"></textarea>
+                                                      ng-model="optionsSLD.selectedRule.filter"
+                                                      debounce="200"></textarea>
                                         </div>
                                         <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" style="padding: 0;">
                                             <button type="button"

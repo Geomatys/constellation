@@ -178,6 +178,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 selectedSymbolizerType:"",
                 selectedSymbolizer:null,
                 filtersEnabled:false,
+                filterMode:'simple',
                 showFilterTextArea:false,
                 filters:[{
                     "attribute":"",
@@ -652,6 +653,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     $scope.editRasterCells();
                 }
                 $scope.optionsSLD.filtersEnabled=false;
+                $scope.optionsSLD.filterMode='simple';
                 $scope.optionsSLD.filters=[{
                     "attribute":"",
                     "comparator":"=",
@@ -1031,11 +1033,15 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             array[to] = target;
         }
 
+        $scope.setFilterMode = function() {
+            $scope.optionsSLD.showFilterTextArea = ($scope.optionsSLD.filterMode !== 'simple');
+        };
+
         /**
          * Binding action for checkbox to enable or disable filter in current rule.
          */
         $scope.applyFilter = function() {
-            if($scope.optionsSLD.filtersEnabled){
+            if($scope.optionsSLD.filtersEnabled && $scope.optionsSLD.filterMode === 'simple'){
                 //apply current filter to the model
                 var strQuery = '';
                 var operator = '';
@@ -1052,7 +1058,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         }else {
                             var strFilter = filter.value;
                             //escape CQL quote from the ui value before apply
-                            if(strFilter.indexOf("'") !== -1){
+                            if(isNaN(strFilter) && strFilter.indexOf("'") !== -1){
                                 var find = "'";
                                 var re = new RegExp(find, 'g');
                                 strFilter = strFilter.replace(re, "\\'");
@@ -1098,8 +1104,10 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 if(olfilter){
                     $scope.optionsSLD.filters = convertOLFilterToArray(olfilter);
                     $scope.optionsSLD.filtersEnabled=true;
+                    $scope.optionsSLD.filterMode='simple';
                 }else {
-                    $scope.optionsSLD.filtersEnabled=false;
+                    $scope.optionsSLD.filtersEnabled=true;
+                    $scope.optionsSLD.filterMode='expert';
                     $scope.optionsSLD.filters=[{
                         "attribute":"",
                         "comparator":"=",
