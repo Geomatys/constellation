@@ -1046,7 +1046,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                             if(filter.value.indexOf(',')!==-1){
                                 var arr= filter.value.split(',');
                                 if(arr.length===2 && arr[0].trim()!=='' && arr[1].trim()!==''){
-                                    strQuery += operator+filter.attribute + ' ' + filter.comparator +' '+ arr[0]+ ' AND '+arr[1];
+                                    strQuery += operator+'\"'+filter.attribute+'\"' + ' ' + filter.comparator +' '+ arr[0]+ ' AND '+arr[1];
                                 }
                             }
                         }else {
@@ -1057,7 +1057,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                                 var re = new RegExp(find, 'g');
                                 strFilter = strFilter.replace(re, "\\'");
                             }
-                            strQuery += operator+filter.attribute + ' ' + filter.comparator + ' \''+ strFilter +'\'';
+                            strQuery += operator+'\"'+filter.attribute+'\"' + ' ' + filter.comparator + ' \''+ strFilter +'\'';
                         }
                         if(filter.operator !== ''){
                             operator = ' '+filter.operator+' ';
