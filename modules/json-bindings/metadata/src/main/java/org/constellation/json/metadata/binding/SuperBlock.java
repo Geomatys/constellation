@@ -33,10 +33,10 @@ public class SuperBlock implements Serializable {
 
     private String name;
     private int multiplicity;
-    private List<BlockObj> children;
     private String help;
     private String path;
     private String render;
+    private List<BlockObj> children;
 
     public SuperBlock(){
 

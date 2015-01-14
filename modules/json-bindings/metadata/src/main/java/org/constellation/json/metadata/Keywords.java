@@ -73,8 +73,6 @@ final class Keywords {
      */
     static final String NIL_REASON = "nilReason:";
     
-    static final String DATE_READ_ONLY = "DATE.readonly";
-
     /**
      * Do not allow (for now) instantiation of this class.
      */

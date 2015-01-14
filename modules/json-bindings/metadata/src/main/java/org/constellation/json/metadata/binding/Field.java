@@ -44,6 +44,20 @@ public class Field implements Serializable {
     public Field() {
 
     }
+    
+    public Field(final Field field) {
+        this.name         = field.name;
+        this.multiplicity = field.multiplicity;
+        this.help         = field.help;
+        this.path         = field.path;
+        this.type         = field.type;
+        this.render       = field.render;
+        this.defaultValue = field.defaultValue;
+        this.value        = field.value;
+        this.obligation   = field.obligation;
+        this.ignore       = field.ignore;
+        this.tag          = field.tag;
+    }
 
     public String getName() {
         return name;

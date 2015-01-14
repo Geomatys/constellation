@@ -35,6 +35,10 @@ public class FieldObj implements Serializable {
     public FieldObj(){
 
     }
+    
+    public FieldObj(final Field field){
+        this.field = field;
+    }
 
     public Field getField() {
         return field;

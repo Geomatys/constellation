@@ -38,7 +38,10 @@
         <dependency>
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-xml-sensorML</artifactId>
-            <version>${geotoolkit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
     </dependencies>
 </project>

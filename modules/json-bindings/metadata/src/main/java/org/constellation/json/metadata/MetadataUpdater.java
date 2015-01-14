@@ -52,6 +52,7 @@ import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.NilReason;
+import org.constellation.json.JsonMetadataConstants;
 import org.geotoolkit.sml.xml.v101.ValidTime;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
@@ -314,8 +315,8 @@ final class MetadataUpdater {
             throw new ParseException("Illegal date: " + value + " (property:" + identifier +")", e);
         }
         try {
-            synchronized (ValueNode.DATE_FORMAT) {
-                return ValueNode.DATE_FORMAT.parse((String) value);
+            synchronized (JsonMetadataConstants.DATE_FORMAT) {
+                return JsonMetadataConstants.DATE_FORMAT.parse((String) value);
             }
         } catch (java.text.ParseException e) {
             throw new ParseException("Illegal date: " + value + " (property:" + identifier +")", e);

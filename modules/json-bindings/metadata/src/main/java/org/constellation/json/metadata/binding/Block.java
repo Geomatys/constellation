@@ -33,11 +33,12 @@ public class Block implements Serializable, ChildEntity {
 
     private String name;
     private int multiplicity;
-    private List<FieldObj> children;
     private String help;
     private String path;
     private String render;
     private String ignore;
+    private String type;
+    private List<FieldObj> children;
 
     public Block(){
 
@@ -97,5 +98,13 @@ public class Block implements Serializable, ChildEntity {
 
     public void setIgnore(String ignore) {
         this.ignore = ignore;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

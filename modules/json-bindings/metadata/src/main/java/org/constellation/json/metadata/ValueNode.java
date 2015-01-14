@@ -22,17 +22,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.TimeZone;
 import java.util.MissingResourceException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.opengis.util.Enumerated;
 import org.apache.sis.measure.Angle;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.CharSequences;
-import static org.constellation.json.metadata.Keywords.DATE_READ_ONLY;
+import static org.constellation.json.JsonMetadataConstants.*;
 
 
 /**
@@ -44,19 +41,6 @@ import static org.constellation.json.metadata.Keywords.DATE_READ_ONLY;
  */
 @SuppressWarnings("serial")
 final class ValueNode extends ArrayList<ValueNode> {
-    /**
-     * The object to use for parsing dates of the form "2014-09-11".
-     * Usage of this format shall be synchronized on {@code DATE_FORMAT}.
-     */
-    static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-    
-    static final DateFormat DATE_HOUR_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
-    static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     /**
      * The template for which this node contains a value.
