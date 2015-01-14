@@ -86,6 +86,10 @@ public interface IDataBusiness {
 
     List<DataBrief> getDataBriefsFromDatasetId(Integer dataSetId);
 
+    List<Data> findByStyleId(final Integer styleId);
+
+    List<DataBrief> getDataBriefsFromStyleId(final Integer styleId);
+
     ParameterValues getVectorDataColumns(int id) throws DataStoreException;
 
     List<Data> findByDatasetId(final Integer datasetId);

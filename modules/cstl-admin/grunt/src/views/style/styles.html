@@ -13,7 +13,7 @@
         </div>
     </div>
 </div>
-<div id="stylesDashboard" class="row" ng-init="init()">
+<div id="stylesDashboard" class="row" ng-init="initStyleDashboard()">
     <div class="col-sm-12">
         <div class="frame dashboard">
             <div class="navbar navbar-default" style="margin-bottom: 0px;">
@@ -41,7 +41,6 @@
                     </ul>
                 </div>
             </div>
-
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
                     <ul class="nav nav-style">
@@ -131,7 +130,7 @@
                             <div class="item style-{{style.Type | lowercase}}"
                                  ng-repeat="style in wrap.dataList"
                                  ng-class="{selected:style.Id==selected.Id, 'col-xs-6':small==true, 'style-small': small}"
-                                 ng-click="select(style)">
+                                 ng-click="select(style);previewStyledData(null,false);">
                                 <div class="top">
                                     <span class="item-title" title="{{style.Name}}">{{truncate(small,style.Name)}}</span>
                                     <span class="pull-right text-right item-list-style"> {{style.Type}}</span>
@@ -177,6 +176,7 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
+                    <div id="stylePreviewMap" class="dashboardmap style-dashboardmap"></div>
                     <div id="selection">
                         <div class="alert alert-info alert-style" ng-class="{hide: selected}">
                             <h4 translate="label.no.selected.style">No selected style</h4>
@@ -230,6 +230,76 @@
                                                 <i class="fa fa-trash-o"></i>
                                             </button>
                                         </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-if="selected">
+                                <div class="row block-association"
+                                     ng-init="assocData=false;assocLayer=false;">
+                                    <div class="col-sm-12 col-md-10 col-md-offset-1">
+                                        <div class="block-associated block-associated-data"
+                                             ng-click="assocData=!assocData;assocLayer=false;">
+                                            <div class="block-associated-nb">{{selected.dataList.length}}</div>
+                                            <div class="block-associated-title"
+                                                 translate="label.related.data">Associated Data</div>
+                                                <span class="fa icon-assoc-data"
+                                                      ng-class="{'selected':assocData,'fa-chevron-circle-up':assocData,'fa-chevron-circle-down':!assocData}"
+                                                      tooltip-placement="bottom"
+                                                      tooltip-html-unsafe="{{'label.show.data' | translate }}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-if="assocData"
+                                     class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
+                                    <div id="linkedDataList" class="block-content" >
+                                        <span ng-show="selected.dataList.length == 0"
+                                              translate="label.no.association">No association</span>
+                                        <div ng-show="selected.dataList.length > 0"
+                                             class="style btn-assoc-item"
+                                             ng-repeat="data in selected.dataList"
+                                             style="margin-bottom:5px;">
+                                            <button type="button"
+                                                    ng-click="previewStyledData(data,false);"
+                                                    class="btn btn-small btn-block-assos btn-block-assos-data">
+                                                <i class="glyphicon"
+                                                   ng-class="{'glyphicon-eye-open':selected.Id==styleCtrl.currentStyleId && data.Id==styleCtrl.currentDataId,'glyphicon-eye-close':selected.Id!=styleCtrl.currentStyleId || data.Id!=styleCtrl.currentDataId}"></i>
+                                            </button>
+                                            {{truncateTitleBlock(data.Name)}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row block-association"
+                                     ng-init="assocData=false;assocLayer=false;">
+                                    <div class="col-sm-12 col-md-10 col-md-offset-1">
+                                        <div class="block-associated block-associated-layers"
+                                             ng-click="assocData=false;assocLayer=!assocLayer;">
+                                            <div class="block-associated-nb">{{selected.layersList.length}}</div>
+                                            <div class="block-associated-title"
+                                                 translate="label.related.layer">Associated Layers</div>
+                                                <span class="fa icon-assoc-layer"
+                                                      ng-class="{'selected':assocLayer,'fa-chevron-circle-up':assocLayer,'fa-chevron-circle-down':!assocLayer}"
+                                                      tooltip-placement="bottom"
+                                                      tooltip-html-unsafe="{{'label.show.layers' | translate }}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-if="assocLayer"
+                                     class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
+                                    <div id="linkedLayersList" class="block-content" >
+                                        <span ng-show="selected.layersList.length == 0"
+                                              translate="label.no.association">No association</span>
+                                        <div ng-show="selected.layersList.length > 0"
+                                             class="style btn-assoc-item"
+                                             ng-repeat="layer in selected.layersList"
+                                             style="margin-bottom:5px;">
+                                            <button type="button"
+                                                    ng-click="previewStyledData(layer,true);"
+                                                    class="btn btn-small btn-block-assos btn-block-assos-layer">
+                                                <i class="glyphicon"
+                                                   ng-class="{'glyphicon-eye-open':selected.Id==styleCtrl.currentStyleId && layer.Id==styleCtrl.currentLayerId,'glyphicon-eye-close':selected.Id!=styleCtrl.currentStyleId || layer.Id!=styleCtrl.currentLayerId}"></i>
+                                            </button>
+                                            {{truncateTitleBlock(layer.Name)}}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

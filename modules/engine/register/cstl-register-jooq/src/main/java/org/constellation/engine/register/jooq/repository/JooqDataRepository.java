@@ -251,7 +251,16 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public List<Data> getDataLinkedData(final int dataId) {
-        return dsl.select(DATA.fields()).from(DATA).join(DATA_X_DATA).onKey(DATA_X_DATA.CHILD_ID).where(DATA_X_DATA.DATA_ID.eq(dataId)).fetchInto(Data.class);
+        return dsl.select(DATA.fields()).from(DATA)
+                .join(DATA_X_DATA).onKey(DATA_X_DATA.CHILD_ID)
+                .where(DATA_X_DATA.DATA_ID.eq(dataId)).fetchInto(Data.class);
+    }
+
+    @Override
+    public List<Data> getDataByLinkedStyle(final int styleId) {
+        return dsl.select(DATA.fields()).from(DATA)
+                .join(STYLED_DATA).onKey(STYLED_DATA.DATA)
+                .where(STYLED_DATA.STYLE.eq(styleId)).fetchInto(Data.class);
     }
 
     @Override

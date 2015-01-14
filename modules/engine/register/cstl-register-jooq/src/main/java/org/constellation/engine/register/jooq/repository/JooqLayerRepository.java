@@ -35,6 +35,7 @@ import java.util.List;
 import static org.constellation.engine.register.jooq.Tables.DATA;
 import static org.constellation.engine.register.jooq.Tables.LAYER;
 import static org.constellation.engine.register.jooq.Tables.PROVIDER;
+import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
 
 @Component
 public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, Layer> implements LayerRepository {
@@ -133,5 +134,12 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     public Data findDatasFromLayerAlias(String layerAlias, String dataProviderIdentifier) {
         return dsl.select().from(DATA).join(PROVIDER).on(DATA.PROVIDER.eq(PROVIDER.ID))
                 .join(LAYER).on(LAYER.DATA.eq(DATA.ID)).where(PROVIDER.IDENTIFIER.eq(dataProviderIdentifier)).and(LAYER.ALIAS.eq(layerAlias)).fetchOneInto(Data.class);
+    }
+
+    @Override
+    public List<Layer> getLayersByLinkedStyle(final int styleId) {
+        return dsl.select(LAYER.fields()).from(LAYER)
+                .join(STYLED_LAYER).onKey(STYLED_LAYER.LAYER)
+                .where(STYLED_LAYER.STYLE.eq(styleId)).fetchInto(Layer.class);
     }
 }

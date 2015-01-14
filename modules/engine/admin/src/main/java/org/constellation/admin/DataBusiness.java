@@ -461,6 +461,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param datasetId the given dataSet id.
      * @return the list of {@link Data}.
      */
+    @Override
     public List<Data> findByDatasetId(final Integer datasetId) {
         return dataRepository.findByDatasetId(datasetId);
     }
@@ -474,6 +475,29 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Override
     public List<DataBrief> getDataBriefsFromDatasetId(final Integer datasetId) {
         final List<Data> dataList = findByDatasetId(datasetId);
+        return getDataBriefFrom(dataList);
+    }
+
+    /**
+     * Returns list of {@link Data} for given style id.
+     *
+     * @param styleId the given style id.
+     * @return the list of {@link Data}.
+     */
+    @Override
+    public List<Data> findByStyleId(final Integer styleId) {
+        return dataRepository.getDataByLinkedStyle(styleId);
+    }
+
+    /**
+     * Returns a list of {@link DataBrief} for given style id.
+     *
+     * @param styleId the given style id.
+     * @return the list of {@link DataBrief}.
+     */
+    @Override
+    public List<DataBrief> getDataBriefsFromStyleId(final Integer styleId) {
+        final List<Data> dataList = findByStyleId(styleId);
         return getDataBriefFrom(dataList);
     }
 

@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -54,6 +55,11 @@ public final class StyleBrief implements Serializable {
 
     @XmlElement(name="Owner")
     private String owner;
+
+    @XmlElement(name="dataList")
+    private List<DataBrief> dataList;
+
+    private List<LayerSummary> layersList;
 
     public Integer getId() {
         return id;
@@ -109,6 +115,22 @@ public final class StyleBrief implements Serializable {
 
     public void setOwner(final String owner) {
         this.owner = owner;
+    }
+
+    public List<DataBrief> getDataList() {
+        return dataList;
+    }
+
+    public void setDataList(List<DataBrief> dataList) {
+        this.dataList = dataList;
+    }
+
+    public List<LayerSummary> getLayersList() {
+        return layersList;
+    }
+
+    public void setLayersList(List<LayerSummary> layersList) {
+        this.layersList = layersList;
     }
 
     @Override

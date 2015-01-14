@@ -46,4 +46,8 @@ public interface ILayerBusiness {
 
     void remove(String spec, String serviceId, String layerId, String namespace) throws ConfigurationException;
 
+    List<org.constellation.engine.register.Layer> findByStyleId(final Integer styleId);
+
+    List<LayerSummary> getLayerSummaryFromStyleId(final Integer styleId);
+
 }

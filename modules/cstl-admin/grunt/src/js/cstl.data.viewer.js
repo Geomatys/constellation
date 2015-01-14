@@ -382,3 +382,4 @@ window.DataViewer = window.buildDataViewer();
 window.DataDashboardViewer = window.buildDataViewer();
 window.LayerDashboardViewer = window.buildDataViewer();
 window.MapContextDashboardViewer = window.buildDataViewer();
+window.StyleDashboardViewer = window.buildDataViewer();

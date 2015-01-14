@@ -50,4 +50,6 @@ public interface LayerRepository {
     Data findDatasFromLayerAlias(String layerAlias, String dataProviderIdentifier);
 
     void updateLayerTitle(LayerSummary layerId);
+
+    List<Layer> getLayersByLinkedStyle(final int styleId);
 }

@@ -16,7 +16,8 @@
 
 angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
-    .controller('StylesController', function($scope, Dashboard, style, Growl, StyleSharedService, $modal, $window) {
+    .controller('StylesController', function($scope,Dashboard,style,Growl,StyleSharedService,$modal,$window,
+                                             $cookieStore,provider) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -24,13 +25,23 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
 
         $scope.hideScroll = true;
 
-        $scope.init = function() {
+        $scope.styleCtrl = {
+            cstlUrl:$cookieStore.get('cstlUrl'),
+            currentStyleId:null,
+            currentDataId:null,
+            currentLayerId:null
+        };
+
+        $scope.initStyleDashboard = function() {
             style.listAll({provider: 'sld'},function(response) {//success
                     Dashboard($scope, response.styles, true);
                     $scope.wrap.filtertype = "";
                     $scope.wrap.ordertype = "Name";
                     $scope.wrap.filtertext='';
                     $scope.wrap.orderreverse=false;
+                    setTimeout(function(){
+                        $scope.previewStyledData(null,false);
+                    },300);
                 },function() {//error
                     Growl('error','Error','Unable to show styles list!');
                 }
@@ -82,6 +93,7 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                             style.listAll({provider: 'sld'}, function(response) {
                                 Dashboard($scope, response.styles, true);
                                 $scope.selected=null;
+                                $scope.previewStyledData(null,false);
                             });
                         },
                         function() {
@@ -117,6 +129,78 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
          */
         $scope.showStyleCreate = function() {
             StyleSharedService.showStyleCreate($scope);
+        };
+
+        $scope.previewStyledData = function(data,isLayer) {
+            if (StyleDashboardViewer.map) {
+                StyleDashboardViewer.map.setTarget(undefined);
+            }
+            StyleDashboardViewer.initConfig();
+            StyleDashboardViewer.fullScreenControl = true;
+            var selectedStyle = $scope.selected;
+            if(selectedStyle) {
+                $scope.styleCtrl.currentStyleId=selectedStyle.Id;
+                var dataToShow;
+                if(data){
+                    dataToShow = data;
+                    if(isLayer){
+                        $scope.styleCtrl.currentLayerId=dataToShow.Id;
+                        $scope.styleCtrl.currentDataId=null;
+                    }else {
+                        $scope.styleCtrl.currentDataId=dataToShow.Id;
+                        $scope.styleCtrl.currentLayerId=null;
+                    }
+                }else if(selectedStyle.dataList && selectedStyle.dataList.length>0){
+                    dataToShow = selectedStyle.dataList[0];
+                    $scope.styleCtrl.currentDataId=dataToShow.Id;
+                    $scope.styleCtrl.currentLayerId=null;
+                }else if(selectedStyle.layersList && selectedStyle.layersList.length>0) {
+                    dataToShow = selectedStyle.layersList[0];
+                    $scope.styleCtrl.currentLayerId=dataToShow.Id;
+                    $scope.styleCtrl.currentDataId=null;
+                }else {
+                    //@TODO the style is not used by any data or layer
+                    // should we use a default data depending on style type vector or raster?
+                    //console.debug(selectedStyle.Type);
+                    $scope.styleCtrl.currentLayerId=null;
+                    $scope.styleCtrl.currentDataId=null;
+                }
+                if(dataToShow) {
+                    var layerName;
+                    if (dataToShow.Namespace) {
+                        layerName = '{' + dataToShow.Namespace + '}' + dataToShow.Name;
+                    } else {
+                        layerName = dataToShow.Name;
+                    }
+                    var providerId = dataToShow.Provider;
+                    var pyramidProviderId = dataToShow.PyramidConformProviderId;
+                    var type = dataToShow.Type.toLowerCase();
+                    var layerData = StyleDashboardViewer.createLayerWithStyle($scope.styleCtrl.cstlUrl,layerName,
+                                pyramidProviderId?pyramidProviderId:providerId,
+                                selectedStyle.Name,
+                                null,null,type!=='vector');
+                    //to force the browser cache reloading styled layer.
+                    layerData.get('params').ts=new Date().getTime();
+                    StyleDashboardViewer.layers = [layerData];
+                    provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
+                        function(response) {//success
+                            var bbox = response.boundingBox;
+                            if (bbox) {
+                                StyleDashboardViewer.extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
+                            }
+                            StyleDashboardViewer.initMap('stylePreviewMap');
+                        }, function() {//error
+                            // failed to find an extent bbox, just load the full map
+                            StyleDashboardViewer.initMap('stylePreviewMap');
+                        }
+                    );
+                } else {
+                    StyleDashboardViewer.initMap('stylePreviewMap');
+                }
+            }else {
+                $scope.styleCtrl.currentStyleId=null;
+                StyleDashboardViewer.initMap('stylePreviewMap');
+            }
         };
 
         $scope.truncate = function(small, text){

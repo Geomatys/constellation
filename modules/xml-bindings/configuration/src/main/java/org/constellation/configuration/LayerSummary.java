@@ -71,7 +71,7 @@ public class LayerSummary {
         this.targetStyle = convertIntoStylesBrief(layer.getStyles());
     }
 
-    private final List<StyleBrief> convertIntoStylesBrief(final List<DataReference> refs) {
+    private List<StyleBrief> convertIntoStylesBrief(final List<DataReference> refs) {
         final List<StyleBrief> briefs = new ArrayList<>();
         if (refs != null) {
             for (final DataReference ref: refs) {

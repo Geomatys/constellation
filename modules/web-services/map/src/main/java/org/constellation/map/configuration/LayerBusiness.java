@@ -19,11 +19,14 @@
 
 package org.constellation.map.configuration;
 
+import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerSummary;
+import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.engine.register.ConstellationPersistenceException;
@@ -88,6 +91,8 @@ public class LayerBusiness implements ILayerBusiness {
     private ServiceRepository serviceRepository;
     @Autowired
     private org.constellation.security.SecurityManager securityManager;
+    @Inject
+    private IDataBusiness dataBusiness;
 
     @Override
     @Transactional
@@ -221,11 +226,59 @@ public class LayerBusiness implements ILayerBusiness {
         }
     }
 
+    /**
+     * Returns list of {@link Layer} for given style id.
+     *
+     * @param styleId the given style id.
+     * @return the list of {@link Data}.
+     */
+    @Override
+    public List<Layer> findByStyleId(final Integer styleId) {
+        return layerRepository.getLayersByLinkedStyle(styleId);
+    }
+
+    @Override
+    public List<LayerSummary> getLayerSummaryFromStyleId(final Integer styleId) {
+        final List<LayerSummary> sumLayers = new ArrayList<>();
+        final List<Layer> layers = findByStyleId(styleId);
+        for(final Layer lay : layers){
+            final QName fullName = new QName(lay.getNamespace(), lay.getName());
+            final Data data = dataRepository.findById(lay.getData());
+            final DataBrief db = dataBusiness.getDataBrief(fullName, data.getProvider());
+            final LayerSummary layerSummary = new LayerSummary();
+            layerSummary.setId(lay.getId());
+            layerSummary.setName(lay.getName());
+            layerSummary.setNamespace(lay.getNamespace());
+            layerSummary.setAlias(lay.getAlias());
+            layerSummary.setTitle(lay.getTitle());
+            layerSummary.setType(db.getType());
+            layerSummary.setSubtype(db.getSubtype());
+            layerSummary.setDate(new Date(lay.getDate()));
+            layerSummary.setOwner(db.getOwner());
+            layerSummary.setProvider(db.getProvider());
+            final List<Style> styles = styleRepository.findByLayer(lay);
+            final List<StyleBrief> styleBriefs = new ArrayList<>();
+            if(styles!=null) {
+                for (final Style style : styles) {
+                    final Provider styleProv = providerRepository.findOne(style.getProvider());
+                    final StyleBrief sb = new StyleBrief();
+                    sb.setProvider(styleProv.getIdentifier());
+                    sb.setName(style.getName());
+                    sb.setTitle(style.getName());
+                    styleBriefs.add(sb);
+                }
+            }
+            layerSummary.setTargetStyle(styleBriefs);
+            sumLayers.add(layerSummary);
+        }
+        return sumLayers;
+    }
+
     @Override
     public List<org.constellation.configuration.Layer> getLayers(final String serviceType, final String serviceName, final String login) throws ConfigurationException {
         final List<org.constellation.configuration.Layer> response = new ArrayList<>();
         final Service service = serviceRepository.findByIdentifierAndType(serviceName, serviceType.toLowerCase());
-        
+
         if (service != null) {
             final LayerContext context = readMapConfiguration(service.getConfig());
             final MapFactory mapfactory = getMapFactory(context.getImplementation());

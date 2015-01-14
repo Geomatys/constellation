@@ -39,9 +39,12 @@ import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.StyleType;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.LayerSummary;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
@@ -111,6 +114,12 @@ public class StyleBusiness implements IStyleBusiness {
 
     @Inject
     ProviderRepository providerRepository;
+
+    @Inject
+    private IDataBusiness dataBusiness;
+
+    @Inject
+    private ILayerBusiness layerBusiness;
 
     @Inject
     private org.constellation.security.SecurityManager securityManager;
@@ -260,18 +269,17 @@ public class StyleBusiness implements IStyleBusiness {
     @Override
     public List<StyleBrief> getAvailableStyles(final String providerId, final String category) throws TargetNotFoundException {
         final Provider provider = ensureExistingProvider(providerId);
-
         final List<Style> styles;
         if (category == null) {
             styles = styleRepository.findByProvider(provider.getId());
         } else {
             styles = styleRepository.findByTypeAndProvider(provider.getId(), category);
         }
-
         final List<StyleBrief> beans = new ArrayList<>();
         for (final Style style : styles) {
             final StyleBrief bean = new StyleBrief();
-            bean.setId(style.getId());
+            final Integer styleId = style.getId();
+            bean.setId(styleId);
             bean.setName(style.getName());
             bean.setProvider(providerId);
             bean.setType(style.getType());
@@ -283,36 +291,16 @@ public class StyleBusiness implements IStyleBusiness {
                 }
             }
             bean.setDate(new Date(style.getDate()));
+            //get linked data
+            final List<DataBrief> dataList = dataBusiness.getDataBriefsFromStyleId(styleId);
+            bean.setDataList(dataList);
+            //get linked layers
+            final List<LayerSummary> layersList = layerBusiness.getLayerSummaryFromStyleId(styleId);
+            bean.setLayersList(layersList);
             beans.add(bean);
         }
         return beans;
     }
-
-    // /**
-    // * Returns the list of available styles for dataId.
-    // *
-    // * @return a {@link List} of {@link StyleDTO} instances
-    // */
-    // public List<StyleDTO> findStyleByDataId(final QName dataname, final
-    // String providerId) {
-    //
-    // List<StyleDTO> returnlist = new ArrayList<>();
-    // Data data =
-    // dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataname.getLocalPart(),
-    // dataname.getNamespaceURI(), providerId);
-    // List<Style> styleList = styleRepository.findByData(data);
-    // for (Style style : styleList) {
-    // StyleDTO styleDTO = new StyleDTO();
-    // try {
-    // BeanUtils.copyProperties(styleDTO, style);
-    // } catch (IllegalAccessException | InvocationTargetException e) {
-    // throw new ConstellationException(e);
-    // }
-    // returnlist.add(styleDTO);
-    // }
-    // return returnlist;
-    //
-    // }
 
     /**
      * Gets and returns the {@link MutableStyle} that matches with the specified
@@ -352,7 +340,6 @@ public class StyleBusiness implements IStyleBusiness {
         if (!mStyle.featureTypeStyles().isEmpty()) {
             mutableRules.addAll(mStyle.featureTypeStyles().get(0).rules());
         }
-
         // search related rule
         MutableRule searchedRule = null;
         for (final MutableRule mutableRule : mutableRules) {
@@ -424,7 +411,6 @@ public class StyleBusiness implements IStyleBusiness {
         } catch (SQLException ex) {
             throw new ConfigurationException("An error occurred while reading data list for style named \"" + styleName + "\".", ex);
         }
-
         // Extract additional information from the style body.
         final MutableStyle style = getStyle(providerId, styleName);
         for (final MutableFeatureTypeStyle fts : style.featureTypeStyles()) {
@@ -444,7 +430,6 @@ public class StyleBusiness implements IStyleBusiness {
                 }
             }
         }
-
         return report;
     }
 
@@ -513,7 +498,6 @@ public class StyleBusiness implements IStyleBusiness {
      */
     @Transactional
     private synchronized void createOrUpdateStyle(final String providerId, String styleName, final MutableStyle style) throws ConfigurationException {
-
         // Proceed style name.
         if (isBlank(styleName)) {
             if (isBlank(style.getName())) {
@@ -524,14 +508,12 @@ public class StyleBusiness implements IStyleBusiness {
         } else {
             style.setName(styleName);
         }
-
         // Retrieve or not the provider instance.
         final Provider provider = providerRepository.findByIdentifier(providerId);
         if (provider == null) {
             throw new ConfigurationException("Unable to set the style named \"" + style.getName() + "\". Provider with id \"" + providerId
                     + "\" not found.");
         }
-
         final StringWriter sw = new StringWriter();
         final StyleXmlIO util = new StyleXmlIO();
         try {
@@ -539,7 +521,6 @@ public class StyleBusiness implements IStyleBusiness {
         } catch (JAXBException ex) {
             throw new ConfigurationException(ex);
         }
-
         final Style s = styleRepository.findByNameAndProvider(provider.getId(), styleName);
         if (s != null) {
             s.setBody(sw.toString());
@@ -555,7 +536,6 @@ public class StyleBusiness implements IStyleBusiness {
                     sw.toString(), userId);
             styleRepository.create(newStyle);
         }
-
     }
 
     /**
@@ -577,7 +557,6 @@ public class StyleBusiness implements IStyleBusiness {
         ensureNonNull("styleId", styleName);
         final Provider provider = ensureExistingProvider(providerId);
         ensureExistingStyle(providerId, styleName);
-
         styleRepository.deleteStyle(provider.getId(), styleName);
     }
 
@@ -604,7 +583,6 @@ public class StyleBusiness implements IStyleBusiness {
         ensureNonNull("dataProvider", dataProvider);
         ensureNonNull("dataId", dataId);
         final Style style = ensureExistingStyle(styleProvider, styleName);
-
         if (style == null) {
             throw new ConfigurationException("Style named \"" + styleName + "\" can't be found from database.");
         }
@@ -614,7 +592,6 @@ public class StyleBusiness implements IStyleBusiness {
                     + "\" can't be found from database.");
         }
         styleRepository.linkStyleToData(style.getId(), data.getId());
-
     }
 
     /**
@@ -640,7 +617,6 @@ public class StyleBusiness implements IStyleBusiness {
         ensureNonNull("dataProvider", dataProvider);
         ensureNonNull("dataId", dataId);
         final Style style = ensureExistingStyle(styleProvider, styleName);
-
         if (style == null) {
             throw new ConfigurationException("Style named \"" + styleName + "\" can't be found from database.");
         }
@@ -660,7 +636,6 @@ public class StyleBusiness implements IStyleBusiness {
         final Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerName);
         final Style style = ensureExistingStyle(styleProviderId, styleName);
         styleRepository.unlinkStyleToLayer(style.getId(), layer.getId());
-
     }
 
     @Override
@@ -670,7 +645,6 @@ public class StyleBusiness implements IStyleBusiness {
         final Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
         final Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerName);
         final Style style = ensureExistingStyle(styleProviderId, styleName);
-
         styleRepository.linkStyleToLayer(style.getId(), layer.getId());
     }
 
@@ -678,7 +652,6 @@ public class StyleBusiness implements IStyleBusiness {
         MutableStyle value = null;
         StringReader sr = new StringReader(xml);
         final String baseErrorMsg = "SLD Style ";
-
         // try SLD 1.1
         try {
             final MutableStyledLayerDescriptor sld = sldParser.readSLD(sr, Specification.StyledLayerDescriptor.V_1_1_0);
@@ -692,7 +665,6 @@ public class StyleBusiness implements IStyleBusiness {
         } finally {
             sr = new StringReader(xml);
         }
-
         // try SLD 1.0
         try {
             final MutableStyledLayerDescriptor sld = sldParser.readSLD(sr, Specification.StyledLayerDescriptor.V_1_0_0);
@@ -706,7 +678,6 @@ public class StyleBusiness implements IStyleBusiness {
         } finally {
             sr = new StringReader(xml);
         }
-
         // try UserStyle SLD 1.1
         try {
             value = sldParser.readStyle(sr, Specification.SymbologyEncoding.V_1_1_0);
@@ -719,7 +690,6 @@ public class StyleBusiness implements IStyleBusiness {
         } finally {
             sr = new StringReader(xml);
         }
-
         // try UserStyle SLD 1.0
         try {
             value = sldParser.readStyle(sr, Specification.SymbologyEncoding.SLD_1_0_0);
@@ -732,7 +702,6 @@ public class StyleBusiness implements IStyleBusiness {
         } finally {
             sr = new StringReader(xml);
         }
-
         // try FeatureTypeStyle SE 1.1
         try {
             final MutableFeatureTypeStyle fts = sldParser.readFeatureTypeStyle(sr, Specification.SymbologyEncoding.V_1_1_0);
@@ -746,7 +715,6 @@ public class StyleBusiness implements IStyleBusiness {
         } finally {
             sr = new StringReader(xml);
         }
-
         // try FeatureTypeStyle SLD 1.0
         try {
             final MutableFeatureTypeStyle fts = sldParser.readFeatureTypeStyle(sr, Specification.SymbologyEncoding.SLD_1_0_0);
@@ -755,12 +723,10 @@ public class StyleBusiness implements IStyleBusiness {
             value.setName(name);
             LOGGER.log(Level.FINE, "{0}{1} is an FeatureTypeStyle SLD 1.0", new Object[] { baseErrorMsg, name });
             return value;
-
         } catch (JAXBException | FactoryException ex) { /* dont log */
         } finally {
             sr = new StringReader(xml);
         }
-
         return value;
     }
 

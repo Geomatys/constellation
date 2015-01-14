@@ -75,4 +75,6 @@ public interface DataRepository {
     void linkDataToData(final int dataId, final int childId);
 
     List<Data> getDataLinkedData(final int dataId);
+
+    List<Data> getDataByLinkedStyle(final int styleId);
 }
