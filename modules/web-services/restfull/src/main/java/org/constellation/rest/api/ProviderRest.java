@@ -195,7 +195,13 @@ public class ProviderRest {
             dataFiles = dataFiles[0].listFiles();
         }
         if(dataFiles == null || dataFiles.length==0) return;
-        final String fileNameWithoutExtention = dataFiles[0].getName().substring(0, dataFiles[0].getName().indexOf('.'));
+        final String firstFileName = dataFiles[0].getName();
+        final String fileNameWithoutExtention;
+        if(firstFileName.indexOf('.')!=-1){
+            fileNameWithoutExtention = firstFileName.substring(0, firstFileName.indexOf('.'));
+        }else {
+            fileNameWithoutExtention = firstFileName;
+        }
         final String parentPath = dataFiles[0].getParentFile().getAbsolutePath();
         final CoordinateReferenceSystem coordinateReferenceSystem = CRS.decode(epsgCode.get("codeEpsg"));
         PrjFiles.write(coordinateReferenceSystem, new File(parentPath+File.separator+fileNameWithoutExtention+".prj"));
