@@ -56,6 +56,8 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
 import org.constellation.admin.util.ImageStatisticDeserializer;
 import org.constellation.api.DataType;
+import org.constellation.api.PropertyConstants;
+import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDataCoverageJob;
 import org.constellation.configuration.ConfigDirectory;
@@ -201,6 +203,12 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Inject
     private IDataCoverageJob dataCoverageJob;
+
+    /**
+     * Injected configuration business
+     */
+    @Inject
+    private IConfigurationBusiness configurationBusiness;
 
     /**
      * Return the {@linkplain Provider provider} for the given {@linkplain Data data} identifier.
@@ -961,7 +969,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Override
     @Scheduled(cron = "1 * * * * *")
     public void updateDataStatistics() {
-        computeEmptyDataStatistics(false);
+        String propertyValue = configurationBusiness.getProperty(PropertyConstants.DATA_ANALYSE_KEY);
+        boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
+        if (doAnalysis) {
+            computeEmptyDataStatistics(false);
+        }
     }
 
     /**
