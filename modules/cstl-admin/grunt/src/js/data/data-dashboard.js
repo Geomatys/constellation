@@ -435,7 +435,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                         DataDashboardViewer.initMap(mapId);
                         if(overlay) {
                             DataDashboardViewer.map.addOverlay(overlay);
-                            //overlay.setMap(DataDashboardViewer.map);
                         }
                     }, function() {//error
                         // failed to find a metadata, just load the full map
