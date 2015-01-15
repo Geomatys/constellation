@@ -314,7 +314,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         final String phenomenonId = getPhenomenonId(phenomenonP);
         if (phenomenonId == null) return null;
         
-        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?")) {
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\",\"partial\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?")) {
             stmtExist.setString(1, phenomenonId);
             boolean exist = false;
             boolean isPartial = false;
