@@ -53,6 +53,19 @@ window.buildWmtsViewer = function () {
                     }
                 }
             }
+            //clip the projected extent that should never be out of default projection extent
+            if(reprojExtent[0]<this.maxExtent[0]){
+                reprojExtent[0] = this.maxExtent[0];
+            }
+            if(reprojExtent[1]<this.maxExtent[1]){
+                reprojExtent[1] = this.maxExtent[1];
+            }
+            if(reprojExtent[2]>this.maxExtent[2]){
+                reprojExtent[2] = this.maxExtent[2];
+            }
+            if(reprojExtent[3]>this.maxExtent[3]){
+                reprojExtent[3] = this.maxExtent[3];
+            }
 
             if(this.addBackground) {
                 //adding background layer by default OSM
@@ -110,6 +123,19 @@ window.buildWmtsViewer = function () {
                         break;
                     }
                 }
+            }
+            //clip the projected extent that should never be out of default projection extent
+            if(reprojExtent[0]<this.maxExtent[0]){
+                reprojExtent[0] = this.maxExtent[0];
+            }
+            if(reprojExtent[1]<this.maxExtent[1]){
+                reprojExtent[1] = this.maxExtent[1];
+            }
+            if(reprojExtent[2]>this.maxExtent[2]){
+                reprojExtent[2] = this.maxExtent[2];
+            }
+            if(reprojExtent[3]>this.maxExtent[3]){
+                reprojExtent[3] = this.maxExtent[3];
             }
             this.map.getView().fitExtent(reprojExtent, size);
             this.map.getView().setZoom(this.map.getView().getZoom()+1);
