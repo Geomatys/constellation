@@ -40,8 +40,10 @@ import org.constellation.provider.StyleProviders;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 
+import org.geotoolkit.parameter.Parameter;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,7 +113,19 @@ public final class CreateProvider extends AbstractCstlProcess {
                 }
                 source.parameter("date").setValue(new Date());
                 try {
-                    DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source, null);
+                    final ParameterValue pv = source.parameter("user_map");
+                    if(pv != null){
+                        final Object objMap = pv.getValue();
+                        if(objMap instanceof Map){
+                            final Map userMap = (Map) objMap;
+                            final Boolean bool = (Boolean) userMap.get("create_dataset");
+                            DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source, null,bool);
+                        }else {
+                            DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source, null);
+                        }
+                    }else {
+                        DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source, null);
+                    }
                     if (domainId != null) {
                         int count = domainRepository.addProviderDataToDomain(id, domainId );
                         LOGGER.info("Added " + count + " data to domain " + domainId);

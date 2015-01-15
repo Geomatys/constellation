@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.geotoolkit.parameter.Parameters.value;
 
@@ -60,6 +61,8 @@ public final class ProviderParameters {
     public static final ParameterDescriptor<String> SOURCE_TYPE_DESCRIPTOR =
             new DefaultParameterDescriptor<>("providerType","provider type",String.class,null,false);
 
+    public static final ParameterDescriptor<Map> SOURCE_USERMAP_DESCRIPTOR =
+            new DefaultParameterDescriptor<>("user_map","optional internal parameters",Map.class,null,false);
 
     ////////////////////////////////////////////////////////////////////////////
     // Source layer parameters /////////////////////////////////////////////////
@@ -112,7 +115,7 @@ public final class ProviderParameters {
         final ParameterDescriptorGroup sourceDescriptor = new org.apache.sis.parameter.DefaultParameterDescriptorGroup(
                 Collections.singletonMap("name", SOURCE_DESCRIPTOR_NAME),1, Integer.MAX_VALUE,
                 SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,SOURCE_DATE_DESCRIPTOR,SOURCE_TYPE_DESCRIPTOR,
-                 sourceConfigDescriptor,LAYER_DESCRIPTOR);
+                SOURCE_USERMAP_DESCRIPTOR, sourceConfigDescriptor,LAYER_DESCRIPTOR);
         return sourceDescriptor;
     }
 

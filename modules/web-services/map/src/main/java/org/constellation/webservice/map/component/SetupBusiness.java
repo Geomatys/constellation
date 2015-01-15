@@ -38,7 +38,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -410,6 +412,9 @@ public class SetupBusiness {
                     getOrCreateValue(source, "id").setValue(shpProvName);
                     getOrCreateValue(source, "load_all").setValue(true);
                     getOrCreateValue(source, "providerType").setValue("vector");
+                    final Map<String,Object> userMap = new HashMap<>();
+                    userMap.put("create_dataset",false);
+                    getOrCreateValue(source, "user_map").setValue(userMap);
 
                     final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                     final ParameterValueGroup shpConfig = createGroup(choice, "ShapefileParametersFolder");
@@ -465,6 +470,9 @@ public class SetupBusiness {
                     getOrCreateValue(source, "id").setValue(tifProvName);
                     getOrCreateValue(source, "load_all").setValue(true);
                     getOrCreateValue(source, "providerType").setValue("raster");
+                    final Map<String,Object> userMap = new HashMap<>();
+                    userMap.put("create_dataset",false);
+                    getOrCreateValue(source, "user_map").setValue(userMap);
 
                     final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                     final ParameterValueGroup tifConfig = createGroup(choice, "FileCoverageStoreParameters");
