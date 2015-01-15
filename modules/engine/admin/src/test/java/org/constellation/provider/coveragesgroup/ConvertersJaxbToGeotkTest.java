@@ -29,13 +29,13 @@ import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.geotoolkit.map.MapItem;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -48,6 +48,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
 @ActiveProfiles({"standard", "derby"})
+@Ignore //ignore this test due to compilation lock in jenkins, this test should be rewrited with mock objects see issue CSTL-1163
 public class ConvertersJaxbToGeotkTest implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
