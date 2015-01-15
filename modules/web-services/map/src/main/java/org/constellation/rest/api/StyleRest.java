@@ -27,10 +27,13 @@ import org.constellation.admin.StyleBusiness;
 import org.constellation.api.DataType;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDataCoverageJob;
+import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.LayerSummary;
+import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
@@ -137,6 +140,9 @@ public final class StyleRest {
 
     @Inject
     private IDataBusiness dataBusiness;
+
+    @Inject
+    private ILayerBusiness layerBusiness;
 
     /**
      * Injected data coverage job
@@ -562,7 +568,13 @@ public final class StyleRest {
     @GET
     @Path("{id}/style/available")
     public Response getAvailableStyles(final @PathParam("id") String id) throws Exception {
-        return ok(new StyleListBrief(styleBusiness.getAvailableStyles(id, null)));
+        final List<StyleBrief> briefsList = styleBusiness.getAvailableStyles(id, null);
+        for(final StyleBrief sb : briefsList) {
+            //set linked layers
+            final List<LayerSummary> layersList = layerBusiness.getLayerSummaryFromStyleId(sb.getId());
+            sb.setLayersList(layersList);
+        }
+        return ok(new StyleListBrief(briefsList));
     }
 
     /**

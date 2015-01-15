@@ -40,11 +40,9 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.StyleType;
 import org.constellation.business.IDataBusiness;
-import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.LayerSummary;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
@@ -117,9 +115,6 @@ public class StyleBusiness implements IStyleBusiness {
 
     @Inject
     private IDataBusiness dataBusiness;
-
-    @Inject
-    private ILayerBusiness layerBusiness;
 
     @Inject
     private org.constellation.security.SecurityManager securityManager;
@@ -294,9 +289,6 @@ public class StyleBusiness implements IStyleBusiness {
             //get linked data
             final List<DataBrief> dataList = dataBusiness.getDataBriefsFromStyleId(styleId);
             bean.setDataList(dataList);
-            //get linked layers
-            final List<LayerSummary> layersList = layerBusiness.getLayerSummaryFromStyleId(styleId);
-            bean.setLayersList(layersList);
             beans.add(bean);
         }
         return beans;
