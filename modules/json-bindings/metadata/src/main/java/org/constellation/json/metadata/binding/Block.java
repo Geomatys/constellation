@@ -19,7 +19,10 @@
 
 package org.constellation.json.metadata.binding;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +32,7 @@ import java.util.List;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class Block implements Serializable, ChildEntity {
 
     private String name;
@@ -42,6 +46,20 @@ public class Block implements Serializable, ChildEntity {
 
     public Block(){
 
+    }
+    
+    public Block(Block block){
+        this.name         = block.name;
+        this.multiplicity = block.multiplicity;
+        this.help         = block.help;
+        this.path         = block.path;
+        this.type         = block.type;
+        this.render       = block.render;
+        this.ignore       = block.ignore;
+        this.children     = new ArrayList<>();
+        for (FieldObj f : block.children) {
+            this.children.add(new FieldObj(f));
+        }
     }
 
     public String getName() {
@@ -66,6 +84,18 @@ public class Block implements Serializable, ChildEntity {
 
     public void setChildren(List<FieldObj> children) {
         this.children = children;
+    }
+    
+    public List<Field> getFields() {
+        final List<Field> results = new ArrayList<>();
+        for (FieldObj f : children) {
+            results.add(f.getField());
+        }
+        return results;
+    }
+    
+    public void addField(int index, Field field) {
+        children.add(index, new FieldObj(field));
     }
 
     public String getHelp() {

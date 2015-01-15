@@ -19,7 +19,10 @@
 
 package org.constellation.json.metadata.binding;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +32,7 @@ import java.util.List;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
 public class SuperBlock implements Serializable {
 
     private String name;
@@ -64,6 +68,18 @@ public class SuperBlock implements Serializable {
 
     public void setChildren(List<BlockObj> children) {
         this.children = children;
+    }
+    
+    public List<Block> getBlocks() {
+        final List<Block> results = new ArrayList<>();
+        for (BlockObj b : children) {
+            results.add(b.getBlock());
+        }
+        return results;
+    }
+    
+    public void addBlock(int index, Block block) {
+        children.add(index, new BlockObj(block));
     }
 
     public String getHelp() {

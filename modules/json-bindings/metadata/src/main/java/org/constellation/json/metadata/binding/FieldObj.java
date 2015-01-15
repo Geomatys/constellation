@@ -36,6 +36,12 @@ public class FieldObj implements Serializable {
 
     }
     
+    public FieldObj(final FieldObj fieldO){
+        if (fieldO != null) {
+            this.field = new Field(fieldO.field);
+        }
+    }
+    
     public FieldObj(final Field field){
         this.field = field;
     }
