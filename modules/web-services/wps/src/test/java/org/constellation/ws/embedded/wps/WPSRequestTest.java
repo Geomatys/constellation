@@ -49,6 +49,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.configuration.WebdavContext;
+import org.constellation.webdav.AdminWebdavService;
+import org.constellation.webdav.WebdavService;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -97,6 +100,7 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
                 serviceBusiness.create("wps", "default", config, null, null);
                 serviceBusiness.create("wps", "test",    config, null, null);
 
+                new AdminWebdavService(); // force webdav registration
                 final Map<String, Object> map = new HashMap<>();
                 map.put("wps", new WPSService());
                 initServer(null, map);
