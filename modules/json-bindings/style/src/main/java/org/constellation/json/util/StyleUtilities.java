@@ -70,13 +70,6 @@ public final class StyleUtilities extends Static {
 
     private static final Logger LOGGER = Logging.getLogger(StyleUtilities.class);
 
-    public static Expression expression(final String label) {
-        if (label.startsWith("{") && label.endsWith("}")) {
-            return FF.property(label.substring(1, label.length() - 1));
-        }
-        return FF.literal(label);
-    }
-
     /**
      * Parse given string as CQL and returns Expression.
      * @param exp

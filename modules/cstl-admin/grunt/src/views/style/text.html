@@ -32,8 +32,8 @@
              style="margin-top:10px;">
             <select class="form-control form-control-fix"
                     ng-init="loadDataProperties();"
-                    ng-model="symbolizer.label">
-                <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.attributesExcludeGeometry">{{dp.name}}</option>
+                    ng-model="symbolizer.label"
+                    ng-options="dp.name as dp.name for dp in $parent.attributesExcludeGeometry">
             </select>
         </div>
     </div>

@@ -24,8 +24,7 @@ import org.opengis.filter.expression.Expression;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
-import static org.constellation.json.util.StyleUtilities.expression;
-import static org.constellation.json.util.StyleUtilities.type;
+import static org.constellation.json.util.StyleUtilities.*;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -106,7 +105,7 @@ public final class TextSymbolizer implements Symbolizer {
                 (String)null,
                 null,
                 null,
-                expression(label),
+                parseExpression(label),
                 type(font),
                 null,
                 type(halo),
