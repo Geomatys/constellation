@@ -208,8 +208,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             final TemporalObject samplingTime = observation.getSamplingTime();
             if (samplingTime instanceof Period) {
                 final Period period  = (Period) samplingTime;
-                final Date beginDate = period.getBeginning().getPosition().getDate();
-                final Date endDate   = period.getEnding().getPosition().getDate();
+                final Date beginDate = period.getBeginning().getDate();
+                final Date endDate   = period.getEnding().getDate();
                 if (beginDate != null) {
                     stmt.setTimestamp(3, new Timestamp(beginDate.getTime()));
                 } else {
@@ -222,10 +222,11 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 }
             } else if (samplingTime instanceof Instant) {
                 final Instant instant = (Instant) samplingTime;
-                Date date = null;
-                if (instant.getPosition() != null) {
-                    date  = instant.getPosition().getDate();
-                }
+                Date date = instant.getDate();
+//                if (instant.getPosition() != null) {
+//                    date  = instant.getPosition().getDate();
+//                }
+                
                 if (date != null) {
                     stmt.setTimestamp(3, new Timestamp(date.getTime()));
                 } else {
@@ -314,7 +315,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         final String phenomenonId = getPhenomenonId(phenomenonP);
         if (phenomenonId == null) return null;
         
-        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\",\"partial\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?")) {
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\", \"partial\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?")) {
             stmtExist.setString(1, phenomenonId);
             boolean exist = false;
             boolean isPartial = false;
@@ -556,8 +557,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         stmtInsert.setString(3, offeringID);
                         if (samplingTime instanceof Period) {
                             final Period period = (Period) samplingTime;
-                            final Date beginDate = period.getBeginning().getPosition().getDate();
-                            final Date endDate = period.getEnding().getPosition().getDate();
+                            final Date beginDate = period.getBeginning().getDate();
+                            final Date endDate = period.getEnding().getDate();
                             if (beginDate != null) {
                                 stmtInsert.setTimestamp(4, new Timestamp(beginDate.getTime()));
                             } else {
@@ -570,7 +571,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                             }
                         } else if (samplingTime instanceof Instant) {
                             final Instant instant = (Instant) samplingTime;
-                            final Date date = instant.getPosition().getDate();
+                            final Date date = instant.getDate();
                             if (date != null) {
                                 stmtInsert.setTimestamp(4, new Timestamp(date.getTime()));
                             } else {
@@ -623,8 +624,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
                     if (samplingTime instanceof Period) {
                         final Period period = (Period) samplingTime;
-                        final Date beginDate = period.getBeginning().getPosition().getDate();
-                        final Date endDate = period.getEnding().getPosition().getDate();
+                        final Date beginDate = period.getBeginning().getDate();
+                        final Date endDate = period.getEnding().getDate();
                         if (beginDate != null) {
                             final long obsBeginTime = beginDate.getTime();
                             if (obsBeginTime < offBegin) {
@@ -645,7 +646,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         }
                     } else if (samplingTime instanceof Instant) {
                         final Instant instant = (Instant) samplingTime;
-                        final Date date = instant.getPosition().getDate();
+                        final Date date = instant.getDate();
                         if (date != null) {
                             final long obsTime = date.getTime();
                             if (obsTime < offBegin) {
@@ -716,20 +717,20 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             stmt.setString(3, (offering.getName() != null) ? offering.getName().getCode() : null);
             if (offering.getTime() instanceof Period) {
                 final Period period = (Period)offering.getTime();
-                if (period.getBeginning() != null && period.getBeginning().getPosition() != null && period.getBeginning().getPosition().getDate() != null) {
-                    stmt.setTimestamp(4, new Timestamp(period.getBeginning().getPosition().getDate().getTime()));
+                if (period.getBeginning() != null && period.getBeginning().getDate() != null) {
+                    stmt.setTimestamp(4, new Timestamp(period.getBeginning().getDate().getTime()));
                 } else {
                     stmt.setNull(4, java.sql.Types.TIMESTAMP);
                 }
-                if (period.getEnding() != null && period.getEnding().getPosition() != null && period.getEnding().getPosition().getDate() != null) {
-                    stmt.setTimestamp(5, new Timestamp(period.getEnding().getPosition().getDate().getTime()));
+                if (period.getEnding() != null && period.getEnding().getDate() != null) {
+                    stmt.setTimestamp(5, new Timestamp(period.getEnding().getDate().getTime()));
                 } else {
                     stmt.setNull(5, java.sql.Types.TIMESTAMP);
                 }
             } else if (offering.getTime() instanceof Instant) {
                 final Instant instant = (Instant)offering.getTime();
-                if (instant.getPosition() != null && instant.getPosition().getDate() != null) {
-                    stmt.setTimestamp(4, new Timestamp(instant.getPosition().getDate().getTime()));
+                if (instant != null && instant.getDate() != null) {
+                    stmt.setTimestamp(4, new Timestamp(instant.getDate().getTime()));
                 } else {
                     stmt.setNull(4, java.sql.Types.TIMESTAMP);
                 }

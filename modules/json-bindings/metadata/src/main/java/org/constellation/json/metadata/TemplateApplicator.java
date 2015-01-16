@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.Metadata;
-import org.opengis.temporal.Position;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalPrimitive;
@@ -563,16 +562,15 @@ final class TemplateApplicator {
         final Instant instant;
         if (metadata instanceof Period) {
             switch (identifier) {
-                case "beginPosition": instant = ((Period) metadata).getBeginning(); break;
-                case "endPosition":   instant = ((Period) metadata).getEnding();    break;
-                default: throw new ParseException("Unsupported extent property: " + identifier);
+                case "beginPosition" : instant = ((Period) metadata).getBeginning(); break;
+                case "endPosition"   : instant = ((Period) metadata).getEnding();    break;
+                default : throw new ParseException("Unsupported extent property: " + identifier);
             }
         } else if (metadata instanceof Instant) {
             instant = (Instant) metadata;
         } else {
             throw new ParseException("Unsupported extent: " + metadata);
         }
-        final Position position = instant.getPosition();
-        return (position != null) ? position.getDate() : null;
+        return (instant != null) ? instant.getDate() : null;
     }
 }

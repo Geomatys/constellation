@@ -217,12 +217,12 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
             final TemporalObject time = observation.getSamplingTime();
             if (time instanceof Period) {
                 final Period period = (Period) time;
-                doc.add(new Field("sampling_time_begin", SOSUtils.getLuceneTimeValue(period.getBeginning().getPosition()), ft));
-                doc.add(new Field("sampling_time_end",   SOSUtils.getLuceneTimeValue(period.getEnding().getPosition()), ft));
+                doc.add(new Field("sampling_time_begin", SOSUtils.getLuceneTimeValue(period.getBeginning().getDate()), ft));
+                doc.add(new Field("sampling_time_end",   SOSUtils.getLuceneTimeValue(period.getEnding().getDate()), ft));
 
             } else if (time instanceof Instant) {
                 final Instant instant = (Instant) time;
-                doc.add(new Field("sampling_time_begin",   SOSUtils.getLuceneTimeValue(instant.getPosition()), ft));
+                doc.add(new Field("sampling_time_begin",   SOSUtils.getLuceneTimeValue(instant.getDate()), ft));
                 doc.add(new Field("sampling_time_end",    "NULL", ft));
 
             } else if (time != null) {

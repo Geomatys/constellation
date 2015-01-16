@@ -1,4 +1,4 @@
-/*
+ /*
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
@@ -36,7 +36,6 @@ import org.constellation.util.XpathUtils;
 import org.geotoolkit.lucene.IndexingException;
 import org.opengis.metadata.Metadata;
 import org.opengis.temporal.Instant;
-import org.opengis.temporal.Position;
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
 
@@ -55,6 +54,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+import org.geotoolkit.gml.xml.AbstractTimePosition;
 
 // Apache Lucene dependencies
 // constellation dependencies
@@ -424,8 +424,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         } else if (obj instanceof org.opengis.util.CodeList) {
             result.add(((org.opengis.util.CodeList)obj).name());
 
-        } else if (obj instanceof Position) {
-            final Position pos = (Position) obj;
+        } else if (obj instanceof AbstractTimePosition) {
+            final AbstractTimePosition pos = (AbstractTimePosition) obj;
             final Date d = pos.getDate();
             if (d != null) {
                 synchronized(Util.LUCENE_DATE_FORMAT) {
@@ -437,9 +437,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
         } else if (obj instanceof Instant) {
             final Instant inst = (Instant)obj;
-            if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
+            if (inst != null && inst.getDate() != null) {
                 synchronized(Util.LUCENE_DATE_FORMAT) {
-                    result.add(Util.LUCENE_DATE_FORMAT.format(inst.getPosition().getDate()));
+                    result.add(Util.LUCENE_DATE_FORMAT.format(inst.getDate()));
                 }
             } else {
                 result.add(NULL_VALUE);

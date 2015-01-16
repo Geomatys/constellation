@@ -176,8 +176,8 @@ public class LuceneObservationFilter implements ObservationFilter {
     public void setTimeEquals(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp = (Period) time;
-            final String begin      = getLuceneTimeValue(tp.getBeginning().getPosition());
-            final String end        = getLuceneTimeValue(tp.getEnding().getPosition());
+            final String begin      = getLuceneTimeValue(tp.getBeginning().getDate());
+            final String end        = getLuceneTimeValue(tp.getEnding().getDate());
 
             // we request directly a multiple observation or a period observation (one measure during a period)
             luceneRequest.append("AND (");
@@ -187,7 +187,7 @@ public class LuceneObservationFilter implements ObservationFilter {
         // if the temporal object is a timeInstant
         } else if (time instanceof Instant) {
             final Instant ti = (Instant) time;
-            final String position    = getLuceneTimeValue(ti.getPosition());
+            final String position    = getLuceneTimeValue(ti.getDate());
             luceneRequest.append("AND (");
 
             // case 1 a single observation
@@ -211,7 +211,7 @@ public class LuceneObservationFilter implements ObservationFilter {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti = (Instant) time;
-            final String position    = getLuceneTimeValue(ti.getPosition());
+            final String position    = getLuceneTimeValue(ti.getDate());
             luceneRequest.append("AND (");
 
             // the single and multpile observations which begin after the bound
@@ -231,7 +231,7 @@ public class LuceneObservationFilter implements ObservationFilter {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti = (Instant) time;
-            final String position    = getLuceneTimeValue(ti.getPosition());
+            final String position    = getLuceneTimeValue(ti.getDate());
             luceneRequest.append("AND (");
 
             // the single and multpile observations which begin after the bound
@@ -254,8 +254,8 @@ public class LuceneObservationFilter implements ObservationFilter {
     public void setTimeDuring(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp = (Period) time;
-            final String begin      = getLuceneTimeValue(tp.getBeginning().getPosition());
-            final String end        = getLuceneTimeValue(tp.getEnding().getPosition());
+            final String begin      = getLuceneTimeValue(tp.getBeginning().getDate());
+            final String end        = getLuceneTimeValue(tp.getEnding().getDate());
             luceneRequest.append("AND (");
 
             // the multiple observations included in the period

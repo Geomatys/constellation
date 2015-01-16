@@ -194,8 +194,8 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     public void setTimeEquals(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
-            final String begin = getTimeValue(tp.getBeginning().getPosition());
-            final String end   = getTimeValue(tp.getEnding().getPosition());
+            final String begin = getTimeValue(tp.getBeginning().getDate());
+            final String end   = getTimeValue(tp.getEnding().getDate());
 
             final Where where       = new Where(configurationQuery.getWhere("tequalsTP"));
             where.replaceVariable("begin", begin, true);
@@ -205,7 +205,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         // if the temporal object is a timeInstant
         } else if (time instanceof Instant) {
             final Instant ti = (Instant) time;
-            final String position = getTimeValue(ti.getPosition());
+            final String position = getTimeValue(ti.getDate());
 
             final Where where = new Where(configurationQuery.getWhere("tequalsTI"));
             where.replaceVariable("position", position, true);
@@ -225,7 +225,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti = (Instant) time;
-            final String position = getTimeValue(ti.getPosition());
+            final String position = getTimeValue(ti.getDate());
             
             final Where where = new Where(configurationQuery.getWhere("tbefore"));
             where.replaceVariable("time", position, true);
@@ -245,7 +245,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti = (Instant) time;
-            final String position    = getTimeValue(ti.getPosition());
+            final String position    = getTimeValue(ti.getDate());
             
             final Where where        = new Where(configurationQuery.getWhere("tafter"));
             where.replaceVariable("time", position, true);
@@ -264,8 +264,8 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
     public void setTimeDuring(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
-            final String begin = getTimeValue(tp.getBeginning().getPosition());
-            final String end   = getTimeValue(tp.getEnding().getPosition());
+            final String begin = getTimeValue(tp.getBeginning().getDate());
+            final String end   = getTimeValue(tp.getEnding().getDate());
 
             final Where where = new Where(configurationQuery.getWhere("tduring"));
             where.replaceVariable("begin", begin, true);

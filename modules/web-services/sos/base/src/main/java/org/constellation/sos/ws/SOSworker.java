@@ -97,6 +97,7 @@ import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.UnauthorizedException;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.gml.GmlInstant;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.AbstractTimePosition;
@@ -1321,13 +1322,13 @@ public class SOSworker extends AbstractWorker {
                             final Timestamp tbegin;
                             final Timestamp tend;
                             final Period p = (Period)obs.getSamplingTime();
-                            if (p.getBeginning() != null && p.getBeginning().getPosition() != null && p.getBeginning().getPosition().getDate() != null) {
-                                tbegin = new Timestamp(p.getBeginning().getPosition().getDate().getTime());
+                            if (p.getBeginning() != null && p.getBeginning().getDate() != null) {
+                                tbegin = new Timestamp(p.getBeginning().getDate().getTime());
                             } else {
                                 tbegin = null;
                             }
-                            if (p.getEnding() != null && p.getEnding().getPosition() != null && p.getEnding().getPosition().getDate() != null) {
-                                tend = new Timestamp(p.getEnding().getPosition().getDate().getTime());
+                            if (p.getEnding() != null && p.getEnding().getDate() != null) {
+                                tend = new Timestamp(p.getEnding().getDate().getTime());
                             } else {
                                 tend = null;
                             }
@@ -1512,12 +1513,12 @@ public class SOSworker extends AbstractWorker {
                 final Period tp = (Period) time;
 
                 //case TBefore
-                if (TimeIndeterminateValueType.BEFORE.equals(((AbstractTimePosition)tp.getBeginning().getPosition()).getIndeterminatePosition())) {
+                if (TimeIndeterminateValueType.BEFORE.equals(((GmlInstant)tp.getBeginning()).getTimePosition().getIndeterminatePosition())) {
                     final Before before  = buildTimeBefore(currentVersion, null, tp.getEnding());
                     times.add(before);
 
                 //case TAfter
-                } else if (TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)tp.getEnding().getPosition()).getIndeterminatePosition())) {
+                } else if (TimeIndeterminateValueType.NOW.equals((((GmlInstant)tp.getEnding()).getTimePosition()).getIndeterminatePosition())) {
                     final After after  = buildTimeAfter(currentVersion, null, tp.getBeginning());
                     times.add(after);
 
@@ -2197,7 +2198,7 @@ public class SOSworker extends AbstractWorker {
                        final Instant timeInstant = (Instant) obs.getSamplingTime();
                         try {
                             final ISODateParser parser = new ISODateParser();
-                            final Date d = parser.parseToDate(timeInstant.getPosition().getDateTime().toString());
+                            final Date d = parser.parseToDate(timeInstant.getDate().toString());
                             final long t = System.currentTimeMillis() - d.getTime();
                             LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + TemporalUtilities.durationToString(t) + ')');
                         } catch (IllegalArgumentException ex) {
@@ -2266,7 +2267,7 @@ public class SOSworker extends AbstractWorker {
                 //String propertyName = time.getTEquals().getPropertyName();
                 final Object timeFilter   = filter.getExpression2();
 
-                // look for "latest" or "getFirst" filter (52N compatibility)
+                /*look for "latest" or "getFirst" filter (52N compatibility)
                 if (timeFilter instanceof Instant){
                     final Instant ti = (Instant) timeFilter;
                     if (ti.getPosition() != null && ti.getPosition().getDateTime() != null &&
@@ -2287,7 +2288,7 @@ public class SOSworker extends AbstractWorker {
                             LOGGER.warning("getFirst time are not handled with template mode");
                         }
                     }
-                }
+                }*/
 
                 if (!template) {
                     localOmFilter.setTimeEquals(timeFilter);
@@ -2313,7 +2314,7 @@ public class SOSworker extends AbstractWorker {
                     localOmFilter.setTimeBefore(timeFilter);
                 } else if (timeFilter instanceof Instant) {
                     final Instant ti = (Instant)timeFilter;
-                    templateTime = buildTimePeriod(version, TimeIndeterminateValueType.BEFORE, ti.getPosition());
+                    templateTime = buildTimePeriod(version, TimeIndeterminateValueType.BEFORE, ti.getDate());
                 } else {
                     throw new CstlServiceException("TM_Before operation require timeInstant!",
                                                   INVALID_PARAMETER_VALUE, EVENT_TIME);
@@ -2332,7 +2333,7 @@ public class SOSworker extends AbstractWorker {
                     localOmFilter.setTimeAfter(timeFilter);
                 } else if (timeFilter instanceof Instant) {
                     final Instant ti = (Instant)timeFilter;
-                    templateTime = buildTimePeriod(version, ti.getPosition(), TimeIndeterminateValueType.NOW);
+                    templateTime = buildTimePeriod(version, ti.getDate(), TimeIndeterminateValueType.NOW);
 
                 } else {
                    throw new CstlServiceException("TM_After operation require timeInstant!",

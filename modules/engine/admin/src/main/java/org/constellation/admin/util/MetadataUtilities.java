@@ -130,19 +130,19 @@ public final class MetadataUtilities {
                 final Period period = (Period) time;
                 final SimplyMetadataTreeNode beginNode = new SimplyMetadataTreeNode("Begin position", false, "time-begin", 9, "times");
                 synchronized(FORMAT) {
-                    beginNode.setValue(FORMAT.format(period.getBeginning().getPosition().getDate()));
+                    beginNode.setValue(FORMAT.format(period.getBeginning().getDate()));
                 }
                 results.add(beginNode);
                 final SimplyMetadataTreeNode endNode = new SimplyMetadataTreeNode("End position", false, "time-end", 9, "times");
                 synchronized(FORMAT) {
-                    endNode.setValue(FORMAT.format(period.getEnding().getPosition().getDate()));
+                    endNode.setValue(FORMAT.format(period.getEnding().getDate()));
                 }
                 results.add(endNode);
             } else if (time instanceof Instant) {
                 final Instant instant = (Instant) time;
                 final SimplyMetadataTreeNode beginNode = new SimplyMetadataTreeNode("Position", false, "time-position", 9, "times");
                 synchronized(FORMAT) {
-                    beginNode.setValue(FORMAT.format(instant.getPosition().getDate()));
+                    beginNode.setValue(FORMAT.format(instant.getDate()));
                 }
                 results.add(beginNode);    
 

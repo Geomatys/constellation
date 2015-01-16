@@ -196,7 +196,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
     @Override
     @Order(order=4)
     public void GetObservationTest() throws Exception {
-        super.GetObservationTest();
+        super.GetObservationTest(); 
     }
 
     /**

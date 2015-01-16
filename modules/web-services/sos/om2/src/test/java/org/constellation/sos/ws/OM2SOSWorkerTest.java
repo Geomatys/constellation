@@ -260,7 +260,7 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
     @Override
     @Order(order=9)
     public void GetResultTest() throws Exception {
-        super.GetResultTest();
+         super.GetResultTest();
     }
 
     /**

@@ -92,8 +92,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     public void setTimeEquals(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
-            final String begin = getTimeValue(tp.getBeginning().getPosition());
-            final String end   = getTimeValue(tp.getEnding().getPosition());
+            final String begin = getTimeValue(tp.getBeginning().getDate());
+            final String end   = getTimeValue(tp.getEnding().getDate());
 
             // we request directly a multiple observation or a period observation (one measure during a period)
             sqlRequest.append("AND (");
@@ -103,7 +103,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         // if the temporal object is a timeInstant
         } else if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
-            final String position = getTimeValue(ti.getPosition());
+            final String position = getTimeValue(ti.getDate());
             //sqlRequest.append("AND (\"time_begin\"='").append(position).append("' AND \"time_end\"='").append(position).append("') ");
             sqlMeasureRequest.append("AND (\"$time\"='").append(position).append("') ");
 
@@ -121,7 +121,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
-            final String position = getTimeValue(ti.getPosition());
+            final String position = getTimeValue(ti.getDate());
             sqlRequest.append("AND (\"time_begin\"<='").append(position).append("')");
             sqlMeasureRequest.append("AND (\"$time\"<='").append(position).append("')");
 
@@ -139,7 +139,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
-            final String position = getTimeValue(ti.getPosition());
+            final String position = getTimeValue(ti.getDate());
             sqlRequest.append("AND (\"time_end\">='").append(position).append("')");
             sqlMeasureRequest.append("AND (\"$time\">='").append(position).append("')");
         } else {
@@ -155,8 +155,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     public void setTimeDuring(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
-            final String begin = getTimeValue(tp.getBeginning().getPosition());
-            final String end   = getTimeValue(tp.getEnding().getPosition());
+            final String begin = getTimeValue(tp.getBeginning().getDate());
+            final String end   = getTimeValue(tp.getEnding().getDate());
             sqlRequest.append("AND (");
 
             // the multiple observations included in the period

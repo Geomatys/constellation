@@ -57,7 +57,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.temporal.Period;
-import org.opengis.temporal.Position;
 import org.opengis.util.FactoryException;
 
 import javax.xml.bind.JAXBElement;
@@ -70,6 +69,8 @@ import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,6 +81,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.DateFormatter;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
@@ -190,10 +192,13 @@ public final class SOSUtils {
      * @return 
      * @throws org.geotoolkit.observation.ObservationStoreException
      */
-    public static String getTimeValue(final Position time) throws ObservationStoreException {
-        if (time != null && time.getDateTime() != null) {
+    public static String getTimeValue(final Date time) throws ObservationStoreException {
+        if (time != null) {
              try {
-                 final String value = time.getDateTime().toString();
+//                 final String value = time.toString();
+                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS");
+                 final String value = df.format(time);
+                 
                  //here t is not used but it allow to verify the syntax of the timestamp
                  final ISODateParser parser = new ISODateParser();
                  final Date d = parser.parseToDate(value);
@@ -217,7 +222,7 @@ public final class SOSUtils {
           }
     }
     
-    public static Timestamp getTimestampValue(final Position time) throws ObservationStoreException {
+    public static Timestamp getTimestampValue(final Date time) throws ObservationStoreException {
         return Timestamp.valueOf(getTimeValue(time));
     }
 
@@ -227,10 +232,12 @@ public final class SOSUtils {
      * @param time a GML time position object.
      * @throws org.apache.sis.storage.DataStoreException
      */
-    public static String getLuceneTimeValue(final Position time) throws DataStoreException {
-        if (time != null && time.getDateTime() != null) {
-            String value = time.getDateTime().toString();
-
+    public static String getLuceneTimeValue(final Date time) throws DataStoreException {
+        if (time != null) {
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS");
+                 String value = df.format(time);
+//            String value = time.toString();
+            
             // we delete the data after the second TODO remove
             if (value.indexOf('.') != -1) {
                 value = value.substring(0, value.indexOf('.'));

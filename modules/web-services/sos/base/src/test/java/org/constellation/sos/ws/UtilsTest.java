@@ -48,8 +48,10 @@ import java.util.List;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
  *
@@ -166,7 +168,7 @@ public class UtilsTest {
     public void getTimeValueTest() throws Exception {
 
         TimePositionType position = new TimePositionType("2007-05-01T07:59:00.0");
-        String result             = SOSUtils.getTimeValue(position);
+        String result             = SOSUtils.getTimeValue(position.getDate());
         String expResult          = "2007-05-01 07:59:00.0";
 
         assertEquals(expResult, result);
@@ -175,21 +177,21 @@ public class UtilsTest {
 
         boolean exLaunched = false;
         try {
-            SOSUtils.getTimeValue(position);
+            SOSUtils.getTimeValue(position.getDate());
         } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "eventTime");
         }
 
-        assertTrue(exLaunched);
+        assertFalse(exLaunched);
 
         String t = null;
         position = new TimePositionType(t);
 
         exLaunched = false;
         try {
-            SOSUtils.getTimeValue(position);
+            SOSUtils.getTimeValue(position.getDate());
         } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
@@ -218,7 +220,7 @@ public class UtilsTest {
     public void getLuceneTimeValueTest() throws Exception {
 
         TimePositionType position = new TimePositionType("2007-05-01T07:59:00.0");
-        String result             = SOSUtils.getLuceneTimeValue(position);
+        String result             = SOSUtils.getLuceneTimeValue(position.getDate());
         String expResult          = "20070501075900";
 
         assertEquals(expResult, result);
@@ -227,21 +229,21 @@ public class UtilsTest {
 
         boolean exLaunched = false;
         try {
-            SOSUtils.getLuceneTimeValue(position);
+            SOSUtils.getLuceneTimeValue(position.getDate());
         } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "eventTime");
         }
 
-        assertTrue(exLaunched);
+        assertFalse(exLaunched);
 
         String t = null;
         position = new TimePositionType(t);
 
         exLaunched = false;
         try {
-            SOSUtils.getLuceneTimeValue(position);
+            SOSUtils.getLuceneTimeValue(position.getDate());
         } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);

@@ -1896,7 +1896,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
          *   with resultTemplate mode and time filter TBefore
          */
         List<EventTime> times = new ArrayList<>();
-        TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T05:00:00.0"));
+        TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T05:00:00.00"));
         TimeBeforeType bfilter = new TimeBeforeType(null, instant);
         EventTime before = new EventTime(bfilter);
         times.add(before);
@@ -1918,7 +1918,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         templateExpResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
-        period = new TimePeriodType(TimeIndeterminateValueType.BEFORE, new TimePositionType("2007-05-01T05:00:00.0"));
+        period = new TimePeriodType(TimeIndeterminateValueType.BEFORE, new TimePositionType("2007-05-01T05:00:00.00"));
         templateExpResult.setSamplingTime(period);
 
         // and we empty the result object
@@ -1947,6 +1947,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         DataArrayPropertyType expR = (DataArrayPropertyType) templateExpResult.getResult();
         obsR = (DataArrayPropertyType) obsResult.getResult();
         emptyNameAndId(expR.getDataArray(),  obsR.getDataArray());
+        templateExpResult.getSamplingTime().equals(obsResult.getSamplingTime());
         
         assertEquals(templateExpResult.getResult(), obsResult.getResult());
         assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
@@ -1971,7 +1972,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
          * Test 3:  getResult with Tafter
          */
         times = new ArrayList<>();
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.00"));
         TimeAfterType afilter = new TimeAfterType(null, instant);
         EventTime after = new EventTime(afilter);
         times.add(after);
@@ -1992,7 +1993,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
          * Test 4:  getResult with Tbefore
          */
         times = new ArrayList<>();
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T04:00:00.0"));
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T04:00:00.00"));
         bfilter = new TimeBeforeType(null, instant);
         EventTime before2 = new EventTime(bfilter);
         times.add(before2);
@@ -2013,7 +2014,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
          * Test 5:  getResult with TEquals
          */
         times = new ArrayList<>();
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T03:59:00.0"));
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T03:59:00.00"));
         TimeEqualsType efilter = new TimeEqualsType(null, instant);
         EventTime equals = new EventTime(efilter);
         times.add(equals);
@@ -2034,7 +2035,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
          * Test 6:  getResult with TEquals
          */
         times = new ArrayList<>();
-        period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T04:00:00.0"));
+        period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.00"), new TimePositionType("2007-05-01T04:00:00.00"));
         TimeDuringType dfilter = new TimeDuringType(null, period);
         EventTime during = new EventTime(dfilter);
         times.add(during);
@@ -2057,7 +2058,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
          *   with resultTemplate mode and time filter TAfter
          */
         times = new ArrayList<>();
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T19:00:00.0"));
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T19:00:00.00"));
         afilter = new TimeAfterType(null, instant);
         after = new EventTime(afilter);
         times.add(after);
@@ -2079,7 +2080,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         templateExpResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
-        period = new TimePeriodType(new TimePositionType("2007-05-01T19:00:00.0"));
+        period = new TimePeriodType(new TimePositionType("2007-05-01T19:00:00.00"));
         templateExpResult.setSamplingTime(period);
 
         // and we empty the result object
@@ -2134,7 +2135,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
          *   with resultTemplate mode and time filter TEquals
          */
         times = new ArrayList<>();
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.00"));
         efilter = new TimeEqualsType(null, instant);
         equals = new EventTime(efilter);
         times.add(equals);
@@ -2155,7 +2156,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
 
         templateExpResult = (ObservationType)obj.getValue();
 
-        instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.00"));
         templateExpResult.setSamplingTime(instant);
 
         // and we empty the result object
@@ -2220,7 +2221,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
 
         ObservationType template = (ObservationType)obj.getValue();
 
-        TimePeriodType period = new TimePeriodType(new TimePositionType("2007-06-01T01:00:00.0"), new TimePositionType("2007-06-01T03:00:00.0"));
+        TimePeriodType period = new TimePeriodType(new TimePositionType("2007-06-01T01:00:00.00"), new TimePositionType("2007-06-01T03:00:00.00"));
         template.setSamplingTime(period);
 
         // and we fill the result object
@@ -2474,7 +2475,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         /**
          * Test 1 : getFeatureOfInterestTime with featureID filter
          */
-        TimePeriodType expResult = new TimePeriodType(null, "2007-05-01T02:59:00", "2007-06-01T03:00:00");
+        TimePeriodType expResult = new TimePeriodType(null, "2007-05-01T02:59:00.00", "2007-06-01T03:00:00.00");
 
         GetFeatureOfInterestTime request = new GetFeatureOfInterestTime("1.0.0", "station-001");
 
@@ -2487,7 +2488,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         /**
          * Test 2 : getFeatureOfInterestTime with featureID filter  (SamplingCurve)
          */
-        expResult = new TimePeriodType(null, "2007-05-01T12:59:00", "2009-05-01T13:47:00");
+        expResult = new TimePeriodType(null, "2007-05-01T12:59:00.00", "2009-05-01T13:47:00.00");
 
         request = new GetFeatureOfInterestTime("1.0.0", "station-006");
 

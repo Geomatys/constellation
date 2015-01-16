@@ -71,7 +71,7 @@ public class DatablockParser {
                     final TEquals filter = (TEquals) bound;
                     if (filter.getExpression2() instanceof Instant) {
                         final Instant ti    = (Instant) filter.getExpression2();
-                        final Timestamp boundEquals = getTimestampValue(ti.getPosition());
+                        final Timestamp boundEquals = getTimestampValue(ti.getDate());
 
                         LOGGER.finer("TE case 1");
                         //case 1 the periods contains a matching values
@@ -81,7 +81,7 @@ public class DatablockParser {
                 } else if (bound instanceof After) {
                     final After filter = (After) bound;
                     final Instant ti   = (Instant) filter.getExpression2();
-                    final Timestamp boundBegin = getTimestampValue(ti.getPosition());
+                    final Timestamp boundBegin = getTimestampValue(ti.getDate());
 
                     // case 1 the period overlaps the bound
                     if (tBegin.before(boundBegin) && tEnd.after(boundBegin)) {
@@ -92,7 +92,7 @@ public class DatablockParser {
                 } else if (bound instanceof Before) {
                     final Before filter = (Before) bound;
                     final Instant ti    = (Instant) filter.getExpression2();
-                    final Timestamp boundEnd = getTimestampValue(ti.getPosition());
+                    final Timestamp boundEnd = getTimestampValue(ti.getDate());
 
                     // case 1 the period overlaps the bound
                     if (tBegin.before(boundEnd) && tEnd.after(boundEnd)) {
@@ -103,8 +103,8 @@ public class DatablockParser {
                 } else if (bound instanceof During) {
                     final During filter = (During) bound;
                     final Period tp     = (Period)filter.getExpression2();
-                    final Timestamp boundBegin = getTimestampValue(tp.getBeginning().getPosition());
-                    final Timestamp boundEnd   = getTimestampValue(tp.getEnding().getPosition());
+                    final Timestamp boundBegin = getTimestampValue(tp.getBeginning().getDate());
+                    final Timestamp boundEnd   = getTimestampValue(tp.getEnding().getDate());
 
                     // case 1 the period overlaps the first bound
                     if (tBegin.before(boundBegin) && tEnd.before(boundEnd) && tEnd.after(boundBegin)) {

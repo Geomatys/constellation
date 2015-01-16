@@ -19,6 +19,7 @@
 
 package org.constellation.sos.ws;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.gml.GmlInstant;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractTimePosition;
 import org.geotoolkit.gml.xml.Envelope;
@@ -144,35 +146,35 @@ public final class Normalizer {
                     final Period totalPeriod = (Period)uniqueObs.getSamplingTime();
                     if (obs.getSamplingTime() instanceof Instant) {
                         final Instant instant = (Instant)obs.getSamplingTime();
-                        if (totalPeriod.getBeginning().getPosition().getDate().getTime() > instant.getPosition().getDate().getTime()) {
-                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  instant.getPosition(), totalPeriod.getEnding().getPosition());
+                        if (totalPeriod.getBeginning().getDate().getTime() > instant.getDate().getTime()) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  new Timestamp(instant.getDate().getTime()), new Timestamp(totalPeriod.getEnding().getDate().getTime()));
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                         }
-                        if (totalPeriod.getEnding().getPosition().getDate().getTime() < instant.getPosition().getDate().getTime()) {
-                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), instant.getPosition());
+                        if (totalPeriod.getEnding().getDate().getTime() < instant.getDate().getTime()) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getDate(), instant.getDate());
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                         } 
                     } else if (obs.getSamplingTime() instanceof Period) {
                         final Period period = (Period)obs.getSamplingTime();
                         // BEGIN
-                        if (TimeIndeterminateValueType.BEFORE.equals(((AbstractTimePosition)totalPeriod.getBeginning().getPosition()).getIndeterminatePosition()) ||
-                            TimeIndeterminateValueType.BEFORE.equals(((AbstractTimePosition)     period.getBeginning().getPosition()).getIndeterminatePosition())) {
-                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());
+                        if (TimeIndeterminateValueType.BEFORE.equals((((GmlInstant)totalPeriod.getBeginning()).getTimePosition()).getIndeterminatePosition()) ||
+                            TimeIndeterminateValueType.BEFORE.equals((((GmlInstant)     period.getBeginning()).getTimePosition()).getIndeterminatePosition())) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  ((GmlInstant) totalPeriod.getBeginning()).getTimePosition(), ((GmlInstant) period.getEnding()).getTimePosition());
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                             
-                        } else if (totalPeriod.getBeginning().getPosition().getDate().getTime() > period.getBeginning().getPosition().getDate().getTime()) {
-                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  period.getBeginning().getPosition(), totalPeriod.getEnding().getPosition());
+                        } else if (totalPeriod.getBeginning().getDate().getTime() > period.getBeginning().getDate().getTime()) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  period.getBeginning().getDate(), totalPeriod.getEnding().getDate());
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                         }
                         
                         // END
-                        if (TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)totalPeriod.getEnding().getPosition()).getIndeterminatePosition()) ||
-                            TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)     period.getEnding().getPosition()).getIndeterminatePosition())) {
-                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());
+                        if (TimeIndeterminateValueType.NOW.equals((((GmlInstant)totalPeriod.getEnding()).getTimePosition()).getIndeterminatePosition()) ||
+                            TimeIndeterminateValueType.NOW.equals((((GmlInstant)     period.getEnding()).getTimePosition()).getIndeterminatePosition())) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getDate(), period.getEnding().getDate());
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                             
-                        } else if (totalPeriod.getEnding().getPosition().getDate().getTime() < period.getEnding().getPosition().getDate().getTime()) {
-                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getPosition(), period.getEnding().getPosition());
+                        } else if (totalPeriod.getEnding().getDate().getTime() < period.getEnding().getDate().getTime()) {
+                            final Period newPeriod = SOSXmlFactory.buildTimePeriod(version,  totalPeriod.getBeginning().getDate(), period.getEnding().getDate());
                             uniqueObs.setSamplingTimePeriod(newPeriod);
                         }
                     }

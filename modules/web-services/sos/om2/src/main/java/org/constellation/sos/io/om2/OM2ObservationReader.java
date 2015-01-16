@@ -77,6 +77,7 @@ import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V100;
 import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V200;
 import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V100;
 import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
+import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDataArrayProperty;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildMeasure;
@@ -86,6 +87,7 @@ import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeInstant;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimePeriod;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.getDefaultTextEncoding;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.getGMLVersion;
+import org.opengis.temporal.IndeterminateValue;
 
 
 /**
@@ -203,7 +205,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                         final Timestamp e  = rs.getTimestamp(5);
                         procedure          = rs.getString(6);
                         if (b != null && e == null) {
-                            time = buildTimePeriod(version, b, null);
+                            time = buildTimePeriod(version, b, (TimeIndeterminateValueType)null);
                         } else if (b != null && e != null) {
                             time = buildTimePeriod(version, b, e);
                         } else {
