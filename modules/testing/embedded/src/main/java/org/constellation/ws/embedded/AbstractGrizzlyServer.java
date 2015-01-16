@@ -101,15 +101,17 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
      * Stop the grizzly server, if it is still alive.
      */
     public static void finish() {
-        if (grizzly.isAlive()) {
-            grizzly.cstlServer.shutdown();
-            grizzly.interrupt();
+        if (grizzly != null) {
+            if (grizzly.isAlive()) {
+                grizzly.cstlServer.shutdown();
+                grizzly.interrupt();
+            }
+            File f = new File("derby.log");
+            if (f.exists()) {
+                f.delete();
+            }
+            grizzly = null;
         }
-        File f = new File("derby.log");
-        if (f.exists()) {
-            f.delete();
-        }
-        grizzly = null;
     }
 
     public void waitForStart() throws Exception {
