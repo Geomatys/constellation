@@ -413,6 +413,13 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                                 var minY = bbox[1];
                                 var maxX = bbox[2];
                                 var maxY = bbox[3];
+                                //For pseudo Mercator we need to check against the validity,
+                                // the bbox crs is always defined as EPSG:4326
+                                //if the viewer use pseudo Mercator then fix Latitude to avoid Infinity values
+                                if(DataDashboardViewer.projection === 'EPSG:3857'){
+                                    if(minY < -85){minY=-85;}
+                                    if(maxY > 85){maxY=85;}
+                                }
                                 var coordinates = [[[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]]];
                                 var polygon = new ol.geom.Polygon(coordinates);
                                 polygon = polygon.transform('EPSG:4326',DataDashboardViewer.projection);
