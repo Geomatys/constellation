@@ -50,6 +50,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -147,6 +148,16 @@ public class DataCoverageJob implements IDataCoverageJob {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
                 dataRepository.update(data);
+
+                // forward original data statistic result and state to pyramid conform child.
+                final List<Data> dataChildren = dataRepository.getDataLinkedData(data.getId());
+                for (Data dataChild : dataChildren) {
+                    if (dataChild.getSubtype().equalsIgnoreCase("pyramid") && !dataChild.isRendered()) {
+                        dataChild.setStatsResult(data.getStatsResult());
+                        dataChild.setStatsState(data.getStatsState());
+                        dataRepository.update(dataChild);
+                    }
+                }
             }
         });
     }
