@@ -110,13 +110,13 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     "symbolPills":'color',
                     "colorModel":'palette',
                     band: {
-                        "selected":undefined
+                        "selected":{name:"0",minValue:0,maxValue:255}
                     },
                     palette: {
                         "index": undefined,
                         "img_palette": 'img/palette0.png',
                         "rasterMinValue": 0,
-                        "rasterMaxValue": 0,
+                        "rasterMaxValue": 255,
                         "intervalsCount": 5,
                         "channelSelection": undefined,
                         nan: {
@@ -554,13 +554,13 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "symbolPills":'color',
                         "colorModel":'palette',
                         band: {
-                            "selected":undefined
+                            "selected":{name:"0",minValue:0,maxValue:255}
                         },
                         palette: {
                             "index": undefined,
                             "img_palette": 'img/palette0.png',
                             "rasterMinValue": 0,
-                            "rasterMaxValue": 0,
+                            "rasterMaxValue": 255,
                             "intervalsCount": 5,
                             "channelSelection": undefined,
                             nan: {
