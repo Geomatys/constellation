@@ -115,6 +115,12 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
             });
         };
 
+        $scope.editStyleWithLinkedData = function(selectedData) {
+            style.get({provider: $scope.selected.Provider, name: $scope.selected.Name}, function(response) {
+                StyleSharedService.editLinkedStyle($scope, response,selectedData);
+            });
+        };
+
         /**
          * Toggle up and down the selected item
          */
@@ -159,11 +165,23 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                     $scope.styleCtrl.currentLayerId=dataToShow.Id;
                     $scope.styleCtrl.currentDataId=null;
                 }else {
-                    //@TODO the style is not used by any data or layer
-                    // should we use a default data depending on style type vector or raster?
-                    //console.debug(selectedStyle.Type);
+                    // the style is not used by any data or layer.
+                    // So we should use a default data depending on style type vector or raster.
                     $scope.styleCtrl.currentLayerId=null;
                     $scope.styleCtrl.currentDataId=null;
+                    dataToShow = {
+                        Namespace:null,
+                        Name:null,
+                        Provider:null,
+                        Type:selectedStyle.Type
+                    };
+                    if(selectedStyle.Type && selectedStyle.Type.toLowerCase() === 'vector'){
+                        dataToShow.Provider = 'generic_shp';
+                        dataToShow.Name = 'CNTR_RG_60M_2006';
+                    }else {
+                        dataToShow.Provider = 'generic_world_tif';
+                        dataToShow.Name = 'cloudsgrey';
+                    }
                 }
                 if(dataToShow) {
                     var layerName;

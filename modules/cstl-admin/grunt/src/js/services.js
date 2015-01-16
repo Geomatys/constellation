@@ -551,7 +551,12 @@ angular.module('cstl-services', ['cstl-restapi'])
                     }
                 });
                 modal.result.then(function(item) {
-                    scope.showDataDashboardMap();
+                    if(typeof scope.showDataDashboardMap === 'function'){
+                        scope.showDataDashboardMap();
+                    }
+                    if(typeof scope.previewStyledData === 'function'){
+                        scope.previewStyledData(null,false);
+                    }
                 });
             }
         };

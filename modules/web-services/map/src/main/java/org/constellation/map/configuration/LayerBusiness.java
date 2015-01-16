@@ -247,8 +247,8 @@ public class LayerBusiness implements ILayerBusiness {
             final DataBrief db = dataBusiness.getDataBrief(fullName, data.getProvider());
             final LayerSummary layerSummary = new LayerSummary();
             layerSummary.setId(lay.getId());
-            layerSummary.setName(lay.getName());
-            layerSummary.setNamespace(lay.getNamespace());
+            layerSummary.setName(data.getName());
+            layerSummary.setNamespace(data.getNamespace());
             layerSummary.setAlias(lay.getAlias());
             layerSummary.setTitle(lay.getTitle());
             layerSummary.setType(db.getType());

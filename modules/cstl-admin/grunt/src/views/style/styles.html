@@ -264,6 +264,11 @@
                                                 <i class="glyphicon"
                                                    ng-class="{'glyphicon-eye-open':selected.Id==styleCtrl.currentStyleId && data.Id==styleCtrl.currentDataId,'glyphicon-eye-close':selected.Id!=styleCtrl.currentStyleId || data.Id!=styleCtrl.currentDataId}"></i>
                                             </button>
+                                            <button type="button"
+                                                    ng-click="editStyleWithLinkedData(data);"
+                                                    class="btn btn-small btn-block-assos btn-block-assos-data">
+                                                <i class="glyphicon glyphicon-pencil"></i>
+                                            </button>
                                             {{truncateTitleBlock(data.Name)}}
                                         </div>
                                     </div>
@@ -297,6 +302,11 @@
                                                     class="btn btn-small btn-block-assos btn-block-assos-layer">
                                                 <i class="glyphicon"
                                                    ng-class="{'glyphicon-eye-open':selected.Id==styleCtrl.currentStyleId && layer.Id==styleCtrl.currentLayerId,'glyphicon-eye-close':selected.Id!=styleCtrl.currentStyleId || layer.Id!=styleCtrl.currentLayerId}"></i>
+                                            </button>
+                                            <button type="button"
+                                                    ng-click="editStyleWithLinkedData(layer);"
+                                                    class="btn btn-small btn-block-assos btn-block-assos-data">
+                                                <i class="glyphicon glyphicon-pencil"></i>
                                             </button>
                                             {{truncateTitleBlock(layer.Name)}}
                                         </div>
