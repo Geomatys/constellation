@@ -18,6 +18,7 @@
             "render" : null,
             "ignore" : null,
             "type" : null,
+            "strict" : false,
             "children" : [ {
               "field" : {
                 "name" : "metadata.field.keyword",
@@ -57,6 +58,7 @@
             "render" : null,
             "ignore" : null,
             "type" : null,
+            "strict" : false,
             "children" : [ {
               "field" : {
                 "name" : "metadata.field.keyword",

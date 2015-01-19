@@ -61,6 +61,16 @@ public class TemplateTree {
         return results;
     }
     
+    public List<ValueNode> getNodesByBlockName(String blockName) {
+        final List<ValueNode> results = new ArrayList<>();
+        for (ValueNode node : nodes) {
+            if (blockName.equals(node.blockName)) {
+                results.add(node);
+            }
+        }
+        return results;
+    }
+    
     
     public ValueNode getRoot() {
         for (ValueNode node : nodes) {
@@ -129,7 +139,7 @@ public class TemplateTree {
 
             List<ValueNode> parents = getNodesByPath(path);
             if (parents.isEmpty()) {
-                ValueNode parent = new ValueNode(path, null, 0, null);
+                ValueNode parent = new ValueNode(path, null, 0, null, null);
                 nodes.add(parent);
                 parent.addChild(child);
                 child = parent;
@@ -143,7 +153,7 @@ public class TemplateTree {
                     }
                 }
                 if (!found) {
-                    ValueNode parent = new ValueNode(path, null, 0, null);
+                    ValueNode parent = new ValueNode(path, null, 0, null, null);
                     nodes.add(parent);
                     parent.addChild(child);
                     child = parent;

@@ -42,8 +42,9 @@ public class Block implements Serializable, ChildEntity {
     private String render;
     private String ignore;
     private String type;
+    private boolean strict;
     private List<FieldObj> children;
-
+    
     public Block(){
 
     }
@@ -56,6 +57,7 @@ public class Block implements Serializable, ChildEntity {
         this.type         = block.type;
         this.render       = block.render;
         this.ignore       = block.ignore;
+        this.strict       = block.strict;
         this.children     = new ArrayList<>();
         for (FieldObj f : block.children) {
             this.children.add(new FieldObj(f));
@@ -136,5 +138,19 @@ public class Block implements Serializable, ChildEntity {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * @return the strict
+     */
+    public boolean isStrict() {
+        return strict;
+    }
+
+    /**
+     * @param strict the strict to set
+     */
+    public void setStrict(boolean strict) {
+        this.strict = strict;
     }
 }

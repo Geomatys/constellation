@@ -18,6 +18,7 @@
             "render" : null,
             "ignore" : null,
             "type" : null,
+            "strict" : false,
             "children" : [ {
               "field" : {
                 "name" : "metadata.field.report.specification.title",
@@ -113,6 +114,7 @@
             "render" : null,
             "ignore" : null,
             "type" : null,
+            "strict" : false,
             "children" : [ {
               "field" : {
                 "name" : "metadata.field.keyword",
@@ -194,6 +196,7 @@
             "render" : null,
             "ignore" : null,
             "type" : null,
+            "strict" : false,
             "children" : [ {
               "field" : {
                 "name" : "metadata.field.keyword",
@@ -284,6 +287,7 @@
             "render" : null,
             "ignore" : null,
             "type" : "org.opengis.metadata.constraint.LegalConstraints",
+            "strict" : false,
             "children" : [ {
               "field" : {
                 "name" : "metadata.field.useLimitation",
@@ -337,6 +341,7 @@
             "render" : null,
             "ignore" : null,
             "type" : "org.opengis.metadata.constraint.SecurityConstraints",
+            "strict" : false,
             "children" : [ {
               "field" : {
                 "name" : "metadata.field.useLimitation",
@@ -399,6 +404,7 @@
             "render" : null,
             "ignore" : null,
             "type" : null,
+            "strict" : false,
             "children" : [ {
               "field" : {
                 "name" : "metadata.field.identifier",

@@ -25,6 +25,8 @@ public class ValueNode {
     
     String path;
     
+    String blockName;
+    
     ValueNode parent;
     
     String defaultValue;
@@ -35,15 +37,18 @@ public class ValueNode {
     
     int ordinal = 0;
     
+    boolean strict = false;
+    
     private String numeratedPath; // must be computed
     
-    public ValueNode(String originalPath, String type, int ordinal, ValueNode parent) {
-        this.path = originalPath;
-        this.type = type;
-        if (originalPath.indexOf('.') != -1) {
-            this.name = originalPath.substring(originalPath.lastIndexOf('.') + 1, originalPath.length());
+    public ValueNode(String path, String type, int ordinal, ValueNode parent, String blockName) {
+        this.path      = path;
+        this.type      = type;
+        this.blockName = blockName;
+        if (path.indexOf('.') != -1) {
+            this.name = path.substring(path.lastIndexOf('.') + 1, path.length());
         } else {
-            this.name = originalPath;
+            this.name = path;
         }
         this.ordinal = ordinal;
         if (parent != null) {
@@ -51,13 +56,13 @@ public class ValueNode {
         }
     }
     
-    public ValueNode(String originalPath, String type, String defaultValue, String render, int ordinal, String value, ValueNode parent) {
-        this.path = originalPath;
+    public ValueNode(String path, String type, String defaultValue, String render, int ordinal, String value, ValueNode parent) {
+        this.path = path;
         this.type = type;
-        if (originalPath.indexOf('.') != -1) {
-            this.name = originalPath.substring(originalPath.lastIndexOf('.') + 1, originalPath.length());
+        if (path.indexOf('.') != -1) {
+            this.name = path.substring(path.lastIndexOf('.') + 1, path.length());
         } else {
-            this.name = originalPath;
+            this.name = path;
         }
         this.defaultValue = defaultValue;
         this.render       = render;
@@ -77,6 +82,8 @@ public class ValueNode {
         this.render       = node.render;
         this.value        = node.value;
         this.defaultValue = node.defaultValue;
+        this.strict       = node.strict;
+        this.blockName    = node.blockName;
         this.ordinal      = ordinal;
         this.parent       = parent;
         this.parent.addChild(this);
@@ -91,6 +98,8 @@ public class ValueNode {
         this.defaultValue = node.defaultValue;
         this.ordinal      = node.ordinal;
         this.parent       = node.parent;
+        this.strict       = node.strict;
+        this.blockName    = node.blockName;
         for (ValueNode child : node.children) {
             this.children.add(new ValueNode(child));
         }
@@ -100,6 +109,8 @@ public class ValueNode {
         this.path = block.getPath();
         this.type         = block.getType();
         this.render       = block.getRender();
+        this.strict       = block.isStrict();
+        this.blockName    = block.getName();
         this.ordinal      = ordinal;
         if (path.indexOf('.') != -1) {
             this.name = path.substring(path.lastIndexOf('.') + 1, path.length());
@@ -122,11 +133,6 @@ public class ValueNode {
         }
     }
 
-    public void fillInfo(ValueNode node) {
-        this.name = node.name;
-        this.type = node.type;
-    }
-    
     public void addChild(ValueNode child) {
         child.parent = this;
         children.add(child);
@@ -178,6 +184,10 @@ public class ValueNode {
         sb.append("render:").append(render).append('\n');
         sb.append("value:").append(value).append('\n');
         sb.append("default value:").append(defaultValue).append('\n');
+        sb.append("strict:").append(strict).append('\n');
+        if (blockName != null){
+            sb.append("block name:").append(blockName).append('\n');
+        }
         return sb.toString();
     }
 
@@ -191,6 +201,8 @@ public class ValueNode {
         hash = 97 * hash + Objects.hashCode(this.defaultValue);
         hash = 97 * hash + Objects.hashCode(this.value);
         hash = 97 * hash + Objects.hashCode(this.render);
+        hash = 97 * hash + Objects.hashCode(this.strict);
+        hash = 97 * hash + Objects.hashCode(this.blockName);
         hash = 97 * hash + this.ordinal;
         return hash;
     }
@@ -204,11 +216,13 @@ public class ValueNode {
             return Objects.equals(this.defaultValue,  that.defaultValue) &&
                    Objects.equals(this.name,          that.name) &&
                    Objects.equals(this.ordinal,       that.ordinal) && 
-                   Objects.equals(this.path,  that.path) && 
+                   Objects.equals(this.path,          that.path) && 
                    Objects.equals(this.render,        that.render) && 
                    Objects.equals(this.type,          that.type) && 
                    Objects.equals(this.value,         that.value) && 
                    Objects.equals(this.children,      that.children) && 
+                   Objects.equals(this.strict,        that.strict) &&
+                   Objects.equals(this.blockName,     that.blockName) &&
                    Objects.equals(this.getNumeratedPath(), that.getNumeratedPath());
         }
         return false;

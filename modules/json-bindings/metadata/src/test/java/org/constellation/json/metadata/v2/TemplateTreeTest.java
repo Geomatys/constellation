@@ -23,29 +23,29 @@ public class TemplateTreeTest {
         final TemplateTree tree  = TemplateTree.getTreeFromRootObj(root);
         final ValueNode result   = tree.getRoot();
         
-        final ValueNode expresult   = new ValueNode("metadata", null, 0, null);
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null);
         
-        final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult);
-        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality);
-        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report);
-        final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN);
+        final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult, null);
+        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality, null);
+        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report, null);
+        final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN, null);
         final ValueNode specTitle   = new ValueNode("metadata.dataQualityInfo.report.result.specification.title", null, null, "Specification.codelist", 0, null, spec);
-        final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec);
+        final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec, null);
         final ValueNode specDateD   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.date", null, null, "DATE.text", 0, null, specDate);
         final ValueNode specDateT   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.dateType", null, "CI_DateTypeCode.publication", "CODELIST.readonly", 0, null, specDate);
         
-        final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality);
+        final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality, null);
         final ValueNode scopeLvl    = new ValueNode("metadata.dataQualityInfo.scope.level", null, "MD_ScopeCode.dataset", "CODELIST.readonly", 0, null, scope);
         
         final ValueNode pass        = new ValueNode("metadata.dataQualityInfo.report.result.pass", null, "nilReason:unknown", "ResultPass.codelist", 0, null, resultN);
         final ValueNode explanation = new ValueNode("metadata.dataQualityInfo.report.result.explanation", null, "See the referenced specification", "textarea", 0, null, resultN);
         
-        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult);
-        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident);
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null);
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword     = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, null, dkey);
-        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey);
+        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey, null);
         final ValueNode thesauTitle = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau);
-        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau);
+        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau, null);
         final ValueNode thesauDateD = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate);
         final ValueNode thesauDateT = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate);
         
@@ -69,40 +69,40 @@ public class TemplateTreeTest {
         final TemplateTree tree   = TemplateTree.getTreeFromRootObj(root);
         final ValueNode result    = tree.getRoot();
                 
-        final ValueNode expresult   = new ValueNode("metadata", null, 0, null);
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null);
         
-        final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult);
-        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality);
-        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report);
-        final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN);
+        final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult, null);
+        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality, null);
+        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report, null);
+        final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN, null);
         final ValueNode specTitle   = new ValueNode("metadata.dataQualityInfo.report.result.specification.title", null, null, "Specification.codelist", 0, "some title", spec);
-        final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec);
+        final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec, null);
         final ValueNode specDateD   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.date", null, null, "DATE.text", 0, "1970-05-10", specDate);
         final ValueNode specDateT   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.dateType", null, "CI_DateTypeCode.publication", "CODELIST.readonly", 0, "CI_DateTypeCode.creation", specDate);
         
-        final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality);
+        final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality, null);
         final ValueNode scopeLvl    = new ValueNode("metadata.dataQualityInfo.scope.level", null, "MD_ScopeCode.dataset", "CODELIST.readonly", 0, "MD_ScopeCode.dataset", scope);
         
         final ValueNode pass        = new ValueNode("metadata.dataQualityInfo.report.result.pass", null, "nilReason:unknown", "ResultPass.codelist", 0, "true", resultN);
         final ValueNode explanation = new ValueNode("metadata.dataQualityInfo.report.result.explanation", null, "See the referenced specification", "textarea", 0, "some explanation", resultN);
         
-        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult);
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null);
         
-        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident);
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword11   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "hello", dkey);
         final ValueNode keyword12   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "world", dkey);
-        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey);
+        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey, null);
         final ValueNode thesauTitle = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau);
-        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau);
+        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau, null);
         final ValueNode thesauDateD = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate);
         final ValueNode thesauDateT = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate);
         
-        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident);
+        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword21    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "this", dkey2);
         final ValueNode keyword22    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "is", dkey2);
-        final ValueNode thesau2      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey2);
+        final ValueNode thesau2      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey2, null);
         final ValueNode thesauTitle2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau2);
-        final ValueNode thesauDate2  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau2);
+        final ValueNode thesauDate2  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau2, null);
         final ValueNode thesauDateD2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate2);
         final ValueNode thesauDateT2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate2);
         
@@ -125,49 +125,49 @@ public class TemplateTreeTest {
         final TemplateTree tree   = TemplateTree.getTreeFromRootObj(root);
         final ValueNode result    = tree.getRoot();
                 
-        final ValueNode expresult   = new ValueNode("metadata", null, 0, null);
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null);
         
-        final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult);
-        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality);
-        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report);
-        final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN);
+        final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult, null);
+        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality, null);
+        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report, null);
+        final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN, null);
         final ValueNode specTitle   = new ValueNode("metadata.dataQualityInfo.report.result.specification.title", null, null, "Specification.codelist", 0, "some title", spec);
-        final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec);
+        final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec, null);
         final ValueNode specDateD   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.date", null, null, "DATE.text", 0, "1970-05-10", specDate);
         final ValueNode specDateT   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.dateType", null, "CI_DateTypeCode.publication", "CODELIST.readonly", 0, "CI_DateTypeCode.creation", specDate);
         
-        final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality);
+        final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality, null);
         final ValueNode scopeLvl    = new ValueNode("metadata.dataQualityInfo.scope.level", null, "MD_ScopeCode.dataset", "CODELIST.readonly", 0, "MD_ScopeCode.dataset", scope);
         
         final ValueNode pass        = new ValueNode("metadata.dataQualityInfo.report.result.pass", null, "nilReason:unknown", "ResultPass.codelist", 0, "true", resultN);
         final ValueNode explanation = new ValueNode("metadata.dataQualityInfo.report.result.explanation", null, "See the referenced specification", "textarea", 0, "some explanation", resultN);
         
-        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult);
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null);
         
-        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident);
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword11   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "hello", dkey);
         final ValueNode keyword12   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "world", dkey);
-        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey);
+        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey, null);
         final ValueNode thesauTitle = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau);
-        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau);
+        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau, null);
         final ValueNode thesauDateD = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate);
         final ValueNode thesauDateT = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate);
         
-        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident);
+        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword21    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "this", dkey2);
         final ValueNode keyword22    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "is", dkey2);
-        final ValueNode thesau2      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey2);
+        final ValueNode thesau2      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey2, null);
         final ValueNode thesauTitle2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau2);
-        final ValueNode thesauDate2  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau2);
+        final ValueNode thesauDate2  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau2, null);
         final ValueNode thesauDateD2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate2);
         final ValueNode thesauDateT2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate2);
         
-        final ValueNode constr       = new ValueNode("metadata.identificationInfo.resourceConstraints", "org.opengis.metadata.constraint.LegalConstraints", 0, ident);
+        final ValueNode constr       = new ValueNode("metadata.identificationInfo.resourceConstraints", "org.opengis.metadata.constraint.LegalConstraints", 0, ident, "metadata.block.legalconstraints");
         final ValueNode useLim       = new ValueNode("metadata.identificationInfo.resourceConstraints.useLimitation", null, null, "textarea", 0, null, constr);
         final ValueNode access       = new ValueNode("metadata.identificationInfo.resourceConstraints.accessConstraints", null, "MD_RestrictionCode.licence", "Restriction.codelist", 0, "MD_RestrictionCode.licence", constr);
         final ValueNode other        = new ValueNode("metadata.identificationInfo.resourceConstraints.otherConstraints", null, null, "textarea", 0, null, constr);
         
-        final ValueNode constr2      = new ValueNode("metadata.identificationInfo.resourceConstraints", "org.opengis.metadata.constraint.SecurityConstraints", 1, ident);
+        final ValueNode constr2      = new ValueNode("metadata.identificationInfo.resourceConstraints", "org.opengis.metadata.constraint.SecurityConstraints", 1, ident, "metadata.block.securityconstraints");
         final ValueNode useLim2      = new ValueNode("metadata.identificationInfo.resourceConstraints.useLimitation", null, null, "textarea", 0, "some limitations", constr2);
         final ValueNode classif      = new ValueNode("metadata.identificationInfo.resourceConstraints.classification", null, "MD_ClassificationCode.unclassified", "Classification.codelist", 0, "MD_ClassificationCode.unclassified", constr2);
         final ValueNode useNote      = new ValueNode("metadata.identificationInfo.resourceConstraints.userNote", null, null, "textarea", 0, null, constr2);
@@ -191,49 +191,49 @@ public class TemplateTreeTest {
         final TemplateTree tree   = TemplateTree.getTreeFromRootObj(root);
         final ValueNode result    = tree.getRoot();
                 
-        final ValueNode expresult   = new ValueNode("metadata", null, 0, null);
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null);
         
-        final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult);
-        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality);
-        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report);
-        final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN);
+        final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult, null);
+        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality, null);
+        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report, null);
+        final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN, null);
         final ValueNode specTitle   = new ValueNode("metadata.dataQualityInfo.report.result.specification.title", null, null, "Specification.codelist", 0, "some title", spec);
-        final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec);
+        final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec, null);
         final ValueNode specDateD   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.date", null, null, "DATE.text", 0, "1970-05-10", specDate);
         final ValueNode specDateT   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.dateType", null, "CI_DateTypeCode.publication", "CODELIST.readonly", 0, "CI_DateTypeCode.creation", specDate);
         
-        final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality);
+        final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality, null);
         final ValueNode scopeLvl    = new ValueNode("metadata.dataQualityInfo.scope.level", null, "MD_ScopeCode.dataset", "CODELIST.readonly", 0, "MD_ScopeCode.dataset", scope);
         
         final ValueNode pass        = new ValueNode("metadata.dataQualityInfo.report.result.pass", null, "nilReason:unknown", "ResultPass.codelist", 0, "true", resultN);
         final ValueNode explanation = new ValueNode("metadata.dataQualityInfo.report.result.explanation", null, "See the referenced specification", "textarea", 0, "some explanation", resultN);
         
-        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult);
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null);
         
-        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident);
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword11   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "hello", dkey);
         final ValueNode keyword12   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "world", dkey);
-        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey);
+        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey, null);
         final ValueNode thesauTitle = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau);
-        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau);
+        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau, null);
         final ValueNode thesauDateD = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate);
         final ValueNode thesauDateT = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate);
         
-        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident);
+        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword21    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "this", dkey2);
         final ValueNode keyword22    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "is", dkey2);
-        final ValueNode thesau2      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey2);
+        final ValueNode thesau2      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey2, null);
         final ValueNode thesauTitle2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau2);
-        final ValueNode thesauDate2  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau2);
+        final ValueNode thesauDate2  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau2, null);
         final ValueNode thesauDateD2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate2);
         final ValueNode thesauDateT2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate2);
         
-        final ValueNode constr       = new ValueNode("metadata.identificationInfo.resourceConstraints", "org.opengis.metadata.constraint.LegalConstraints", 0, ident);
+        final ValueNode constr       = new ValueNode("metadata.identificationInfo.resourceConstraints", "org.opengis.metadata.constraint.LegalConstraints", 0, ident, "metadata.block.legalconstraints");
         final ValueNode useLim       = new ValueNode("metadata.identificationInfo.resourceConstraints.useLimitation", null, null, "textarea", 0, "legal limitations", constr);
         final ValueNode access       = new ValueNode("metadata.identificationInfo.resourceConstraints.accessConstraints", null, "MD_RestrictionCode.licence", "Restriction.codelist", 0, "MD_RestrictionCode.licence", constr);
         final ValueNode other        = new ValueNode("metadata.identificationInfo.resourceConstraints.otherConstraints", null, null, "textarea", 0, null, constr);
         
-        final ValueNode constr2      = new ValueNode("metadata.identificationInfo.resourceConstraints", "org.opengis.metadata.constraint.SecurityConstraints", 1, ident);
+        final ValueNode constr2      = new ValueNode("metadata.identificationInfo.resourceConstraints", "org.opengis.metadata.constraint.SecurityConstraints", 1, ident, "metadata.block.securityconstraints");
         final ValueNode useLim2      = new ValueNode("metadata.identificationInfo.resourceConstraints.useLimitation", null, null, "textarea", 0, "some limitations", constr2);
         final ValueNode classif      = new ValueNode("metadata.identificationInfo.resourceConstraints.classification", null, "MD_ClassificationCode.unclassified", "Classification.codelist", 0, "MD_ClassificationCode.unclassified", constr2);
         final ValueNode useNote      = new ValueNode("metadata.identificationInfo.resourceConstraints.userNote", null, null, "textarea", 0, null, constr2);
@@ -258,15 +258,15 @@ public class TemplateTreeTest {
         final TemplateTree tree   = TemplateTree.getTreeFromRootObj(root);
         final ValueNode result    = tree.getRoot();
                 
-        final ValueNode expresult   = new ValueNode("metadata", null, 0, null);
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null);
         
-        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult);
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null);
         
-        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident);
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword11   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "hello", dkey);
         final ValueNode keyword12   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "world", dkey);
         
-        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident);
+        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident, "metadata.block.descriptiveKeyword");
         final ValueNode keyword21    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "this", dkey2);
         final ValueNode keyword22    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "is", dkey2);
         

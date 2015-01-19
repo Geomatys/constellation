@@ -79,15 +79,74 @@ public class TemplateWriter extends AbstractTemplateHandler {
         }
     }
     
+    private ValueNode extractSubTreeFromMetadata(final ValueNode root, final Object metadata) throws ParseException {
+        final List<ValueNode> children = new ArrayList<>(root.children);
+        for (ValueNode node : children) {
+            final ValueNode origNode = new ValueNode(node);
+            final Object obj = getValue(node, metadata);
+            if (obj instanceof Collection && !((Collection)obj).isEmpty())  {
+                final Iterator it = ((Collection)obj).iterator();
+                int i = node.ordinal;
+                boolean first = true;
+                while (it.hasNext()) {
+                    Object child = it.next();
+                    if (!first) {
+                        node = new ValueNode(origNode, root, i);
+                    }
+                    if (node.isField()) {
+                        node.value = valueToString(node, child);
+                    } else {
+                        extractSubTreeFromMetadata(node, child);
+                    }
+                    i++;
+                }
+            } else {
+                if (node.isField()) {
+                    node.value = valueToString(node, obj);
+                } else {
+                    extractSubTreeFromMetadata(node, obj);
+                }
+            }
+        }
+        return root;
+    }
+    
     private Object getValue(final ValueNode node, Object metadata) throws ParseException {
         if (metadata instanceof AbstractMetadata) {
             Object obj = asFullMap(metadata).get(node.name);
             
+            /*
+             * In strict mode, we want that the sub-tree of the object correspound exactly the node tree.
+             * For a collection, we return a sub-collection with only the matching instance
+             *
+             * The matching point are read-only fields and types.
+             */
+            if (node.strict) {
+                if (obj instanceof Collection) {
+                    final Collection result     = new ArrayList<>(); 
+                    final Collection collection = (Collection) obj;
+                    final Iterator it           = collection.iterator();
+                    while (it.hasNext()) {
+                        final Object o = it.next();
+                        final ValueNode candidate = extractSubTreeFromMetadata(node, o);
+                        if (matchNode(node, candidate)) {
+                            result.add(o);
+                        }
+                    }
+                    return result;
+                } else {
+                    final ValueNode candidate = extractSubTreeFromMetadata(node, obj);
+                    if (matchNode(node, candidate)) {
+                        return obj;
+                    }
+                    return null;
+                }
+                
            /*
             * if the node has a type we verify that the values correspound to the declared type.
             * For a collection, we return a sub-collection with only the matching instance
             */
-            if (node.type != null) {
+            } else if (node.type != null) {
                 Class type;
                 try {
                     type = Class.forName(node.type);
@@ -117,6 +176,10 @@ public class TemplateWriter extends AbstractTemplateHandler {
             // TODO try via getter
             return null;
         }
+    }
+    
+    private static boolean matchNode(final ValueNode origin, final ValueNode candidate) {
+        return false;
     }
     
     private static String valueToString(final ValueNode n, final Object value) {
@@ -175,7 +238,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
                 Block origBlock = new Block(block);
                 
                 if (block.getPath() != null) {
-                    List<ValueNode> nodes = tree.getNodesByPathAndType(block.getPath(), block.getType());
+                    List<ValueNode> nodes = tree.getNodesByBlockName(block.getName());
                     for (int i = 0; i < nodes.size(); i++) {
                         final ValueNode node = nodes.get(i);
                         if (i > 0) {
