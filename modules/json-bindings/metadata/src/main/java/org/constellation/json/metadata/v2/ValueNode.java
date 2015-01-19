@@ -172,7 +172,7 @@ public class ValueNode {
         }
         sb.append("path:").append(path).append('\n');
         if (parent != null) {
-            sb.append("parent:").append(parent.path).append('\n');
+            sb.append("parent:").append(parent.path).append('[').append(parent.ordinal).append("]\n");
         }
         sb.append("children:").append(children.size()).append('\n');
         sb.append("render:").append(render).append('\n');
