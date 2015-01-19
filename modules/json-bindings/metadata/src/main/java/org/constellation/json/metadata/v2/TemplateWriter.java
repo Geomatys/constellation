@@ -1,7 +1,6 @@
 
 package org.constellation.json.metadata.v2;
 
-import com.sun.org.apache.bcel.internal.util.Objects;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import org.apache.sis.measure.Angle;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.MetadataStandard;
