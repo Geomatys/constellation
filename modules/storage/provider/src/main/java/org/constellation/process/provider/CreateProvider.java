@@ -40,7 +40,6 @@ import org.constellation.provider.StyleProviders;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 
-import org.geotoolkit.parameter.Parameter;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValue;
@@ -113,12 +112,11 @@ public final class CreateProvider extends AbstractCstlProcess {
                 }
                 source.parameter("date").setValue(new Date());
                 try {
-                    final ParameterValue pv = source.parameter("user_map");
+                    final ParameterValue pv = source.parameter("create_dataset");
                     if(pv != null){
-                        final Object objMap = pv.getValue();
-                        if(objMap instanceof Map){
-                            final Map userMap = (Map) objMap;
-                            final Boolean bool = (Boolean) userMap.get("create_dataset");
+                        final Object objBool = pv.getValue();
+                        if(objBool instanceof Boolean){
+                            final Boolean bool = (Boolean) objBool;
                             DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source, null,bool);
                         }else {
                             DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source, null);

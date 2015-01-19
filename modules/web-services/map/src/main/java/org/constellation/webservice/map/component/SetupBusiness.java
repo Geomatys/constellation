@@ -38,9 +38,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,13 +77,9 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.GraphicalSymbol;
 import org.opengis.util.NoSuchIdentifierException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Specific setup for map service
@@ -412,9 +406,7 @@ public class SetupBusiness {
                     getOrCreateValue(source, "id").setValue(shpProvName);
                     getOrCreateValue(source, "load_all").setValue(true);
                     getOrCreateValue(source, "providerType").setValue("vector");
-                    final Map<String,Object> userMap = new HashMap<>();
-                    userMap.put("create_dataset",false);
-                    getOrCreateValue(source, "user_map").setValue(userMap);
+                    getOrCreateValue(source, "create_dataset").setValue(false);
 
                     final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                     final ParameterValueGroup shpConfig = createGroup(choice, "ShapefileParametersFolder");
@@ -470,9 +462,7 @@ public class SetupBusiness {
                     getOrCreateValue(source, "id").setValue(tifProvName);
                     getOrCreateValue(source, "load_all").setValue(true);
                     getOrCreateValue(source, "providerType").setValue("raster");
-                    final Map<String,Object> userMap = new HashMap<>();
-                    userMap.put("create_dataset",false);
-                    getOrCreateValue(source, "user_map").setValue(userMap);
+                    getOrCreateValue(source, "create_dataset").setValue(false);
 
                     final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                     final ParameterValueGroup tifConfig = createGroup(choice, "FileCoverageStoreParameters");
