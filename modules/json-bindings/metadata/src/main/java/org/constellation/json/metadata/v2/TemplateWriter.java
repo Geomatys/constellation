@@ -18,11 +18,7 @@ import static org.constellation.json.JsonMetadataConstants.DATE_FORMAT;
 import static org.constellation.json.JsonMetadataConstants.DATE_HOUR_FORMAT;
 import static org.constellation.json.JsonMetadataConstants.DATE_READ_ONLY;
 import org.constellation.json.metadata.ParseException;
-import org.constellation.json.metadata.binding.Block;
-import org.constellation.json.metadata.binding.Field;
-import org.constellation.json.metadata.binding.RootBlock;
 import org.constellation.json.metadata.binding.RootObj;
-import org.constellation.json.metadata.binding.SuperBlock;
 import org.opengis.util.Enumerated;
 
 /**
@@ -48,7 +44,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
         
         fillValueWithMetadata(tree, tree.getRoot(), metadata);
         
-        return getRootObjFromTree(template, tree);
+        return TemplateTree.getRootObjFromTree(template, tree);
     }
     
     private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata) throws ParseException {
@@ -227,62 +223,4 @@ public class TemplateWriter extends AbstractTemplateHandler {
         }
         return p;
     }
-    
-    private RootObj getRootObjFromTree(final RootObj rootobj, final TemplateTree tree) {
-        final RootBlock root = rootobj.getRoot();
-        
-        for (SuperBlock sb : root.getSuperBlocks()) {
-            final List<Block> children = new ArrayList<>(sb.getBlocks());
-            int count = 0;
-            for (Block block : children) {
-                Block origBlock = new Block(block);
-                
-                if (block.getPath() != null) {
-                    List<ValueNode> nodes = tree.getNodesByBlockName(block.getName());
-                    for (int i = 0; i < nodes.size(); i++) {
-                        final ValueNode node = nodes.get(i);
-                        if (i > 0) {
-                            block = new Block(origBlock);
-                            sb.addBlock(count + 1, block);
-                        }
-                        final List<Field> childrenField = new ArrayList<>(block.getFields());
-                        int countField = 0;
-                        for (Field field : childrenField) {
-                            final List<ValueNode> childNodes = tree.getNodesByPathAndParent(field.getPath(), node);
-                            for (int j = 0; j < childNodes.size(); j++) {
-                                final ValueNode childNode = childNodes.get(j);
-                                if (j > 0) {
-                                    field = new Field(field);
-                                    block.addField(countField + 1, field);
-                                }
-                                field.setValue(childNode.value);
-                            }
-                            countField++;
-                        }
-                    }
-                    
-                } else {
-                
-                    final List<Field> childrenField = new ArrayList<>(block.getFields());
-                    int countField = 0;
-                    for (Field field : childrenField) {
-                        final List<ValueNode> nodes = tree.getNodesByPath(field.getPath());
-                        for (int i = 0; i < nodes.size(); i++) {
-                            final ValueNode node = nodes.get(i);
-                            if (i > 0) {
-                                field = new Field(field);
-                                block.addField(countField + 1, field);
-                            }
-                            field.setValue(node.value);
-                        }
-                        countField++;
-                    }
-                }
-                count++;
-            }
-        }
-        
-        return rootobj;
-    }
-    
 }
