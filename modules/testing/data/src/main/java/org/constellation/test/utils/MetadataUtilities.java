@@ -72,6 +72,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -371,15 +372,15 @@ public final class MetadataUtilities {
         assertEquals(expResult.getDateStamp(), result.getDateStamp());
         assertEquals(expResult.getDistributionInfo(), result.getDistributionInfo());
         assertEquals(expResult.getFileIdentifier(), result.getFileIdentifier());
-        assertEquals(expResult.getHierarchyLevelNames(), result.getHierarchyLevelNames());
-        assertEquals(expResult.getHierarchyLevels(), result.getHierarchyLevels());
+        assertCollectionEquals(expResult.getHierarchyLevelNames(), result.getHierarchyLevelNames());
+        assertCollectionEquals(expResult.getHierarchyLevels(), result.getHierarchyLevels());
         if (expResult.getIdentificationInfo() != null && result.getIdentificationInfo() != null) {
             assertEquals(expResult.getIdentificationInfo().size(), result.getIdentificationInfo().size());
             for (int i = 0; i < expResult.getIdentificationInfo().size(); i++) {
                 Identification expId = expResult.getIdentificationInfo().iterator().next();
                 Identification resId = result.getIdentificationInfo().iterator().next();
                 assertEquals(expId.getAbstract(), resId.getAbstract());
-                assertEquals(expId.getAggregationInfo(), resId.getAggregationInfo());
+                assertCollectionEquals(expId.getAggregationInfo(), resId.getAggregationInfo());
                 if (expId.getCitation() != null && resId.getCitation() != null) {
                     assertEquals(expId.getCitation().getDates().size(), resId.getCitation().getDates().size());
                     Iterator<? extends CitationDate> expCitDateIt = expId.getCitation().getDates().iterator();
@@ -397,7 +398,8 @@ public final class MetadataUtilities {
                 assertEquals(expId.getCredits(), resId.getCredits());
                 if (resId.getDescriptiveKeywords().iterator().hasNext()) {
                         assertEquals(expId.getDescriptiveKeywords().iterator().next().getKeywords(), resId.getDescriptiveKeywords().iterator().next().getKeywords());
-                        if (resId.getDescriptiveKeywords().iterator().next().getThesaurusName() != null) {
+                        if (resId.getDescriptiveKeywords().iterator().next().getThesaurusName() != null &&
+                            expId.getDescriptiveKeywords().iterator().next().getThesaurusName() != null) {
                             if (resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().hasNext()) {
                                 assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode());
                                 assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next());
@@ -467,7 +469,7 @@ public final class MetadataUtilities {
             assertEquals(expResult.getIdentificationInfo(), result.getIdentificationInfo());
         }
         assertEquals(expResult.getLanguage(), result.getLanguage());
-        assertEquals(expResult.getLocales(), result.getLocales());
+        assertCollectionEquals(expResult.getLocales(), result.getLocales());
         assertEquals(expResult.getMetadataConstraints(), result.getMetadataConstraints());
         assertEquals(expResult.getMetadataExtensionInfo(), result.getMetadataExtensionInfo());
         assertEquals(expResult.getMetadataMaintenance(), result.getMetadataMaintenance());
@@ -1081,5 +1083,9 @@ public final class MetadataUtilities {
         assertEquals(expResult.getStatus(), result.getStatus());
         assertEquals(expResult.getVersionInfo(), result.getVersionInfo());
         assertEquals(expResult, result);
+    }
+    
+    private static void assertCollectionEquals(final Collection<?> expected, final Collection<?> actual) {
+        assertArrayEquals(expected.toArray(), actual.toArray());
     }
 }

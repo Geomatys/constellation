@@ -1,0 +1,240 @@
+{
+    "root": {
+        "name": "MD_Metadata",
+        "multiplicity": 1,
+        "children": [{
+                "superblock": {
+                    "name": "metadata.block.dataQuality",
+                    "multiplicity": 1,
+                    "help": "metadata.block.dataQuality_help",
+                    "path": null,
+                    "children": [{
+                            "block": {
+                                "name": "metadata.block.report",
+                                "multiplicity": 1,
+                                "help": "metadata.block.report_help",
+                                "path": null,
+                                "children": [{
+                                        "field": {
+                                            "name": "metadata.field.report.specification.title",
+                                            "multiplicity": 62,
+                                            "help": "metadata.field.report.specification.title_help",
+                                            "path": "metadata.dataQualityInfo.report.result.specification.title",
+                                            "render": "Specification.codelist",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.report.specification.date",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.report.specification.date_help",
+                                            "path": "metadata.dataQualityInfo.report.result.specification.date.date",
+                                            "render": "DATE.text",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.dateType",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.dateType_help",
+                                            "path": "metadata.dataQualityInfo.report.result.specification.date.dateType",
+                                            "render": "CODELIST.readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "CI_DateTypeCode.publication",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.scopeLevel",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.scopeLevel_help",
+                                            "path": "metadata.dataQualityInfo.scope.level",
+                                            "render": "CODELIST.readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "MD_ScopeCode.dataset",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.resultPass",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.resultPass_help",
+                                            "path": "metadata.dataQualityInfo.report.result.pass",
+                                            "render": "ResultPass.codelist",
+                                            "obligation": "M",
+                                            "defaultValue": "nilReason:unknown",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.resultExplanation",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.resultExplanation_help",
+                                            "path": "metadata.dataQualityInfo.report.result.explanation",
+                                            "render": "textarea",
+                                            "obligation": "M",
+                                            "defaultValue": "See the referenced specification",
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }, {
+                            "block": {
+                                "name": "metadata.block.descriptiveKeyword",
+                                "multiplicity": 62,
+                                "help": "metadata.block.descriptiveKeyword_help",
+                                "path": "metadata.identificationInfo.descriptiveKeywords",
+                                "children": [{
+                                        "field": {
+                                            "name": "metadata.field.keyword",
+                                            "multiplicity": 62,
+                                            "help": "metadata.field.keyword_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.keyword",
+                                            "render": "KEYWORD.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusTitle",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusTitle_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.title",
+                                            "render": "text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusDate",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusDate_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date",
+                                            "render": "DATE.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusDateType",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusDateType_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
+                                            "render": "DATE.codelist",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }, {
+                "superblock": {
+                    "name": "metadata.block.metadata",
+                    "multiplicity": 1,
+                    "help": "metadata.block.metadata_help",
+                    "path": null,
+                    "children": [{
+                            "block": {
+                                "name": "metadata.block.basic",
+                                "multiplicity": 1,
+                                "help": "metadata.block.basic_help",
+                                "path": null,
+                                "children": [{
+                                        "field": {
+                                            "name": "metadata.field.identifier",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.identifier_help",
+                                            "path": "metadata.fileIdentifier",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.dateStamp",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.dateStamp_help",
+                                            "path": "metadata.dateStamp",
+                                            "render": "DATE.readonly",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.metadataStandardName",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.metadataStandardName_help",
+                                            "path": "metadata.metadataStandardName",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.metadataStandardVersion",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.metadataStandardVersion_help",
+                                            "path": "metadata.metadataStandardVersion",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "2011.03",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.characterSet",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.characterSet_help",
+                                            "path": "metadata.characterSet",
+                                            "render": "CharacterSet.codelist",
+                                            "obligation": "M",
+                                            "defaultValue": "UTF-8",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.metadatalanguage",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.metadatalanguage_help",
+                                            "path": "metadata.language",
+                                            "render": "Language.codelist",
+                                            "obligation": "M",
+                                            "defaultValue": "LanguageCode.fra",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.hierarchyLevel",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.hierarchyLevel_help",
+                                            "path": "metadata.hierarchyLevel",
+                                            "render": "CODELIST.readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "MD_ScopeCode.dataset",
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

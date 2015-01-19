@@ -1,0 +1,37 @@
+{
+    "root": {
+        "name": "MD_Metadata",
+        "multiplicity": 1,
+        "children": [{
+                "superblock": {
+                    "name": "metadata.block.dataQuality",
+                    "multiplicity": 1,
+                    "help": "metadata.block.dataQuality_help",
+                    "path": null,
+                    "children": [{
+                            "block": {
+                                "name": "metadata.block.descriptiveKeyword",
+                                "multiplicity": 62,
+                                "help": "metadata.block.descriptiveKeyword_help",
+                                "path": "metadata.identificationInfo.descriptiveKeywords",
+                                "children": [{
+                                        "field": {
+                                            "name": "metadata.field.keyword",
+                                            "multiplicity": 62,
+                                            "help": "metadata.field.keyword_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.keyword",
+                                            "render": "KEYWORD.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
