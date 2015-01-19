@@ -5,11 +5,11 @@
  */
 package org.constellation.json.metadata.v2;
 
-import com.sun.org.apache.bcel.internal.util.Objects;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.constellation.json.metadata.binding.Block;
 import org.constellation.json.metadata.binding.Field;
 import org.constellation.json.metadata.binding.RootBlock;

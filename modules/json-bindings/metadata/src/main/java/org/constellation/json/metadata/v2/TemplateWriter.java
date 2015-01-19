@@ -1,6 +1,7 @@
 
 package org.constellation.json.metadata.v2;
 
+import com.sun.org.apache.bcel.internal.util.Objects;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +95,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
                     } else {
                         extractSubTreeFromMetadata(node, child);
                     }
+                    first = false;
                     i++;
                 }
             } else {
@@ -124,14 +126,14 @@ public class TemplateWriter extends AbstractTemplateHandler {
                     final Iterator it           = collection.iterator();
                     while (it.hasNext()) {
                         final Object o = it.next();
-                        final ValueNode candidate = extractSubTreeFromMetadata(node, o);
+                        final ValueNode candidate = extractSubTreeFromMetadata(new ValueNode(node), o);
                         if (matchNode(node, candidate)) {
                             result.add(o);
                         }
                     }
                     return result;
                 } else {
-                    final ValueNode candidate = extractSubTreeFromMetadata(node, obj);
+                    final ValueNode candidate = extractSubTreeFromMetadata(new ValueNode(node), obj);
                     if (matchNode(node, candidate)) {
                         return obj;
                     }
@@ -175,6 +177,24 @@ public class TemplateWriter extends AbstractTemplateHandler {
     }
     
     private static boolean matchNode(final ValueNode origin, final ValueNode candidate) {
+        if (Objects.equals(origin.type, candidate.type)) {
+            if (origin.render != null && origin.render.contains("readonly") && !Objects.equals(origin.defaultValue, candidate.value)) {
+                    return false;
+            }
+            for (ValueNode originChild : origin.children) {
+                final List<ValueNode> candidateChildren = candidate.getChildrenByName(originChild.name);
+                if (!originChild.multiple && candidateChildren.size() > 1) {
+                    return false;
+                }
+                for (ValueNode candidateChild : candidateChildren) {
+                    if (!matchNode(originChild, candidateChild)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+            
+        }
         return false;
     }
     

@@ -39,6 +39,8 @@ public class ValueNode {
     
     boolean strict = false;
     
+    boolean multiple = false;
+    
     private String numeratedPath; // must be computed
     
     public ValueNode(String path, String type, int ordinal, ValueNode parent, String blockName) {
@@ -84,6 +86,7 @@ public class ValueNode {
         this.defaultValue = node.defaultValue;
         this.strict       = node.strict;
         this.blockName    = node.blockName;
+        this.multiple     = node.multiple;
         this.ordinal      = ordinal;
         this.parent       = parent;
         this.parent.addChild(this);
@@ -100,6 +103,7 @@ public class ValueNode {
         this.parent       = node.parent;
         this.strict       = node.strict;
         this.blockName    = node.blockName;
+        this.multiple     = node.multiple;
         for (ValueNode child : node.children) {
             this.children.add(new ValueNode(child));
         }
@@ -111,6 +115,7 @@ public class ValueNode {
         this.render       = block.getRender();
         this.strict       = block.isStrict();
         this.blockName    = block.getName();
+        this.multiple     = block.getMultiplicity() > 1;
         this.ordinal      = ordinal;
         if (path.indexOf('.') != -1) {
             this.name = path.substring(path.lastIndexOf('.') + 1, path.length());
@@ -125,6 +130,7 @@ public class ValueNode {
         this.render       = field.getRender();
         this.defaultValue = field.getDefaultValue();
         this.value        = field.getValue();
+        this.multiple     = field.getMultiplicity() > 1;
         this.ordinal      = ordinal;
         if (path.indexOf('.') != -1) {
             this.name = path.substring(path.lastIndexOf('.') + 1, path.length());
@@ -166,6 +172,16 @@ public class ValueNode {
             }
         }
         return numeratedPath;
+    }
+    
+    public List<ValueNode> getChildrenByName(String name) {
+        final List<ValueNode> results = new ArrayList<>();
+        for (ValueNode node : children) {
+            if (node.name.equals(name)) {
+                results.add(node);
+            }
+        }
+        return results;
     }
     
     @Override
