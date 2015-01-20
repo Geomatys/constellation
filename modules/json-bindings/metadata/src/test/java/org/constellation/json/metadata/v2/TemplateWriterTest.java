@@ -342,6 +342,65 @@ public class TemplateWriterTest {
         
         assertEquals(expectedJson, resultJson);
         
+        /*
+        * TEST 4 : zero for gemet block, two instance for free block
+        */
+        stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json"); // TODO we should not have to do that. root is modified but writeTemplate
+        root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        keywords.setThesaurusName(null);
+        keywords2.setThesaurusName(null);
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        
+        rootFilled = writer.writeTemplate(root, metadata);
+        resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords4.json");
+        expectedJson = FileUtilities.getStringFromStream(resStream);
+        
+        assertEquals(expectedJson, resultJson);
+        
+         /*
+        * TEST 5 : two instance for gemet block, two instance for free block
+        */
+        stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json"); // TODO we should not have to do that. root is modified but writeTemplate
+        root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        keywords.setThesaurusName(gemet);
+        keywords2.setThesaurusName(gemet);
+        
+        final DefaultKeywords keywords3 = new DefaultKeywords();
+        final InternationalString kw31 = new SimpleInternationalString("you");
+        final InternationalString kw32 = new SimpleInternationalString("shall");
+        keywords3.setKeywords(Arrays.asList(kw31, kw32));
+        final DefaultCitation agro = new DefaultCitation("AGRO");
+        agro.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.CREATION)));
+        keywords3.setThesaurusName(agro);
+        final DefaultKeywords keywords4 = new DefaultKeywords();
+        final InternationalString kw41 = new SimpleInternationalString("not pass");
+        keywords4.setKeywords(Arrays.asList(kw41));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2, keywords3, keywords4));
+        
+        rootFilled = writer.writeTemplate(root, metadata);
+        resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords5.json");
+        expectedJson = FileUtilities.getStringFromStream(resStream);
+        
+        assertEquals(expectedJson, resultJson);
+        
     }
     
 }
