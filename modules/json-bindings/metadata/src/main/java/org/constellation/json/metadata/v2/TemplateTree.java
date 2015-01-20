@@ -33,6 +33,16 @@ public class TemplateTree {
         return null;
     }
     
+    public ValueNode getNodeByNumeratedPath(String numeratedPath, String blockName) {
+        for (ValueNode node : nodes) {
+            if (node.getNumeratedPath().equals(numeratedPath)
+             && Objects.equals(node.blockName, blockName)) {
+                return node;
+            }
+        }
+        return null;
+    }
+    
     public ValueNode getNodeByNumeratedPath(String numeratedPath) {
         for (ValueNode node : nodes) {
             if (node.getNumeratedPath().equals(numeratedPath)) {
@@ -89,9 +99,13 @@ public class TemplateTree {
      * @return 
      */
     public ValueNode duplicateNode(ValueNode node, int i) {
-        final String numeratedPath = updateLastOrdinal(node.getNumeratedPath(), i);
-        ValueNode exist = getNodeByNumeratedPath(numeratedPath);
+        String numeratedPath = updateLastOrdinal(node.getNumeratedPath(), i);
+        ValueNode exist = getNodeByNumeratedPath(numeratedPath, node.blockName); // issue here
         if (exist == null) {
+            while (getNodeByNumeratedPath(numeratedPath) != null) {
+                i++;
+                numeratedPath = updateLastOrdinal(numeratedPath, i);
+            }
             exist = new ValueNode(node, node.parent, i);
             nodes.add(exist);
             for (ValueNode child : node.children) {

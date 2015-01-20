@@ -1,0 +1,124 @@
+{
+    "root": {
+        "name": "MD_Metadata",
+        "multiplicity": 1,
+        "children": [{
+                "superblock": {
+                    "name": "metadata.block.dataQuality",
+                    "multiplicity": 1,
+                    "help": "metadata.block.dataQuality_help",
+                    "path": null,
+                    "children": [{
+                            "block": {
+                                "name": "metadata.block.descriptiveKeyword_inspire",
+                                "multiplicity": 62,
+                                "help": "metadata.block.descriptiveKeyword_inspire_help",
+                                "path": "metadata.identificationInfo.descriptiveKeywords",
+                                "strict": true,
+                                "children": [{
+                                        "field": {
+                                            "name": "metadata.field.keyword",
+                                            "multiplicity": 62,
+                                            "help": "metadata.field.keyword_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.keyword",
+                                            "render": "KEYWORD.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusTitle",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusTitle_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.title",
+                                            "render": "readonly",
+                                            "obligation": "O",
+                                            "defaultValue": "GEMET",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusDate",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusDate_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date",
+                                            "render": "DATE.text",
+                                            "obligation": "O",
+                                            "defaultValue": "2012-01-01",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusDateType",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusDateType_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
+                                            "render": "CODELIST.readonly",
+                                            "obligation": "O",
+                                            "defaultValue": "CI_DateTypeCode.publication",
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }, {
+                            "block": {
+                                "name": "metadata.block.descriptiveKeyword",
+                                "multiplicity": 62,
+                                "help": "metadata.block.descriptiveKeyword_help",
+                                "path": "metadata.identificationInfo.descriptiveKeywords",
+                                "children": [{
+                                        "field": {
+                                            "name": "metadata.field.keyword",
+                                            "multiplicity": 62,
+                                            "help": "metadata.field.keyword_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.keyword",
+                                            "render": "KEYWORD.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusTitle",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusTitle_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.title",
+                                            "render": "text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusDate",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusDate_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date",
+                                            "render": "DATE.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "field": {
+                                            "name": "metadata.field.thesaurusDateType",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.thesaurusDateType_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType",
+                                            "render": "DATE.codelist",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

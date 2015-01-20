@@ -167,7 +167,7 @@ public class TemplateWriterTest {
         
         dataIdent.setResourceConstraints(Arrays.asList(constraint2, constraint));
         
-        stream     = TemplateWriterTest.class.getResourceAsStream("profile_default_raster2.json");
+        stream     = TemplateWriterTest.class.getResourceAsStream("profile_default_raster2.json"); // TODO we should not have to do that. root is modified but writeTemplate
         root       =  objectMapper.readValue(stream, RootObj.class);
         rootFilled = writer.writeTemplate(root, metadata);
         
@@ -189,7 +189,7 @@ public class TemplateWriterTest {
          */
         dataIdent.setResourceConstraints(Arrays.asList(constraint, constraint2));
         
-        stream     = TemplateWriterTest.class.getResourceAsStream("profile_default_raster2.json");
+        stream     = TemplateWriterTest.class.getResourceAsStream("profile_default_raster2.json"); // TODO we should not have to do that. root is modified but writeTemplate
         root       =  objectMapper.readValue(stream, RootObj.class);
         rootFilled = writer.writeTemplate(root, metadata);
         
@@ -249,6 +249,96 @@ public class TemplateWriterTest {
         objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
         
         String resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+        
+    }
+    
+    @Test
+    public void testWriteFilledMetadataKeyword2() throws IOException {
+        
+        InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json");
+        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        /*
+        * TEST 1 : one instance for gemet block, one for free block
+        */
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultCitation gemet = new DefaultCitation("GEMET");
+        gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        keywords.setThesaurusName(gemet);
+        
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        metadata.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        RootObj rootFilled = writer.writeTemplate(root, metadata);
+        
+        InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords2.json");
+        String expectedJson = FileUtilities.getStringFromStream(resStream);
+
+        
+        File resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        String resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+        
+        /*
+        * TEST 2 : one instance for gemet block, one for free block but inversed in metadata
+        */
+        stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json"); // TODO we should not have to do that. root is modified but writeTemplate
+        root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords2, keywords));
+        
+        rootFilled = writer.writeTemplate(root, metadata);
+        resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+        
+       /*
+        * TEST 3 : two instance for gemet block, zero for free block
+        */
+        stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json"); // TODO we should not have to do that. root is modified but writeTemplate
+        root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        keywords2.setThesaurusName(gemet);
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        
+        rootFilled = writer.writeTemplate(root, metadata);
+        resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords3.json");
+        expectedJson = FileUtilities.getStringFromStream(resStream);
         
         assertEquals(expectedJson, resultJson);
         

@@ -5,11 +5,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Objects;
+import java.util.Set;
 import org.apache.sis.measure.Angle;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.MetadataStandard;
@@ -43,16 +45,16 @@ public class TemplateWriter extends AbstractTemplateHandler {
     public RootObj writeTemplate(final RootObj template, final Object metadata) throws ParseException {
         final TemplateTree tree  = TemplateTree.getTreeFromRootObj(template);
         
-        fillValueWithMetadata(tree, tree.getRoot(), metadata);
+        fillValueWithMetadata(tree, tree.getRoot(), metadata, new HashSet<>());
         
         return TemplateTree.getRootObjFromTree(template, tree);
     }
     
-    private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata) throws ParseException {
+    private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata, final Set<Object> excluded) throws ParseException {
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             final ValueNode origNode = new ValueNode(node);
-            final Object obj = getValue(node, metadata);
+            final Object obj = getValue(node, metadata, excluded);
             if (obj instanceof Collection && !((Collection)obj).isEmpty())  {
                 final Iterator it = ((Collection)obj).iterator();
                 int i = node.ordinal;
@@ -60,27 +62,27 @@ public class TemplateWriter extends AbstractTemplateHandler {
                     Object child = it.next();
                     node = tree.duplicateNode(origNode, i);
                     if (node.isField()) {
-                        node.value = valueToString(node, child);
+                        node.value = valueToString(node, child, true);
                     } else {
-                        fillValueWithMetadata(tree, node, child);
+                        fillValueWithMetadata(tree, node, child, excluded);
                     }
                     i++;
                 }
             } else {
                 if (node.isField()) {
-                    node.value = valueToString(node, obj);
+                    node.value = valueToString(node, obj, true);
                 } else {
-                    fillValueWithMetadata(tree, node, obj);
+                    fillValueWithMetadata(tree, node, obj, excluded);
                 }
             }
         }
     }
     
-    private ValueNode extractSubTreeFromMetadata(final ValueNode root, final Object metadata) throws ParseException {
+    private ValueNode extractSubTreeFromMetadata(final ValueNode root, final Object metadata, final Set<Object> excluded) throws ParseException {
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             final ValueNode origNode = new ValueNode(node);
-            final Object obj = getValue(node, metadata);
+            final Object obj = getValue(node, metadata, excluded);
             if (obj instanceof Collection && !((Collection)obj).isEmpty())  {
                 final Iterator it = ((Collection)obj).iterator();
                 int i = node.ordinal;
@@ -91,88 +93,83 @@ public class TemplateWriter extends AbstractTemplateHandler {
                         node = new ValueNode(origNode, root, i);
                     }
                     if (node.isField()) {
-                        node.value = valueToString(node, child);
+                        node.value = valueToString(node, child, false);
                     } else {
-                        extractSubTreeFromMetadata(node, child);
+                        extractSubTreeFromMetadata(node, child, excluded);
                     }
                     first = false;
                     i++;
                 }
             } else {
                 if (node.isField()) {
-                    node.value = valueToString(node, obj);
+                    node.value = valueToString(node, obj, false);
                 } else {
-                    extractSubTreeFromMetadata(node, obj);
+                    extractSubTreeFromMetadata(node, obj, excluded);
                 }
             }
         }
         return root;
     }
     
-    private Object getValue(final ValueNode node, Object metadata) throws ParseException {
+    private Object getValue(final ValueNode node, Object metadata, Set<Object> excluded) throws ParseException {
         if (metadata instanceof AbstractMetadata) {
             Object obj = asFullMap(metadata).get(node.name);
-            
-            /*
-             * In strict mode, we want that the sub-tree of the object correspound exactly the node tree.
-             * For a collection, we return a sub-collection with only the matching instance
-             *
-             * The matching point are read-only fields and types.
-             */
-            if (node.strict) {
-                if (obj instanceof Collection) {
-                    final Collection result     = new ArrayList<>(); 
-                    final Collection collection = (Collection) obj;
-                    final Iterator it           = collection.iterator();
-                    while (it.hasNext()) {
-                        final Object o = it.next();
-                        final ValueNode candidate = extractSubTreeFromMetadata(new ValueNode(node), o);
-                        if (matchNode(node, candidate)) {
-                            result.add(o);
-                        }
-                    }
-                    return result;
-                } else {
-                    final ValueNode candidate = extractSubTreeFromMetadata(new ValueNode(node), obj);
-                    if (matchNode(node, candidate)) {
-                        return obj;
-                    }
-                    return null;
+            if (obj instanceof Collection) {
+                final Collection result = new ArrayList<>(); 
+                final Iterator it       = ((Collection)obj).iterator();
+                while (it.hasNext()) {
+                    final Object o = getSingleValue(node, it.next(), excluded);
+                    if (o != null) result.add(o);
                 }
-                
-           /*
-            * if the node has a type we verify that the values correspound to the declared type.
-            * For a collection, we return a sub-collection with only the matching instance
-            */
-            } else if (node.type != null) {
-                Class type;
-                try {
-                    type = Class.forName(node.type);
-                } catch (ClassNotFoundException ex) {
-                    throw new ParseException("Unable to find a class for type : " + node.type);
-                }
-        
-                if (obj instanceof Collection) {
-                    final Collection result     = new ArrayList<>(); 
-                    final Collection collection = (Collection) obj;
-                    final Iterator it           = collection.iterator();
-                    while (it.hasNext()) {
-                        final Object o = it.next();
-                        if (type.isInstance(o)) {
-                            result.add(o);
-                        }
-                    }
-                    return result;
-                } else if (type.isInstance(obj) ) {
-                    return obj;
-                }
-                return null;
+                return result;
             } else {
-                return obj;
+                return getSingleValue(node, obj, excluded);
             }
         } else {
             // TODO try via getter
             return null;
+        }
+    }
+    
+    private Object getSingleValue(final ValueNode node, Object metadata, Set<Object> excluded) throws ParseException {
+        if (excluded.contains(metadata)) return null;
+        
+        /*
+         * In strict mode, we want that the sub-tree of the object correspound exactly the node tree.
+         * For a collection, we return a sub-collection with only the matching instance
+         *
+         * The matching point are read-only fields and types.
+         */
+        if (node.strict) {
+            final ValueNode candidate = extractSubTreeFromMetadata(new ValueNode(node), metadata, new HashSet<>());
+            if (matchNode(node, candidate)) {
+                excluded.add(metadata);
+                return metadata;
+            }
+            return null;
+
+       /*
+        * if the node has a type we verify that the values correspound to the declared type.
+        * For a collection, we return a sub-collection with only the matching instance
+        */
+        } else if (node.type != null) {
+            Class type;
+            try {
+                type = Class.forName(node.type);
+            } catch (ClassNotFoundException ex) {
+                throw new ParseException("Unable to find a class for type : " + node.type);
+            }
+            if (type.isInstance(metadata) ) {
+                excluded.add(metadata);
+                return metadata;
+            }
+            return null;
+        /*
+         * else return simply the object
+         */
+        } else {
+            excluded.add(metadata);
+            return metadata;
         }
     }
     
@@ -198,10 +195,14 @@ public class TemplateWriter extends AbstractTemplateHandler {
         return false;
     }
     
-    private static String valueToString(final ValueNode n, final Object value) {
+    private static String valueToString(final ValueNode n, final Object value, final boolean applyDefault) {
         final String p;
         if (value == null) {
-            p = n.defaultValue;
+            if (applyDefault) {
+                p = n.defaultValue;
+            } else {
+                p = null;
+            }
         } else if (value instanceof Number) {
             p = value.toString();
         } else if (value instanceof Angle) {
