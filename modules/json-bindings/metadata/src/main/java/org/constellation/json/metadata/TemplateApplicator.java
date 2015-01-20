@@ -191,7 +191,7 @@ final class TemplateApplicator {
         if (template.path == null) {
             /*
              * If this node does not declare any path, we can not get a metadata value for this node.
-             * However maybe some chidren may have a path allowing them to fetch metadata values.
+             * However maybe some chidren have a path allowing them to fetch metadata values.
              */
             sibling = null;
             ValueNode node = null;
@@ -477,7 +477,7 @@ final class TemplateApplicator {
         }
         return null;
     }
-    
+
     private static String referenceSystemCode(final ReferenceSystem r) {
         if (r instanceof ReferenceSystemMetadata) {
             if(r.getName() != null) {
@@ -508,7 +508,7 @@ final class TemplateApplicator {
         }
         return null;
     }
-    
+
     private static String referenceSystemCodeSpace(final ReferenceSystem r) {
         if (r instanceof ReferenceSystemMetadata) {
             if(r.getName() != null) {
@@ -539,7 +539,7 @@ final class TemplateApplicator {
         }
         return null;
     }
-    
+
     private static String referenceSystemVersion(final ReferenceSystem r) {
         if (r instanceof ReferenceSystemMetadata) {
             if(r.getName() != null) {

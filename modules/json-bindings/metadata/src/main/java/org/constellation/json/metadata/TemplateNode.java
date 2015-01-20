@@ -107,7 +107,10 @@ final class TemplateNode {
      * does not have an opening bracket.
      */
     private final String separator;
-    
+
+    /**
+     * The value of the {@code "render"} property, or {@code null} if none.
+     */
     final String render;
 
     /**
@@ -124,7 +127,7 @@ final class TemplateNode {
         final List<TemplateNode> children = new ArrayList<>();
         String  path         = null;
         String  ignore       = null;
-        String render        = null;
+        String  render       = null;
         Object  defaultValue = null;
         int     valueIndex   = -1;
         int     pathIndex    = -1;
@@ -339,6 +342,7 @@ final class TemplateNode {
      * @throws IOException If an error occurred while writing the JSON file.
      */
     private void writeTree(final ValueNode node, final Appendable out, final boolean isLastNode) throws IOException {
+        boolean hasEmptyNode = false;
         for (int i=0; i<content.length; i++) {
             final Object line = content[i];
             if (line instanceof TemplateNode) {
@@ -349,6 +353,10 @@ final class TemplateNode {
                  * usually "," but can also be ",{" if the node has no opening bracket.
                  */
                 final int n = node.size();
+                if (n == 0 && !hasEmptyNode) { // HACK! The 'node' list should never be empty at this point.
+                    hasEmptyNode = true;       // I don't know where is the bug. But at least, let try to have
+                    out.append('}');           // valid JSON.
+                }
                 for (int j=0; j<n; j++) {
                     final ValueNode child = node.get(j);
                     if (child.template == line) {
