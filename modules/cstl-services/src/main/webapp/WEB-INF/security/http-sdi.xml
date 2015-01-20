@@ -1,16 +1,8 @@
 <beans:beans xmlns="http://www.springframework.org/schema/security"
   xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
-
-  <global-method-security secured-annotations="enabled" jsr250-annotations="enabled" />
-
-  <context:component-scan base-package="org.constellation.security.spring.component" />
-  
-  <beans:alias name="springSecurityFilterChain" alias="securityFilter" />
   
   <http pattern="/WS/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
     <custom-filter ref="authenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
@@ -22,10 +14,10 @@
     <intercept-url pattern="/api/user/authenticate" access="permitAll()" />
     <intercept-url pattern="/api/**" access="isAuthenticated()" />
   </http>
-  <http pattern="/spring/admin/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false"
+  <http pattern="/spring/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false"
     entry-point-ref="unauthorizedEntryPoint">
     <custom-filter ref="authenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
-    <intercept-url pattern="/spring/admin/**" access="hasRole('cstl-admin')" />
+    <intercept-url pattern="/spring/auth/**" access="isAuthenticated()" />
     <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
   </http>
 
@@ -35,25 +27,5 @@
     <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
   </http>
 
-  <beans:bean id="sessionAuthenticationStrategy"
-    class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
-    <beans:constructor-arg>
-      <beans:list>
-        <beans:bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
-        </beans:bean>
-        <beans:bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
-          <beans:constructor-arg ref="sessionRegistry" />
-        </beans:bean>
-      </beans:list>
-    </beans:constructor-arg>
-  </beans:bean>
-
-  <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
-
-  <authentication-manager alias="authenticationManager">
-    <authentication-provider user-service-ref="cstlUserService">
-      <password-encoder hash="md5" />
-    </authentication-provider>
-  </authentication-manager>
 
 </beans:beans>

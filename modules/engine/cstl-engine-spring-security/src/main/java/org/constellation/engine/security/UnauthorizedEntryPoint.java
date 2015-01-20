@@ -1,4 +1,4 @@
-package org.constellation.security.spring.component;
+package org.constellation.engine.security;
 
 import java.io.IOException;
 

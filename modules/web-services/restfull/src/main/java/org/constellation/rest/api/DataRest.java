@@ -81,6 +81,7 @@ import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.engine.security.WorkspaceService;
 import org.constellation.json.metadata.Template;
 import org.constellation.json.metadata.binding.BlockObj;
 import org.constellation.json.metadata.binding.FieldObj;
@@ -177,7 +178,7 @@ public class DataRest {
     private IProcessBusiness processBusiness;
 
     @Inject
-    private TokenService tokenService;
+    private WorkspaceService workspaceService;
 
     @Inject
     private IMapContextBusiness mapContextBusiness;
@@ -254,7 +255,7 @@ public class DataRest {
                                @FormDataParam("metadata") InputStream fileMetaIs,
                                @FormDataParam("metadata") FormDataContentDisposition fileMetaDetail,
                                @Context HttpServletRequest request) {
-        final File uploadDirectory = ConfigDirectory.getUploadDirectory(tokenService.extractAuthTokenFromRequest(request));
+        final File uploadDirectory = workspaceService.getUploadDirectory();
         HashMap<String,String> hashMap = new HashMap<>();
         String dataName = fileDetail.getFileName();
         final File newFileData = new File(uploadDirectory, dataName);
@@ -288,7 +289,7 @@ public class DataRest {
                                    @FormDataParam("serverMetadataPath") String serverMetadataPath,
                                    @Context HttpServletRequest request) {
 
-        final File uploadDirectory = ConfigDirectory.getUploadDirectory(tokenService.extractAuthTokenFromRequest(request));
+        final File uploadDirectory = workspaceService.getUploadDirectory();
         Map<String,String> hashMap = new HashMap<>();
         if (identifier != null && ! identifier.isEmpty()){
             hashMap.put("dataName", identifier);

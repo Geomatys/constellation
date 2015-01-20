@@ -106,6 +106,12 @@
             <artifactId>cstl-json-metadata</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <dependency>
+          <groupId>org.constellation.engine</groupId>
+          <artifactId>cstl-engine-spring-security</artifactId>
+          <version>${project.version}</version>
+        </dependency>
 
         <!-- Geomatys external project -->
         <dependency>

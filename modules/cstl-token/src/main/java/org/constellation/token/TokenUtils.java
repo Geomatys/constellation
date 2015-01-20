@@ -90,12 +90,13 @@ public class TokenUtils {
         return parts[0];
     }
 
-    public static boolean validateToken(String authToken, String username, String secret) {
+    public static boolean validateToken(String authToken, String secret) {
         String[] parts = authToken.split(TOKEN_SEPARATOR);
         if (parts.length < 4) {
             LOGGER.warn("Token malformed: " + authToken);
             return false;
         }
+        String username = parts[0];
         long expires = Long.parseLong(parts[1]);
         String signature = parts[2];
 

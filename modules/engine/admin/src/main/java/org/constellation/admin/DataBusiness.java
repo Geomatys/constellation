@@ -1259,7 +1259,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
 
     @Override
-    @Scheduled(fixedDelay=5*60*1000)
+    //FIXME RESTORE cleaning mechanism @Scheduled(fixedDelay=5*60*1000)
     public void uploadCleaner() {
         LOGGER.debug("Cleaner");
         java.nio.file.Path uploadDirectory = ConfigDirectory.getUploadDirectory();
