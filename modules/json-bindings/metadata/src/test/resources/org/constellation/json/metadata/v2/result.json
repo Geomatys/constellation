@@ -391,5 +391,12 @@
         } ]
       }
     } ]
-  }
+  },
+  "nodeTypes" : [ {
+    "path" : "metadata.dataQualityInfo.report",
+    "type" : "org.opengis.metadata.quality.DomainConsistency"
+  }, {
+    "path" : "metadata.dataQualityInfo.report.result",
+    "type" : "org.opengis.metadata.quality.ConformanceResult"
+  } ]
 }

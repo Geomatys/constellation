@@ -378,23 +378,23 @@ public class TeamplateReaderUpdateTest {
         expResult.setMetadataStandardVersion("2011.03");
         
         final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
+        
         final DefaultDomainConsistency report = new DefaultDomainConsistency();
         final DefaultCitation cit = new DefaultCitation("some title");
         final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
         cit.setDates(Arrays.asList(date));
         final DefaultConformanceResult confResult = new DefaultConformanceResult(cit, "some explanation", true);
         report.setResults(Arrays.asList(confResult));
-        quality.setReports(Arrays.asList(report));
         
-        // extra dataqualityInfo
-        final DefaultDataQuality quality2 = new DefaultDataQuality(new DefaultScope(ScopeCode.AGGREGATE));
+        // extra report
         final DefaultFormatConsistency report2 = new DefaultFormatConsistency();
         final DefaultQuantitativeResult confResult2 = new DefaultQuantitativeResult();
         confResult2.setErrorStatistic(new SimpleInternationalString("stats error"));
         report2.setResults(Arrays.asList(confResult2));
-        quality2.setReports(Arrays.asList(report2));
         
-        expResult.setDataQualityInfo(Arrays.asList(quality, quality2));
+        quality.setReports(Arrays.asList(report2, report));
+        
+        expResult.setDataQualityInfo(Arrays.asList(quality));
         
         final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
         final DefaultKeywords keywords = new DefaultKeywords();

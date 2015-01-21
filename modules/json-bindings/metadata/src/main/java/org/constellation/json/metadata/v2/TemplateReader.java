@@ -149,18 +149,47 @@ public class TemplateReader extends AbstractTemplateHandler {
                     putValue(node, metadata);
                 } else {
                     Object newValue = buildNewInstance(metadata, node);
-                    putValue(node, metadata, newValue);
-                    updateObjectFromRootObj(tree, node, newValue);
+                    // if new Value is null, an unexpected type may has been found 
+                    if (newValue != null) {
+                        putValue(node, metadata, newValue);
+                        updateObjectFromRootObj(tree, node, newValue);
+                    }
                 }
             }
         }
     }
     
     
-    private Object getValue(final ValueNode node, Object metadata) {
+    private Object getValue(final ValueNode node, Object metadata) throws ParseException {
         if (metadata instanceof AbstractMetadata) {
             AbstractMetadata meta = (AbstractMetadata) metadata;
-            return meta.asMap().get(node.name);
+            Object result = meta.asMap().get(node.name);
+            /*
+             * if the node has a type we verify that the values correspound to the declared type.
+             * For a collection, we return a sub-collection with only the matching instance
+             */
+            if (node.type != null) {
+                Class type;
+                try {
+                    type = Class.forName(node.type);
+                } catch (ClassNotFoundException ex) {
+                    throw new ParseException("Unable to find a class for type : " + node.type);
+                }
+                if (result instanceof Collection) {
+                    final Collection results = new ArrayList<>(); 
+                    final Iterator it        = ((Collection)result).iterator();
+                    while (it.hasNext()) {
+                        final Object o = it.next();
+                        if (type.isInstance(o)) results.add(o);
+                    }
+                    return results;
+                } else if (type.isInstance(result)) {
+                    return result;
+                }
+                return null;
+            } else {
+                return result;
+            }
         } else {
             // TODO try via getter
             return null;
@@ -173,9 +202,11 @@ public class TemplateReader extends AbstractTemplateHandler {
     
     private void putValue(final ValueNode node, final Object metadata, Object value) throws ParseException {
         Class type = getType(metadata, node);
-        value      = convert(node.name, type, value);
-        final Map<String,Object> values = asMap(metadata);
-        values.put(node.name, value);
+        if (type != null) {
+            value      = convert(node.name, type, value);
+            final Map<String,Object> values = asMap(metadata);
+            values.put(node.name, value);
+        }
     }
     
     /**
@@ -200,7 +231,12 @@ public class TemplateReader extends AbstractTemplateHandler {
     private Object buildNewInstance(final Object metadata, final ValueNode node) throws ParseException {
         try {
             Class type = getType(metadata, node);
-            return factory.create(type, Collections.<String,Object>emptyMap());
+            if (type != null) {
+                return factory.create(type, Collections.<String,Object>emptyMap());
+            } else {
+                LOGGER.log(Level.INFO, "no type find for attribute:{0} in object:{1}", new Object[]{node.name, metadata.getClass().getName()});
+                return null;
+            }
         } catch (FactoryException ex) {
             throw new ParseException("Error while building empty instance from factory");
         }

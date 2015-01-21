@@ -47,6 +47,9 @@ public class RootBlock implements Serializable {
         this.name         = block.name;
         this.multiplicity = block.multiplicity;
         this.children     = new ArrayList<>();
+        for (SuperBlockObj sbj : block.children) {
+            this.children.add(new SuperBlockObj(sbj));
+        }
     }
 
     public String getName() {

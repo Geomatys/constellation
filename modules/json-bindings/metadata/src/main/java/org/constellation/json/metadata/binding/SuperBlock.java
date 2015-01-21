@@ -45,6 +45,18 @@ public class SuperBlock implements Serializable {
     public SuperBlock(){
 
     }
+    
+    public SuperBlock(SuperBlock sb){
+        this.name         = sb.name;
+        this.help         = sb.help;
+        this.multiplicity = sb.multiplicity;
+        this.path         = sb.path;
+        this.render       = sb.render;
+        this.children     = new ArrayList<>();
+        for (BlockObj bobj : sb.children) {
+            this.children.add(new BlockObj(bobj));
+        }
+    }
 
     public String getName() {
         return name;

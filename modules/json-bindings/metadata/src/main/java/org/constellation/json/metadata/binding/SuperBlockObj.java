@@ -35,6 +35,10 @@ public class SuperBlockObj implements Serializable {
     public SuperBlockObj(){
 
     }
+    
+    public SuperBlockObj(final SuperBlockObj sbj){
+        this.superblock = new SuperBlock(sbj.superblock);
+    }
 
     public SuperBlock getSuperblock() {
         return superblock;

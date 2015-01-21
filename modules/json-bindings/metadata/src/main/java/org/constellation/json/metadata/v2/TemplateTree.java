@@ -146,7 +146,7 @@ public class TemplateTree {
         throw new IllegalArgumentException(numeratedPath + " does not contain numerated value");
     }
     
-    private void addNode(ValueNode node, ValueNode ancestor) {
+    private void addNode(ValueNode node, ValueNode ancestor, final RootObj template) {
         
         // else for a new Node to add, we create all the missing parent nodes
         nodes.add(node);
@@ -158,7 +158,7 @@ public class TemplateTree {
 
             List<ValueNode> parents = getNodesByPath(path);
             if (parents.isEmpty()) {
-                ValueNode parent = new ValueNode(path, null, 0, null, null);
+                ValueNode parent = new ValueNode(path, template.getTypeForPath(path), 0, null, null);
                 nodes.add(parent);
                 parent.addChild(child);
                 child = parent;
@@ -172,7 +172,7 @@ public class TemplateTree {
                     }
                 }
                 if (!found) {
-                    ValueNode parent = new ValueNode(path, null, 0, null, null);
+                    ValueNode parent = new ValueNode(path, template.getTypeForPath(path), 0, null, null);
                     nodes.add(parent);
                     parent.addChild(child);
                     child = parent;
@@ -196,7 +196,7 @@ public class TemplateTree {
                 if (block.getPath() != null) {
                     int blockOrdinal = updateOrdinal(blockPathOrdinal, block.getPath());
                     ancestor = new ValueNode(block, blockOrdinal);
-                    tree.addNode(ancestor, null);
+                    tree.addNode(ancestor, null, template);
                 }
                 
                 // Fields
@@ -204,7 +204,7 @@ public class TemplateTree {
                 for (Field field : block.getFields()) {
                     int fieldOrdinal = updateOrdinal(fieldPathOrdinal, field.getPath());
                     final ValueNode node = new ValueNode(field, fieldOrdinal);
-                    tree.addNode(node, ancestor);
+                    tree.addNode(node, ancestor, template);
                 }
             }
         }
@@ -222,7 +222,8 @@ public class TemplateTree {
     }
     
     public static RootObj getRootObjFromTree(final RootObj rootobj, final TemplateTree tree) {
-        final RootBlock root = rootobj.getRoot();
+        final RootObj result = new RootObj(rootobj);
+        final RootBlock root = result.getRoot();
         
         for (SuperBlock sb : root.getSuperBlocks()) {
             final List<Block> children = new ArrayList<>(sb.getBlocks());
@@ -287,6 +288,6 @@ public class TemplateTree {
             }
         }
         
-        return rootobj;
+        return result;
     }
 }

@@ -20,6 +20,8 @@
 package org.constellation.json.metadata.binding;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Pojo class used for Jackson that represents the binding for root object
@@ -30,9 +32,20 @@ import java.io.Serializable;
  */
 public class RootObj implements Serializable {
     private RootBlock root;
+    
+    private List<NodeType> nodeTypes;
 
     public RootObj(){
-
+    }
+    
+    public RootObj(RootObj rootObj){
+        this.root = new RootBlock(rootObj.root);
+        if (rootObj.nodeTypes != null) {
+            this.nodeTypes = new ArrayList<>();
+            for (NodeType nd : rootObj.nodeTypes) {
+                this.nodeTypes.add(new NodeType(nd));
+            }
+        }
     }
 
     public RootBlock getRoot() {
@@ -41,5 +54,30 @@ public class RootObj implements Serializable {
 
     public void setRoot(RootBlock root) {
         this.root = root;
+    }
+
+    /**
+     * @return the nodeTypes
+     */
+    public List<NodeType> getNodeTypes() {
+        return nodeTypes;
+    }
+
+    /**
+     * @param nodeTypes the nodeTypes to set
+     */
+    public void setNodeTypes(List<NodeType> nodeTypes) {
+        this.nodeTypes = nodeTypes;
+    }
+    
+    public String getTypeForPath(final String path) {
+        if (nodeTypes != null) {
+            for (NodeType nt : nodeTypes) {
+                if (nt.getPath().equals(path)) {
+                    return nt.getType();
+                }
+            }
+        }
+        return null;
     }
 }

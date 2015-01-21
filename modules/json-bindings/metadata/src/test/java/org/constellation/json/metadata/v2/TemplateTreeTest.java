@@ -26,8 +26,8 @@ public class TemplateTreeTest {
         final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null);
         
         final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult, null);
-        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality, null);
-        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report, null);
+        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", "org.opengis.metadata.quality.DomainConsistency", 0, dataQuality, null);
+        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", "org.opengis.metadata.quality.ConformanceResult", 0, report, null);
         final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN, null);
         final ValueNode specTitle   = new ValueNode("metadata.dataQualityInfo.report.result.specification.title", null, null, "Specification.codelist", 0, null, spec);
         final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec, null);
@@ -72,8 +72,8 @@ public class TemplateTreeTest {
         final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null);
         
         final ValueNode dataQuality = new ValueNode("metadata.dataQualityInfo", null, 0, expresult, null);
-        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", null, 0, dataQuality, null);
-        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", null, 0, report, null);
+        final ValueNode report      = new ValueNode("metadata.dataQualityInfo.report", "org.opengis.metadata.quality.DomainConsistency", 0, dataQuality, null);
+        final ValueNode resultN     = new ValueNode("metadata.dataQualityInfo.report.result", "org.opengis.metadata.quality.ConformanceResult", 0, report, null);
         final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN, null);
         final ValueNode specTitle   = new ValueNode("metadata.dataQualityInfo.report.result.specification.title", null, null, "Specification.codelist", 0, "some title", spec);
         final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec, null);

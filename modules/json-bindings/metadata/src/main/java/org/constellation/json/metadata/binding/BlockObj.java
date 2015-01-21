@@ -35,6 +35,10 @@ public class BlockObj implements Serializable {
 
     }
     
+    public BlockObj(final BlockObj block) {
+        this.block = new Block(block.block);
+    }
+    
     public BlockObj(final Block block) {
         this.block = block;
     }

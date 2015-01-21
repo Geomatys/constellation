@@ -108,8 +108,8 @@ public class TemplateWriterTest {
     @Test
     public void testWriteFilledMetadata2() throws IOException {
         
-        InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_default_raster2.json");
-        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_default_raster2.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
         
         
         final DefaultMetadata metadata = new DefaultMetadata();
@@ -172,8 +172,6 @@ public class TemplateWriterTest {
         
         dataIdent.setResourceConstraints(Arrays.asList(constraint2, constraint));
         
-        stream     = TemplateWriterTest.class.getResourceAsStream("profile_default_raster2.json"); // TODO we should not have to do that. root is modified but writeTemplate
-        root       =  objectMapper.readValue(stream, RootObj.class);
         rootFilled = writer.writeTemplate(root, metadata);
         
         resStream = TemplateWriterTest.class.getResourceAsStream("result3.json");
@@ -194,8 +192,6 @@ public class TemplateWriterTest {
          */
         dataIdent.setResourceConstraints(Arrays.asList(constraint, constraint2));
         
-        stream     = TemplateWriterTest.class.getResourceAsStream("profile_default_raster2.json"); // TODO we should not have to do that. root is modified but writeTemplate
-        root       =  objectMapper.readValue(stream, RootObj.class);
         rootFilled = writer.writeTemplate(root, metadata);
         
         resStream = TemplateWriterTest.class.getResourceAsStream("result3.json");
@@ -244,8 +240,8 @@ public class TemplateWriterTest {
         
         
         
-        InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords.json");
-        String expectedJson = FileUtilities.getStringFromStream(resStream);
+        final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords.json");
+        final String expectedJson = FileUtilities.getStringFromStream(resStream);
 
         
         File resultFile = File.createTempFile("test", ".json");
@@ -262,8 +258,8 @@ public class TemplateWriterTest {
     @Test
     public void testWriteFilledMetadataKeyword2() throws IOException {
         
-        InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json");
-        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
         
         
         final DefaultMetadata metadata = new DefaultMetadata();
@@ -309,9 +305,6 @@ public class TemplateWriterTest {
         /*
         * TEST 2 : one instance for gemet block, one for free block but inversed in metadata
         */
-        stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json"); // TODO we should not have to do that. root is modified but writeTemplate
-        root       =  objectMapper.readValue(stream, RootObj.class);
-        
         dataIdent.setDescriptiveKeywords(Arrays.asList(keywords2, keywords));
         
         rootFilled = writer.writeTemplate(root, metadata);
@@ -327,8 +320,6 @@ public class TemplateWriterTest {
        /*
         * TEST 3 : two instance for gemet block, zero for free block
         */
-        stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json"); // TODO we should not have to do that. root is modified but writeTemplate
-        root       =  objectMapper.readValue(stream, RootObj.class);
         
         keywords2.setThesaurusName(gemet);
         
@@ -350,9 +341,6 @@ public class TemplateWriterTest {
         /*
         * TEST 4 : zero for gemet block, two instance for free block
         */
-        stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json"); // TODO we should not have to do that. root is modified but writeTemplate
-        root       =  objectMapper.readValue(stream, RootObj.class);
-        
         keywords.setThesaurusName(null);
         keywords2.setThesaurusName(null);
         
@@ -374,9 +362,6 @@ public class TemplateWriterTest {
          /*
         * TEST 5 : two instance for gemet block, two instance for free block
         */
-        stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords2.json"); // TODO we should not have to do that. root is modified but writeTemplate
-        root       =  objectMapper.readValue(stream, RootObj.class);
-        
         keywords.setThesaurusName(gemet);
         keywords2.setThesaurusName(gemet);
         
