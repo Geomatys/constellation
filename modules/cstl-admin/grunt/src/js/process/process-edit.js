@@ -169,6 +169,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 //test cast
                 switch(parameter.binding) {
                     case "valueClass:java.lang.Integer" : //fall trough
+                    case "valueClass:java.lang.Long" : //fall trough
                     case "valueClass:java.lang.Double" :
                         if (!angular.isNumber(parameter.save)) {
                             Growl('error', 'Error', 'Parameter '+parameter.name+' is not a Number');
@@ -266,7 +267,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
 
         function convertValue(value, binding) {
-            if ("valueClass:java.lang.Integer" === binding) {
+            if ("valueClass:java.lang.Integer" === binding || "valueClass:java.lang.Long" === binding) {
                 return parseInt(value);
             }
 
@@ -286,6 +287,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             "valueClass:java.lang.String",
             "valueClass:java.lang.Boolean",
             "valueClass:java.lang.Integer",
+            "valueClass:java.lang.Long",
             "valueClass:java.lang.Double",
             "valueClass:java.net.URL",
             "valueClass:java.io.File",

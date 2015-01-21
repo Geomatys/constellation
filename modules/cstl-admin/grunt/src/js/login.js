@@ -51,7 +51,7 @@ cstlLoginApp.controller("login", function($scope, $http){
     };
 
     $scope.login = function(){
-        $http.post(cstlUrl + 'api/user/authenticate', {username: $scope.formInputs.username,
+        $http.post(cstlUrl + 'spring/login', {username: $scope.formInputs.username,
                                                        password: $scope.formInputs.password})
             .success(function(resp){
                 jQuery('#msg-error').hide();

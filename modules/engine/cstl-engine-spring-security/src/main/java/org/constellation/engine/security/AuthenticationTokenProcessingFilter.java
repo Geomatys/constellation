@@ -1,0 +1,67 @@
+package org.constellation.engine.security;
+
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.filter.GenericFilterBean;
+
+public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
+
+   
+    
+    private UserDetailsExtractor userDetailsExtractor;
+    
+    
+    public void setUserDetailsExtractor(UserDetailsExtractor userDetailsExtractor) {
+        this.userDetailsExtractor = userDetailsExtractor;
+    }
+    
+    public UserDetailsExtractor getUserDetailsExtractor() {
+        return userDetailsExtractor;
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest httpRequest = this.getAsHttpRequest(request);
+
+        UserDetails userDetails = userDetailsExtractor.userDetails(httpRequest);
+
+        try {
+
+            if (userDetails != null) {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+                        userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
+            chain.doFilter(request, response);
+        } finally {
+            SecurityContextHolder.getContext().setAuthentication(null);
+        }
+
+    }
+
+   
+    private HttpServletRequest getAsHttpRequest(ServletRequest request) {
+        if (!(request instanceof HttpServletRequest)) {
+            throw new RuntimeException("Expecting an HTTP request");
+        }
+
+        return (HttpServletRequest) request;
+    }
+
+   
+
+  
+
+}

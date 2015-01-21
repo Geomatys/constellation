@@ -207,7 +207,7 @@ angular.module('cstl-services', ['cstl-restapi'])
               return $.cookie(CstlConfig['cookie.auth.token']);
             },
             renew: function() {
-                $http.get('@cstl/api/user/extendToken').success(function(token){
+                $http.get('@cstl/spring/auth/extendToken').success(function(token){
                   $.cookie(CstlConfig['cookie.auth.token'], token, { path : '/' });
                   $rootScope.authToken = token;
                   console.log("Token extended: " + token);

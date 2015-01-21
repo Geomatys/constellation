@@ -74,7 +74,7 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
 
         $http.get("app/conf").success(function(data){
             $scope.logout = function(){
-              $http.delete('@cstl/api/user/logout').then(function() {
+              $http.delete('@cstl/spring/auth/logout').then(function() {
                 TokenService.clear();
                 window.location.href="index.html";
                 });

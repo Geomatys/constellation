@@ -186,6 +186,7 @@
         <jersey.version>2.12</jersey.version>
 	    <jaxws.version>2.2.8</jaxws.version>
         <spring.version>4.0.6.RELEASE</spring.version>
+        <spring-security.version>3.2.5.RELEASE</spring-security.version>
         <selenium.version>2.42.2</selenium.version>
         <jackson.version>2.3.2</jackson.version>
         <joda.version>2.2</joda.version>

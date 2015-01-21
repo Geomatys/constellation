@@ -14,39 +14,50 @@ import org.constellation.token.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-@Component
 public class TokenServiceImpl implements TokenService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenService.class);
-    
+
     private String secret = "cstl-sdi";
-    
+
     @Inject
     private Environment env;
-    
+
     @PostConstruct
     public void init() {
         secret = env.getProperty("cstl.secret", UUID.randomUUID().toString());
     }
-    
+
     public String createToken(String username) {
         return TokenUtils.createToken(username, secret);
     }
 
     @Override
-    public String getUserNameFromToken(String authToken) {
+    public String getUserName(String authToken) {
         return TokenUtils.getUserNameFromToken(authToken);
     }
 
     @Override
-    public boolean validateToken(String authToken, String username) {
-        return TokenUtils.validateToken(authToken, username, secret);
+    public String getUserName(HttpServletRequest request) {
+        String token = extractToken(request);
+        //FIXME We should use cache here.
+        if (token == null)
+            return null;
+        if (validate(token))
+            return getUserName(token);
+        return null;
     }
-    
-    public String extractAuthTokenFromRequest(HttpServletRequest httpRequest) {
+
+    @Override
+    public boolean validate(String authToken) {
+
+        return TokenUtils.validateToken(authToken, secret);
+    }
+
+    @Override
+    public String extractToken(HttpServletRequest httpRequest) {
 
         String authToken = headers(httpRequest);
         if (authToken != null) {
@@ -116,5 +127,5 @@ public class TokenServiceImpl implements TokenService {
         }
         return authToken;
     }
-    
+
 }

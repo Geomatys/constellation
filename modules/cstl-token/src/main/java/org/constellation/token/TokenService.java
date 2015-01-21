@@ -7,10 +7,12 @@ public interface TokenService {
 
     String createToken(String username);
 
-    String getUserNameFromToken(String authToken);
+    String getUserName(String authToken);
+    
+    String getUserName(HttpServletRequest request);
 
-    boolean validateToken(String authToken, String username);
+    boolean validate(String authToken);
 
-    String extractAuthTokenFromRequest(HttpServletRequest httpRequest);
+    String extractToken(HttpServletRequest httpRequest);
 
 }
