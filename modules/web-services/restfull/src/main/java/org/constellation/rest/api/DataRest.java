@@ -1462,6 +1462,8 @@ public class DataRest {
                 }
             }
 
+            globalEnv.intersect(CRS.getEnvelope(coordsys));
+
             final String uuid = UUID.randomUUID().toString();
             final String providerId = briefs.size()==1?firstDataProv:uuid;
             final String dataName = layerName;
@@ -1518,7 +1520,12 @@ public class DataRest {
                 for(final DataBrief db : briefs){
                     dataBusiness.linkDataToData(db.getId(),pyramidDataBrief.getId());
                 }
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                return Response.status(500).entity("Failed to create pyramid layer " + ex.getMessage()).build();
+            }
 
+            try {
                 //insert a mapcontext for this wmts pyramid of data
                 final MapContextLayersDTO mapContext = new MapContextLayersDTO();
                 mapContext.setOwner(cstlUser.get().getId());
@@ -1551,8 +1558,7 @@ public class DataRest {
                 }
                 mapContextBusiness.setMapItems(mapcontextId, mapcontextlayers);
             } catch (Exception ex) {
-                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-                return Response.status(500).entity("Failed to create pyramid layer " + ex.getMessage()).build();
+                LOGGER.log(Level.WARNING, "Can not create mapcontext for WMTS layer", ex);
             }
 
             //prepare the pyramid and mosaics
