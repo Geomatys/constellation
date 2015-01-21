@@ -22,6 +22,8 @@ import org.apache.sis.metadata.iso.maintenance.DefaultScope;
 import org.apache.sis.metadata.iso.quality.DefaultConformanceResult;
 import org.apache.sis.metadata.iso.quality.DefaultDataQuality;
 import org.apache.sis.metadata.iso.quality.DefaultDomainConsistency;
+import org.apache.sis.metadata.iso.quality.DefaultFormatConsistency;
+import org.apache.sis.metadata.iso.quality.DefaultQuantitativeResult;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.json.metadata.binding.RootObj;
 import org.geotoolkit.util.FileUtilities;
@@ -401,6 +403,66 @@ public class TemplateWriterTest {
         
         resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords5.json");
         expectedJson = FileUtilities.getStringFromStream(resStream);
+        
+        assertEquals(expectedJson, resultJson);
+        
+    }
+    
+    @Test
+    public void testWriteFilledMetadataBadType() throws IOException {
+        
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_default_raster.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        // case value into a block with no path
+        metadata.setFileIdentifier("metadata-id-0007");
+        metadata.setLanguage(Locale.FRENCH);
+        
+        // the second instance will be ignored int the result because the fields is not multiple
+        metadata.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET, ScopeCode.APPLICATION));
+        
+        
+        // unexpected type for report element
+        final DefaultDataQuality quality2 = new DefaultDataQuality(new DefaultScope(ScopeCode.AGGREGATE));
+        final DefaultFormatConsistency report2 = new DefaultFormatConsistency();
+        final DefaultQuantitativeResult confResult2 = new DefaultQuantitativeResult();
+        confResult2.setErrorStatistic(new SimpleInternationalString("stats error"));
+        report2.setResults(Arrays.asList(confResult2));
+        quality2.setReports(Arrays.asList(report2));
+        metadata.setDataQualityInfo(Arrays.asList(quality2));
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        metadata.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        final RootObj rootFilled = writer.writeTemplate(root, metadata);
+        
+        
+        final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result4.json");
+        String expectedJson = FileUtilities.getStringFromStream(resStream);
+
+        
+        File resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        String resultJson = FileUtilities.getStringFromFile(resultFile);
         
         assertEquals(expectedJson, resultJson);
         
