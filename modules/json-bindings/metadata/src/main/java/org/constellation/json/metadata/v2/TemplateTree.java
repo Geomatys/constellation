@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.json.metadata.binding.Block;
 import org.constellation.json.metadata.binding.Field;
 import org.constellation.json.metadata.binding.RootBlock;
@@ -22,7 +24,9 @@ import org.constellation.json.metadata.binding.SuperBlock;
  */
 public class TemplateTree {
     
-    private List<ValueNode> nodes = new ArrayList<>();
+    private static final Logger LOGGER = Logging.getLogger(TemplateTree.class);
+    
+    private final List<ValueNode> nodes = new ArrayList<>();
     
     public ValueNode getNodeByPath(String path) {
         for (ValueNode node : nodes) {
@@ -241,10 +245,16 @@ public class TemplateTree {
                             for (int j = 0; j < childNodes.size(); j++) {
                                 final ValueNode childNode = childNodes.get(j);
                                 if (j > 0) {
-                                    field = new Field(field);
-                                    block.addField(countField + 1, field);
+                                    if (field.getMultiplicity() > 1) {
+                                        field = new Field(field);
+                                        block.addField(countField + 1, field);
+                                        field.setValue(childNode.value);
+                                    } else {
+                                        LOGGER.info("field value excluded for multiplicity purpose");
+                                    }
+                                } else {
+                                    field.setValue(childNode.value);
                                 }
-                                field.setValue(childNode.value);
                             }
                             countField++;
                         }
@@ -259,10 +269,16 @@ public class TemplateTree {
                         for (int i = 0; i < nodes.size(); i++) {
                             final ValueNode node = nodes.get(i);
                             if (i > 0) {
-                                field = new Field(field);
-                                block.addField(countField + 1, field);
+                                if (field.getMultiplicity() > 1) {
+                                    field = new Field(field);
+                                    block.addField(countField + 1, field);
+                                    field.setValue(node.value);
+                                } else {
+                                    LOGGER.info("field value excluded for multiplicity purpose");
+                                }
+                            } else {
+                                field.setValue(node.value);
                             }
-                            field.setValue(node.value);
                         }
                         countField++;
                     }

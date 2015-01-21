@@ -5,10 +5,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Objects;
 import java.util.Set;
@@ -45,12 +47,12 @@ public class TemplateWriter extends AbstractTemplateHandler {
     public RootObj writeTemplate(final RootObj template, final Object metadata) throws ParseException {
         final TemplateTree tree  = TemplateTree.getTreeFromRootObj(template);
         
-        fillValueWithMetadata(tree, tree.getRoot(), metadata, new HashSet<>());
+        fillValueWithMetadata(tree, tree.getRoot(), metadata, new HashMap<String, Set<Object>>());
         
         return TemplateTree.getRootObjFromTree(template, tree);
     }
     
-    private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata, final Set<Object> excluded) throws ParseException {
+    private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded) throws ParseException {
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             final ValueNode origNode = new ValueNode(node);
@@ -78,7 +80,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
         }
     }
     
-    private ValueNode extractSubTreeFromMetadata(final ValueNode root, final Object metadata, final Set<Object> excluded) throws ParseException {
+    private ValueNode extractSubTreeFromMetadata(final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded) throws ParseException {
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             final ValueNode origNode = new ValueNode(node);
@@ -111,7 +113,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
         return root;
     }
     
-    private Object getValue(final ValueNode node, Object metadata, Set<Object> excluded) throws ParseException {
+    private Object getValue(final ValueNode node, Object metadata,  Map<String, Set<Object>> excluded) throws ParseException {
         if (metadata instanceof AbstractMetadata) {
             Object obj = asFullMap(metadata).get(node.name);
             if (obj instanceof Collection) {
@@ -131,8 +133,8 @@ public class TemplateWriter extends AbstractTemplateHandler {
         }
     }
     
-    private Object getSingleValue(final ValueNode node, Object metadata, Set<Object> excluded) throws ParseException {
-        if (excluded.contains(metadata)) return null;
+    private Object getSingleValue(final ValueNode node, Object metadata, Map<String, Set<Object>> excluded) throws ParseException {
+        if (excluded.containsKey(node.path) && excluded.get(node.path).contains(metadata)) return null;
         
         /*
          * In strict mode, we want that the sub-tree of the object correspound exactly the node tree.
@@ -141,9 +143,9 @@ public class TemplateWriter extends AbstractTemplateHandler {
          * The matching point are read-only fields and types.
          */
         if (node.strict) {
-            final ValueNode candidate = extractSubTreeFromMetadata(new ValueNode(node), metadata, new HashSet<>());
+            final ValueNode candidate = extractSubTreeFromMetadata(new ValueNode(node), metadata, new HashMap<String, Set<Object>>());
             if (matchNode(node, candidate)) {
-                excluded.add(metadata);
+                exclude(excluded, node, metadata);
                 return metadata;
             }
             return null;
@@ -160,7 +162,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
                 throw new ParseException("Unable to find a class for type : " + node.type);
             }
             if (type.isInstance(metadata) ) {
-                excluded.add(metadata);
+                exclude(excluded, node, metadata);
                 return metadata;
             }
             return null;
@@ -168,7 +170,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
          * else return simply the object
          */
         } else {
-            excluded.add(metadata);
+            exclude(excluded, node, metadata);
             return metadata;
         }
     }
@@ -197,7 +199,8 @@ public class TemplateWriter extends AbstractTemplateHandler {
     
     private static String valueToString(final ValueNode n, final Object value, final boolean applyDefault) {
         final String p;
-        if (value == null) {
+        // Null or empty collection
+        if (value == null || value instanceof Collection) { 
             if (applyDefault) {
                 p = n.defaultValue;
             } else {
@@ -243,5 +246,15 @@ public class TemplateWriter extends AbstractTemplateHandler {
             }
         }
         return p;
+    }
+    
+    private static void exclude(final Map<String, Set<Object>> excluded, final ValueNode node, final Object obj) {
+        if (excluded.containsKey(node.path)) {
+            excluded.get(node.path).add(obj);
+        } else {
+            final HashSet<Object> set = new HashSet<>();
+            set.add(obj);
+            excluded.put(node.path, set);
+        }
     }
 }

@@ -52,6 +52,9 @@ public class TemplateWriterTest {
         metadata.setFileIdentifier("metadata-id-0007");
         metadata.setLanguage(Locale.FRENCH);
         
+        // the second instance will be ignored int the result because the fields is not multiple
+        metadata.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET, ScopeCode.APPLICATION));
+        
         final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
         final DefaultDomainConsistency report = new DefaultDomainConsistency();
         final DefaultCitation cit = new DefaultCitation("some title");

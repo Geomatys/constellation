@@ -19,6 +19,7 @@ import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.TypeValuePolicy;
 import org.apache.sis.metadata.ValueExistencePolicy;
+import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
@@ -139,7 +140,7 @@ public class TemplateReader extends AbstractTemplateHandler {
 
             } else if (obj != null){
                 if (node.isField()) {
-                    putValue(node, obj);
+                    putValue(node, metadata); // replace
                 } else {
                     updateObjectFromRootObj(tree, node, obj);
                 }
@@ -224,6 +225,14 @@ public class TemplateReader extends AbstractTemplateHandler {
         if (InternationalString.class.isAssignableFrom(type) && value instanceof String) {
             return new SimpleInternationalString(value.toString());
         }
+        if (Charset.class.isAssignableFrom(type) && value instanceof String) {
+            return Charset.forName(value.toString());
+        }
+        if (Locale.class.isAssignableFrom(type) && value instanceof String) {
+            String text = value.toString();
+            text = text.substring(text.indexOf('.') + 1).trim();
+            return Locales.parse(text);
+        }
         if (!CharSequence.class.isAssignableFrom(type) && (value instanceof CharSequence)) {
             String text = value.toString();
             if (text.startsWith("nilReason:")) {
@@ -291,7 +300,13 @@ public class TemplateReader extends AbstractTemplateHandler {
             List list = (List) c;
             list.set(ordinal, newValue);
         } else {
-            throw new IllegalArgumentException("COllection is not a List");
+            final Iterator it = c.iterator();
+            Object old = it.next();
+            for (int i = 0; i < ordinal; i++) {
+                old = it.next();
+            }
+            c.remove(old);
+            c.add(newValue);
         }
     }
 }
