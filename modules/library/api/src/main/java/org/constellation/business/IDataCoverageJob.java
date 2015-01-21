@@ -18,9 +18,9 @@
  */
 package org.constellation.business;
 
-import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 
 import java.util.concurrent.Future;
+import org.geotoolkit.metadata.ImageStatistics;
 
 /**
  * Gather all asynchronous method on data.

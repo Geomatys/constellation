@@ -39,7 +39,7 @@ import javax.xml.bind.JAXBException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
 import org.constellation.engine.register.Dataset;
-import org.geotoolkit.process.coverage.statistics.ImageStatistics;
+import org.geotoolkit.metadata.ImageStatistics;
 
 /**
  * @author Cédric Briançon (Geomatys)

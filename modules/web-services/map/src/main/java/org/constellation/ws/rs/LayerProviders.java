@@ -65,7 +65,6 @@ import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
-import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sld.xml.Specification;
@@ -107,6 +106,7 @@ import java.util.Map;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
+import org.geotoolkit.metadata.ImageStatistics;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;

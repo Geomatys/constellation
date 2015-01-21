@@ -39,7 +39,6 @@ import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListenerAdapter;
-import org.geotoolkit.process.coverage.statistics.ImageStatistics;
 import org.geotoolkit.process.coverage.statistics.Statistics;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.context.annotation.Primary;
@@ -54,6 +53,7 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.metadata.ImageStatistics;
 
 import static org.geotoolkit.parameter.Parameters.value;
 import static org.geotoolkit.process.coverage.statistics.StatisticsDescriptor.OUTCOVERAGE;

@@ -8,16 +8,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import org.geotoolkit.image.internal.SampleType;
-import org.geotoolkit.process.coverage.statistics.ImageStatistics;
+import org.geotoolkit.metadata.ImageStatistics;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static org.geotoolkit.process.coverage.statistics.ImageStatistics.*;
 
 /**
  * @author Quentin Boileau (Geomatys)
