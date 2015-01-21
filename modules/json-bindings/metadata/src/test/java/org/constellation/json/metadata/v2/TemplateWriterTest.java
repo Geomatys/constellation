@@ -468,4 +468,76 @@ public class TemplateWriterTest {
         
     }
     
+    @Test
+    public void testWriteFilledMetadataMultipleFieldNonBlock() throws IOException {
+        
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_default_raster.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        // case value into a block with no path
+        metadata.setFileIdentifier("metadata-id-0007");
+        metadata.setLanguage(Locale.FRENCH);
+        
+        // the second instance will be ignored int the result because the fields is not multiple
+        metadata.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET, ScopeCode.APPLICATION));
+        
+        final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
+        final DefaultDomainConsistency report = new DefaultDomainConsistency();
+        final DefaultCitation cit = new DefaultCitation("some title");
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        cit.setDates(Arrays.asList(date));
+        final DefaultConformanceResult result = new DefaultConformanceResult(cit, "some explanation", true);
+        report.setResults(Arrays.asList(result));
+        quality.setReports(Arrays.asList(report));
+        
+        // unexpected type for report element
+        final DefaultDataQuality quality2 = new DefaultDataQuality(new DefaultScope(ScopeCode.AGGREGATE));
+        final DefaultDomainConsistency report2 = new DefaultDomainConsistency();
+        final DefaultCitation cit2 = new DefaultCitation("some second title");
+        final DefaultCitationDate date2 = new DefaultCitationDate(new Date(11156600000L), DateType.PUBLICATION);
+        cit2.setDates(Arrays.asList(date2));
+        final DefaultConformanceResult confResult2 = new DefaultConformanceResult(cit2, "some second explanation", true);
+        report2.setResults(Arrays.asList(confResult2));
+        quality2.setReports(Arrays.asList(report2));
+        
+        
+        metadata.setDataQualityInfo(Arrays.asList(quality, quality2));
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        metadata.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        final RootObj rootFilled = writer.writeTemplate(root, metadata);
+        
+        
+        final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result5.json");
+        String expectedJson = FileUtilities.getStringFromStream(resStream);
+
+        
+        File resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        String resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+        
+    }
+    
 }
