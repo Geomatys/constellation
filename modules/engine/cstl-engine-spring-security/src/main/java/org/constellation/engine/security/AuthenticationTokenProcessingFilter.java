@@ -21,12 +21,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
         @Override
         public boolean onUnauthorized(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-            try {
-                httpServletResponse.sendRedirect("/constellation/login.html");
-            } catch (IOException e) {
-             
-            }
-            return true;
+            return false;
         }
     };
 
