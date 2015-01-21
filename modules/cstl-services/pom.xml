@@ -748,6 +748,10 @@
       <artifactId>metrics-spring</artifactId>
       <version>3.0.0-RC2</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-legacy</artifactId>
+    </dependency>
   </dependencies>
 
 
