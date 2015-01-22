@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
+import static org.constellation.json.JsonMetadataConstants.cleanNumeratedPath;
 import org.constellation.json.metadata.binding.Block;
 import org.constellation.json.metadata.binding.Field;
 import org.constellation.json.metadata.binding.RootBlock;
@@ -212,7 +213,8 @@ public class TemplateTree {
         return tree;
     }
     
-    private static int updateOrdinal(Map<String, Integer> pathOrdinal, final String path) {
+    private static int updateOrdinal(Map<String, Integer> pathOrdinal, String path) {
+        path = cleanNumeratedPath(path);
         int ordinal = 0;
         if (pathOrdinal.containsKey(path)) {
             ordinal = pathOrdinal.get(path) + 1;
@@ -239,6 +241,8 @@ public class TemplateTree {
                             block = new Block(origBlock);
                             sb.addBlock(count + 1, block);
                         }
+                        block.setPath(node.getNumeratedPath());
+                        
                         final List<Field> childrenField = new ArrayList<>(block.getFields());
                         int countField = 0;
                         for (Field field : childrenField) {
@@ -249,11 +253,13 @@ public class TemplateTree {
                                     if (field.getMultiplicity() > 1) {
                                         field = new Field(field);
                                         block.addField(countField + 1, field);
+                                        field.setPath(childNode.getNumeratedPath());
                                         field.setValue(childNode.value);
                                     } else {
-                                        LOGGER.info("field value excluded for multiplicity purpose");
+                                        LOGGER.info("field value excluded for multiplicity purpose");// TODO continue;
                                     }
                                 } else {
+                                    field.setPath(childNode.getNumeratedPath());
                                     field.setValue(childNode.value);
                                 }
                             }
@@ -273,11 +279,13 @@ public class TemplateTree {
                                 if (field.getMultiplicity() > 1) {
                                     field = new Field(field);
                                     block.addField(countField + 1, field);
+                                    field.setPath(node.getNumeratedPath());
                                     field.setValue(node.value);
                                 } else {
-                                    LOGGER.info("field value excluded for multiplicity purpose");
+                                    LOGGER.info("field value excluded for multiplicity purpose"); // TODO continue;
                                 }
                             } else {
+                                field.setPath(node.getNumeratedPath());
                                 field.setValue(node.value);
                             }
                         }

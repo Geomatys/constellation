@@ -44,4 +44,8 @@ public class JsonMetadataConstants {
     static {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
+    
+    public static String cleanNumeratedPath(final String numeratedPath) {
+        return numeratedPath.replaceAll("\\[[0-9]*\\]", "");
+    }
 }

@@ -8,6 +8,7 @@ package org.constellation.json.metadata.v2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import static org.constellation.json.JsonMetadataConstants.cleanNumeratedPath;
 import org.constellation.json.metadata.binding.Block;
 import org.constellation.json.metadata.binding.Field;
 
@@ -110,7 +111,7 @@ public class ValueNode {
     }
     
     public ValueNode(Block block, int ordinal) {
-        this.path = block.getPath();
+        this.path         = cleanNumeratedPath(block.getPath());
         this.type         = block.getType();
         this.render       = block.getRender();
         this.strict       = block.isStrict();
@@ -125,7 +126,7 @@ public class ValueNode {
     }
     
     public ValueNode(Field field, int ordinal) {
-        this.path = field.getPath();
+        this.path         = cleanNumeratedPath(field.getPath());
         this.type         = field.getType();
         this.render       = field.getRender();
         this.defaultValue = field.getDefaultValue();
