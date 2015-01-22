@@ -257,4 +257,16 @@ public class TemplateWriter extends AbstractTemplateHandler {
             excluded.put(node.path, set);
         }
     }
+    
+    
+    private static class NumeratedCollectionElement {
+        public int index;
+        public Object obj;
+        
+        public NumeratedCollectionElement(int index, Object obj) {
+            this.index = index;
+            this.obj   = obj;
+        }
+        
+    }
 }

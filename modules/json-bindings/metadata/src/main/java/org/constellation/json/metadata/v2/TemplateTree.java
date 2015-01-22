@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.constellation.json.metadata.v2;
 
 import java.util.ArrayList;
@@ -15,7 +11,6 @@ import org.apache.sis.util.logging.Logging;
 import static org.constellation.json.JsonMetadataConstants.cleanNumeratedPath;
 import org.constellation.json.metadata.binding.Block;
 import org.constellation.json.metadata.binding.Field;
-import org.constellation.json.metadata.binding.RootBlock;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.json.metadata.binding.SuperBlock;
 
@@ -87,6 +82,21 @@ public class TemplateTree {
         return results;
     }
     
+    public List<ValueNode> getNodesForBlock(Block block) {
+        final List<ValueNode> results = new ArrayList<>();
+        if (block.getPath() != null) {
+            for (ValueNode node : nodes) {
+                if (block.getName().equals(node.blockName)) {
+                    results.add(node);
+                }
+            }
+            return results;
+        } else {
+            results.add(null);
+        }
+        return results;
+    }
+    
     
     public ValueNode getRoot() {
         for (ValueNode node : nodes) {
@@ -132,7 +142,7 @@ public class TemplateTree {
     public List<ValueNode> getNodesByPathAndParent(String path, ValueNode parent) {
         final List<ValueNode> results = new ArrayList<>();
         for (ValueNode node : nodes) {
-            if (node.path.equals(path) && node.hashParent(parent)) {
+            if (node.path.equals(path) && (parent == null || node.hashParent(parent))) {
                 results.add(node);
             }
         }
@@ -225,74 +235,44 @@ public class TemplateTree {
     
     public static RootObj getRootObjFromTree(final RootObj rootobj, final TemplateTree tree) {
         final RootObj result = new RootObj(rootobj);
-        final RootBlock root = result.getRoot();
         
-        for (SuperBlock sb : root.getSuperBlocks()) {
+        for (SuperBlock sb : result.getRoot().getSuperBlocks()) {
             final List<Block> children = new ArrayList<>(sb.getBlocks());
-            int count = 0;
+            int blockCount = 0;
             for (Block block : children) {
-                Block origBlock = new Block(block);
+                final Block origBlock = new Block(block);
+                final List<ValueNode> blockNodes = tree.getNodesForBlock(block);
                 
-                if (block.getPath() != null) {
-                    List<ValueNode> nodes = tree.getNodesByBlockName(block.getName());
-                    for (int i = 0; i < nodes.size(); i++) {
-                        final ValueNode node = nodes.get(i);
-                        if (i > 0) {
-                            block = new Block(origBlock);
-                            sb.addBlock(count + 1, block);
-                        }
-                        block.setPath(node.getNumeratedPath());
-                        
-                        final List<Field> childrenField = new ArrayList<>(block.getFields());
-                        int countField = 0;
-                        for (Field field : childrenField) {
-                            final List<ValueNode> childNodes = tree.getNodesByPathAndParent(field.getPath(), node);
-                            for (int j = 0; j < childNodes.size(); j++) {
-                                final ValueNode childNode = childNodes.get(j);
-                                if (j > 0) {
-                                    if (field.getMultiplicity() > 1) {
-                                        field = new Field(field);
-                                        block.addField(countField + 1, field);
-                                        field.setPath(childNode.getNumeratedPath());
-                                        field.setValue(childNode.value);
-                                    } else {
-                                        LOGGER.info("field value excluded for multiplicity purpose");// TODO continue;
-                                    }
-                                } else {
-                                    field.setPath(childNode.getNumeratedPath());
-                                    field.setValue(childNode.value);
-                                }
-                            }
-                            countField++;
-                        }
+                for (int i = 0; i < blockNodes.size(); i++) {
+                    final ValueNode node = blockNodes.get(i);
+                    if (i > 0) {
+                        block = sb.addBlock(blockCount + 1, new Block(origBlock));
                     }
-                    
-                } else {
-                
+                    if (node != null) {
+                        block.setPath(node.getNumeratedPath());
+                    }
+
                     final List<Field> childrenField = new ArrayList<>(block.getFields());
-                    int countField = 0;
+                    int fieldCount = 0;
                     for (Field field : childrenField) {
-                        final List<ValueNode> nodes = tree.getNodesByPath(field.getPath());
-                        for (int i = 0; i < nodes.size(); i++) {
-                            final ValueNode node = nodes.get(i);
-                            if (i > 0) {
+                        final List<ValueNode> fieldNodes = tree.getNodesByPathAndParent(field.getPath(), node);
+                        for (int j = 0; j < fieldNodes.size(); j++) {
+                            final ValueNode childNode = fieldNodes.get(j);
+                            if (j > 0) {
                                 if (field.getMultiplicity() > 1) {
-                                    field = new Field(field);
-                                    block.addField(countField + 1, field);
-                                    field.setPath(node.getNumeratedPath());
-                                    field.setValue(node.value);
+                                    field = block.addField(fieldCount + 1, new Field(field));
                                 } else {
-                                    LOGGER.info("field value excluded for multiplicity purpose"); // TODO continue;
+                                    LOGGER.info("field value excluded for multiplicity purpose");
+                                    continue;
                                 }
-                            } else {
-                                field.setPath(node.getNumeratedPath());
-                                field.setValue(node.value);
                             }
+                            field.setPath(childNode.getNumeratedPath());
+                            field.setValue(childNode.value);
                         }
-                        countField++;
+                        fieldCount++;
                     }
                 }
-                count++;
+                blockCount++;
             }
         }
         

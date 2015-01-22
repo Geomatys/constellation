@@ -96,8 +96,9 @@ public class Block implements Serializable, ChildEntity {
         return results;
     }
     
-    public void addField(int index, Field field) {
+    public Field addField(int index, Field field) {
         children.add(index, new FieldObj(field));
+        return field;
     }
 
     public String getHelp() {

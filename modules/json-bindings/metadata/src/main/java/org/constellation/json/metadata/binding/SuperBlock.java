@@ -90,8 +90,9 @@ public class SuperBlock implements Serializable {
         return results;
     }
     
-    public void addBlock(int index, Block block) {
+    public Block addBlock(int index, Block block) {
         children.add(index, new BlockObj(block));
+        return block;
     }
 
     public String getHelp() {
