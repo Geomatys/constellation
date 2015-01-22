@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,25 +17,44 @@ import org.springframework.web.filter.GenericFilterBean;
 
 public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
-   
-    
+    private UnauthorizedHandler unauthorizedHandler = new UnauthorizedHandler() {
+
+        @Override
+        public boolean onUnauthorized(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+            return false;
+        }
+    };
+
     private UserDetailsExtractor userDetailsExtractor;
-    
-    
+
+    public void setUnauthorizedHandler(UnauthorizedHandler unauthorizedHandler) {
+        this.unauthorizedHandler = unauthorizedHandler;
+    }
+
+    public UnauthorizedHandler getUnauthorizedHandler() {
+        return unauthorizedHandler;
+    }
+
     public void setUserDetailsExtractor(UserDetailsExtractor userDetailsExtractor) {
         this.userDetailsExtractor = userDetailsExtractor;
     }
-    
+
     public UserDetailsExtractor getUserDetailsExtractor() {
         return userDetailsExtractor;
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpRequest = this.getAsHttpRequest(request);
+        HttpServletRequest httpRequest = getAsHttpRequest(request);
 
         UserDetails userDetails = userDetailsExtractor.userDetails(httpRequest);
 
+        if (userDetails == null) {
+            if(unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
+                return;
+            }
+        }
+        
         try {
 
             if (userDetails != null) {
@@ -51,7 +71,6 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
     }
 
-   
     private HttpServletRequest getAsHttpRequest(ServletRequest request) {
         if (!(request instanceof HttpServletRequest)) {
             throw new RuntimeException("Expecting an HTTP request");
@@ -60,8 +79,12 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         return (HttpServletRequest) request;
     }
 
-   
+    private HttpServletResponse getAsHttpResponse(ServletResponse response) {
+        if (!(response instanceof HttpServletResponse)) {
+            throw new RuntimeException("Expecting an HTTP response");
+        }
 
-  
+        return (HttpServletResponse) response;
+    }
 
 }

@@ -27,8 +27,4 @@
     </constructor-arg>
   </bean>
 
-  <bean id="authenticationTokenProcessingFilter" class="org.constellation.engine.security.AuthenticationTokenProcessingFilter">
-    <property name="userDetailsExtractor" ref="cstlUserDetailsExtractor" />
-  </bean>
-
 </beans>
