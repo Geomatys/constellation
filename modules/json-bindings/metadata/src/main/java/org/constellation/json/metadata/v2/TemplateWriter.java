@@ -170,7 +170,6 @@ public class TemplateWriter extends AbstractTemplateHandler {
          * else return simply the object
          */
         } else {
-            exclude(excluded, node, metadata);
             return metadata;
         }
     }

@@ -117,9 +117,14 @@ public class TemplateTree {
         String numeratedPath = updateLastOrdinal(node.getNumeratedPath(), i);
         ValueNode exist = getNodeByNumeratedPath(numeratedPath, node.blockName); // issue here
         if (exist == null) {
-            while (getNodeByNumeratedPath(numeratedPath) != null) {
-                i++;
-                numeratedPath = updateLastOrdinal(numeratedPath, i);
+            int j = i;
+            ValueNode n = getNodeByNumeratedPath(numeratedPath);
+            while (n != null) {
+                j++;
+                numeratedPath = updateLastOrdinal(numeratedPath, j);
+                ValueNode tmp = getNodeByNumeratedPath(numeratedPath);
+                n.updateOrdinal(j);
+                n = tmp;
             }
             exist = new ValueNode(node, node.parent, i);
             nodes.add(exist);
@@ -169,7 +174,7 @@ public class TemplateTree {
 
             List<ValueNode> parents = getNodesByPath(path);
             if (parents.isEmpty()) {
-                ValueNode parent = new ValueNode(path, template.getTypeForPath(path), 0, null, null);
+                ValueNode parent = new ValueNode(path, template.getTypeForPath(path), 0, null, null, false);
                 nodes.add(parent);
                 parent.addChild(child);
                 child = parent;
@@ -183,7 +188,7 @@ public class TemplateTree {
                     }
                 }
                 if (!found) {
-                    ValueNode parent = new ValueNode(path, template.getTypeForPath(path), 0, null, null);
+                    ValueNode parent = new ValueNode(path, template.getTypeForPath(path), 0, null, null,false);
                     nodes.add(parent);
                     parent.addChild(child);
                     child = parent;
@@ -247,6 +252,7 @@ public class TemplateTree {
                     final ValueNode node = blockNodes.get(i);
                     if (i > 0) {
                         block = sb.addBlock(blockCount + 1, new Block(origBlock));
+                        blockCount++;
                     }
                     if (node != null) {
                         block.setPath(node.getNumeratedPath());

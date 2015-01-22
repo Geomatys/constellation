@@ -44,9 +44,10 @@ public class ValueNode {
     
     private String numeratedPath; // must be computed
     
-    public ValueNode(String path, String type, int ordinal, ValueNode parent, String blockName) {
+    public ValueNode(String path, String type, int ordinal, ValueNode parent, String blockName, boolean strict) {
         this.path      = path;
         this.type      = type;
+        this.strict    = strict;
         this.blockName = blockName;
         if (path.indexOf('.') != -1) {
             this.name = path.substring(path.lastIndexOf('.') + 1, path.length());
@@ -183,6 +184,15 @@ public class ValueNode {
             }
         }
         return results;
+    }
+    
+    public void updateOrdinal(int i) {
+        this.ordinal = i;
+        // reset all children numerated path
+        this.numeratedPath = null;
+        for (ValueNode child : children) {
+            child.updateOrdinal(child.ordinal);
+        }
     }
     
     @Override
