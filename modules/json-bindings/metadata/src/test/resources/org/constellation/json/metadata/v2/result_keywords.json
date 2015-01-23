@@ -10,6 +10,7 @@
         "path" : null,
         "render" : null,
         "children" : [ {
+          "type" : "block",
           "block" : {
             "name" : "metadata.block.descriptiveKeyword",
             "multiplicity" : 62,
@@ -20,6 +21,7 @@
             "type" : null,
             "strict" : false,
             "children" : [ {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.keyword",
                 "multiplicity" : 62,
@@ -34,6 +36,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.keyword",
                 "multiplicity" : 62,
@@ -50,6 +53,7 @@
             } ]
           }
         }, {
+          "type" : "block",
           "block" : {
             "name" : "metadata.block.descriptiveKeyword",
             "multiplicity" : 62,
@@ -60,6 +64,7 @@
             "type" : null,
             "strict" : false,
             "children" : [ {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.keyword",
                 "multiplicity" : 62,
@@ -74,6 +79,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.keyword",
                 "multiplicity" : 62,

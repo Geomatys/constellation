@@ -10,7 +10,9 @@ import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import static org.constellation.json.JsonMetadataConstants.cleanNumeratedPath;
 import org.constellation.json.metadata.binding.Block;
+import org.constellation.json.metadata.binding.ComponentObj;
 import org.constellation.json.metadata.binding.Field;
+import org.constellation.json.metadata.binding.FieldObj;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.json.metadata.binding.SuperBlock;
 
@@ -217,15 +219,24 @@ public class TemplateTree {
                 
                 // Fields
                 Map<String, Integer> fieldPathOrdinal = new HashMap<>();
-                for (Field field : block.getFields()) {
-                    int fieldOrdinal = updateOrdinal(fieldPathOrdinal, field.getPath());
-                    final ValueNode node = new ValueNode(field, fieldOrdinal);
-                    tree.addNode(node, ancestor, template);
+                for (ComponentObj child : block.getChildren()) {
+                    if (child instanceof FieldObj) {
+                        updateTreeFromField((FieldObj)child, tree, ancestor, template, fieldPathOrdinal);
+                    } else {
+                        throw new UnsupportedOperationException("TODO");
+                    }
                 }
             }
         }
         
         return tree;
+    }
+    
+    public static void updateTreeFromField(FieldObj fieldObj, TemplateTree tree, final ValueNode ancestor, final RootObj template, Map<String, Integer> fieldPathOrdinal) {
+        final Field field = fieldObj.getField();
+        int fieldOrdinal = updateOrdinal(fieldPathOrdinal, field.getPath());
+        final ValueNode node = new ValueNode(field, fieldOrdinal);
+        tree.addNode(node, ancestor, template);
     }
     
     private static int updateOrdinal(Map<String, Integer> pathOrdinal, String path) {
@@ -258,22 +269,13 @@ public class TemplateTree {
                         block.setPath(node.getNumeratedPath());
                     }
 
-                    final List<Field> childrenField = new ArrayList<>(block.getFields());
+                    final List<ComponentObj> blockChildren = new ArrayList<>(block.getChildren());
                     int fieldCount = 0;
-                    for (Field field : childrenField) {
-                        final List<ValueNode> fieldNodes = tree.getNodesByPathAndParent(field.getPath(), node);
-                        for (int j = 0; j < fieldNodes.size(); j++) {
-                            final ValueNode childNode = fieldNodes.get(j);
-                            if (j > 0) {
-                                if (field.getMultiplicity() > 1) {
-                                    field = block.addField(fieldCount + 1, new Field(field));
-                                } else {
-                                    LOGGER.info("field value excluded for multiplicity purpose");
-                                    continue;
-                                }
-                            }
-                            field.setPath(childNode.getNumeratedPath());
-                            field.setValue(childNode.value);
+                    for (ComponentObj child : blockChildren) {
+                        if (child instanceof FieldObj) {
+                            updateRootObjFromTree((FieldObj) child, block, tree, node, fieldCount);
+                        } else {
+                            throw new UnsupportedOperationException("TODO");
                         }
                         fieldCount++;
                     }
@@ -283,5 +285,23 @@ public class TemplateTree {
         }
         
         return result;
+    }
+    
+    private static void updateRootObjFromTree(final FieldObj fieldObj, final Block owner, final TemplateTree tree, final ValueNode node, final int fieldCount) {
+        Field field = fieldObj.getField();
+        final List<ValueNode> fieldNodes = tree.getNodesByPathAndParent(field.getPath(), node);
+        for (int j = 0; j < fieldNodes.size(); j++) {
+            final ValueNode childNode = fieldNodes.get(j);
+            if (j > 0) {
+                if (field.getMultiplicity() > 1) {
+                    field = owner.addField(fieldCount + 1, new Field(field));
+                } else {
+                    LOGGER.info("field value excluded for multiplicity purpose");
+                    continue;
+                }
+            }
+            field.setPath(childNode.getNumeratedPath());
+            field.setValue(childNode.value);
+        }
     }
 }

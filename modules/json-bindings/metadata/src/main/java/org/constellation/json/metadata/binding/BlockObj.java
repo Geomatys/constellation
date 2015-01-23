@@ -28,7 +28,7 @@ import java.io.Serializable;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
-public class BlockObj implements Serializable {
+public class BlockObj extends ComponentObj implements Serializable {
     private Block block;
 
     public BlockObj() {

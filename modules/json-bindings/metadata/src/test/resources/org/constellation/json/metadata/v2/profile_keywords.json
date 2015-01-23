@@ -9,12 +9,14 @@
                     "help": "metadata.block.dataQuality_help",
                     "path": null,
                     "children": [{
+                            "type": "block",
                             "block": {
                                 "name": "metadata.block.descriptiveKeyword",
                                 "multiplicity": 62,
                                 "help": "metadata.block.descriptiveKeyword_help",
                                 "path": "metadata.identificationInfo.descriptiveKeywords",
                                 "children": [{
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.keyword",
                                             "multiplicity": 62,

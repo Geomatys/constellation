@@ -103,6 +103,7 @@ import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.engine.security.WorkspaceService;
 import org.constellation.json.metadata.Template;
 import org.constellation.json.metadata.binding.BlockObj;
+import org.constellation.json.metadata.binding.ComponentObj;
 import org.constellation.json.metadata.binding.FieldObj;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.json.metadata.binding.SuperBlockObj;
@@ -897,6 +898,10 @@ public class DataRest {
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
+    /**
+     * @deprecated move this method to TemplateTree
+     */
+    @Deprecated
     private int calculateMDCompletion(final RootObj metadataValues) {
         int result = 0;
         int fieldsCount=0;
@@ -905,10 +910,10 @@ public class DataRest {
         for(final SuperBlockObj sb:superblocks){
             final List<BlockObj> blocks = sb.getSuperblock().getChildren();
             for(final BlockObj b:blocks){
-                final List<FieldObj> fields = b.getBlock().getChildren();
-                for(final FieldObj f:fields){
+                final List<ComponentObj> fields = b.getBlock().getChildren();
+                for(final ComponentObj f:fields){
                     fieldsCount++;
-                    final String value = f.getField().getValue();
+                    final String value = ((FieldObj)f).getField().getValue();
                     if(value != null && !value.isEmpty()){
                         fieldValueCount++;
                     }

@@ -10,6 +10,7 @@
         "path" : null,
         "render" : null,
         "children" : [ {
+          "type" : "block",
           "block" : {
             "name" : "metadata.block.report",
             "multiplicity" : 1,
@@ -20,6 +21,7 @@
             "type" : null,
             "strict" : false,
             "children" : [ {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.report.specification.title",
                 "multiplicity" : 62,
@@ -34,6 +36,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.report.specification.date",
                 "multiplicity" : 1,
@@ -48,6 +51,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.dateType",
                 "multiplicity" : 1,
@@ -62,6 +66,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.scopeLevel",
                 "multiplicity" : 1,
@@ -76,6 +81,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.resultPass",
                 "multiplicity" : 1,
@@ -90,6 +96,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.resultExplanation",
                 "multiplicity" : 1,
@@ -106,6 +113,7 @@
             } ]
           }
         }, {
+          "type" : "block",
           "block" : {
             "name" : "metadata.block.descriptiveKeyword",
             "multiplicity" : 62,
@@ -116,6 +124,7 @@
             "type" : null,
             "strict" : false,
             "children" : [ {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.keyword",
                 "multiplicity" : 62,
@@ -130,6 +139,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.keyword",
                 "multiplicity" : 62,
@@ -144,6 +154,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.thesaurusTitle",
                 "multiplicity" : 1,
@@ -158,6 +169,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.thesaurusDate",
                 "multiplicity" : 1,
@@ -172,6 +184,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.thesaurusDateType",
                 "multiplicity" : 1,
@@ -188,6 +201,7 @@
             } ]
           }
         }, {
+          "type" : "block",
           "block" : {
             "name" : "metadata.block.descriptiveKeyword",
             "multiplicity" : 62,
@@ -198,6 +212,7 @@
             "type" : null,
             "strict" : false,
             "children" : [ {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.keyword",
                 "multiplicity" : 62,
@@ -212,6 +227,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.keyword",
                 "multiplicity" : 62,
@@ -226,6 +242,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.thesaurusTitle",
                 "multiplicity" : 1,
@@ -240,6 +257,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.thesaurusDate",
                 "multiplicity" : 1,
@@ -254,6 +272,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.thesaurusDateType",
                 "multiplicity" : 1,
@@ -279,6 +298,7 @@
         "path" : null,
         "render" : null,
         "children" : [ {
+          "type" : "block",
           "block" : {
             "name" : "metadata.block.basic",
             "multiplicity" : 1,
@@ -289,6 +309,7 @@
             "type" : null,
             "strict" : false,
             "children" : [ {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.identifier",
                 "multiplicity" : 1,
@@ -303,6 +324,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.dateStamp",
                 "multiplicity" : 1,
@@ -317,6 +339,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.metadataStandardName",
                 "multiplicity" : 1,
@@ -331,6 +354,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.metadataStandardVersion",
                 "multiplicity" : 1,
@@ -345,6 +369,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.characterSet",
                 "multiplicity" : 1,
@@ -359,6 +384,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.metadatalanguage",
                 "multiplicity" : 1,
@@ -373,6 +399,7 @@
                 "tag" : null
               }
             }, {
+              "type" : "field",
               "field" : {
                 "name" : "metadata.field.hierarchyLevel",
                 "multiplicity" : 1,

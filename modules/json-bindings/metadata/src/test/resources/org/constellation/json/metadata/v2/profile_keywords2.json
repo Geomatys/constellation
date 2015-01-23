@@ -9,6 +9,7 @@
                     "help": "metadata.block.dataQuality_help",
                     "path": null,
                     "children": [{
+                            "type": "block",
                             "block": {
                                 "name": "metadata.block.descriptiveKeyword_inspire",
                                 "multiplicity": 62,
@@ -16,6 +17,7 @@
                                 "path": "metadata.identificationInfo.descriptiveKeywords",
                                 "strict": true,
                                 "children": [{
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.keyword",
                                             "multiplicity": 62,
@@ -27,6 +29,7 @@
                                             "value": null
                                         }
                                     }, {
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.thesaurusTitle",
                                             "multiplicity": 1,
@@ -38,6 +41,7 @@
                                             "value": null
                                         }
                                     }, {
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.thesaurusDate",
                                             "multiplicity": 1,
@@ -49,6 +53,7 @@
                                             "value": null
                                         }
                                     }, {
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.thesaurusDateType",
                                             "multiplicity": 1,
@@ -63,12 +68,14 @@
                                 ]
                             }
                         }, {
+                            "type": "block",
                             "block": {
                                 "name": "metadata.block.descriptiveKeyword",
                                 "multiplicity": 62,
                                 "help": "metadata.block.descriptiveKeyword_help",
                                 "path": "metadata.identificationInfo.descriptiveKeywords",
                                 "children": [{
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.keyword",
                                             "multiplicity": 62,
@@ -80,6 +87,7 @@
                                             "value": null
                                         }
                                     }, {
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.thesaurusTitle",
                                             "multiplicity": 1,
@@ -91,6 +99,7 @@
                                             "value": null
                                         }
                                     }, {
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.thesaurusDate",
                                             "multiplicity": 1,
@@ -102,6 +111,7 @@
                                             "value": null
                                         }
                                     }, {
+                                        "type": "field",
                                         "field": {
                                             "name": "metadata.field.thesaurusDateType",
                                             "multiplicity": 1,

@@ -28,7 +28,7 @@ import java.io.Serializable;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
-public class FieldObj implements Serializable {
+public class FieldObj extends ComponentObj implements Serializable {
 
     private Field field;
 

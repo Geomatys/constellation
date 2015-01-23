@@ -43,7 +43,7 @@ public class Block implements Serializable, ChildEntity {
     private String ignore;
     private String type;
     private boolean strict;
-    private List<FieldObj> children;
+    private List<ComponentObj> children;
     
     public Block(){
 
@@ -59,8 +59,12 @@ public class Block implements Serializable, ChildEntity {
         this.ignore       = block.ignore;
         this.strict       = block.strict;
         this.children     = new ArrayList<>();
-        for (FieldObj f : block.children) {
-            this.children.add(new FieldObj(f));
+        for (ComponentObj child : block.children) {
+            if (child instanceof FieldObj) {
+                this.children.add(new FieldObj((FieldObj)child));
+            } else {
+                this.children.add(new BlockObj((BlockObj)child));
+            }
         }
     }
 
@@ -80,20 +84,12 @@ public class Block implements Serializable, ChildEntity {
         this.multiplicity = multiplicity;
     }
 
-    public List<FieldObj> getChildren() {
+    public List<ComponentObj> getChildren() {
         return children;
     }
 
-    public void setChildren(List<FieldObj> children) {
+    public void setChildren(List<ComponentObj> children) {
         this.children = children;
-    }
-    
-    public List<Field> getFields() {
-        final List<Field> results = new ArrayList<>();
-        for (FieldObj f : children) {
-            results.add(f.getField());
-        }
-        return results;
     }
     
     public Field addField(int index, Field field) {

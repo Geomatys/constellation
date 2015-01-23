@@ -151,8 +151,8 @@ final class FormReader {
             for (final BlockObj bc : sb.getSuperblock().getChildren()) {
                 final Block block = bc.getBlock();
                 final String[] parent = parsePath(null, block.getPath());
-                for (final FieldObj fc : block.getChildren()) {
-                    final Field field = fc.getField();
+                for (final ComponentObj fc : block.getChildren()) {
+                    final Field field = ((FieldObj)fc).getField();
                     final String[] path = parsePath(parent, field.getPath());
                     addValue(path, field.getValue());
                 }
