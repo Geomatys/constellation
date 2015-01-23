@@ -45,53 +45,209 @@ import org.geotoolkit.metadata.ImageStatistics;
  * @author Cédric Briançon (Geomatys)
  */
 public interface IDataBusiness {
-    
-    void deleteData(QName qName, String id);
 
+    /**
+     * Delete data from database and delete data's dataset if it's empty.
+     * This should be called when a provider update his layer list and
+     * one layer was removed by external modification.
+     * Because this method delete data entry in Data table, every link to
+     * this data should be cascaded.
+     *
+     * Do not use this method to remove a data, use {@link #removeData(Integer)} instead.
+     *
+     * @param qName given data name.
+     * @param providerIdentifier given provider identifier.
+     */
+    void missingData(QName qName, String providerIdentifier);
+
+    /**
+     * Set {@code updated} attribute to {@code false} in removed data and his children.
+     * This may remove data/provider/dataset depending of the state of provider/dataset.
+     *
+     * @see #updateDataIncluded(int, boolean)
+     * @param dataId
+     * @throws ConfigurationException
+     */
+    void removeData(Integer dataId)throws ConfigurationException;
+
+    /**
+     * Proceed to create a new data for given parameters.
+     * @param name data name to create.
+     * @param providerIdentifier provider identifier.
+     * @param type data type.
+     * @param sensorable flag that indicates if data is sensorable.
+     * @param included flag that indicates if data is included.
+     * @param subType data subType.
+     * @param metadataXml metadata of data.
+     */
     Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean included, String subType, String metadataXml);
 
+    /**
+     * Proceed to create a new data for given parameters.
+     * @param name data name to create.
+     * @param providerIdentifier provider identifier.
+     * @param type data type.
+     * @param sensorable flag that indicates if data is sensorable.
+     * @param included flag that indicates if data is included.
+     * @param rendered flag that indicates if data is rendered (can be null).
+     * @param subType data subType.
+     * @param metadataXml metadata of data.
+     */
     Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean included, Boolean rendered, String subType, String metadataXml);
 
+    /**
+     * Proceed to remove data for given provider.
+     * Synchronized method.
+     * @param providerId given provider identifier.
+     */
     void removeDataFromProvider(String providerId);
 
-    DataBrief getDataBrief(QName dataName, Integer id) throws ConstellationException;
+    /**
+     * Returns {@link DataBrief} for given data name and provider id as integer.
+     *
+     * @param dataName given data name.
+     * @param providerId given data provider as integer.
+     * @return {@link DataBrief}.
+     * @throws ConstellationException is thrown if result fails.
+     */
+    DataBrief getDataBrief(QName dataName, Integer providerId) throws ConstellationException;
 
+    /**
+     * Returns {@link DataBrief} for given data name and provider identifier as string.
+     *
+     * @param fullName given data name.
+     * @param providerIdentifier given data provider identifier.
+     * @return {@link DataBrief}
+     * @throws ConstellationException is thrown if result fails.
+     */
     DataBrief getDataBrief(QName fullName, String providerIdentifier) throws ConstellationException;
 
+    /**
+     * Returns {@link DefaultMetadata} for given providerId and data name.
+     * @param providerID given data provider id.
+     * @param qName given data name.
+     * @return {@link DefaultMetadata}
+     * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
+     */
     DefaultMetadata loadIsoDataMetadata(String providerID, QName qName)  throws ConstellationException;
 
+    /**
+     * Returns {@link DefaultMetadata} for given dataId.
+     * @param dataId given data id.
+     * @return {@link DefaultMetadata}
+     * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
+     */
     DefaultMetadata loadIsoDataMetadata(int dataId) throws ConstellationException;
     
     Dataset getDatasetForData(String providerID, QName qName) throws ConstellationException;
 
     Dataset getDatasetForData(int dataId) throws ConstellationException;
 
+    /**
+     * Proceed to remove all data.
+     */
     void deleteAll();
 
     List<Data> searchOnMetadata(String search) throws IOException, ConstellationException;
 
+    /**
+     * Update data {@code included} attribute.
+     * If data {@code included} is set to {@code false}, all layers using this data are deleted,
+     * data is removed from all CSW and reload them, delete data provider if all siblings data also have
+     * their {@code included} attribute set as {@code false}.
+     * This may also delete data's dataset if it's empty.
+     *
+     * @param dataId the given data Id.
+     * @param included value to set
+     * @throws org.constellation.configuration.ConfigurationException
+     */
     void updateDataIncluded(int dataId, boolean included) throws ConfigurationException;
 
+    /**
+     * Returns {@link DataBrief} for given layer alias and data provider identifier.
+     *
+     * @param layerAlias given layer name.
+     * @param providerid given data provider identifier.
+     * @return {@link DataBrief}.
+     * @throws ConstellationException is thrown if result fails.
+     */
     DataBrief getDataLayer(String layerAlias, String providerid);
 
+    /**
+     * Load a metadata for given data provider id and data name.
+     *
+     * @param providerId given data provider.
+     * @param name given data name.
+     * @param instance marshaller pool.
+     * @return {@link CoverageMetadataBean}
+     * @throws ConstellationException is thrown for JAXBException.
+     */
     CoverageMetadataBean loadDataMetadata(String providerId, QName name, MarshallerPool instance);
 
-    List<DataBrief> getDataBriefsFromMetadataId(String id);
+    /**
+     * Returns a list of {@link DataBrief} for given metadata identifier.
+     *
+     * @param metadataId given metadata identifier.
+     * @return list of {@link DataBrief}.
+     */
+    List<DataBrief> getDataBriefsFromMetadataId(String metadataId);
 
-    Provider getProvider(int id);
+    /**
+     * Return the {@linkplain Provider provider} for the given {@linkplain Data data} identifier.
+     *
+     * @param dataId {@link Data} identifier
+     * @return a {@linkplain Provider provider}
+     */
+    Provider getProvider(int dataId);
 
+    /**
+     * Proceed to add a data domain.
+     * @param dataId given data Id.
+     * @param domainId given domain Id.
+     */
     void addDataToDomain(int dataId, int domainId);
 
+    /**
+     * proceed to remove data from domain.
+     * synchronized method.
+     * @param dataId given data id.
+     * @param domainId given domain id.
+     * @throws CstlConfigurationRuntimeException
+     */
     void removeDataFromDomain(int dataId, int domainId) throws CstlConfigurationRuntimeException;
 
-    List<DataBrief> getDataBriefsFromDatasetId(Integer dataSetId);
+    /**
+     * Returns a list of {@link DataBrief} for given dataSet id.
+     *
+     * @param datasetId the given dataSet id.
+     * @return the list of {@link DataBrief}.
+     */
+    List<DataBrief> getDataBriefsFromDatasetId(Integer datasetId);
 
+    /**
+     * Returns list of {@link Data} for given style id.
+     *
+     * @param styleId the given style id.
+     * @return the list of {@link Data}.
+     */
     List<Data> findByStyleId(final Integer styleId);
 
+    /**
+     * Returns a list of {@link DataBrief} for given style id.
+     *
+     * @param styleId the given style id.
+     * @return the list of {@link DataBrief}.
+     */
     List<DataBrief> getDataBriefsFromStyleId(final Integer styleId);
 
     ParameterValues getVectorDataColumns(int id) throws DataStoreException;
 
+    /**
+     * Returns list of {@link Data} for given dataSet id.
+     *
+     * @param datasetId the given dataSet id.
+     * @return the list of {@link Data}.
+     */
     List<Data> findByDatasetId(final Integer datasetId);
 
     void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException;

@@ -242,7 +242,7 @@ public final class DefaultConfigurator implements Configurator {
                     }
                 }
                 if (!found) {
-                    dataBusiness.deleteData(new QName(data.getNamespace(),data.getName()), provider.getId());
+                    dataBusiness.missingData(new QName(data.getNamespace(), data.getName()), provider.getId());
                 }
             }
 

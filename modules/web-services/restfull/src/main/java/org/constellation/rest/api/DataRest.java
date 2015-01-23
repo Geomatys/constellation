@@ -1991,13 +1991,6 @@ public class DataRest {
         return Response.ok(datasetBriefs).build();
     }
 
-    @DELETE
-    @Path("{providerid}/{dataid}")
-    public Response deleteData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
-        dataBusiness.deleteData(new QName("", dataid), providerid);
-        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
     @POST
     @Path("/include/{dataId}")
     public Response includeData(final @PathParam("dataId") int dataId) {
@@ -2010,15 +2003,11 @@ public class DataRest {
         }
     }
 
-    @GET
+    @DELETE
     @Path("/remove/{dataId}")
     public Response removeData(final @PathParam("dataId") int dataId) {
         try {
-            final List<org.constellation.engine.register.Data> linkedDataList = dataBusiness.getDataLinkedData(dataId);
-            for(final org.constellation.engine.register.Data d : linkedDataList){
-                dataBusiness.updateDataIncluded(d.getId(), false);
-            }
-            dataBusiness.updateDataIncluded(dataId, false);
+            dataBusiness.removeData(dataId);
             return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         }catch(Exception ex){
             LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);

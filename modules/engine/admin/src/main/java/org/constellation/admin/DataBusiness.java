@@ -211,10 +211,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     private IConfigurationBusiness configurationBusiness;
 
     /**
-     * Return the {@linkplain Provider provider} for the given {@linkplain Data data} identifier.
-     *
-     * @param dataId {@link Data} identifier
-     * @return a {@linkplain Provider provider}
+     * {@inheritDoc}
      */
     @Override
     public Provider getProvider(int dataId) {
@@ -223,11 +220,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns {@link DefaultMetadata} for given providerId and data name.
-     * @param providerId given data provider id.
-     * @param name given data name.
-     * @return {@link DefaultMetadata}
-     * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
+     * {@inheritDoc}
      */
     @Override
     public DefaultMetadata loadIsoDataMetadata(final String providerId,
@@ -254,10 +247,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns {@link DefaultMetadata} for given dataId.
-     * @param dataId given data id.
-     * @return {@link DefaultMetadata}
-     * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
+     * {@inheritDoc}
      */
     @Override
     public DefaultMetadata loadIsoDataMetadata(final int dataId) throws ConstellationException{
@@ -301,11 +291,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Search and returns result as list of {@link Data} for given query string.
-     * @param queryString the lucene query.
-     * @return list of {@link Data}
-     * @throws ConstellationException
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public List<Data> searchOnMetadata(final String queryString) throws IOException, ConstellationException {
@@ -359,13 +345,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Load a metadata for given data provider id and data name.
-     *
-     * @param providerIdentifier given data provider.
-     * @param name given data name.
-     * @param pool marshaller pool.
-     * @return {@link CoverageMetadataBean}
-     * @throws ConstellationException is thrown for JAXBException.
+     * {@inheritDoc}
      */
     @Override
     public CoverageMetadataBean loadDataMetadata(final String providerIdentifier,
@@ -388,12 +368,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns {@link DataBrief} for given data name and provider id as integer.
-     *
-     * @param fullName given data name.
-     * @param providerId given data provider as integer.
-     * @return {@link DataBrief}.
-     * @throws ConstellationException is thrown if result fails.
+     * {@inheritDoc}
      */
     @Override
     public DataBrief getDataBrief(QName fullName,Integer providerId) throws ConstellationException {
@@ -408,12 +383,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns {@link DataBrief} for given data name and provider identifier as string.
-     *
-     * @param fullName given data name.
-     * @param providerIdentifier given data provider identifier.
-     * @return {@link DataBrief}
-     * @throws ConstellationException is thrown if result fails.
+     * {@inheritDoc}
      */
     @Override
     public DataBrief getDataBrief(final QName fullName,
@@ -431,10 +401,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns a list of {@link DataBrief} for given metadata identifier.
-     *
-     * @param metadataId given metadata identifier.
-     * @return list of {@link DataBrief}.
+     * {@inheritDoc}
      */
     @Override
     public List<DataBrief> getDataBriefsFromMetadataId(final String metadataId) {
@@ -443,12 +410,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns {@link DataBrief} for given layer alias and data provider identifier.
-     *
-     * @param layerAlias given layer name.
-     * @param dataProviderIdentifier given data provider identifier.
-     * @return {@link DataBrief}.
-     * @throws ConstellationException is thrown if result fails.
+     * {@inheritDoc}
      */
     @Override
     public DataBrief getDataLayer(final String layerAlias,
@@ -464,10 +426,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns list of {@link Data} for given dataSet id.
-     *
-     * @param datasetId the given dataSet id.
-     * @return the list of {@link Data}.
+     * {@inheritDoc}
      */
     @Override
     public List<Data> findByDatasetId(final Integer datasetId) {
@@ -475,10 +434,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns a list of {@link DataBrief} for given dataSet id.
-     *
-     * @param datasetId the given dataSet id.
-     * @return the list of {@link DataBrief}.
+     * {@inheritDoc}
      */
     @Override
     public List<DataBrief> getDataBriefsFromDatasetId(final Integer datasetId) {
@@ -487,10 +443,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns list of {@link Data} for given style id.
-     *
-     * @param styleId the given style id.
-     * @return the list of {@link Data}.
+     * {@inheritDoc}
      */
     @Override
     public List<Data> findByStyleId(final Integer styleId) {
@@ -498,10 +451,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Returns a list of {@link DataBrief} for given style id.
-     *
-     * @param styleId the given style id.
-     * @return the list of {@link DataBrief}.
+     * {@inheritDoc}
      */
     @Override
     public List<DataBrief> getDataBriefsFromStyleId(final Integer styleId) {
@@ -632,21 +582,24 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Proceed to remove data for given data name and provider identifier.
-     * @param name given data name.
-     * @param providerIdentifier given provider identifier.
+     * {@inheritDoc}
      */
     @Override
     @Transactional
-    public void deleteData(final QName name, final String providerIdentifier) {
+    public void missingData(final QName name, final String providerIdentifier) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
-            final Data d = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), provider.getId());
-            if (d != null) {
-                indexEngine.removeDataMetadataFromIndex(d.getId());
-                dataRepository.delete(d.getId());
+            final Data data = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), provider.getId());
+            if (data != null) {
+
+                // remove data metadata from index
+                indexEngine.removeDataMetadataFromIndex(data.getId());
+
+                // delete data entry
+                dataRepository.delete(data.getId());
+
                 // Relevant erase dataset when the is no more data in it. fr now we remove it
-                deleteDatasetIfEmpty(d.getDatasetId());
+                deleteDatasetIfEmpty(data.getDatasetId());
             }
         }
     }
@@ -662,7 +615,20 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Proceed to remove all data.
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public void removeData(Integer dataId) throws ConfigurationException {
+        final List<Data> linkedDataList = getDataLinkedData(dataId);
+        for(final Data d : linkedDataList){
+            updateDataIncluded(d.getId(), false);
+        }
+        updateDataIncluded(dataId, false);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -677,37 +643,22 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Proceed to create a new data for given parameters.
-     * @param name data name to create.
-     * @param providerIdentifier provider identifier.
-     * @param type data type.
-     * @param sensorable flag that indicates if data is sensorable.
-     * @param visible flag that indicates if data is visible.
-     * @param subType data subType.
-     * @param metadata metadata of data.
+     * {@inheritDoc}
      */
     @Override
     @Transactional
     public Data create(final QName name, final String providerIdentifier,
                        final String type, final boolean sensorable,
-                       final boolean visible, final String subType, final String metadata) {
-        return create(name, providerIdentifier, type, sensorable, visible, null, subType, metadata);
+                       final boolean include, final String subType, final String metadata) {
+        return create(name, providerIdentifier, type, sensorable, include, null, subType, metadata);
     }
 
     /**
-     * Proceed to create a new data for given parameters.
-     * @param name data name to create.
-     * @param providerIdentifier provider identifier.
-     * @param type data type.
-     * @param sensorable flag that indicates if data is sensorable.
-     * @param visible flag that indicates if data is visible.
-     * @param rendered flag that indicates if data is rendered (can be null).
-     * @param subType data subType.
-     * @param metadataXml metadata of data.
+     * {@inheritDoc}
      */
     @Override
     @Transactional
-    public Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean visible, Boolean rendered, String subType, String metadataXml) {
+    public Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean include, Boolean rendered, String subType, String metadataXml) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
             final Data data = new Data();
@@ -722,7 +673,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             data.setSensorable(sensorable);
             data.setType(type);
             data.setSubtype(subType);
-            data.setIncluded(visible);
+            data.setIncluded(include);
             data.setMetadata(metadataXml);
             data.setRendered(rendered);
             return dataRepository.create(data);
@@ -731,10 +682,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Update data visibility for given data name and provider identifier.
-     * @param dataId the given data Id.
-     * @param included value to set
-     * @throws org.constellation.configuration.ConfigurationException
+     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -782,9 +730,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Proceed to add a data domain.
-     * @param dataId given data Id.
-     * @param domainId given domain Id.
+     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -793,11 +739,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * proceed to remove data from domain.
-     * synchronized method.
-     * @param dataId given data id.
-     * @param domainId given domain id.
-     * @throws CstlConfigurationRuntimeException
+     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -811,9 +753,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Proceed to remove data for given provider.
-     * Synchronized method.
-     * @param providerID given provider identifier.
+     * {@inheritDoc}
      */
     @Override
     @Transactional

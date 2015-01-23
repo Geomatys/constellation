@@ -148,7 +148,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'metadataFolder':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadatapath/true;jsessionid=', isArray: true},
             'importDataFull':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/import/full;jsessionid='},
             'extension':            {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/testextension;jsessionid='},
-            'removeData':           {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/remove/:dataId;jsessionid='},
+            'removeData':           {method: 'DELETE',  url: '@cstl/api/1/domain/$domainId/data/remove/:dataId;jsessionid='},
             'includeData':          {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/include/:dataId;jsessionid='},
             'initMetadata':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata;jsessionid='},
             'setUpMetadata':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/upload;jsessionid='},
