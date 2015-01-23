@@ -416,6 +416,47 @@ public class TeamplateReaderUpdateTest {
         expResult.setMetadataMaintenance(maint);
         
         MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+    
+    @Test
+    public void testUpdateMultipleBlock() throws IOException, FactoryException {
         
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        final DefaultDataIdentification previousDataIdent = new DefaultDataIdentification();
+        final DefaultKeywords previouskeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        final InternationalString pkw2 = new SimpleInternationalString("world");
+        previouskeywords.setKeywords(Arrays.asList(pkw1, pkw2));
+        final DefaultCitation previousGemet = new DefaultCitation("GEMET");
+        previousGemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        previouskeywords.setThesaurusName(previousGemet);
+        
+        previousDataIdent.setDescriptiveKeywords(Arrays.asList(previouskeywords));
+        previous.setIdentificationInfo(Arrays.asList(previousDataIdent));
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_multiple_block2.json");
+        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        Object result = reader.readTemplate(root, previous);
+        
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultCitation gemet = new DefaultCitation("GEMET");
+        gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(11145600000L), DateType.CREATION), 
+                                     new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        keywords.setThesaurusName(gemet);
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
     }
 }

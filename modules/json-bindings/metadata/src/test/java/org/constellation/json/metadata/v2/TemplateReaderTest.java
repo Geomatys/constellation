@@ -176,4 +176,45 @@ public class TemplateReaderTest {
         
         MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
     }
+    
+    @Test
+    public void testReadFromFilledTemplateMultipleBlock() throws IOException, FactoryException {
+        InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_multiple_block.json");
+        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        
+        Object result = reader.readTemplate(root, new DefaultMetadata());
+        
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultCitation gemet = new DefaultCitation("GEMET");
+        gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        keywords.setThesaurusName(gemet);
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+        
+        /*
+        * TEST 2 : one keyword with two thesaurus date
+        */
+        gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(11145600000L), DateType.CREATION), 
+                                     new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        
+        stream = TemplateReaderTest.class.getResourceAsStream("result_multiple_block2.json");
+        root   =  objectMapper.readValue(stream, RootObj.class);
+        
+        result = reader.readTemplate(root, new DefaultMetadata());
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
 }

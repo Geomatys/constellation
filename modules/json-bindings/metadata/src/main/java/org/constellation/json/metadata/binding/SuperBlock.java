@@ -33,7 +33,7 @@ import java.util.List;
  * @since 0.9
  */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class SuperBlock implements Serializable {
+public class SuperBlock implements Serializable, IBlock {
 
     private String name;
     private int multiplicity;
@@ -90,6 +90,7 @@ public class SuperBlock implements Serializable {
         return results;
     }
     
+    @Override
     public Block addBlock(int index, Block block) {
         children.add(index, new BlockObj(block));
         return block;

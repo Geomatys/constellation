@@ -33,7 +33,7 @@ import java.util.List;
  * @since 0.9
  */
 @JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
-public class Block implements Serializable, ChildEntity {
+public class Block implements Serializable, ChildEntity, IBlock {
 
     private String name;
     private int multiplicity;
@@ -95,6 +95,12 @@ public class Block implements Serializable, ChildEntity {
     public Field addField(int index, Field field) {
         children.add(index, new FieldObj(field));
         return field;
+    }
+    
+    @Override
+    public Block addBlock(int index, Block block) {
+        children.add(index, new BlockObj(block));
+        return block;
     }
 
     public String getHelp() {

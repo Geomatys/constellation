@@ -1,0 +1,118 @@
+{
+  "root" : {
+    "name" : "MD_Metadata",
+    "multiplicity" : 1,
+    "children" : [ {
+      "superblock" : {
+        "name" : "metadata.block.keywords",
+        "multiplicity" : 1,
+        "help" : "metadata.block.keywords_help",
+        "path" : null,
+        "render" : null,
+        "children" : [ {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.descriptiveKeyword",
+            "multiplicity" : 62,
+            "help" : "metadata.block.descriptiveKeyword_help",
+            "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0]",
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keyword",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keyword_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[0]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "hello",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keyword",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keyword_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[1]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "world",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.thesaurusTitle",
+                "multiplicity" : 1,
+                "help" : "metadata.field.thesaurusTitle_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].thesaurusName[0].title[0]",
+                "type" : null,
+                "render" : "text",
+                "defaultValue" : null,
+                "value" : "GEMET",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "block",
+              "block" : {
+                "name" : "metadata.block.descriptiveKeyword_thesaurus_date",
+                "multiplicity" : 62,
+                "help" : "metadata.block.descriptiveKeyword_thesaurus_date_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].thesaurusName[0].date[0]",
+                "render" : null,
+                "ignore" : null,
+                "type" : null,
+                "strict" : false,
+                "children" : [ {
+                  "type" : "field",
+                  "field" : {
+                    "name" : "metadata.field.thesaurusDate",
+                    "multiplicity" : 1,
+                    "help" : "metadata.field.thesaurusDate_help",
+                    "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].thesaurusName[0].date[0].date[0]",
+                    "type" : null,
+                    "render" : "DATE.text",
+                    "defaultValue" : null,
+                    "value" : "2012-01-01",
+                    "obligation" : "O",
+                    "ignore" : null,
+                    "tag" : null
+                  }
+                }, {
+                  "type" : "field",
+                  "field" : {
+                    "name" : "metadata.field.thesaurusDateType",
+                    "multiplicity" : 1,
+                    "help" : "metadata.field.thesaurusDateType_help",
+                    "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].thesaurusName[0].date[0].dateType[0]",
+                    "type" : null,
+                    "render" : "DATE.codelist",
+                    "defaultValue" : null,
+                    "value" : "CI_DateTypeCode.publication",
+                    "obligation" : "O",
+                    "ignore" : null,
+                    "tag" : null
+                  }
+                } ]
+              }
+            } ]
+          }
+        } ]
+      }
+    } ]
+  },
+  "nodeTypes" : null
+}

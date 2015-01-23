@@ -314,6 +314,57 @@ public class TemplateTreeTest {
         valueNodeEquals(expresult, result);
     }
     
+    @Test
+    public void testTreeFromEmptyTemplateMultipleBlock() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        final InputStream stream  = TemplateTreeTest.class.getResourceAsStream("profile_multiple_block.json");
+        final RootObj root        =  objectMapper.readValue(stream, RootObj.class);
+        final TemplateTree tree   = TemplateTree.getTreeFromRootObj(root);
+        final ValueNode result    = tree.getRoot();
+                
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null, false);
+        
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null, false);
+        
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword", false);
+        final ValueNode keyword11   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, null, dkey);
+        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey, null, false);
+        final ValueNode thesauTitle = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau);
+        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau, "metadata.block.descriptiveKeyword_thesaurus_date", false);
+        final ValueNode thesauDateD = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate);
+        final ValueNode thesauDateT = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate);
+        
+        
+        
+        valueNodeEquals(expresult, result);
+    }
+    
+    @Test
+    public void testTreeFromFilledTemplateMultipleBlock() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        final InputStream stream  = TemplateTreeTest.class.getResourceAsStream("result_multiple_block.json");
+        final RootObj root        =  objectMapper.readValue(stream, RootObj.class);
+        final TemplateTree tree   = TemplateTree.getTreeFromRootObj(root);
+        final ValueNode result    = tree.getRoot();
+                
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null, false);
+        
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null, false);
+        
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword", false);
+        final ValueNode keyword11   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "hello", dkey);
+        final ValueNode keyword12   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "world", dkey);
+        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey, null, false);
+        final ValueNode thesauTitle = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, "GEMET", thesau);
+        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau, "metadata.block.descriptiveKeyword_thesaurus_date", false);
+        final ValueNode thesauDateD = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, "2012-01-01", thesauDate);
+        final ValueNode thesauDateT = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, "CI_DateTypeCode.publication", thesauDate);
+        
+        
+        
+        valueNodeEquals(expresult, result);
+    }
+    
     
     private static void valueNodeEquals(final ValueNode expected, final ValueNode result) {
         if (expected.children.size() == result.children.size()) {

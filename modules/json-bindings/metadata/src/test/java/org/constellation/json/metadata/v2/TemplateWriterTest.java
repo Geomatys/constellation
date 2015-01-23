@@ -525,4 +525,66 @@ public class TemplateWriterTest {
         
     }
     
+    @Test
+    public void testWriteFilledMetadataMultipleBlock() throws IOException {
+        
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_multiple_block.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        /*
+        * TEST 1 : one keyword, one thesaurus date
+        */
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultCitation gemet = new DefaultCitation("GEMET");
+        gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        keywords.setThesaurusName(gemet);
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords));
+        metadata.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        RootObj rootFilled = writer.writeTemplate(root, metadata);
+        
+        InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_multiple_block.json");
+        String expectedJson = FileUtilities.getStringFromStream(resStream);
+
+        
+        File resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        String resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+        
+        /*
+        * TEST 2 : one keyword with two thesaurus date
+        */
+        gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(11156600000L), DateType.CREATION), new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        
+        rootFilled = writer.writeTemplate(root, metadata);
+        
+        resStream = TemplateWriterTest.class.getResourceAsStream("result_multiple_block2.json");
+        expectedJson = FileUtilities.getStringFromStream(resStream);
+        
+        resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+    }
+    
 }

@@ -10,9 +10,11 @@ import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import static org.constellation.json.JsonMetadataConstants.cleanNumeratedPath;
 import org.constellation.json.metadata.binding.Block;
+import org.constellation.json.metadata.binding.BlockObj;
 import org.constellation.json.metadata.binding.ComponentObj;
 import org.constellation.json.metadata.binding.Field;
 import org.constellation.json.metadata.binding.FieldObj;
+import org.constellation.json.metadata.binding.IBlock;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.json.metadata.binding.SuperBlock;
 
@@ -205,31 +207,35 @@ public class TemplateTree {
     public static TemplateTree getTreeFromRootObj(RootObj template) {
         final TemplateTree tree = new TemplateTree();
         for (SuperBlock sb : template.getRoot().getSuperBlocks()) {
-            
-            Map<String, Integer> blockPathOrdinal = new HashMap<>();
-            for (Block block : sb.getBlocks()) {
-                
-                // Multiple Block
-                ValueNode ancestor = null;
-                if (block.getPath() != null) {
-                    int blockOrdinal = updateOrdinal(blockPathOrdinal, block.getPath());
-                    ancestor = new ValueNode(block, blockOrdinal);
-                    tree.addNode(ancestor, null, template);
-                }
-                
-                // Fields
-                Map<String, Integer> fieldPathOrdinal = new HashMap<>();
-                for (ComponentObj child : block.getChildren()) {
-                    if (child instanceof FieldObj) {
-                        updateTreeFromField((FieldObj)child, tree, ancestor, template, fieldPathOrdinal);
-                    } else {
-                        throw new UnsupportedOperationException("TODO");
-                    }
-                }
+            final Map<String, Integer> blockPathOrdinal = new HashMap<>();
+            for (BlockObj block : sb.getChildren()) {
+                updateTreeFromBlock(block, tree, template, blockPathOrdinal);
             }
         }
         
         return tree;
+    }
+    
+    public static void updateTreeFromBlock(BlockObj blockO, TemplateTree tree, final RootObj template, Map<String, Integer> blockPathOrdinal) {
+        final Block block = blockO.getBlock();
+        
+        // Multiple Block
+        ValueNode ancestor = null;
+        if (block.getPath() != null) {
+            int blockOrdinal = updateOrdinal(blockPathOrdinal, block.getPath());
+            ancestor = new ValueNode(block, blockOrdinal);
+            tree.addNode(ancestor, null, template);
+        }
+
+        // Fields
+        final Map<String, Integer> fieldPathOrdinal = new HashMap<>();
+        for (ComponentObj child : block.getChildren()) {
+            if (child instanceof FieldObj) {
+                updateTreeFromField((FieldObj)child, tree, ancestor, template, fieldPathOrdinal);
+            } else {
+                updateTreeFromBlock((BlockObj)child, tree, template, blockPathOrdinal);
+            }
+        }
     }
     
     public static void updateTreeFromField(FieldObj fieldObj, TemplateTree tree, final ValueNode ancestor, final RootObj template, Map<String, Integer> fieldPathOrdinal) {
@@ -253,33 +259,10 @@ public class TemplateTree {
         final RootObj result = new RootObj(rootobj);
         
         for (SuperBlock sb : result.getRoot().getSuperBlocks()) {
-            final List<Block> children = new ArrayList<>(sb.getBlocks());
+            final List<BlockObj> children = new ArrayList<>(sb.getChildren());
             int blockCount = 0;
-            for (Block block : children) {
-                final Block origBlock = new Block(block);
-                final List<ValueNode> blockNodes = tree.getNodesForBlock(block);
-                
-                for (int i = 0; i < blockNodes.size(); i++) {
-                    final ValueNode node = blockNodes.get(i);
-                    if (i > 0) {
-                        block = sb.addBlock(blockCount + 1, new Block(origBlock));
-                        blockCount++;
-                    }
-                    if (node != null) {
-                        block.setPath(node.getNumeratedPath());
-                    }
-
-                    final List<ComponentObj> blockChildren = new ArrayList<>(block.getChildren());
-                    int fieldCount = 0;
-                    for (ComponentObj child : blockChildren) {
-                        if (child instanceof FieldObj) {
-                            updateRootObjFromTree((FieldObj) child, block, tree, node, fieldCount);
-                        } else {
-                            throw new UnsupportedOperationException("TODO");
-                        }
-                        fieldCount++;
-                    }
-                }
+            for (BlockObj block : children) {
+                blockCount = updateRootObjFromTree(sb, block, tree, blockCount);
                 blockCount++;
             }
         }
@@ -287,7 +270,36 @@ public class TemplateTree {
         return result;
     }
     
-    private static void updateRootObjFromTree(final FieldObj fieldObj, final Block owner, final TemplateTree tree, final ValueNode node, final int fieldCount) {
+    private static int updateRootObjFromTree(final IBlock owner, final BlockObj blockObj, final TemplateTree tree, int blockCount) {
+        Block block = blockObj.getBlock();
+        final Block origBlock = new Block(block);
+        final List<ValueNode> blockNodes = tree.getNodesForBlock(block);
+
+        for (int i = 0; i < blockNodes.size(); i++) {
+            final ValueNode node = blockNodes.get(i);
+            if (i > 0) {
+                block = owner.addBlock(blockCount + 1, new Block(origBlock));
+                blockCount++;
+            }
+            if (node != null) {
+                block.setPath(node.getNumeratedPath());
+            }
+
+            final List<ComponentObj> blockChildren = new ArrayList<>(block.getChildren());
+            int fieldCount = 0;
+            for (ComponentObj child : blockChildren) {
+                if (child instanceof FieldObj) {
+                    fieldCount = updateRootObjFromTree((FieldObj) child, block, tree, node, fieldCount);
+                } else {
+                    fieldCount = updateRootObjFromTree(block, (BlockObj)child, tree, fieldCount);
+                }
+                fieldCount++;
+            }
+        }
+        return blockCount;
+    }
+    
+    private static int updateRootObjFromTree(final FieldObj fieldObj, final Block owner, final TemplateTree tree, final ValueNode node, int fieldCount) {
         Field field = fieldObj.getField();
         final List<ValueNode> fieldNodes = tree.getNodesByPathAndParent(field.getPath(), node);
         for (int j = 0; j < fieldNodes.size(); j++) {
@@ -295,6 +307,7 @@ public class TemplateTree {
             if (j > 0) {
                 if (field.getMultiplicity() > 1) {
                     field = owner.addField(fieldCount + 1, new Field(field));
+                    fieldCount++;
                 } else {
                     LOGGER.info("field value excluded for multiplicity purpose");
                     continue;
@@ -303,5 +316,6 @@ public class TemplateTree {
             field.setPath(childNode.getNumeratedPath());
             field.setValue(childNode.value);
         }
+        return fieldCount;
     }
 }
