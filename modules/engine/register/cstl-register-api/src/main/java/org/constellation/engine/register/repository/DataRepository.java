@@ -76,5 +76,12 @@ public interface DataRepository {
 
     List<Data> getDataLinkedData(final int dataId);
 
+    /**
+     * Remove all cross reference between a data and his children.
+     * Children data are not removed, only cross references are.
+     * @param dataId origin data id
+     */
+    void removeLinkedData(final int dataId);
+
     List<Data> getDataByLinkedStyle(final int styleId);
 }

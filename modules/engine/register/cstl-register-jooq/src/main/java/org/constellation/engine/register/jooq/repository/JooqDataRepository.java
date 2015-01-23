@@ -256,6 +256,14 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
                 .where(DATA_X_DATA.DATA_ID.eq(dataId)).fetchInto(Data.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeLinkedData(int dataId) {
+        dsl.delete(DATA_X_DATA).where(DATA_X_DATA.DATA_ID.eq(dataId)).execute();
+    }
+
     @Override
     public List<Data> getDataByLinkedStyle(final int styleId) {
         return dsl.select(DATA.fields()).from(DATA)
