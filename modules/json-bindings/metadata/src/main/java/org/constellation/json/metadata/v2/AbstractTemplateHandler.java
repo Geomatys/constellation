@@ -37,7 +37,7 @@ public class AbstractTemplateHandler {
     /**
      * The default value to give to the {@code specialized} of {@link FormReader} constructor.
      */
-    private static final Map<Class<?>, Class<?>> DEFAULT_SPECIALIZED;
+    public static final Map<Class<?>, Class<?>> DEFAULT_SPECIALIZED;
     static {
         final Map<Class<?>, Class<?>> specialized = new HashMap<>();
         specialized.put(Responsibility.class,        ResponsibleParty.class);
@@ -50,8 +50,16 @@ public class AbstractTemplateHandler {
         DEFAULT_SPECIALIZED = specialized;
     }
     
+    protected Map<Class<?>, Class<?>> specialized;
+    
     public AbstractTemplateHandler(final MetadataStandard standard) {
         this.standard = standard;
+        this.specialized = DEFAULT_SPECIALIZED;
+    }
+    
+    public AbstractTemplateHandler(final MetadataStandard standard, Map<Class<?>, Class<?>> specialized) {
+        this.standard = standard;
+        this.specialized = specialized;
     }
     
     protected Map<String,Object> asMap(final Object metadata) {
@@ -62,22 +70,4 @@ public class AbstractTemplateHandler {
         return standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY);
     }
     
-    /**
-     * Returns the type of values for the given property in the given metadata.
-     */
-    private Class<?> getType(final Object metadata, final ValueNode node) throws ParseException {
-        if (node.type != null) {
-            try {
-                return Class.forName(node.type);
-            } catch (ClassNotFoundException ex) {
-                throw new ParseException("Unable to find a class for type : " + node.type);
-            }
-        }
-        Class type= standard.asTypeMap(metadata.getClass(), KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.ELEMENT_TYPE).get(node.name);
-        final Class<?> special = DEFAULT_SPECIALIZED.get(type);
-        if (special != null) {
-            return special;
-        }
-        return type;
-    }
 }

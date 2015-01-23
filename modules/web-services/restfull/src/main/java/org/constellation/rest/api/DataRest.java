@@ -63,6 +63,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import java.io.StringWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -101,7 +102,7 @@ import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.engine.security.WorkspaceService;
-import org.constellation.json.metadata.Template;
+import org.constellation.json.metadata.v2.Template;
 import org.constellation.json.metadata.binding.BlockObj;
 import org.constellation.json.metadata.binding.ComponentObj;
 import org.constellation.json.metadata.binding.FieldObj;
@@ -691,7 +692,7 @@ public class DataRest {
     public Response getDatasetMetadata(final ParameterValues values) {
         final String identifier         = values.getValues().get("identifier");
         final String dataType           = values.getValues().get("type");
-        final StringBuilder buffer = new StringBuilder();
+        final StringWriter buffer       = new StringWriter();
         try{
             final DefaultMetadata metadata  =  datasetBusiness.getMetadata(identifier, -1);
             if (metadata != null) {
@@ -714,7 +715,7 @@ public class DataRest {
         final String providerId         = values.getValues().get("provider");
         final String identifier         = values.getValues().get("identifier");
         final String dataType           = values.getValues().get("type");
-        final StringBuilder buffer = new StringBuilder();
+        final StringWriter buffer       = new StringWriter();
         try{
             final QName dataName = Util.parseQName(identifier);
             DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, dataName);
@@ -762,7 +763,7 @@ public class DataRest {
                                        final @PathParam("dataId") String dataId,
                                        final @PathParam("type") String type,
                                        final @PathParam("prune") boolean prune) {
-        final StringBuilder buffer = new StringBuilder();
+        final StringWriter buffer = new StringWriter();
         try{
             String dataIdStr = dataId;
             if(dataIdStr != null) {
@@ -813,7 +814,7 @@ public class DataRest {
     public Response getIsoMetadataJsonDS(final @PathParam("datasetIdentifier") String datasetIdentifier,
                                          final @PathParam("type") String type,
                                          final @PathParam("prune") boolean prune) {
-        final StringBuilder buffer = new StringBuilder();
+        final StringWriter buffer = new StringWriter();
         try{
             final DefaultMetadata metadata = datasetBusiness.getMetadata(datasetIdentifier,-1);
             if (metadata != null) {

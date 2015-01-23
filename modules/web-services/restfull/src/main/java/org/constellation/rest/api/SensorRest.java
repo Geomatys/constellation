@@ -40,7 +40,7 @@ import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Sensor;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.json.metadata.Template;
+import org.constellation.json.metadata.v2.Template;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
@@ -200,7 +200,7 @@ public class SensorRest {
         if (record != null) {
             try {
                 final AbstractSensorML sml = SOSUtils.unmarshallSensor(record.getMetadata());
-                final StringBuilder buffer = new StringBuilder();
+                final StringWriter buffer = new StringWriter();
                 if (sml != null) {
                     //get template name
                     final String templateName;

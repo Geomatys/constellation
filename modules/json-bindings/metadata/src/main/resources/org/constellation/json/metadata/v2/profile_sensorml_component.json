@@ -1,0 +1,394 @@
+{
+    "root": {
+        "name": "SensorML",
+        "multiplicity": 1,
+        "children": [{
+                "superblock": {
+                    "name": "component.sblock.identification",
+                    "multiplicity": 1,
+                    "help": "component.sblock.identification_help",
+                    "path": null,
+                    "children": [{
+                            "type": "block",
+                            "block": {
+                                "name": "component.block.identification.uniqueID",
+                                "multiplicity": 1,
+                                "help": "component.block.identification.uniqueID_help",
+                                "path": "metadata.member.realProcess.identification.identifierList.identifier",
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.uniqueID.name",
+                                            "multiplicity": 1,
+                                            "help": "component.field.uniqueID.name_help",
+                                            "path": "metadata.member.realProcess.identification.identifierList.identifier.name",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "uniqueID",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.uniqueID.definition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.uniqueID.definition_help",
+                                            "path": "metadata.member.realProcess.identification.identifierList.identifier.term.definition",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "urn:ogc:def:identifierType:OGC:uniqueID",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.uniqueID.value",
+                                            "multiplicity": 1,
+                                            "help": "component.field.uniqueID.value_help",
+                                            "path": "metadata.member.realProcess.identification.identifierList.identifier.term.value",
+                                            "render": "text",
+                                            "tag": "title",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }, {
+                            "type": "block",
+                            "block": {
+                                "name": "component.block.identification.identifier",
+                                "multiplicity": 62,
+                                "help": "component.block.identification.identifier_help",
+                                "path": "metadata.member.realProcess.identification.identifierList.identifier",
+                                "ignore": "1 0 1 0 1",
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.identifier.name",
+                                            "multiplicity": 1,
+                                            "help": "component.field.identifier.name_help",
+                                            "path": "metadata.member.realProcess.identification.identifierList.identifier.name",
+                                            "render": "text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.identifier.definition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.identifier.definition_help",
+                                            "path": "metadata.member.realProcess.identification.identifierList.identifier.term.definition",
+                                            "render": "uri",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.identifier.value",
+                                            "multiplicity": 1,
+                                            "help": "component.field.identifier.value_help",
+                                            "path": "metadata.member.realProcess.identification.identifierList.identifier.term.value",
+                                            "render": "text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }, {
+                "superblock": {
+                    "name": "component.sblock.validTime",
+                    "multiplicity": 1,
+                    "help": "component.sblock.validTime_help",
+                    "path": null,
+                    "children": [{
+                            "type": "block",
+                            "block": {
+                                "name": "component.block.validTime",
+                                "multiplicity": 1,
+                                "help": "component.block.validTime_help",
+                                "path": null,
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.validTime.beginPosition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.validTime.beginPosition_help",
+                                            "path": "metadata.member.realProcess.validTime.timePeriod.beginPosition",
+                                            "render": "DATE.text",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.validTime.endPosition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.validTime.endPosition_help",
+                                            "path": "metadata.member.realProcess.validTime.timePeriod.endPosition",
+                                            "render": "DATE.text",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }, {
+                "superblock": {
+                    "name": "component.sblock.position",
+                    "multiplicity": 1,
+                    "help": "component.sblock.position_help",
+                    "path": null,
+                    "children": [{
+                            "type": "block",
+                            "block": {
+                                "name": "component.block.position",
+                                "multiplicity": 1,
+                                "help": "component.block.position_help",
+                                "path": null,
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.position.name",
+                                            "multiplicity": 1,
+                                            "help": "component.field.position.name_help",
+                                            "path": "metadata.member.realProcess.position.name",
+                                            "render": "text",
+                                            "obligation": "M",
+                                            "defaultValue": "platform-location",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.position.referenceFrame",
+                                            "multiplicity": 1,
+                                            "help": "component.field.position.referenceFrame_help",
+                                            "path": "metadata.member.realProcess.position.position.referenceFrame",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "urn:ogc:def:crs,crs:EPSG::4326",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.position.definition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.position.definition_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.definition",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "urn:ogc:def:phenomenon:location",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.latitude.name",
+                                            "multiplicity": 1,
+                                            "help": "component.field.latitude.name_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.latitude.name",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "latitude",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.latitude.definition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.latitude.definition_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.latitude.quantity.definition",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "urn:ogc:def:phenomenon:latitude",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.latitude.uom",
+                                            "multiplicity": 1,
+                                            "help": "component.field.latitude.uom_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.latitude.quantity.uom.code",
+                                            "render": "text",
+                                            "obligation": "M",
+                                            "defaultValue": "degree",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.latitude.value",
+                                            "multiplicity": 1,
+                                            "help": "component.field.latitude.value_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.latitude.quantity.value",
+                                            "render": "decimal",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.longitude.name",
+                                            "multiplicity": 1,
+                                            "help": "component.field.longitude.name_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.longitude.name",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "longitude",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.longitude.definition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.longitude.definition_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.longitude.quantity.definition",
+                                            "render": "readonly",
+                                            "obligation": "M",
+                                            "defaultValue": "urn:ogc:def:phenomenon:longitude",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.longitude.uom",
+                                            "multiplicity": 1,
+                                            "help": "component.field.longitude.uom_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.longitude.quantity.uom.code",
+                                            "render": "text",
+                                            "obligation": "M",
+                                            "defaultValue": "degree",
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.longitude.value",
+                                            "multiplicity": 1,
+                                            "help": "component.field.longitude.value_help",
+                                            "path": "metadata.member.realProcess.position.position.location.vector.longitude.quantity.value",
+                                            "render": "decimal",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }, {
+                "superblock": {
+                    "name": "component.sblock.inOut",
+                    "multiplicity": 1,
+                    "help": "component.sblock.inOut_help",
+                    "path": null,
+                    "children": [{
+                            "type": "block",
+                            "block": {
+                                "name": "component.block.inputs",
+                                "multiplicity": 62,
+                                "help": "component.block.inputs_help",
+                                "path": "metadata.member.realProcess.inputs.inputList.input",
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.input.name",
+                                            "multiplicity": 1,
+                                            "help": "component.field.input.name_help",
+                                            "path": "metadata.member.realProcess.inputs.inputList.input.name",
+                                            "render": "text",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.input.definition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.input.definition_help",
+                                            "path": "metadata.member.realProcess.inputs.inputList.input.observableProperty.definition",
+                                            "render": "uri",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }, {
+                            "type": "block",
+                            "block": {
+                                "name": "component.block.outputs",
+                                "multiplicity": 62,
+                                "help": "component.block.outputs_help",
+                                "path": "metadata.member.realProcess.outputs.outputList.output",
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.output.name",
+                                            "multiplicity": 1,
+                                            "help": "component.field.output.name_help",
+                                            "path": "metadata.member.realProcess.outputs.outputList.output.name",
+                                            "render": "text",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.output.definition",
+                                            "multiplicity": 1,
+                                            "help": "component.field.output.definition_help",
+                                            "path": "metadata.member.realProcess.outputs.outputList.output.quantity.definition",
+                                            "render": "uri",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "component.field.output.uom",
+                                            "multiplicity": 1,
+                                            "help": "component.field.output.uom_help",
+                                            "path": "metadata.member.realProcess.outputs.outputList.output.quantity.uom.code",
+                                            "render": "text",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

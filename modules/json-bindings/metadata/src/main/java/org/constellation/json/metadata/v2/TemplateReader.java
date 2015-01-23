@@ -18,7 +18,6 @@ import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.TypeValuePolicy;
-import org.apache.sis.metadata.ValueExistencePolicy;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.iso.Types;
@@ -64,30 +63,17 @@ public class TemplateReader extends AbstractTemplateHandler {
             COMPONENT = new MetadataFactory(SensorMLStandard.COMPONENT);
     
     /**
-     * The default value to give to the {@code specialized} of {@link FormReader} constructor.
-     */
-    private static final Map<Class<?>, Class<?>> DEFAULT_SPECIALIZED;
-    static {
-        final Map<Class<?>, Class<?>> specialized = new HashMap<>();
-        specialized.put(Responsibility.class,        ResponsibleParty.class);
-        specialized.put(Identification.class,        DataIdentification.class);
-        specialized.put(GeographicExtent.class,      GeographicBoundingBox.class);
-        specialized.put(SpatialRepresentation.class, VectorSpatialRepresentation.class);
-        specialized.put(Constraints.class,           LegalConstraints.class);
-        specialized.put(Result.class,                ConformanceResult.class);
-        specialized.put(Element.class,               DomainConsistency.class);
-        DEFAULT_SPECIALIZED = specialized;
-    }
-    
-
-    /**
      * The metadata factory to use for creating new instances.
      */
     private final MetadataFactory factory;
     
     
     public TemplateReader(final MetadataStandard standard) {
-        super(standard);
+        this(standard, DEFAULT_SPECIALIZED);
+    }
+    
+    public TemplateReader(final MetadataStandard standard, Map<Class<?>, Class<?>> specialized) {
+        super(standard, specialized);
         if (standard == SensorMLStandard.SYSTEM) {
             factory = SYSTEM;
         } else if (standard == SensorMLStandard.COMPONENT) {
@@ -221,7 +207,7 @@ public class TemplateReader extends AbstractTemplateHandler {
             }
         }
         Class type = standard.asTypeMap(metadata.getClass(), KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.ELEMENT_TYPE).get(node.name);
-        final Class<?> special = DEFAULT_SPECIALIZED.get(type);
+        final Class<?> special = specialized.get(type);
         if (special != null) {
             return special;
         }
