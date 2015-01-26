@@ -54,6 +54,8 @@ import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
+import org.constellation.admin.listener.DefaultDataBusinessListener;
+import org.constellation.admin.listener.IDataBusinessListener;
 import org.constellation.admin.util.ImageStatisticDeserializer;
 import org.constellation.api.DataType;
 import org.constellation.api.PropertyConstants;
@@ -95,6 +97,7 @@ import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.PropertyType;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
@@ -209,6 +212,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Inject
     private IConfigurationBusiness configurationBusiness;
+
+    @Autowired(required = false)
+    private IDataBusinessListener dataBusinessListener = new DefaultDataBusinessListener();
 
     /**
      * {@inheritDoc}
@@ -591,12 +597,13 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         if (provider != null) {
             final Data data = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), provider.getId());
             if (data != null) {
-
                 // remove data metadata from index
                 indexEngine.removeDataMetadataFromIndex(data.getId());
 
                 // delete data entry
+                dataBusinessListener.preDataDelete(data);
                 dataRepository.delete(data.getId());
+                dataBusinessListener.postDataDelete(data);
 
                 // Relevant erase dataset when the is no more data in it. fr now we remove it
                 deleteDatasetIfEmpty(data.getDatasetId());
@@ -636,7 +643,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         final List<Data> datas = dataRepository.findAll();
         for (final Data data : datas) {
             indexEngine.removeDataMetadataFromIndex(data.getId());
+            dataBusinessListener.preDataDelete(data);
             dataRepository.delete(data.getId());
+            dataBusinessListener.postDataDelete(data);
             // Relevant erase dataset when the is no more data in it. fr now we remove it
             deleteDatasetIfEmpty(data.getDatasetId());
         }
@@ -661,7 +670,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean include, Boolean rendered, String subType, String metadataXml) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
-            final Data data = new Data();
+            Data data = new Data();
             data.setDate(new Date().getTime());
             data.setName(name.getLocalPart());
             data.setNamespace(name.getNamespaceURI());
@@ -676,7 +685,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             data.setIncluded(include);
             data.setMetadata(metadataXml);
             data.setRendered(rendered);
-            return dataRepository.create(data);
+            data = dataRepository.create(data);
+            dataBusinessListener.postDataCreate(data);
+            return data;
         }
         return null;
     }
@@ -704,17 +715,28 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
             // 3. cleanup provider if empty
             boolean remove = true;
-            for (Data pdata : dataRepository.findByProviderId(providerID)) {
+            List<Data> providerData = dataRepository.findByProviderId(providerID);
+            for (Data pdata : providerData) {
                 if (pdata.isIncluded()) {
                     remove = false;
                     break;
                 }
             }
             if (remove) {
+                //notify pre delete
+                for (Data pdata : providerData) {
+                    dataBusinessListener.preDataDelete(pdata);
+                }
+
                 final Provider p = providerRepository.findOne(providerID);
                 final DataProvider dp = DataProviders.getInstance().getProvider(p.getIdentifier());
                 DataProviders.getInstance().removeProvider(dp);
                 providerRepository.delete(providerID);
+
+                //notify post delete
+                for (Data pdata : providerData) {
+                    dataBusinessListener.postDataDelete(pdata);
+                }
 
                 // delete associated files in integrated folder. the file name (p.getIdentifier()) is a folder.
                 final File provDir = ConfigDirectory.getDataIntegratedDirectory(p.getIdentifier());
@@ -763,7 +785,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             final List<Data> datas = dataRepository.findByProviderId(p.getId());
             for (final Data data : datas) {
                 indexEngine.removeDataMetadataFromIndex(data.getId());
+                dataBusinessListener.preDataDelete(data);
                 dataRepository.delete(data.getId());
+                dataBusinessListener.postDataDelete(data);
                 // Relevant erase dataset when the is no more data in it. fr now we remove it
                 deleteDatasetIfEmpty( data.getDatasetId());
             }

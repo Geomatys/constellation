@@ -40,6 +40,8 @@ import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
+import org.constellation.admin.listener.DefaultDataBusinessListener;
+import org.constellation.admin.listener.IDataBusinessListener;
 import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.configuration.ConfigDirectory;
@@ -62,6 +64,7 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,6 +124,10 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      */
     @Inject
     private IndexEngine indexEngine;
+
+
+    @Autowired(required = false)
+    private IDataBusinessListener dataBusinessListener = new DefaultDataBusinessListener();
 
     /**
      * Creates a new instance of {@link DatasetBusiness}.
@@ -556,17 +563,29 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             // 2. cleanup provider if empty
             for (Integer providerID : involvedProvider) {
                 boolean remove = true;
-                for (Data data : dataRepository.findByProviderId(providerID)) {
-                    if (data.isIncluded()) {
+                List<Data> providerData = dataRepository.findByProviderId(providerID);
+                for (Data pdata : providerData) {
+                    if (pdata.isIncluded()) {
                         remove = false;
                         break;
                     }
                 }
                 if (remove) {
+                    //notify pre delete
+                    for (Data pdata : providerData) {
+                        dataBusinessListener.preDataDelete(pdata);
+                    }
+
                     final Provider p = providerRepository.findOne(providerID);
                     final DataProvider dp = DataProviders.getInstance().getProvider(p.getIdentifier());
                     DataProviders.getInstance().removeProvider(dp);
                     providerRepository.delete(providerID);
+
+                    //notify post delete
+                    for (Data pdata : providerData) {
+                        dataBusinessListener.postDataDelete(pdata);
+                    }
+
                     final File provDir = ConfigDirectory.getDataIntegratedDirectory(p.getIdentifier());
                     FileUtilities.deleteDirectory(provDir);
                 }
