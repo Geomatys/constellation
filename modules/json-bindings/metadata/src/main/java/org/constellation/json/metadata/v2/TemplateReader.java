@@ -20,6 +20,8 @@ import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.TypeValuePolicy;
+import org.apache.sis.metadata.iso.DefaultIdentifier;
+import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.iso.Types;
@@ -140,9 +142,13 @@ public class TemplateReader extends AbstractTemplateHandler {
     
     
     private Object getValue(final ValueNode node, Object metadata) throws ParseException {
-        if (metadata instanceof AbstractMetadata) {
-            AbstractMetadata meta = (AbstractMetadata) metadata;
-            Object result = meta.asMap().get(node.name);
+        // special types
+        if (metadata instanceof ReferenceSystemMetadata || metadata instanceof TimePeriodType || metadata instanceof TimePositionType) {
+            final Method getter = ReflectionUtilities.getGetterFromName(node.name, metadata.getClass());
+            return ReflectionUtilities.invokeMethod(metadata, getter);
+            
+        } else {
+            Object result = fixImmutable(asMap(metadata).get(node.name));
             /*
              * if the node has a type we verify that the values correspound to the declared type.
              * For a collection, we return a sub-collection with only the matching instance
@@ -169,9 +175,6 @@ public class TemplateReader extends AbstractTemplateHandler {
             } else {
                 return result;
             }
-        } else {
-            // TODO try via getter
-            return null;
         }
     }
     
@@ -297,6 +300,29 @@ public class TemplateReader extends AbstractTemplateHandler {
         return value;
     }
 
+    private static Object fixImmutable(final Object obj) {
+        if (obj instanceof Collection) {
+            final Iterator it = ((Collection)obj).iterator();
+            while(it.hasNext()) {
+                Object o = it.next();
+                if (o instanceof ReferenceSystemMetadata) {
+                    fixImmutableRs((ReferenceSystemMetadata)o);
+                }
+            }
+        }
+        if (obj instanceof ReferenceSystemMetadata) {
+            fixImmutableRs((ReferenceSystemMetadata)obj);
+        }
+        return obj;
+    }
+    
+    private static void fixImmutableRs(final ReferenceSystemMetadata rs) {
+        if (rs.getName() instanceof ImmutableIdentifier) {
+            final DefaultIdentifier newID = new DefaultIdentifier(rs.getName());
+            rs.setName(newID);
+        }
+    }
+    
     /**
      * Returns the given value as a date.
      */
