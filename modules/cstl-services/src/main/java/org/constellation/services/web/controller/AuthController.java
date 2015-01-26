@@ -19,9 +19,7 @@
 package org.constellation.services.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 
 import org.constellation.auth.transfer.TokenTransfer;
 import org.constellation.engine.register.CstlUser;
@@ -45,7 +43,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.common.base.Optional;
 
@@ -139,19 +136,9 @@ public class AuthController {
         return new ResponseEntity<TokenTransfer>(new TokenTransfer(createToken, id, defaultDomain.getId()), HttpStatus.OK);
     }
 
-    @RequestMapping(value="/auth/extendToken", method=RequestMethod.GET)
-    public @ResponseBody String extendToken() {
-        UserDetails userDetails = extractUserDetail();
+   
 
-        return tokenService.createToken(userDetails.getUsername());
-
-    }
-
-    @RequestMapping(value="/auth/logout", method=RequestMethod.DELETE)
-    public void logout(@Context HttpServletRequest request, @Context HttpServletResponse response) {
-        request.getSession().invalidate();
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-    }
+   
 
     public static UserDetails extractUserDetail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

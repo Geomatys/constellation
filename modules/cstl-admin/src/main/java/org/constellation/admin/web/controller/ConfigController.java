@@ -24,7 +24,10 @@ import java.util.Properties;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.constellation.admin.security.CstlAdminLoginConfigurationService;
 import org.constellation.token.TokenUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +39,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ConfigController {
 	
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigController.class);
+    
     private static long TOKEN_LIFE = TokenUtils.getTokenLife();
+
+    @Inject
+    private CstlAdminLoginConfigurationService cstlAdminLoginConfigurationService;
+    
+    public ConfigController() {
+         LOGGER.info("***** ConfigController contruct *****");
+    }
+    
     
 	@Inject
 	private Environment env;
@@ -67,6 +80,7 @@ public class ConfigController {
 		}
 		properties.put("cstl", context);
 		properties.put("token.life", TOKEN_LIFE);
+		properties.put("cstlLoginURL", env.getProperty("cstlLoginURL", cstlAdminLoginConfigurationService.getCstlLoginURL()));
 		return properties;
 	}
 
