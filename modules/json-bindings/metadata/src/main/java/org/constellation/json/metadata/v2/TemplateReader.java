@@ -1,19 +1,21 @@
 
 package org.constellation.json.metadata.v2;
 
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
@@ -26,24 +28,15 @@ import org.apache.sis.xml.NilReason;
 import org.constellation.json.JsonMetadataConstants;
 import org.constellation.json.metadata.ParseException;
 import org.constellation.json.metadata.binding.RootObj;
+import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gts.xml.PeriodDurationType;
 import org.geotoolkit.metadata.MetadataFactory;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
-import org.opengis.metadata.citation.Responsibility;
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.constraint.Constraints;
-import org.opengis.metadata.constraint.LegalConstraints;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.metadata.extent.GeographicExtent;
-import org.opengis.metadata.identification.DataIdentification;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.metadata.quality.ConformanceResult;
-import org.opengis.metadata.quality.DomainConsistency;
-import org.opengis.metadata.quality.Element;
-import org.opengis.metadata.quality.Result;
-import org.opengis.metadata.spatial.SpatialRepresentation;
-import org.opengis.metadata.spatial.VectorSpatialRepresentation;
+import org.opengis.referencing.ReferenceSystem;
 import org.opengis.temporal.PeriodDuration;
+import org.opengis.temporal.TemporalPrimitive;
 import org.opengis.util.CodeList;
 import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
@@ -190,8 +183,20 @@ public class TemplateReader extends AbstractTemplateHandler {
         Class type = getType(metadata, node);
         if (type != null) {
             value      = convert(node.name, type, value);
-            final Map<String,Object> values = asMap(metadata);
-            values.put(node.name, value);
+            if (type == ReferenceSystem.class || (metadata instanceof ReferenceSystem) || (metadata instanceof TimePeriodType) || (metadata instanceof TimePositionType)) {
+                final Method setter = ReflectionUtilities.getSetterFromName(node.name, value.getClass(), metadata.getClass());
+                if (setter != null) {
+                    if (setter.getParameterTypes()[0] == Collection.class) {
+                        value = Arrays.asList(value);
+                    }
+                    ReflectionUtilities.invokeMethod(setter, metadata, value);
+                } else {
+                    LOGGER.warning("Unable to find a setter for:" + node.name + " in " + metadata.getClass().getName());
+                }
+            } else {
+                final Map<String,Object> values = asMap(metadata);
+                values.put(node.name, value);
+            }
         }
     }
     
@@ -206,7 +211,13 @@ public class TemplateReader extends AbstractTemplateHandler {
                 throw new ParseException("Unable to find a class for type : " + node.type);
             }
         }
-        Class type = standard.asTypeMap(metadata.getClass(), KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.ELEMENT_TYPE).get(node.name);
+        Class type;
+        if (metadata instanceof ReferenceSystemMetadata || metadata instanceof TimePeriodType || metadata instanceof TimePositionType) {
+            final Method getter = ReflectionUtilities.getGetterFromName(node.name, metadata.getClass());
+            return getter.getReturnType();
+        } else {
+            type = standard.asTypeMap(metadata.getClass(), KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.ELEMENT_TYPE).get(node.name);
+        }
         final Class<?> special = specialized.get(type);
         if (special != null) {
             return special;
@@ -217,7 +228,15 @@ public class TemplateReader extends AbstractTemplateHandler {
     private Object buildNewInstance(final Object metadata, final ValueNode node) throws ParseException {
         try {
             Class type = getType(metadata, node);
-            if (type != null) {
+            // special case
+            if (type == ReferenceSystem.class) {
+                return new ReferenceSystemMetadata();
+            } else if (type == TemporalPrimitive.class) {
+                return new TimePeriodType();
+            } else if (type == TimePositionType.class) {
+                return new TimePositionType();    
+                
+            } else if (type != null) {
                 return factory.create(type, Collections.<String,Object>emptyMap());
             } else {
                 LOGGER.log(Level.INFO, "no type find for attribute:{0} in object:{1}", new Object[]{node.name, metadata.getClass().getName()});

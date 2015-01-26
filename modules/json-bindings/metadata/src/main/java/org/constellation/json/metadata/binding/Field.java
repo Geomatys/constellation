@@ -146,4 +146,16 @@ public class Field implements Serializable {
     public void setTag(String tag) {
         this.tag = tag;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Block]\n");
+        sb.append("name:").append(name).append('\n');
+        sb.append("path:").append(path).append('\n');
+        sb.append("type:").append(type).append('\n');
+        sb.append("multiplicity:").append(multiplicity).append('\n');
+        sb.append("defaultValue:").append(defaultValue).append('\n');
+        sb.append("value:").append(value);
+        return sb.toString();
+    }
 }

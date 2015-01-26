@@ -53,4 +53,9 @@ public class FieldObj extends ComponentObj implements Serializable {
     public void setField(Field field) {
         this.field = field;
     }
+    
+    @Override
+    public String toString() {
+        return "[FieldObj]\nfield:" + field;
+    }
 }

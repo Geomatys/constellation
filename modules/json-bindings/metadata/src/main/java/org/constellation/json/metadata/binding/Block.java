@@ -156,4 +156,15 @@ public class Block implements Serializable, ChildEntity, IBlock {
     public void setStrict(boolean strict) {
         this.strict = strict;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[Block]\n");
+        sb.append("name:").append(name).append('\n');
+        sb.append("path:").append(path).append('\n');
+        sb.append("type:").append(type).append('\n');
+        sb.append("multiplicity:").append(multiplicity).append('\n');
+        sb.append("children:").append(children.size());
+        return sb.toString();
+    }
 }

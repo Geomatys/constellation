@@ -47,4 +47,9 @@ public class SuperBlockObj implements Serializable {
     public void setSuperblock(SuperBlock superblock) {
         this.superblock = superblock;
     }
+    
+    @Override
+    public String toString() {
+        return "[SuperBlockObj]\nsuperBlock:" + superblock;
+    }
 }

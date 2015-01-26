@@ -119,4 +119,14 @@ public class SuperBlock implements Serializable, IBlock {
     public void setRender(String render) {
         this.render = render;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[SuperBlock]\n");
+        sb.append("name:").append(name).append('\n');
+        sb.append("path:").append(path).append('\n');
+        sb.append("multiplicity:").append(multiplicity).append('\n');
+        sb.append("children:").append(children.size());
+        return sb.toString();
+    }
 }

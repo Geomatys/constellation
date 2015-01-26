@@ -152,7 +152,7 @@ public class Template {
      * @throws IOException if an error occurred while parsing.
      */
     public void read(final RootObj json, final Object destination, final boolean skipNulls) throws IOException {
-        TemplateReader reader = new TemplateReader(standard);
+        TemplateReader reader = new TemplateReader(standard, specialized);
         reader.readTemplate(json, destination);
     }
     

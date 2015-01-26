@@ -1,6 +1,7 @@
 
 package org.constellation.json.metadata.v2;
 
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,8 @@ import static org.constellation.json.JsonMetadataConstants.DATE_HOUR_FORMAT;
 import static org.constellation.json.JsonMetadataConstants.DATE_READ_ONLY;
 import org.constellation.json.metadata.ParseException;
 import org.constellation.json.metadata.binding.RootObj;
+import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.opengis.util.Enumerated;
 
 /**
@@ -114,7 +117,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
     }
     
     private Object getValue(final ValueNode node, Object metadata,  Map<String, Set<Object>> excluded) throws ParseException {
-        if (metadata instanceof AbstractMetadata) {
+        if (metadata instanceof AbstractMetadata && !(metadata instanceof TimePeriodType)) {
             Object obj = asFullMap(metadata).get(node.name);
             if (obj instanceof Collection) {
                 final Collection result = new ArrayList<>(); 
@@ -127,8 +130,17 @@ public class TemplateWriter extends AbstractTemplateHandler {
             } else {
                 return getSingleValue(node, obj, excluded);
             }
+        } else if (metadata instanceof Collection && ((Collection)metadata).isEmpty()) {
+            return null;
+            
+        } else if (metadata != null) {
+            final Method getter = ReflectionUtilities.getGetterFromName(node.name, metadata.getClass());
+            if (getter != null) {
+                return ReflectionUtilities.invokeMethod(metadata, getter);
+            }
+            throw new UnsupportedOperationException("Not an AbstractMetadata class:" + metadata.getClass().getName() + " TODO");
+            
         } else {
-            // TODO try via getter
             return null;
         }
     }

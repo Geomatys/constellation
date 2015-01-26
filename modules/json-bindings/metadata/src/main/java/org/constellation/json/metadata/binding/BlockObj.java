@@ -50,4 +50,9 @@ public class BlockObj extends ComponentObj implements Serializable {
     public void setBlock(Block block) {
         this.block = block;
     }
+    
+    @Override
+    public String toString() {
+        return "[BlockObj]\nsuperBlock:" + block;
+    }
 }

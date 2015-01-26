@@ -7,12 +7,16 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
 import org.apache.sis.metadata.iso.constraint.DefaultLegalConstraints;
 import org.apache.sis.metadata.iso.constraint.DefaultSecurityConstraints;
+import org.apache.sis.metadata.iso.extent.DefaultExtent;
+import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.metadata.iso.maintenance.DefaultScope;
@@ -182,7 +186,6 @@ public class TemplateReaderTest {
         InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_multiple_block.json");
         RootObj root       =  objectMapper.readValue(stream, RootObj.class);
         
-        
         TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
         
         Object result = reader.readTemplate(root, new DefaultMetadata());
@@ -214,6 +217,34 @@ public class TemplateReaderTest {
         root   =  objectMapper.readValue(stream, RootObj.class);
         
         result = reader.readTemplate(root, new DefaultMetadata());
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+    
+    @Test
+    public void testReadFromFilledTemplateSpecialType() throws IOException, FactoryException {
+        InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_special_type.json");
+        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        
+        Object result = reader.readTemplate(root, new DefaultMetadata());
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final ReferenceSystemMetadata rs = new ReferenceSystemMetadata(new DefaultIdentifier("EPSG:4326"));
+        expResult.setReferenceSystemInfo(Arrays.asList(rs));
+        
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        
+        final DefaultExtent ex = new DefaultExtent();
+        final DefaultTemporalExtent tex = new DefaultTemporalExtent();
+                                                       
+        tex.setBounds(new Date(11142000000L), new Date(1325372400000L));
+        ex.setTemporalElements(Arrays.asList(tex));
+        dataIdent.setExtents(Arrays.asList(ex));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
         
         MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
     }

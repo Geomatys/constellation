@@ -83,4 +83,13 @@ public class RootBlock implements Serializable {
     public void setChildren(List<SuperBlockObj> children) {
         this.children = children;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[RootBlock]\n");
+        sb.append("name:").append(name).append('\n');
+        sb.append("multiplicity:").append(multiplicity).append('\n');
+        sb.append("children:").append(children.size());
+        return sb.toString();
+    }
 }

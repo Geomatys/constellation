@@ -1,0 +1,88 @@
+{
+  "root" : {
+    "name" : "MD_Metadata",
+    "multiplicity" : 1,
+    "children" : [ {
+      "superblock" : {
+        "name" : "metadata.block.dataIdentification",
+        "multiplicity" : 1,
+        "help" : "metadata.block.dataIdentification_help",
+        "path" : null,
+        "render" : null,
+        "children" : [ {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.refSystemInfo",
+            "multiplicity" : 1,
+            "help" : "metadata.block.refSystemInfo_help",
+            "path" : null,
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.code",
+                "multiplicity" : 1,
+                "help" : "metadata.field.code_help",
+                "path" : "metadata[0].referenceSystemInfo[0].name[0].code[0]",
+                "type" : null,
+                "render" : "text",
+                "defaultValue" : null,
+                "value" : "EPSG:4326",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            } ]
+          }
+        }, {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.temporalExtension",
+            "multiplicity" : 62,
+            "help" : "metadata.block.temporalExtension_help",
+            "path" : "metadata[0].identificationInfo[0].extent[0].temporalElement[0]",
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.beginPosition",
+                "multiplicity" : 1,
+                "help" : "metadata.field.beginPosition_help",
+                "path" : "metadata[0].identificationInfo[0].extent[0].temporalElement[0].extent[0].beginPosition[0].value[0]",
+                "type" : null,
+                "render" : "DATE.text",
+                "defaultValue" : null,
+                "value" : "1970-05-10",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.endPosition",
+                "multiplicity" : 1,
+                "help" : "metadata.field.endPosition_help",
+                "path" : "metadata[0].identificationInfo[0].extent[0].temporalElement[0].extent[0].endPosition[0].value[0]",
+                "type" : null,
+                "render" : "DATE.text",
+                "defaultValue" : null,
+                "value" : "2012-01-01",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            } ]
+          }
+        } ]
+      }
+    } ]
+  },
+  "nodeTypes" : null
+}

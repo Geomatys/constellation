@@ -1,0 +1,73 @@
+{
+    "root": {
+        "name": "MD_Metadata",
+        "multiplicity": 1,
+        "children": [{
+                "superblock": {
+                    "name": "metadata.block.dataIdentification",
+                    "multiplicity": 1,
+                    "help": "metadata.block.dataIdentification_help",
+                    "path": null,
+                    "children": [{
+                            "type": "block",
+                            "block": {
+                                "name": "metadata.block.refSystemInfo",
+                                "multiplicity": 1,
+                                "help": "metadata.block.refSystemInfo_help",
+                                "path": null,
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.code",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.code_help",
+                                            "path": "metadata.referenceSystemInfo.name.code",
+                                            "render": "text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }, {
+                            "type": "block",
+                            "block": {
+                                "name": "metadata.block.temporalExtension",
+                                "multiplicity": 62,
+                                "help": "metadata.block.temporalExtension_help",
+                                "path": "metadata.identificationInfo.extent.temporalElement",
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.beginPosition",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.beginPosition_help",
+                                            "path": "metadata.identificationInfo.extent.temporalElement.extent.beginPosition.value",
+                                            "render": "DATE.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.endPosition",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.endPosition_help",
+                                            "path": "metadata.identificationInfo.extent.temporalElement.extent.endPosition.value",
+                                            "render": "DATE.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

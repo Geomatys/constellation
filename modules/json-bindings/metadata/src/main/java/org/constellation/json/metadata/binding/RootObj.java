@@ -80,4 +80,9 @@ public class RootObj implements Serializable {
         }
         return null;
     }
+    
+    @Override
+    public String toString() {
+        return "[BlockObj]\nroot:" + root;
+    }
 }
