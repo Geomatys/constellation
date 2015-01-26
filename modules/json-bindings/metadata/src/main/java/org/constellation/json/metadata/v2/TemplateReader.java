@@ -94,7 +94,6 @@ public class TemplateReader extends AbstractTemplateHandler {
 
     private void updateObjectFromRootObj(TemplateTree tree, final ValueNode root, final Object metadata) throws ParseException {
         
-        
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             
@@ -102,6 +101,11 @@ public class TemplateReader extends AbstractTemplateHandler {
             
             if (obj instanceof Collection) {
                 final Collection list = (Collection) obj;
+                
+                // remove disapeared collection instance
+                stripCollection(children, list, node);
+                
+                // treat child object 
                 Object child = get((Collection) obj, node.ordinal);
                 if (child != null) {
                     if (node.isField()) {
@@ -320,6 +324,32 @@ public class TemplateReader extends AbstractTemplateHandler {
         if (rs.getName() instanceof ImmutableIdentifier) {
             final DefaultIdentifier newID = new DefaultIdentifier(rs.getName());
             rs.setName(newID);
+        }
+    }
+    
+    private static void stripCollection(final List<ValueNode> nodes, Collection c, ValueNode current) {
+        // remove only node that are multiple in the forms (ie only the one wich can be remove by the user)
+        if (current.blockName != null || current.isField()) {
+            
+            int cpt = 0;
+            for (ValueNode node : nodes) {
+                if (node.path.equals(current.path)) {
+                    cpt++;
+                }
+            }
+            if (c.size() > cpt) {
+                final List toRemove = new ArrayList<>();
+                final Iterator it = c.iterator();
+                int i = 0;
+                while (it.hasNext()) {
+                    Object o = it.next();
+                    if (i >= cpt) {
+                        toRemove.add(o);
+                    }
+                    i++;
+                }
+                c.removeAll(toRemove);
+            }
         }
     }
     

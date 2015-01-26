@@ -229,7 +229,7 @@ public class TeamplateReaderUpdateTest {
         previous.setFileIdentifier("metadata-id-0008");
         previous.setLanguage(Locale.ENGLISH);
         previous.setCharacterSet(CharacterSet.ISO_8859_1);
-        previous.setHierarchyLevels(Arrays.asList(ScopeCode.APPLICATION, ScopeCode.AGGREGATE));
+        previous.setHierarchyLevels(Arrays.asList(ScopeCode.APPLICATION, ScopeCode.AGGREGATE));// extra hierarchy level
         previous.setMetadataStandardName("x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster2");
         previous.setMetadataStandardVersion("2011.03.21");
         
@@ -277,7 +277,7 @@ public class TeamplateReaderUpdateTest {
         expResult.setFileIdentifier("metadata-id-0007");
         expResult.setLanguage(Locale.FRENCH);
         expResult.setCharacterSet(CharacterSet.UTF_8);
-        expResult.setHierarchyLevels(Arrays.asList(ScopeCode.AGGREGATE, ScopeCode.DATASET));
+        expResult.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET));// extra hierarchy level removed
         expResult.setMetadataStandardName("x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster");
         expResult.setMetadataStandardVersion("2011.03");
         
@@ -334,7 +334,7 @@ public class TeamplateReaderUpdateTest {
         previous.setFileIdentifier("metadata-id-0008");
         previous.setLanguage(Locale.ENGLISH);
         previous.setCharacterSet(CharacterSet.ISO_8859_1);
-        previous.setHierarchyLevels(Arrays.asList(ScopeCode.APPLICATION, ScopeCode.AGGREGATE));
+        previous.setHierarchyLevels(Arrays.asList(ScopeCode.APPLICATION, ScopeCode.AGGREGATE));// extra hierarchy level
         previous.setMetadataStandardName("x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster2");
         previous.setMetadataStandardVersion("2011.03.21");
         
@@ -373,7 +373,7 @@ public class TeamplateReaderUpdateTest {
         expResult.setFileIdentifier("metadata-id-0007");
         expResult.setLanguage(Locale.FRENCH);
         expResult.setCharacterSet(CharacterSet.UTF_8);
-        expResult.setHierarchyLevels(Arrays.asList(ScopeCode.AGGREGATE, ScopeCode.DATASET));
+        expResult.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET));// extra hierarchy level removed
         expResult.setMetadataStandardName("x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster");
         expResult.setMetadataStandardVersion("2011.03");
         
@@ -455,6 +455,136 @@ public class TeamplateReaderUpdateTest {
         keywords.setThesaurusName(gemet);
         
         dataIdent.setDescriptiveKeywords(Arrays.asList(keywords));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+    
+    
+    @Test
+    public void testReadAddBlockInstance() throws IOException, FactoryException {
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_keywords.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        final DefaultDataIdentification prevDataIdent = new DefaultDataIdentification();
+        final DefaultKeywords prevKeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        final InternationalString pkw2 = new SimpleInternationalString("world");
+        prevKeywords.setKeywords(Arrays.asList(pkw1, pkw2));
+        
+        prevDataIdent.setDescriptiveKeywords(Arrays.asList(prevKeywords));
+        
+        previous.setIdentificationInfo(Arrays.asList(prevDataIdent));
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        Object result = reader.readTemplate(root, previous);
+        
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+    
+    @Test
+    public void testReadRemoveBlockInstance() throws IOException, FactoryException {
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_keywords6.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        final DefaultDataIdentification prevDataIdent = new DefaultDataIdentification();
+        final DefaultKeywords prevKeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        final InternationalString pkw2 = new SimpleInternationalString("world");
+        prevKeywords.setKeywords(Arrays.asList(pkw1, pkw2));
+        
+        final DefaultKeywords prevKeywords2 = new DefaultKeywords();
+        final InternationalString pkw21 = new SimpleInternationalString("this");
+        final InternationalString pkw22 = new SimpleInternationalString("is");
+        prevKeywords2.setKeywords(Arrays.asList(pkw21, pkw22));
+        
+        prevDataIdent.setDescriptiveKeywords(Arrays.asList(prevKeywords, prevKeywords2));
+        
+        previous.setIdentificationInfo(Arrays.asList(prevDataIdent));
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        Object result = reader.readTemplate(root, previous);
+        
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords));
+        
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+    
+    @Test
+    public void testReadRemoveFieldInstance() throws IOException, FactoryException {
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_keywords7.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        final DefaultDataIdentification prevDataIdent = new DefaultDataIdentification();
+        final DefaultKeywords prevKeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        final InternationalString pkw2 = new SimpleInternationalString("world");
+        prevKeywords.setKeywords(Arrays.asList(pkw1, pkw2));
+        
+        final DefaultKeywords prevKeywords2 = new DefaultKeywords();
+        final InternationalString pkw21 = new SimpleInternationalString("this");
+        final InternationalString pkw22 = new SimpleInternationalString("is");
+        prevKeywords2.setKeywords(Arrays.asList(pkw21, pkw22));
+        
+        prevDataIdent.setDescriptiveKeywords(Arrays.asList(prevKeywords, prevKeywords2));
+        
+        previous.setIdentificationInfo(Arrays.asList(prevDataIdent));
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        Object result = reader.readTemplate(root, previous);
+        
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        keywords.setKeywords(Arrays.asList(kw1));
+        
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        
         expResult.setIdentificationInfo(Arrays.asList(dataIdent));
         
         MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
