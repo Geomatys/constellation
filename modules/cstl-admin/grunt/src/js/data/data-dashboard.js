@@ -47,6 +47,37 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         $scope.searchMD = {};
 
         /**
+         * Array of available ways to import data in Constellation.
+         * This array can be overrided by sub project to add its own data format.
+         */
+        $scope.dataCtrl.availableWays = [
+            {   name:'localFile',
+                idHTML:'uploadchoice',
+                translateKey:'label.file.local',
+                defaultTranslateValue:'Local file',
+                bindFunction:function(){$scope.showLocalFilePopup();}
+            },
+            {   name:'serverFile',
+                idHTML:'filesystemchoice',
+                translateKey:'label.file.server',
+                defaultTranslateValue:'Server file',
+                bindFunction:function(){$scope.showServerFilePopup();}
+            },
+            {   name:'database',
+                idHTML:'dbchoice',
+                translateKey:'label.file.db',
+                defaultTranslateValue:'Database',
+                bindFunction:function(){$scope.showDatabasePopup();}
+            },
+            {   name:'emptyDataset',
+                idHTML:'emptychoice',
+                translateKey:'label.file.empty',
+                defaultTranslateValue:'Empty dataset',
+                bindFunction:function(){$scope.showEmptyDataSetPopup();}
+            }
+        ];
+
+        /**
          * Select appropriate tab 'tabdata' or 'tabmetadata'.
          * @param item
          */

@@ -10,16 +10,11 @@
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a id="uploadchoice"
-                       ng-click="showLocalFilePopup()"
-                       translate="label.file.local">Local file</a></li>
-                <li><a id="filesystemchoice"
-                       ng-click="showServerFilePopup()"
-                       translate="label.file.server">Server file</a></li>
-                <li><a ng-click="showDatabasePopup()"
-                       translate="label.file.db">Database</a></li>
-                <li><a ng-click="showEmptyDataSetPopup()"
-                       translate="label.file.emtpy">Database</a></li>
+                <li ng-repeat="way in dataCtrl.availableWays">
+                    <a id="{{way.idHTML}}"
+                       ng-click="way.bindFunction();"
+                       translate="{{way.translateKey}}">{{way.defaultTranslateValue}}</a>
+                </li>
             </ul>
         </div>
     </div>

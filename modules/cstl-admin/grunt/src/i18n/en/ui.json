@@ -366,7 +366,7 @@
     "label.file.local": "Local file",
     "label.file.server": "Server file",
     "label.file.db":"Database",
-    "label.file.emtpy":"Empty dataset",
+    "label.file.empty":"Empty dataset",
     "label.finish": "Finish",
     "label.import.style": "Import a style",
     "label.layer": "layer",

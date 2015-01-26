@@ -417,7 +417,7 @@
     "label.file.local": "Fichier local",
     "label.file.server": "Fichier serveur",
     "label.file.db":"Base de données",
-    "label.file.emtpy":"Collection vide",
+    "label.file.empty":"Collection vide",
     "label.fields.required":"Tous les champs sont obligatoires.",
     "label.finish": "Terminer",
     "label.import.style": "Importer un style",
