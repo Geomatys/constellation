@@ -11,6 +11,8 @@ import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
+import org.apache.sis.metadata.iso.constraint.DefaultLegalConstraints;
+import org.apache.sis.metadata.iso.constraint.DefaultSecurityConstraints;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.metadata.iso.maintenance.DefaultMaintenanceInformation;
@@ -25,6 +27,8 @@ import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.test.utils.MetadataUtilities;
 import org.junit.Test;
 import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.constraint.Classification;
+import org.opengis.metadata.constraint.Restriction;
 import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.maintenance.ScopeCode;
@@ -588,5 +592,269 @@ public class TeamplateReaderUpdateTest {
         expResult.setIdentificationInfo(Arrays.asList(dataIdent));
         
         MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+    
+    @Test
+    public void testReadFromFilledTemplate2() throws IOException, FactoryException {
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        previous.setFileIdentifier("metadata-id-0007");
+        previous.setLanguage(Locale.FRENCH);
+        previous.setCharacterSet(CharacterSet.UTF_8);
+        previous.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET));
+        previous.setMetadataStandardName("x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster");
+        previous.setMetadataStandardVersion("2011.03");
+        
+        final DefaultDataQuality prevQuality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
+        final DefaultDomainConsistency prevReport = new DefaultDomainConsistency();
+        final DefaultCitation prevCit = new DefaultCitation("some title");
+        final DefaultCitationDate prevDate = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        prevCit.setDates(Arrays.asList(prevDate));
+        final DefaultConformanceResult prevConfResult = new DefaultConformanceResult(prevCit, "some explanation", true);
+        prevReport.setResults(Arrays.asList(prevConfResult));
+        prevQuality.setReports(Arrays.asList(prevReport));
+        previous.setDataQualityInfo(Arrays.asList(prevQuality));
+        
+        final DefaultDataIdentification prevDataIdent = new DefaultDataIdentification();
+        final DefaultKeywords prevKeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        final InternationalString pkw2 = new SimpleInternationalString("world");
+        prevKeywords.setKeywords(Arrays.asList(pkw1, pkw2));
+        
+        final DefaultKeywords prevKeywords2 = new DefaultKeywords();
+        final InternationalString pkw21 = new SimpleInternationalString("this");
+        final InternationalString pkw22 = new SimpleInternationalString("is");
+        prevKeywords2.setKeywords(Arrays.asList(pkw21, pkw22));
+        
+        prevDataIdent.setDescriptiveKeywords(Arrays.asList(prevKeywords, prevKeywords2));
+        
+        final DefaultLegalConstraints prevConstraint1 = new DefaultLegalConstraints();
+        prevConstraint1.setAccessConstraints(Arrays.asList(Restriction.LICENCE));
+        
+        final DefaultSecurityConstraints prevConstraint2 = new DefaultSecurityConstraints();
+        prevConstraint2.setUseLimitations(Arrays.asList(new SimpleInternationalString("some limitations")));
+        prevConstraint2.setClassification(Classification.UNCLASSIFIED);
+        
+        prevDataIdent.setResourceConstraints(Arrays.asList(prevConstraint1,prevConstraint2));
+        
+        previous.setIdentificationInfo(Arrays.asList(prevDataIdent));
+        
+        
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result2.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        Object result = reader.readTemplate(root, previous);
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        expResult.setFileIdentifier("metadata-id-0007");
+        expResult.setLanguage(Locale.FRENCH);
+        expResult.setCharacterSet(CharacterSet.UTF_8);
+        expResult.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET));
+        expResult.setMetadataStandardName("x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster");
+        expResult.setMetadataStandardVersion("2011.03");
+        
+        final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
+        final DefaultDomainConsistency report = new DefaultDomainConsistency();
+        final DefaultCitation cit = new DefaultCitation("some title");
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        cit.setDates(Arrays.asList(date));
+        final DefaultConformanceResult confResult = new DefaultConformanceResult(cit, "some explanation", true);
+        report.setResults(Arrays.asList(confResult));
+        quality.setReports(Arrays.asList(report));
+        expResult.setDataQualityInfo(Arrays.asList(quality));
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        
+        final DefaultLegalConstraints constraint1 = new DefaultLegalConstraints();
+        constraint1.setAccessConstraints(Arrays.asList(Restriction.LICENCE));
+        
+        final DefaultSecurityConstraints constraint2 = new DefaultSecurityConstraints();
+        constraint2.setUseLimitations(Arrays.asList(new SimpleInternationalString("some limitations")));
+        constraint2.setClassification(Classification.UNCLASSIFIED);
+        
+        dataIdent.setResourceConstraints(Arrays.asList(constraint1,constraint2));
+        
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+        
+    }
+    
+    
+    @Test
+    public void testRemoveSpecialTypeBlock() throws IOException, FactoryException {
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        previous.setFileIdentifier("metadata-id-0007");
+        previous.setLanguage(Locale.FRENCH);
+        previous.setCharacterSet(CharacterSet.UTF_8);
+        previous.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET));
+        previous.setMetadataStandardName("x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster");
+        previous.setMetadataStandardVersion("2011.03");
+        
+        final DefaultDataQuality prevQuality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
+        final DefaultDomainConsistency prevReport = new DefaultDomainConsistency();
+        final DefaultCitation prevCit = new DefaultCitation("some title");
+        final DefaultCitationDate prevDate = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        prevCit.setDates(Arrays.asList(prevDate));
+        final DefaultConformanceResult prevConfResult = new DefaultConformanceResult(prevCit, "some explanation", true);
+        prevReport.setResults(Arrays.asList(prevConfResult));
+        prevQuality.setReports(Arrays.asList(prevReport));
+        previous.setDataQualityInfo(Arrays.asList(prevQuality));
+        
+        final DefaultDataIdentification prevDataIdent = new DefaultDataIdentification();
+        final DefaultKeywords prevKeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        final InternationalString pkw2 = new SimpleInternationalString("world");
+        prevKeywords.setKeywords(Arrays.asList(pkw1, pkw2));
+        
+        final DefaultKeywords prevKeywords2 = new DefaultKeywords();
+        final InternationalString pkw21 = new SimpleInternationalString("this");
+        final InternationalString pkw22 = new SimpleInternationalString("is");
+        prevKeywords2.setKeywords(Arrays.asList(pkw21, pkw22));
+        
+        prevDataIdent.setDescriptiveKeywords(Arrays.asList(prevKeywords, prevKeywords2));
+        
+        final DefaultLegalConstraints prevConstraint1 = new DefaultLegalConstraints();
+        prevConstraint1.setAccessConstraints(Arrays.asList(Restriction.LICENCE));
+        
+        final DefaultLegalConstraints prevConstraint2 = new DefaultLegalConstraints();
+        prevConstraint2.setAccessConstraints(Arrays.asList(Restriction.COPYRIGHT));
+        
+        
+        final DefaultSecurityConstraints prevConstraint3 = new DefaultSecurityConstraints();
+        prevConstraint3.setUseLimitations(Arrays.asList(new SimpleInternationalString("some limitations")));
+        prevConstraint3.setClassification(Classification.UNCLASSIFIED);
+        
+        final DefaultSecurityConstraints prevConstraint4 = new DefaultSecurityConstraints();
+        prevConstraint4.setUseLimitations(Arrays.asList(new SimpleInternationalString("some limitations second")));
+        prevConstraint4.setClassification(Classification.PROTECTED);
+        
+        prevDataIdent.setResourceConstraints(Arrays.asList(prevConstraint1,prevConstraint2, prevConstraint3, prevConstraint4));
+        
+        previous.setIdentificationInfo(Arrays.asList(prevDataIdent));
+        
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result2.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        Object result = reader.readTemplate(root, previous);
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        expResult.setFileIdentifier("metadata-id-0007");
+        expResult.setLanguage(Locale.FRENCH);
+        expResult.setCharacterSet(CharacterSet.UTF_8);
+        expResult.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET));
+        expResult.setMetadataStandardName("x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster");
+        expResult.setMetadataStandardVersion("2011.03");
+        
+        final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
+        final DefaultDomainConsistency report = new DefaultDomainConsistency();
+        final DefaultCitation cit = new DefaultCitation("some title");
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        cit.setDates(Arrays.asList(date));
+        final DefaultConformanceResult confResult = new DefaultConformanceResult(cit, "some explanation", true);
+        report.setResults(Arrays.asList(confResult));
+        quality.setReports(Arrays.asList(report));
+        expResult.setDataQualityInfo(Arrays.asList(quality));
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        
+        final DefaultLegalConstraints constraint1 = new DefaultLegalConstraints();
+        constraint1.setAccessConstraints(Arrays.asList(Restriction.LICENCE));
+        
+        final DefaultSecurityConstraints constraint2 = new DefaultSecurityConstraints();
+        constraint2.setUseLimitations(Arrays.asList(new SimpleInternationalString("some limitations")));
+        constraint2.setClassification(Classification.UNCLASSIFIED);
+        
+        dataIdent.setResourceConstraints(Arrays.asList(constraint1,constraint2));
+        
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+        
+    }
+    
+    @Test
+    public void testRemoveSpecialKeywordBlock() throws IOException, FactoryException {
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        final DefaultDataIdentification prevDataIdent = new DefaultDataIdentification();
+        final DefaultKeywords prevKeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        final InternationalString pkw2 = new SimpleInternationalString("world");
+        prevKeywords.setKeywords(Arrays.asList(pkw1, pkw2));
+        final DefaultCitation prevGemet = new DefaultCitation("GEMET");
+        prevGemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        prevKeywords.setThesaurusName(prevGemet);
+        
+        final DefaultKeywords prevKeywords2 = new DefaultKeywords();
+        final InternationalString pkw21 = new SimpleInternationalString("you shall");
+        final InternationalString pkw22 = new SimpleInternationalString("not pass");
+        prevKeywords2.setKeywords(Arrays.asList(pkw21, pkw22));
+        prevKeywords2.setThesaurusName(prevGemet);
+        
+        final DefaultKeywords prevKeywords3 = new DefaultKeywords();
+        final InternationalString pkw31 = new SimpleInternationalString("this");
+        final InternationalString pkw32 = new SimpleInternationalString("is");
+        prevKeywords3.setKeywords(Arrays.asList(pkw31, pkw32));
+        
+        prevDataIdent.setDescriptiveKeywords(Arrays.asList(prevKeywords, prevKeywords2, prevKeywords3));
+        previous.setIdentificationInfo(Arrays.asList(prevDataIdent));
+        
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_keywords2.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        Object result = reader.readTemplate(root, previous);
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultCitation gemet = new DefaultCitation("GEMET");
+        gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        keywords.setThesaurusName(gemet);
+        
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    
     }
 }

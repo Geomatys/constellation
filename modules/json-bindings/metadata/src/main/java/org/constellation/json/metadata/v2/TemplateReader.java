@@ -1,6 +1,7 @@
 
 package org.constellation.json.metadata.v2;
 
+import com.google.common.base.Objects;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -103,10 +104,10 @@ public class TemplateReader extends AbstractTemplateHandler {
                 final Collection list = (Collection) obj;
                 
                 // remove disapeared collection instance
-                stripCollection(children, list, node);
+                strip(children, list, node);
                 
                 // treat child object 
-                Object child = get((Collection) obj, node.ordinal);
+                Object child = get(list, node.ordinal);
                 if (child != null) {
                     if (node.isField()) {
                         replace(list, node.ordinal, convert(node.name, child.getClass(), node.value));
@@ -165,11 +166,13 @@ public class TemplateReader extends AbstractTemplateHandler {
                     throw new ParseException("Unable to find a class for type : " + node.type);
                 }
                 if (result instanceof Collection) {
-                    final Collection results = new ArrayList<>(); 
+                    final NumeratedCollection results = new NumeratedCollection((Collection)result); 
                     final Iterator it        = ((Collection)result).iterator();
+                    int i = 0;
                     while (it.hasNext()) {
                         final Object o = it.next();
-                        if (type.isInstance(o)) results.add(o);
+                        if (type.isInstance(o)) results.put(i, o);
+                        i++;
                     }
                     return results;
                 } else if (type.isInstance(result)) {
@@ -327,32 +330,6 @@ public class TemplateReader extends AbstractTemplateHandler {
         }
     }
     
-    private static void stripCollection(final List<ValueNode> nodes, Collection c, ValueNode current) {
-        // remove only node that are multiple in the forms (ie only the one wich can be remove by the user)
-        if (current.blockName != null || current.isField()) {
-            
-            int cpt = 0;
-            for (ValueNode node : nodes) {
-                if (node.path.equals(current.path)) {
-                    cpt++;
-                }
-            }
-            if (c.size() > cpt) {
-                final List toRemove = new ArrayList<>();
-                final Iterator it = c.iterator();
-                int i = 0;
-                while (it.hasNext()) {
-                    Object o = it.next();
-                    if (i >= cpt) {
-                        toRemove.add(o);
-                    }
-                    i++;
-                }
-                c.removeAll(toRemove);
-            }
-        }
-    }
-    
     /**
      * Returns the given value as a date.
      */
@@ -380,6 +357,9 @@ public class TemplateReader extends AbstractTemplateHandler {
     
     
     private Object get(Collection c , int ordinal) {
+        if (c instanceof NumeratedCollection) {
+            return ((NumeratedCollection)c).get(ordinal);
+        }
         if (c.size() > ordinal) {
             final Iterator it = c.iterator();
             for (int i = 0; i < c.size(); i++) {
@@ -404,6 +384,33 @@ public class TemplateReader extends AbstractTemplateHandler {
             }
             c.remove(old);
             c.add(newValue);
+        }
+    }
+    
+    private static void strip(final List<ValueNode> nodes, Collection c, ValueNode current) {
+        // remove only node that are multiple in the forms (ie only the one wich can be remove by the user)
+        if (current.blockName != null || current.isField()) {
+            
+            int cpt = 0;
+            for (ValueNode node : nodes) {
+                if (Objects.equal(node.path,      current.path) &&
+                    Objects.equal(node.blockName, current.blockName)) {
+                    cpt++;
+                }
+            }
+            if (c.size() > cpt) {
+                final List toRemove = new ArrayList<>();
+                final Iterator it = c.iterator();
+                int i = 0;
+                while (it.hasNext()) {
+                    Object o = it.next();
+                    if (i >= cpt) {
+                        toRemove.add(o);
+                    }
+                    i++;
+                }
+                c.removeAll(toRemove);
+            }
         }
     }
 }
