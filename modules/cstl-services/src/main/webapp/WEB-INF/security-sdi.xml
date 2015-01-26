@@ -24,5 +24,8 @@
       </bean>
     </property>
   </bean>
+  
+  <alias name="authenticationTokenProcessingFilter" alias="cstlAdminAuthenticationTokenProcessingFilter"/>
+  <alias name="authenticationTokenProcessingFilter" alias="cstlServicesAuthenticationTokenProcessingFilter"/>
 
 </beans>

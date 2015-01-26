@@ -3,26 +3,32 @@
   xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
+  <http pattern="/spring/oauth2/**" security="none" />
   
   <http pattern="/WS/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
-    <custom-filter ref="authenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
+    <custom-filter ref="cstlServicesAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
     <intercept-url pattern="/WS/configuration/**" access="hasRole('cstl-admin')" />
     <intercept-url pattern="/WS/*/admin/**" access="hasRole('cstl-admin')" />
   </http>
+  
+  
   <http pattern="/api/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
-    <custom-filter ref="authenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
+    <custom-filter ref="cstlAdminAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
     <intercept-url pattern="/api/user/authenticate" access="permitAll()" />
     <intercept-url pattern="/api/**" access="isAuthenticated()" />
   </http>
+  
+  
+  
   <http pattern="/spring/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false"
     entry-point-ref="unauthorizedEntryPoint">
-    <custom-filter ref="authenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
+    <custom-filter ref="cstlAdminAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
     <intercept-url pattern="/spring/auth/**" access="isAuthenticated()" />
     <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
   </http>
 
   <http pattern="/sql.jsp" create-session="never" use-expressions="true" entry-point-ref="unauthorizedEntryPoint" auto-config="false">
-    <custom-filter ref="authenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
+    <custom-filter ref="cstlAdminAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
     <intercept-url pattern="/sql.jsp" access="hasRole('cstl-admin')" />
     <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
   </http>
