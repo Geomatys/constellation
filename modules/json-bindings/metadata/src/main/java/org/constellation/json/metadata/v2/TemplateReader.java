@@ -271,6 +271,7 @@ public class TemplateReader extends AbstractTemplateHandler {
                 // TODO: "log and continue" is not appropriate here, since the user can not know that his data is lost.
                 LOGGER.log(Level.WARNING, "Bad period duration value: {0} (property: {1})",
                         new Object[] {value, identifier});
+                return null;
             }
         }
         if (InternationalString.class.isAssignableFrom(type) && value instanceof String) {
