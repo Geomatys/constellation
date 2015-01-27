@@ -332,7 +332,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Transactional
     public void saveMetadata(final String providerId,
                              final QName name,
-                             final DefaultMetadata metadata) throws ConstellationException {
+                             final DefaultMetadata metadata) throws ConfigurationException {
         final String metadataStr;
         try {
             final MarshallerPool pool = getMarshallerPool();
@@ -360,6 +360,17 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRepository.create(metadataRecord);
             }    
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
+           
+            // calculate completion rating
+            Integer completion = null;
+            final Template template = Template.getInstance(getTemplate(name, data.getType()));
+            try {
+                completion = template.calculateMDCompletion(metadata);
+            } catch (IOException ex) {
+                LOGGER.warn("Error while calculating metadata completion", ex);
+            }
+            data.setMdCompletion(completion);
+            dataRepository.update(data);
         }
     }
 
