@@ -126,6 +126,7 @@ import com.google.common.base.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import org.constellation.engine.register.Metadata;
 import org.constellation.engine.register.repository.MetadataRepository;
+import org.constellation.json.metadata.v2.Template;
 import org.geotoolkit.metadata.ImageStatistics;
 import org.geotoolkit.metadata.dimap.DimapAccessor;
 import org.geotoolkit.util.DomUtilities;
@@ -859,13 +860,23 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
+            
+            // calculate completion rating
+            Integer completion = null;
+            final Template template = Template.getInstance(getTemplate(dataName, data.getType()));
+            try {
+                completion = template.calculateMDCompletion(metadata);
+            } catch (IOException ex) {
+                LOGGER.warn("Error while calculating metadata completion", ex);
+            }
+
             Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
             if (metadataRecord != null) {
                 metadataRecord.setMetadataIso(metadataString);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, data.getId(), null, null, null);
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, data.getId(), null, null, completion);
                 metadataRepository.create(metadataRecord);
             }
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
@@ -873,19 +884,6 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             updateInternalCSWIndex(metadata.getFileIdentifier(), domainId, true);
         } else {
             throw new TargetNotFoundException("Data :" + dataName + " in provider:" + providerId +  " not found");
-        }
-    }
-
-    @Override
-    @Transactional
-    public void updateMDCompletion(final String providerId, final QName dataName, final Integer rating) {
-        final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
-        if (data != null) {
-            final Metadata meta = metadataRepository.findByDataId(data.getId());
-            if (meta != null) {
-                meta.setMdCompletion(rating);
-                metadataRepository.update(meta);
-            }
         }
     }
 

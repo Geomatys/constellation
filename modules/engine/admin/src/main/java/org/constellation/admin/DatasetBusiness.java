@@ -57,6 +57,7 @@ import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.json.metadata.v2.Template;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.security.SecurityManagerHolder;
@@ -312,13 +313,13 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         String metadataString = null;
         try {
             final MarshallerPool pool = getMarshallerPool();
-            if(pool != null) {
+            if (pool != null) {
                 final Marshaller marshaller = pool.acquireMarshaller();
                 final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 marshaller.marshal(metadata, outputStream);
                 pool.recycle(marshaller);
                 metadataString = outputStream.toString();
-            }else {
+            } else {
                 metadataString = marshallMetadata(metadata);
             }
         } catch (JAXBException ex) {
@@ -327,13 +328,27 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         
         final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
         if (dataset != null) {
+            
+            // calculate completion rating
+            List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
+            Integer completion = null;
+            if (!datas.isEmpty()) {
+                final String type = datas.get(0).getType();
+                final Template template = Template.getInstance(getTemplate(datasetIdentifier, type));
+                try {
+                    completion = template.calculateMDCompletion(metadata);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+                }
+            }
+            
             Metadata metadataRecord = metadataRepository.findByDatasetId(dataset.getId());
             if (metadataRecord != null) {
                 metadataRecord.setMetadataIso(metadataString);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId(), null, null);
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId(), null, completion);
                 metadataRepository.create(metadataRecord);
             }
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
@@ -342,31 +357,6 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
-    }
-
-    @Override
-    @Transactional
-    public void updateMDCompletion(final Integer datasetID, final Integer rating) {
-        final Dataset dataset = datasetRepository.findById(datasetID);
-        if (dataset != null) {
-            final Metadata meta = metadataRepository.findByDatasetId(dataset.getId());
-            if (meta != null) {
-                meta.setMdCompletion(rating);
-                metadataRepository.update(meta);
-            }
-        }
-    }
-    
-    @Override
-    public Integer getDatasetMDCompletion(final Integer datasetID) {
-        final Dataset dataset = datasetRepository.findById(datasetID);
-        if (dataset != null) {
-            final Metadata meta = metadataRepository.findByDatasetId(dataset.getId());
-            if (meta != null) {
-               return meta.getMdCompletion();
-            }
-        }
-        return null;
     }
 
     /**

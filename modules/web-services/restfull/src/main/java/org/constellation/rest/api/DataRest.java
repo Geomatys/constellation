@@ -103,11 +103,7 @@ import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.engine.security.WorkspaceService;
 import org.constellation.json.metadata.v2.Template;
-import org.constellation.json.metadata.binding.BlockObj;
-import org.constellation.json.metadata.binding.ComponentObj;
-import org.constellation.json.metadata.binding.FieldObj;
 import org.constellation.json.metadata.binding.RootObj;
-import org.constellation.json.metadata.binding.SuperBlockObj;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -880,16 +876,11 @@ public class DataRest {
                 //update dateStamp for metadata
                 metadata.setDateStamp(new Date());
 
-                //calculate completion rating
-                final int rating = calculateMDCompletion(metadataValues);
-
                 //Save metadata
                 if (dataset) {
                     datasetBusiness.updateMetadata(ds.getIdentifier(), -1, metadata);
-                    datasetBusiness.updateMDCompletion(ds.getId(),rating);
                 } else {
                     dataBusiness.updateMetadata(provider, dataName, -1, metadata);
-                    dataBusiness.updateMDCompletion(provider,dataName,rating);
                 }
             }
         } catch (ConfigurationException ex) {
@@ -897,35 +888,6 @@ public class DataRest {
             throw new ConstellationException(ex);
         }
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
-    /**
-     * @deprecated move this method to TemplateTree
-     */
-    @Deprecated
-    private int calculateMDCompletion(final RootObj metadataValues) {
-        int result = 0;
-        int fieldsCount=0;
-        int fieldValueCount=0;
-        final List<SuperBlockObj> superblocks = metadataValues.getRoot().getChildren();
-        for(final SuperBlockObj sb:superblocks){
-            final List<BlockObj> blocks = sb.getSuperblock().getChildren();
-            for(final BlockObj b:blocks){
-                final List<ComponentObj> fields = b.getBlock().getChildren();
-                for(final ComponentObj f:fields){
-                    fieldsCount++;
-                    final String value = ((FieldObj)f).getField().value;
-                    if(value != null && !value.isEmpty()){
-                        fieldValueCount++;
-                    }
-
-                }
-            }
-        }
-        if(fieldsCount>0){
-            result = Math.round(fieldValueCount*100/fieldsCount);
-        }
-        return result;
     }
 
     @POST
@@ -953,14 +915,9 @@ public class DataRest {
                 //update dateStamp for metadata
                 metadata.setDateStamp(new Date());
 
-                //calculate completion rating
-                final int rating = calculateMDCompletion(metadataValues);
-
                 //Save metadata
                 datasetBusiness.updateMetadata(identifier, -1, metadata);
 
-                final Dataset ds = datasetBusiness.getDataset(identifier);
-                datasetBusiness.updateMDCompletion(ds.getId(),rating);
             }
         } catch (ConfigurationException ex) {
             LOGGER.warning("Error while saving dataset metadata");

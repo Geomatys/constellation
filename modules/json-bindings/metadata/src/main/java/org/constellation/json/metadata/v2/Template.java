@@ -7,10 +7,15 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.sis.metadata.MetadataStandard;
+import org.constellation.json.metadata.binding.BlockObj;
+import org.constellation.json.metadata.binding.ComponentObj;
+import org.constellation.json.metadata.binding.FieldObj;
 import org.constellation.json.metadata.binding.RootObj;
+import org.constellation.json.metadata.binding.SuperBlockObj;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 
 /**
@@ -156,4 +161,34 @@ public class Template {
         reader.readTemplate(json, destination);
     }
     
+    public int calculateMDCompletion(final Object metadata) throws IOException {
+        final TemplateWriter writer = new TemplateWriter(standard);
+        final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata);
+        return calculateMDCompletion(rootFilled);
+    }
+    
+    public int calculateMDCompletion(final RootObj metadataValues) {
+        int result = 0;
+        int fieldsCount=0;
+        int fieldValueCount=0;
+        final List<SuperBlockObj> superblocks = metadataValues.getRoot().getChildren();
+        for(final SuperBlockObj sb:superblocks){
+            final List<BlockObj> blocks = sb.getSuperblock().getChildren();
+            for(final BlockObj b:blocks){
+                final List<ComponentObj> fields = b.getBlock().getChildren();
+                for(final ComponentObj f:fields){
+                    fieldsCount++;
+                    final String value = ((FieldObj)f).getField().value;
+                    if(value != null && !value.isEmpty()){
+                        fieldValueCount++;
+                    }
+
+                }
+            }
+        }
+        if(fieldsCount>0){
+            result = Math.round(fieldValueCount*100/fieldsCount);
+        }
+        return result;
+    }
 }
