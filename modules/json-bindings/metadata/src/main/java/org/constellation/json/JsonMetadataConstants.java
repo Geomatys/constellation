@@ -46,6 +46,7 @@ public class JsonMetadataConstants {
     }
     
     public static String cleanNumeratedPath(final String numeratedPath) {
-        return numeratedPath.replaceAll("\\[[0-9]*\\]", "");
+        String s = numeratedPath.replaceAll("\\[[0-9]*\\]", "");
+        return s.replace("+", "");
     }
 }

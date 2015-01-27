@@ -231,7 +231,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          * @param fieldObj
          */
         $scope.addFieldOccurrence = function(blockObj,fieldObj) {
-            var newField = {"field":{}};
+            var newField = {"type": "field","field":{}};
             // Shallow copy
             newField.field = jQuery.extend({}, fieldObj.field);
             newField.field.value=fieldObj.field.defaultValue;
@@ -285,7 +285,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          * @param blockObj the given block to create a new occurrence based on it.
          */
         $scope.addBlockOccurrence = function(superBlockObj, blockObj){
-            var newBlock = {"block":{}};
+            var newBlock = {"type": "block","block":{}};
             // Deep copy
             newBlock.block = jQuery.extend(true,{}, blockObj.block);
             var blockPath = newBlock.block.path;
