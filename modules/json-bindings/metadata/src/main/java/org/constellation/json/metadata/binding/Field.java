@@ -19,6 +19,7 @@
 
 package org.constellation.json.metadata.binding;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import java.io.Serializable;
 
 /**
@@ -35,8 +36,10 @@ public class Field implements Serializable {
     private String path;
     private String type;
     private String render;
-    private String defaultValue;
-    private String value;
+    @JsonRawValue
+    public String defaultValue;
+    @JsonRawValue
+    public String value;
     private String obligation;
     private String ignore;
     private String tag;
@@ -108,7 +111,11 @@ public class Field implements Serializable {
     }
 
     public String getDefaultValue() {
-        return defaultValue;
+        if (defaultValue == null || (render != null && (render.equals("integer") || render.equals("decimal")))) {
+            return defaultValue;
+        } else {
+            return '"' + defaultValue + '"';
+        }
     }
 
     public void setDefaultValue(String defaultValue) {
@@ -116,7 +123,11 @@ public class Field implements Serializable {
     }
 
     public String getValue() {
-        return value;
+        if (value == null || (render != null && (render.equals("integer") || render.equals("decimal")))) {
+            return value;
+        } else {
+            return '"' + value + '"';
+        }
     }
 
     public void setValue(String value) {

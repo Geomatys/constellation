@@ -154,7 +154,7 @@ final class FormReader {
                 for (final ComponentObj fc : block.getChildren()) {
                     final Field field = ((FieldObj)fc).getField();
                     final String[] path = parsePath(parent, field.getPath());
-                    addValue(path, field.getValue());
+                    addValue(path, field.value);
                 }
             }
         }

@@ -130,8 +130,8 @@ public class ValueNode {
         this.path         = cleanNumeratedPath(field.getPath());
         this.type         = field.getType();
         this.render       = field.getRender();
-        this.defaultValue = field.getDefaultValue();
-        this.value        = field.getValue();
+        this.defaultValue = field.defaultValue;
+        this.value        = field.value;
         this.multiple     = field.getMultiplicity() > 1;
         this.ordinal      = ordinal;
         if (path.indexOf('.') != -1) {

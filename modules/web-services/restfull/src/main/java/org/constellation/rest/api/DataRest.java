@@ -914,7 +914,7 @@ public class DataRest {
                 final List<ComponentObj> fields = b.getBlock().getChildren();
                 for(final ComponentObj f:fields){
                     fieldsCount++;
-                    final String value = ((FieldObj)f).getField().getValue();
+                    final String value = ((FieldObj)f).getField().value;
                     if(value != null && !value.isEmpty()){
                         fieldValueCount++;
                     }
