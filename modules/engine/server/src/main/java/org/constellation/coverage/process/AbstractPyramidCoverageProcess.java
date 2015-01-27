@@ -97,7 +97,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
     }
 
 
-    protected CoverageStore createXMLCoverageStore(final File pyramidFolder, final Name layerName, String tileFormat, ViewType type)
+    protected CoverageStore getOrCreateXMLCoverageStore(final File pyramidFolder)
             throws DataStoreException, ProcessException, MalformedURLException {
 
         final ParameterValueGroup storeParams = XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
@@ -110,13 +110,11 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             throw new ProcessException("Can't initialize XMLCoverageStore.", this, null);
         }
 
-        //create reference
-        store.create(layerName, type, tileFormat);
-
         return store;
     }
 
-    protected CoverageReference getOrCreateCRef(CoverageStore coverageStore, Name coverageName) throws DataStoreException {
+    protected CoverageReference getOrCreateCRef(XMLCoverageStore coverageStore, Name coverageName, String tileFormat, ViewType type)
+            throws DataStoreException {
         CoverageReference cv = null;
         for (Name n : coverageStore.getNames()) {
             if (n.getLocalPart().equals(coverageName.getLocalPart())) {
@@ -124,7 +122,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             }
         }
         if (cv == null) {
-            cv = coverageStore.create(coverageName);
+            cv = coverageStore.create(coverageName, type, tileFormat);
         }
         return cv;
     }

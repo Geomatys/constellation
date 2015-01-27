@@ -44,6 +44,7 @@ import org.opengis.util.FactoryException;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -195,7 +196,7 @@ public class PyramidCoverageHelper {
      * @throws FactoryException
      */
     public void buildPyramid(final ProcessListener listener)
-            throws DataStoreException, TransformException, FactoryException {
+            throws DataStoreException, TransformException, FactoryException, IOException {
 
         List<GridCoverage2D> coverages = getCoveragesPyramid();
         int coverageCount = 1;

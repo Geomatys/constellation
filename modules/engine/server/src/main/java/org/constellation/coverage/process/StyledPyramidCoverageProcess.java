@@ -41,6 +41,7 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.CoverageMapLayer;
@@ -196,7 +197,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
             try {
                 final File finalPyramidFolder = new File(pyramidFolder, pyramidName);
                 referenceName = new DefaultName(pyramidName);
-                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, PNG_FORMAT,  ViewType.RENDERED);
+                outputCoverageStore = getOrCreateXMLCoverageStore(finalPyramidFolder);
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
             }
@@ -212,7 +213,8 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
 
         //build pyramid
         try {
-            final PyramidalCoverageReference outCovRef = (PyramidalCoverageReference) getOrCreateCRef(outputCoverageStore, referenceName);
+            final PyramidalCoverageReference outCovRef =
+                    (PyramidalCoverageReference) getOrCreateCRef((XMLCoverageStore) outputCoverageStore, referenceName, PNG_FORMAT, ViewType.RENDERED);
             final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
 
             final GridCoverageReader reader = inCovRef.acquireReader();
@@ -279,6 +281,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         input.parameter("tilesize").setValue(new Dimension(TILE_SIZE, TILE_SIZE));
         input.parameter("scales").setValue(scales);
         input.parameter("container").setValue(outputRef);
+        input.parameter("update").setValue(true);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
         p.call();
     }

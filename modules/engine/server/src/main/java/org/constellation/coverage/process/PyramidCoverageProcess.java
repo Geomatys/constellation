@@ -38,6 +38,7 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.interpolation.InterpolationCase;
@@ -182,7 +183,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
             try {
                 final File finalPyramidFolder = new File(pyramidFolder, pyramidName);
                 referenceName = new DefaultName(pyramidName);
-                outputCoverageStore = createXMLCoverageStore(finalPyramidFolder, referenceName, TIFF_FORMAT, ViewType.GEOPHYSICS);
+                outputCoverageStore = getOrCreateXMLCoverageStore(finalPyramidFolder);
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
             }
@@ -192,7 +193,8 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         final Dimension tileDim = new Dimension(TILE_SIZE, TILE_SIZE);
         final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
         try {
-            final PyramidalCoverageReference outCovRef = (PyramidalCoverageReference) getOrCreateCRef(outputCoverageStore, referenceName);
+            final PyramidalCoverageReference outCovRef =
+                    (PyramidalCoverageReference) getOrCreateCRef((XMLCoverageStore)outputCoverageStore, referenceName, TIFF_FORMAT, ViewType.GEOPHYSICS);
 
             final GridCoverageReader reader = inCovRef.acquireReader();
             final GridCoverageReadParam readParam = new GridCoverageReadParam();
@@ -261,6 +263,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         input.parameter("pyramid_name").setValue(outName.getLocalPart());
         input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
         input.parameter("resolution_per_envelope").setValue(envScales);
+        input.parameter("reuseTile").setValue(true);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
         p.call();
     }
