@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 
-import org.constellation.token.TokenService;
+import org.constellation.token.TokenExtender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,14 @@ public class CstlAdminTokenController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CstlAdminTokenController.class);
 
     @Autowired
-    private TokenService tokenService;
+    private TokenExtender tokenExtender;
+    
     
     @RequestMapping(value="/auth/extendToken", method=RequestMethod.GET)
-    public @ResponseBody String extendToken() {
+    public @ResponseBody String extendToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         UserDetails userDetails = AuthController.extractUserDetail();
 
-        return tokenService.createToken(userDetails.getUsername());
+        return tokenExtender.extend(userDetails.getUsername(), httpServletRequest, httpServletResponse);
 
     }
     

@@ -18,7 +18,7 @@
  */
 package org.constellation.rest.api;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,8 +30,16 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -55,8 +63,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.base.Optional;
-
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -66,8 +72,21 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.admin.exception.ConstellationException;
-import org.constellation.business.*;
-import org.constellation.configuration.*;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IMapContextBusiness;
+import org.constellation.business.IProcessBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.ISensorBusiness;
+import org.constellation.business.IStyleBusiness;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.DataSetBrief;
+import org.constellation.configuration.ProviderConfiguration;
+import org.constellation.configuration.StringList;
+import org.constellation.configuration.StyleBrief;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.ImportedData;
 import org.constellation.dto.MetadataLists;
@@ -94,12 +113,14 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.constellation.token.TokenService;
 import org.constellation.util.ParamUtilities;
 import org.constellation.util.Util;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
-import org.geotoolkit.coverage.*;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.CoverageUtilities;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -139,6 +160,8 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Optional;
 
 /**
  * Manage data sending

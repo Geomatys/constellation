@@ -185,7 +185,7 @@ cstlAdminApp
             // After this amount of time passes without the user performing an action
             // that triggers one of the watched DOM events, the user is considered idle.
 
-            var cookieToken = $.cookie('authToken');
+            var cookieToken = $.cookie('access_token');
             if(cookieToken && cookieToken.indexOf('_') !==-1){
                 var splitArr = cookieToken.split('_');
                 tokenDuration = splitArr[splitArr.length-1]/1000;
@@ -208,7 +208,7 @@ cstlAdminApp
 
             $rootScope.authenticated=true;
           
-            $rootScope.authToken = TokenService.get();
+            $rootScope.access_token = TokenService.get();
 
             // Call when the 401 response is returned by the client
             $rootScope.$on('event:auth-loginRequired', function() {

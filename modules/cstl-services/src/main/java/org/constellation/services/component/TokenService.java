@@ -8,15 +8,17 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.constellation.token.TokenService;
+import org.constellation.token.TokenExtender;
 import org.constellation.token.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
-public class TokenServiceImpl implements TokenService {
+public class TokenService implements TokenExtender {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenService.class);
 
@@ -29,17 +31,22 @@ public class TokenServiceImpl implements TokenService {
     public void init() {
         secret = env.getProperty("cstl.secret", UUID.randomUUID().toString());
     }
-
+    
     public String createToken(String username) {
         return TokenUtils.createToken(username, secret);
     }
+    
+    public boolean validate(String access_token) {
+        return TokenUtils.validateToken(access_token, secret);
+    }
+    
+    
 
-    @Override
-    public String getUserName(String authToken) {
-        return TokenUtils.getUserNameFromToken(authToken);
+    private String getUserName(String access_token) {
+        return TokenUtils.getUserNameFromToken(access_token);
     }
 
-    @Override
+    
     public String getUserName(HttpServletRequest request) {
         String token = extractToken(request);
         //FIXME We should use cache here.
@@ -50,28 +57,23 @@ public class TokenServiceImpl implements TokenService {
         return null;
     }
 
-    @Override
-    public boolean validate(String authToken) {
+   
 
-        return TokenUtils.validateToken(authToken, secret);
-    }
+    private String extractToken(HttpServletRequest httpRequest) {
 
-    @Override
-    public String extractToken(HttpServletRequest httpRequest) {
-
-        String authToken = headers(httpRequest);
-        if (authToken != null) {
-            return authToken;
+        String access_token = headers(httpRequest);
+        if (access_token != null) {
+            return access_token;
         }
 
-        authToken = cookie(httpRequest);
-        if (authToken != null) {
-            return authToken;
+        access_token = cookie(httpRequest);
+        if (access_token != null) {
+            return access_token;
         }
 
-        authToken = queryString(httpRequest);
-        if (authToken != null) {
-            return authToken;
+        access_token = queryString(httpRequest);
+        if (access_token != null) {
+            return access_token;
         }
 
         return null;
@@ -89,13 +91,13 @@ public class TokenServiceImpl implements TokenService {
             if (tokenIndex != -1) {
                 tokenIndex += "token=".length();
                 int tokenEndIndex = queryString.indexOf('&', tokenIndex);
-                String authToken;
+                String access_token;
                 if (tokenEndIndex == -1)
-                    authToken = queryString.substring(tokenIndex);
+                    access_token = queryString.substring(tokenIndex);
                 else
-                    authToken = queryString.substring(tokenIndex, tokenEndIndex);
-                LOGGER.debug("QueryString: " + authToken + " (" + httpRequest.getRequestURI() + ")");
-                return authToken;
+                    access_token = queryString.substring(tokenIndex, tokenEndIndex);
+                LOGGER.debug("QueryString: " + access_token + " (" + httpRequest.getRequestURI() + ")");
+                return access_token;
             }
         }
         return null;
@@ -106,11 +108,11 @@ public class TokenServiceImpl implements TokenService {
         Cookie[] cookies = httpRequest.getCookies();
         if (cookies != null)
             for (Cookie cookie : cookies) {
-                if ("authToken".equals(cookie.getName())) {
+                if ("access_token".equals(cookie.getName())) {
                     try {
-                        String authToken = URLDecoder.decode(cookie.getValue(), "UTF-8");
-                        LOGGER.debug("Cookie: " + authToken + " (" + httpRequest.getRequestURI() + ")");
-                        return authToken;
+                        String access_token = URLDecoder.decode(cookie.getValue(), "UTF-8");
+                        LOGGER.debug("Cookie: " + access_token + " (" + httpRequest.getRequestURI() + ")");
+                        return access_token;
                     } catch (UnsupportedEncodingException e) {
                         LOGGER.error(e.getMessage(), e);
                     }
@@ -120,12 +122,17 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private String headers(HttpServletRequest httpRequest) {
-        String authToken = httpRequest.getHeader("X-Auth-Token");
-        if (authToken != null) {
-            LOGGER.debug("Header: " + authToken + " (" + httpRequest.getRequestURI() + ")");
-            return authToken;
+        String access_token = httpRequest.getHeader("X-Auth-Token");
+        if (access_token != null) {
+            LOGGER.debug("Header: " + access_token + " (" + httpRequest.getRequestURI() + ")");
+            return access_token;
         }
-        return authToken;
+        return access_token;
+    }
+
+    @Override
+    public String extend(String token, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        return TokenUtils.createToken(token, secret);
     }
 
 }

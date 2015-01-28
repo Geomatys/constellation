@@ -81,19 +81,19 @@ public class TokenUtils {
         return new String(Hex.encode(digest.digest(signatureBuilder.toString().getBytes())));
     }
 
-    public static String getUserNameFromToken(String authToken) {
-        if (null == authToken) {
+    public static String getUserNameFromToken(String access_token) {
+        if (null == access_token) {
             return null;
         }
 
-        String[] parts = authToken.split(TOKEN_SEPARATOR);
+        String[] parts = access_token.split(TOKEN_SEPARATOR);
         return parts[0];
     }
 
-    public static boolean validateToken(String authToken, String secret) {
-        String[] parts = authToken.split(TOKEN_SEPARATOR);
+    public static boolean validateToken(String access_token, String secret) {
+        String[] parts = access_token.split(TOKEN_SEPARATOR);
         if (parts.length < 4) {
-            LOGGER.warn("Token malformed: " + authToken);
+            LOGGER.warn("Token malformed: " + access_token);
             return false;
         }
         String username = parts[0];
@@ -101,19 +101,19 @@ public class TokenUtils {
         String signature = parts[2];
 
         if (expires < System.currentTimeMillis()) {
-            LOGGER.info("Token expired: " + authToken);
+            LOGGER.info("Token expired: " + access_token);
             return false;
         }
 
         if(signature.equals(TokenUtils.computeSignature(username, expires, secret))) {
             return true;
         }
-        LOGGER.info("Token missmatch: " + authToken);
+        LOGGER.info("Token missmatch: " + access_token);
         return false;
     }
 
-    public static boolean shouldBeExtended(String authToken) {
-        String[] parts = authToken.split(TOKEN_SEPARATOR);
+    public static boolean shouldBeExtended(String access_token) {
+        String[] parts = access_token.split(TOKEN_SEPARATOR);
         long expires = Long.parseLong(parts[1]);
 
         return expires < System.currentTimeMillis() + tokenHalfLife;

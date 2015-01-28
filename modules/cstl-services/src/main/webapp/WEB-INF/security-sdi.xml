@@ -6,7 +6,7 @@
 
   <import resource="security/common.xml" />
 
-  <bean id="cstlTokenService" class="org.constellation.services.component.TokenServiceImpl" autowire="byType" />
+  <bean id="cstlTokenService" class="org.constellation.services.component.TokenService" autowire="byType" />
 
   <sec:jdbc-user-service id="cstlUserService" data-source-ref="dataSource" />
 
@@ -16,7 +16,7 @@
     </sec:authentication-provider>
   </sec:authentication-manager>
 
-  <bean id="authenticationTokenProcessingFilter" class="org.constellation.engine.security.AuthenticationTokenProcessingFilter">
+  <bean id="cstlAuthenticationTokenProcessingFilter" class="org.constellation.engine.security.AuthenticationTokenProcessingFilter">
     <property name="userDetailsExtractor">
       <bean class="org.constellation.services.security.CstlUserDetailsExtractor">
         <property name="tokenService" ref="cstlTokenService" />
@@ -25,7 +25,4 @@
     </property>
   </bean>
   
-  <alias name="authenticationTokenProcessingFilter" alias="cstlAdminAuthenticationTokenProcessingFilter"/>
-  <alias name="authenticationTokenProcessingFilter" alias="cstlServicesAuthenticationTokenProcessingFilter"/>
-
 </beans>

@@ -263,7 +263,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
             $scope.loader.upload = true;
             $.ajax({
                 headers: {
-                  'X-Auth-Token': $rootScope.authToken
+                  'access_token': $rootScope.access_token
                 },
                 url: $cookieStore.get('cstlUrl') + "api/1/domain/"+ $cookieStore.get('cstlActiveDomainId') + "/data/upload/data",
                 type: 'POST',
@@ -531,7 +531,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
             var formData = new FormData($form[0]);
             $.ajax({
                 headers: {
-                  'X-Auth-Token': $rootScope.authToken
+                  'access_token': $rootScope.access_token
                 },
                 url: $cookieStore.get('cstlUrl') + "api/1/domain/"+ $cookieStore.get('cstlActiveDomainId') + '/data/upload/metadata',
                 type: 'POST',
@@ -640,7 +640,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
 
             $.ajax({
                 headers: {
-                  'X-Auth-Token': $rootScope.authToken
+                  'access_token': $rootScope.access_token
                 },
                 url: $cookieStore.get('cstlUrl') + "api/1/domain/"+ $cookieStore.get('cstlActiveDomainId') + '/data/upload/data',
                 type: 'POST',

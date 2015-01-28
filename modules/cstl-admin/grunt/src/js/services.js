@@ -87,7 +87,7 @@ angular.module('cstl-services', ['cstl-restapi'])
         'cookie.cstl.url':   'cstlUrl',
         'cookie.domain.id':  'cstlActiveDomainId',
         'cookie.user.id':    'cstlUserId',
-        'cookie.auth.token': 'authToken'
+        'cookie.auth.token': 'access_token'
     })
 
     // -------------------------------------------------------------------------
@@ -132,7 +132,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                 if (angular.isDefined(cstlUrl)) {
                     url = url.replace(CstlConfig['inject.expr.ctrl.url'], cstlUrl);
                     if(config){
-                      config.headers['X-Auth-Token'] = $.cookie(CstlConfig['cookie.auth.token']);
+                      config.headers.access_token = $.cookie(CstlConfig['cookie.auth.token']);
                     }
                 }else if (/@cstl/.test(url)){
                   window.location.href="index.html";
@@ -209,7 +209,7 @@ angular.module('cstl-services', ['cstl-restapi'])
             renew: function() {
                 $http.get('@cstl/spring/auth/extendToken').success(function(token){
                   $.cookie(CstlConfig['cookie.auth.token'], token, { path : '/' });
-                  $rootScope.authToken = token;
+                  $rootScope.access_token = token;
                   console.log("Token extended: " + token);
                 });
             },

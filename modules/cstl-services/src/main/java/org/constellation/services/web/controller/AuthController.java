@@ -26,7 +26,7 @@ import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.token.TokenService;
+import org.constellation.services.component.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -74,7 +74,7 @@ public class AuthController {
 
     @Autowired
     private TokenService tokenService;
-
+    
     @Autowired
     private UserDetailsService userService;
 

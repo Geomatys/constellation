@@ -56,7 +56,7 @@ cstlLoginApp.controller("login", function($scope, $http){
             .success(function(resp){
                 jQuery('#msg-error').hide();
                 if (resp.token) {
-                    $.cookie('authToken', resp.token, { path : '/' });
+                    $.cookie('access_token', resp.token, { path : '/' });
                     $.cookie('cstlActiveDomainId', resp.domainId, { path : '/' });
                     $.cookie('cstlUserId', resp.userId, { path : '/' });
                     window.location.href="admin.html";

@@ -3,7 +3,7 @@ package org.constellation.services.security;
 import javax.servlet.http.HttpServletRequest;
 
 import org.constellation.engine.security.UserDetailsExtractor;
-import org.constellation.token.TokenService;
+import org.constellation.services.component.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;

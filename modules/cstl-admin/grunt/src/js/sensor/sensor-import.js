@@ -32,7 +32,7 @@ angular.module('cstl-sensor-import', ['cstl-restapi', 'cstl-services', 'ui.boots
 
             $.ajax({
                 headers: {
-                 'X-Auth-Token': $rootScope.authToken
+                 'access_token': $rootScope.access_token
                 },
                 url: $cookieStore.get('cstlUrl') + "api/1/sensor/upload",
                 type: 'POST',
