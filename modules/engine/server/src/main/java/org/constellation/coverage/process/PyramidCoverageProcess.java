@@ -103,7 +103,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
                                    final File pyramidFolder,
                                    final Domain domain,
                                    final Dataset dataset,
-                                   final CoordinateReferenceSystem pyramidCRS) {
+                                   final CoordinateReferenceSystem[] pyramidCRS) {
         this(PyramidCoverageDescriptor.INSTANCE, toParameters(inCoverageRef, orinigalData, pyramidName, providerID,
                 pyramidFolder, domain, dataset, pyramidCRS));
     }
@@ -115,7 +115,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
                                                     final File pyramidFolder,
                                                     final Domain domain,
                                                     final Dataset dataset,
-                                                    final CoordinateReferenceSystem pyramidCRS){
+                                                    final CoordinateReferenceSystem[] pyramidCRS){
         final ParameterValueGroup params = PyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
         fillParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder, domain, dataset, pyramidCRS, params);
         return params;
@@ -124,7 +124,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
     @Override
     protected void execute() throws ProcessException {
         final CoverageReference inCovRef = value(IN_COVERAGE_REF, inputParameters);
-        final CoordinateReferenceSystem pyramidCRS = value(PYRAMID_CRS, inputParameters);
+        final CoordinateReferenceSystem[] pyramidCRSs = value(PYRAMID_CRS, inputParameters);
         final Data originalData         = value(ORIGINAL_DATA, inputParameters);
         final String providerID         = value(PROVIDER_OUT_ID, inputParameters);
         final File pyramidFolder        = value(PYRAMID_FOLDER, inputParameters);
@@ -191,7 +191,6 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
 
         //build pyramid
         final Dimension tileDim = new Dimension(TILE_SIZE, TILE_SIZE);
-        final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
         try {
             final PyramidalCoverageReference outCovRef =
                     (PyramidalCoverageReference) getOrCreateCRef((XMLCoverageStore)outputCoverageStore, referenceName, TIFF_FORMAT, ViewType.GEOPHYSICS);
@@ -206,12 +205,16 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
                 throw new ProcessException("CoverageStack implementation not supported.", this, null);
             }
 
-            final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
             final Map<Envelope, double[]> map = new HashMap<>();
-            map.put(pyramidEnv, scales);
+            for (CoordinateReferenceSystem pyramidCRS : pyramidCRSs) {
+                final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
+                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
+                map.put(pyramidEnv, scales);
 
-            //Prepare pyramid's mosaics.
-            CoverageUtilities.getOrCreatePyramid(outCovRef, pyramidEnv, tileDim, scales);
+                //Prepare pyramid's mosaics.
+                CoverageUtilities.getOrCreatePyramid(outCovRef, pyramidEnv, tileDim, scales);
+            }
+
             pyramidData(inCovRef, outputCoverageStore, referenceName, map, tileDim);
 
         } catch (DataStoreException | FactoryException | TransformException | OutOfDomainOfValidityException e) {

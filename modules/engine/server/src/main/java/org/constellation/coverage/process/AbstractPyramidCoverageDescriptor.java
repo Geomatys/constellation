@@ -42,9 +42,9 @@ public abstract class AbstractPyramidCoverageDescriptor extends AbstractCstlProc
             new DefaultParameterDescriptor<>(PYRAMID_FOLDER_NAME, PYRAMID_FOLDER_REMARKS, File.class, null, true);
 
     public static final String PYRAMID_CRS_NAME = "pyramid_crs";
-    private static final String PYRAMID_CRS_REMARKS = "Output pyramid CRS.";
-    public static final ParameterDescriptor<CoordinateReferenceSystem> PYRAMID_CRS =
-            new DefaultParameterDescriptor(PYRAMID_CRS_NAME, PYRAMID_CRS_REMARKS, CoordinateReferenceSystem.class, null, false);
+    private static final String PYRAMID_CRS_REMARKS = "Output pyramid CRSs.";
+    public static final ParameterDescriptor<CoordinateReferenceSystem[]> PYRAMID_CRS =
+            new DefaultParameterDescriptor(PYRAMID_CRS_NAME, PYRAMID_CRS_REMARKS, CoordinateReferenceSystem[].class, null, false);
 
     public static final String PROVIDER_OUT_ID_NAME = "pyramid_provider_identifer";
     private static final String PROVIDER_OUT_ID_REMARKS = "The identifier of the output provider.";

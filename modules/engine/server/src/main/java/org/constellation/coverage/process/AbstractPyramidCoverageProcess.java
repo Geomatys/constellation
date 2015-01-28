@@ -85,7 +85,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
 
     protected static void fillParameters(CoverageReference inCoverageRef, Data orinigalData, String pyramidName,
                                          String providerID, File pyramidFolder, Domain domain, Dataset dataset,
-                                         CoordinateReferenceSystem pyramidCRS, ParameterValueGroup params) {
+                                         CoordinateReferenceSystem[] pyramidCRS, ParameterValueGroup params) {
         getOrCreate(IN_COVERAGE_REF, params).setValue(inCoverageRef);
         getOrCreate(ORIGINAL_DATA, params).setValue(orinigalData);
         getOrCreate(PYRAMID_NAME, params).setValue(pyramidName);

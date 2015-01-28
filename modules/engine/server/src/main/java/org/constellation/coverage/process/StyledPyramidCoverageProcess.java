@@ -114,7 +114,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                                          final File pyramidFolder,
                                          final Domain domain,
                                          final Dataset dataset,
-                                         final CoordinateReferenceSystem pyramidCRS,
+                                         final CoordinateReferenceSystem[] pyramidCRS,
                                          final StyleReference styleRef) {
         this(StyledPyramidCoverageDescriptor.INSTANCE, toParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder,
                 domain, dataset, pyramidCRS, styleRef));
@@ -127,7 +127,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                                                     final File pyramidFolder,
                                                     final Domain domain,
                                                     final Dataset dataset,
-                                                    final CoordinateReferenceSystem pyramidCRS,
+                                                    final CoordinateReferenceSystem[] pyramidCRS,
                                                     final StyleReference styleRef){
         final ParameterValueGroup params = StyledPyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
         fillParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder, domain, dataset, pyramidCRS, params);
@@ -138,7 +138,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
     @Override
     protected void execute() throws ProcessException {
         final CoverageReference inCovRef = value(IN_COVERAGE_REF, inputParameters);
-        final CoordinateReferenceSystem pyramidCRS = value(PYRAMID_CRS, inputParameters);
+        final CoordinateReferenceSystem[] pyramidCRSs = value(PYRAMID_CRS, inputParameters);
         final Data originalData         = value(ORIGINAL_DATA, inputParameters);
         final String providerID         = value(PROVIDER_OUT_ID, inputParameters);
         final File pyramidFolder        = value(PYRAMID_FOLDER, inputParameters);
@@ -213,23 +213,25 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
 
         //build pyramid
         try {
-            final PyramidalCoverageReference outCovRef =
-                    (PyramidalCoverageReference) getOrCreateCRef((XMLCoverageStore) outputCoverageStore, referenceName, PNG_FORMAT, ViewType.RENDERED);
-            final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
+            for (CoordinateReferenceSystem pyramidCRS : pyramidCRSs) {
 
-            final GridCoverageReader reader = inCovRef.acquireReader();
-            final GridCoverageReadParam readParam = new GridCoverageReadParam();
-            readParam.setDeferred(true);
-            final GridCoverage coverage = reader.read(inCovRef.getImageIndex(), readParam);
-            inCovRef.recycle(reader);
+                final PyramidalCoverageReference outCovRef =
+                        (PyramidalCoverageReference) getOrCreateCRef((XMLCoverageStore) outputCoverageStore, referenceName, PNG_FORMAT, ViewType.RENDERED);
+                final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
 
-            if (coverage instanceof GridCoverageStack) {
-                throw new ProcessException("CoverageStack implementation not supported.", this, null);
+                final GridCoverageReader reader = inCovRef.acquireReader();
+                final GridCoverageReadParam readParam = new GridCoverageReadParam();
+                readParam.setDeferred(true);
+                final GridCoverage coverage = reader.read(inCovRef.getImageIndex(), readParam);
+                inCovRef.recycle(reader);
+
+                if (coverage instanceof GridCoverageStack) {
+                    throw new ProcessException("CoverageStack implementation not supported.", this, null);
+                }
+
+                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
+                pyramidStyledData(inCovRef, pyramidEnv, scales, outCovRef, style);
             }
-
-            final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
-            pyramidStyledData(inCovRef, pyramidEnv, scales, outCovRef, style);
-
         } catch (DataStoreException | FactoryException | OutOfDomainOfValidityException | TransformException e) {
             throw new ProcessException(e.getMessage(), this, e);
         }
