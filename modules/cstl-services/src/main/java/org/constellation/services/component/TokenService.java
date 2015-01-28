@@ -122,7 +122,7 @@ public class TokenService implements TokenExtender {
     }
 
     private String headers(HttpServletRequest httpRequest) {
-        String access_token = httpRequest.getHeader("X-Auth-Token");
+        String access_token = httpRequest.getHeader("access_token");
         if (access_token != null) {
             LOGGER.debug("Header: " + access_token + " (" + httpRequest.getRequestURI() + ")");
             return access_token;
