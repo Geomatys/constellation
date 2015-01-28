@@ -69,7 +69,7 @@ public class CorsFilter implements Filter {
         }
 
         if ("OPTIONS".equals(httpServletRequest.getMethod()))
-            httpServletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         else
             chain.doFilter(request, response);
 
