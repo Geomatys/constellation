@@ -59,7 +59,6 @@ import static org.constellation.engine.register.jooq.Tables.CSTL_USER;
 import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 import static org.constellation.engine.register.jooq.Tables.USER_X_ROLE;
 
-@Component
 public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, CstlUser> implements UserRepository {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
