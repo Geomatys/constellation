@@ -211,7 +211,7 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                     //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
                     if(selectedContext.crs !== 'EPSG:4326' && selectedContext.crs !=='CRS:84'){
                         var projection = ol.proj.get(selectedContext.crs);
-                        extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                        extent = ol.proj.transformExtent(extent, projection,'EPSG:4326');
                     }
                     MapContextDashboardViewer.zoomToExtent(extent, MapContextDashboardViewer.map.getSize(),true);
                 }

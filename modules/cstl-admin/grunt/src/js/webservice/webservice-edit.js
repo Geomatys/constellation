@@ -1183,7 +1183,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     var extent = [minX,minY,maxX,maxY];
                     if(crsCode !== 'EPSG:4326' && crsCode !=='CRS:84'){
                         var projection = ol.proj.get(crsCode);
-                        extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                        extent = ol.proj.transformExtent(extent, projection,'EPSG:4326');
                     }
                     DataViewer.zoomToExtent(extent,DataViewer.map.getSize(),true);
                 } else {

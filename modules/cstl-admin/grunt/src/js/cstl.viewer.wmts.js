@@ -42,7 +42,7 @@ window.buildWmtsViewer = function () {
             var projection = ol.proj.get(this.projection);
             this.maxExtent = projection.getExtent();
             //calculate reprojected extent for given projection
-            var reprojExtent = ol.proj.transform(this.extent, 'EPSG:4326', this.projection);
+            var reprojExtent = ol.proj.transformExtent(this.extent, 'EPSG:4326', this.projection);
             //if the projected extent contains Infinity then the extent will be the projection extent.
             if(Array.isArray(reprojExtent)){
                 for(var i=0;i<reprojExtent.length;i++){
@@ -114,7 +114,7 @@ window.buildWmtsViewer = function () {
 
         zoomToExtent : function(extent,size){
             var projection = ol.proj.get(this.projection);
-            var reprojExtent = ol.proj.transform(extent, 'EPSG:4326', this.projection);
+            var reprojExtent = ol.proj.transformExtent(extent, 'EPSG:4326', this.projection);
             if(Array.isArray(reprojExtent)){
                 for(var i=0;i<reprojExtent.length;i++){
                     var coord = reprojExtent[i];

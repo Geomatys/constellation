@@ -628,7 +628,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
                     if($scope.ctxt.crs !== 'EPSG:4326' && $scope.ctxt.crs !=='CRS:84'){
                         var projection = ol.proj.get($scope.ctxt.crs);
-                        extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                        extent = ol.proj.transformExtent(extent, projection,'EPSG:4326');
                     }
                     DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
                 }
@@ -957,7 +957,7 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
                     if(crs !== 'EPSG:4326' && crs !=='CRS:84'){
                         var projection = ol.proj.get(crs);
-                        extent = ol.proj.transform(extent, projection,'EPSG:4326');
+                        extent = ol.proj.transformExtent(extent, projection,'EPSG:4326');
                     }
                     DataViewer.zoomToExtent(extent, DataViewer.map.getSize(),true);
                 }
