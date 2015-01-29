@@ -5,6 +5,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +108,7 @@ public class TokenUtils {
             return false;
         }
 
-        if(signature.equals(TokenUtils.computeSignature(username, expires, secret))) {
+        if (signature.equals(TokenUtils.computeSignature(username, expires, secret))) {
             return true;
         }
         LOGGER.info("Token missmatch: " + access_token);
@@ -117,6 +120,43 @@ public class TokenUtils {
         long expires = Long.parseLong(parts[1]);
 
         return expires < System.currentTimeMillis() + tokenHalfLife;
+    }
+
+    
+    /**
+     * Extract access_token from header, parameter or cookies.  
+     * @param request
+     * @return
+     */
+    public static String extractAccessToken(HttpServletRequest request) {
+        return extract(request, "access_token");
+    }
+
+    /**
+     * Extract value of header, parameter or cookie for a given name.  
+     * @param request
+     * @param name
+     * @return
+     */
+    public static String extract(HttpServletRequest request, String name) {
+        String access_token = request.getHeader(name);
+        if (access_token != null)
+            return access_token;
+
+        access_token = request.getParameter(name);
+        if (access_token != null)
+            return access_token;
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null)
+            return null;
+       
+        for (Cookie cookie : cookies) {
+            if (name.equals(cookie.getName()))
+                return cookie.getValue();
+        }
+        
+        return null;
     }
 
 }
