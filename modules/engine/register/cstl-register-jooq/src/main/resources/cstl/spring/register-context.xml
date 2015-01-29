@@ -7,12 +7,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
 
-  <context:component-scan base-package="org.constellation.engine.register.jooq" >
-    <context:exclude-filter type="assignable" expression="org.constellation.engine.register.repository.UserRepository"/>
-  </context:component-scan>
-
-  <!-- Explicit declaration -->
-  <bean id="userRepository" class="org.constellation.engine.register.jooq.repository.JooqUserRepository" />
+  <context:component-scan base-package="org.constellation.engine.register.jooq"/>
 
   <tx:annotation-driven transaction-manager="transactionManager" />
 
