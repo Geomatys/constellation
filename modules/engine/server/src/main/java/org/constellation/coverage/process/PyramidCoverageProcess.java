@@ -158,24 +158,8 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
             if (namespace!= null && namespace.equals("no namespace")) {
                 namespace = null;
             }
+            referenceName = new DefaultName(namespace, pyramidName);
 
-            try {
-                final Set<Name> names = outputCoverageStore.getNames();
-                referenceName = new DefaultName(namespace, pyramidName);
-
-                final CoverageReference coverageReference;
-                if (names.contains(referenceName)) {
-                    coverageReference = outputCoverageStore.getCoverageReference(referenceName);
-                } else {
-                    coverageReference = outputCoverageStore.create(referenceName);
-                }
-
-                if (!(coverageReference instanceof PyramidalCoverageReference)) {
-                    throw new ProcessException("Provider "+providerID+" don't store pyramidal coverages.", this, null);
-                }
-            } catch (DataStoreException e) {
-                throw new ProcessException(e.getMessage(), this, e);
-            }
         }
 
         if (outputCoverageStore == null) {
@@ -266,7 +250,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         input.parameter("pyramid_name").setValue(outName.getLocalPart());
         input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
         input.parameter("resolution_per_envelope").setValue(envScales);
-        input.parameter("reuseTile").setValue(true);
+        input.parameter("reuse_tiles").setValue(true);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
         p.call();
     }
