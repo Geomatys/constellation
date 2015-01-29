@@ -19,11 +19,18 @@
 
 package org.constellation.admin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.XML;
 
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Metadata;
@@ -32,7 +39,9 @@ import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.json.metadata.v2.Template;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,9 +52,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
+@Profile("standard")
 @Component
 @Primary
 public class MetadataBusiness implements IMetadataBusiness {
+
+    protected static final Logger LOGGER = Logging.getLogger(MetadataBusiness.class);
+    
     /**
      * Injected data repository.
      */
@@ -94,22 +107,75 @@ public class MetadataBusiness implements IMetadataBusiness {
             metadata.setMetadataId(metadataId);
             metadata.setMetadataIso(xml);
             metadataRepository.update(metadata);
+            
+            if (metadata.getDatasetId() != null) {
+                final Dataset dataset = datasetRepository.findById(metadata.getDatasetId()); // calculate completion rating
+                Integer completion = null;
+                try {
+                    List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
+                    if (!datas.isEmpty()) {
+                        final String type = datas.get(0).getType();
+                        final Template template = Template.getInstance(getDatasetTemplate(dataset.getIdentifier(), type));
+                        completion = template.calculateMDCompletion(unmarshallMetadata(xml));
+                    }
+                } catch (IOException | ConfigurationException | JAXBException ex) {
+                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+                }
+                dataset.setMdCompletion(completion);
+                datasetRepository.update(dataset);
+            }
+            if (metadata.getDataId() != null) {
+                final Data data = dataRepository.findById(metadata.getDataId());
+                // calculate completion rating
+                Integer completion = null;
+                try {
+                    final Template template = Template.getInstance(getDataTemplate(data.getName(), data.getNamespace(), data.getType()));
+                    completion = template.calculateMDCompletion(unmarshallMetadata(xml));
+                } catch (IOException | ConfigurationException | JAXBException ex) {
+                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+                }
+                data.setMdCompletion(completion);
+                dataRepository.update(data);
+            }
             return true;
         }
+
         
         // if the metadata is not yet present look for empty metadata object
         final Dataset dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (dataset != null) {
             final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null, null);
             metadataRepository.create(metadata2);
+            Integer completion = null;
+            try {
+                List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
+                if (!datas.isEmpty()) {
+                    final String type = datas.get(0).getType();
+                    final Template template = Template.getInstance(getDatasetTemplate(dataset.getIdentifier(), type));
+                    completion = template.calculateMDCompletion(unmarshallMetadata(xml));
+                }
+            } catch (IOException | ConfigurationException | JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+            }
+            dataset.setMdCompletion(completion);
+            datasetRepository.update(dataset);
             return true;
         }
-        
         // unsafe but no better way for now
         final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (data != null) {
             final Metadata metadata2 = new Metadata(metadataId, xml, data.getId(), null, null, null);
             metadataRepository.create(metadata2);
+            // calculate completion rating
+            Integer completion = null;
+            try {
+                final Template template = Template.getInstance(getDataTemplate(data.getName(), data.getNamespace(), data.getType()));
+                completion = template.calculateMDCompletion(unmarshallMetadata(xml));
+            } catch (IOException | ConfigurationException | JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+            }
+            data.setMdCompletion(completion);
+            dataRepository.update(data);
             return true;
         }
         
@@ -204,5 +270,40 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (service != null) {
             metadataRepository.removeDataFromCSW(metadataId, service.getId());
         }
+    }
+    
+    protected Object unmarshallMetadata(final String metadata) throws JAXBException {
+        return XML.unmarshal(metadata);
+    }
+    
+    protected String getDataTemplate(final String dataName, final String dataNamespace, final String dataType) throws ConfigurationException {
+        final String templateName;
+        if ("vector".equalsIgnoreCase(dataType)) {
+            //vector template
+            templateName = "profile_default_vector";
+        } else if ("raster".equalsIgnoreCase(dataType)) {
+            //raster template
+            templateName = "profile_default_raster";
+        } else {
+            //default template is import
+            templateName = "profile_import";
+        }
+        return templateName;
+    }
+    
+    protected String getDatasetTemplate(final String datasetId, final String dataType) throws ConfigurationException {
+        //get template name
+        final String templateName;
+        if ("vector".equalsIgnoreCase(dataType)) {
+            //vector template
+            templateName = "profile_default_vector";
+        } else if ("raster".equalsIgnoreCase(dataType)) {
+            //raster template
+            templateName = "profile_default_raster";
+        } else {
+            //default template is import
+            templateName = "profile_import";
+        }
+        return templateName;
     }
 }
