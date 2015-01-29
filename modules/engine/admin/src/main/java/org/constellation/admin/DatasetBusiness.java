@@ -83,8 +83,7 @@ import org.springframework.context.annotation.Profile;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
-@Profile("standard")
-@Component
+@Component("cstlDatasetBusiness")
 @Primary
 public class DatasetBusiness extends InternalCSWSynchronizer implements IDatasetBusiness {
 

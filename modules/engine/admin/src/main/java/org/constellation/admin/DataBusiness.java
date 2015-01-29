@@ -141,8 +141,7 @@ import org.xml.sax.SAXException;
  * @since 0.9
  */
 
-@Profile("standard")
-@Component
+@Component("cstlDataBusiness")
 @DependsOn({"database-initer", "providerBusiness"})
 @Primary
 public class DataBusiness extends InternalCSWSynchronizer implements IDataBusiness {
