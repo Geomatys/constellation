@@ -611,7 +611,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
     }
 
-    private void deleteDatasetIfEmpty(Integer datasetID) {
+    protected void deleteDatasetIfEmpty(Integer datasetID) {
         if (datasetID != null) {
             List<Data> datas = dataRepository.findAllByDatasetId(datasetID);
             if (datas.isEmpty()) {
