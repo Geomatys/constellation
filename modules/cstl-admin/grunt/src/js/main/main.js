@@ -61,7 +61,7 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
             // the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog
             closeModals();
             //renew token
-            TokenService.renew();
+            //TokenService.renew();
         });
 
         $scope.$on('$keepalive', function() {

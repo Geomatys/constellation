@@ -184,12 +184,17 @@ cstlAdminApp
             //The idle timeout duration in seconds.
             // After this amount of time passes without the user performing an action
             // that triggers one of the watched DOM events, the user is considered idle.
-
-            var cookieToken = $.cookie('access_token');
-            if(cookieToken && cookieToken.indexOf('_') !==-1){
-                var splitArr = cookieToken.split('_');
-                tokenDuration = splitArr[splitArr.length-1]/1000;
+            if($.cookie('token_life')){
+            	tokenDuration = $.cookie('token_life')/2;
+            }else{
+            	var cookieToken = $.cookie('access_token');
+            	if(cookieToken && cookieToken.indexOf('_') !==-1){
+            		var splitArr = cookieToken.split('_');
+            		tokenDuration = splitArr[splitArr.length-1]/1000;
+            	}
             }
+            console.log("Token duration set to: " + tokenDuration);
+            
             $idleProvider.idleDuration(tokenDuration*2);
 
             //The warning duration in seconds.
