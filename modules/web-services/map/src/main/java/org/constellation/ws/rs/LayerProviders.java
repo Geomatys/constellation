@@ -603,6 +603,11 @@ public final class LayerProviders {
         // Extract first band statistics.
         double min = dims.get(0).getMinimumValue();
         double max = dims.get(0).getMaximumValue();
+
+        if (Double.isInfinite(min) || Double.isInfinite(max)) {
+            return null;
+        }
+
         double average = (max + min) / 2;
 
         // Generate a color map from band statistics.
