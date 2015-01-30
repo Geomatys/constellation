@@ -21,6 +21,8 @@ package org.constellation.rest.api;
 import com.google.common.base.Function;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,43 +36,60 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.security.Principal;
+import java.util.Enumeration;
 
 /**
  * RestFull user configuration service
- * 
+ *
  * @author Olivier NOUGUIER (Geomatys)
  * @version 0.9
  * @since 0.9
  */
 @Named
 @Path("/1/session")
-@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-@Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class SessionRest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SessionRest.class);
 
     @Inject
     private UserRepository userRepository;
-    
-	@GET
-	@Path("/logout")
-	public Response findOne(@PathParam("id") String login, @Context HttpServletRequest req) {
-		HttpSession session = req.getSession(false);
-		if(session!=null)
-			session.invalidate();
-		return Response.ok("OK").build();
-	}
-	
-	 @GET
-	    @Path("/account")
-	    public Response account(@Context HttpServletRequest req) {
-	        return userRepository.findOneWithRolesAndDomains(req.getUserPrincipal().getName())
-	                .transform(new Function<DomainUser, Response>() {
-	                    @Override
-	                    public Response apply(DomainUser domainUser) {
-	                        return Response.ok(domainUser).build();
-	                    }
-	                }).or(Response.status(404).build());
-	    }
+
+    @GET
+    @Path("/logout")
+    public Response findOne(@PathParam("id") String login, @Context HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session != null)
+            session.invalidate();
+        return Response.ok("OK").build();
+    }
+
+    @GET
+    @Path("/account")
+    public Response account(@Context HttpServletRequest req) {
+        Principal userPrincipal = req.getUserPrincipal();
+        if(userPrincipal==null){
+            LOGGER.warn("No principal in request");
+
+            StringBuilder builder = new StringBuilder();
+            for (Enumeration<String> headerNames = req.getHeaderNames();headerNames.hasMoreElements(); /* NO-OPS */) {
+                String header = headerNames.nextElement();
+                builder.append(header).append(':').append(req.getHeader(header));
+            }
+
+            LOGGER.warn(builder.toString());
+            return Response.status(401).build();
+        }
+        return userRepository.findOneWithRolesAndDomains(userPrincipal.getName())
+                .transform(new Function<DomainUser, Response>() {
+                    @Override
+                    public Response apply(DomainUser domainUser) {
+                        return Response.ok(domainUser).build();
+                    }
+                }).or(Response.status(404).build());
+    }
 
 
 }

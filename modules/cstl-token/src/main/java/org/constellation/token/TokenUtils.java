@@ -1,5 +1,7 @@
 package org.constellation.token;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
@@ -8,6 +10,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,23 +142,68 @@ public class TokenUtils {
      * @return
      */
     public static String extract(HttpServletRequest request, String name) {
-        String access_token = request.getHeader(name);
-        if (access_token != null)
-            return access_token;
+        String value = headers(request, name);
+        if (value != null)
+            return value;
 
-        access_token = request.getParameter(name);
-        if (access_token != null)
-            return access_token;
+        value = queryString(request, name);
+        if (value != null)
+            return value;
 
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null)
-            return null;
-       
-        for (Cookie cookie : cookies) {
-            if (name.equals(cookie.getName()))
-                return cookie.getValue();
-        }
+        return cookie(request, name);
         
+    }
+
+
+    private static String queryString(HttpServletRequest httpRequest, String name) {
+
+        /*
+         * If access_token not found get it from request query string 'name' parameter
+         */
+        String queryString = httpRequest.getQueryString();
+        if (StringUtils.isNotBlank(queryString)) {
+            int tokenIndex = queryString.indexOf(name+"=");
+            if (tokenIndex != -1) {
+                tokenIndex += (name + "=").length();
+                int tokenEndIndex = queryString.indexOf('&', tokenIndex);
+                String access_token;
+                if (tokenEndIndex == -1)
+                    access_token = queryString.substring(tokenIndex);
+                else
+                    access_token = queryString.substring(tokenIndex, tokenEndIndex);
+                LOGGER.debug("QueryString: " + access_token + " (" + httpRequest.getRequestURI() + ")");
+                return access_token;
+            }
+        }
+        return null;
+    }
+
+    private static String cookie(HttpServletRequest httpRequest, String name) {
+        /* Extract from cookie */
+        Cookie[] cookies = httpRequest.getCookies();
+        if (cookies != null)
+            for (Cookie cookie : cookies) {
+                if (name.equals(cookie.getName())) {
+                    try {
+                        String value = URLDecoder.decode(cookie.getValue(), "UTF-8");
+                        LOGGER.debug("Cookie: " + value + " (" + httpRequest.getRequestURI() + ")");
+                        if(StringUtils.isNotBlank(value))
+                          return value;
+                    } catch (UnsupportedEncodingException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
+            }
+        return null;
+    }
+
+    private static String headers(HttpServletRequest httpRequest, String name) {
+        String value = httpRequest.getHeader(name);
+        if (value != null) {
+            LOGGER.debug("Header: " + value + " (" + httpRequest.getRequestURI() + ")");
+            if(StringUtils.isNotBlank(value))
+               return value;
+        }
         return null;
     }
 
