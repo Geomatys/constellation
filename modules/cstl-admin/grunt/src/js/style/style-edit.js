@@ -463,8 +463,27 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          * @param styleObj
          */
         $scope.duplicateChooseStyle = function(styleObj) {
-            //@TODO make a duplication of given style to create a new style based on it.
-            //$scope.setStyleChooser('duplicate');
+            $scope.setStyleChooser('duplicate');
+            var styleName = styleObj.Name;
+            var providerId = styleObj.Provider;
+            if(styleObj.Type === 'VECTOR'){
+                style.get({provider: providerId, name: styleName}, function(response) {
+                    $scope.newStyle = response;
+                    $scope.selectedStyle = styleObj;
+                    initOptionsSLD();
+                    $scope.optionsSLD.userStyleName = styleName +"(1)";
+                    $scope.loadDataProperties();
+                    $scope.initVectorPlot();
+                });
+            }else {
+                style.get({provider: providerId, name: styleName}, function(response) {
+                    $scope.newStyle = response;
+                    $scope.selectedStyle = styleObj;
+                    initOptionsSLD();
+                    $scope.optionsSLD.userStyleName = styleName +"(1)";
+                    $scope.loadDataProperties();
+                });
+            }
         };
 
         /**
