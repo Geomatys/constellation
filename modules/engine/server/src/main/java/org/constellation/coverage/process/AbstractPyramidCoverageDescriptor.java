@@ -61,6 +61,10 @@ public abstract class AbstractPyramidCoverageDescriptor extends AbstractCstlProc
     public static final ParameterDescriptor<Domain> DOMAIN =
             new DefaultParameterDescriptor(DOMAIN_NAME, DOMAIN_REMARKS, Domain.class, null, false);
 
+    public static final String UPDATE_NAME = "update";
+    private static final String UPDATE_REMARKS = "Flag that enable update of output pyramid tiles.";
+    public static final ParameterDescriptor<Boolean> UPDATE =
+            new DefaultParameterDescriptor(UPDATE_NAME, UPDATE_REMARKS, Boolean.class, Boolean.FALSE, false);
 
     public static final String OUT_PYRAMID_PROVIDER_NAME = "out_pyramid_provider";
     private static final String OUT_PYRAMID_PROVIDER_REMARKS = "A provider configuration.";

@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.UPDATE;
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.DOMAIN;
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.IN_COVERAGE_REF;
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.ORIGINAL_DATA;
@@ -103,9 +104,10 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
                                    final File pyramidFolder,
                                    final Domain domain,
                                    final Dataset dataset,
-                                   final CoordinateReferenceSystem[] pyramidCRS) {
+                                   final CoordinateReferenceSystem[] pyramidCRS,
+                                   final Boolean updatePyramid) {
         this(PyramidCoverageDescriptor.INSTANCE, toParameters(inCoverageRef, orinigalData, pyramidName, providerID,
-                pyramidFolder, domain, dataset, pyramidCRS));
+                pyramidFolder, domain, dataset, pyramidCRS, updatePyramid));
     }
 
     private static ParameterValueGroup toParameters(final CoverageReference inCoverageRef,
@@ -115,9 +117,10 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
                                                     final File pyramidFolder,
                                                     final Domain domain,
                                                     final Dataset dataset,
-                                                    final CoordinateReferenceSystem[] pyramidCRS){
+                                                    final CoordinateReferenceSystem[] pyramidCRS,
+                                                    final Boolean updatePyramid){
         final ParameterValueGroup params = PyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
-        fillParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder, domain, dataset, pyramidCRS, params);
+        fillParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder, domain, dataset, pyramidCRS, updatePyramid, params);
         return params;
     }
 
@@ -132,6 +135,11 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         final Dataset dataset           = value(PYRAMID_DATASET, inputParameters);
         String pyramidName              = value(PYRAMID_NAME, inputParameters);
         final Integer domainId          = domain != null ? domain.getId() : null;
+        Boolean update                  = value(UPDATE, inputParameters);
+
+        if (update == null) {
+            update = Boolean.FALSE;
+        }
 
         if (pyramidName == null) {
             pyramidName = inCovRef.getName().getLocalPart();
@@ -199,7 +207,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
                 CoverageUtilities.getOrCreatePyramid(outCovRef, pyramidEnv, tileDim, scales);
             }
 
-            pyramidData(inCovRef, outputCoverageStore, referenceName, map, tileDim);
+            pyramidData(inCovRef, outputCoverageStore, referenceName, map, tileDim, update);
 
         } catch (DataStoreException | FactoryException | TransformException | OutOfDomainOfValidityException e) {
             throw new ProcessException(e.getMessage(), this, e);
@@ -231,10 +239,11 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
      * @param outName
      * @param envScales
      * @param tileDim
+     * @param update
      * @throws ProcessException
      */
     private void pyramidData(CoverageReference inRef, CoverageStore outCoverageStore, Name outName,
-                             Map<Envelope, double[]> envScales, Dimension tileDim) throws ProcessException {
+                             Map<Envelope, double[]> envScales, Dimension tileDim, Boolean update) throws ProcessException {
 
         final ProcessDescriptor desc;
         try {
@@ -250,7 +259,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         input.parameter("pyramid_name").setValue(outName.getLocalPart());
         input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
         input.parameter("resolution_per_envelope").setValue(envScales);
-        input.parameter("reuse_tiles").setValue(true);
+        input.parameter("reuse_tiles").setValue(update);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
         p.call();
     }

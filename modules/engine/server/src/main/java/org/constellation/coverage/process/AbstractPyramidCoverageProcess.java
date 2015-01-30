@@ -58,6 +58,7 @@ import static org.constellation.coverage.process.AbstractPyramidCoverageDescript
 import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_DATASET;
 import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_FOLDER;
 import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_NAME;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.UPDATE;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 
@@ -85,7 +86,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
 
     protected static void fillParameters(CoverageReference inCoverageRef, Data orinigalData, String pyramidName,
                                          String providerID, File pyramidFolder, Domain domain, Dataset dataset,
-                                         CoordinateReferenceSystem[] pyramidCRS, ParameterValueGroup params) {
+                                         CoordinateReferenceSystem[] pyramidCRS, Boolean update, ParameterValueGroup params) {
         getOrCreate(IN_COVERAGE_REF, params).setValue(inCoverageRef);
         getOrCreate(ORIGINAL_DATA, params).setValue(orinigalData);
         getOrCreate(PYRAMID_NAME, params).setValue(pyramidName);
@@ -94,6 +95,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         getOrCreate(DOMAIN, params).setValue(domain);
         getOrCreate(PYRAMID_DATASET, params).setValue(dataset);
         getOrCreate(PYRAMID_CRS, params).setValue(pyramidCRS);
+        getOrCreate(UPDATE, params).setValue(update);
     }
 
 

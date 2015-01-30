@@ -68,6 +68,7 @@ import java.net.MalformedURLException;
 import java.util.Set;
 import java.util.logging.Level;
 
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.UPDATE;
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.PYRAMID_CRS;
 import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.DOMAIN;
 import static org.constellation.coverage.process.StyledPyramidCoverageDescriptor.IN_COVERAGE_REF;
@@ -115,9 +116,10 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                                          final Domain domain,
                                          final Dataset dataset,
                                          final CoordinateReferenceSystem[] pyramidCRS,
-                                         final StyleReference styleRef) {
+                                         final StyleReference styleRef,
+                                         final Boolean updatePyramid) {
         this(StyledPyramidCoverageDescriptor.INSTANCE, toParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder,
-                domain, dataset, pyramidCRS, styleRef));
+                domain, dataset, pyramidCRS, styleRef, updatePyramid));
     }
 
     private static ParameterValueGroup toParameters(final CoverageReference inCoverageRef,
@@ -128,9 +130,10 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                                                     final Domain domain,
                                                     final Dataset dataset,
                                                     final CoordinateReferenceSystem[] pyramidCRS,
-                                                    final StyleReference styleRef){
+                                                    final StyleReference styleRef,
+                                                    final Boolean updatePyramid){
         final ParameterValueGroup params = StyledPyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
-        fillParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder, domain, dataset, pyramidCRS, params);
+        fillParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder, domain, dataset, pyramidCRS, updatePyramid, params);
         getOrCreate(STYLE, params).setValue(styleRef);
         return params;
     }
@@ -147,6 +150,11 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         final StyleReference styleRef   = value(STYLE, inputParameters);
         String pyramidName              = value(PYRAMID_NAME, inputParameters);
         final Integer domainId          = domain != null ? domain.getId() : null;
+        Boolean update                  = value(UPDATE, inputParameters);
+
+        if (update == null) {
+            update = Boolean.FALSE;
+        }
 
         if (pyramidName == null) {
             pyramidName = inCovRef.getName().getLocalPart();
@@ -230,7 +238,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                 }
 
                 final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
-                pyramidStyledData(inCovRef, pyramidEnv, scales, outCovRef, style);
+                pyramidStyledData(inCovRef, pyramidEnv, scales, outCovRef, style, update);
             }
         } catch (DataStoreException | FactoryException | OutOfDomainOfValidityException | TransformException e) {
             throw new ProcessException(e.getMessage(), this, e);
@@ -265,7 +273,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
      * @throws ProcessException
      */
     private void pyramidStyledData(CoverageReference reference, Envelope dataEnv, double[] scales,
-                                   PyramidalCoverageReference outputRef, MutableStyle style) throws ProcessException {
+                                   PyramidalCoverageReference outputRef, MutableStyle style, boolean update) throws ProcessException {
         final MapContext context = MapBuilder.createContext();
         final CoverageMapLayer layer = MapBuilder.createCoverageLayer(reference, style);
         context.items().add(layer);
@@ -283,7 +291,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         input.parameter("tilesize").setValue(new Dimension(TILE_SIZE, TILE_SIZE));
         input.parameter("scales").setValue(scales);
         input.parameter("container").setValue(outputRef);
-        input.parameter("update").setValue(true);
+        input.parameter("update").setValue(update);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
         p.call();
     }
