@@ -189,7 +189,7 @@
             </button>
             <button type="button"
                     class="btn btn-add"
-                    ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-show="(isSelectedChooser('new') || isSelectedChooser('duplicate')) && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
                     ng-click="createStyle();">
                 <span translate="sldeditor.button.create">Create</span>
             </button>

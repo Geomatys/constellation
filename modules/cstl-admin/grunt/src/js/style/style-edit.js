@@ -468,23 +468,27 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             var providerId = styleObj.Provider;
             if(styleObj.Type === 'VECTOR'){
                 style.get({provider: providerId, name: styleName}, function(response) {
-                    $scope.newStyle = response;
-                    $scope.selectedStyle = styleObj;
-                    initOptionsSLD();
-                    $scope.optionsSLD.userStyleName = styleName +"(1)";
-                    $scope.loadDataProperties();
+                    prepareAndRenameLayerForDuplication(response, styleObj, styleName);
                     $scope.initVectorPlot();
                 });
             }else {
                 style.get({provider: providerId, name: styleName}, function(response) {
-                    $scope.newStyle = response;
-                    $scope.selectedStyle = styleObj;
-                    initOptionsSLD();
-                    $scope.optionsSLD.userStyleName = styleName +"(1)";
-                    $scope.loadDataProperties();
+                    prepareAndRenameLayerForDuplication(response, styleObj, styleName);
                 });
             }
         };
+
+        function prepareAndRenameLayerForDuplication(response, styleObj, styleName) {
+            $scope.newStyle = response;
+            $scope.selectedStyle = styleObj;
+            initOptionsSLD();
+            if (styleName.match(/-\d{9}\d*$/g)) {
+                $scope.optionsSLD.userStyleName = styleName.substring(0, styleName.lastIndexOf("-")) +"-"+ new Date().getTime();
+            } else {
+                $scope.optionsSLD.userStyleName = styleName + "-" + new Date().getTime();
+            }
+            $scope.loadDataProperties();
+        }
 
         /**
          * setter for stylechooser
