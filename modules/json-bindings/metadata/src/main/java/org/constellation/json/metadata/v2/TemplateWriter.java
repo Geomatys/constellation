@@ -45,17 +45,20 @@ public class TemplateWriter extends AbstractTemplateHandler {
      * 
      * @param template
      * @param metadata
+     * @param prune
      * @return 
      */
-    public RootObj writeTemplate(final RootObj template, final Object metadata) throws ParseException {
+    public RootObj writeTemplate(final RootObj template, final Object metadata, final boolean prune) throws ParseException {
         final TemplateTree tree  = TemplateTree.getTreeFromRootObj(template);
         
-        fillValueWithMetadata(tree, tree.getRoot(), metadata, new HashMap<String, Set<Object>>());
-        
+        fillValueWithMetadata(tree, tree.getRoot(), metadata, new HashMap<String, Set<Object>>(), prune);
+        if (prune) {
+            TemplateTree.pruneTree(tree, tree.getRoot());
+        }
         return TemplateTree.getRootObjFromTree(template, tree);
     }
     
-    private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded) throws ParseException {
+    private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded, final boolean prune) throws ParseException {
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             final ValueNode origNode = new ValueNode(node);
@@ -67,17 +70,17 @@ public class TemplateWriter extends AbstractTemplateHandler {
                     Object child = it.next();
                     node = tree.duplicateNode(origNode, i);
                     if (node.isField()) {
-                        node.value = valueToString(node, child, true);
+                        node.value = valueToString(node, child, !prune);
                     } else {
-                        fillValueWithMetadata(tree, node, child, excluded);
+                        fillValueWithMetadata(tree, node, child, excluded, prune);
                     }
                     i++;
                 }
             } else {
                 if (node.isField()) {
-                    node.value = valueToString(node, obj, true);
+                    node.value = valueToString(node, obj, !prune);
                 } else {
-                    fillValueWithMetadata(tree, node, obj, excluded);
+                    fillValueWithMetadata(tree, node, obj, excluded, prune);
                 }
             }
         }

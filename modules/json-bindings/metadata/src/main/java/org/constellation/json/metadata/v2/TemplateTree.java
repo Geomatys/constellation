@@ -264,6 +264,12 @@ public class TemplateTree {
             for (BlockObj block : children) {
                 blockCount = updateRootObjFromTree(sb, block, tree, blockCount);
                 blockCount++;
+                if (block.getBlock().childrenEmpty()) {
+                    sb.removeBlock(block);
+                }
+            }
+            if (sb.childrenEmpty()) {
+                result.getRoot().remove(sb);
             }
         }
         
@@ -275,6 +281,10 @@ public class TemplateTree {
         final Block origBlock = new Block(block);
         final List<ValueNode> blockNodes = tree.getNodesForBlock(block);
 
+        if (blockNodes.isEmpty()) {
+            owner.removeBlock(blockObj);
+        }
+        
         for (int i = 0; i < blockNodes.size(); i++) {
             final ValueNode node = blockNodes.get(i);
             if (i > 0) {
@@ -302,6 +312,11 @@ public class TemplateTree {
     private static int updateRootObjFromTree(final FieldObj fieldObj, final Block owner, final TemplateTree tree, final ValueNode node, int fieldCount) {
         Field field = fieldObj.getField();
         final List<ValueNode> fieldNodes = tree.getNodesByPathAndParent(field.getPath(), node);
+        
+        if (fieldNodes.isEmpty()) {
+            owner.removeField(fieldObj);
+        }
+        
         for (int j = 0; j < fieldNodes.size(); j++) {
             final ValueNode childNode = fieldNodes.get(j);
             if (j > 0) {
@@ -317,5 +332,21 @@ public class TemplateTree {
             field.setValue(childNode.value);
         }
         return fieldCount;
+    }
+    
+    public static void pruneTree(TemplateTree tree, final ValueNode node) {
+        List<ValueNode> toRemove = new ArrayList<>();
+        for (ValueNode child : node.children) {
+            pruneTree(tree, child);
+            if (child.isField()) {
+                if (child.value == null || child.value.isEmpty()) {
+                    toRemove.add(child);
+                }
+            }
+        }
+        if (!toRemove.isEmpty()) {
+            node.children.removeAll(toRemove);
+            tree.nodes.removeAll(toRemove);
+        }
     }
 }

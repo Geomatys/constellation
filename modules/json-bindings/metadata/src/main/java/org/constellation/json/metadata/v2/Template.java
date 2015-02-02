@@ -140,7 +140,7 @@ public class Template {
      */
     public void write(final Object metadata, final Writer out, final boolean prune) throws IOException {
         final TemplateWriter writer     = new TemplateWriter(standard);
-        final RootObj rootFilled        = writer.writeTemplate(rootObj, metadata);
+        final RootObj rootFilled        = writer.writeTemplate(rootObj, metadata, prune);
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(out, rootFilled);
     }
@@ -163,7 +163,7 @@ public class Template {
     
     public int calculateMDCompletion(final Object metadata) throws IOException {
         final TemplateWriter writer = new TemplateWriter(standard);
-        final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata);
+        final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false);
         return calculateMDCompletion(rootFilled);
     }
     

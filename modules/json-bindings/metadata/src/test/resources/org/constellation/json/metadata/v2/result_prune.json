@@ -1,0 +1,212 @@
+{
+  "root" : {
+    "name" : "MD_Metadata",
+    "multiplicity" : 1,
+    "children" : [ {
+      "superblock" : {
+        "name" : "metadata.block.dataQuality",
+        "multiplicity" : 1,
+        "help" : "metadata.block.dataQuality_help",
+        "path" : null,
+        "render" : null,
+        "children" : [ {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.report",
+            "multiplicity" : 1,
+            "help" : "metadata.block.report_help",
+            "path" : null,
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.report.specification.title",
+                "multiplicity" : 62,
+                "help" : "metadata.field.report.specification.title_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].specification[0].title[0]",
+                "type" : null,
+                "render" : "Specification.codelist",
+                "defaultValue" : null,
+                "value" : "some title",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.report.specification.date",
+                "multiplicity" : 1,
+                "help" : "metadata.field.report.specification.date_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].specification[0].date[0].date[0]",
+                "type" : null,
+                "render" : "DATE.text",
+                "defaultValue" : null,
+                "value" : "1970-05-10",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.dateType",
+                "multiplicity" : 1,
+                "help" : "metadata.field.dateType_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].specification[0].date[0].dateType[0]",
+                "type" : null,
+                "render" : "CODELIST.readonly",
+                "defaultValue" : "CI_DateTypeCode.publication",
+                "value" : "CI_DateTypeCode.creation",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.scopeLevel",
+                "multiplicity" : 1,
+                "help" : "metadata.field.scopeLevel_help",
+                "path" : "metadata[0].dataQualityInfo[0].scope[0].level[0]",
+                "type" : null,
+                "render" : "CODELIST.readonly",
+                "defaultValue" : "MD_ScopeCode.dataset",
+                "value" : "MD_ScopeCode.dataset",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.resultPass",
+                "multiplicity" : 1,
+                "help" : "metadata.field.resultPass_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].pass[0]",
+                "type" : null,
+                "render" : "ResultPass.codelist",
+                "defaultValue" : "nilReason:unknown",
+                "value" : "true",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.resultExplanation",
+                "multiplicity" : 1,
+                "help" : "metadata.field.resultExplanation_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].explanation[0]",
+                "type" : null,
+                "render" : "textarea",
+                "defaultValue" : "See the referenced specification",
+                "value" : "some explanation",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            } ]
+          }
+        }, {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.descriptiveKeyword",
+            "multiplicity" : 62,
+            "help" : "metadata.block.descriptiveKeyword_help",
+            "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0]",
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keyword",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keyword_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[0]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "hello",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keyword",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keyword_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[1]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "world",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            } ]
+          }
+        }, {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.descriptiveKeyword",
+            "multiplicity" : 62,
+            "help" : "metadata.block.descriptiveKeyword_help",
+            "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[1]",
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keyword",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keyword_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[1].keyword[0]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "this",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keyword",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keyword_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[1].keyword[1]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "is",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            } ]
+          }
+        } ]
+      }
+    } ]
+  },
+  "nodeTypes" : [ {
+    "path" : "metadata.dataQualityInfo.report",
+    "type" : "org.opengis.metadata.quality.DomainConsistency"
+  }, {
+    "path" : "metadata.dataQualityInfo.report.result",
+    "type" : "org.opengis.metadata.quality.ConformanceResult"
+  } ]
+}

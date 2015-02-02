@@ -95,7 +95,17 @@ public class SuperBlock implements Serializable, IBlock {
         children.add(index, new BlockObj(block));
         return block;
     }
+    
+    @Override
+    public void removeBlock(BlockObj blockObj) {
+        children.remove(blockObj);
+    }
 
+    @Override
+    public boolean childrenEmpty() {
+        return children.isEmpty();
+    }
+    
     public String getHelp() {
         return help;
     }

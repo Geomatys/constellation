@@ -72,6 +72,15 @@ public class RootBlock implements Serializable {
         return children;
     }
     
+    public void remove(SuperBlock sb) {
+        for (SuperBlockObj sbo : children) {
+            if (sbo.getSuperblock().getName().equals(sb.getName())) {
+                children.remove(sbo);
+                return;
+            }
+        }
+    }
+    
     public List<SuperBlock> getSuperBlocks() {
         final List<SuperBlock> results = new ArrayList<>();
         for (SuperBlockObj sb : children) {

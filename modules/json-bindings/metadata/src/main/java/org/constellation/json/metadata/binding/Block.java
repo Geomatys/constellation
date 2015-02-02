@@ -97,12 +97,29 @@ public class Block implements Serializable, ChildEntity, IBlock {
         return field;
     }
     
+    public void removeField(FieldObj fieldObj) {
+        children.remove(fieldObj);
+    }
+    
     @Override
     public Block addBlock(int index, Block block) {
         children.add(index, new BlockObj(block));
         return block;
     }
+    
+    @Override
+    public void removeBlock(BlockObj blockObj) {
+        children.remove(blockObj);
+    }
 
+    @Override
+    public boolean childrenEmpty() {
+        if (children != null) {
+            return children.isEmpty();
+        }
+        return true;
+    }
+    
     public String getHelp() {
         return help;
     }

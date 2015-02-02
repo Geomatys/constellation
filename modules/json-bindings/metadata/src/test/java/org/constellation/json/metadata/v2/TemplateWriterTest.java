@@ -87,7 +87,7 @@ public class TemplateWriterTest {
         
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
-        final RootObj rootFilled = writer.writeTemplate(root, metadata);
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, false);
         
         
         final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result.json");
@@ -152,7 +152,7 @@ public class TemplateWriterTest {
         
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
-        RootObj rootFilled = writer.writeTemplate(root, metadata);
+        RootObj rootFilled = writer.writeTemplate(root, metadata, false);
         
         
         InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result2.json");
@@ -176,7 +176,7 @@ public class TemplateWriterTest {
         
         dataIdent.setResourceConstraints(Arrays.asList(constraint2, constraint));
         
-        rootFilled = writer.writeTemplate(root, metadata);
+        rootFilled = writer.writeTemplate(root, metadata, false);
         
         resStream = TemplateWriterTest.class.getResourceAsStream("result3.json");
         expectedJson = FileUtilities.getStringFromStream(resStream);
@@ -196,7 +196,7 @@ public class TemplateWriterTest {
          */
         dataIdent.setResourceConstraints(Arrays.asList(constraint, constraint2));
         
-        rootFilled = writer.writeTemplate(root, metadata);
+        rootFilled = writer.writeTemplate(root, metadata, false);
         
         resStream = TemplateWriterTest.class.getResourceAsStream("result3.json");
         expectedJson = FileUtilities.getStringFromStream(resStream);
@@ -240,7 +240,7 @@ public class TemplateWriterTest {
         
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
-        final RootObj rootFilled = writer.writeTemplate(root, metadata);
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, false);
         
         
         
@@ -291,7 +291,7 @@ public class TemplateWriterTest {
         
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
-        RootObj rootFilled = writer.writeTemplate(root, metadata);
+        RootObj rootFilled = writer.writeTemplate(root, metadata, false);
         
         InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords2.json");
         String expectedJson = FileUtilities.getStringFromStream(resStream);
@@ -311,7 +311,7 @@ public class TemplateWriterTest {
         */
         dataIdent.setDescriptiveKeywords(Arrays.asList(keywords2, keywords));
         
-        rootFilled = writer.writeTemplate(root, metadata);
+        rootFilled = writer.writeTemplate(root, metadata, false);
         resultFile = File.createTempFile("test", ".json");
         
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -329,7 +329,7 @@ public class TemplateWriterTest {
         
         dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
         
-        rootFilled = writer.writeTemplate(root, metadata);
+        rootFilled = writer.writeTemplate(root, metadata, false);
         resultFile = File.createTempFile("test", ".json");
         
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -350,7 +350,7 @@ public class TemplateWriterTest {
         
         dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
         
-        rootFilled = writer.writeTemplate(root, metadata);
+        rootFilled = writer.writeTemplate(root, metadata, false);
         resultFile = File.createTempFile("test", ".json");
         
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -382,7 +382,7 @@ public class TemplateWriterTest {
         
         dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2, keywords3, keywords4));
         
-        rootFilled = writer.writeTemplate(root, metadata);
+        rootFilled = writer.writeTemplate(root, metadata, false);
         resultFile = File.createTempFile("test", ".json");
         
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -439,7 +439,7 @@ public class TemplateWriterTest {
         
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
-        final RootObj rootFilled = writer.writeTemplate(root, metadata);
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, false);
         
         
         final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result4.json");
@@ -511,7 +511,7 @@ public class TemplateWriterTest {
         
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
-        final RootObj rootFilled = writer.writeTemplate(root, metadata);
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, false);
         
         
         final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result5.json");
@@ -556,7 +556,7 @@ public class TemplateWriterTest {
         
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
-        RootObj rootFilled = writer.writeTemplate(root, metadata);
+        RootObj rootFilled = writer.writeTemplate(root, metadata, false);
         
         InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_multiple_block.json");
         String expectedJson = FileUtilities.getStringFromStream(resStream);
@@ -576,7 +576,7 @@ public class TemplateWriterTest {
         */
         gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(11156600000L), DateType.CREATION), new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
         
-        rootFilled = writer.writeTemplate(root, metadata);
+        rootFilled = writer.writeTemplate(root, metadata, false);
         
         resStream = TemplateWriterTest.class.getResourceAsStream("result_multiple_block2.json");
         expectedJson = FileUtilities.getStringFromStream(resStream);
@@ -616,10 +616,100 @@ public class TemplateWriterTest {
         
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
-        final RootObj rootFilled = writer.writeTemplate(root, metadata);
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, false);
         
         
         final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_special_type.json");
+        String expectedJson = FileUtilities.getStringFromStream(resStream);
+
+        
+        File resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        String resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+        
+    }
+    
+    @Test
+    public void testWriteFilledMetadataPrune() throws IOException {
+        
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_default_raster.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
+        final DefaultDomainConsistency report = new DefaultDomainConsistency();
+        final DefaultCitation cit = new DefaultCitation("some title");
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        cit.setDates(Arrays.asList(date));
+        final DefaultConformanceResult result = new DefaultConformanceResult(cit, "some explanation", true);
+        report.setResults(Arrays.asList(result));
+        quality.setReports(Arrays.asList(report));
+        metadata.setDataQualityInfo(Arrays.asList(quality));
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        metadata.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, true);
+        
+        
+        final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_prune.json");
+        String expectedJson = FileUtilities.getStringFromStream(resStream);
+
+        
+        File resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        String resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+        
+    }
+    
+    @Test
+    public void testWriteFilledMetadataPrune2() throws IOException {
+        
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_default_raster.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        // case value into a block with no path
+        metadata.setFileIdentifier("metadata-id-0007");
+        metadata.setLanguage(Locale.FRENCH);
+        
+        // the second instance will be ignored int the result because the fields is not multiple
+        metadata.setHierarchyLevels(Arrays.asList(ScopeCode.DATASET, ScopeCode.APPLICATION));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, true);
+        
+        
+        final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_prune2.json");
         String expectedJson = FileUtilities.getStringFromStream(resStream);
 
         

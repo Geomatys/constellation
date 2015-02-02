@@ -1,0 +1,81 @@
+{
+  "root" : {
+    "name" : "MD_Metadata",
+    "multiplicity" : 1,
+    "children" : [ {
+      "superblock" : {
+        "name" : "metadata.block.metadata",
+        "multiplicity" : 1,
+        "help" : "metadata.block.metadata_help",
+        "path" : null,
+        "render" : null,
+        "children" : [ {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.basic",
+            "multiplicity" : 1,
+            "help" : "metadata.block.basic_help",
+            "path" : null,
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.identifier",
+                "multiplicity" : 1,
+                "help" : "metadata.field.identifier_help",
+                "path" : "metadata[0].fileIdentifier[0]",
+                "type" : null,
+                "render" : "readonly",
+                "defaultValue" : null,
+                "value" : "metadata-id-0007",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.metadatalanguage",
+                "multiplicity" : 1,
+                "help" : "metadata.field.metadatalanguage_help",
+                "path" : "metadata[0].language[0]",
+                "type" : null,
+                "render" : "Language.codelist",
+                "defaultValue" : "LanguageCode.fra",
+                "value" : "LanguageCode.fra",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.hierarchyLevel",
+                "multiplicity" : 1,
+                "help" : "metadata.field.hierarchyLevel_help",
+                "path" : "metadata[0].hierarchyLevel[0]",
+                "type" : null,
+                "render" : "CODELIST.readonly",
+                "defaultValue" : "MD_ScopeCode.dataset",
+                "value" : "MD_ScopeCode.dataset",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            } ]
+          }
+        } ]
+      }
+    } ]
+  },
+  "nodeTypes" : [ {
+    "path" : "metadata.dataQualityInfo.report",
+    "type" : "org.opengis.metadata.quality.DomainConsistency"
+  }, {
+    "path" : "metadata.dataQualityInfo.report.result",
+    "type" : "org.opengis.metadata.quality.ConformanceResult"
+  } ]
+}
