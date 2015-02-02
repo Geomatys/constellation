@@ -1,7 +1,6 @@
 
 package org.constellation.json.metadata.v2;
 
-import com.google.common.base.Objects;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -14,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
@@ -394,8 +394,8 @@ public class TemplateReader extends AbstractTemplateHandler {
             
             int cpt = 0;
             for (ValueNode node : nodes) {
-                if (Objects.equal(node.path,      current.path) &&
-                    Objects.equal(node.blockName, current.blockName)) {
+                if (Objects.equals(node.path,      current.path) &&
+                    Objects.equals(node.blockName, current.blockName)) {
                     cpt++;
                 }
             }
