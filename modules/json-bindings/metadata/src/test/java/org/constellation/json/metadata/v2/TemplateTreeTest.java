@@ -4,6 +4,7 @@ package org.constellation.json.metadata.v2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import org.constellation.json.JsonMetadataConstants;
 import org.constellation.json.metadata.binding.RootObj;
 import org.junit.Assert;
 import org.junit.Test;
@@ -365,7 +366,19 @@ public class TemplateTreeTest {
         valueNodeEquals(expresult, result);
     }
     
-    
+    @Test
+    public void buildNumeratedPath() {
+        String orig      =  "metadata.identificationInfo.descriptiveKeywords";
+        String result    = JsonMetadataConstants.buildNumeratedPath(orig, 0);
+        String expResult =  "metadata[0].identificationInfo[0].descriptiveKeywords[0]";
+        
+        Assert.assertEquals(expResult, result);
+        
+        result = JsonMetadataConstants.buildNumeratedPath(expResult, 0);
+        
+        Assert.assertNull(result);
+        
+    }
     private static void valueNodeEquals(final ValueNode expected, final ValueNode result) {
         if (expected.children.size() == result.children.size()) {
             for (int i = 0 ; i < expected.children.size(); i++) {

@@ -49,4 +49,27 @@ public class JsonMetadataConstants {
         String s = numeratedPath.replaceAll("\\[[0-9]*\\]", "");
         return s.replace("+", "");
     }
+    
+    public static String removeLastNumeratedPathPart(final String numeratedPath) {
+        int index = numeratedPath.lastIndexOf('[');
+        if (index != -1) {
+            return numeratedPath.substring(0, index);
+        }
+        return numeratedPath;
+    }
+    
+    public static String buildNumeratedPath(final String numeratedPath, int ordinal) {
+        int index = numeratedPath.lastIndexOf('[');
+        if (index == -1) {
+            StringBuilder sb = new StringBuilder();
+            String[] parts = numeratedPath.split("\\.");
+            for (int i = 0; i < parts.length; i++) {
+                sb.append(parts[i]).append("[0].");
+            }
+            sb.deleteCharAt(sb.length()-1);
+            sb.replace(sb.length() - 2, sb.length() - 1, Integer.toString(ordinal));
+            return sb.toString();
+        }
+        return null;
+    }
 }
