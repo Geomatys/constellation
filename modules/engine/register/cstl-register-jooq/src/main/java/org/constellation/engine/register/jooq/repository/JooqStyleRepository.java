@@ -16,6 +16,9 @@ import org.constellation.engine.register.repository.StyleRepository;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.SelectConditionStep;
+import org.jooq.UpdateConditionStep;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,12 +105,14 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
         }
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void setDefaultStyleToLayer(int styleId, int layerId) {
-        StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.DEFAULT.eq(true)).fetchOneInto(StyledLayerRecord.class);
+        StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.IS_DEFAULT.eq(true)).fetchOneInto(StyledLayerRecord.class);
         if (styledLayerRecord != null) {
-            dsl.update(STYLED_LAYER).set(STYLED_LAYER.DEFAULT, false).where(STYLED_LAYER.LAYER.eq(layerId)).execute();
+            dsl.update(STYLED_LAYER).set(STYLED_LAYER.IS_DEFAULT, false).where(STYLED_LAYER.LAYER.eq(layerId)).execute();
         }
-        dsl.update(STYLED_LAYER).set(STYLED_LAYER.DEFAULT, true).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.STYLE.eq(styleId)).execute();
+        UpdateConditionStep<StyledLayerRecord> update = dsl.update(STYLED_LAYER).set(STYLED_LAYER.IS_DEFAULT, true).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.STYLE.eq(styleId));
+        update.execute();
     }
 
     @Override
