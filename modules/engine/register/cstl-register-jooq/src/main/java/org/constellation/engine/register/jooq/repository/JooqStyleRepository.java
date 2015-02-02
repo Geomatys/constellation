@@ -81,9 +81,12 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void linkStyleToData(int styleId, int dataid) {
-        InsertSetMoreStep<StyledDataRecord> insert = dsl.insertInto(STYLED_DATA).set(STYLED_DATA.DATA, dataid).set(STYLED_DATA.STYLE, styleId);
-        insert.execute();
-
+        StyledDataRecord link = dsl.select().from(STYLED_DATA)
+                .where(STYLED_DATA.DATA.eq(dataid).and(STYLED_DATA.STYLE.eq(styleId)))
+                .fetchOneInto(StyledDataRecord.class);
+        if (link == null) {
+            dsl.insertInto(STYLED_DATA).set(STYLED_DATA.DATA, dataid).set(STYLED_DATA.STYLE, styleId).execute();
+        }
     }
 
     @Override
