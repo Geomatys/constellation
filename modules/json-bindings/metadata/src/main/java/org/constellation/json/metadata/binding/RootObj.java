@@ -19,6 +19,7 @@
 
 package org.constellation.json.metadata.binding;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.List;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
+ @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class RootObj implements Serializable {
     private RootBlock root;
     
@@ -56,6 +58,13 @@ public class RootObj implements Serializable {
         this.root = root;
     }
 
+    public List<SuperBlock> getSuperBlocks() {
+        if (root != null) {
+            return root.getSuperBlocks();
+        }
+        return new ArrayList<>();
+    }
+    
     /**
      * @return the nodeTypes
      */

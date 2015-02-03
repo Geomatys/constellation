@@ -42,8 +42,6 @@ public class ValueNode {
     
     boolean multiple = false;
     
-    private String numeratedPath; // must be computed
-    
     public ValueNode(String path, String type, int ordinal, ValueNode parent, String blockName, boolean strict) {
         this.path      = path;
         this.type      = type;
@@ -166,14 +164,11 @@ public class ValueNode {
     }
     
     public String getNumeratedPath() {
-        if (numeratedPath == null) {
-            if (parent != null) {
-                numeratedPath = parent.getNumeratedPath() + '.' + name + "[" + ordinal + "]";
-            } else {
-                numeratedPath = name + "[" + ordinal + "]";
-            }
+        if (parent != null) {
+            return parent.getNumeratedPath() + '.' + name + "[" + ordinal + "]";
+        } else {
+            return name + "[" + ordinal + "]";
         }
-        return numeratedPath;
     }
     
     public List<ValueNode> getChildrenByName(String name) {
@@ -188,11 +183,6 @@ public class ValueNode {
     
     public void updateOrdinal(int i) {
         this.ordinal = i;
-        // reset all children numerated path
-        this.numeratedPath = null;
-        for (ValueNode child : children) {
-            child.updateOrdinal(child.ordinal);
-        }
     }
     
     @Override

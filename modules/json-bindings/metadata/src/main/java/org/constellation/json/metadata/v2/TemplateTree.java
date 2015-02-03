@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
-import static org.constellation.json.JsonMetadataConstants.cleanNumeratedPath;
+import org.constellation.json.JsonMetadataConstants;
+import static org.constellation.json.JsonMetadataConstants.getLastOrdinal;
+import static org.constellation.json.JsonMetadataConstants.isNumeratedPath;
 import org.constellation.json.metadata.binding.Block;
 import org.constellation.json.metadata.binding.BlockObj;
 import org.constellation.json.metadata.binding.ComponentObj;
@@ -166,19 +168,29 @@ public class TemplateTree {
         throw new IllegalArgumentException(numeratedPath + " does not contain numerated value");
     }
     
-    private void addNode(ValueNode node, ValueNode ancestor, final RootObj template) {
-        
-        // else for a new Node to add, we create all the missing parent nodes
+    private void addNode(ValueNode node, ValueNode ancestor, final RootObj template, String numPath) {
         nodes.add(node);
-
+        
+        // for a new Node to add, we create all the missing parent nodes
         ValueNode child = node;
         String path     = node.path;
         while (path.indexOf('.') != -1) {
-            path = path.substring(0, path.lastIndexOf('.'));
+            path    = path.substring(0, path.lastIndexOf('.'));
+            numPath = numPath.substring(0, numPath.lastIndexOf('.'));
+            int i   = getLastOrdinal(numPath);
 
-            List<ValueNode> parents = getNodesByPath(path);
+            List<ValueNode> parents;
+            if (isNumeratedPath(numPath)) {
+                parents = new ArrayList<>();
+                ValueNode v = getNodeByNumeratedPath(numPath);
+                if (v != null) {
+                    parents.add(v);
+                }
+            } else {
+                parents = getNodesByPath(path);
+            }
             if (parents.isEmpty()) {
-                ValueNode parent = new ValueNode(path, template.getTypeForPath(path), 0, null, null, false);
+                ValueNode parent = new ValueNode(path, template.getTypeForPath(path), i, null, null, false);
                 nodes.add(parent);
                 parent.addChild(child);
                 child = parent;
@@ -192,7 +204,7 @@ public class TemplateTree {
                     }
                 }
                 if (!found) {
-                    ValueNode parent = new ValueNode(path, template.getTypeForPath(path), 0, null, null,false);
+                    ValueNode parent = new ValueNode(path, template.getTypeForPath(path), i, null, null,false);
                     nodes.add(parent);
                     parent.addChild(child);
                     child = parent;
@@ -206,7 +218,7 @@ public class TemplateTree {
     
     public static TemplateTree getTreeFromRootObj(RootObj template) {
         final TemplateTree tree = new TemplateTree();
-        for (SuperBlock sb : template.getRoot().getSuperBlocks()) {
+        for (SuperBlock sb : template.getSuperBlocks()) {
             final Map<String, Integer> blockPathOrdinal = new HashMap<>();
             for (BlockObj block : sb.getChildren()) {
                 updateTreeFromBlock(block, tree, template, blockPathOrdinal);
@@ -224,7 +236,7 @@ public class TemplateTree {
         if (block.getPath() != null) {
             int blockOrdinal = updateOrdinal(blockPathOrdinal, block.getPath());
             ancestor = new ValueNode(block, blockOrdinal);
-            tree.addNode(ancestor, null, template);
+            tree.addNode(ancestor, null, template, block.getPath());
         }
 
         // Fields
@@ -242,11 +254,11 @@ public class TemplateTree {
         final Field field = fieldObj.getField();
         int fieldOrdinal = updateOrdinal(fieldPathOrdinal, field.getPath());
         final ValueNode node = new ValueNode(field, fieldOrdinal);
-        tree.addNode(node, ancestor, template);
+        tree.addNode(node, ancestor, template, field.getPath());
     }
     
     private static int updateOrdinal(Map<String, Integer> pathOrdinal, String path) {
-        path = cleanNumeratedPath(path);
+        path = JsonMetadataConstants.removeLastNumeratedPathPart(path); //cleanNumeratedPath(path);
         int ordinal = 0;
         if (pathOrdinal.containsKey(path)) {
             ordinal = pathOrdinal.get(path) + 1;

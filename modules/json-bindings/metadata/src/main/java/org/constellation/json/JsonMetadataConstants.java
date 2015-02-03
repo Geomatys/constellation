@@ -58,6 +58,19 @@ public class JsonMetadataConstants {
         return numeratedPath;
     }
     
+    public static int getLastOrdinal(final String numeratedPath) {
+        int i = numeratedPath.lastIndexOf('[');
+        int j = numeratedPath.lastIndexOf(']');
+        if (i != -1 && j != -1) {
+            return Integer.parseInt(numeratedPath.substring(i + 1, j));
+        }
+        return 0;
+    }
+    
+    public static boolean isNumeratedPath(String s) {
+        return s.indexOf('[') != -1;
+    }
+    
     public static String buildNumeratedPath(final String numeratedPath, int ordinal) {
         int index = numeratedPath.lastIndexOf('[');
         if (index == -1) {
