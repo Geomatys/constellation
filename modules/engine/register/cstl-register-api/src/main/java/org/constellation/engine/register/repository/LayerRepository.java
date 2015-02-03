@@ -35,11 +35,20 @@ public interface LayerRepository {
     
     List<Layer> findByDataId(int dataId);
 
+    /**
+     * Delete all layer associated to a service.
+     * @param service service of which layers are removed.
+     * @return number of layer removed.
+     */
     int deleteServiceLayer(Service service);
 
     Layer save(Layer storeLayer);
 
-    int update(Layer storeLayer);
+    /**
+     * Update a layer entry.
+     * @param storeLayer layer to update
+     */
+    void update(Layer storeLayer);
 
     void delete(int layerId);
     

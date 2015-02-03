@@ -73,7 +73,7 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
-    public int update(Layer layer) {
+    public void update(Layer layer) {
         LayerRecord layerRecord = new LayerRecord();
         layerRecord.from(layer);
         UpdateConditionStep<LayerRecord> set = dsl.update(LAYER).set(LAYER.NAME, layer.getName())
@@ -81,9 +81,7 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
                 .set(LAYER.DATA, layer.getData()).set(LAYER.CONFIG, layer.getConfig())
                 .set(LAYER.TITLE, layer.getTitle())
                 .where(LAYER.ID.eq(layer.getId()));
-
-        return set.execute();
-
+        set.execute();
     }
 
     @Override

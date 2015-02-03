@@ -156,7 +156,8 @@ public class LayerBusiness implements ILayerBusiness {
             if (!update) {
                 layerID = layerRepository.save(layer).getId();
             } else {
-                layerID = layerRepository.update(layer);
+                layerRepository.update(layer);
+                layerID = layer.getId();
             }
             
             for (int styleID : styleRepository.getStyleIdsForData(data.getId())) {
