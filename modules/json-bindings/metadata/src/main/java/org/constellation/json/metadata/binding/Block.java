@@ -131,6 +131,19 @@ public class Block implements Serializable, ChildEntity, IBlock {
     public String getPath() {
         return path;
     }
+    
+    public void updatePath(int ordinal) {
+        final String oldPrefix = path.substring(0, path.length() - 1); // remove the '+'
+        path = path.substring(0, path.lastIndexOf('['));
+        path = path + '[' + ordinal + ']';
+        for (ComponentObj cp : children) {
+            cp.updatePath(oldPrefix, path);
+        }
+    }
+    
+    public void updatePath(String oldPrefix, String newPrefix) {
+        path = path.replace(oldPrefix, newPrefix);
+    }
 
     public void setPath(String path) {
         this.path = path;

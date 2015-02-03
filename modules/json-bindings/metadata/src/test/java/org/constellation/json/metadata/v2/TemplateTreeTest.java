@@ -275,6 +275,33 @@ public class TemplateTreeTest {
     }
     
     @Test
+    public void testTreeFromFilledTemplateKeywordsUI() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        final InputStream stream  = TemplateTreeTest.class.getResourceAsStream("result_keywords_UI.json");
+        final RootObj root        =  objectMapper.readValue(stream, RootObj.class);
+        final TemplateTree tree   = TemplateTree.getTreeFromRootObj(root);
+        final ValueNode result    = tree.getRoot();
+                
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null, false);
+        
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null, false);
+        
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword", false);
+        final ValueNode keyword11   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "hello", dkey);
+        final ValueNode keyword12   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "world", dkey);
+        
+        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident, "metadata.block.descriptiveKeyword", false);
+        final ValueNode keyword21    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "this", dkey2);
+        final ValueNode keyword22    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "is", dkey2);
+        
+        final ValueNode dkey3        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 2, ident, "metadata.block.descriptiveKeyword", false);
+        final ValueNode keyword31    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "my", dkey3);
+        final ValueNode keyword32    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "test", dkey3);
+        
+        valueNodeEquals(expresult, result);
+    }
+    
+    @Test
     public void testTreeFromFilledTemplateKeywords3() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         final InputStream stream  = TemplateTreeTest.class.getResourceAsStream("result_keywords3.json");

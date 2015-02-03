@@ -93,6 +93,10 @@ public class Field implements Serializable {
     public void setPath(String path) {
         this.path = path;
     }
+    
+    public void updatePath(String oldPrefix, String newPrefix) {
+        path = path.replace(oldPrefix, newPrefix);
+    }
 
     public String getType() {
         return type;

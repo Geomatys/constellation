@@ -18,4 +18,5 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @Type(value = BlockObj.class, name = "block") })  
 public abstract class ComponentObj {
     
+    abstract void updatePath(final String oldPrefix, final String newPrefix);
 }

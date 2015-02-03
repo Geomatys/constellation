@@ -236,6 +236,9 @@ public class TemplateTree {
         if (block.getPath() != null) {
             int blockOrdinal = updateOrdinal(blockPathOrdinal, block.getPath());
             ancestor = new ValueNode(block, blockOrdinal);
+            if (block.getPath().endsWith("+")) {
+                block.updatePath(blockOrdinal);
+            }
             tree.addNode(ancestor, null, template, block.getPath());
         }
 
@@ -258,7 +261,7 @@ public class TemplateTree {
     }
     
     private static int updateOrdinal(Map<String, Integer> pathOrdinal, String path) {
-        path = JsonMetadataConstants.removeLastNumeratedPathPart(path); //cleanNumeratedPath(path);
+        path = JsonMetadataConstants.removeLastNumeratedPathPart(path);
         int ordinal = 0;
         if (pathOrdinal.containsKey(path)) {
             ordinal = pathOrdinal.get(path) + 1;
@@ -270,7 +273,7 @@ public class TemplateTree {
     public static RootObj getRootObjFromTree(final RootObj rootobj, final TemplateTree tree) {
         final RootObj result = new RootObj(rootobj);
         
-        for (SuperBlock sb : result.getRoot().getSuperBlocks()) {
+        for (SuperBlock sb : result.getSuperBlocks()) {
             final List<BlockObj> children = new ArrayList<>(sb.getChildren());
             int blockCount = 0;
             for (BlockObj block : children) {

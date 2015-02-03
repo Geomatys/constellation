@@ -467,7 +467,7 @@ public class TeamplateReaderUpdateTest {
     
     @Test
     public void testReadAddBlockInstance() throws IOException, FactoryException {
-        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_keywords.json");
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_keywords_UI.json");
         final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
         
         
@@ -500,7 +500,12 @@ public class TeamplateReaderUpdateTest {
         final InternationalString kw22 = new SimpleInternationalString("is");
         keywords2.setKeywords(Arrays.asList(kw21, kw22));
         
-        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2));
+        final DefaultKeywords keywords3 = new DefaultKeywords();
+        final InternationalString kw31 = new SimpleInternationalString("my");
+        final InternationalString kw32 = new SimpleInternationalString("test");
+        keywords3.setKeywords(Arrays.asList(kw31, kw32));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords2, keywords3));
         
         expResult.setIdentificationInfo(Arrays.asList(dataIdent));
         

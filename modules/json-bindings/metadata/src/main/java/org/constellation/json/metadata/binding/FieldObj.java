@@ -58,4 +58,9 @@ public class FieldObj extends ComponentObj implements Serializable {
     public String toString() {
         return "[FieldObj]\nfield:" + field;
     }
+
+    @Override
+    public void updatePath(final String oldPrefix, final String newPrefix) {
+        field.updatePath(oldPrefix, newPrefix);
+    }
 }

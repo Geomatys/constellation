@@ -55,4 +55,9 @@ public class BlockObj extends ComponentObj implements Serializable {
     public String toString() {
         return "[BlockObj]\nsuperBlock:" + block;
     }
+
+    @Override
+    public void updatePath(final String oldPrefix, final String newPrefix) {
+        block.updatePath(oldPrefix, newPrefix);
+    }
 }
