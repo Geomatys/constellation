@@ -2,7 +2,9 @@
 package org.constellation.json.metadata.v2;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.TypeValuePolicy;
@@ -70,4 +72,13 @@ public class AbstractTemplateHandler {
         return standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY);
     }
     
+    protected Class readType(ValueNode node) throws ParseException {
+        Class type;
+        try {
+            type = Class.forName(node.type);
+        } catch (ClassNotFoundException ex) {
+            throw new ParseException("Unable to find a class for type : " + node.type);
+        }
+        return type;
+    }
 }

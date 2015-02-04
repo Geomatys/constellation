@@ -4,6 +4,7 @@ package org.constellation.json.metadata.v2;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +26,21 @@ public class NumeratedCollection implements Collection{
     
     public void put(Integer i, Object obj) {
         valueMap.put(i, obj);
+    }
+    
+    public void replace(int ordinal, Object newValue) {
+        if (original instanceof List) {
+            List list = (List) original;
+            list.set(ordinal, newValue);
+        } else {
+            final Iterator it = original.iterator();
+            Object old = it.next();
+            for (int i = 0; i < ordinal; i++) {
+                old = it.next();
+            }
+            original.remove(old);
+            original.add(newValue);
+        }
     }
     
     @Override

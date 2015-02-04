@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -85,7 +86,7 @@ public class TemplateReader extends AbstractTemplateHandler {
         
         final TemplateTree tree  = TemplateTree.getTreeFromRootObj(template);
         
-        updateObjectFromRootObj(tree,  tree.getRoot(), metadata);
+        updateObjectFromRootObj(tree,  tree.getRoot(), metadata, new ReservedObjects());
         
         if (metadata instanceof AbstractMetadata) {
             ((AbstractMetadata)metadata).prune();
@@ -93,12 +94,12 @@ public class TemplateReader extends AbstractTemplateHandler {
         return metadata;
     }
 
-    private void updateObjectFromRootObj(TemplateTree tree, final ValueNode root, final Object metadata) throws ParseException {
+    private void updateObjectFromRootObj(TemplateTree tree, final ValueNode root, final Object metadata, ReservedObjects reserved) throws ParseException {
         
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             
-            final Object obj = getValue(node, metadata);
+            final Object obj = getValue(node, metadata, reserved);
             
             if (obj instanceof Collection) {
                 final Collection list = (Collection) obj;
@@ -112,7 +113,7 @@ public class TemplateReader extends AbstractTemplateHandler {
                     if (node.isField()) {
                         replace(list, node.ordinal, convert(node.name, child.getClass(), node.value));
                     } else {
-                        updateObjectFromRootObj(tree, node, child);
+                        updateObjectFromRootObj(tree, node, child, reserved);
                     }
                 } else {
                     if (node.isField()) {
@@ -120,7 +121,7 @@ public class TemplateReader extends AbstractTemplateHandler {
                     } else {
                         Object newValue = buildNewInstance(metadata, node);
                         putValue(node, metadata, newValue);
-                        updateObjectFromRootObj(tree, node, newValue);
+                        updateObjectFromRootObj(tree, node, newValue, reserved);
                     }
                 }
 
@@ -128,7 +129,7 @@ public class TemplateReader extends AbstractTemplateHandler {
                 if (node.isField()) {
                     putValue(node, metadata); // replace
                 } else {
-                    updateObjectFromRootObj(tree, node, obj);
+                    updateObjectFromRootObj(tree, node, obj, reserved);
                 }
             } else {
                 if (node.isField()) {
@@ -138,7 +139,7 @@ public class TemplateReader extends AbstractTemplateHandler {
                     // if new Value is null, an unexpected type may has been found 
                     if (newValue != null) {
                         putValue(node, metadata, newValue);
-                        updateObjectFromRootObj(tree, node, newValue);
+                        updateObjectFromRootObj(tree, node, newValue, reserved);
                     }
                 }
             }
@@ -146,7 +147,10 @@ public class TemplateReader extends AbstractTemplateHandler {
     }
     
     
-    private Object getValue(final ValueNode node, Object metadata) throws ParseException {
+    private Object getValue(final ValueNode node, Object metadata, ReservedObjects reserved) throws ParseException {
+        if (metadata == null) {
+            return null;
+        }
         // special types
         if (metadata instanceof ReferenceSystemMetadata || metadata instanceof TimePeriodType || metadata instanceof TimePositionType) {
             final Method getter = ReflectionUtilities.getGetterFromName(node.name, metadata.getClass());
@@ -154,55 +158,111 @@ public class TemplateReader extends AbstractTemplateHandler {
             
         } else {
             Object result = fixImmutable(asMap(metadata).get(node.name));
+           
+            /*
+             * if the node is strict we verify that the values correspound to the sub nodes.
+             * For a collection, we return a sub-collection with only the matching instance
+             */    
+            if (node.strict){
+                
+                if (result instanceof Collection) {
+                    final NumeratedCollection results = new NumeratedCollection((Collection)result); 
+                    final Iterator it        = ((Collection)result).iterator();
+                    int i = 0;
+                    while (it.hasNext()) {
+                        final Object o = it.next();
+                        if (!reserved.isReserved(node, o) && objectMatchStrictNode(o, node, reserved)) {
+                            reserved.reserve(node, o);
+                            results.put(i, o);
+                        }
+                        i++;
+                    }
+                    return results;
+                    
+                } else if (!reserved.isReserved(node, result) && objectMatchStrictNode(result, node, reserved)) {
+                    reserved.reserve(node, result);
+                    return result;
+                }
+                return null;
+            
             /*
              * if the node has a type we verify that the values correspound to the declared type.
              * For a collection, we return a sub-collection with only the matching instance
-             */
-            if (node.type != null) {
-                Class type;
-                try {
-                    type = Class.forName(node.type);
-                } catch (ClassNotFoundException ex) {
-                    throw new ParseException("Unable to find a class for type : " + node.type);
-                }
+             */    
+            } else if (node.type != null) {
+                final Class type = readType(node);
                 if (result instanceof Collection) {
                     final NumeratedCollection results = new NumeratedCollection((Collection)result); 
                     final Iterator it        = ((Collection)result).iterator();
                     int i = 0;
                     while (it.hasNext()) {
                         final Object o = it.next();
-                        if (type.isInstance(o)) results.put(i, o);
+                        if (!reserved.isReserved(node, o) && type.isInstance(o)) {
+                            reserved.reserve(node, o);
+                            results.put(i, o);
+                        }
                         i++;
                     }
                     return results;
-                } else if (type.isInstance(result)) {
+                } else if (!reserved.isReserved(node, result) && type.isInstance(result)) {
+                    reserved.reserve(node, result);
                     return result;
                 }
                 return null;
                 
-            } else if (node.strict){
-                
-                if (result instanceof Collection) {
-                    final NumeratedCollection results = new NumeratedCollection((Collection)result); 
-                    final Iterator it        = ((Collection)result).iterator();
-                    int i = 0;
-                    while (it.hasNext()) {
-                        final Object o = it.next();
-                        if (objectMatchStrictNode(o, node)) results.put(i, o);
-                        i++;
-                    }
-                    return results;
-                } else if (objectMatchStrictNode(result, node)) {
-                    return result;
-                }
-                return null;
             } else {
-                return result;
+                if (result instanceof Collection) {
+                    final NumeratedCollection results = new NumeratedCollection((Collection)result); 
+                    final Iterator it        = ((Collection)result).iterator();
+                    int i = 0;
+                    while (it.hasNext()) {
+                        final Object o = it.next();
+                        if (!reserved.isReserved(node, o)) {
+                            reserved.reserve(node, o);
+                            results.put(i, o);
+                        }
+                        i++;
+                    }
+                    return results;
+                } else if (!reserved.isReserved(node, result)) {
+                    reserved.reserve(node, result);
+                    return result;
+                }
+                return null;
             }
         }
     }
     
-    public boolean objectMatchStrictNode(final Object obj, ValueNode n) {
+    private boolean objectMatchStrictNode(final Object obj, ValueNode n, ReservedObjects reserved) throws ParseException {
+        if (n.type != null) {
+            Class type = readType(n);
+            if (!type.isInstance(obj)) return false;
+        }
+        
+        for (ValueNode child : n.children) {
+            final Object childO = getValue(child, obj, new ReservedObjects());
+            final Collection c; 
+            if (childO instanceof Collection) {
+                c = (Collection) childO;
+            } else {
+                c = Arrays.asList(childO);
+            }
+            for (Object o : c) {
+                if (child.isField() && child.render != null && child.render.contains("readonly") && child.defaultValue != null) {
+                    if (o == null) return false;
+                    Class type      = o.getClass();
+                    Object defValue = convert(child.name, type, child.defaultValue);
+                    if (!Objects.equals(o, defValue)) {
+                        return false;
+                    }
+                } else {
+                    if (!objectMatchStrictNode(o, child, reserved)) {
+                        return false;
+                    }
+                }
+            }
+            
+        }
         return true;
     }
     
@@ -236,11 +296,7 @@ public class TemplateReader extends AbstractTemplateHandler {
      */
     private Class<?> getType(final Object metadata, final ValueNode node) throws ParseException {
         if (node.type != null) {
-            try {
-                return Class.forName(node.type);
-            } catch (ClassNotFoundException ex) {
-                throw new ParseException("Unable to find a class for type : " + node.type);
-            }
+            return readType(node);
         }
         Class type;
         if (metadata instanceof ReferenceSystemMetadata || metadata instanceof TimePeriodType || metadata instanceof TimePositionType) {
@@ -398,6 +454,9 @@ public class TemplateReader extends AbstractTemplateHandler {
         if (c instanceof List) {
             List list = (List) c;
             list.set(ordinal, newValue);
+        } else if (c instanceof NumeratedCollection){
+            NumeratedCollection list = (NumeratedCollection) c;
+            list.replace(ordinal, newValue);
         } else {
             final Iterator it = c.iterator();
             Object old = it.next();
@@ -432,6 +491,44 @@ public class TemplateReader extends AbstractTemplateHandler {
                     i++;
                 }
                 c.removeAll(toRemove);
+            }
+        }
+    }
+    
+    private static class ReservedObjects {
+
+        public Map<String, Map<String, List<Object>>> objects = new HashMap<>();
+
+        public boolean isReserved(final ValueNode node, final Object obj) {
+            if (node.blockName != null) {
+                final Map<String, List<Object>> map = objects.get(node.path);
+                if (map != null) {
+                    for (String blockName : map.keySet()) {
+                        if (!blockName.equals(node.blockName) && map.get(blockName).contains(obj)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void reserve(final ValueNode node, final Object obj) {
+            if (node.blockName != null) {
+                if (objects.containsKey(node.path) && objects.get(node.path).containsKey(node.blockName)) {
+                    objects.get(node.path).get(node.blockName).add(obj);
+
+                } else if (objects.containsKey(node.path)) {
+                    final List<Object> set = new ArrayList<>();
+                    set.add(obj);
+                    objects.get(node.path).put(node.blockName, set);
+                } else {
+                    final List<Object> set = new ArrayList<>();
+                    set.add(obj);
+                    Map<String, List<Object>> map = new HashMap<>();
+                    map.put(node.blockName, set);
+                    objects.put(node.path, map);
+                }
             }
         }
     }

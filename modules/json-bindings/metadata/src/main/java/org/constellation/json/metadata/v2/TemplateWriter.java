@@ -149,7 +149,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
     }
     
     private Object getSingleValue(final ValueNode node, Object metadata, Map<String, Set<Object>> excluded) throws ParseException {
-        if (excluded.containsKey(node.path) && excluded.get(node.path).contains(metadata)) return null;
+        if (isExcluded(excluded, node, metadata)) return null;
         
         /*
          * In strict mode, we want that the sub-tree of the object correspound exactly the node tree.
@@ -170,12 +170,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
         * For a collection, we return a sub-collection with only the matching instance
         */
         } else if (node.type != null) {
-            Class type;
-            try {
-                type = Class.forName(node.type);
-            } catch (ClassNotFoundException ex) {
-                throw new ParseException("Unable to find a class for type : " + node.type);
-            }
+            final Class type = readType(node);
             if (type.isInstance(metadata) ) {
                 exclude(excluded, node, metadata);
                 return metadata;
@@ -185,6 +180,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
          * else return simply the object
          */
         } else {
+            // exclude ??
             return metadata;
         }
     }
@@ -272,6 +268,9 @@ public class TemplateWriter extends AbstractTemplateHandler {
         }
     }
     
+    private static boolean isExcluded(final Map<String, Set<Object>> excluded, final ValueNode node, final Object obj) {
+        return excluded.containsKey(node.path) && excluded.get(node.path).contains(obj);
+    }
     
     private static class NumeratedCollectionElement {
         public int index;
