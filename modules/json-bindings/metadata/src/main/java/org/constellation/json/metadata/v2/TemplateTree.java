@@ -216,6 +216,16 @@ public class TemplateTree {
         
     }
     
+    private void moveFollowingNumeratedPath(String path, int ordinal) {
+        path = JsonMetadataConstants.cleanNumeratedPath(path);
+        List<ValueNode> toUpdate = getNodesByPath(path);
+        for (ValueNode n : toUpdate) {
+            if (n.ordinal >= ordinal) {
+                n.updateOrdinal(n.ordinal++);
+            }
+        }
+    }
+    
     public static TemplateTree getTreeFromRootObj(RootObj template) {
         final TemplateTree tree = new TemplateTree();
         for (SuperBlock sb : template.getSuperBlocks()) {
@@ -234,10 +244,11 @@ public class TemplateTree {
         // Multiple Block
         ValueNode ancestor = null;
         if (block.getPath() != null) {
-            int blockOrdinal = updateOrdinal(blockPathOrdinal, block.getPath());
-            ancestor = new ValueNode(block, blockOrdinal);
+            int ordinal = updateOrdinal(blockPathOrdinal, block.getPath());
+            ancestor = new ValueNode(block, ordinal);
             if (block.getPath().endsWith("+")) {
-                block.updatePath(blockOrdinal);
+                block.updatePath(ordinal);
+                template.moveFollowingNumeratedPath(block, ordinal);
             }
             tree.addNode(ancestor, null, template, block.getPath());
         }
@@ -277,7 +288,7 @@ public class TemplateTree {
             final List<BlockObj> children = new ArrayList<>(sb.getChildren());
             int blockCount = 0;
             for (BlockObj block : children) {
-                blockCount = updateRootObjFromTree(sb, block, tree, blockCount);
+                blockCount = updateRootObjFromTree(block, sb, tree, blockCount);
                 blockCount++;
                 if (block.getBlock().childrenEmpty()) {
                     sb.removeBlock(block);
@@ -291,7 +302,7 @@ public class TemplateTree {
         return result;
     }
     
-    private static int updateRootObjFromTree(final IBlock owner, final BlockObj blockObj, final TemplateTree tree, int blockCount) {
+    private static int updateRootObjFromTree(final BlockObj blockObj, final IBlock owner, final TemplateTree tree, int blockCount) {
         Block block = blockObj.getBlock();
         final Block origBlock = new Block(block);
         final List<ValueNode> blockNodes = tree.getNodesForBlock(block);
@@ -316,7 +327,7 @@ public class TemplateTree {
                 if (child instanceof FieldObj) {
                     fieldCount = updateRootObjFromTree((FieldObj) child, block, tree, node, fieldCount);
                 } else {
-                    fieldCount = updateRootObjFromTree(block, (BlockObj)child, tree, fieldCount);
+                    fieldCount = updateRootObjFromTree((BlockObj) child, block, tree, fieldCount);
                 }
                 fieldCount++;
             }

@@ -179,10 +179,31 @@ public class TemplateReader extends AbstractTemplateHandler {
                     return result;
                 }
                 return null;
+                
+            } else if (node.strict){
+                
+                if (result instanceof Collection) {
+                    final NumeratedCollection results = new NumeratedCollection((Collection)result); 
+                    final Iterator it        = ((Collection)result).iterator();
+                    int i = 0;
+                    while (it.hasNext()) {
+                        final Object o = it.next();
+                        if (objectMatchStrictNode(o, node)) results.put(i, o);
+                        i++;
+                    }
+                    return results;
+                } else if (objectMatchStrictNode(result, node)) {
+                    return result;
+                }
+                return null;
             } else {
                 return result;
             }
         }
+    }
+    
+    public boolean objectMatchStrictNode(final Object obj, ValueNode n) {
+        return true;
     }
     
     private void putValue(final ValueNode node, final Object metadata) throws ParseException {

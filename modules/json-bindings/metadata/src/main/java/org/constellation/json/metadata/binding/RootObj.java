@@ -90,6 +90,10 @@ public class RootObj implements Serializable {
         return null;
     }
     
+    public void moveFollowingNumeratedPath(Block block, int ordinal) {
+        root.moveFollowingNumeratedPath(block, ordinal);
+    }
+    
     @Override
     public String toString() {
         return "[BlockObj]\nroot:" + root;

@@ -302,6 +302,48 @@ public class TemplateTreeTest {
     }
     
     @Test
+    public void testTreeFromFilledTemplateKeywordsUI2() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        final InputStream stream  = TemplateTreeTest.class.getResourceAsStream("result_keywords2_UI.json");
+        final RootObj root        =  objectMapper.readValue(stream, RootObj.class);
+        final TemplateTree tree   = TemplateTree.getTreeFromRootObj(root);
+        final ValueNode result    = tree.getRoot();
+                
+        final ValueNode expresult   = new ValueNode("metadata", null, 0, null, null, false);
+        
+        final ValueNode ident       = new ValueNode("metadata.identificationInfo", null, 0, expresult, null, false);
+        
+        final ValueNode dkey        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 0, ident, "metadata.block.descriptiveKeyword_inspire", true);
+        final ValueNode keyword11   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "hello", dkey);
+        final ValueNode keyword12   = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "world", dkey);
+        final ValueNode thesau      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey, null, false);
+        final ValueNode thesauTitle = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, "GEMET", "readonly", 0, "GEMET", thesau);
+        final ValueNode thesauDate  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau, null, false);
+        final ValueNode thesauDateD = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, "2012-01-01", "DATE.text", 0, "2012-01-01", thesauDate);
+        final ValueNode thesauDateT = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, "CI_DateTypeCode.publication", "CODELIST.readonly", 0, "CI_DateTypeCode.publication", thesauDate);
+        
+        final ValueNode dkey2        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 1, ident, "metadata.block.descriptiveKeyword_inspire", true);
+        final ValueNode keyword21    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "hey", dkey2);
+        final ValueNode keyword22    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "you", dkey2);
+        final ValueNode thesau2      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey2, null, false);
+        final ValueNode thesauTitle2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, "GEMET", "readonly", 0, "GEMET", thesau2);
+        final ValueNode thesauDate2  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau2, null, false);
+        final ValueNode thesauDateD2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, "2012-01-01", "DATE.text", 0, "2012-01-01", thesauDate2);
+        final ValueNode thesauDateT2 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, "CI_DateTypeCode.publication", "CODELIST.readonly", 0, "CI_DateTypeCode.publication", thesauDate2);
+        
+        final ValueNode dkey3        = new ValueNode("metadata.identificationInfo.descriptiveKeywords", null, 2, ident, "metadata.block.descriptiveKeyword", false);
+        final ValueNode keyword31    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 0, "this", dkey3);
+        final ValueNode keyword32    = new ValueNode("metadata.identificationInfo.descriptiveKeywords.keyword", null, null, "KEYWORD.text", 1, "is", dkey3);
+        final ValueNode thesau3      = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName", null, 0, dkey3, null, false);
+        final ValueNode thesauTitle3 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.title", null, null, "text", 0, null, thesau3);
+        final ValueNode thesauDate3  = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date", null, 0, thesau3, null, false);
+        final ValueNode thesauDateD3 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.date", null, null, "DATE.text", 0, null, thesauDate3);
+        final ValueNode thesauDateT3 = new ValueNode("metadata.identificationInfo.descriptiveKeywords.thesaurusName.date.dateType", null, null, "DATE.codelist", 0, null, thesauDate3);
+        
+        valueNodeEquals(expresult, result);
+    }
+    
+    @Test
     public void testTreeFromFilledTemplateKeywords3() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         final InputStream stream  = TemplateTreeTest.class.getResourceAsStream("result_keywords3.json");

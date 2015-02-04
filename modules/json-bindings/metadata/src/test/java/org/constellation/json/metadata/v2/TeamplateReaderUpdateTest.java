@@ -863,6 +863,67 @@ public class TeamplateReaderUpdateTest {
     
     }
     
+    @Test
+    public void testAddSpecialKeywordBlock() throws IOException, FactoryException {
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        final DefaultDataIdentification prevDataIdent = new DefaultDataIdentification();
+        final DefaultKeywords prevKeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        final InternationalString pkw2 = new SimpleInternationalString("world");
+        prevKeywords.setKeywords(Arrays.asList(pkw1, pkw2));
+        final DefaultCitation prevGemet = new DefaultCitation("GEMET");
+        prevGemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        prevKeywords.setThesaurusName(prevGemet);
+        
+        final DefaultKeywords prevKeywords2 = new DefaultKeywords();
+        final InternationalString pkw21 = new SimpleInternationalString("you shall");
+        final InternationalString pkw22 = new SimpleInternationalString("not pass");
+        prevKeywords2.setKeywords(Arrays.asList(pkw21, pkw22));
+        prevKeywords2.setThesaurusName(prevGemet);
+        
+        final DefaultKeywords prevKeywords3 = new DefaultKeywords();
+        final InternationalString pkw31 = new SimpleInternationalString("this");
+        final InternationalString pkw32 = new SimpleInternationalString("is");
+        prevKeywords3.setKeywords(Arrays.asList(pkw31, pkw32));
+        
+        prevDataIdent.setDescriptiveKeywords(Arrays.asList(prevKeywords, prevKeywords2, prevKeywords3));
+        previous.setIdentificationInfo(Arrays.asList(prevDataIdent));
+        
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_keywords2_UI.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        Object result = reader.readTemplate(root, previous);
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("world");
+        keywords.setKeywords(Arrays.asList(kw1, kw2));
+        final DefaultCitation gemet = new DefaultCitation("GEMET");
+        gemet.setDates(Arrays.asList(new DefaultCitationDate(new Date(1325376000000L), DateType.PUBLICATION)));
+        keywords.setThesaurusName(gemet);
+        
+        final DefaultKeywords keywords3 = new DefaultKeywords();
+        final InternationalString kw31 = new SimpleInternationalString("hey");
+        final InternationalString kw32 = new SimpleInternationalString("you");
+        keywords3.setKeywords(Arrays.asList(kw31, kw32));
+        keywords3.setThesaurusName(gemet);
+        
+        final DefaultKeywords keywords2 = new DefaultKeywords();
+        final InternationalString kw21 = new SimpleInternationalString("this");
+        final InternationalString kw22 = new SimpleInternationalString("is");
+        keywords2.setKeywords(Arrays.asList(kw21, kw22));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords, keywords3, keywords2));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    
+    }
+    
     /**
      */
     @Test

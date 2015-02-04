@@ -93,6 +93,12 @@ public class RootBlock implements Serializable {
         this.children = children;
     }
     
+    public void moveFollowingNumeratedPath(Block block, int ordinal) {
+        for (SuperBlockObj sb : children) {
+            sb.getSuperblock().moveFollowingNumeratedPath(block, ordinal);
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[RootBlock]\n");

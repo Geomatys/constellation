@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.constellation.json.JsonMetadataConstants;
 
 /**
  * Pojo class used for Jackson that represents the binding for superblock
@@ -128,6 +129,18 @@ public class SuperBlock implements Serializable, IBlock {
 
     public void setRender(String render) {
         this.render = render;
+    }
+
+    public void moveFollowingNumeratedPath(Block block, int ordinal) {
+        // super block is not supposed to use path
+        final String prefix = JsonMetadataConstants.removeLastNumeratedPathPart(block.getPath());
+        for (BlockObj bo : children) {
+            int bOrd = JsonMetadataConstants.getLastOrdinal(bo.getBlock().getPath());
+            if (bo.getBlock().getPath().startsWith(prefix) && bOrd >= ordinal && bo.getBlock() != block) {
+                bo.getBlock().updatePath(bOrd + 1);
+            }
+        }
+        
     }
     
     @Override
