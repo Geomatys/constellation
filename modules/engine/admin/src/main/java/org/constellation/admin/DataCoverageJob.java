@@ -134,7 +134,7 @@ public class DataCoverageJob implements IDataCoverageJob {
 
             //update data
             Data lastData = dataRepository.findById(dataId);
-            if (!lastData.getStatsState().equals(STATE_ERROR)) {
+            if (lastData != null && !lastData.getStatsState().equals(STATE_ERROR)) {
                 data.setStatsState(STATE_ERROR);
                 //data.setStatsResult(Exceptions.formatStackTrace(e));
                 updateData(data);
@@ -177,10 +177,29 @@ public class DataCoverageJob implements IDataCoverageJob {
         public void progressing(ProcessEvent event) {
             if (event.getOutput() != null) {
                 final Data data = getData();
+                if (data != null) {
+                    try {
+                        data.setStatsState(STATE_PARTIAL);
+                        data.setStatsResult(statisticsAsString(event));
+                        updateData(data);
+                    } catch (JsonProcessingException e) {
+                        data.setStatsState(STATE_ERROR);
+                        data.setStatsResult("Error during statistic serializing.");
+                        updateData(data);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void completed(ProcessEvent event) {
+            final Data data = getData();
+            if (data != null) {
                 try {
-                    data.setStatsState(STATE_PARTIAL);
+                    data.setStatsState(STATE_COMPLETED);
                     data.setStatsResult(statisticsAsString(event));
                     updateData(data);
+                    LOGGER.log(Level.INFO, "Data " + dataId + " " + data.getName() + " coverage statistics completed.");
                 } catch (JsonProcessingException e) {
                     data.setStatsState(STATE_ERROR);
                     data.setStatsResult("Error during statistic serializing.");
@@ -190,29 +209,16 @@ public class DataCoverageJob implements IDataCoverageJob {
         }
 
         @Override
-        public void completed(ProcessEvent event) {
-            final Data data = getData();
-            try {
-                data.setStatsState(STATE_COMPLETED);
-                data.setStatsResult(statisticsAsString(event));
-                updateData(data);
-                LOGGER.log(Level.INFO, "Data " + dataId + " " + data.getName() + " coverage statistics completed.");
-            } catch (JsonProcessingException e) {
-                data.setStatsState(STATE_ERROR);
-                data.setStatsResult("Error during statistic serializing.");
-                updateData(data);
-            }
-        }
-
-        @Override
         public void failed(ProcessEvent event) {
             final Data data = getData();
-            data.setStatsState(STATE_ERROR);
-            //data.setStatsResult(Exceptions.formatStackTrace(event.getException()));
-            updateData(data);
-            Exception exception = event.getException();
-            LOGGER.log(Level.WARNING, "Error during coverage statistic update for data " + dataId +
-                    " "+data.getName() + " : " + exception.getMessage(), exception);
+            if (data != null) {
+                data.setStatsState(STATE_ERROR);
+                //data.setStatsResult(Exceptions.formatStackTrace(event.getException()));
+                updateData(data);
+                Exception exception = event.getException();
+                LOGGER.log(Level.WARNING, "Error during coverage statistic update for data " + dataId +
+                        " " + data.getName() + " : " + exception.getMessage(), exception);
+            }
 
         }
 
