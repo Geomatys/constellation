@@ -21,7 +21,7 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.DatasetXCsw;
+import org.constellation.engine.register.MetadataXCsw;
 
 /**
  *
@@ -47,9 +47,9 @@ public interface DatasetRepository {
     
     void remove(int id);
     
-    List<DatasetXCsw> getCswLinkedDataset(final int cswId);
+    List<Dataset> getCswLinkedDataset(final int cswId);
     
-    DatasetXCsw addDatasetToCSW(final int serviceID, final int datasetID, final boolean allData);
+    MetadataXCsw addDatasetToCSW(final int serviceID, final int datasetID, final boolean allData);
     
     void removeDatasetFromCSW(final int serviceID, final int datasetID);
     

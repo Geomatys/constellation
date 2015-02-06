@@ -109,7 +109,7 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
         /**
          * Test 1: No configuration file.
          */
-        Service service = new Service("default", "sos", System.currentTimeMillis(), null, null, null, null, "NOT_STARTED", "1.0.0");
+        Service service = new Service("default", "sos", System.currentTimeMillis(), null, null, "NOT_STARTED", "1.0.0");
         int id =  serviceRepository.create(service);
         assertTrue(id > 0);
         

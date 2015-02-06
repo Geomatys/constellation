@@ -26,10 +26,11 @@ import javax.inject.Inject;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.DatasetXCsw;
+import org.constellation.engine.register.Metadata;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
+import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -60,7 +61,12 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Inject
     private ServiceRepository serviceRepository;
-
+    /**
+     * Injected metadata repository.
+     */
+    @Inject
+    protected MetadataRepository metadataRepository;
+    
     /**
      * Returns the xml as string representation of metadata for given metadata identifier.
      *
@@ -70,19 +76,12 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public String searchMetadata(final String metadataId, final boolean includeService)  {
-        final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
-        if (dataset != null) {
-            return dataset.getMetadataIso();
-        }
-        final Data data = dataRepository.findByMetadataId(metadataId);
-        if (data != null && data.isIncluded()) {
-            return data.getIsoMetadata();
-        }
-        if (includeService) {
-            final Service service = serviceRepository.findByMetadataId(metadataId);
-            if (service != null) {
-                return service.getMetadataIso();
+        final Metadata metadata = metadataRepository.findByMetadataId(metadataId);
+        if (metadata != null) {
+            if (!includeService && metadata.getServiceId() != null) {
+                return null;
             }
+            return metadata.getMetadataIso();
         }
         return null;
     }
@@ -90,40 +89,27 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final String xml)  {
-        final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
-        if (dataset != null) {
-            dataset.setMetadataIso(xml);
-            datasetRepository.update(dataset);
-            return true;
-        }
-        final Data data = dataRepository.findByMetadataId(metadataId);
-        if (data != null) {
-            data.setIsoMetadata(xml);
-            dataRepository.update(data);
-            return true;
-        }
-        final Service service = serviceRepository.findByMetadataId(metadataId);
-        if (service != null) {
-            service.setMetadataIso(xml);
-            serviceRepository.update(service);
+        final Metadata metadata = metadataRepository.findByMetadataId(metadataId);
+        if (metadata != null) {
+            metadata.setMetadataId(metadataId);
+            metadata.setMetadataIso(xml);
+            metadataRepository.update(metadata);
             return true;
         }
         
         // if the metadata is not yet present look for empty metadata object
-        final Dataset dataset2 = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
-        if (dataset2 != null) {
-            dataset2.setMetadataIso(xml);
-            dataset2.setMetadataId(metadataId);
-            datasetRepository.update(dataset2);
+        final Dataset dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
+        if (dataset != null) {
+            final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null);
+            metadataRepository.create(metadata2);
             return true;
         }
         
         // unsafe but no better way for now
-        final Data data2 = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
-        if (data2 != null) {
-            data2.setIsoMetadata(xml);
-            data2.setMetadataId(metadataId);
-            dataRepository.update(data2);
+        final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
+        if (data != null) {
+            final Metadata metadata2 = new Metadata(metadataId, xml, data.getId(), null, null);
+            metadataRepository.create(metadata2);
             return true;
         }
         
@@ -152,23 +138,13 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     public List<String> getInternalMetadataIds(final boolean includeService) {
         final List<String> results = new ArrayList<>();
-        final List<Dataset> datasets = datasetRepository.findAll();
-        for (final Dataset record : datasets) {
-            if (record.getMetadataIso() != null) {
-                results.add(record.getMetadataId());
-            }
-        }
-        if (includeService) {
-            final List<Service> services = serviceRepository.findAll();
-            for (final Service record : services) {
-                if (record.getMetadataIso() != null) {
+        final List<Metadata> metadatas = metadataRepository.findAll();
+        for (final Metadata record : metadatas) {
+            if (record.getServiceId() != null) {
+                if (includeService) {
                     results.add(record.getMetadataId());
                 }
-            }
-        }
-        final List<Data> datas = dataRepository.findAll();
-        for (final Data record : datas) {
-            if (record.isIncluded() && record.getIsoMetadata() != null) {
+            } else {
                 results.add(record.getMetadataId());
             }
         }
@@ -184,10 +160,15 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     public List<String> getAllMetadata(final boolean includeService) {
         final List<String> results = new ArrayList<>();
-        final List<String> allIdentifiers = getInternalMetadataIds(includeService);
-        for(final String identifier : allIdentifiers){
-            final String metadataStr = searchMetadata(identifier, includeService);
-            results.add(metadataStr);
+        final List<Metadata> metadatas = metadataRepository.findAll();
+        for (final Metadata record : metadatas) {
+            if (record.getServiceId() != null) {
+                if (includeService) {
+                    results.add(record.getMetadataIso());
+                }
+            } else {
+                results.add(record.getMetadataIso());
+            }
         }
         return results;
     }
@@ -197,25 +178,18 @@ public class MetadataBusiness implements IMetadataBusiness {
         final List<String> results = new ArrayList<>();
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {
-            final List<Data> datas    = dataRepository.getCswLinkedData(service.getId());
+            final List<Data> datas = dataRepository.getCswLinkedData(service.getId());
             for (Data data : datas) {
-                if (data.getMetadataId() != null && data.isIncluded()) {
-                    results.add(data.getMetadataId());
+                final Metadata meta = metadataRepository.findByDataId(data.getId());
+                if (meta != null && data.isIncluded()) {
+                    results.add(meta.getMetadataId());
                 }
             }
             
-            for (DatasetXCsw dxc : datasetRepository.getCswLinkedDataset(service.getId())) {
-                final Dataset ds = datasetRepository.findById(dxc.getDatasetId());
-                if (ds.getMetadataId() != null) {
-                    results.add(ds.getMetadataId());
-                }
-                if (dxc.isAllData()) {
-                    final List<Data> subDatas = dataRepository.findByDatasetId(dxc.getDatasetId());
-                    for (Data data : subDatas) {
-                        if (data.getMetadataId() != null && data.isIncluded()) {
-                            results.add(data.getMetadataId());
-                        }
-                    }
+            for (Dataset ds : datasetRepository.getCswLinkedDataset(service.getId())) {
+                final Metadata meta = metadataRepository.findByDatasetId(ds.getId());
+                if (meta.getMetadataId() != null) {
+                    results.add(meta.getMetadataId());
                 }
             }
         }

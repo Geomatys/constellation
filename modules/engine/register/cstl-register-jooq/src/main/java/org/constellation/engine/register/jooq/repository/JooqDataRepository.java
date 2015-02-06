@@ -39,11 +39,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.constellation.engine.register.jooq.tables.records.DataXCswRecord;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.constellation.engine.register.jooq.Tables.*;
+import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
@@ -112,7 +112,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public Data findByMetadataId(String metadataId) {
-        return dsl.select().from(DATA).where(DATA.METADATA_ID.eq(metadataId)).fetchOneInto(Data.class);
+        return dsl.select().from(DATA).join(METADATA).onKey(METADATA.DATA_ID).where(METADATA.METADATA_ID.eq(metadataId)).fetchOneInto(Data.class);
     }
 
     @Override
@@ -157,9 +157,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
         dsl.update(DATA)
                 .set(DATA.DATE, data.getDate())
-                .set(DATA.ISO_METADATA, data.getIsoMetadata())
                 .set(DATA.METADATA, data.getMetadata())
-                .set(DATA.METADATA_ID, data.getMetadataId())
                 .set(DATA.NAME, data.getName())
                 .set(DATA.NAMESPACE, data.getNamespace())
                 .set(DATA.OWNER, data.getOwner())
@@ -198,44 +196,64 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public Data findByIdentifierWithEmptyMetadata(String localPart) {
-        return dsl.select().from(DATA).where(DATA.NAME.eq(localPart)).and(DATA.METADATA_ID.isNull()).and(DATA.ISO_METADATA.isNull()).fetchOneInto(Data.class);
+        List<Data> datas = dsl.select().from(DATA).where(DATA.NAME.eq(localPart)).fetchInto(Data.class);
+        for (Data data : datas) {
+            Metadata m = dsl.select().from(METADATA).where(METADATA.DATA_ID.eq(data.getId())).fetchOneInto(Metadata.class);
+            if (m == null) {
+                return data;
+            }
+        }
+        return null;
     }
 
     @Override
     public List<Data> getCswLinkedData(final int cswId) {
-        return dsl.select(DATA.fields()).from(DATA).join(DATA_X_CSW).onKey(DATA_X_CSW.DATA_ID).where(DATA_X_CSW.CSW_ID.eq(cswId)).fetchInto(Data.class);
+        return dsl.select(DATA.fields()).from(DATA, METADATA, METADATA_X_CSW)
+                .where(METADATA.DATA_ID.eq(DATA.ID))
+                .and(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
+                .and(METADATA_X_CSW.CSW_ID.eq(cswId)).fetchInto(Data.class);
     }
     
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
-    public DataXCsw addDataToCSW(final int serviceID, final int dataID) {
-        final DataXCsw dxc = dsl.select().from(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).and(DATA_X_CSW.DATA_ID.eq(dataID)).fetchOneInto(DataXCsw.class);
-        if (dxc == null) {
-            DataXCswRecord newRecord = dsl.newRecord(DATA_X_CSW);
-            newRecord.setCswId(serviceID);
-            newRecord.setDataId(dataID);
-            newRecord.store();
-            return newRecord.into(DataXCsw.class);
+    public MetadataXCsw addDataToCSW(final int serviceID, final int dataID) {
+        final Metadata metadata = dsl.select().from(METADATA).where(METADATA.DATA_ID.eq(dataID)).fetchOneInto(Metadata.class);
+        if (metadata != null) {
+            final MetadataXCsw dxc = dsl.select().from(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).and(METADATA_X_CSW.METADATA_ID.eq(metadata.getId())).fetchOneInto(MetadataXCsw.class);
+            if (dxc == null) {
+                MetadataXCswRecord newRecord = dsl.newRecord(METADATA_X_CSW);
+                newRecord.setCswId(serviceID);
+                newRecord.setMetadataId(metadata.getId());
+                newRecord.store();
+                return newRecord.into(MetadataXCsw.class);
+            }
+            return dxc;
         }
-        return dxc;
+        return null;
     }
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void removeDataFromCSW(int serviceID, int dataID) {
-        dsl.delete(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).and(DATA_X_CSW.DATA_ID.eq(dataID)).execute();
+        final Metadata metadata = dsl.select().from(METADATA).where(METADATA.DATA_ID.eq(dataID)).fetchOneInto(Metadata.class);
+        if (metadata != null) {
+            dsl.delete(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).and(METADATA_X_CSW.METADATA_ID.eq(metadata.getId())).execute();
+        }
     }
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void removeDataFromAllCSW(int dataID) {
-        dsl.delete(DATA_X_CSW).where(DATA_X_CSW.DATA_ID.eq(dataID)).execute();
+        final Metadata metadata = dsl.select().from(METADATA).where(METADATA.DATA_ID.eq(dataID)).fetchOneInto(Metadata.class);
+        if (metadata != null) {
+            dsl.delete(METADATA_X_CSW).where(METADATA_X_CSW.METADATA_ID.eq(metadata.getId())).execute();
+        }
     }
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void removeAllDataFromCSW(int serviceID) {
-        dsl.delete(DATA_X_CSW).where(DATA_X_CSW.CSW_ID.eq(serviceID)).execute();
+        dsl.delete(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).execute();
     }
 
     @Override

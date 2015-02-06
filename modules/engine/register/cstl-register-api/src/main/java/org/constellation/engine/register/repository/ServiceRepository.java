@@ -27,6 +27,7 @@ import org.constellation.engine.register.ServiceExtraConfig;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.constellation.engine.register.Metadata;
 
 public interface ServiceRepository {
 	
@@ -73,4 +74,7 @@ public interface ServiceRepository {
     Service findByMetadataId(String metadataId);
 
     List<Data> findDataByServiceId(Integer id);
+
+    Metadata getMetadata(Integer id);
+    
 }

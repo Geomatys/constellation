@@ -21,10 +21,10 @@ package org.constellation.engine.register.repository;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.i18n.DataWithI18N;
-import org.constellation.engine.register.DataXCsw;
 
 import java.util.List;
 import java.util.Map;
+import org.constellation.engine.register.MetadataXCsw;
 
 public interface DataRepository {
 
@@ -64,7 +64,7 @@ public interface DataRepository {
 
     List<Data> getCswLinkedData(final int cswId);
     
-    DataXCsw addDataToCSW(final int serviceID, final int dataID);
+    MetadataXCsw addDataToCSW(final int serviceID, final int dataID);
     
     void removeDataFromCSW(final int serviceID, final int dataID);
     

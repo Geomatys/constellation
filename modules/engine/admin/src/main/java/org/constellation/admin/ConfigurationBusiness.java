@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.engine.register.Metadata;
+import org.constellation.engine.register.repository.MetadataRepository;
 
 @Component
 @Primary
@@ -36,6 +38,9 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
     
     @Autowired
     private ServiceRepository serviceRepository;
+    
+    @Autowired
+    private MetadataRepository metadataRepository;
 
     @Override
     public File getConfigurationDirectory() {
@@ -66,13 +71,14 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
         try {
             final List<Service> records = serviceRepository.findAll();
             for (Service record : records) {
-                if (record.getMetadataIso() != null) {
-                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(record.getMetadataIso());
+                final Metadata metadata = serviceRepository.getMetadata(record.getId());
+                if (metadata != null) {
+                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(metadata.getMetadataIso());
                     CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType(), url, servMeta);
                     final String xml = MetadataIOUtils.marshallMetadataToString(servMeta);
-                    record.setMetadataId(servMeta.getFileIdentifier());
-                    record.setMetadataIso(xml);
-                    serviceRepository.update(record);
+                    metadata.setMetadataId(servMeta.getFileIdentifier());
+                    metadata.setMetadataIso(xml);
+                    metadataRepository.update(metadata);
                 }
             }
         } catch (JAXBException ex) {

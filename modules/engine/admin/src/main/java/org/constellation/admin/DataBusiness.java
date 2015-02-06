@@ -100,7 +100,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,6 +124,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
 import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.engine.register.Metadata;
+import org.constellation.engine.register.repository.MetadataRepository;
 import org.geotoolkit.metadata.ImageStatistics;
 import org.geotoolkit.metadata.dimap.DimapAccessor;
 import org.geotoolkit.util.DomUtilities;
@@ -195,6 +196,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Inject
     private SensorRepository sensorRepository;
     /**
+     * Injected metadata repository.
+     */
+    @Inject
+    protected MetadataRepository metadataRepository;
+    /**
      * Injected lucene index engine.
      */
     @Inject
@@ -230,25 +236,25 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Override
     public DefaultMetadata loadIsoDataMetadata(final String providerId,
                                                final QName name) throws ConstellationException{
-        DefaultMetadata metadata = null;
+        DefaultMetadata result = null;
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         final MarshallerPool pool = getMarshallerPool();
         try {
-            final String metadataStr = data.getIsoMetadata();
-            if (data != null && metadataStr != null) {
+            final Metadata metadata = metadataRepository.findByDataId(data.getId());
+            if (metadata != null && metadata.getMetadataIso() != null) {
                 if(pool != null){
-                    final InputStream sr = new ByteArrayInputStream(metadataStr.getBytes("UTF-8"));
+                    final InputStream sr = new ByteArrayInputStream(metadata.getMetadataIso().getBytes("UTF-8"));
                     final Unmarshaller m = pool.acquireUnmarshaller();
-                    metadata = (DefaultMetadata) m.unmarshal(sr);
+                    result = (DefaultMetadata) m.unmarshal(sr);
                     pool.recycle(m);
                 }else {
-                    metadata = unmarshallMetadata(metadataStr);
+                    result = unmarshallMetadata(metadata.getMetadataIso());
                 }
             }
         } catch (UnsupportedEncodingException | JAXBException e) {
             throw new ConstellationException(e);
         }
-        return metadata;
+        return result;
     }
 
     /**
@@ -256,25 +262,24 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Override
     public DefaultMetadata loadIsoDataMetadata(final int dataId) throws ConstellationException{
-        DefaultMetadata metadata = null;
-        final Data data = dataRepository.findById(dataId);
+        DefaultMetadata result = null;
+        final Metadata metadata = metadataRepository.findByDataId(dataId);
         final MarshallerPool pool = getMarshallerPool();
         try {
-            final String metadataStr = data.getIsoMetadata();
-            if (data != null && metadataStr != null) {
+            if (metadata != null && metadata.getMetadataIso() != null) {
                 if(pool != null){
-                    final InputStream sr = new ByteArrayInputStream(metadataStr.getBytes("UTF-8"));
+                    final InputStream sr = new ByteArrayInputStream(metadata.getMetadataIso().getBytes("UTF-8"));
                     final Unmarshaller m = pool.acquireUnmarshaller();
-                    metadata = (DefaultMetadata) m.unmarshal(sr);
+                    result = (DefaultMetadata) m.unmarshal(sr);
                     pool.recycle(m);
                 } else {
-                    metadata = unmarshallMetadata(metadataStr);
+                    result = unmarshallMetadata(metadata.getMetadataIso());
                 }
             }
         } catch (UnsupportedEncodingException | JAXBException e) {
             throw new ConstellationException(e);
         }
-        return metadata;
+        return result;
     }
 
     @Override
@@ -343,10 +348,18 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             throw new ConstellationException(ex);
         }
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
-        data.setIsoMetadata(metadataStr);
-        data.setMetadataId(metadata.getFileIdentifier());
-        dataRepository.update(data);
-        indexEngine.addMetadataToIndexForData(metadata, data.getId());
+        if (data != null) {
+            Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
+            if (metadataRecord != null) {
+                metadataRecord.setMetadataIso(metadataStr);
+                metadataRecord.setMetadataId(metadata.getFileIdentifier());
+                metadataRepository.update(metadataRecord);
+            } else {
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataStr, data.getId(), null, null);
+                metadataRepository.create(metadataRecord);
+            }    
+            indexEngine.addMetadataToIndexForData(metadata, data.getId());
+        }
     }
 
     /**
@@ -746,7 +759,10 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             deleteDatasetIfEmpty(data.getDatasetId());
 
             // update internal CSW index
-            updateInternalCSWIndex(data.getMetadataId(), 1, false); // TODO DOMAIN ID
+            Metadata metadata = metadataRepository.findByDataId(data.getId());
+            if (metadata != null) {
+                updateInternalCSWIndex(metadata.getMetadataId(), 1, false); // TODO DOMAIN ID
+            }
         }
     }
 
@@ -839,9 +855,15 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
-            data.setIsoMetadata(metadataString);
-            data.setMetadataId(metadata.getFileIdentifier());
-            dataRepository.update(data);
+            Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
+            if (metadataRecord != null) {
+                metadataRecord.setMetadataIso(metadataString);
+                metadataRecord.setMetadataId(metadata.getFileIdentifier());
+                metadataRepository.update(metadataRecord);
+            } else {
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, data.getId(), null, null);
+                metadataRepository.create(metadataRecord);
+            }
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
             // update internal CSW index
             updateInternalCSWIndex(metadata.getFileIdentifier(), domainId, true);

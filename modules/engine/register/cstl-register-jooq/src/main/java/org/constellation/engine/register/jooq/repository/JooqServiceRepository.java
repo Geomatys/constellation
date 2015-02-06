@@ -18,6 +18,7 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import java.util.Arrays;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
@@ -45,10 +46,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.constellation.engine.register.Metadata;
 
 import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_CSW;
 import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 import static org.constellation.engine.register.jooq.Tables.SERVICE;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_DETAILS;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
@@ -71,7 +74,11 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
                 .where(Tables.LAYER.DATA.eq(dataId));
         final List<Service> layerServices = from.fetchInto(Service.class);
         
-        final List<Service> cswServices = dsl.select(SERVICE.fields()).from(SERVICE).join(DATA_X_CSW).onKey(DATA_X_CSW.CSW_ID).where(DATA_X_CSW.DATA_ID.eq(dataId)).fetchInto(Service.class);
+        final List<Service> cswServices = dsl.select(SERVICE.fields()).from(Arrays.asList(SERVICE,METADATA_X_CSW,METADATA))
+                .where(METADATA_X_CSW.CSW_ID.eq(SERVICE.ID))
+                .and(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
+                .and(METADATA.DATA_ID.eq(dataId)).fetchInto(Service.class);
+        
         layerServices.addAll(cswServices);
         return layerServices;
     }
@@ -98,8 +105,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
                 .set(SERVICE.DATE, service.getDate())
                 .set(SERVICE.CONFIG, service.getConfig())
                 .set(SERVICE.IDENTIFIER, service.getIdentifier())
-                .set(SERVICE.METADATA_ISO, service.getMetadataIso())
-                .set(SERVICE.METADATA_ID, service.getMetadataId())
                 .set(SERVICE.OWNER, service.getOwner())
                 .set(SERVICE.STATUS, service.getStatus())
                 .set(SERVICE.TYPE, service.getType())
@@ -224,14 +229,12 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         serviceRecord.setConfig(service.getConfig());
         serviceRecord.setDate(service.getDate());
         serviceRecord.setIdentifier(service.getIdentifier());
-        serviceRecord.setMetadataIso(service.getMetadataIso());
-        serviceRecord.setMetadataId(service.getMetadataId());
         serviceRecord.setType(service.getType());
         serviceRecord.setOwner(service.getOwner());
         serviceRecord.setStatus(service.getStatus());
         serviceRecord.setVersions(service.getVersions());
         serviceRecord.store();
-        return serviceRecord.getId().intValue();
+        return serviceRecord.getId();
     }
 
     @Override
@@ -251,7 +254,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     @Override
     public Service findByMetadataId(String metadataId) {
-        return dsl.select().from(SERVICE).where(SERVICE.METADATA_ID.eq(metadataId)).fetchOneInto(Service.class);
+        return dsl.select().from(SERVICE).join(METADATA).onKey(METADATA.SERVICE_ID).where(METADATA.METADATA_ID.eq(metadataId)).fetchOneInto(Service.class);
     }
 
     @Override
@@ -271,6 +274,11 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         return dsl.select().from(SERVICE).join(SERVICE_X_DOMAIN).on(SERVICE_X_DOMAIN.SERVICE_ID.eq(SERVICE.ID))
                 .where(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId).and(SERVICE.TYPE.eq(type)))
                 .fetchInto(Service.class);
+    }
+
+    @Override
+    public Metadata getMetadata(Integer id) {
+        return dsl.select().from(METADATA).where(METADATA.SERVICE_ID.eq(id)).fetchOneInto(Metadata.class);
     }
 
 }

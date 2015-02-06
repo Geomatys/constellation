@@ -20,11 +20,13 @@ package org.constellation.engine.register.jooq.repository;
 
 import java.util.List;
 import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.DatasetXCsw;
+import org.constellation.engine.register.Metadata;
+import org.constellation.engine.register.MetadataXCsw;
 import static org.constellation.engine.register.jooq.Tables.DATASET;
-import static org.constellation.engine.register.jooq.Tables.DATASET_X_CSW;
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 import org.constellation.engine.register.jooq.tables.records.DatasetRecord;
-import org.constellation.engine.register.jooq.tables.records.DatasetXCswRecord;
+import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
@@ -48,8 +50,6 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     public Dataset insert(Dataset dataset) {
         DatasetRecord newRecord = dsl.newRecord(DATASET);
         newRecord.setIdentifier(dataset.getIdentifier());
-        newRecord.setMetadataIso(dataset.getMetadataIso());
-        newRecord.setMetadataId(dataset.getMetadataId());
         newRecord.setOwner(dataset.getOwner());
         newRecord.setDate(dataset.getDate());
         newRecord.setFeatureCatalog(dataset.getFeatureCatalog());
@@ -64,9 +64,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
         datasetRecord.from(dataset);
         UpdateConditionStep<DatasetRecord> set = dsl.update(DATASET)
                 .set(DATASET.IDENTIFIER, dataset.getIdentifier())
-                .set(DATASET.METADATA_ISO, dataset.getMetadataIso())
                 .set(DATASET.OWNER, dataset.getOwner())
-                .set(DATASET.METADATA_ID, dataset.getMetadataId())
                 .set(DATASET.DATE, dataset.getDate())
                 .set(DATASET.FEATURE_CATALOG, dataset.getFeatureCatalog())
                 .set(DATASET.MD_COMPLETION,dataset.getMdCompletion())
@@ -78,7 +76,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     
     @Override
     public Dataset findByMetadataId(String metadataId) {
-        return dsl.select().from(DATASET).where(DATASET.METADATA_ID.eq(metadataId)).fetchOneInto(Dataset.class);
+        return dsl.select().from(DATASET).join(METADATA).onKey(METADATA.DATASET_ID).where(METADATA.METADATA_ID.eq(metadataId)).fetchOneInto(Dataset.class);
     }
     
     @Override
@@ -88,7 +86,14 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     
     @Override
     public Dataset findByIdentifierWithEmptyMetadata(String identifier) {
-        return dsl.select().from(DATASET).where(DATASET.IDENTIFIER.eq(identifier)).and(DATASET.METADATA_ID.isNull()).and(DATASET.METADATA_ISO.isNull()).fetchOneInto(Dataset.class);
+        List<Dataset> datas = dsl.select().from(DATASET).where(DATASET.IDENTIFIER.eq(identifier)).fetchInto(Dataset.class);
+        for (Dataset dataset : datas) {
+            Metadata m = dsl.select().from(METADATA).where(METADATA.DATASET_ID.eq(dataset.getId())).fetchOneInto(Metadata.class);
+            if (m == null) {
+                return dataset;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -110,40 +115,52 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
 
     @Override
-    public List<DatasetXCsw> getCswLinkedDataset(final int cswId) {
-        return dsl.select().from(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(cswId)).fetchInto(DatasetXCsw.class);
+    public List<Dataset> getCswLinkedDataset(final int cswId) {
+        return dsl.select(DATASET.fields()).from(DATASET, METADATA, METADATA_X_CSW)
+                .where(METADATA.ID.eq(METADATA_X_CSW.METADATA_ID))
+                .and(DATASET.ID.eq(METADATA.DATASET_ID))
+                .and(METADATA_X_CSW.CSW_ID.eq(cswId)).and(METADATA.DATASET_ID.isNotNull()).fetchInto(Dataset.class);
     }
     
     @Override
-    public DatasetXCsw addDatasetToCSW(final int serviceID, final int datasetID, final boolean allData) {
-        final DatasetXCsw dxc = dsl.select().from(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(serviceID)).and(DATASET_X_CSW.DATASET_ID.eq(datasetID)).fetchOneInto(DatasetXCsw.class);
-        if (dxc == null) {
-            DatasetXCswRecord newRecord = dsl.newRecord(DATASET_X_CSW);
-            newRecord.setAllData(allData);
-            newRecord.setCswId(serviceID);
-            newRecord.setDatasetId(datasetID);
-            newRecord.store();
-            return newRecord.into(DatasetXCsw.class);
+    public MetadataXCsw addDatasetToCSW(final int serviceID, final int datasetID, final boolean allData) {
+        final Metadata metadata = dsl.select().from(METADATA).where(METADATA.DATASET_ID.eq(datasetID)).fetchOneInto(Metadata.class);
+        if (metadata != null) {
+            final MetadataXCsw dxc = dsl.select().from(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).and(METADATA_X_CSW.METADATA_ID.eq(metadata.getId())).fetchOneInto(MetadataXCsw.class);
+            if (dxc == null) {
+                MetadataXCswRecord newRecord = dsl.newRecord(METADATA_X_CSW);
+                newRecord.setCswId(serviceID);
+                newRecord.setMetadataId(metadata.getId());
+                newRecord.store();
+                return newRecord.into(MetadataXCsw.class);
+            }
+            return dxc;
         }
-        return dxc;
+        return null;
     }
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void removeDatasetFromCSW(int serviceID, int datasetID) {
-        dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(serviceID)).and(DATASET_X_CSW.DATASET_ID.eq(datasetID)).execute();
+        final Metadata metadata = dsl.select().from(METADATA).where(METADATA.DATASET_ID.eq(datasetID)).fetchOneInto(Metadata.class);
+        if (metadata != null) {
+            dsl.delete(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).and(METADATA_X_CSW.METADATA_ID.eq(metadata.getId())).execute();
+        }
     }
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void removeDatasetFromAllCSW(int datasetID) {
-        dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.DATASET_ID.eq(datasetID)).execute();
+        final Metadata metadata = dsl.select().from(METADATA).where(METADATA.DATASET_ID.eq(datasetID)).fetchOneInto(Metadata.class);
+        if (metadata != null) {
+            dsl.delete(METADATA_X_CSW).where(METADATA_X_CSW.METADATA_ID.eq(metadata.getId())).execute();
+        }
     }
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void removeAllDatasetFromCSW(int serviceID) {
-        dsl.delete(DATASET_X_CSW).where(DATASET_X_CSW.CSW_ID.eq(serviceID)).execute();
+         dsl.delete(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).execute();
     }
     
 }

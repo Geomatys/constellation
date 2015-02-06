@@ -53,7 +53,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 
@@ -732,14 +731,12 @@ public class ServiceBusiness implements IServiceBusiness {
 
     private ServiceDTO convertIntoServiceDto(final Service service, final Details details) {
         final ServiceDTO serviceDTO = new ServiceDTO();
-        serviceDTO.setMetadataIso(service.getMetadataIso());
         serviceDTO.setOwner(service.getOwner());
         serviceDTO.setConfig(service.getConfig());
         serviceDTO.setDate(new Date(service.getDate()));
         serviceDTO.setDescription(details != null ? details.getDescription() : "");
         serviceDTO.setId(service.getId());
         serviceDTO.setIdentifier(service.getIdentifier());
-        serviceDTO.setMetadataId(service.getMetadataId());
         serviceDTO.setStatus(service.getStatus());
         serviceDTO.setTitle(details != null ? details.getName() : "");
         serviceDTO.setType(service.getType());

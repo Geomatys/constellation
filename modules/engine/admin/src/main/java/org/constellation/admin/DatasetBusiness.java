@@ -50,9 +50,11 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.Metadata;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
+import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.DataProvider;
@@ -72,8 +74,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import org.springframework.context.annotation.Profile;
 
 /**
  *
@@ -118,6 +118,11 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      */
     @Inject
     private ProviderRepository providerRepository;
+    /**
+     * Injected metadata repository.
+     */
+    @Inject
+    protected MetadataRepository metadataRepository;
     /**
      * Injected lucene index engine.
      */
@@ -179,8 +184,13 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Override
     @Transactional
     public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) {
-        final Dataset ds = new Dataset(identifier, metadataId, metadataXml, owner, System.currentTimeMillis(), null,0);
-        return datasetRepository.insert(ds);
+        Dataset ds = new Dataset(identifier, owner, System.currentTimeMillis(), null,0);
+        ds = datasetRepository.insert(ds);
+        if (metadataId != null && metadataXml != null) {
+            final Metadata metadata = new Metadata(metadataId, metadataXml, null, ds.getId(), null);
+            metadataRepository.create(metadata);
+        }
+        return ds;
     }
 
     @Override
@@ -218,27 +228,33 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Override
     public DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException {
         final Dataset dataset = getDataset(datasetIdentifier, domainId);
-        final MarshallerPool pool = getMarshallerPool();
-        final String metadataStr = dataset.getMetadataIso();
-        if(metadataStr == null){
-            throw new ConfigurationException("Unable to get metadata for dataset identifier "+datasetIdentifier);
-        }
-        try {
-            final DefaultMetadata metadata;
-            if(pool != null) {
-                final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-                final byte[] byteArray = metadataStr.getBytes();
-                final ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-                metadata = (DefaultMetadata) unmarshaller.unmarshal(bais);
-                pool.recycle(unmarshaller);
-            } else {
-                metadata = unmarshallMetadata(metadataStr);
+        if (dataset != null) {
+            final Metadata metaRecord = metadataRepository.findByDatasetId(dataset.getId());
+            if (metaRecord != null) {
+                final MarshallerPool pool = getMarshallerPool();
+                final String metadataStr = metaRecord.getMetadataIso();
+                if(metadataStr == null){
+                    throw new ConfigurationException("Unable to get metadata for dataset identifier "+datasetIdentifier);
+                }
+                try {
+                    final DefaultMetadata metadata;
+                    if(pool != null) {
+                        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+                        final byte[] byteArray = metadataStr.getBytes();
+                        final ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+                        metadata = (DefaultMetadata) unmarshaller.unmarshal(bais);
+                        pool.recycle(unmarshaller);
+                    } else {
+                        metadata = unmarshallMetadata(metadataStr);
+                    }
+                    metadata.prune();
+                    return metadata;
+                } catch (JAXBException ex) {
+                    throw new ConfigurationException("Unable to unmarshall the dataset metadata", ex);
+                }
             }
-            metadata.prune();
-            return metadata;
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("Unable to unmarshall the dataset metadata", ex);
         }
+        return null;
     }
 
     /**
@@ -251,7 +267,13 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Override
     public Node getMetadataNode(final String datasetIdentifier, int domainId) throws ConfigurationException {
         final Dataset dataset = getDataset(datasetIdentifier, domainId);
-        return getNodeFromString(dataset.getMetadataIso());
+        if (dataset != null) {
+            final Metadata metaRecord = metadataRepository.findByDatasetId(dataset.getId());
+            if (metaRecord != null) {
+                return getNodeFromString(metaRecord.getMetadataIso());
+            }
+        }
+        return null;
     }
 
     /**
@@ -305,9 +327,15 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         
         final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
         if (dataset != null) {
-            dataset.setMetadataIso(metadataString);
-            dataset.setMetadataId(metadata.getFileIdentifier());
-            datasetRepository.update(dataset);
+            Metadata metadataRecord = metadataRepository.findByDatasetId(dataset.getId());
+            if (metadataRecord != null) {
+                metadataRecord.setMetadataIso(metadataString);
+                metadataRecord.setMetadataId(metadata.getFileIdentifier());
+                metadataRepository.update(metadataRecord);
+            } else {
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId(), null);
+                metadataRepository.create(metadataRecord);
+            }
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
             // update internal CSW index
             updateInternalCSWIndex(metadata.getFileIdentifier(), domainId, true);
@@ -338,9 +366,15 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                                final String metaId, final String metadataXml) throws ConfigurationException {
         final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
         if (dataset != null) {
-            dataset.setMetadataIso(metadataXml);
-            dataset.setMetadataId(metaId);
-            datasetRepository.update(dataset);
+            Metadata metadataRecord = metadataRepository.findByDatasetId(dataset.getId());
+            if (metadataRecord != null) {
+                metadataRecord.setMetadataIso(metadataXml);
+                metadataRecord.setMetadataId(metaId);
+                metadataRepository.update(metadataRecord);
+            } else {
+                metadataRecord = new Metadata(metaId, metadataXml, null, dataset.getId(), null);
+                metadataRepository.create(metadataRecord);
+            }
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
@@ -555,7 +589,10 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 data.setDatasetId(null);
                 dataRepository.update(data);
                 involvedProvider.add(data.getProvider());
-                updateInternalCSWIndex(data.getMetadataId(), domainId, false);
+                Metadata meta = metadataRepository.findByDataId(data.getId());
+                if (meta != null) {
+                    updateInternalCSWIndex(meta.getMetadataId(), domainId, false);
+                }
                 dataRepository.removeDataFromAllCSW(data.getId());
             }
 
@@ -597,7 +634,10 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             datasetRepository.remove(ds.getId());
             
             // update internal CSW index
-            updateInternalCSWIndex(ds.getMetadataId(), domainId, false);
+            final Metadata meta = metadataRepository.findByDatasetId(ds.getId());
+            if (meta != null) {
+                updateInternalCSWIndex(meta.getMetadataId(), domainId, false);
+            }
         }
     }
     
