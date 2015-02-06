@@ -97,10 +97,11 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
                 indexer.removeDocument(identifier);
                 indexer.indexDocument(original);
             }
+            boolean success = metadataBusiness.updateMetadata(identifier, sw.toString());
             if (partial) {
                 metadataBusiness.linkMetadataIDToCSW(identifier, id);
             }
-            return metadataBusiness.updateMetadata(identifier, sw.toString());
+            return success;
         } catch (TransformerException ex) {
             throw new MetadataIoException("Unable to write the file.", ex, NO_APPLICABLE_CODE);
         }

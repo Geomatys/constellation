@@ -112,7 +112,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public Data findByMetadataId(String metadataId) {
-        return dsl.select().from(DATA).join(METADATA).onKey(METADATA.DATA_ID).where(METADATA.METADATA_ID.eq(metadataId)).fetchOneInto(Data.class);
+        return dsl.select(DATA.fields()).from(DATA).join(METADATA).onKey(METADATA.DATA_ID).where(METADATA.METADATA_ID.eq(metadataId)).fetchOneInto(Data.class);
     }
 
     @Override
