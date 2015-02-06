@@ -63,4 +63,6 @@ public interface IDatasetBusiness {
     String getTemplate(final String datasetId, final String dataType) throws ConfigurationException;
 
     void updateMDCompletion(final Integer datasetID, final Integer rating);
+    
+    Integer getDatasetMDCompletion(final Integer datasetID);
 }

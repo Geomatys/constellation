@@ -231,6 +231,7 @@ public class MetadataRest {
                 owner = user.getLogin();
             }
         }
+        final Integer completion = datasetBusiness.getDatasetMDCompletion(dataSetId);
         final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
         String type = null;
         if(dataBriefList!=null && !dataBriefList.isEmpty()){
@@ -241,7 +242,7 @@ public class MetadataRest {
                 type, owner,
                 dataBriefList,
                 dataset.getDate(),
-                dataset.getMdCompletion());
+                completion);
         try{
             final Node nodeMetadata = datasetBusiness.getMetadataNode(dataset.getIdentifier(),domainId);
             if(nodeMetadata!=null){

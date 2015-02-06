@@ -355,7 +355,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataStr, data.getId(), null, null);
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataStr, data.getId(), null, null, null);
                 metadataRepository.create(metadataRecord);
             }    
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
@@ -529,7 +529,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setStatsResult(data.getStatsResult());
             db.setStatsState(data.getStatsState());
             db.setRendered(data.isRendered());
-            db.setMdCompletion(data.getMdCompletion());
+            
+            final Metadata meta = metadataRepository.findByDataId(data.getId());
+            if (meta != null) {
+                db.setMdCompletion(meta.getMdCompletion());
+            }
 
             final List<Data> linkedDataList = getDataLinkedData(data.getId());
             for(final Data d : linkedDataList){
@@ -861,7 +865,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, data.getId(), null, null);
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, data.getId(), null, null, null);
                 metadataRepository.create(metadataRecord);
             }
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
@@ -876,8 +880,13 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Transactional
     public void updateMDCompletion(final String providerId, final QName dataName, final Integer rating) {
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
-        data.setMdCompletion(rating);
-        dataRepository.update(data);
+        if (data != null) {
+            final Metadata meta = metadataRepository.findByDataId(data.getId());
+            if (meta != null) {
+                meta.setMdCompletion(rating);
+                metadataRepository.update(meta);
+            }
+        }
     }
 
     @Override

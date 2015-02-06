@@ -100,7 +100,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         // if the metadata is not yet present look for empty metadata object
         final Dataset dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (dataset != null) {
-            final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null);
+            final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null, null);
             metadataRepository.create(metadata2);
             return true;
         }
@@ -108,13 +108,13 @@ public class MetadataBusiness implements IMetadataBusiness {
         // unsafe but no better way for now
         final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (data != null) {
-            final Metadata metadata2 = new Metadata(metadataId, xml, data.getId(), null, null);
+            final Metadata metadata2 = new Metadata(metadataId, xml, data.getId(), null, null, null);
             metadataRepository.create(metadata2);
             return true;
         }
         
         // save a new metadata (unliked to any data/dataset/service)
-        final Metadata metadata2 = new Metadata(metadataId, xml, null, null, null);
+        final Metadata metadata2 = new Metadata(metadataId, xml, null, null, null, null);
         metadataRepository.create(metadata2);
         return true;
     }

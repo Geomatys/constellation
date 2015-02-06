@@ -162,6 +162,7 @@ import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
+import org.constellation.engine.register.Metadata;
 
 /**
  * Manage data sending
@@ -1017,6 +1018,8 @@ public class DataRest {
                 owner = user.getLogin();
             }
         }
+        final Integer completion = datasetBusiness.getDatasetMDCompletion(dataSetId);
+        
         final DataSetBrief dsb;
         if(children==null){
             final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
@@ -1029,7 +1032,7 @@ public class DataRest {
                     type, owner,
                     dataBriefList,
                     dataset.getDate(),
-                    dataset.getMdCompletion());
+                    completion);
         }else {
             String type = null;
             if(!children.isEmpty()){
@@ -1039,7 +1042,7 @@ public class DataRest {
                     dataset.getIdentifier(),
                     type, owner, children,
                     dataset.getDate(),
-                    dataset.getMdCompletion());
+                    completion);
         }
         return dsb;
     }

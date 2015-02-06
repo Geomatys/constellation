@@ -184,10 +184,10 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Override
     @Transactional
     public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) {
-        Dataset ds = new Dataset(identifier, owner, System.currentTimeMillis(), null,0);
+        Dataset ds = new Dataset(identifier, owner, System.currentTimeMillis(), null);
         ds = datasetRepository.insert(ds);
         if (metadataId != null && metadataXml != null) {
-            final Metadata metadata = new Metadata(metadataId, metadataXml, null, ds.getId(), null);
+            final Metadata metadata = new Metadata(metadataId, metadataXml, null, ds.getId(), null, null);
             metadataRepository.create(metadata);
         }
         return ds;
@@ -333,7 +333,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId(), null);
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId(), null, null);
                 metadataRepository.create(metadataRecord);
             }
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
@@ -348,8 +348,25 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Transactional
     public void updateMDCompletion(final Integer datasetID, final Integer rating) {
         final Dataset dataset = datasetRepository.findById(datasetID);
-        dataset.setMdCompletion(rating);
-        datasetRepository.update(dataset);
+        if (dataset != null) {
+            final Metadata meta = metadataRepository.findByDatasetId(dataset.getId());
+            if (meta != null) {
+                meta.setMdCompletion(rating);
+                metadataRepository.update(meta);
+            }
+        }
+    }
+    
+    @Override
+    public Integer getDatasetMDCompletion(final Integer datasetID) {
+        final Dataset dataset = datasetRepository.findById(datasetID);
+        if (dataset != null) {
+            final Metadata meta = metadataRepository.findByDatasetId(dataset.getId());
+            if (meta != null) {
+               return meta.getMdCompletion();
+            }
+        }
+        return null;
     }
 
     /**
@@ -372,7 +389,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setMetadataId(metaId);
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metaId, metadataXml, null, dataset.getId(), null);
+                metadataRecord = new Metadata(metaId, metadataXml, null, dataset.getId(), null, null);
                 metadataRepository.create(metadataRecord);
             }
         } else {

@@ -47,6 +47,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                 .set(METADATA.METADATA_ID, metadata.getMetadataId())
                 .set(METADATA.METADATA_ISO, metadata.getMetadataIso())
                 .set(METADATA.SERVICE_ID, metadata.getServiceId())
+                .set(METADATA.MD_COMPLETION, metadata.getMdCompletion())
                 .where(METADATA.ID.eq(metadata.getId())).execute();
         return metadata;
     }
@@ -59,6 +60,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setMetadataId(metadata.getMetadataId());
         metadataRecord.setMetadataIso(metadata.getMetadataIso());
         metadataRecord.setServiceId(metadata.getServiceId());
+        metadataRecord.setMdCompletion(metadata.getMdCompletion());
         metadataRecord.store();
         return metadataRecord.getId();
     }
