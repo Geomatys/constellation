@@ -18,9 +18,13 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import java.util.List;
 import org.constellation.engine.register.Metadata;
-import static org.constellation.engine.register.jooq.tables.Metadata.METADATA;
+import org.constellation.engine.register.MetadataXCsw;
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 import org.constellation.engine.register.jooq.tables.records.MetadataRecord;
+import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.springframework.stereotype.Component;
 
@@ -72,6 +76,38 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     @Override
     public Metadata findByDatasetId(int datasetId) {
         return dsl.select().from(METADATA).where(METADATA.DATASET_ID.eq(datasetId)).fetchOneInto(Metadata.class);
+    }
+
+    @Override
+    public MetadataXCsw addMetadataToCSW(final String metadataID, final int serviceID) {
+        final Metadata metadata = dsl.select().from(METADATA).where(METADATA.METADATA_ID.eq(metadataID)).fetchOneInto(Metadata.class);
+        if (metadata != null) {
+            final MetadataXCsw dxc = dsl.select().from(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).and(METADATA_X_CSW.METADATA_ID.eq(metadata.getId())).fetchOneInto(MetadataXCsw.class);
+            if (dxc == null) {
+                MetadataXCswRecord newRecord = dsl.newRecord(METADATA_X_CSW);
+                newRecord.setCswId(serviceID);
+                newRecord.setMetadataId(metadata.getId());
+                newRecord.store();
+                return newRecord.into(MetadataXCsw.class);
+            }
+            return dxc;
+        }
+        return null;
+    }
+
+    @Override
+    public void removeDataFromCSW(final String metadataID, final int serviceID) {
+        final Metadata metadata = dsl.select().from(METADATA).where(METADATA.METADATA_ID.eq(metadataID)).fetchOneInto(Metadata.class);
+        if (metadata != null) {
+            dsl.delete(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).and(METADATA_X_CSW.METADATA_ID.eq(metadata.getId())).execute();
+        }
+    }
+
+    @Override
+    public List<Metadata> findByCswId(Integer id) {
+        return dsl.select(METADATA.fields()).from(METADATA, METADATA_X_CSW)
+                  .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
+                  .and(METADATA_X_CSW.CSW_ID.eq(id)).fetchInto(Metadata.class);
     }
     
 }

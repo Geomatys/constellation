@@ -113,8 +113,10 @@ public class MetadataBusiness implements IMetadataBusiness {
             return true;
         }
         
-        // no possible for service
-        return false;
+        // save a new metadata (unliked to any data/dataset/service)
+        final Metadata metadata2 = new Metadata(metadataId, xml, null, null, null);
+        metadataRepository.create(metadata2);
+        return true;
     }
 
     /**
@@ -178,19 +180,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         final List<String> results = new ArrayList<>();
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {
-            final List<Data> datas = dataRepository.getCswLinkedData(service.getId());
-            for (Data data : datas) {
-                final Metadata meta = metadataRepository.findByDataId(data.getId());
-                if (meta != null && data.isIncluded()) {
-                    results.add(meta.getMetadataId());
-                }
-            }
-            
-            for (Dataset ds : datasetRepository.getCswLinkedDataset(service.getId())) {
-                final Metadata meta = metadataRepository.findByDatasetId(ds.getId());
-                if (meta.getMetadataId() != null) {
-                    results.add(meta.getMetadataId());
-                }
+            List<Metadata> metas = metadataRepository.findByCswId(service.getId());
+            for (Metadata meta : metas) {
+                results.add(meta.getMetadataId());
             }
         }
         return results;
@@ -201,34 +193,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier) {
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {
-            final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
-            if (dataset != null) {
-                datasetRepository.addDatasetToCSW(service.getId(), dataset.getId(), false);
-            }
-            final Data data = dataRepository.findByMetadataId(metadataId);
-            if (data != null) {
-                dataRepository.addDataToCSW(service.getId(), data.getId());
-            }
-            /*final Service service = serviceRepository.findByMetadataId(metadataId);
-            if (service != null) {
-                service.setMetadataIso(xml);
-                serviceRepository.update(service);
-                return true;
-            }*/
-
-            // if the metadata is not yet present look for empty metadata object
-            final Dataset dataset2 = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
-            if (dataset2 != null) {
-                datasetRepository.addDatasetToCSW(service.getId(), dataset2.getId(), false);
-            }
-
-            // unsafe but no better way for now
-            final Data data2 = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
-            if (data2 != null) {
-                dataRepository.addDataToCSW(service.getId(), data2.getId());
-            }
-
-            // no possible for service
+            metadataRepository.addMetadataToCSW(metadataId, service.getId());
         }
     }
     
@@ -237,34 +202,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public void unlinkMetadataIDToCSW(final String metadataId, final String cswIdentifier) {
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {
-            final Dataset dataset = datasetRepository.findByMetadataId(metadataId);
-            if (dataset != null) {
-                datasetRepository.removeDatasetFromCSW(service.getId(), dataset.getId());
-            }
-            final Data data = dataRepository.findByMetadataId(metadataId);
-            if (data != null) {
-                dataRepository.removeDataFromCSW(service.getId(), data.getId());
-            }
-            /*final Service service = serviceRepository.findByMetadataId(metadataId);
-            if (service != null) {
-                service.setMetadataIso(xml);
-                serviceRepository.update(service);
-                return true;
-            }*/
-
-            // if the metadata is not yet present look for empty metadata object
-            final Dataset dataset2 = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
-            if (dataset2 != null) {
-                datasetRepository.removeDatasetFromCSW(service.getId(), dataset2.getId());
-            }
-
-            // unsafe but no better way for now
-            final Data data2 = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
-            if (data2 != null) {
-                dataRepository.removeDataFromCSW(service.getId(), data2.getId());
-            }
-
-            // no possible for service
+            metadataRepository.removeDataFromCSW(metadataId, service.getId());
         }
     }
 }

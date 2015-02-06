@@ -49,7 +49,7 @@ public interface DatasetRepository {
     
     List<Dataset> getCswLinkedDataset(final int cswId);
     
-    MetadataXCsw addDatasetToCSW(final int serviceID, final int datasetID, final boolean allData);
+    MetadataXCsw addDatasetToCSW(final int serviceID, final int datasetID);
     
     void removeDatasetFromCSW(final int serviceID, final int datasetID);
     

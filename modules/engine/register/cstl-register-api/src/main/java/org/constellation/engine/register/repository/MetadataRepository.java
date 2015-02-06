@@ -20,6 +20,7 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 import org.constellation.engine.register.Metadata;
+import org.constellation.engine.register.MetadataXCsw;
 
 /**
  *
@@ -36,6 +37,12 @@ public interface MetadataRepository {
     Metadata findByDatasetId(int id);
     
     Metadata findByMetadataId(String metadataId);
+    
+    List<Metadata> findByCswId(Integer id);
 
     List<Metadata> findAll();
+    
+    MetadataXCsw addMetadataToCSW(final String metadataID, final int cswID);
+    
+    void removeDataFromCSW(final String metadataID, final int cswID);
 }
