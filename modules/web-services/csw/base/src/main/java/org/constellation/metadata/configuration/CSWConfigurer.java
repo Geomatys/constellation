@@ -56,12 +56,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
 import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.XML;
 import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.ws.ICSWConfigurer;
 import org.geotoolkit.index.tree.manager.NamedEnvelope;
 import org.opengis.metadata.Metadata;
@@ -79,6 +83,8 @@ import org.opengis.metadata.Metadata;
 public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
 
     protected final DocumentBuilderFactory dbf;
+    
+    private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
     
     /**
      * A flag indicating if an indexation is going on.
@@ -819,5 +825,36 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
             return config.getFormat();
         }
         return null;
+    }
+
+    /**
+     * Convert geotk metadata string xml to w3c document.
+     *
+     * @param serviceID
+     * @param metadata the given metadata xml as string.
+     * 
+     * @return {@link Node} that represents the metadata in w3c document format.
+     * @throws ConfigurationException
+     */
+    public Node getNodeFromGeotkMetadata(final String serviceID, final Object metadata) throws ConfigurationException {
+        final AbstractCSWFactory factory = getCSWFactory(serviceID);
+        final MarshallerPool pool = factory.getMarshallerPool();
+        try {
+            dbf.setNamespaceAware(true);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.newDocument();
+            final Marshaller marshaller = pool.acquireMarshaller();
+            final MarshallWarnings warnings = new MarshallWarnings();
+            marshaller.setProperty(XML.CONVERTER, warnings);
+            marshaller.setProperty(XML.TIMEZONE, tz);
+            marshaller.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, true);
+            marshaller.setProperty(XML.GML_VERSION, LegacyNamespaces.VERSION_3_2_1);
+            marshaller.marshal(metadata, document);
+            pool.recycle(marshaller);
+            
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | JAXBException ex) {
+            throw new ConfigurationException(ex);
+        }
     }
 }
