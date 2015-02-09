@@ -39,6 +39,7 @@ import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.observation.ObservationStoreFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.storage.DataStoreFactory;
@@ -52,7 +53,9 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -496,26 +499,75 @@ public class ProviderBusiness implements IProviderBusiness {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
-    public DataBrief createPyramidConform(final String providerId, final String dataName, final String namespace, final int userOwnerId) throws ConstellationException {
+    public DataBrief createPyramidConform(final String providerId, final String dataName, final String namespace,
+                                          final int userOwnerId) throws ConstellationException {
+        final QName qName = new QName(namespace, dataName);
+        final DataBrief inData = dataBusiness.getDataBrief(qName, providerId);
+        if (inData != null){
+            // Execute in transaction to be ensure that taskParameter is in Database before run
+            // process in Quartz scheduler.
+            Map<String, Object> result = SpringHelper.executeInTransaction(new TransactionCallback<Map<String, Object>>() {
+                @Override
+                public Map<String, Object> doInTransaction(TransactionStatus transactionStatus) {
+                    return preparePyramidConform(inData, userOwnerId);
+                }
+            });
+
+            final DataBrief outData = (DataBrief) result.get("outData");
+            final Process process = (Process) result.get("process");
+            final Integer taskParameterId = (Integer) result.get("taskParameterId");
+            final String taskName = (String) result.get("taskName");
+
+            //run pyramid process in Quartz
+            processBusiness.runProcess(taskName, process, taskParameterId, userOwnerId);
+            return outData;
+        }
+        throw new ConstellationException("Data "+qName+" not found in provider identifier "+providerId);
+    }
+
+    /**
+     * Prepare pyramid conform for a data.
+     * This method should not be called alone, but before
+     * {@link org.constellation.business.IProcessBusiness#runProcess(String, org.geotoolkit.process.Process, Integer, Integer)}.
+     *
+     * This method need to be called in a Transaction
+     *
+     * @param inData Data to pyramid
+     * @param userOwnerId owner of the pyramid
+     * @return a Map with :
+     *      <ul>
+     *          <li>"ouData" : new pyramid DataBrief</li>
+     *          <li>"process" : pyramid process to execute</li>
+     *          <li>"taskParameterId" : task parameter id linked to process</li>
+     *          <li>"taskName" : name of the task</li>
+     *      </ul>
+     * @throws ConstellationException
+     */
+    private Map<String, Object> preparePyramidConform(final DataBrief inData, final int userOwnerId) throws ConstellationException {
+        final String dataName = inData.getName();
+        final String namespace = inData.getNamespace();
+        final String providerId = inData.getProvider();
+        final Integer datasetID = inData.getDatasetId();
+        Name name = new DefaultName(namespace,dataName);
+
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
         if (inProvider == null) {
             throw new ConstellationException("Provider " + providerId + " does not exist");
         }
-        final org.constellation.provider.Data inData = inProvider.get(new DefaultName(namespace,dataName));
-        if (inData == null) {
+        final org.constellation.provider.Data providerData = inProvider.get(name);
+        if (providerData == null) {
             throw new ConstellationException("Data " + dataName + " does not exist in provider " + providerId);
         }
         Envelope dataEnv;
         try {
             //use data crs
-            dataEnv = inData.getEnvelope();
+            dataEnv = providerData.getEnvelope();
         } catch (DataStoreException ex) {
             throw new ConstellationException("Failed to extract envelope for data " + dataName + ". " + ex.getMessage(),ex);
         }
 
-        final Object origin = inData.getOrigin();
+        final Object origin = providerData.getOrigin();
 
         if(!(origin instanceof CoverageReference)) {
             throw new ConstellationException("Cannot create pyramid conform for no raster data, it is not supported yet!");
@@ -531,12 +583,6 @@ public class ProviderBusiness implements IProviderBusiness {
         } catch (CoverageStoreException ex) {
             throw new ConstellationException("Failed to extract grid geometry for data " + dataName + ". " + ex.getMessage(),ex);
         }
-        Integer datasetID = null;
-        final DataBrief db = dataBusiness.getDataBrief(new QName(namespace,dataName), providerId);
-        if(db != null){
-            datasetID = db.getDatasetId();
-        }
-
 
         //create the output folder for pyramid
         PyramidalCoverageReference outRef;
@@ -562,7 +608,6 @@ public class ProviderBusiness implements IProviderBusiness {
             if (outStore == null) {
                 throw new ConstellationException("Failed to create pyramid layer ");
             }
-            Name name = new DefaultName(namespace,dataName);
             XMLCoverageReference covRef = (XMLCoverageReference)outStore.create(name, ViewType.GEOPHYSICS, "TIFF");
 
             // create provider
@@ -656,6 +701,9 @@ public class ProviderBusiness implements IProviderBusiness {
             throw new ConstellationException("Process coverage.coveragepyramid not found " + ex.getMessage(),ex);
         }
 
+        Map<String, Object> result = new HashMap<>();
+        result.put("outData", pyramidDataBrief);
+
         //add task in scheduler
         try {
             final ParameterValueGroup input = desc.getInputDescriptor().createValue();
@@ -666,21 +714,24 @@ public class ProviderBusiness implements IProviderBusiness {
             input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
             input.parameter("resolution_per_envelope").setValue(resolutionPerEnvelope);
             final org.geotoolkit.process.Process p = desc.createProcess(input);
+            result.put("process", p);
 
+            String taskName = "conform_pyramid_" + providerId + ":" + dataName + "_" + System.currentTimeMillis();
             TaskParameter taskParameter = new TaskParameter();
             taskParameter.setProcessAuthority(desc.getIdentifier().getAuthority().toString());
             taskParameter.setProcessCode(desc.getIdentifier().getCode());
             taskParameter.setDate(System.currentTimeMillis());
-            taskParameter.setInputs(ParamUtilities.writeParameter(input));
+            taskParameter.setInputs(ParamUtilities.writeParameterJSON(input));
             taskParameter.setOwner(userOwnerId);
-            taskParameter.setName("Create conform pyramid for " + providerId + ":" + dataName+" | "+System.currentTimeMillis());
+            taskParameter.setName(taskName);
             taskParameter.setType("INTERNAL");
             taskParameter = processBusiness.addTaskParameter(taskParameter);
-            processBusiness.runProcess("Create conform pyramid for " + providerId + ":" + dataName,
-                    p, taskParameter.getId(), userOwnerId);
+            result.put("taskParameterId", taskParameter.getId());
+            result.put("taskName", taskName);
+
         } catch ( IOException ex) {
             throw new ConstellationException("Unable to run pyramid process on scheduler",ex);
         }
-        return pyramidDataBrief;
+        return result;
     }
 }
