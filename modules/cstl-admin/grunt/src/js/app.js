@@ -238,9 +238,34 @@ cstlAdminApp
 
 
 $(window).scroll(function(){
-    if ($(this).scrollTop() > 259) {
-        $('#block-information-right').css('padding-top', $(this).scrollTop() - 259);
-    } else {
-        $('#block-information-right').css('padding-top', 0);
+    if(window.location.hash.substring(1)==='/data'){
+        if ($(this).scrollTop() > 259) {
+            $('#block-information-right').css('padding-top', $(this).scrollTop() - 259);
+        } else {
+            $('#block-information-right').css('padding-top', 0);
+        }
     }
+    else if(window.location.hash.substring(1)==='/styles' || window.location.hash.substring(1)==='/sensors' || window.location.hash.substring(1)==='/mapcontext'){
+        if ($(this).scrollTop() > 230) {
+            $('#block-information-right').css('padding-top', $(this).scrollTop() - 230);
+        } else {
+            $('#block-information-right').css('padding-top', 0);
+        }
+    }
+
+    else if(window.location.hash.substring(1)==='/tasks'){
+        if ($(this).scrollTop() > 190) {
+            $('#block-information-right').css('padding-top', $(this).scrollTop() - 190);
+        } else {
+            $('#block-information-right').css('padding-top', 0);
+        }
+    }
+    else{
+        if ($(this).scrollTop() > 250) {
+            $('#block-information-right').css('padding-top', $(this).scrollTop() - 250);
+        } else {
+            $('#block-information-right').css('padding-top', 0);
+        }
+    }
+
 });
