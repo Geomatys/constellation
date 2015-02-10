@@ -106,11 +106,11 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (metadata != null) {
             metadata.setMetadataId(metadataId);
             metadata.setMetadataIso(xml);
-            metadataRepository.update(metadata);
             
+            // calculate completion rating
+            Integer completion = null;
             if (metadata.getDatasetId() != null) {
                 final Dataset dataset = datasetRepository.findById(metadata.getDatasetId()); // calculate completion rating
-                Integer completion = null;
                 try {
                     List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
                     if (!datas.isEmpty()) {
@@ -121,22 +121,18 @@ public class MetadataBusiness implements IMetadataBusiness {
                 } catch (IOException | ConfigurationException | JAXBException ex) {
                     LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
                 }
-                dataset.setMdCompletion(completion);
-                datasetRepository.update(dataset);
             }
             if (metadata.getDataId() != null) {
                 final Data data = dataRepository.findById(metadata.getDataId());
-                // calculate completion rating
-                Integer completion = null;
                 try {
                     final Template template = Template.getInstance(getDataTemplate(data.getName(), data.getNamespace(), data.getType()));
                     completion = template.calculateMDCompletion(unmarshallMetadata(xml));
                 } catch (IOException | ConfigurationException | JAXBException ex) {
                     LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
                 }
-                data.setMdCompletion(completion);
-                dataRepository.update(data);
             }
+            metadata.setMdCompletion(completion);
+            metadataRepository.update(metadata);
             return true;
         }
 
@@ -145,7 +141,6 @@ public class MetadataBusiness implements IMetadataBusiness {
         final Dataset dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (dataset != null) {
             final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null, null);
-            metadataRepository.create(metadata2);
             Integer completion = null;
             try {
                 List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
@@ -157,15 +152,14 @@ public class MetadataBusiness implements IMetadataBusiness {
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            dataset.setMdCompletion(completion);
-            datasetRepository.update(dataset);
+            metadata2.setMdCompletion(completion);
+            metadataRepository.create(metadata2);
             return true;
         }
         // unsafe but no better way for now
         final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (data != null) {
             final Metadata metadata2 = new Metadata(metadataId, xml, data.getId(), null, null, null);
-            metadataRepository.create(metadata2);
             // calculate completion rating
             Integer completion = null;
             try {
@@ -174,8 +168,8 @@ public class MetadataBusiness implements IMetadataBusiness {
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            data.setMdCompletion(completion);
-            dataRepository.update(data);
+            metadata2.setMdCompletion(completion);
+            metadataRepository.create(metadata2);
             return true;
         }
         

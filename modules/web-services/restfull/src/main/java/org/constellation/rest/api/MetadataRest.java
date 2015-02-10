@@ -231,18 +231,8 @@ public class MetadataRest {
                 owner = user.getLogin();
             }
         }
-        final Integer completion = datasetBusiness.getDatasetMDCompletion(dataSetId);
         final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
-        String type = null;
-        if(dataBriefList!=null && !dataBriefList.isEmpty()){
-            type = dataBriefList.get(0).getType();
-        }
-        final DataSetBrief dsb = new DataSetBrief(dataset.getId(),
-                dataset.getIdentifier(),
-                type, owner,
-                dataBriefList,
-                dataset.getDate(),
-                completion);
+        final DataSetBrief dsb = datasetBusiness.getDatasetBrief(dataSetId, dataBriefList, owner);
         try{
             final Node nodeMetadata = datasetBusiness.getMetadataNode(dataset.getIdentifier(),domainId);
             if(nodeMetadata!=null){

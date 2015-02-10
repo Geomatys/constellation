@@ -350,17 +350,6 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         }
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         if (data != null) {
-            Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
-            if (metadataRecord != null) {
-                metadataRecord.setMetadataIso(metadataStr);
-                metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRepository.update(metadataRecord);
-            } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataStr, data.getId(), null, null, null);
-                metadataRepository.create(metadataRecord);
-            }    
-            indexEngine.addMetadataToIndexForData(metadata, data.getId());
-           
             // calculate completion rating
             Integer completion = null;
             final Template template = Template.getInstance(getTemplate(name, data.getType()));
@@ -369,8 +358,17 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             } catch (IOException ex) {
                 LOGGER.warn("Error while calculating metadata completion", ex);
             }
-            data.setMdCompletion(completion);
-            dataRepository.update(data);
+            Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
+            if (metadataRecord != null) {
+                metadataRecord.setMetadataIso(metadataStr);
+                metadataRecord.setMetadataId(metadata.getFileIdentifier());
+                metadataRecord.setMdCompletion(completion);
+                metadataRepository.update(metadataRecord);
+            } else {
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataStr, data.getId(), null, null, completion);
+                metadataRepository.create(metadataRecord);
+            }    
+            indexEngine.addMetadataToIndexForData(metadata, data.getId());
         }
     }
 

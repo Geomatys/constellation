@@ -971,7 +971,7 @@ public class DataRest {
      * @param domainId given domain id.
      * @return {@link DataSetBrief} built from the given dataset.
      */
-    private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId, final List<DataBrief> children){
+    private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId, List<DataBrief> children){
         final Integer dataSetId = dataset.getId();
         final Optional<CstlUser> optUser = userRepository.findById(dataset.getOwner());
         String owner = null;
@@ -981,32 +981,10 @@ public class DataRest {
                 owner = user.getLogin();
             }
         }
-        final Integer completion = datasetBusiness.getDatasetMDCompletion(dataSetId);
-        
-        final DataSetBrief dsb;
-        if(children==null){
-            final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
-            String type = null;
-            if(dataBriefList!=null && !dataBriefList.isEmpty()){
-                type = dataBriefList.get(0).getType();
-            }
-            dsb = new DataSetBrief(dataset.getId(),
-                    dataset.getIdentifier(),
-                    type, owner,
-                    dataBriefList,
-                    dataset.getDate(),
-                    completion);
-        }else {
-            String type = null;
-            if(!children.isEmpty()){
-                type = children.get(0).getType();
-            }
-            dsb = new DataSetBrief(dataset.getId(),
-                    dataset.getIdentifier(),
-                    type, owner, children,
-                    dataset.getDate(),
-                    completion);
+        if (children == null) {
+            children = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
         }
+        final DataSetBrief dsb = datasetBusiness.getDatasetBrief(dataSetId, children, owner);
         return dsb;
     }
 

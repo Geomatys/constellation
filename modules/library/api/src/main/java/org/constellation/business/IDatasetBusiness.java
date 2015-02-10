@@ -27,6 +27,8 @@ import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.util.List;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.DataSetBrief;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -61,5 +63,7 @@ public interface IDatasetBusiness {
     void addProviderDataToDataset(final String datasetId, final String providerId) throws ConfigurationException;
     
     String getTemplate(final String datasetId, final String dataType) throws ConfigurationException;
+    
+    DataSetBrief getDatasetBrief(final Integer dataSetId, List<DataBrief> children, String owner);
 
 }

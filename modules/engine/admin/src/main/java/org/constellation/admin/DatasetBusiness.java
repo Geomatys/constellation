@@ -46,6 +46,8 @@ import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.DataSetBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
@@ -675,5 +677,26 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
 
     protected DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
         return (DefaultMetadata) XML.unmarshal(metadata);
+    }
+
+    @Override
+    public DataSetBrief getDatasetBrief(Integer dataSetId, List<DataBrief> children, String owner) {
+        final Dataset dataset = datasetRepository.findById(dataSetId);
+        Integer completion = null;
+        final Metadata meta = metadataRepository.findByDatasetId(dataSetId);
+        if (meta != null) {
+            completion = meta.getMdCompletion();
+        }
+        String type = null;
+        if (!children.isEmpty()) {
+            type = children.get(0).getType();
+        }
+        final DataSetBrief dsb = new DataSetBrief(dataset.getId(),
+                dataset.getIdentifier(),
+                type, owner, children,
+                dataset.getDate(),
+                completion);
+
+        return dsb;
     }
 }
