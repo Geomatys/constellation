@@ -720,6 +720,8 @@
     "msg.delete.style.selected": "Supprimer définitivement le style selectionné.",
     "msg.edit.style.selected": "Éditer le style selectionné.",
     "msg.no.selected.data": "Cliquez sur une donnée ci-contre pour afficher plus d'informations.",
+    "msg.no.selected.data.map": "Cliquez sur une donnée ci-contre pour la visualiser sur une carte.",
+    "msg.no.selected.data.assos": "Cliquez sur une donnée ci-contre pour afficher ses associations (Styles, Services, Capteurs).",
     "msg.no.selected.sensor": "Cliquez sur un capteur ci-contre pour afficher plus d'informations.",
     "msg.no.selected.layer": "Cliquez sur une couche ci-contre pour afficher plus d'informations.",
     "msg.no.selected.metadata": "Cliquez sur une fiche de métadonnées ci-contre pour afficher plus d'informations.",

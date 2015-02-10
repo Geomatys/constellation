@@ -234,3 +234,13 @@ cstlAdminApp
             $idle.watch();
 
         }]);
+
+
+
+$(window).scroll(function(){
+    if ($(this).scrollTop() > 259) {
+        $('#block-information-right').css('padding-top', $(this).scrollTop() - 259);
+    } else {
+        $('#block-information-right').css('padding-top', 0);
+    }
+});
