@@ -481,20 +481,12 @@
 
                                 <!-- map tab -->
                                 <div class="sous-block-information sous-block-information-service" ng-show="currentTabInfo==='view'">
-                                    <div class="alert alert-info alert-data"
-                                         ng-class="{'alert-csw':type==='csw','alert-sos':type==='sos'}"
-                                         ng-show="!selected">
-                                        <h4 translate="label.no.selected.data">No selected data</h4>
-                                        <p translate="msg.no.selected.data.map"
-                                           style="font-weight:normal;">Click on a data to display more information</p>
-                                    </div>
-
                                     <div id="wmtsPreviewMap" class="dashboardmap data-dashboardmap"
                                          style="padding:0;"
-                                         ng-if="service.type.toLowerCase() === 'wmts' && selected"></div>
+                                         ng-if="service.type.toLowerCase() === 'wmts'"></div>
                                     <div id="layerPreviewMap" class="dashboardmap data-dashboardmap"
                                          style="padding:0;"
-                                         ng-if="service.type.toLowerCase() !== 'wmts' && service.type.toLowerCase() !== 'sos' && service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps' && selected"></div>
+                                         ng-if="service.type.toLowerCase() !== 'wmts' && service.type.toLowerCase() !== 'sos' && service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps'"></div>
                                 </div>
 
                                 <!-- info tab -->

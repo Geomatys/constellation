@@ -68,6 +68,9 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
          */
         $scope.selectTabInfo = function(item) {
             $scope.currentTabInfo = item;
+            setTimeout(function(){
+                $scope.showMapContextDashboardMap();
+            },300);
         };
 
         /**
