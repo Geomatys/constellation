@@ -607,6 +607,10 @@
     "msg.no.selected.mapcontext": "Click on a map context to display more information.",
     "msg.no.selected.style": "Click on a style to display more information.",
     "msg.no.selected.task":"Click on a task to display more information.",
+    "msg.no.selected.mapcontext.map":"Click on a map context to show it on a map.",
+    "msg.no.selected.style.map": "Click on a style to show it.",
+    "msg.no.selected.style.assos": "Click on a style to display its associations (Layers, Data).",
+    "msg.no.selected.metadata.map":"Click on a metadata to show data on a map.",
 
     "navtab.block.info.info":"Information",
     "navtab.block.info.view":"View",

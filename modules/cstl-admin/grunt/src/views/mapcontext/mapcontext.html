@@ -213,78 +213,108 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
-                    <div id="mapcontextPreviewMap" class="dashboardmap mapcontext-dashboardmap"></div>
-                    <div id="selection">
-                        <div class="alert alert-info alert-mapcontext"
-                             ng-class="{hide: selected}">
-                            <h4 translate="label.no.selected.mapcontext">No selected map context</h4>
-                            <p translate="msg.no.selected.mapcontext"
-                               style="font-weight:normal;">Click on a map context to display more information</p>
+
+                    <div id="block-information-right">
+
+                        <!-- tabs -->
+                        <div style="padding:0 10px;">
+                            <ul class="nav nav-tabs">
+                                <li class="tab-mapcontext" ng-click="selectTabInfo('view')" ng-class="{'active':currentTabInfo==='view'}">
+                                    <a translate="navtab.block.info.view">View </a>
+                                </li>
+                                <li class="tab-mapcontext" ng-click="selectTabInfo('info')" ng-class="{'active':currentTabInfo==='info'}">
+                                    <a translate="navtab.block.info.info">Information </a>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="selected-item"
-                             id="selected-item"
-                             ng-class="{hide: !selected}">
-                            <div class="block-header block-header-mapcontext"
-                                 ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc"
-                                        title="{{selected.name}}">{{truncateTitleBlock(selected.name)}}</strong>
-                                <i class="fa fa-chevron-down pull-right"></i>
+
+                        <!-- map tab -->
+                        <div class="sous-block-information" ng-show="currentTabInfo==='view'">
+                            <div class="alert alert-info alert-mapcontext"
+                                 ng-if="!selected">
+                                <h4 translate="label.no.selected.mapcontext">No selected map context</h4>
+                                <p translate="msg.no.selected.mapcontext.map"
+                                   style="font-weight:normal;">Click on a data to display the map</p>
                             </div>
-                            <div class="block-content">
-                                <div class="row description-block" ng-if="selected.description">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-description.svg" alt="" />
-                                    </div>
-                                    <div class="col-sm-9 col-md-10 description-text">{{selected.description}}</div>
+
+                            <div id="mapcontextPreviewMap" class="dashboardmap mapcontext-dashboardmap" ng-show="selected"></div>
+                        </div>
+
+                        <!-- info tab -->
+                        <div class="sous-block-information" ng-show="currentTabInfo==='info'">
+                            <div>
+                                <div class="alert alert-info alert-mapcontext"
+                                     ng-class="{hide: selected}">
+                                    <h4 translate="label.no.selected.mapcontext">No selected map context</h4>
+                                    <p translate="msg.no.selected.mapcontext"
+                                       style="font-weight:normal;">Click on a map context to display more information</p>
                                 </div>
-                                <div class="row description-block" ng-if="selected.userOwner">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-owner.svg" alt="" />
+                                <div class="selected-item"
+                                     id="selected-item"
+                                     ng-class="{hide: !selected}">
+                                    <div class="block-header block-header-mapcontext"
+                                         ng-click="toggleUpDownSelected()">
+                                        <strong class="item-title title-bloc"
+                                                title="{{selected.name}}">{{truncateTitleBlock(selected.name)}}</strong>
+                                        <i class="fa fa-chevron-down pull-right"></i>
                                     </div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.userOwner}}</span>
+                                    <div class="block-content">
+                                        <div class="row description-block" ng-if="selected.description">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-description.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">{{selected.description}}</div>
+                                        </div>
+                                        <div class="row description-block" ng-if="selected.userOwner">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-owner.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{selected.userOwner}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row description-block" ng-if="selected.keywords">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-tag.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">{{selected.keywords}}</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row description-block" ng-if="selected.keywords">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-tag.svg" alt="" />
-                                    </div>
-                                    <div class="col-sm-9 col-md-10 description-text">{{selected.keywords}}</div>
-                                </div>
-                            </div>
-                            <div class="block-action">
-                                <div class="row" style="padding-bottom: 5px;">
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <a class="btn btn-mapcontext"
-                                               ng-href="{{cstlUrl}}api/1/context/{{selected.id}}/export?token={{authToken}}"
-                                               data-placement="bottom"
-                                               title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
-                                                <i class="fa fa-download"></i>
-                                            </a>
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <button class="btn btn-mapcontext"
-                                                    type="button"
-                                                    ng-click="editMapContext()"
-                                                    data-placement="bottom"
-                                                    title="{{'layer.listing.selected.edit.button' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-pencil"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <button class="btn btn-mapcontext"
-                                                    type="button"
-                                                    ng-click="deleteMapContext()"
-                                                    data-placement="bottom"
-                                                    title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-trash"></i>
-                                            </button>
-                                        </span>
+                                    <div class="block-action">
+                                        <div class="row" style="padding-bottom: 5px;">
+                                            <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                                <span class="tooltipicon">
+                                                    <a class="btn btn-mapcontext"
+                                                       ng-href="{{cstlUrl}}api/1/context/{{selected.id}}/export?token={{authToken}}"
+                                                       data-placement="bottom"
+                                                       title="{{'layer.listing.selected.export.button' | translate }}" tooltip>
+                                                        <i class="fa fa-download"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                                <span class="tooltipicon">
+                                                    <button class="btn btn-mapcontext"
+                                                            type="button"
+                                                            ng-click="editMapContext()"
+                                                            data-placement="bottom"
+                                                            title="{{'layer.listing.selected.edit.button' | translate }}" tooltip>
+                                                        <i class="glyphicon glyphicon-pencil"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                                <span class="tooltipicon">
+                                                    <button class="btn btn-mapcontext"
+                                                            type="button"
+                                                            ng-click="deleteMapContext()"
+                                                            data-placement="bottom"
+                                                            title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                        <i class="glyphicon glyphicon-trash"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

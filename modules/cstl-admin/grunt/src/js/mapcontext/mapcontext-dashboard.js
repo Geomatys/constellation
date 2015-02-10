@@ -33,6 +33,7 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
         $scope.values = {
             selectedLayer : null
         };
+        $scope.currentTabInfo = 'view';
 
         $scope.initMapContextDashboard = function() {
             mapcontext.listLayers({}, function(response) {//success
@@ -60,6 +61,13 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                 $scope.hideScroll = (this.pageYOffset < 220);
                 $scope.$apply();
             });
+        };
+
+        /**
+         * Select tab in information block.
+         */
+        $scope.selectTabInfo = function(item) {
+            $scope.currentTabInfo = item;
         };
 
         /**

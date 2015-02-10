@@ -728,6 +728,11 @@
     "msg.no.selected.mapcontext": "Cliquez sur une composition cartographique pour afficher plus d'informations.",
     "msg.no.selected.style": "Cliquez sur un style ci-contre pour afficher plus d'informations.",
     "msg.no.selected.task": "Cliquez sur un traitement ci-contre pour afficher plus d'informations.",
+    "msg.no.selected.mapcontext.map":"Cliquez sur une fiche de métadonnées ci-contre pour la visualiser sur une carte.",
+    "msg.no.selected.style.map": "Cliquez sur un style ci-contre pour le visualiser.",
+    "msg.no.selected.style.assos": "Cliquez sur un style ci-contre pour afficher ses associations (Données, Couches).",
+    "msg.no.selected.metadata.map":"Cliquez sur une fiche de métadonnées ci-contre pour afficher sa donnée sur une carte.",
+
 
     "navtab.block.info.info":"Information",
     "navtab.block.info.view":"Vue",
