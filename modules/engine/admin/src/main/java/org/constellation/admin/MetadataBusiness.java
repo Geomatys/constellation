@@ -51,7 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
-@Component
+@Component("cstlMetadataBusiness")
 @Primary
 public class MetadataBusiness implements IMetadataBusiness {
 
