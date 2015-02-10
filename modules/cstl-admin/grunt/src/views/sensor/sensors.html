@@ -210,93 +210,96 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
-                    <div id="selection">
-                        <div class="alert alert-sos alert-info alert-data"
-                             ng-class="{hide: sensorCtrl.selectedSensor}">
-                            <h4 translate="label.no.selected.sensor">No selected sensor</h4>
-                            <p translate="msg.no.selected.sensor"
-                               style="font-weight:normal;">Click on a data to display more information</p>
-                        </div>
-                        <div class="selected-item"
-                             id="selected-item"
-                             ng-class="{hide: !sensorCtrl.selectedSensor}">
-                            <div class="block-header block-header-sos"
-                                 ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc"
-                                        title="{{sensorCtrl.selectedSensor.id}}">{{truncateTitleBlock(sensorCtrl.selectedSensor.id)}}</strong>
-                                <i class="fa fa-chevron-down pull-right"></i>
+
+                    <div id="block-information-right" style="padding: 10px;">
+                        <div id="section">
+                            <div class="alert alert-sos alert-info alert-data"
+                                 ng-class="{hide: sensorCtrl.selectedSensor}">
+                                <h4 translate="label.no.selected.sensor">No selected sensor</h4>
+                                <p translate="msg.no.selected.sensor"
+                                   style="font-weight:normal;">Click on a data to display more information</p>
                             </div>
-                            <div>
-                            <div class="block-content">
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-owner.svg" alt="" />
+                            <div class="selected-item"
+                                 id="selected-item"
+                                 ng-class="{hide: !sensorCtrl.selectedSensor}">
+                                <div class="block-header block-header-sos"
+                                     ng-click="toggleUpDownSelected()">
+                                    <strong class="item-title title-bloc"
+                                            title="{{sensorCtrl.selectedSensor.id}}">{{truncateTitleBlock(sensorCtrl.selectedSensor.id)}}</strong>
+                                    <i class="fa fa-chevron-down pull-right"></i>
+                                </div>
+                                <div>
+                                <div class="block-content">
+                                    <div class="row description-block">
+                                        <div class="col-sm-3 col-md-2">
+                                            <img src="img/block-content-owner.svg" alt="" />
+                                        </div>
+                                        <div class="col-sm-9 col-md-10 description-text">
+                                            <span>{{sensorCtrl.selectedSensor.owner}}</span>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{sensorCtrl.selectedSensor.owner}}</span>
+                                    <div class="row description-block">
+                                        <div class="col-sm-3 col-md-2">
+                                            <img src="img/block-content-date.svg" alt="" />
+                                        </div>
+                                        <div class="col-sm-9 col-md-10 description-text">
+                                            <span>{{sensorCtrl.selectedSensor.createDate | date:'yyyy-MM-dd'}}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-date.svg" alt="" />
-                                    </div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{sensorCtrl.selectedSensor.createDate | date:'yyyy-MM-dd'}}</span>
-                                    </div>
+                                <div class="block-content" ng-if="sensorCtrl.selectedSensorsChild">
+                                    <h6 translate="label.title">Title</h6>
+                                    <span>{{truncateTitleBlock(sensorCtrl.selectedSensorsChild.id)}}</span>
+                                    <div class="separator"></div>
+                                    <h6 translate="label.type">Type</h6>
+                                    <span translate="label.sensor">sensor</span>
                                 </div>
-                            </div>
-                            <div class="block-content" ng-if="sensorCtrl.selectedSensorsChild">
-                                <h6 translate="label.title">Title</h6>
-                                <span>{{truncateTitleBlock(sensorCtrl.selectedSensorsChild.id)}}</span>
-                                <div class="separator"></div>
-                                <h6 translate="label.type">Type</h6>
-                                <span translate="label.sensor">sensor</span>
-                            </div>
-                            </div>
-                            <div class="block-action">
-                                <div class="row">
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <button type="button"
-                                                    class="btn btn-sos"
-                                                    ng-click="displayMetadataSensorML()"
-                                                    data-placement="bottom"
-                                                    title="{{'sensor.metadata.listing.selected.view.button' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-file"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <button type="button"
-                                                    class="btn btn-sos"
-                                                    ng-click="displayMetadataSensorMLEditor();"
-                                                    data-placement="bottom"
-                                                    title="{{'sensor.metadata.listing.selected.edit.button' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-pencil"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <a class="btn btn-sos"
-                                               ng-href="{{sensorCtrl.cstlUrl}}api/1/sensor/metadata/download/{{sensorCtrl.selectedSensorsChild?sensorCtrl.selectedSensorsChild.id:sensorCtrl.selectedSensor.id}}?token={{authToken}}"
-                                               data-placement="bottom"
-                                               title="{{'sensor.metadata.listing.selected.export.button' | translate }}" tooltip>
-                                                <i class="fa fa-download"></i>
-                                            </a>
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <button type="button"
-                                                    class="btn btn-sos"
-                                                    ng-click="deleteSensor();"
-                                                    data-placement="bottom"
-                                                    title="{{'sensor.listing.selected.delete.button' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-trash"></i>
-                                            </button>
-                                        </span>
+                                </div>
+                                <div class="block-action">
+                                    <div class="row">
+                                        <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                            <span class="tooltipicon">
+                                                <button type="button"
+                                                        class="btn btn-sos"
+                                                        ng-click="displayMetadataSensorML()"
+                                                        data-placement="bottom"
+                                                        title="{{'sensor.metadata.listing.selected.view.button' | translate }}" tooltip>
+                                                    <i class="glyphicon glyphicon-file"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                            <span class="tooltipicon">
+                                                <button type="button"
+                                                        class="btn btn-sos"
+                                                        ng-click="displayMetadataSensorMLEditor();"
+                                                        data-placement="bottom"
+                                                        title="{{'sensor.metadata.listing.selected.edit.button' | translate }}" tooltip>
+                                                    <i class="glyphicon glyphicon-pencil"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                            <span class="tooltipicon">
+                                                <a class="btn btn-sos"
+                                                   ng-href="{{sensorCtrl.cstlUrl}}api/1/sensor/metadata/download/{{sensorCtrl.selectedSensorsChild?sensorCtrl.selectedSensorsChild.id:sensorCtrl.selectedSensor.id}}?token={{authToken}}"
+                                                   data-placement="bottom"
+                                                   title="{{'sensor.metadata.listing.selected.export.button' | translate }}" tooltip>
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                            <span class="tooltipicon">
+                                                <button type="button"
+                                                        class="btn btn-sos"
+                                                        ng-click="deleteSensor();"
+                                                        data-placement="bottom"
+                                                        title="{{'sensor.listing.selected.delete.button' | translate }}" tooltip>
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
