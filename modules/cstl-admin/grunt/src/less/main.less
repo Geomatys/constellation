@@ -1864,6 +1864,32 @@ p.error-select-one{
     padding: 10px;
     margin-bottom: 15px;
   }
+
+  .nav.nav-tabs{
+    li.tab-data, li.tab-metadata, li.tab-style{
+      a{
+        background-color: #F5F5F5;
+      }
+    }
+    li.tab-data.active a, li.tab-data:hover a{
+      background-color: #8ac1d4;
+    }
+    li.tab-metadata.active a, li.tab-metadata:hover a{
+      background-color: #e8bd94;
+    }
+
+    li.tab-style {
+      a{
+        border: solid 1px #dadada;
+        color: #4d4d4d;
+      }
+      &.active a, &:hover a{
+        background-color: #9e96c2;
+        color: #fff;
+        border: solid 1px #8f86b9;
+      }
+    }
+  }
 }
 
 

@@ -608,6 +608,10 @@
     "msg.no.selected.style": "Click on a style to display more information.",
     "msg.no.selected.task":"Click on a task to display more information.",
 
+    "navtab.block.info.info":"Information",
+    "navtab.block.info.view":"View",
+    "navtab.block.info.assos":"Associations",
+
     "server.choose.file": "Choose a file on the server",
     "server.create.button": "Create",
     "server.next.button": "Next",

@@ -460,20 +460,23 @@
                         </div>
                         <div class="pull-left" style="width: 40%;">
                         <div id="block-information-right">
+
+                            <!-- tabs -->
                             <div style="padding:0 10px;">
                                 <ul class="nav nav-tabs">
                                     <li class="tab-data" ng-click="selectTabInfo('view')" ng-class="{'active':dataCtrl.currentTabInfo==='view'}">
-                                        <a>View </a>
+                                        <a translate="navtab.block.info.view">View </a>
                                     </li>
                                     <li class="tab-data" ng-click="selectTabInfo('info')" ng-class="{'active':dataCtrl.currentTabInfo==='info'}">
-                                        <a>Information </a>
+                                        <a translate="navtab.block.info.info">Information </a>
                                     </li>
                                     <li class="tab-data" ng-click="selectTabInfo('assos')" ng-class="{'active':dataCtrl.currentTabInfo==='assos'}">
-                                        <a>Association </a>
+                                        <a translate="navtab.block.info.assos">Association </a>
                                     </li>
                                 </ul>
                             </div>
 
+                            <!-- map tab -->
                             <div class="sous-block-information" ng-show="dataCtrl.currentTabInfo==='view'">
                                 <div class="alert alert-info alert-data"
                                      ng-if="!dataCtrl.selectedDataSetChild">
@@ -484,6 +487,7 @@
                                 <div id="dataPreviewMap" class="dashboardmap data-dashboardmap" ng-show="dataCtrl.selectedDataSetChild"></div>
                             </div>
 
+                            <!-- info tab -->
                             <div class="sous-block-information" ng-show="dataCtrl.currentTabInfo==='info'">
                                 <div>
                                     <div class="alert alert-info alert-data"
@@ -610,7 +614,7 @@
                                 </div>
                             </div>
 
-
+                            <!-- associations tab -->
                             <div class="sous-block-information" ng-show="dataCtrl.currentTabInfo==='assos'">
 
                                 <div class="alert alert-info alert-data"

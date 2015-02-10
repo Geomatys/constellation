@@ -176,63 +176,107 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
-                    <div id="stylePreviewMap" class="dashboardmap style-dashboardmap"></div>
-                    <div id="selection">
-                        <div class="alert alert-info alert-style" ng-class="{hide: selected}">
-                            <h4 translate="label.no.selected.style">No selected style</h4>
-                            <p translate="msg.no.selected.style">Click on a style to display more information</p>
+
+                    <div id="block-information-right">
+                        <!-- tabs -->
+                        <div style="padding:0 10px;">
+                            <ul class="nav nav-tabs">
+                                <li class="tab-style" ng-click="selectTabInfo('view')" ng-class="{'active':styleCtrl.currentTabInfo==='view'}">
+                                    <a translate="navtab.block.info.view">View </a>
+                                </li>
+                                <li class="tab-style" ng-click="selectTabInfo('info')" ng-class="{'active':styleCtrl.currentTabInfo==='info'}">
+                                    <a translate="navtab.block.info.info">Information </a>
+                                </li>
+                                <li class="tab-style" ng-click="selectTabInfo('assos')" ng-class="{'active':styleCtrl.currentTabInfo==='assos'}">
+                                    <a translate="navtab.block.info.assos">Associations</a>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="selected-item" id="selected-item" ng-class="{hide: !selected}">
-                            <div class="block-header block-header-style" ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc"
-                                        title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
-                                <i class="fa fa-chevron-down pull-right"></i>
+
+                        <!-- map tab -->
+                        <div class="sous-block-information" ng-show="styleCtrl.currentTabInfo==='view'">
+                            <div class="alert alert-info alert-style"
+                                 ng-if="!selected">
+                                <h4 translate="label.no.selected.data">No selected data</h4>
+                                <p translate="msg.no.selected.data.map"
+                                   style="font-weight:normal;">Click on a data to display the map</p>
                             </div>
-                            <div class="block-content"
-                                 ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-owner.svg" alt="" />
-                                    </div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.Owner}}</span>
-                                    </div>
+                            <div id="stylePreviewMap" class="dashboardmap style-dashboardmap" ng-show="selected"></div>
+                        </div>
+
+                        <!-- info tab -->
+                        <div class="sous-block-information" ng-show="styleCtrl.currentTabInfo==='info'">
+                            <div>
+                                <div class="alert alert-info alert-style" ng-class="{hide:selected}">
+                                    <h4 translate="label.no.selected.style">No selected style</h4>
+                                    <p translate="msg.no.selected.style">Click on a style to display more information</p>
                                 </div>
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2"><img src="img/block-content-date.svg" alt="" /></div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
+                                <div class="selected-item" id="selected-item" ng-class="{hide: !selected}">
+                                    <div class="block-header block-header-style" ng-click="toggleUpDownSelected()">
+                                        <strong class="item-title title-bloc"
+                                                title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
+                                        <i class="fa fa-chevron-down pull-right"></i>
                                     </div>
+                                    <div class="block-content"
+                                         ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
+                                        <div class="row description-block">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-owner.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{selected.Owner}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row description-block">
+                                            <div class="col-sm-3 col-md-2"><img src="img/block-content-date.svg" alt="" /></div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="block-action block-action-style">
+                                        <div class="row" style="padding-bottom: 5px">
+                                            <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                                <span class="tooltipicon">
+                                                    <button type="button"
+                                                            id="editStyleBtn"
+                                                            class="btn btn-style"
+                                                            ng-click="editStyle()"
+                                                            data-placement="bottom"
+                                                            title="{{'style.listing.selected.edit.button' | translate }}" tooltip>
+                                                        <i class="glyphicon glyphicon-pencil"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                                <span class="tooltipicon">
+                                                    <button type="button"
+                                                            id="deleteStyleBtn"
+                                                            class="btn btn-style"
+                                                            ng-click="deleteStyle()"
+                                                            data-placement="bottom"
+                                                            title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
-                            <div class="block-action block-action-style">
-                                <div class="row" style="padding-bottom: 5px">
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <button type="button"
-                                                    id="editStyleBtn"
-                                                    class="btn btn-style"
-                                                    ng-click="editStyle()"
-                                                    data-placement="bottom"
-                                                    title="{{'style.listing.selected.edit.button' | translate }}" tooltip>
-                                                <i class="glyphicon glyphicon-pencil"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                        <span class="tooltipicon">
-                                            <button type="button"
-                                                    id="deleteStyleBtn"
-                                                    class="btn btn-style"
-                                                    ng-click="deleteStyle()"
-                                                    data-placement="bottom"
-                                                    title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
-                                                <i class="fa fa-trash-o"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                                </div>
+                        </div> <!-- info tab end-->
+
+
+                        <!-- associations tab -->
+                        <div class="sous-block-information" ng-show="styleCtrl.currentTabInfo==='assos'">
+                            <div class="alert alert-info alert-style"
+                                 ng-if="!selected">
+                                <h4 translate="label.no.selected.data">No selected data</h4>
+                                <p translate="msg.no.selected.data.assos"
+                                   style="font-weight:normal;">Click on a data to display data associations (Styles, Services, Sensors)</p>
                             </div>
+
                             <div ng-if="selected">
                                 <div class="row block-association"
                                      ng-init="assocData=false;assocLayer=false;">
@@ -242,18 +286,18 @@
                                             <div class="block-associated-nb">{{selected.dataList.length}}</div>
                                             <div class="block-associated-title"
                                                  translate="label.related.data">Associated Data</div>
-                                                <span class="fa icon-assoc-data"
-                                                      ng-class="{'selected':assocData,'fa-chevron-circle-up':assocData,'fa-chevron-circle-down':!assocData}"
-                                                      tooltip-placement="bottom"
-                                                      tooltip-html-unsafe="{{'label.show.data' | translate }}"></span>
+                                                            <span class="fa icon-assoc-data"
+                                                                  ng-class="{'selected':assocData,'fa-chevron-circle-up':assocData,'fa-chevron-circle-down':!assocData}"
+                                                                  tooltip-placement="bottom"
+                                                                  tooltip-html-unsafe="{{'label.show.data' | translate }}"></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div ng-if="assocData"
                                      class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
                                     <div id="linkedDataList" class="block-content" >
-                                        <span ng-show="selected.dataList.length == 0"
-                                              translate="label.no.association">No association</span>
+                                                    <span ng-show="selected.dataList.length == 0"
+                                                          translate="label.no.association">No association</span>
                                         <div ng-show="selected.dataList.length > 0"
                                              class="style btn-assoc-item"
                                              ng-repeat="data in selected.dataList"
@@ -281,18 +325,18 @@
                                             <div class="block-associated-nb">{{selected.layersList.length}}</div>
                                             <div class="block-associated-title"
                                                  translate="label.related.layer">Associated Layers</div>
-                                                <span class="fa icon-assoc-layer"
-                                                      ng-class="{'selected':assocLayer,'fa-chevron-circle-up':assocLayer,'fa-chevron-circle-down':!assocLayer}"
-                                                      tooltip-placement="bottom"
-                                                      tooltip-html-unsafe="{{'label.show.layers' | translate }}"></span>
+                                                            <span class="fa icon-assoc-layer"
+                                                                  ng-class="{'selected':assocLayer,'fa-chevron-circle-up':assocLayer,'fa-chevron-circle-down':!assocLayer}"
+                                                                  tooltip-placement="bottom"
+                                                                  tooltip-html-unsafe="{{'label.show.layers' | translate }}"></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div ng-if="assocLayer"
                                      class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
                                     <div id="linkedLayersList" class="block-content" >
-                                        <span ng-show="selected.layersList.length == 0"
-                                              translate="label.no.association">No association</span>
+                                                    <span ng-show="selected.layersList.length == 0"
+                                                          translate="label.no.association">No association</span>
                                         <div ng-show="selected.layersList.length > 0"
                                              class="style btn-assoc-item"
                                              ng-repeat="layer in selected.layersList"
@@ -313,7 +357,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> <!-- association tab end -->
                     </div>
                 </div>
             </div>

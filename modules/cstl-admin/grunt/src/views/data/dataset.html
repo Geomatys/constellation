@@ -346,109 +346,139 @@
                     </div>
                 </div>
             </div>
-            <div class="pull-left"
-                 style="width: 40%;">
-                <div id="metadataPreviewMap" class="dashboardmap metadata-dashboardmap"></div>
-                <div id="selection">
-                    <div class="alert alert-info alert-csw"
-                         ng-if="!selectedDS && !dataCtrl.selectedDataSetChild">
-                        <h4 translate="label.no.selected.metadata">No selected metadata</h4>
-                        <p style="font-weight:normal;"
-                           translate="msg.no.selected.metadata">Click on a metadata to display more information</p>
+            <div class="pull-left" style="width: 40%;">
+
+                <div id="block-information-right">
+
+                    <!-- tabs -->
+                    <div style="padding:0 10px;">
+                        <ul class="nav nav-tabs">
+                            <li class="tab-metadata" ng-click="selectTabInfo('view')" ng-class="{'active':dataCtrl.currentTabInfo==='view'}">
+                                <a translate="navtab.block.info.view">View </a>
+                            </li>
+                            <li class="tab-metadata" ng-click="selectTabInfo('info')" ng-class="{'active':dataCtrl.currentTabInfo==='info'}">
+                                <a translate="navtab.block.info.info">Information </a>
+                            </li>
+                        </ul>
                     </div>
-                    <div id="selected-item"
-                         class="selected-item"
-                         ng-if="selectedDS || dataCtrl.selectedDataSetChild">
-                        <div class="block-header block-header-md"
-                             ng-click="toggleUpDownSelectedMD()"
-                             ng-if="selectedDS">
-                            <strong class="item-title title-bloc"
-                                    title="{{selectedDS.Name}}">{{truncateTitleBlock(selectedDS.Name)}}</strong>
-                            <i class="fa fa-chevron-up pull-right"></i>
+
+                    <!-- map tab -->
+                    <div class="sous-block-information" ng-show="dataCtrl.currentTabInfo==='view'">
+                        <div class="alert alert-info alert-csw"
+                             ng-if="!dataCtrl.selectedDataSetChild">
+                            <h4 translate="label.no.selected.data">No selected data</h4>
+                            <p translate="msg.no.selected.data.map"
+                               style="font-weight:normal;">Click on a data to display the map</p>
                         </div>
-                        <div class="block-header block-header-md"
-                             ng-click="toggleUpDownSelectedMD()"
-                             ng-if="!selectedDS && dataCtrl.selectedDataSetChild">
-                            <strong class="item-title title-bloc"
-                                    title="{{dataCtrl.selectedDataSetChild.Name}}">{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</strong>
-                            <i class="fa fa-chevron-down pull-right"></i>
-                        </div>
+                        <div id="metadataPreviewMap" class="dashboardmap metadata-dashboardmap" ng-show="dataCtrl.selectedDataSetChild"></div>
+                    </div>
+
+                    <!-- info tab -->
+                    <div class="sous-block-information" ng-show="dataCtrl.currentTabInfo==='info'">
                         <div>
-                            <div class="block-content"
-                                 ng-if="selectedDS">
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-owner.svg" alt="" />
+                            <div class="alert alert-info alert-csw"
+                                 ng-if="!selectedDS && !dataCtrl.selectedDataSetChild">
+                                <h4 translate="label.no.selected.metadata">No selected metadata</h4>
+                                <p style="font-weight:normal;"
+                                   translate="msg.no.selected.metadata">Click on a metadata to display more information</p>
+                            </div>
+                            <div id="selected-item"
+                                 class="selected-item"
+                                 ng-if="selectedDS || dataCtrl.selectedDataSetChild">
+                                <div class="block-header block-header-md"
+                                     ng-click="toggleUpDownSelectedMD()"
+                                     ng-if="selectedDS">
+                                    <strong class="item-title title-bloc"
+                                            title="{{selectedDS.Name}}">{{truncateTitleBlock(selectedDS.Name)}}</strong>
+                                    <i class="fa fa-chevron-up pull-right"></i>
+                                </div>
+                                <div class="block-header block-header-md"
+                                     ng-click="toggleUpDownSelectedMD()"
+                                     ng-if="!selectedDS && dataCtrl.selectedDataSetChild">
+                                    <strong class="item-title title-bloc"
+                                            title="{{dataCtrl.selectedDataSetChild.Name}}">{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</strong>
+                                    <i class="fa fa-chevron-down pull-right"></i>
+                                </div>
+                                <div>
+                                    <div class="block-content"
+                                         ng-if="selectedDS">
+                                        <div class="row description-block">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-owner.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{selectedDS.Owner}}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{selectedDS.Owner}}</span>
+                                    <div class="block-content"
+                                         ng-class="{'block-vector':dataCtrl.selectedDataSetChild.Type=='VECTOR','block-raster':dataCtrl.selectedDataSetChild.Type=='COVERAGE'}"
+                                         ng-if="dataCtrl.selectedDataSetChild">
+                                        <h6 translate="label.title">Title</h6>
+                                        <span>{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</span>
+                                        <div class="row description-block">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-date.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{dataCtrl.selectedDataSetChild.Date | date:'yyyy-MM-dd'}}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="block-content"
-                                 ng-class="{'block-vector':dataCtrl.selectedDataSetChild.Type=='VECTOR','block-raster':dataCtrl.selectedDataSetChild.Type=='COVERAGE'}"
-                                 ng-if="dataCtrl.selectedDataSetChild">
-                                <h6 translate="label.title">Title</h6>
-                                <span>{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</span>
-                                <div class="row description-block">
-                                    <div class="col-sm-3 col-md-2">
-                                        <img src="img/block-content-date.svg" alt="" />
-                                    </div>
-                                    <div class="col-sm-9 col-md-10 description-text">
-                                        <span>{{dataCtrl.selectedDataSetChild.Date | date:'yyyy-MM-dd'}}</span>
+                                <div class="block-action">
+                                    <div class="row" style="padding-bottom: 5px">
+                                        <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                            <span class="tooltipicon">
+                                                <button type="button"
+                                                        id="seeMetadata"
+                                                        class="btn btn-csw"
+                                                        ng-click="displayMetadataFromMD()"
+                                                        data-placement="bottom"
+                                                        title="{{'dataset.metadata.listing.selected.view.button' | translate }}" tooltip>
+                                                    <i class="glyphicon glyphicon-file"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-3 col-md-2 tooltip-left-menu">
+                                            <span class="tooltipicon">
+                                                <button type="button"
+                                                        class="btn btn-csw"
+                                                        ng-click="displayMetadataEditor();"
+                                                        data-placement="bottom"
+                                                        title="{{'dataset.metadata.listing.selected.edit.button' | translate }}" tooltip>
+                                                    <i class="glyphicon glyphicon-pencil"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-3 col-md-2 tooltip-left-menu" ng-if="selectedDS && !dataCtrl.selectedDataSetChild">
+                                            <span class="tooltipicon">
+                                                <a id="exportMD"
+                                                   class="btn btn-csw"
+                                                   ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selectedDS.Name}}?token={{authToken}}"
+                                                   data-placement="bottom"
+                                                   title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </span>
+                                        </div>
+                                        <div class="col-sm-3 col-md-2 tooltip-left-menu" ng-if="dataCtrl.selectedDataSetChild">
+                                            <span class="tooltipicon">
+                                                <a id="exportMDChild"
+                                                   class="btn btn-csw"
+                                                   ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/metadata/iso/download/{{dataCtrl.selectedDataSetChild.Provider}}/{{dataCtrl.selectedDataSetChild.Id}}?token={{authToken}}"
+                                                   data-placement="bottom"
+                                                   title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="block-action">
-                            <div class="row" style="padding-bottom: 5px">
-                                <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                    <span class="tooltipicon">
-                                        <button type="button"
-                                                id="seeMetadata"
-                                                class="btn btn-csw"
-                                                ng-click="displayMetadataFromMD()"
-                                                data-placement="bottom"
-                                                title="{{'dataset.metadata.listing.selected.view.button' | translate }}" tooltip>
-                                            <i class="glyphicon glyphicon-file"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <div class="col-sm-3 col-md-2 tooltip-left-menu">
-                                    <span class="tooltipicon">
-                                        <button type="button"
-                                                class="btn btn-csw"
-                                                ng-click="displayMetadataEditor();"
-                                                data-placement="bottom"
-                                                title="{{'dataset.metadata.listing.selected.edit.button' | translate }}" tooltip>
-                                            <i class="glyphicon glyphicon-pencil"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <div class="col-sm-3 col-md-2 tooltip-left-menu" ng-if="selectedDS && !dataCtrl.selectedDataSetChild">
-                                    <span class="tooltipicon">
-                                        <a id="exportMD"
-                                           class="btn btn-csw"
-                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/metadata/dataset/{{selectedDS.Name}}?token={{authToken}}"
-                                           data-placement="bottom"
-                                           title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
-                                            <i class="fa fa-download"></i>
-                                        </a>
-                                    </span>
-                                </div>
-                                <div class="col-sm-3 col-md-2 tooltip-left-menu" ng-if="dataCtrl.selectedDataSetChild">
-                                    <span class="tooltipicon">
-                                        <a id="exportMDChild"
-                                           class="btn btn-csw"
-                                           ng-href="{{dataCtrl.cstlUrl}}api/1/domain/{{dataCtrl.domainId}}/data/metadata/iso/download/{{dataCtrl.selectedDataSetChild.Provider}}/{{dataCtrl.selectedDataSetChild.Id}}?token={{authToken}}"
-                                           data-placement="bottom"
-                                           title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
-                                            <i class="fa fa-download"></i>
-                                        </a>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+
+
                     </div>
                 </div>
             </div>

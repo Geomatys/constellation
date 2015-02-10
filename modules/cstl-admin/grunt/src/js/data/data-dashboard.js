@@ -86,6 +86,9 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             $scope.dataCtrl.currentTab = item;
         };
 
+        /**
+         * Select tab in information block.
+         */
         $scope.selectTabInfo = function(item) {
             $scope.dataCtrl.currentTabInfo = item;
         };
