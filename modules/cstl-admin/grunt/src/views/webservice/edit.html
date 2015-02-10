@@ -465,13 +465,16 @@
                                 <div  ng-if="service.type.toLowerCase() === 'wms' || service.type.toLowerCase() === 'wmts' || service.type.toLowerCase() === 'wfs' || service.type.toLowerCase() === 'wcs' ">
                                     <ul class="nav nav-tabs">
                                         <li class="tab-data" ng-click="selectTabInfo('view')" ng-class="{'active':currentTabInfo==='view'}">
-                                            <a translate="navtab.block.info.view">View </a>
+                                            <a class="hidden-xs hidden-sm" translate="navtab.block.info.view">View </a>
+                                            <a class="hidden-md hidden-lg fa fa-eye" style="font-size: 20px;"> </a>
                                         </li>
                                         <li class="tab-data" ng-click="selectTabInfo('info')" ng-class="{'active':currentTabInfo==='info'}">
-                                            <a translate="navtab.block.info.info">Information </a>
+                                            <a class="hidden-xs hidden-sm" translate="navtab.block.info.info">Information </a>
+                                            <a class="hidden-md hidden-lg fa fa-info-circle" style="font-size: 20px;"> </a>
                                         </li>
                                         <li class="tab-data" ng-click="selectTabInfo('assos')" ng-class="{'active':currentTabInfo==='assos'}" ng-if="service.type.toLowerCase() === 'wms'">
-                                            <a translate="navtab.block.info.assos">Association </a>
+                                            <a class="hidden-xs hidden-sm" translate="navtab.block.info.assos">Association </a>
+                                            <a class="hidden-md hidden-lg fa fa-link" style="font-size: 20px;"> </a>
                                         </li>
                                     </ul>
                                 </div>
