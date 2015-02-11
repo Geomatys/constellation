@@ -275,14 +275,18 @@ public class TemplateReader extends AbstractTemplateHandler {
         if (type != null) {
             value      = convert(node.name, type, value);
             if (type == ReferenceSystem.class || (metadata instanceof ReferenceSystem) || (metadata instanceof TimePeriodType) || (metadata instanceof TimePositionType)) {
-                final Method setter = ReflectionUtilities.getSetterFromName(node.name, value.getClass(), metadata.getClass());
-                if (setter != null) {
-                    if (setter.getParameterTypes()[0] == Collection.class) {
-                        value = Arrays.asList(value);
+                if (value != null) {
+                    final Method setter = ReflectionUtilities.getSetterFromName(node.name, value.getClass(), metadata.getClass());
+                    if (setter != null) {
+                        if (setter.getParameterTypes()[0] == Collection.class) {
+                            value = Arrays.asList(value);
+                        }
+                        ReflectionUtilities.invokeMethod(setter, metadata, value);
+                    } else {
+                        LOGGER.warning("Unable to find a setter for:" + node.name + " in " + metadata.getClass().getName());
                     }
-                    ReflectionUtilities.invokeMethod(setter, metadata, value);
                 } else {
-                    LOGGER.warning("Unable to find a setter for:" + node.name + " in " + metadata.getClass().getName());
+                    LOGGER.warning("TODO find a setter for null values");
                 }
             } else {
                 final Map<String,Object> values = asMap(metadata);

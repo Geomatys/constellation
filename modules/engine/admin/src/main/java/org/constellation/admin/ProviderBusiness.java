@@ -335,7 +335,12 @@ public class ProviderBusiness implements IProviderBusiness {
                 boolean foundProvider = false;
                 try {
                     
-                    final Path filePath = Paths.get(inParams.get("path"));
+                    final Path filePath;
+                    if (inParams.get("path") != null) {
+                        filePath = Paths.get(inParams.get("path"));
+                    } else {
+                        filePath = null;
+                    }
                     URL url = null;
                     if (filePath != null) {
                         url = filePath.toUri().toURL();
@@ -394,9 +399,6 @@ public class ProviderBusiness implements IProviderBusiness {
                         }
                     }
 
-                    if(!foundProvider) {
-                        throw new ConfigurationException("No provider found to resolve the data!");
-                    }
 
                     if (subType!=null && !subType.isEmpty()) {
                         if (url != null) {
@@ -406,7 +408,13 @@ public class ProviderBusiness implements IProviderBusiness {
                         final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
                         final ParameterValueGroup choice = ParametersExt.getOrCreateGroup(sources.groups("choice").get(0),cvgConfig.getDescriptor().getName().getCode());
                         Parameters.copy(cvgConfig, choice);
+                        foundProvider = true;
                     }
+                    
+                    if(!foundProvider) {
+                        throw new ConfigurationException("No provider found to resolve the data!");
+                    }
+                    
                 } catch (MalformedURLException e) {
                     LOGGER.log(Level.WARNING, "unable to create url from path", e);
                 }
