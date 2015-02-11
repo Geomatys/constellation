@@ -1129,6 +1129,7 @@
     "task.history.state":"State",
     "task.history.error.msg":"Error message",
     "tasks.history.show.error":"Show error message",
+    "tasks.history.show.success":"Show outputs",
     "task.start":"Start date:",
     "task.end":"End date:",
 

@@ -20,10 +20,13 @@
             <div ng-if="showOutputs">
                 <div class="row" style="margin-top: 15px;">
                     <div class="col-xs-12 col-md-6">
-                        <span style="font-weight: bold;">Output</span>:
+                        <h5 style="font-weight: bold;">Outputs :</h5>
                     </div>
                 </div>
-                <pre class="code-pre">{{taskStatus.output}}</pre>
+                <div ng-repeat='(key, value) in taskStatus.output track by key'>
+                    <span style="font-weight: bold;">{{key}}</span>
+                    <pre class="code-pre">{{value}}</pre>
+                </div>
             </div>
 
             <div ng-if="showMessage">

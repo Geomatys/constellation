@@ -220,6 +220,15 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
                 status.status === 'SUCCEED');
         };
 
+        $scope.messageType = function(status) {
+            if (status.status === 'FAILED' || status.status === 'CANCELLED') {
+                return 'tasks.history.show.error';
+            }
+            if (status.status === 'SUCCEED') {
+                return 'tasks.history.show.success';
+            }
+        };
+
         $scope.truncate = function(small, text){
             if(text) {
                 if (window.innerWidth >= 1200) {

@@ -1104,6 +1104,7 @@
     "task.history.state":"Etat",
     "task.history.error.msg":"Message d'erreur",
     "tasks.history.show.error":"Voir le message d'erreur",
+    "tasks.history.show.success":"Voir les sorties",
     "task.start":"Date de début:",
     "task.end":"Date de fin:",
 

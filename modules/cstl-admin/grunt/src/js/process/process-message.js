@@ -37,11 +37,17 @@ angular.module('cstl-process-message', ['ui.bootstrap.modal'])
         }
 
         function init() {
-            if ($scope.taskStatus.output !== null && angular.isString($scope.taskStatus.output)) {
+            if (checkNullEmpty($scope.taskStatus.output)) {
                 $scope.taskStatus.output = angular.fromJson($scope.taskStatus.output);
             }
 
-            $scope.showOutputs = checkNullEmpty($scope.taskStatus.output);
+            if (angular.isArray($scope.taskStatus.output) && $scope.taskStatus.output.length > 0) {
+                $scope.taskStatus.output = $scope.taskStatus.output[0];
+                $scope.showOutputs = true;
+            } else {
+                $scope.showOutputs = checkNullEmpty($scope.taskStatus.output);
+            }
+
             $scope.showMessage = checkNullEmpty($scope.taskStatus.message);
         }
 

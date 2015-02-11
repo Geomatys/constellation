@@ -180,31 +180,31 @@
                                     <h6 translate="task.history">History</h6>
 
                                     <div class="row description-block">
-                                       <table class="table table-condensed table-hover task-history"
-                                              fixed-header table-height="215px" ng-model="selected.statusList">
-                                           <thead>
-                                                <tr>
-                                                    <th translate="task.history.date">Date</th>
-                                                    <th translate="task.history.state">Status</th>
-                                                    <th></th>
-                                                </tr>
-                                           </thead>
-                                           <tbody>
-                                               <tr ng-repeat="status in selected.statusList | filter:statusHistoryFilter | orderBy:-end:false"
-                                                       ng-class="statusClass(status)"
-                                                       style="line-height: 20px">
-                                                   <td>{{status.end | date:"dd/MM/yyyy h:mma"}}</td>
-                                                   <td>{{status.status}}</td>
-                                                   <td>
+                                        <table class="table table-condensed table-hover task-history"
+                                               fixed-header table-height="215px" ng-model="selected.statusList">
+                                            <thead>
+                                            <tr>
+                                                <th translate="task.history.date">Date</th>
+                                                <th translate="task.history.state">Status</th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="status in selected.statusList | filter:statusHistoryFilter | orderBy:-end:false"
+                                                ng-class="statusClass(status)"
+                                                style="line-height: 20px">
+                                                <td>{{status.end | date:"dd/MM/yyyy h:mma"}}</td>
+                                                <td>{{status.status}}</td>
+                                                <td>
                                                        <span ng-click="showMessage(status)"
-                                                             title="{{'tasks.history.show.error' | translate }}" tooltip
+                                                             title="{{messageType(status) | translate }}" tooltip
                                                              style="display: inline-block; cursor: pointer;">
                                                            <i class="glyphicon glyphicon-info-sign"/>
                                                        </span>
-                                                   </td>
-                                               </tr>
-                                           </tbody>
-                                       </table>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
