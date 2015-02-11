@@ -204,8 +204,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      */
     private final static List<String> DEFAULT_CRS = new ArrayList<>();
     static {
-        DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
-        DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
+        DEFAULT_CRS.add("urn:ogc:def:crs:EPSG:7.01:4326");
+        DEFAULT_CRS.add("urn:ogc:def:crs:EPSG:7.01:3395");
     }
 
     private List<StoredQueryDescription> storedQueries = new ArrayList<>();
@@ -447,14 +447,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
 
             if (id != null) {
-                defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
+                defaultCRS = "urn:ogc:def:crs:" + id.replaceAll(":", ":7.01:");
 //                final String defaultCRS = IdentifiedObjects.lookupIdentifier(Citations.URN_OGC,
 //                        type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
             } else {
-                defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+                defaultCRS = "urn:ogc:def:crs:EPSG:7.01:4326";
             }
         } else {
-            defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+            defaultCRS = "urn:ogc:def:crs:EPSG:7.01:4326";
         }
         return defaultCRS;
     }

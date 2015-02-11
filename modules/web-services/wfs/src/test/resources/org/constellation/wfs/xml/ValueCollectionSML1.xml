@@ -3,19 +3,19 @@
     <wfs:member>
         <sml:Input>
             <gml:name>level</gml:name>
-            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+            <gml:description>urn:ogc:def:phenomenon:OGC:level</gml:description>
         </sml:Input>
     </wfs:member>
     <wfs:member>
         <sml:Input>
             <gml:name>level</gml:name>
-            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+            <gml:description>urn:ogc:def:phenomenon:OGC:level</gml:description>
         </sml:Input>
     </wfs:member>
     <wfs:member>
         <sml:Input>
             <gml:name>height</gml:name>
-            <gml:description>urn:x-ogc:def:phenomenon:OGC:height</gml:description>
+            <gml:description>urn:ogc:def:phenomenon:OGC:height</gml:description>
         </sml:Input>
     </wfs:member>
 </wfs:ValueCollection>

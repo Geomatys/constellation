@@ -211,7 +211,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(31.08, 68.87))));
         points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(32.19, 71.96))));
 
-        EqualsType equals = new EqualsType("http://cite.opengeospatial.org/gmlsf:multiPointProperty", new MultiPointType("urn:x-ogc:def:crs:EPSG:4326", points));
+        EqualsType equals = new EqualsType("http://cite.opengeospatial.org/gmlsf:multiPointProperty", new MultiPointType("urn:ogc:def:crs:EPSG:4326", points));
         FilterType f = new FilterType(equals);
         queries.add(new QueryType(f, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature")), "1.1.0"));
         GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
@@ -233,12 +233,12 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
 
         queries = new ArrayList<QueryType>();
-        BBOXType bbox = new BBOXType("http://cite.opengeospatial.org/gmlsf:pointProperty", 30, -12, 60, -6, "urn:x-ogc:def:crs:EPSG:4326");
+        BBOXType bbox = new BBOXType("http://cite.opengeospatial.org/gmlsf:pointProperty", 30, -12, 60, -6, "urn:ogc:def:crs:EPSG:4326");
         PropertyIsEqualToType propEqual = new PropertyIsEqualToType(new LiteralType("name-f015"), new PropertyNameType("http://www.opengis.net/gml:name"), Boolean.TRUE);
         AndType and = new AndType(bbox, propEqual);
         f = new FilterType(and);
         QueryType query = new QueryType(f, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature")), "1.1.0");
-        query.setSrsName("urn:x-ogc:def:crs:EPSG:6.11:32629");
+        query.setSrsName("urn:ogc:def:crs:EPSG:6.11:32629");
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 

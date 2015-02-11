@@ -32,7 +32,7 @@
                     <sml:input>
                         <sml:Input>
                             <gml:name>level</gml:name>
-                            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+                            <gml:description>urn:ogc:def:phenomenon:OGC:level</gml:description>
                         </sml:Input>
                     </sml:input>
                 </sml:InputList>
@@ -42,19 +42,19 @@
                     <sml:output>
                         <sml:Output>
                             <gml:name>time</gml:name>
-                            <gml:description>urn:x-ogc:def:phenomenon:observationTime</gml:description>
+                            <gml:description>urn:ogc:def:phenomenon:observationTime</gml:description>
                         </sml:Output>
                     </sml:output>
                     <sml:output>
                         <sml:Output>
                             <gml:name>depth</gml:name>
-                            <gml:description>urn:x-ogc:def:phenomenon:OGC:depth</gml:description>
+                            <gml:description>urn:ogc:def:phenomenon:OGC:depth</gml:description>
                         </sml:Output>
                     </sml:output>
                     <sml:output>
                         <sml:Output>
                             <gml:name>validity</gml:name>
-                            <gml:description>urn:x-ogc:def:phenomenon:BRGM:validity</gml:description>
+                            <gml:description>urn:ogc:def:phenomenon:BRGM:validity</gml:description>
                         </sml:Output>
                     </sml:output>
                 </sml:OutputList>

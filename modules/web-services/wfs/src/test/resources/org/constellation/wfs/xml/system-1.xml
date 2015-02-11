@@ -15,9 +15,9 @@
     <sml:phenomenons>validity</sml:phenomenons>
     <sml:smltype>System</sml:smltype>
     <sml:smlref>http://ades.eaufrance.fr/FichePtEau.aspx?code=10972X0137/PONT</sml:smlref>
-    <sml:inputs name="level">urn:x-ogc:def:phenomenon:OGC:level</sml:inputs>
-    <sml:outputs name="time">urn:x-ogc:def:phenomenon:observationTime</sml:outputs>
-    <sml:outputs name="validity">urn:x-ogc:def:phenomenon:BRGM:validity</sml:outputs>
-    <sml:outputs name="depth">urn:x-ogc:def:phenomenon:OGC:depth</sml:outputs>
+    <sml:inputs name="level">urn:ogc:def:phenomenon:OGC:level</sml:inputs>
+    <sml:outputs name="time">urn:ogc:def:phenomenon:observationTime</sml:outputs>
+    <sml:outputs name="validity">urn:ogc:def:phenomenon:BRGM:validity</sml:outputs>
+    <sml:outputs name="depth">urn:ogc:def:phenomenon:OGC:depth</sml:outputs>
     <sml:producer name="BRGM">BLAISE Marion (BRGM)</sml:producer>
 </sml:System>
