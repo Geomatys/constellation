@@ -91,9 +91,11 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          */
         $scope.selectTabInfo = function(item) {
             $scope.dataCtrl.currentTabInfo = item;
-            setTimeout(function(){
-                $scope.showDataDashboardMap();
-            },300);
+            if(item==='view'){
+                setTimeout(function(){
+                    $scope.showDataDashboardMap();
+                },300);
+            }
         };
 
         /**

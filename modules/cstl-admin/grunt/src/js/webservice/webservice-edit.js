@@ -53,9 +53,11 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
          */
         $scope.selectTabInfo = function(item) {
             $scope.currentTabInfo = item;
-            setTimeout(function(){
-                $scope.showLayerDashboardMap();
-            },300);
+            if(item==='view') {
+                setTimeout(function () {
+                    $scope.showLayerDashboardMap();
+                }, 300);
+            }
         };
 
         $scope.getCurrentLang = function() {

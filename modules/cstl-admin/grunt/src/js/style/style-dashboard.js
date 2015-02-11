@@ -78,10 +78,11 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
          */
         $scope.selectTabInfo = function(item) {
             $scope.styleCtrl.currentTabInfo = item;
-            setTimeout(function(){
-                $scope.previewStyledData(null,false);
-            },300);
-
+            if(item==='view') {
+                setTimeout(function () {
+                    $scope.previewStyledData(null, false);
+                }, 300);
+            }
         };
 
         /**
