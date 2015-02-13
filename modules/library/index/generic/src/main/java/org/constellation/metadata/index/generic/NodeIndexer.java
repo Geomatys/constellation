@@ -304,7 +304,7 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
 
     @Override
     public void destroy() {
-        LOGGER.info("shutting down Node indexer");
+        LOGGER.log(logLevel, "shutting down Node indexer");
         super.destroy();
     }
 

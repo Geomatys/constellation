@@ -306,7 +306,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
 
     @Override
     public AcknowlegementType importRecords(final String id, final File f, final String fileName) throws ConfigurationException {
-        LOGGER.info("Importing record");
+        LOGGER.finer("Importing record");
         final AbstractIndexer indexer = getIndexer(id, null);
         try {
             final MetadataWriter writer = getWriter(id, indexer);
