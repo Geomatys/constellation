@@ -751,7 +751,7 @@ public class TemplateWriterTest {
         TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
         
         writer.writeTemplate(root, metadata, false);
-        
-        
+    
+    
     }
 }

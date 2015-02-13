@@ -292,6 +292,7 @@ public class TemplateTree {
                 blockCount++;
                 if (block.getBlock().childrenEmpty()) {
                     sb.removeBlock(block);
+                    blockCount--;
                 }
             }
             if (sb.childrenEmpty()) {
@@ -309,6 +310,7 @@ public class TemplateTree {
 
         if (blockNodes.isEmpty()) {
             owner.removeBlock(blockObj);
+            blockCount--;
         }
         
         for (int i = 0; i < blockNodes.size(); i++) {
