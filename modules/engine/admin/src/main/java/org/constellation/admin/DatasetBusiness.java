@@ -616,20 +616,11 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                     }
                 }
                 if (remove) {
-                    //notify pre delete
-                    for (Data pdata : providerData) {
-                        dataBusinessListener.preDataDelete(pdata);
-                    }
-
                     final Provider p = providerRepository.findOne(providerID);
                     final DataProvider dp = DataProviders.getInstance().getProvider(p.getIdentifier());
-                    DataProviders.getInstance().removeProvider(dp);
-                    providerRepository.delete(providerID);
 
-                    //notify post delete
-                    for (Data pdata : providerData) {
-                        dataBusinessListener.postDataDelete(pdata);
-                    }
+                    //will remove provider from cache, delete data and delete provider from database.
+                    DataProviders.getInstance().removeProvider(dp);
 
                     final File provDir = ConfigDirectory.getDataIntegratedDirectory(p.getIdentifier());
                     FileUtilities.deleteDirectory(provDir);
