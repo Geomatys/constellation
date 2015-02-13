@@ -262,7 +262,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                     showInput: true,
                     allowEmpty: true,
                     showAlpha: true,
-                    preferredFormat: "hex",
+                    preferredFormat: "hex8",
                     showButtons: false,
                     change: function(color) {
                         scope.$eval(attrs.oncolorchanged || '', { value: color });

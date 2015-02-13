@@ -19,6 +19,7 @@
 
 package org.constellation.json.binding;
 
+import org.constellation.json.util.StyleUtilities;
 import org.geotoolkit.filter.DefaultLiteral;
 
 import java.awt.*;
@@ -53,7 +54,7 @@ public final class InterpolationPoint implements StyleElement<org.geotoolkit.sty
 		if(interpolationPoint.getValue() instanceof DefaultLiteral){
 			final Object obj = ((DefaultLiteral)interpolationPoint.getValue()).getValue();
 			if(obj instanceof Color){
-				color = "#"+Integer.toHexString(((Color)obj).getRGB()).substring(2);
+                color = StyleUtilities.toHex((Color) obj);
 			}
 		}
     }

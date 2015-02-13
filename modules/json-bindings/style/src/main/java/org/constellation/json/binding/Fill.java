@@ -20,6 +20,7 @@
 package org.constellation.json.binding;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.json.util.StyleUtilities;
 import org.geotoolkit.cql.CQL;
 import org.opengis.filter.expression.Expression;
 
@@ -51,7 +52,7 @@ public final class Fill implements StyleElement<org.opengis.style.Fill> {
     public Fill(final org.opengis.style.Fill fill) {
         ensureNonNull("fill", fill);
         final Color col = fill.getColor().evaluate(null, Color.class);
-        color = String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
+        color = StyleUtilities.toHex(col);
         final Expression opacityExp = fill.getOpacity();
         if(opacityExp != null){
             opacity = CQL.write(opacityExp);

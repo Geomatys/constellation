@@ -1894,7 +1894,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 if(palette.nan.color){
                     colorMap.function.nanColor = palette.nan.color;
                 }else {
-                    colorMap.function.nanColor = '#ffffff';
+                    colorMap.function.nanColor = '#00ffffff';
                 }
             }else {
                 colorMap.function.nanColor = null;

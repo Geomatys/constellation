@@ -19,6 +19,7 @@
 package org.constellation.json.binding;
 
 
+import org.constellation.json.util.StyleUtilities;
 import org.geotoolkit.cql.CQL;
 
 import java.awt.*;
@@ -61,7 +62,7 @@ public class PieSymbolizer implements Symbolizer {
             for (final org.geotoolkit.display2d.ext.pie.PieSymbolizer.ColorQuarter colorQuarter : symbolizer.getColorQuarters()) {
                 final ColorQuarter colorQuarterToAdd = new ColorQuarter();
                 final Color color = colorQuarter.getColor().evaluate(null, Color.class);
-                final String colorHex = String.format("#%06X", (0xFFFFFF & color.getRGB()));
+                final String colorHex = StyleUtilities.toHex(color);
                 colorQuarterToAdd.setColor(colorHex);
                 colorQuarterToAdd.setQuarter(colorQuarter.getQuarter().evaluate(null, String.class));
                 colorQuarters.add(colorQuarterToAdd);

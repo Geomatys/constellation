@@ -133,7 +133,21 @@ public final class StyleUtilities extends Static {
     }
 
     public static String toHex(final Color color) {
-        return String.format("#%06X", (0xFFFFFF & color.getRGB()));
+        String redCode = Integer.toHexString(color.getRed());
+        String greenCode = Integer.toHexString(color.getGreen());
+        String blueCode = Integer.toHexString(color.getBlue());
+        if (redCode.length() == 1)      redCode = "0" + redCode;
+        if (greenCode.length() == 1)    greenCode = "0" + greenCode;
+        if (blueCode.length() == 1)     blueCode = "0" + blueCode;
+
+        int alpha = color.getAlpha();
+        if(alpha != 255){
+            String alphaCode = Integer.toHexString(alpha);
+            if (alphaCode.length() == 1) alphaCode = "0" + alphaCode;
+            return "#" + alphaCode + redCode + greenCode + blueCode;
+        }else{
+            return "#" + redCode + greenCode + blueCode;
+        }
     }
 
     public static final Symbolizer DEFAULT_POINT_SYMBOLIZER        = new PointSymbolizer();

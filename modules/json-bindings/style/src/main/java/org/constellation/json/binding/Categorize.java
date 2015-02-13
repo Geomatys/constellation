@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.constellation.json.util.StyleUtilities;
 import org.geotoolkit.filter.DefaultLiteral;
 import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.function.ThreshholdsBelongTo;
@@ -63,7 +64,7 @@ public class Categorize implements Function{
 
                 if(colorHexExp instanceof DefaultLiteral){
                     final Object colorHex = ((DefaultLiteral)colorHexExp).getValue();
-                    ip.setColor("#"+Integer.toHexString(((Color)colorHex).getRGB()).substring(2));
+                    ip.setColor(StyleUtilities.toHex((Color)colorHex));
                 }
 
                 if(expression instanceof DefaultLiteral){

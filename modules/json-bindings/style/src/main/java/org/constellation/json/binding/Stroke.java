@@ -30,6 +30,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
 import static org.constellation.json.util.StyleUtilities.literal;
 import static org.constellation.json.util.StyleUtilities.parseExpression;
+import static org.constellation.json.util.StyleUtilities.toHex;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -57,7 +58,7 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
     public Stroke(final org.opengis.style.Stroke stroke) {
         ensureNonNull("stroke", stroke);
         final Color col = stroke.getColor().evaluate(null, Color.class);
-        color = String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
+        color = toHex(col);
         final Expression opacityExp = stroke.getOpacity();
         if(opacityExp != null){
             opacity = CQL.write(opacityExp);

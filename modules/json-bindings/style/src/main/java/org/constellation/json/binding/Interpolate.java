@@ -19,6 +19,7 @@
 
 package org.constellation.json.binding;
 
+import org.constellation.json.util.StyleUtilities;
 import org.geotoolkit.filter.DefaultLiteral;
 import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.function.Method;
@@ -58,7 +59,7 @@ public final class Interpolate implements Function {
                 if(nanColor == null && point.getData() instanceof Double && Double.isNaN((double) point.getData())){
                     if(point.getValue() instanceof DefaultLiteral){
                         final Object colorHex = ((DefaultLiteral)point.getValue()).getValue();
-                        nanColor = "#"+Integer.toHexString(((Color)colorHex).getRGB()).substring(2);
+                        nanColor = StyleUtilities.toHex(((Color)colorHex));
                     }
                 }
             }
@@ -138,7 +139,7 @@ public final class Interpolate implements Function {
                     final double val = min + (coefficient * i);
                     final Color color = inter.evaluate(val, Color.class);
                     final InterpolationPoint point = new InterpolationPoint();
-                    point.setColor("#"+Integer.toHexString(color.getRGB()).substring(2));
+                    point.setColor(StyleUtilities.toHex((color)));
                     point.setData(val);
                     recomputePoints.add(point);
                 }
@@ -148,4 +149,5 @@ public final class Interpolate implements Function {
         return SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(recomputePoints), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
         
     }
+
 }
