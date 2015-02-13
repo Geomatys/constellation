@@ -33,12 +33,16 @@ import org.constellation.json.JsonMetadataConstants;
 import org.constellation.json.metadata.ParseException;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.gml.xml.AbstractTimePosition;
+import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gts.xml.PeriodDurationType;
 import org.geotoolkit.metadata.MetadataFactory;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
 import org.opengis.referencing.ReferenceSystem;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 import org.opengis.temporal.PeriodDuration;
 import org.opengis.temporal.TemporalPrimitive;
 import org.opengis.util.CodeList;
@@ -152,7 +156,7 @@ public class TemplateReader extends AbstractTemplateHandler {
             return null;
         }
         // special types
-        if (metadata instanceof ReferenceSystemMetadata || metadata instanceof TimePeriodType || metadata instanceof TimePositionType) {
+        if (metadata instanceof ReferenceSystemMetadata || metadata instanceof Period || metadata instanceof AbstractTimePosition || metadata instanceof Instant) {
             final Method getter = ReflectionUtilities.getGetterFromName(node.name, metadata.getClass());
             return ReflectionUtilities.invokeMethod(metadata, getter);
             
@@ -274,7 +278,12 @@ public class TemplateReader extends AbstractTemplateHandler {
         Class type = getType(metadata, node);
         if (type != null) {
             value      = convert(node.name, type, value);
-            if (type == ReferenceSystem.class || (metadata instanceof ReferenceSystem) || (metadata instanceof TimePeriodType) || (metadata instanceof TimePositionType)) {
+            if (type == ReferenceSystem.class || 
+               (metadata instanceof ReferenceSystem) ||
+               (metadata instanceof Period) ||
+               (metadata instanceof AbstractTimePosition) || 
+               (metadata instanceof Instant)) {
+                
                 if (value != null) {
                     final Method setter = ReflectionUtilities.getSetterFromName(node.name, value.getClass(), metadata.getClass());
                     if (setter != null) {
@@ -303,7 +312,7 @@ public class TemplateReader extends AbstractTemplateHandler {
             return readType(node);
         }
         Class type;
-        if (metadata instanceof ReferenceSystemMetadata || metadata instanceof TimePeriodType || metadata instanceof TimePositionType) {
+        if (metadata instanceof ReferenceSystemMetadata || metadata instanceof Period || metadata instanceof AbstractTimePosition || metadata instanceof Instant) {
             final Method getter = ReflectionUtilities.getGetterFromName(node.name, metadata.getClass());
             return getter.getReturnType();
         } else {
@@ -326,6 +335,8 @@ public class TemplateReader extends AbstractTemplateHandler {
                 return new TimePeriodType();
             } else if (type == TimePositionType.class) {
                 return new TimePositionType();    
+            } else if (type == TimeInstantType.class) {
+                return new TimeInstantType();    
                 
             } else if (type != null) {
                 return factory.create(type, Collections.<String,Object>emptyMap());

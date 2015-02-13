@@ -30,6 +30,7 @@ import org.apache.sis.metadata.iso.quality.DefaultFormatConsistency;
 import org.apache.sis.metadata.iso.quality.DefaultQuantitativeResult;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.json.metadata.binding.RootObj;
+import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.util.FileUtilities;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -721,6 +722,36 @@ public class TemplateWriterTest {
         String resultJson = FileUtilities.getStringFromFile(resultFile);
         
         assertEquals(expectedJson, resultJson);
+        
+    }
+    
+    @Test
+    public void testWriteSpecialType2() throws IOException {
+        
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_special_type.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        final ReferenceSystemMetadata rs = new ReferenceSystemMetadata(new DefaultIdentifier("EPSG:4326"));
+        metadata.setReferenceSystemInfo(Arrays.asList(rs));
+        
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        
+        final DefaultExtent ex = new DefaultExtent();
+        final DefaultTemporalExtent tex = new DefaultTemporalExtent();
+        tex.setExtent(new TimeInstantType(new Date(System.currentTimeMillis())));
+        ex.setTemporalElements(Arrays.asList(tex));
+        dataIdent.setExtents(Arrays.asList(ex));
+        metadata.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        writer.writeTemplate(root, metadata, false);
+        
         
     }
 }

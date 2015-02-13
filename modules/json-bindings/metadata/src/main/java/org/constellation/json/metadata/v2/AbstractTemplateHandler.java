@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.TypeValuePolicy;
 import org.apache.sis.metadata.ValueExistencePolicy;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.json.metadata.ParseException;
 import org.opengis.metadata.citation.Responsibility;
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -31,6 +33,7 @@ import org.opengis.metadata.spatial.VectorSpatialRepresentation;
  */
 public class AbstractTemplateHandler {
     
+    protected static final Logger LOGGER = Logging.getLogger(AbstractTemplateHandler.class);
     /**
      * The metadata standard.
      */

@@ -26,7 +26,8 @@ import static org.constellation.json.JsonMetadataConstants.DATE_READ_ONLY;
 import org.constellation.json.metadata.ParseException;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.util.ReflectionUtilities;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 import org.opengis.util.Enumerated;
 
 /**
@@ -120,7 +121,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
     }
     
     private Object getValue(final ValueNode node, Object metadata,  Map<String, Set<Object>> excluded) throws ParseException {
-        if (metadata instanceof AbstractMetadata && !(metadata instanceof TimePeriodType)) {
+        if (metadata instanceof AbstractMetadata && !(metadata instanceof Period) && !(metadata instanceof Instant)) {
             Object obj = asFullMap(metadata).get(node.name);
             if (obj instanceof Collection) {
                 final Collection result = new ArrayList<>(); 
@@ -141,7 +142,8 @@ public class TemplateWriter extends AbstractTemplateHandler {
             if (getter != null) {
                 return ReflectionUtilities.invokeMethod(metadata, getter);
             }
-            throw new UnsupportedOperationException("Not an AbstractMetadata class:" + metadata.getClass().getName() + " TODO");
+            LOGGER.warning("Unable to find:" + metadata.getClass().getName() + " getter for:" + node.name);
+            return null;
             
         } else {
             return null;
