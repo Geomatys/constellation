@@ -315,6 +315,23 @@ public class StyleBusiness implements IStyleBusiness {
     }
 
     /**
+     * Gets and returns the {@link MutableStyle} that matches with the specified id.
+     *
+     * @param styleId style entity id.
+     * @return the {@link MutableStyle} instance
+     * @throws TargetNotFoundException
+     *             if the style with the specified identifier can't be found
+     */
+    @Override
+    public MutableStyle getStyle(int styleId) throws TargetNotFoundException {
+        Style style = styleRepository.findById(styleId);
+        if (style == null) {
+            throw new TargetNotFoundException("Style with id"+styleId+" not found.");
+        }
+        return parseStyle(style.getName(), style.getBody());
+    }
+
+    /**
      * 
      * @param providerId
      *            the style provider identifier
