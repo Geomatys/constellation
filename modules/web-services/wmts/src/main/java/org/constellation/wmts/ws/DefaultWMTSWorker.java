@@ -282,6 +282,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
             for (final Layer configLayer : declaredLayers) {
                 final Data details = getLayerReference(configLayer);
+                if (details == null) {
+                    LOGGER.log(Level.WARNING, "No data can be found for name : "+configLayer.getName());
+                    continue;
+                }
                 final String name;
                 if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
                     name = configLayer.getAlias().trim().replaceAll(" ", "_");
@@ -292,7 +296,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 final Object origin = details.getOrigin();
                 if (!(origin instanceof PyramidalCoverageReference)) {
                     //WMTS only handle PyramidalModel
-                    LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", name);
+                    LOGGER.log(Level.WARNING, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", name);
                     continue;
                 }
 
