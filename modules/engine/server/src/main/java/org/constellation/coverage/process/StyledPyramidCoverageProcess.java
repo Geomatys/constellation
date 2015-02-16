@@ -50,6 +50,7 @@ import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.process.StyleProcessReference;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Providers;
@@ -117,7 +118,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                                          final Domain domain,
                                          final Dataset dataset,
                                          final CoordinateReferenceSystem[] pyramidCRS,
-                                         final StyleReference styleRef,
+                                         final StyleProcessReference styleRef,
                                          final Boolean updatePyramid) {
         this(StyledPyramidCoverageDescriptor.INSTANCE, toParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder,
                 domain, dataset, pyramidCRS, styleRef, updatePyramid));
@@ -131,7 +132,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
                                                     final Domain domain,
                                                     final Dataset dataset,
                                                     final CoordinateReferenceSystem[] pyramidCRS,
-                                                    final StyleReference styleRef,
+                                                    final StyleProcessReference styleRef,
                                                     final Boolean updatePyramid){
         final ParameterValueGroup params = StyledPyramidCoverageDescriptor.INSTANCE.getInputDescriptor().createValue();
         fillParameters(inCoverageRef, orinigalData, pyramidName, providerID, pyramidFolder, domain, dataset, pyramidCRS, updatePyramid, params);
@@ -148,7 +149,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         final File pyramidFolder        = value(PYRAMID_FOLDER, inputParameters);
         final Domain domain             = value(DOMAIN, inputParameters);
         final Dataset dataset           = value(PYRAMID_DATASET, inputParameters);
-        final StyleReference styleRef   = value(STYLE, inputParameters);
+        final StyleProcessReference styleRef   = value(STYLE, inputParameters);
         String pyramidName              = value(PYRAMID_NAME, inputParameters);
         final Integer domainId          = domain != null ? domain.getId() : null;
         Boolean update                  = value(UPDATE, inputParameters);
@@ -215,7 +216,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         //get layer style
         final MutableStyle style;
         try {
-            style = styleBusiness.getStyle(styleRef.getProviderId(), styleRef.getLayerId().getLocalPart());
+            style = styleBusiness.getStyle(styleRef.getId());
         } catch (TargetNotFoundException ex) {
             throw new ProcessException("Style not found: " + ex.getMessage(), this, ex);
         }

@@ -21,6 +21,7 @@ package org.constellation.coverage.process;
 
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.StyleProcessReference;
 import org.constellation.util.StyleReference;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -41,8 +42,8 @@ public class StyledPyramidCoverageDescriptor extends AbstractPyramidCoverageDesc
 
     public static final String STYLE_NAME = "pyramid_style";
     private static final String STYLE_REMARKS = "The style to apply to the pyramid.";
-    public static final ParameterDescriptor<StyleReference> STYLE =
-            new DefaultParameterDescriptor<>(STYLE_NAME, STYLE_REMARKS, StyleReference.class, null, true);
+    public static final ParameterDescriptor<StyleProcessReference> STYLE =
+            new DefaultParameterDescriptor<>(STYLE_NAME, STYLE_REMARKS, StyleProcessReference.class, null, true);
 
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
             new GeneralParameterDescriptor[]{IN_COVERAGE_REF, ORIGINAL_DATA, PYRAMID_NAME, PYRAMID_FOLDER, STYLE,

@@ -1,0 +1,4 @@
+org.constellation.process.converter.MapToCRSProcessReferenceConverter
+org.constellation.process.converter.MapToDatasetProcessReferenceConverter
+org.constellation.process.converter.MapToServiceProcessReferenceConverter
+org.constellation.process.converter.MapToStyleProcessReferenceConverter
