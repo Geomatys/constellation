@@ -66,7 +66,15 @@
     </dependency>
     <dependency>
         <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-oracle</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-feature-gpx</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-gml</artifactId>
     </dependency>
     <dependency>
         <groupId>org.geotoolkit</groupId>

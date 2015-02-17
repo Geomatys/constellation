@@ -655,6 +655,16 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit</groupId>
+                <artifactId>geotk-feature-oracle</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit</groupId>
+                <artifactId>geotk-feature-gml</artifactId>
+                <version>${geotoolkit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit</groupId>
                 <artifactId>geotk-jaxp-core</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>
