@@ -13,6 +13,8 @@ import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
 import org.apache.sis.metadata.iso.constraint.DefaultLegalConstraints;
 import org.apache.sis.metadata.iso.constraint.DefaultSecurityConstraints;
+import org.apache.sis.metadata.iso.extent.DefaultExtent;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.metadata.iso.maintenance.DefaultMaintenanceInformation;
@@ -1047,5 +1049,41 @@ public class TeamplateReaderUpdateTest {
         
         MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
         
+    }
+    
+    @Test
+    public void testReadFromFilledTemplateExtent() throws IOException, FactoryException {
+        InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_extent.json");
+        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        final DefaultDataIdentification pdataIdent = new DefaultDataIdentification();
+        
+        final DefaultExtent pex = new DefaultExtent();
+        final DefaultGeographicBoundingBox pbbox = new DefaultGeographicBoundingBox(-11, 11, -11, 11);
+        pbbox.setInclusion(null);
+        pex.setGeographicElements(Arrays.asList(pbbox));
+        
+        pdataIdent.setExtents(Arrays.asList(pex));
+        previous.setIdentificationInfo(Arrays.asList(pdataIdent));
+        
+        
+        Object result = reader.readTemplate(root, previous);
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        
+        final DefaultExtent ex = new DefaultExtent();
+        final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(-10, 10, -10, 10);
+        bbox.setInclusion(null);
+        ex.setGeographicElements(Arrays.asList(bbox));
+        
+        dataIdent.setExtents(Arrays.asList(ex));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
     }
 }

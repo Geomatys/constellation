@@ -56,7 +56,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
         if (prune) {
             TemplateTree.pruneTree(tree, tree.getRoot());
         }
-        return TemplateTree.getRootObjFromTree(template, tree);
+        return TemplateTree.getRootObjFromTree(template, tree, prune);
     }
     
     private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded, final boolean prune) throws ParseException {

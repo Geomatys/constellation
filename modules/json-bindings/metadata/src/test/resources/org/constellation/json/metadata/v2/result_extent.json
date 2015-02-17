@@ -1,0 +1,118 @@
+{
+  "root" : {
+    "name" : "MD_Metadata",
+    "multiplicity" : 1,
+    "children" : [ {
+      "superblock" : {
+        "name" : "metadata.block.GSD_Identification",
+        "multiplicity" : 1,
+        "help" : "metadata.block.GSD_Identification_help",
+        "path" : null,
+        "render" : null,
+        "children" : [ {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.geographicExtension",
+            "multiplicity" : 1,
+            "help" : "metadata.block.geographicExtension_help",
+            "path" : "metadata[0].identificationInfo[0].extent[0].geographicElement[0]",
+            "render" : "BOUNDINGBOX",
+            "ignore" : null,
+            "type" : "org.opengis.metadata.extent.GeographicBoundingBox",
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.westBoundLongitude",
+                "multiplicity" : 1,
+                "help" : "metadata.field.westBoundLongitude_help",
+                "path" : "metadata[0].identificationInfo[0].extent[0].geographicElement[0].westBoundLongitude[0]",
+                "type" : null,
+                "render" : "decimal",
+                "defaultValue" : -180,
+                "value" : -10.0,
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.eastBoundLongitude",
+                "multiplicity" : 1,
+                "help" : "metadata.field.eastBoundLongitude_help",
+                "path" : "metadata[0].identificationInfo[0].extent[0].geographicElement[0].eastBoundLongitude[0]",
+                "type" : null,
+                "render" : "decimal",
+                "defaultValue" : 180,
+                "value" : 10.0,
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.northBoundLatitude",
+                "multiplicity" : 1,
+                "help" : "metadata.field.northBoundLatitude_help",
+                "path" : "metadata[0].identificationInfo[0].extent[0].geographicElement[0].northBoundLatitude[0]",
+                "type" : null,
+                "render" : "decimal",
+                "defaultValue" : 90,
+                "value" : 10.0,
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.southBoundLatitude",
+                "multiplicity" : 1,
+                "help" : "metadata.field.southBoundLatitude_help",
+                "path" : "metadata[0].identificationInfo[0].extent[0].geographicElement[0].southBoundLatitude[0]",
+                "type" : null,
+                "render" : "decimal",
+                "defaultValue" : -90,
+                "value" : -10.0,
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null
+              }
+            } ]
+          }
+        }, {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.place",
+            "multiplicity" : 62,
+            "help" : "metadata.block.place_help",
+            "path" : "metadata[0].identificationInfo[0].extent[0].geographicElement[1]",
+            "render" : "BOUNDINGBOX",
+            "ignore" : null,
+            "type" : "org.opengis.metadata.extent.GeographicDescription",
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.geographicIdentifier",
+                "multiplicity" : 1,
+                "help" : "metadata.field.geographicIdentifier_help",
+                "path" : "metadata[0].identificationInfo[0].extent[0].geographicElement[1].geographicIdentifier[0].code[0]",
+                "type" : null,
+                "render" : "text",
+                "defaultValue" : null,
+                "value" : null,
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null
+              }
+            } ]
+          }
+        } ]
+      }
+    } ]
+  },
+  "nodeTypes" : null
+}

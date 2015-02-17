@@ -251,7 +251,7 @@ public class TemplateTree {
                 template.moveFollowingNumeratedPath(block, ordinal);
             }
             tree.addNode(ancestor, null, template, block.getPath());
-        }
+        } 
 
         // Fields
         final Map<String, Integer> fieldPathOrdinal = new HashMap<>();
@@ -281,7 +281,7 @@ public class TemplateTree {
         return ordinal;
     }
     
-    public static RootObj getRootObjFromTree(final RootObj rootobj, final TemplateTree tree) {
+    public static RootObj getRootObjFromTree(final RootObj rootobj, final TemplateTree tree, final boolean prune) {
         final RootObj result = new RootObj(rootobj);
         
         for (SuperBlock sb : result.getSuperBlocks()) {
@@ -290,7 +290,7 @@ public class TemplateTree {
             for (BlockObj block : children) {
                 blockCount = updateRootObjFromTree(block, sb, tree, blockCount);
                 blockCount++;
-                if (block.getBlock().childrenEmpty()) {
+                if (prune && block.getBlock().childrenEmpty()) {
                     sb.removeBlock(block);
                     blockCount--;
                 }

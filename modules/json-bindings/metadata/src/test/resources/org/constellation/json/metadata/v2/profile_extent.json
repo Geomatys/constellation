@@ -1,0 +1,100 @@
+{
+    "root": {
+        "name": "MD_Metadata",
+        "multiplicity": 1,
+        "children": [{
+                "superblock": {
+                    "name": "metadata.block.GSD_Identification",
+                    "multiplicity": 1,
+                    "help": "metadata.block.GSD_Identification_help",
+                    "children": [{
+                            "type": "block",
+                            "block": {
+                                "name": "metadata.block.geographicExtension",
+                                "multiplicity": 1,
+                                "help": "metadata.block.geographicExtension_help",
+                                "path": "metadata.identificationInfo.extent.geographicElement",
+                                "type": "org.opengis.metadata.extent.GeographicBoundingBox",
+                                "render": "BOUNDINGBOX",
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.westBoundLongitude",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.westBoundLongitude_help",
+                                            "path": "metadata.identificationInfo.extent.geographicElement.westBoundLongitude",
+                                            "render": "decimal",
+                                            "obligation": "M",
+                                            "defaultValue": -180,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.eastBoundLongitude",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.eastBoundLongitude_help",
+                                            "path": "metadata.identificationInfo.extent.geographicElement.eastBoundLongitude",
+                                            "render": "decimal",
+                                            "obligation": "M",
+                                            "defaultValue": 180,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.northBoundLatitude",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.northBoundLatitude_help",
+                                            "path": "metadata.identificationInfo.extent.geographicElement.northBoundLatitude",
+                                            "render": "decimal",
+                                            "obligation": "M",
+                                            "defaultValue": 90,
+                                            "value": null
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.southBoundLatitude",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.southBoundLatitude_help",
+                                            "path": "metadata.identificationInfo.extent.geographicElement.southBoundLatitude",
+                                            "render": "decimal",
+                                            "obligation": "M",
+                                            "defaultValue": -90,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }, {
+                            "type": "block",
+                            "block": {
+                                "name": "metadata.block.place",
+                                "multiplicity": 62,
+                                "help": "metadata.block.place_help",
+                                "path": "metadata.identificationInfo.extent.geographicElement",
+                                "render": "BOUNDINGBOX",
+                                "type": "org.opengis.metadata.extent.GeographicDescription",
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.geographicIdentifier",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.geographicIdentifier_help",
+                                            "path": "metadata.identificationInfo.extent.geographicElement.geographicIdentifier.code",
+                                            "render": "text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

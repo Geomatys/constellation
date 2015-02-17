@@ -44,6 +44,7 @@ import org.constellation.admin.SensorBusiness;
 import org.constellation.engine.register.Sensor;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.geotoolkit.sml.xml.SensorMLUtilities;
 
 /**
  * A sensorML Writer working on a fileSystem.
@@ -98,7 +99,7 @@ public class InternalSensorWriter implements SensorWriter {
                 s.setMetadata(sw.toString());
                sensorBusiness.update(s);
             } else {
-               sensorBusiness.create(id, "TODO", null, sw.toString());
+               sensorBusiness.create(id, SensorMLUtilities.getSensorMLType(sensor), null, sw.toString());
             }
         } catch (JAXBException ex) {
             String msg = ex.getMessage();
