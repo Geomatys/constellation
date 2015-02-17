@@ -70,7 +70,11 @@ window.buildWmtsViewer = function () {
             if(this.addBackground) {
                 //adding background layer by default OSM
                 var sourceOSM = new ol.source.OSM({
-                    attributions:[]
+                    attributions:[new ol.Attribution({
+                        html: 'Tiles courtesy of ' +
+                            '<a href="http://www.mapquest.com" target="_blank">MapQuest</a>'
+                    })],
+                    url:'//otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
                 });
                 var backgroundLayer = new ol.layer.Tile({
                     source: sourceOSM
