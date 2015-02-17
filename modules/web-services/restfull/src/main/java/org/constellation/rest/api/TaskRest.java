@@ -19,8 +19,6 @@
 package org.constellation.rest.api;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +43,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.sis.util.iso.Names;
+import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IProcessBusiness;
@@ -54,10 +53,13 @@ import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringMap;
 import org.constellation.engine.register.TaskParameterWithOwnerName;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.jooq.tables.pojos.Task;
 import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.util.ParamUtilities;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -159,21 +161,11 @@ public class TaskRest {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity(new AcknowlegementType("Failure", "Could not find process description for given authority/code.")).build();
         }
-            //TODO use real binding from ParameterDescriptorGroup to JSON
+
         try {
-            //write descriptor to XML String
-            final Writer xmlWriter = new StringWriter();
-            final ParameterDescriptorWriter descWriter = new ParameterDescriptorWriter();
-            descWriter.setOutput(xmlWriter);
-            descWriter.write(idesc);
-            xmlWriter.flush();
-
-            // write XML String into JSON
-            final JSONObject jsonObject = XML.toJSONObject(xmlWriter.toString());
-            final String jsonString = jsonObject.toString();
+            final String jsonString = ParamUtilities.writeParameterDescriptorJSON(idesc);
             return Response.ok(jsonString, MediaType.APPLICATION_JSON_TYPE).build();
-
-        } catch (XMLStreamException | JSONException | IOException e) {
+        } catch (IOException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new AcknowlegementType("Failure", "Could not find chain for given authority/code.")).build();
         }

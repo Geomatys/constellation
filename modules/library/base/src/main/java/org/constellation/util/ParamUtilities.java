@@ -22,19 +22,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.io.IOUtils;
+import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.Static;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.util.json.ParameterDescriptorJSONSerializer;
+import org.constellation.util.json.ParameterValueJSONDeserializer;
+import org.constellation.util.json.ParameterValueJSONSerializer;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-import org.slf4j.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -42,7 +47,8 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  *
  */
 public final class ParamUtilities extends Static {
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ParamUtilities.class);
+
+    private static final Logger LOGGER = Logging.getLogger(ParamUtilities.class);
 
     /**
      * Reads an {@link java.io.InputStream} to build a {@link org.opengis.parameter.GeneralParameterValue}
@@ -70,7 +76,7 @@ public final class ParamUtilities extends Static {
             try {
                 stream.close();
             } catch (IOException ex) {
-                LOGGER.warn("Error while closing stream", ex);
+                LOGGER.log(Level.WARNING,"Error while closing stream", ex);
             }
         }
     }
@@ -89,7 +95,7 @@ public final class ParamUtilities extends Static {
             try {
                 stream.close();
             } catch (IOException ex) {
-                LOGGER.warn("Error while closing stream", ex);
+                LOGGER.log(Level.WARNING, "Error while closing stream", ex);
             }
         }
     }
@@ -124,7 +130,7 @@ public final class ParamUtilities extends Static {
             try {
                 stream.close();
             } catch (IOException ex) {
-                LOGGER.warn("Error while closing stream", ex);
+                LOGGER.log(Level.WARNING, "Error while closing stream", ex);
             }
         }
     }
@@ -152,11 +158,53 @@ public final class ParamUtilities extends Static {
         }
     }
 
-    public static String writeParameterJSON(ParameterValueGroup output) throws JsonProcessingException {
+    /**
+     * Serialize a ParameterValueGroup into a JSON String.
+     * @param parameter ParameterValueGroup
+     * @return JSON String.
+     * @throws JsonProcessingException
+     * @throws org.apache.sis.util.NullArgumentException if {@code parameter} is {@code null}
+     */
+    public static String writeParameterJSON(GeneralParameterValue parameter) throws JsonProcessingException {
+        ArgumentChecks.ensureNonNull("parameter", parameter);
         final ObjectMapper mapper = new ObjectMapper();
         final SimpleModule module = new SimpleModule();
         module.addSerializer(GeneralParameterValue.class, new ParameterValueJSONSerializer()); //custom serializer
         mapper.registerModule(module);
-        return mapper.writeValueAsString(output);
+        return mapper.writeValueAsString(parameter);
+    }
+
+    /**
+     * Deserialize a ParameterValueGroup from a JSON String.
+     * @param inputJson String json
+     * @param descriptor GeneralParameterDescriptor that describe ParameterValueGroup
+     * @return ParameterValueGroup matching GeneralParameterDescriptor descriptor
+     * @throws IOException
+     * @throws org.apache.sis.util.NullArgumentException if {@code inputJson} or {@code descriptor} are {@code null}
+     */
+    public static GeneralParameterValue readParameterJSON(String inputJson, GeneralParameterDescriptor descriptor) throws IOException {
+        ArgumentChecks.ensureNonNull("inputJson", inputJson);
+        ArgumentChecks.ensureNonNull("descriptor", descriptor);
+        final ObjectMapper mapper = new ObjectMapper();
+        final SimpleModule module = new SimpleModule();
+        module.addDeserializer(GeneralParameterValue.class, new ParameterValueJSONDeserializer(descriptor)); //custom serializer
+        mapper.registerModule(module);
+        return mapper.readValue(inputJson, GeneralParameterValue.class);
+    }
+
+    /**
+     * Serialize a GeneralParameterDescriptor into a JSON String.
+     * @param descriptor GeneralParameterDescriptor.
+     * @return JSON String.
+     * @throws JsonProcessingException
+     * @throws org.apache.sis.util.NullArgumentException if {@code descriptor} is {@code null}
+     */
+    public static String writeParameterDescriptorJSON(GeneralParameterDescriptor descriptor) throws JsonProcessingException {
+        ArgumentChecks.ensureNonNull("descriptor", descriptor);
+        final ObjectMapper mapper = new ObjectMapper();
+        final SimpleModule module = new SimpleModule();
+        module.addSerializer(GeneralParameterDescriptor.class, new ParameterDescriptorJSONSerializer()); //custom serializer
+        mapper.registerModule(module);
+        return mapper.writeValueAsString(descriptor);
     }
 }

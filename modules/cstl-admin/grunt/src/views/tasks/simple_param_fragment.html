@@ -7,7 +7,7 @@
     <div ng-show="parameter.maxOccurs==1" class="col-sm-9">
         <div ng-switch="parameter.binding">
             <!-- java.lang.String management -->
-            <div ng-switch-when="valueClass:java.lang.String">
+            <div ng-switch-when="java.lang.String">
                 <!-- We need one String parameter with no restriction -->
                 <div ng-if="parameter.restriction.enumeration.length == 0">
                     <input id="{{parameter.id}}" class="form-control" ng-required="parameter.mandatory" type="text"
@@ -23,7 +23,7 @@
             </div>
 
             <!-- java.lang.Boolean management -->
-            <div ng-switch-when="valueClass:java.lang.Boolean">
+            <div ng-switch-when="java.lang.Boolean">
                 <!-- We need one Boolean parameter -->
                 <div class="checkbox">
                     <input id="{{parameter.id}}" type="checkbox" value="{{parameter.default}}"
@@ -32,21 +32,21 @@
             </div>
 
             <!-- java.net.URL management -->
-            <div ng-switch-when="valueClass:java.net.URL">
+            <div ng-switch-when="java.net.URL">
                 <!-- We need one URL parameter -->
                 <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="text"
                        value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
             </div>
 
             <!-- java.io.File management -->
-            <div ng-switch-when="valueClass:java.io.File">
+            <div ng-switch-when="java.io.File">
                 <!-- We need one File parameter with no restriction -->
                 <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="text"
                        value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save" />
             </div>
 
             <!-- java.lang.Integer management -->
-            <div ng-switch-when="valueClass:java.lang.Integer">
+            <div ng-switch-when="java.lang.Integer">
                 <!-- We need one Integer parameter with no restriction -->
                 <div ng-if="parameter.restriction.enumeration.length == 0">
                     <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="number"
@@ -61,7 +61,7 @@
             </div>
 
             <!-- java.lang.Long management -->
-            <div ng-switch-when="valueClass:java.lang.Long">
+            <div ng-switch-when="java.lang.Long">
                 <!-- We need one Long parameter with no restriction -->
                 <div ng-if="parameter.restriction.enumeration.length == 0">
                     <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="number"
@@ -76,7 +76,7 @@
             </div>
 
             <!-- java.lang.Double management -->
-            <div ng-switch-when="valueClass:java.lang.Double">
+            <div ng-switch-when="java.lang.Double">
                 <!-- We need one Double parameter with no restriction -->
                 <div ng-if="parameter.restriction.enumeration.length == 0">
                     <input id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control" type="number"
@@ -91,7 +91,7 @@
             </div>
 
             <!--org.constellation.util.StyleReference-->
-            <div ng-switch-when="valueClass:org.constellation.util.StyleReference">
+            <div ng-switch-when="org.constellation.util.StyleReference">
                 <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
                         ng-model="parameter.save" ng-options="style.ref as style.name for style in parameter.restriction.enumeration">
                 </select>
@@ -105,5 +105,5 @@
     </div>
 
     <div class="clearfix"></div>
-    <p ng-show="parameter.documentation" class="help-block col-sm-12">{{parameter.documentation}}</p>
+    <p ng-show="parameter.description" class="help-block col-sm-12">{{parameter.description}}</p>
 </div>

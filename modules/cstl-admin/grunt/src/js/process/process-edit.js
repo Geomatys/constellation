@@ -168,9 +168,9 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
                 //test cast
                 switch(parameter.binding) {
-                    case "valueClass:java.lang.Integer" : //fall trough
-                    case "valueClass:java.lang.Long" : //fall trough
-                    case "valueClass:java.lang.Double" :
+                    case "java.lang.Integer" : //fall trough
+                    case "java.lang.Long" : //fall trough
+                    case "java.lang.Double" :
                         if (!angular.isNumber(parameter.save)) {
                             Growl('error', 'Error', 'Parameter '+parameter.name+' is not a Number');
                             return false;
@@ -267,15 +267,15 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
 
         function convertValue(value, binding) {
-            if ("valueClass:java.lang.Integer" === binding || "valueClass:java.lang.Long" === binding) {
+            if ("java.lang.Integer" === binding || "java.lang.Long" === binding) {
                 return parseInt(value);
             }
 
-            if ("valueClass:java.lang.Double" === binding) {
+            if ("java.lang.Double" === binding) {
                 return parseFloat(value);
             }
 
-            if ("valueClass:java.lang.Boolean" === binding) {
+            if ("java.lang.Boolean" === binding) {
                 return Boolean(value);
             }
             return value;
@@ -284,14 +284,14 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         // Scope variables
 
         $scope.manageField = [
-            "valueClass:java.lang.String",
-            "valueClass:java.lang.Boolean",
-            "valueClass:java.lang.Integer",
-            "valueClass:java.lang.Long",
-            "valueClass:java.lang.Double",
-            "valueClass:java.net.URL",
-            "valueClass:java.io.File",
-            "valueClass:org.constellation.util.StyleReference"
+            "java.lang.String",
+            "java.lang.Boolean",
+            "java.lang.Integer",
+            "java.lang.Long",
+            "java.lang.Double",
+            "java.net.URL",
+            "java.io.File",
+            "org.constellation.util.StyleReference"
         ];
         $scope.canManage = false;
 
@@ -404,7 +404,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                 var prepareFields = function(input) {
 
                     //initialize style list
-                    if ("valueClass:org.constellation.util.StyleReference" === input.binding) {
+                    if ("org.constellation.util.StyleReference" === input.binding) {
                         //initialize only once
                         if (!initializationFlags[input.binding]) {
                             listAvailableStyles();
@@ -422,14 +422,15 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                     inputElement.minOccurs = elem.minOccurs || 1;
                     inputElement.maxOccurs = elem.maxOccurs || 1;
                     inputElement.mandatory = inputElement.minOccurs > 0;
+                    inputElement.description = elem.description;
 
                     //Simple parameter
-                    var simple = elem.simpleType;
+                    var simple = elem.class !== undefined;
                     if (simple) {
                         inputElement.type = "simple";
-                        inputElement.binding = simple.annotation.appinfo;
-                        inputElement.default = convertValue(elem.default, inputElement.binding);
-                        inputElement.documentation = simple.annotation.documentation;
+                        inputElement.binding = elem.class;
+                        inputElement.default = convertValue(elem.defaultValue, inputElement.binding);
+                        inputElement.unit = simple.unit;
                         inputElement.save = inputElement.default;
 
                         //check if parameter is handled
@@ -439,18 +440,21 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
                         if (simple.restriction) {
                             var restriction = simple.restriction;
-                            inputElement.base = restriction.base;
+                            //inputElement.base = restriction.base;
 
                             //extract valid value range
                             inputElement.restriction = {};
-                            var minValue = restriction.minInclusive !== undefined ? restriction.minInclusive.value : null;
-                            var maxValue = restriction.maxInclusive !== undefined ? restriction.maxInclusive.value : null;
+                            var minValue = restriction.minValue;
+                            var maxValue = restriction.maxValue;
                             if (minValue !== null && maxValue !== null) {
                                 inputElement.restriction.range = [minValue, maxValue];
                             }
 
                             //extract valid values
-                            inputElement.restriction.enumeration = extractEnumeration(restriction.enumeration, inputElement.binding);
+                            inputElement.restriction.enumeration = extractEnumeration(restriction.validValues, inputElement.binding);
+                        } else {
+                            inputElement.restriction = {};
+                            inputElement.restriction.enumeration = [];
                         }
 
                         prepareFields(inputElement);
@@ -459,13 +463,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                         //Group parameters
                         inputElement.type = "group";
                         inputElement.inputs = [[]];
-                        var complex = elem.complexType;
-
-                        parseElements(complex.sequence.element, inputElement.inputs[0], inputElement.id);
-
-                        if (complex.sequence.annotation) {
-                            inputElement.documentation = complex.sequence.annotation.documentation;
-                        }
+                        parseElements(elem.descriptors, inputElement.inputs[0], inputElement.id);
                     }
                     return inputElement;
                 };
@@ -486,7 +484,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                     }
                 };
 
-                parseElements(newValue.schema.element.complexType.sequence.element, inputs, null);
+                parseElements(newValue.descriptors, inputs, null);
                 $scope.parameters = inputs;
                 restoreInputs();
             }

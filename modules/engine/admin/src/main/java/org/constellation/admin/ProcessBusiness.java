@@ -64,6 +64,7 @@ import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.TaskRepository;
 import org.constellation.scheduler.QuartzJobListener;
 import org.constellation.scheduler.QuartzTask;
+import org.constellation.util.ParamUtilities;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.io.DirectoryWatcher;
@@ -84,6 +85,7 @@ import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -368,11 +370,9 @@ public class ProcessBusiness implements IProcessBusiness {
 
         ParameterValueGroup params;
         try {
-            final ObjectMapper mapper = new ObjectMapper();
-            final Map valueMap = mapper.readValue(taskParameter.getInputs(), Map.class);
-            params = Parameters.toParameter(valueMap, idesc);
+            params = (ParameterValueGroup) ParamUtilities.readParameterJSON(taskParameter.getInputs(), idesc);
         } catch (IOException e) {
-            throw new ConfigurationException("Fail to parse input parameter as JSON for task : "+taskParameter.getId(), e);
+            throw new ConfigurationException("Fail to parse input parameter as JSON : "+e.getMessage(), e);
         }
 
         return params;
