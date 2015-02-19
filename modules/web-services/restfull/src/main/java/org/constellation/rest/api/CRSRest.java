@@ -21,11 +21,16 @@ package org.constellation.rest.api;
 
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.dto.CoordinateReferenceSystemDTO;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.CRSCoverageList;
 import org.constellation.utils.CRSUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
+import org.geotoolkit.referencing.CRS;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.FactoryException;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
@@ -36,7 +41,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,7 +76,68 @@ public class CRSRest {
         return Response.ok(coverageList).build();
     }
 
+    /**
+     * Return all EPSG code with there description/name.
+     * This method is similar to {@link org.constellation.rest.api.ProviderRest#getAllEpsgCode(int, String)} but doesn't
+     * need domain id and provider id which are useless.
+     *
+     * @return a list of {@link org.constellation.admin.dto.CoordinateReferenceSystemDTO}
+     */
+    @GET
+    @Path("/")
+    @Produces("application/json")
+    public Response getAllEPSG() {
+        try {
+            String filter = null;
+            final CRSAuthorityFactory factory = CRS.getAuthorityFactory(Boolean.FALSE);
+            final Set<String> authorityCodes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
 
+            final List<CoordinateReferenceSystemDTO> crss = new ArrayList<>();
+            for (String code : authorityCodes) {
+                final String codeAndName = code + " - " + factory.getDescriptionText(code).toString();
+                crss.add(new CoordinateReferenceSystemDTO(code, codeAndName));
+            }
+            return Response.ok().entity(crss).build();
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.WARNING, "Enable to load EPSG codes : "+ex.getMessage(), ex);
+            return Response.serverError().entity("Enable to load EPSG codes : "+ex.getMessage()).build();
+        }
+    }
+
+    /**
+     * Return all EPSG code with there description/name.
+     * This method is similar to {@link org.constellation.rest.api.ProviderRest#getAllEpsgCode(int, String)} but doesn't
+     * need domain id and provider id which are useless.
+     *
+     * @param filter an optional filter parameter applied on code and crs name.
+     * @return a list of {@link org.constellation.admin.dto.CoordinateReferenceSystemDTO}
+     */
+    @GET
+    @Path("/filter/{filter}")
+    @Produces("application/json")
+    public Response getAllEPSG(@PathParam("filter") String filter) {
+        try {
+            final CRSAuthorityFactory factory = CRS.getAuthorityFactory(Boolean.FALSE);
+            final Set<String> authorityCodes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+
+            if (filter != null) {
+                filter = filter.toLowerCase();
+            }
+
+            final List<CoordinateReferenceSystemDTO> crss = new ArrayList<>();
+            for (String code : authorityCodes) {
+                final String codeAndName = code + " - " + factory.getDescriptionText(code).toString();
+
+                if (filter != null && codeAndName.toLowerCase().contains(filter)) {
+                    crss.add(new CoordinateReferenceSystemDTO(code, codeAndName));
+                }
+            }
+            return Response.ok().entity(crss).build();
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.WARNING, "Enable to load EPSG codes : "+ex.getMessage(), ex);
+            return Response.serverError().entity("Enable to load EPSG codes : "+ex.getMessage()).build();
+        }
+    }
 
     /**
      * return crs list string for a layer

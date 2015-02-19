@@ -1831,6 +1831,28 @@ public class DataRest {
         return Response.ok(briefs).build();
     }
 
+    /**
+     * List all Datasets without sub-datas
+     * @param domainId
+     * @return
+     */
+    @GET
+    @Path("/list/dataset")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getDatasetList(@PathParam("domainId") int domainId) {
+        final List<DataSetBrief> datasetBriefs = new ArrayList<>();
+        final List<Dataset> datasets = datasetBusiness.getAllDataset();
+        if(datasets!=null){
+            for(final Dataset ds : datasets){
+                final List<DataBrief> briefs = new ArrayList<>();
+                final DataSetBrief dsb = buildDatsetBrief(ds,domainId,briefs);
+                datasetBriefs.add(dsb);
+            }
+        }
+        return Response.ok(datasetBriefs).build();
+    }
+
     @GET
     @Path("/list/published/{published}/data")
     @Produces({MediaType.APPLICATION_JSON})

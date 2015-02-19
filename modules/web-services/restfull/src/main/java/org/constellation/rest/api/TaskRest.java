@@ -40,13 +40,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.sis.util.iso.Names;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.admin.exception.ConstellationException;
+import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProcessBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
@@ -57,18 +58,18 @@ import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.jooq.tables.pojos.Task;
 import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
+import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.process.DatasetProcessReference;
+import org.constellation.process.ServiceProcessReference;
+import org.constellation.process.StyleProcessReference;
 import org.constellation.util.ParamUtilities;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.chain.model.Chain;
-import org.geotoolkit.xml.parameter.ParameterDescriptorWriter;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -98,6 +99,24 @@ public class TaskRest {
 
     @Inject
     private UserRepository userRepository;
+
+    /**
+     * DatasetBusiness used for provider GUI editors data
+     */
+    @Inject
+    private IDatasetBusiness datasetBusiness;
+
+    /**
+     * ServiceBusiness used for provider GUI editors data
+     */
+    @Inject
+    private IServiceBusiness serviceBusiness;
+
+    /**
+     * StyleRepository used for provider GUI editors data
+     */
+    @Inject
+    private StyleRepository styleRepository;
     
     // <editor-fold defaultstate="collapsed" desc="GeotkProcessAPI">
     /**
@@ -400,6 +419,75 @@ public class TaskRest {
             ltpwon.add(tpwon);
         }
         return ltpwon;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="EditorsDataProvidersAPI">
+    /**
+     * List all Datasets as DatasetProcessReference to provider GUI editors.
+     * @return list of DatasetProcessReference
+     */
+    @GET
+    @Path("/list/datasetRef")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getDatasetProcessReferenceList() {
+        final List<DatasetProcessReference> datasetPRef = new ArrayList<>();
+        final List<Dataset> datasets = datasetBusiness.getAllDataset();
+        if(datasets!=null){
+            for(final Dataset ds : datasets){
+                final DatasetProcessReference ref = new DatasetProcessReference();
+                ref.setId(ds.getId());
+                ref.setIdentifier(ds.getIdentifier());
+                datasetPRef.add(ref);
+            }
+        }
+        return Response.ok(datasetPRef).build();
+    }
+
+    /**
+     * List all Services as ServiceProcessReference to provider GUI editors.
+     * @param domainId
+     * @return list of ServiceProcessReference
+     */
+    @GET
+    @Path("/list/serviceRef/domain/{domainId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getServiceProcessReferenceList(@PathParam("domainId") Integer domainId) throws ConfigurationException {
+        final List<ServiceProcessReference> servicePRef = new ArrayList<>();
+        final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainId(domainId, null);
+        if(services!=null){
+            for(final ServiceDTO service : services){
+                final ServiceProcessReference ref = new ServiceProcessReference();
+                ref.setId(service.getId());
+                ref.setType(service.getType());
+                ref.setName(service.getTitle());
+                servicePRef.add(ref);
+            }
+        }
+        return Response.ok(servicePRef).build();
+    }
+
+    /**
+     * List all Style as StyleProcessReference to provider GUI editors.
+     * @return list of ServiceProcessReference
+     */
+    @GET
+    @Path("/list/styleRef")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getStyleProcessReferenceList() throws ConfigurationException {
+        final List<StyleProcessReference> servicePRef = new ArrayList<>();
+        final List<Style> styles = styleRepository.findAll();
+        if(styles!=null){
+            for(final Style style : styles){
+                final StyleProcessReference ref = new StyleProcessReference();
+                ref.setId(style.getId());
+                ref.setType(style.getType());
+                ref.setName(style.getName());
+                ref.setProvider(style.getProvider());
+                servicePRef.add(ref);
+            }
+        }
+        return Response.ok(servicePRef).build();
     }
     // </editor-fold>
 

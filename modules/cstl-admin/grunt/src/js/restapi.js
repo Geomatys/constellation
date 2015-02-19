@@ -134,6 +134,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'listAll':              {method: 'GET',     isArray: true},
             'listPublished':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/published/:published/data;jsessionid=', isArray: true},
             'listPublishedDS':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/published/:published/dataset;jsessionid=', isArray: true},
+            'listAllDS':            {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/dataset/;jsessionid=', isArray: true},
             'listSensorable':       {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/observation/:observation/data;jsessionid=', isArray: true},
             'listSensorableDS':     {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/observation/:observation/dataset;jsessionid=', isArray: true},
             'listData':             {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/provider;jsessionid='},
@@ -215,6 +216,13 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         });
     })
 
+    .factory('crs', function($resource) {
+        return $resource('@cstl/api/1/crs', {}, {
+            'listAll':         {method: "GET",    url: '@cstl/api/1/crs/;jsessionid=', isArray: true},
+            'listFiltered':    {method: "GET",    url: '@cstl/api/1/crs/filtered/:filter/;jsessionid=', isArray: true}
+        });
+    })
+
     .factory('csw', function($resource) {
         return $resource('@cstl/api/1/CSW', {}, {
             'count':            {method: 'GET',       url: '@cstl/api/1/CSW/:id/records/count;jsessionid='},
@@ -283,23 +291,26 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
 
     .factory('TaskService', function($resource) {
         return $resource('@cstl/api/1/task', {}, {
-            'listTasks':             {method: 'GET',    url: '@cstl/api/1/task/listTasks;jsessionid=',                           isArray: false },
-            'listRunningTasks':      {method: 'GET',    url: '@cstl/api/1/task/listRunningTasks/:id/:limit;jsessionid=',                isArray: true },
-            'taskHistory':           {method: 'GET',    url: '@cstl/api/1/task/taskHistory/:id/:limit;jsessionid=',                isArray: true },
-            'listProcess':           {method: 'GET',    url: '@cstl/api/1/task/listProcesses;jsessionid=',                       isArray: false },
-            'describeProcess':       {method: 'GET',    url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
-            'countProcess':          {method: 'GET',    url: '@cstl/api/1/task/countProcesses;jsessionid=' },
-            'listProcessForFactory': {method: 'GET',    url: '@cstl/api/1/task/process/factory/:authorityCode;jsessionid=',      isArray: false },
-            'listParamsTask':        {method: 'GET',    url: '@cstl/api/1/task/params/list;jsessionid=',                         isArray: true },
-            'listParamsTaskByType':  {method: 'GET',    url: '@cstl/api/1/task/params/list/:type;jsessionid=',                   isArray: true },
-            'getParamsTask':         {method: 'GET',    url: '@cstl/api/1/task/params/get/:id;jsessionid=',                      isArray: false },
-            'deleteParamsTask':      {method: 'GET',    url: '@cstl/api/1/task/params/delete/:id;jsessionid=',                   isArray: false },
-            'createParamsTask':      {method: 'POST',   url: '@cstl/api/1/task/params/create;jsessionid=',                       isArray: false },
-            'updateParamsTask':      {method: 'POST',   url: '@cstl/api/1/task/params/update;jsessionid=',                       isArray: false },
-            'executeParamsTask':     {method: 'GET',    url: '@cstl/api/1/task/params/execute/:id;jsessionid=',                  isArray: false },
-            'startScheduleParamsTask':{method: 'GET',   url: '@cstl/api/1/task/params/schedule/start/:id;jsessionid=',           isArray: false },
-            'stopScheduleParamsTask': {method: 'GET',   url: '@cstl/api/1/task/params/schedule/stop/:id;jsessionid=',            isArray: false },
-            'duplicateParamsTask':   {method: 'GET',    url: '@cstl/api/1/task/params/duplicate/:id;jsessionid=',                isArray: false}
+            'listTasks':                {method: 'GET',     url: '@cstl/api/1/task/listTasks;jsessionid=',                           isArray: false },
+            'listRunningTasks':         {method: 'GET',     url: '@cstl/api/1/task/listRunningTasks/:id/:limit;jsessionid=',                isArray: true },
+            'taskHistory':              {method: 'GET',     url: '@cstl/api/1/task/taskHistory/:id/:limit;jsessionid=',                isArray: true },
+            'listProcess':              {method: 'GET',     url: '@cstl/api/1/task/listProcesses;jsessionid=',                       isArray: false },
+            'describeProcess':          {method: 'GET',     url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
+            'countProcess':             {method: 'GET',     url: '@cstl/api/1/task/countProcesses;jsessionid=' },
+            'listProcessForFactory':    {method: 'GET',     url: '@cstl/api/1/task/process/factory/:authorityCode;jsessionid=',      isArray: false },
+            'listParamsTask':           {method: 'GET',     url: '@cstl/api/1/task/params/list;jsessionid=',                         isArray: true },
+            'listParamsTaskByType':     {method: 'GET',     url: '@cstl/api/1/task/params/list/:type;jsessionid=',                   isArray: true },
+            'getParamsTask':            {method: 'GET',     url: '@cstl/api/1/task/params/get/:id;jsessionid=',                      isArray: false },
+            'deleteParamsTask':         {method: 'GET',     url: '@cstl/api/1/task/params/delete/:id;jsessionid=',                   isArray: false },
+            'createParamsTask':         {method: 'POST',    url: '@cstl/api/1/task/params/create;jsessionid=',                       isArray: false },
+            'updateParamsTask':         {method: 'POST',    url: '@cstl/api/1/task/params/update;jsessionid=',                       isArray: false },
+            'executeParamsTask':        {method: 'GET',     url: '@cstl/api/1/task/params/execute/:id;jsessionid=',                  isArray: false },
+            'startScheduleParamsTask':  {method: 'GET',     url: '@cstl/api/1/task/params/schedule/start/:id;jsessionid=',           isArray: false },
+            'stopScheduleParamsTask':   {method: 'GET',     url: '@cstl/api/1/task/params/schedule/stop/:id;jsessionid=',            isArray: false },
+            'duplicateParamsTask':      {method: 'GET',     url: '@cstl/api/1/task/params/duplicate/:id;jsessionid=',                isArray: false},
+            'listDataset':              {method: 'GET',     url: '@cstl/api/1/task/list/datasetRef;jsessionid=',  isArray: true },
+            'listService':              {method: 'GET',     url: '@cstl/api/1/task/list/serviceRef/domain/$domainId;jsessionid=',  isArray: true },
+            'listStyle':                {method: 'GET',     url: '@cstl/api/1/task/list/styleRef;jsessionid=',  isArray: true }
         });
     })
 
