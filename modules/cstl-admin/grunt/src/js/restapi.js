@@ -104,7 +104,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'domains':                 {method: 'GET',     url: '@cstl/api/1/servicepermission/user/$userId/service/:id', isArray: true},
             'linkToDomain':            {method: 'POST',    url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
             'unlinkFromDomain':        {method: 'DELETE',  url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
-            'listAll':                 {method: 'GET',     isArray: false},
+            'listAll':                 {method: 'GET',     isArray: true},
             'listAllByType':           {method: 'GET',     url: '@cstl/api/1/admin/domain/$domainId/instances/:lang/:type', isArray: false},
             'listServiceLayers':       {method: 'GET',     url: '@cstl/api/1/admin/domain/$domainId/service/layers/:lang', isArray: true},
             'get':                     {method: 'GET',     url: '@cstl/api/1/OGC/:type/:id/:lang;jsessionid='},
@@ -185,7 +185,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     .factory('style', function($resource) {
         return $resource('@cstl/api/1/SP/:provider/style/available;jsessionid=', {}, {
 
-            'listAll':                  {method: 'GET',    isArray: false },
+            'listAll':                  {method: 'GET',    isArray: true },
             'get':                      {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
             'createjson':               {method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
             'updatejson':               {method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/:name/update;jsessionid='},

@@ -46,7 +46,7 @@
 
 
             <div class="row bg-white dash-inner" style="padding: 20px 15px;" id="list-services">
-                <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter" data-name="{{service.name}}">
+                <div class="col-sm-6 service-item" ng-repeat="service in services | filter:typeFilter" data-name="{{service.name}}">
                     <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info service-name">{{service.name}} </h3></a>
                     <div class="well"
                          ng-class="{'started':service.status=='STARTED','stopped':service.status=='ERROR','not-started':service.status=='STOPPED'}"

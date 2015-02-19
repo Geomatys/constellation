@@ -525,7 +525,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                 modal.result.then(function(item) {
                     if (scope) {
                         style.listAll({provider: 'sld'}, function(response) {
-                            scope.wrap.fullList = response.styles;
+                            scope.wrap.fullList = response;
                         });
                     }
                 });
@@ -547,7 +547,7 @@ angular.module('cstl-services', ['cstl-restapi'])
                 modal.result.then(function(item) {
                     if (scope) {
                         style.listAll({provider: 'sld'}, function(response) {
-                            scope.wrap.fullList = response.styles;
+                            scope.wrap.fullList = response;
                             scope.previewStyledData(null,false);
                         });
                     }
@@ -745,4 +745,151 @@ angular.module('cstl-services', ['cstl-restapi'])
         }
 
         return DashboardHelper;
-    });
+    })
+
+    // -------------------------------------------------------------------------
+    //  View resolver
+    // -------------------------------------------------------------------------
+
+    .factory('viewResolve', function($q, $injector, $http, $templateCache, $sce) {
+        /**
+         * Based on "ngRoute" angular module source code.
+         *
+         * @param {Object} config the view configuration
+         * @param {Object} [resolveLocals] variables to be injected in "resolve" functions
+         * @see https://code.angularjs.org/1.2.17/angular-route.js
+         */
+        function viewResolve(config, resolveLocals) {
+            var locals = angular.extend({}, config.resolve),
+                template, templateUrl;
+
+            angular.forEach(locals, function(value, key) {
+                if (angular.isString(value)) {
+                    locals[key] = $injector.get(value);
+                } else {
+                    locals[key] = $injector.invoke(value, null, resolveLocals);
+                }
+            });
+
+            if (angular.isDefined(template = config.template)) {
+                if (angular.isFunction(template)) {
+                    template = $injector.invoke(template, null, resolveLocals);
+                }
+            } else if (angular.isDefined(templateUrl = config.templateUrl)) {
+                if (angular.isFunction(templateUrl)) {
+                    templateUrl = $injector.invoke(templateUrl, null, resolveLocals);
+                }
+                templateUrl = $sce.getTrustedResourceUrl(templateUrl);
+                if (angular.isDefined(templateUrl)) {
+                    template = $http.get(templateUrl, {cache: $templateCache}).
+                        then(function(response) { return response.data; });
+                }
+            }
+            if (angular.isDefined(template)) {
+                locals.$template = template;
+            }
+
+            return $q.all(locals);
+        }
+
+        return viewResolve;
+    })
+
+
+    // -------------------------------------------------------------------------
+    //  Style service : get available styles with a cache support
+    // -------------------------------------------------------------------------
+    .service('StyleService', function(TaskService) {
+
+        var self = this;
+        self.styles = null;
+
+        function init() {
+            self.styles = TaskService.listStyle();
+        }
+
+        self.getStyles = function() {
+            if (self.styles === null) {
+                init();
+            }
+            return self.styles;
+        };
+
+        self.refresh = function() {
+            init();
+        };
+
+    })
+
+    // -------------------------------------------------------------------------
+    //  CRS service
+    // -------------------------------------------------------------------------
+    .service('EPSGService', function(crs) {
+
+        var self = this;
+        self.epsgCodes = null;
+
+        function init() {
+            self.epsgCodes = crs.listAll();
+        }
+
+        self.getEPSGCodes = function() {
+            if (self.epsgCodes === null) {
+                init();
+            }
+            return self.epsgCodes;
+        };
+
+        self.refresh = function() {
+            init();
+        };
+    })
+
+    // -------------------------------------------------------------------------
+    //  OGC WS service
+    // -------------------------------------------------------------------------
+    .service('OGCWSService', function(TaskService) {
+
+        var self = this;
+        self.services = null;
+
+        function init() {
+            self.services = TaskService.listService();
+        }
+
+        self.getAllServices = function() {
+            if (self.services === null) {
+                init();
+            }
+            return self.services;
+        };
+
+        self.refresh = function() {
+            init();
+        };
+    })
+
+    // -------------------------------------------------------------------------
+    //  Data service
+    // -------------------------------------------------------------------------
+    .service('DataService', function(TaskService) {
+
+        var self = this;
+        self.dataset = null;
+
+        function initDatasets() {
+            self.dataset = TaskService.listDataset();
+        }
+
+        self.getAllDatasets = function() {
+            if (self.dataset === null) {
+                initDatasets();
+            }
+            return self.dataset;
+        };
+
+        self.refresh = function() {
+            initDatasets();
+        };
+    })
+;

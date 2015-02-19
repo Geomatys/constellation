@@ -1,0 +1,15 @@
+<div class="parameter-group">
+    <div class="group-header">
+        <label>{{parameter.name}}&nbsp;<span ng-show="parameter.mandatory" class="mandatory">(*)</span></label>
+        <button type="button" class="btn btn-default" ng-show="parameter.maxOccurs > 1 && parameter.maxOccurs > parameter.inputs.length" ng-click="addGroupOccurrence(parameter)">
+            <i class="fa fa-plus"></i>
+        </button>
+    </div>
+    <p class="help-block" ng-show="parameter.documentation">{{parameter.documentation}}</p>
+    <div class="group-body">
+        <div class="group-occurrence" ng-repeat="group in parameter.inputs">
+            <div class="remove" ng-click="removeGroupOccurrence(parameter, $index)" ng-show="$index !== 0 || parameter.minOccurs === 0">×</div>
+            <div ng-repeat="parameter in group" ng-include="'views/tasks/' + parameter.type + '_renderer.html'"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+@import "../../lib/bootstrap/less/mixins";
+
+.picklist {
+  width: 100%;
+
+  > .picklist-head {
+    .clearfix();
+
+    > label {
+      width: 50%;
+      float: left;
+
+      &:first-child {
+        padding-right: 30px;
+      }
+      &:last-child {
+        padding-left: 30px;
+      }
+    }
+  }
+
+  > .picklist-body {
+    position: relative;
+    height: 160px;
+    .clearfix();
+
+    > .picklist-left,
+    > .picklist-right {
+      width: 50%;
+      height: 100%;
+      float: left;
+
+      > select {
+        height: 100%;
+        width: 100%;
+        margin-bottom: 0;
+      }
+    }
+
+    > .picklist-left {
+      padding-right: 30px;
+    }
+    > .picklist-right {
+      padding-left: 30px;
+    }
+
+    > .picklist-actions {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      margin-left: -30px;
+      height: 100%;
+      width: 60px;
+
+      > .centered {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 34px;
+        height: 148px;
+
+        > .btn {
+          margin-bottom: 4px;
+          width: 34px;
+          height: 34px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}

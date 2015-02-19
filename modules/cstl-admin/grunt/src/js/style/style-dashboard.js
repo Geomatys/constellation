@@ -34,7 +34,7 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
 
         $scope.initStyleDashboard = function() {
             style.listAll({provider: 'sld'},function(response) {//success
-                    Dashboard($scope, response.styles, true);
+                    Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
                     $scope.wrap.ordertype = "Name";
                     $scope.wrap.filtertext='';
@@ -61,7 +61,7 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
          */
         $scope.resetFilters = function(){
             style.listAll({provider: 'sld'},function(response) {//success
-                    Dashboard($scope, response.styles, true);
+                    Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
                     $scope.wrap.ordertype = "Name";
                     $scope.wrap.filtertext='';
@@ -91,7 +91,7 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                         function() {
                             Growl('success', 'Success', 'Style ' + styleName + ' successfully deleted');
                             style.listAll({provider: 'sld'}, function(response) {
-                                Dashboard($scope, response.styles, true);
+                                Dashboard($scope, response, true);
                                 $scope.selected=null;
                                 $scope.previewStyledData(null,false);
                             });

@@ -110,8 +110,8 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
                 var count = 0;
-                for (var i=0; i<response.instance.length; i++) {
-                    if (response.instance[i].status === 'STARTED' && response.instance[i].type !== 'WEBDAV') {
+                for (var i=0; i<response.length; i++) {
+                    if (response[i].status === 'STARTED' && response[i].type !== 'WEBDAV') {
                         count++;
                     }
                 }

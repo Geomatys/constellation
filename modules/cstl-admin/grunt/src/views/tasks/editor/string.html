@@ -1,0 +1,12 @@
+<!-- We need one String parameter with no restriction -->
+<div ng-if="parameter.restriction.enumeration.length == 0">
+    <input id="{{parameter.id}}" class="form-control" ng-required="parameter.mandatory" type="text"
+           value="{{parameter.default}}" name="{{parameter.name}}" ng-model="parameter.save[$index]"/>
+</div>
+
+<!-- We need one String parameter with multiple restriction -->
+<div ng-if="parameter.restriction.enumeration.length > 1">
+    <select id="{{parameter.id}}" ng-required="parameter.mandatory" class="form-control"
+            ng-model="parameter.save[$index]" ng-options="val for val in parameter.restriction.enumeration">
+    </select>
+</div>

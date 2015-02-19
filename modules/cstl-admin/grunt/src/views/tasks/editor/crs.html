@@ -1,0 +1,6 @@
+<select id="{{parameter.id}}" class="form-control" ng-if="!parameter.isArray" ng-required="parameter.mandatory"
+        ng-model="parameter.save[$index]" ng-options="e.code for e in ec.epsgCodes track by e.code">
+</select>
+<picklist ng-if="parameter.isArray" label-field="code"
+          left-label="'tasks.edit.picklist.selected'|translate" left-model="parameter.save[$index]"
+          right-label="'tasks.edit.picklist.available'|translate" right-model="ec.epsgCodes"></picklist>

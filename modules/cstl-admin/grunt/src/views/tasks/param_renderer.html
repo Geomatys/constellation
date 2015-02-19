@@ -1,4 +1,3 @@
-
 <!-- Group parameters -->
 <div ng-if="parameter.type === 'group'" class="parameter-group">
     <label>{{parameter.name}} <span ng-show="parameter.mandatory" class="mandatory">(*)</span></label>
@@ -33,7 +32,14 @@
 </div>
 
 <!-- Simple parameters -->
-<div ng-if="parameter.type === 'simple'"
-     ng-include="'views/tasks/simple_param_fragment.html'"
-     class="parameter_simple"></div>
+<div ng-if="parameter.type === 'simple'" class="parameter_simple">
+    <div class="form-group">
+        <label for="{{parameter.id}}" class="col-sm-3 control-label" style="text-align:left;">
+            {{parameter.name}} <span ng-show="parameter.mandatory" class="mandatory">(*)</span>
+        </label>
+        <div ng-show="parameter.maxOccurs==1" process-param-editor="parameter" class="col-sm-9"></div>
+        <div class="clearfix"></div>
+        <p ng-show="parameter.documentation" class="help-block col-sm-12">{{parameter.documentation}}</p>
+    </div>
+</div>
 

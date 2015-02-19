@@ -419,11 +419,11 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             } else {
                 // for Internal data layer and for internal wms layer
                 style.listAll({provider: 'sld'}, function (response) {
-                    if(response && response.styles) {
+                    if(response) {
                         for (var j = 0; j < item.layer.TargetStyle.length; j++) {
                             var tgStyle = item.layer.TargetStyle[j];
-                            for (var i = 0; i < response.styles.length; i++) {
-                                var style = response.styles[i];
+                            for (var i = 0; i < response.length; i++) {
+                                var style = response[i];
                                 if (style.Name === tgStyle.Name && style.Provider === tgStyle.Provider) {
                                     $scope.styles.existing.push(style);
                                     break;

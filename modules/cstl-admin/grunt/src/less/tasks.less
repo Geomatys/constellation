@@ -61,3 +61,71 @@
   word-wrap: normal;
   white-space: pre;
 }
+
+
+// Group parameters
+// ----------
+
+.parameter-group {
+  margin-top: 10px;
+
+  > .group-header {
+    position: relative;
+    padding-right: 50px; // more than "+" button width
+    min-height: 34px;    // equals to "+" button height
+    margin-bottom: 8px;
+
+    > label {
+      display: block;
+      margin: 0;
+      padding: 9px 0;
+    }
+
+    > button {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+
+  > .group-body > .group-occurrence {
+    background-color: rgba(230, 230, 230, .5);
+    border-left: 4px solid #60a84d;
+    padding: 15px;
+    margin-bottom: 10px;
+    position: relative;
+
+    > .remove {
+      display: block;
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      background-color: #60a84d;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      text-align: center;
+      color: #ffffff;
+      text-shadow: 0 1px 0 #000000;
+    }
+
+    > div:last-child > .parameter-simple:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+
+// Simple parameters
+// ----------
+
+.parameter-simple .simple-occurrence {
+  margin-bottom: 15px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}

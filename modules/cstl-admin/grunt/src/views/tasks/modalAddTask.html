@@ -41,7 +41,7 @@
                 <div class="form-horizontal">
                 <div class="" ng-class="{'has-error':!isValid(parameter.name)}"
                      ng-repeat="parameter in parameters track by $index"
-                     ng-include="'views/tasks/param_renderer.html'"></div>
+                     ng-include="'views/tasks/' + parameter.type + '_renderer.html'"></div>
                 </div>
             </form>
 

@@ -553,4 +553,74 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                 });
             }
         };
+    })
+
+    .directive('picklist', function() {
+        return {
+            restrict: 'EA',
+            scope: {
+                leftModel: '=',
+                rightModel: '=',
+                leftLabel: '=',
+                rightLabel: '=',
+                labelField: '@'
+            },
+            link: function(scope) {
+
+                scope.leftModel = scope.leftModel || [];
+                scope.rightModel = scope.rightModel || [];
+                scope.leftSelect = [];
+                scope.rightSelect = [];
+
+                scope.move = function(direction, items) {
+                    var targetModel = (direction === 'left') ? scope.leftModel : scope.rightModel;
+                    var sourceModel = (direction === 'left') ? scope.rightModel : scope.leftModel;
+
+                    // Move items.
+                    var i = items.length;
+                    while (i--) {
+                        if (targetModel.indexOf(items[i]) === -1) {
+                            targetModel.push(items[i]);
+
+                            // Ensure that the moved item is properly removed from the opposite
+                            // side model array. Note that the item array could be the side model
+                            // array itself.
+                            if (items === sourceModel) {
+                                items.splice(i, 1);
+                            } else {
+                                sourceModel.splice(sourceModel.indexOf(items[i]), 1);
+                            }
+                        }
+                    }
+
+                    // Reset selection.
+                    scope.leftSelect = [];
+                    scope.rightSelect = [];
+                };
+            },
+            replace: true,
+            template:
+                '<div class="picklist clearfix">' +
+                    '<div class="picklist-head" ng-show="leftLabel || rightLabel">' +
+                        '<label ng-bind="leftLabel"></label>' +
+                        '<label ng-bind="rightLabel"></label>' +
+                    '</div>' +
+                    '<div class="picklist-body">' +
+                        '<div class="picklist-left">' +
+                            '<select multiple="multiple" class="form-control" ng-model="leftSelect" ng-options="item as item[labelField] for item in leftModel"/>' +
+                        '</div>' +
+                        '<div class="picklist-actions">' +
+                            '<div class="centered">' +
+                                '<button type="button" class="btn btn-default" ng-click="move(\'left\',rightModel)" ng-disabled="!rightModel.length"><i class="fa fa-angle-double-left"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="move(\'left\',rightSelect)" ng-disabled="!rightSelect.length"><i class="fa fa-angle-left"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="move(\'right\',leftSelect)" ng-disabled="!leftSelect.length"><i class="fa fa-angle-right"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="move(\'right\',leftModel)" ng-disabled="!leftModel.length"><i class="fa fa-angle-double-right"></i></button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="picklist-right">' +
+                            '<select multiple="multiple" class="form-control" ng-model="rightSelect" ng-options="item as item[labelField] for item in rightModel"/>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>'
+        };
     });

@@ -146,7 +146,7 @@ public class AdminRest {
             final Instance instance = convertToInstance(service);
             instances.add(instance);
         }
-        return Response.ok(new InstanceReport(instances)).build();
+        return Response.ok(instances).build();
     }
 
     @GET
@@ -158,7 +158,7 @@ public class AdminRest {
             final Instance instance = convertToInstance(service);
             instances.add(instance);
         }
-        return Response.ok(new InstanceReport(instances)).build();
+        return Response.ok(instances).build();
     }
 
     @GET

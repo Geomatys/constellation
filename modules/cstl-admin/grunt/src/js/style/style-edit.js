@@ -2372,14 +2372,14 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
         $scope.initScopeStyle = function() {
             style.listAll({provider: 'sld'}, function(response) {
                 var stylesArray = [];
-                if(response.styles && response.styles.length>0 && $scope.dataType){
-                    for(var i=0;i<response.styles.length;i++){
-                        if($scope.dataType.toLowerCase() === response.styles[i].Type.toLowerCase()){
-                            stylesArray.push(response.styles[i]);
+                if(response && response.length>0 && $scope.dataType){
+                    for(var i=0;i<response.length;i++){
+                        if($scope.dataType.toLowerCase() === response[i].Type.toLowerCase()){
+                            stylesArray.push(response[i]);
                         }
                     }
                 }else {
-                    stylesArray =response.styles;
+                    stylesArray = response;
                 }
                 Dashboard($scope, stylesArray, true);
             });

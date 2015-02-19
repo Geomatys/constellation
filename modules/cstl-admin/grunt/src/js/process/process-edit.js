@@ -18,9 +18,144 @@
  * limitations under the License.
  */
 
-angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal', 'processParamEditorEngine'])
 
-    .controller('ModalAddTaskController', function($scope, $modalInstance, Growl, TaskService, processes, task, style){
+    .config(function(processParamEditorProvider) {
+        processParamEditorProvider
+            .put('java.lang.Boolean', {
+                templateUrl: 'views/tasks/editor/boolean.html'
+            })
+            .put('java.lang.Double', {
+                templateUrl: 'views/tasks/editor/number.html'
+            })
+            .put('java.lang.Integer', {
+                templateUrl: 'views/tasks/editor/number.html'
+            })
+            .put('java.lang.Long', {
+                templateUrl: 'views/tasks/editor/number.html'
+            })
+            .put('java.lang.String', {
+                templateUrl: 'views/tasks/editor/string.html'
+            })
+            .put('java.net.URL', {
+                templateUrl: 'views/tasks/editor/url.html'
+            })
+            .put('java.io.File', {
+                templateUrl: 'views/tasks/editor/file.html'
+            })
+            .put('org.constellation.process.StyleProcessReference', {
+                templateUrl: 'views/tasks/editor/style.html',
+                controller:'StyleEditorController',
+                controllerAs: 'ec',
+                resolve : {
+                    'styles': ['StyleService', function(StyleService) {
+                        return StyleService.getStyles().$promise;
+                    }]
+                }
+            })
+            .put('org.constellation.process.ServiceProcessReference', {
+                templateUrl: 'views/tasks/editor/service.html',
+                controller:'ServiceEditorController',
+                controllerAs: 'ec',
+                resolve : {
+                    'services': ['OGCWSService', function(OGCWSService) {
+                        return OGCWSService.getAllServices().$promise;
+                    }]
+                }
+            })
+            .put('org.constellation.process.CRSProcessReference', {
+                templateUrl: 'views/tasks/editor/crs.html',
+                controller:'CRSEditorController',
+                controllerAs: 'ec',
+                resolve : {
+                    'epsgCodes': ['EPSGService', function(EPSGService) {
+                        return EPSGService.getEPSGCodes().$promise;
+                    }]
+                }
+            })
+            .put('org.constellation.process.DatasetProcessReference', {
+                templateUrl: 'views/tasks/editor/dataset.html',
+                controller:'DatasetEditorController',
+                controllerAs: 'ec',
+                resolve : {
+                    'datasets': ['DataService', function(DataService) {
+                        return DataService.getAllDatasets().$promise;
+                    }]
+                }
+            });
+    })
+
+    .controller('StyleEditorController', function(parameter, valueIndex, styles, $filter) {
+
+        var self = this;
+
+        //full list
+        self.styles = styles;
+
+        //apply filter
+        if (parameter.ext && parameter.ext.filter) {
+            self.styles = $filter('filter')(self.styles, parameter.ext.filter);
+        }
+
+        // add undefined if parameter optional
+        self.styles = (parameter.mandatory ? [] : [undefined]).concat(self.styles);
+
+        //initialize parameter saved value
+        if (parameter.save[valueIndex] === undefined) {
+            parameter.save[valueIndex] = parameter.mandatory ? styles[0] : undefined;
+        }
+    })
+
+    .controller('ServiceEditorController', function(parameter, valueIndex, services, $filter) {
+
+        var self = this;
+        //full list
+        self.services = services;
+
+        //apply filter
+        if (parameter.ext && parameter.ext.filter) {
+            self.services = $filter('filter')(self.services, parameter.ext.filter);
+        }
+
+        // add undefined if parameter optional
+        self.services = (parameter.mandatory ? [] : [undefined]).concat(self.services);
+
+        //initialize parameter saved value
+        if (parameter.save[valueIndex] === undefined) {
+            parameter.save[valueIndex] = parameter.mandatory ? services[0] : undefined;
+        }
+    })
+
+    .controller('CRSEditorController', function(parameter, valueIndex, epsgCodes) {
+
+        var self = this;
+
+        self.epsgCodes = (parameter.mandatory ? [] : [undefined]).concat(epsgCodes);
+
+        if (parameter.save[valueIndex] === undefined) {
+            parameter.save[valueIndex] = parameter.mandatory ? epsgCodes[0] : undefined;
+        }
+    })
+
+    .controller('DatasetEditorController', function(parameter, valueIndex, datasets) {
+
+        var self = this;
+
+        self.datasets = (parameter.mandatory ? [] : [undefined]).concat(datasets);
+
+        if (parameter.save[valueIndex] === undefined) {
+            parameter.save[valueIndex] = parameter.mandatory ? datasets[0] : undefined;
+        }
+    })
+
+    .controller('ModalAddTaskController', function($scope, $modalInstance, Growl, TaskService, processes, task,
+                                                   StyleService, OGCWSService, EPSGService, DataService, processParamEditor){
+
+        //init services
+        StyleService.refresh();
+        OGCWSService.refresh();
+        DataService.refresh();
+        //EPSGService.refresh(); //no need to refresh crs list.
 
         // Private function
         function parseProcessDefaultName(processName) {
@@ -161,7 +296,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             if (parameter.type === 'simple') {
 
                 //test emptyness
-                if (parameter.mandatory && parameter.save === null) {
+                if (parameter.mandatory && (parameter.save === null || parameter.save.length === 0)) {
                     Growl('error', 'Error', 'Parameter '+parameter.name+' is mandatory');
                     return false;
                 }
@@ -217,26 +352,30 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             copy.minOccurs = param.minOccurs;
             copy.maxOccurs = param.maxOccurs;
             copy.mandatory = param.mandatory;
-            copy.documentation = param.documentation;
+            copy.description = param.description;
             copy.type = param.type;
+            copy.isArray = param.isArray;
 
             if (param.type === 'simple') {
                 copy.default = param.default;
                 copy.binding = param.binding;
-                copy.documentation = param.documentation;
-                copy.save = copy.default;
-                copy.base = param.base;
+                copy.unit = param.unit;
                 copy.restriction = param.restriction;
+                copy.ext = param.ext;
+                copy.save = [];
+                for (var i = 0; i < copy.minOccurs; i++) {
+                    copy.save.push(copy.default);
+                }
             } else {
-                copy.inputs = [[]];
+                copy.inputs = [];
                 var paramInputs = param.inputs;
-                var nbGrp = paramInputs.length;
-                for (var i = 0; i <nbGrp; i++) {
+                //only duplicate minOccurs number of group occurrences.
+                for (var j = 0; j < copy.minOccurs; j++) {
                     var grpInputs = [];
-                    var params = paramInputs[i];
+                    var params = paramInputs[j];
                     var nbParams = params.length;
-                    for (var j = 0; j <nbParams; j++) {
-                        grpInputs.push(copyParam(params[j]));
+                    for (var k = 0; k <nbParams; k++) {
+                        grpInputs.push(copyParam(params[k]));
                     }
                     copy.inputs.push(grpInputs);
                 }
@@ -244,16 +383,6 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             return copy;
         }
 
-        function listAvailableStyles() {
-            style.listAll({provider: 'sld'}, function (response) {
-                $scope.styles.splice(0,$scope.styles.length);
-                jQuery.each(response.styles, function(i,style) {
-                    var styleName = style.Name;
-                    var styleRef = '${providerStyleType|sld|'+styleName+'}';
-                    $scope.styles.push({name:styleName, ref:styleRef});
-                });
-            });
-        }
 
         function extractEnumeration(enumList, binding) {
             var enumerationList = [];
@@ -282,17 +411,6 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         }
 
         // Scope variables
-
-        $scope.manageField = [
-            "java.lang.String",
-            "java.lang.Boolean",
-            "java.lang.Integer",
-            "java.lang.Long",
-            "java.lang.Double",
-            "java.net.URL",
-            "java.io.File",
-            "org.constellation.util.StyleReference"
-        ];
         $scope.canManage = false;
 
         $scope.option = {
@@ -331,10 +449,10 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
         $scope.validate = function() {
 
-            if (!$scope.isValid("formModalAddTask")) {
-                Growl('error', 'Error', 'Form is invalid');
-                return false;
-            }
+            //if (!$scope.isValid("formModalAddTask")) {
+            //    Growl('error', 'Error', 'Form is invalid');
+            //    return false;
+            //}
 
             if (!$scope.task.processAuthority && !$scope.task.processCode) {
                 //add mode
@@ -395,77 +513,80 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         }, true);
 
         $scope.$watch('describeProcess', function(newValue, oldValue){
+
             if (newValue !== oldValue) {
                 $scope.canManage = true;
 
                 var inputs = [];
-                var initializationFlags = {};
 
-                var prepareFields = function(input) {
-
-                    //initialize style list
-                    if ("org.constellation.util.StyleReference" === input.binding) {
-                        //initialize only once
-                        if (!initializationFlags[input.binding]) {
-                            listAvailableStyles();
-                        }
-                        initializationFlags[input.binding] = true;
-                        input.restriction.enumeration = $scope.styles;
-                    }
+                var isArray = function(string) {
+                    return string.indexOf('[]', string.length - 2) !== -1;
                 };
 
-
                 var parseParameterDescriptor = function(elem, idPrefix) {
-                    var inputElement = {};
-                    inputElement.name = elem.name;
-                    inputElement.id = idPrefix != null ? idPrefix+'_'+elem.name : elem.name;
-                    inputElement.minOccurs = elem.minOccurs || 1;
-                    inputElement.maxOccurs = elem.maxOccurs || 1;
-                    inputElement.mandatory = inputElement.minOccurs > 0;
-                    inputElement.description = elem.description;
+                    var parameter = {};
+                    parameter.name = elem.name;
+                    parameter.id = idPrefix != null ? idPrefix+'_'+elem.name : elem.name;
+                    parameter.minOccurs = elem.minOccurs || 1;
+                    parameter.maxOccurs = elem.maxOccurs || 1;
+                    parameter.mandatory = parameter.minOccurs > 0;
+                    parameter.description = elem.description;
 
                     //Simple parameter
-                    var simple = elem.class !== undefined;
+                    var javaClass = elem.class;
+                    var simple = javaClass !== undefined;
                     if (simple) {
-                        inputElement.type = "simple";
-                        inputElement.binding = elem.class;
-                        inputElement.default = convertValue(elem.defaultValue, inputElement.binding);
-                        inputElement.unit = simple.unit;
-                        inputElement.save = inputElement.default;
+                        parameter.type = "simple";
+                        parameter.isArray = false;
+                        parameter.binding = javaClass;
+                        if (isArray(javaClass)) {
+                            parameter.isArray = true;
+                            parameter.binding = javaClass.substring(0, javaClass.length-2);
+                        }
+                        parameter.default = convertValue(elem.defaultValue, parameter.binding);
+                        parameter.unit = simple.unit;
+
+                        //default values
+                        parameter.save = [];
+                        for (var j = 0; j < parameter.minOccurs; j++) {
+                            parameter.save.push(parameter.default);
+                        }
 
                         //check if parameter is handled
-                        if (inputElement.mandatory && jQuery.inArray(inputElement.binding, $scope.manageField) === -1) {
+                        if (parameter.mandatory && !processParamEditor.hasEditor(parameter.binding)) {
                             $scope.canManage = false;
                         }
 
-                        if (simple.restriction) {
-                            var restriction = simple.restriction;
+                        if (elem.restriction) {
+                            var restriction = elem.restriction;
                             //inputElement.base = restriction.base;
 
                             //extract valid value range
-                            inputElement.restriction = {};
+                            parameter.restriction = {};
                             var minValue = restriction.minValue;
                             var maxValue = restriction.maxValue;
                             if (minValue !== null && maxValue !== null) {
-                                inputElement.restriction.range = [minValue, maxValue];
+                                parameter.restriction.range = [minValue, maxValue];
                             }
 
                             //extract valid values
-                            inputElement.restriction.enumeration = extractEnumeration(restriction.validValues, inputElement.binding);
+                            parameter.restriction.enumeration = extractEnumeration(restriction.validValues, parameter.binding);
                         } else {
-                            inputElement.restriction = {};
-                            inputElement.restriction.enumeration = [];
+                            parameter.restriction = {};
+                            parameter.restriction.enumeration = [];
                         }
 
-                        prepareFields(inputElement);
+                        if (elem.ext) {
+                            parameter.ext = elem.ext;
+                        }
 
                     } else {
                         //Group parameters
-                        inputElement.type = "group";
-                        inputElement.inputs = [[]];
-                        parseElements(elem.descriptors, inputElement.inputs[0], inputElement.id);
+                        parameter.type = "group";
+                        parameter.inputs = [[]];
+                        parseElements(elem.descriptors, parameter.inputs[0], parameter.id);
                     }
-                    return inputElement;
+                    return parameter;
                 };
 
                 var parseElements = function(elements, inputsDesc, idPrefix) {

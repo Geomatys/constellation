@@ -574,7 +574,7 @@ public final class StyleRest {
             final List<LayerSummary> layersList = layerBusiness.getLayerSummaryFromStyleId(sb.getId());
             sb.setLayersList(layersList);
         }
-        return ok(new StyleListBrief(briefsList));
+        return ok(briefsList);
     }
 
     /**

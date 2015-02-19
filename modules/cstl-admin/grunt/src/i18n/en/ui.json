@@ -1085,6 +1085,8 @@
 
     "sensor.observation":"Sensor observation",
 
+    "tasks.edit.picklist.available":"Available",
+    "tasks.edit.picklist.selected":"Selected",
     "tasks.information.edit":"Edit task",
     "tasks.information.execute":"Execute task",
     "tasks.information.duplicate":"Duplicate task",

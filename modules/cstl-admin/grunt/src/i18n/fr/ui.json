@@ -1060,6 +1060,8 @@
 
     "sensor.observation":"Observation",
 
+    "tasks.edit.picklist.available":"Disponibles",
+    "tasks.edit.picklist.selected":"Sélectionnés",
     "tasks.information.edit":"Éditer le traitement",
     "tasks.information.execute":"Executer le traitement",
     "tasks.information.duplicate":"Dupliquer le traitement",

@@ -1,0 +1,21 @@
+<div class="form-group parameter-simple">
+    <label for="{{parameter.id}}" class="col-sm-3 control-label" style="text-align:left;">
+        {{parameter.name}}&nbsp;<span ng-show="parameter.mandatory" class="mandatory">(*)</span>
+    </label>
+    <div class="col-sm-9" ng-show="!parameter.save.length">
+        <button type="button" class="btn btn-default" ng-click="parameter.save.push(parameter.default)"><i class="fa fa-plus"></i></button>
+    </div>
+    <div class="col-sm-9" ng-show="parameter.save.length">
+        <div class="row simple-occurrence" ng-repeat="value in parameter.save track by $index">
+            <div ng-class="{'col-sm-12': parameter.maxOccurs <= 1, 'col-sm-9': parameter.maxOccurs > 1}">
+                <div process-param-editor="parameter"></div>
+            </div>
+            <div class="col-sm-3" ng-show="parameter.maxOccurs > 1">
+                <button type="button" class="btn btn-default" ng-show="$index >= parameter.minOccurs" ng-click="parameter.save.splice($index,1)"><i class="fa fa-minus"></i></button>
+                <button type="button" class="btn btn-default" ng-show="$index === 0 && parameter.save.length < parameter.maxOccurs" ng-click="parameter.save.push(parameter.default)"><i class="fa fa-plus"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <p ng-show="parameter.documentation" class="help-block col-sm-12">{{parameter.documentation}}</p>
+</div>
