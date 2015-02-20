@@ -36,7 +36,6 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageUtilities;
 import org.geotoolkit.coverage.GridMosaic;
 import org.geotoolkit.coverage.Pyramid;
@@ -50,7 +49,6 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
-import org.geotoolkit.image.io.mosaic.Tile;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -98,7 +96,6 @@ import org.springframework.context.annotation.Scope;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.inject.Named;
-import javax.ws.rs.HEAD;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -165,8 +162,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      * {@link org.geotoolkit.coverage.Pyramid} ids. It's used only if we've got multiple pyramids with the same ID but
      * different matrix structure. Otherwise, we directly use pyramid ids as tile matrix set name.
      */
-    private HashMap<String, String> tmsIdBinding = new HashMap<>();
-    private ReentrantReadWriteLock tmsBindingLock = new ReentrantReadWriteLock();
+    private final HashMap<String, HashSet<String>> tmsIdBinding = new HashMap<>();
+    private final ReentrantReadWriteLock tmsBindingLock = new ReentrantReadWriteLock();
 
     /**
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
@@ -241,23 +238,20 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
 
         /* We synchronize Computing, because every thread will compute the same thing, its useless to waste CPU. One will
-         * do the job, the others will wait.
+         * do the job, the others will wait for it. More over, it's EXTREMELY important for the integrity of the binding
+         * between pyramids and Tile matrix set ids that we synchronize the get Capa using our binding lock.
          */
-        synchronized (this) {
+        tmsBindingLock.writeLock().lock();
+        try {
 
             cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
             if (cachedCapabilities != null) {
                 return (Capabilities) cachedCapabilities.applySections(sections);
             }
-        /*
-         * BUILD NEW CAPABILITIES DOCUMENT
-         */
-            tmsBindingLock.writeLock().lock();
-            try {
-                tmsIdBinding.clear();
-            } finally {
-                tmsBindingLock.writeLock().unlock();
-            }
+            /*
+             * BUILD NEW CAPABILITIES DOCUMENT
+             */
+            tmsIdBinding.clear();
 
             // we load the skeleton capabilities
             final Details skeleton = getStaticCapabilitiesObject("wmts", null);
@@ -476,7 +470,9 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                      * - If we already have a tile matrix set equal to the current one, we just make a link to the old
                      * one.
                      * - If we've got two sets with the same name, but they're different, we rename the new matrix set
-                     * to avoid mistakes. We store a binding between the new identifier and the old one to be able to
+                     * to avoid mistakes. 
+                     * 
+                     * In all cases, we store a binding between the TMS identifier and the pyramid one to be able to
                      * retrieve pyramid at getTile request.
                      */
                         TileMatrixSet previousDefined = tileSets.get(pr.getId());
@@ -502,14 +498,10 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                             final String tmsUUID = UUID.randomUUID().toString();
                             tms.setIdentifier(new CodeType(tmsUUID));
                             tileSets.put(tmsUUID, tms);
-
-                            tmsBindingLock.writeLock().lock();
-                            try {
-                                tmsIdBinding.put(tmsUUID, pr.getId());
-                            } finally {
-                                tmsBindingLock.writeLock().unlock();
-                            }
                         }
+                        
+                        addTileMatrixSetBinding(tms.getIdentifier().getValue(), pr.getId());
+                        
 
                         final TileMatrixSetLink tmsl = new TileMatrixSetLink(tms.getIdentifier().getValue());
                         outputLayer.addTileMatrixSetLink(tmsl);
@@ -527,9 +519,33 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             putCapabilitiesInCache("1.0.0", null, c);
             LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
             return (Capabilities) c.applySections(sections);
+        
+        } finally {
+            tmsBindingLock.writeLock().unlock();
         }
     }
 
+    /**
+     * Add a binding between a tile matrix set defined in service GetCapabilities,
+     * and a pyramid set Id. The aim is to factorize the possible tile matrixes.
+     * @param tmsId The ID of the {@link TileMatrixSet} to expose via GetCapabilities.
+     * @param pyramidId The pyramid ID to add as valid pyramid for input TMS.
+     * @return True if we successfully added the binding, false otherwise (in could already exist).
+     */
+    private boolean addTileMatrixSetBinding(final String tmsId, final String pyramidId) {
+        tmsBindingLock.writeLock().lock();
+        try {
+            HashSet<String> bindings = tmsIdBinding.get(tmsId);
+            if (bindings == null) {
+                bindings = new HashSet<>();
+                tmsIdBinding.put(tmsId, bindings);
+            }
+            return bindings.add(pyramidId);
+        } finally {
+            tmsBindingLock.writeLock().unlock();
+        }
+    }
+    
     /**
      * Return CRS code name. As WMTS define only 2D CRS (additional dimensions are stored beside), we will extract
      * horizontal CRS, and search for a standard EPSG identifier. If we cannot find it, we will just keep CRS initial
@@ -684,11 +700,20 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final int columnIndex         = request.getTileCol();
         final int rowIndex            = request.getTileRow();
         final String level            = request.getTileMatrix();
-
+        
         String matrixSetName   = request.getTileMatrixSet();
-        final String idBinding = tmsIdBinding.get(matrixSetName);
-        if (idBinding != null) {
-            matrixSetName = idBinding;
+        final HashSet<String> validPyramidNames;
+        tmsBindingLock.readLock().lock();
+        try {
+            final HashSet<String> idBinding = tmsIdBinding.get(matrixSetName);
+            if (idBinding != null && !idBinding.isEmpty()) {
+                validPyramidNames = idBinding;
+            } else {
+                validPyramidNames = new HashSet<>(1);
+                validPyramidNames.add(matrixSetName);
+            }
+        } finally {
+            tmsBindingLock.readLock().unlock();
         }
 
         if (columnIndex < 0 || rowIndex < 0) {
@@ -699,31 +724,31 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         try {
             final Data details = getLayerReference(userLogin, layerName);
-            if(details == null){
-                throw new CstlServiceException("Operation request contains an invalid parameter value, " +
-                        "No layer for name : " + layerName ,
+            if (details == null) {
+                throw new CstlServiceException("Operation request contains an invalid parameter value, "
+                        + "No layer for name : " + layerName,
                         INVALID_PARAMETER_VALUE, "layerName");
             }
 
             final Object origin = details.getOrigin();
-            if(!(origin instanceof PyramidalCoverageReference)){
+            if (!(origin instanceof PyramidalCoverageReference)) {
                 //WMTS only handle PyramidalCoverageReference
-                throw new CstlServiceException("Operation request contains an invalid parameter value, " +
-                        "invalid layer : " + layerName + " , layer is not a pyramid model " + layerName,
+                throw new CstlServiceException("Operation request contains an invalid parameter value, "
+                        + "invalid layer : " + layerName + " , layer is not a pyramid model " + layerName,
                         INVALID_PARAMETER_VALUE, "layerName");
             }
 
-            final PyramidSet set = ((PyramidalCoverageReference)origin).getPyramidSet();
+            final PyramidSet set = ((PyramidalCoverageReference) origin).getPyramidSet();
             Pyramid pyramid = null;
-            for(Pyramid pr : set.getPyramids()){
-                if(pr.getId().equals(matrixSetName)){
+            for (Pyramid pr : set.getPyramids()) {
+                if (validPyramidNames.contains(pr.getId())) {
                     pyramid = pr;
                     break;
                 }
             }
-            if(pyramid == null){
-                throw new CstlServiceException("Operation request contains an invalid parameter value," +
-                        " undefined matrixSet: " + matrixSetName + " for layer: " + layerName,
+            if (pyramid == null) {
+                throw new CstlServiceException("Operation request contains an invalid parameter value,"
+                        + " undefined matrixSet: " + matrixSetName + " for layer: " + layerName,
                         INVALID_PARAMETER_VALUE, "tilematrixset");
             }
 
