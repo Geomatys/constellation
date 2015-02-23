@@ -171,6 +171,8 @@ import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V110;
 import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V200;
 import static org.constellation.wfs.ws.WFSConstants.TYPE_PARAM;
 import static org.constellation.wfs.ws.WFSConstants.UNKNOW_TYPENAME;
+import org.geotoolkit.data.FeatureStoreRuntimeException;
+import org.geotoolkit.data.session.Session;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
@@ -747,16 +749,22 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (maxFeatures != 0){
                     queryBuilder.setMaxFeatures(maxFeatures);
                 }
-                FeatureCollection collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
+
+                final Session session = layer.getStore().createSession(false);
+                final org.geotoolkit.data.query.Query qb = queryBuilder.buildQuery();
+                FeatureCollection collection = session.getFeatureCollection(qb);
+                int colSize = 0;
+
                 // look for matching count
                 queryBuilder.setMaxFeatures(null);
                 try {
-                    nbMatched = nbMatched +  layer.getStore().createSession(false).getCount(queryBuilder.buildQuery());
-                } catch (DataStoreException ex) {
+                    colSize = collection.size();
+                    nbMatched = nbMatched +  colSize;
+                } catch (FeatureStoreRuntimeException ex) {
                     throw new CstlServiceException(ex);
                 }
 
-                if (!collection.isEmpty()) {
+                if (colSize>0) {
                     if(queryCRS == null){
                         try {
                             //ensure axes are in the declared order, since we use urn epsg, we must comply
