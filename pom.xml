@@ -179,9 +179,7 @@
         <shiro.version>1.2.1</shiro.version>
         <geoapi.version>4.0-M02</geoapi.version>
         <sis.version>0.5-jdk7</sis.version>
-        <geotoolkit.version>4.0-M03</geotoolkit.version>
-        <!--<mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>-->
-        <!--<juzu.version>0.7.0-beta22</juzu.version>-->
+        <geotoolkit.version>4.0-SNAPSHOT</geotoolkit.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jersey.version>2.12</jersey.version>
 	    <jaxws.version>2.2.8</jaxws.version>
