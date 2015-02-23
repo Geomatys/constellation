@@ -143,6 +143,16 @@ public class QuartzJobListener implements JobListener {
             taskEntity.setState(TaskState.RUNNING.name());
             taskEntity.setMessage(toString(event.getTask()));
             taskEntity.setProgress((double) event.getProgress());
+
+            ParameterValueGroup output = event.getOutput();
+            if (output != null) {
+                try {
+                    taskEntity.setTaskOutput(ParamUtilities.writeParameterJSON(output));
+                } catch (JsonProcessingException e) {
+                    LOGGER.log(Level.WARNING, "Process output serialization failed", e);
+                }
+            }
+
             updateTask(taskEntity);
         }
 
