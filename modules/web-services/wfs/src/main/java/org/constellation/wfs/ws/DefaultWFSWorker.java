@@ -160,10 +160,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
+import org.apache.sis.xml.Namespaces;
+import org.constellation.wfs.ws.WFSConstants.GetXSD;
 
 import static org.constellation.wfs.ws.WFSConstants.IDENTIFIER_FILTER;
 import static org.constellation.wfs.ws.WFSConstants.IDENTIFIER_PARAM;
@@ -191,6 +195,8 @@ import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildSections;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildTransactionResponse;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildValueCollection;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildWFSCapabilities;
+import org.geotoolkit.xsd.xml.v2001.FormChoice;
+import org.geotoolkit.xsd.xml.v2001.Import;
 
 
 /**
@@ -529,10 +535,150 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 LOGGER.log(Level.SEVERE, "error while excluding primary keys", ex);
             }
         }
+        
+        /*
+         * Most simple case. we have only one feature type
+         */
+        final Schema schema;
+        if (size == 1) {
+            final FeatureType type = types.get(0);
+            final String tn        = type.getName().getLocalPart();
+            final String tnmsp     = type.getName().getNamespaceURI();
+            schema = writer.getSchemaFromFeatureType(type);
+            final Set<String> nmsps = Utils.listAllNamespaces(type);
+            nmsps.remove(tnmsp);
+            nmsps.remove(Namespaces.GML);
+            nmsps.remove("http://www.opengis.net/gml");
+            for (String nmsp : nmsps) {
+                schema.addImport(new Import(nmsp, getServiceUrl() + "request=xsd&version=" + currentVersion + "&targetNamespace=" + nmsp + "&typename=ns:" + tn + "&namespace=xmlns(ns=" + tnmsp + ")"));
+            }
+        /*
+         * Second case. we have many feature type in the same namespace
+         */    
+        } else if (AllInSameNamespace(types)) {
+            schema = writer.getSchemaFromFeatureType(types);
+            final Set<String> nmsps = new HashSet<>();
+            for (FeatureType type : types) {
+                nmsps.addAll(Utils.listAllNamespaces(type));
+            }
+            nmsps.remove(types.get(0).getName().getNamespaceURI());
+            nmsps.remove(Namespaces.GML);
+            nmsps.remove("http://www.opengis.net/gml");
+            for (String nmsp : nmsps) {
+                schema.addImport(new Import(nmsp, getServiceUrl() + "request=xsd&version=" + currentVersion + "&targetNamespace=" + nmsp));
+            }
+        
+        /*
+         * third case. we have many feature type in the many namespace.
+         * send an xsd pointing on various describeFeatureRequest   
+         */     
+        } else {
+            Map<String, List<FeatureType>> typeMap = splitByNamespace(types);
+            schema = new Schema(FormChoice.QUALIFIED, null);
+            for (String nmsp : typeMap.keySet()) {
+                final List<FeatureType> fts = typeMap.get(nmsp);
+                StringBuilder sb = new StringBuilder();
+                for (FeatureType ft : fts) {
+                    sb.append("ns:").append(ft.getName().getLocalPart()).append(',');
+                }
+                sb.delete(sb.length() -1, sb.length());
+                final String schemaLocation = getServiceUrl() + "request=DescribeFeatureType&service=WFS&version=" + currentVersion + "&typename=" + sb.toString() + "&namespace=xmlns(ns=" + nmsp + ")";
+                schema.addImport(new Import(nmsp, schemaLocation));
+            }
+        }
+        
         LOGGER.log(logLevel, "DescribeFeatureType treated in {0}ms", (System.currentTimeMillis() - start));
-        return writer.getSchemaFromFeatureType(types);
+        return schema;
     }
 
+    private boolean AllInSameNamespace(final List<FeatureType> types) {
+        if (!types.isEmpty() || types.size() == 1) {
+            String firstNmsp = types.get(0).getName().getNamespaceURI();
+            for (int i = 1; i < types.size(); i++) {
+                FeatureType type = types.get(i);
+                if (!firstNmsp.equals(type.getName().getNamespaceURI())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    private Map<String, List<FeatureType>> splitByNamespace(final List<FeatureType> types) {
+        Map<String, List<FeatureType>> results = new HashMap<>();
+        for (FeatureType type : types) {
+            final String nmsp = type.getName().getNamespaceURI();
+            if (results.containsKey(nmsp)) {
+                results.get(nmsp).add(type);
+            } else {
+                final List<FeatureType> ft = new ArrayList<>();
+                ft.add(type);
+                results.put(nmsp, ft);
+            }
+        }
+        return results;
+    }
+    
+    @Override
+    public Schema getXsd(final GetXSD request) throws CstlServiceException {
+        final String userLogin = getUserLogin();
+
+        final String gmlVersion;
+        if ("2.0.0".equals(request.version)) {
+            gmlVersion = "3.2.1";
+        } else {
+            gmlVersion = "3.1.1";
+        }
+        final JAXBFeatureTypeWriter writer  = new JAXBFeatureTypeWriter(gmlVersion);
+        final List<FeatureType> types = new ArrayList<>();
+        final String suffix;
+        if (request.featureType == null) {
+            //search all types
+            for (final QName name : getConfigurationLayerNames(userLogin)) {
+                final Data layer = getLayerReference(userLogin, name);
+                if (!(layer instanceof FeatureData)) {continue;}
+
+                try {
+                    types.add(getFeatureTypeFromLayer((FeatureData)layer));
+                } catch (DataStoreException ex) {
+                    LOGGER.log(Level.WARNING, "error while getting featureType for:{0}", layer.getName());
+                }
+            }
+            suffix = "";
+        } else {
+            final Name n = Utils.getNameFromQname(request.featureType);
+            if (layersContainsKey(userLogin, n) == null) {
+                throw new CstlServiceException(UNKNOW_TYPENAME + request.featureType, INVALID_PARAMETER_VALUE, "typenames");
+            }
+            final Data layer = getLayerReference(userLogin, n);
+
+            if(!(layer instanceof FeatureData)) {
+                throw new CstlServiceException(UNKNOW_TYPENAME + request.featureType, INVALID_PARAMETER_VALUE, "typenames");
+            }
+
+            try {
+                types.add(getFeatureTypeFromLayer((FeatureData)layer));
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.WARNING, "error while getting featureType for:"+ layer.getName(), ex);
+            }
+            suffix = "&typename=ns:" + request.featureType.getLocalPart() + "&namespace=xmlns(ns=" + request.featureType.getNamespaceURI() + ")";
+        }
+        Schema schema = writer.getExternalSchemaFromFeatureType(request.namespace, types);
+        final Set<String> nmsps = new HashSet<>();
+        for (FeatureType type : types) {
+            nmsps.addAll(Utils.listAllSubNamespaces(type, request.namespace));
+        }
+        nmsps.remove(request.namespace);
+        nmsps.remove(Namespaces.GML);
+        nmsps.remove("http://www.opengis.net/gml");
+        
+        for (String nmsp : nmsps) {
+            schema.addImport(new Import(nmsp, getServiceUrl() + "request=xsd&version=" + request.version + "&targetNamespace=" + nmsp + suffix));
+        }
+        return schema;
+        
+    }
+    
     /**
      * Extract a FeatureType from a FeatureLayerDetails
      *

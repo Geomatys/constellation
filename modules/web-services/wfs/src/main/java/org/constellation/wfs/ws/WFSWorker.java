@@ -124,4 +124,6 @@ public interface WFSWorker extends Worker {
     DropStoredQueryResponse dropStoredQuery(final DropStoredQuery request) throws CstlServiceException;
     
     List<ParameterExpression> getParameterForStoredQuery(final String queryId);
+    
+    Schema getXsd(final WFSConstants.GetXSD request) throws CstlServiceException;
 }

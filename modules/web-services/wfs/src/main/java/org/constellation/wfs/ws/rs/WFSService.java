@@ -98,6 +98,7 @@ import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
 import static org.constellation.wfs.ws.WFSConstants.FILTER;
 import static org.constellation.wfs.ws.WFSConstants.GML_3_1_1;
 import static org.constellation.wfs.ws.WFSConstants.GML_3_2_1;
+import org.constellation.wfs.ws.WFSConstants.GetXSD;
 import static org.constellation.wfs.ws.WFSConstants.HANDLE;
 import static org.constellation.wfs.ws.WFSConstants.NAMESPACE;
 import static org.constellation.wfs.ws.WFSConstants.STR_CREATE_STORED_QUERY;
@@ -111,6 +112,7 @@ import static org.constellation.wfs.ws.WFSConstants.STR_GET_PROPERTY_VALUE;
 import static org.constellation.wfs.ws.WFSConstants.STR_LIST_STORED_QUERIES;
 import static org.constellation.wfs.ws.WFSConstants.STR_LOCKFEATURE;
 import static org.constellation.wfs.ws.WFSConstants.STR_TRANSACTION;
+import static org.constellation.wfs.ws.WFSConstants.STR_XSD;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildAcceptFormat;
@@ -289,6 +291,10 @@ public class WFSService extends GridWebService<WFSWorker> {
             } else if (request instanceof Transaction) {
                 final Transaction model = (Transaction) request;
                 return Response.ok(worker.transaction(model), MediaType.TEXT_XML).build();
+                
+            }  else if (request instanceof GetXSD) {
+                final GetXSD model = (GetXSD) request;
+                return Response.ok(worker.getXsd(model), MediaType.TEXT_XML).build();
             }
 
             throw new CstlServiceException("The operation " + request.getClass().getName() + " is not supported by the service",
@@ -412,6 +418,8 @@ public class WFSService extends GridWebService<WFSWorker> {
             return createNewCreateStoredQueryRequest();
         } else if (STR_DROP_STORED_QUERY.equalsIgnoreCase(request)) {
             return createNewDropStoredQueryRequest(worker);
+        } else if (STR_XSD.equalsIgnoreCase(request)) {
+            return createNewXsdRequest(worker);
         }
         throw new CstlServiceException("The operation " + request + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
@@ -1020,5 +1028,23 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String id           = getParameter("id",  true);
 
         return buildDropStoredQuery(version, service, handle, id);
+    }
+
+    private GetXSD createNewXsdRequest(WFSWorker worker) throws CstlServiceException {
+        final String version              = getParameter(VERSION_PARAMETER, true);
+        worker.checkVersionSupported(version, false);
+        
+        final String targetNamespace      = getParameter("targetnamespace", true);
+        final String namespace            = getParameter(NAMESPACE, false);
+        final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
+        final String typeNameStr          = getParameter("typeName", true);
+        final List<QName> typeNames       = extractTypeName(typeNameStr, mapping);
+        QName typeName;
+        if (typeNames.size() == 1) {
+            typeName = typeNames.get(0);
+        } else {
+            typeName = null;
+        }
+        return new GetXSD(typeName, targetNamespace, version);
     }
 }

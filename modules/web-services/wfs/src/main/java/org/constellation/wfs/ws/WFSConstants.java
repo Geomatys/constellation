@@ -65,6 +65,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.apache.sis.util.Version;
+import org.geotoolkit.ows.xml.RequestBase;
 
 /**
  *  WFS Constants
@@ -91,6 +93,7 @@ public final class WFSConstants {
     public static final String STR_GET_PROPERTY_VALUE      = "GetPropertyValue";
     public static final String STR_CREATE_STORED_QUERY     = "CreateStoredQuery";
     public static final String STR_DROP_STORED_QUERY       = "DropStoredQuery";
+    public static final String STR_XSD                     = "xsd";
 
     public static final String UNKNOW_TYPENAME= "The specified TypeNames does not exist:";
 
@@ -418,5 +421,37 @@ public final class WFSConstants {
 
         // Create capabilities base.
         return WFSXmlFactory.buildWFSCapabilities(version, servIdent, servProv, null, null, null);
+    }
+    
+    public static class GetXSD implements RequestBase {
+        public QName featureType;
+        public String namespace;
+        public String version;
+        
+        public GetXSD(QName featureType, String namespace, String version) {
+            this.featureType = featureType;
+            this.namespace   = namespace;
+            this.version     = version;
+        }
+
+        @Override
+        public String getService() {
+            return "WFS";
+        }
+
+        @Override
+        public void setService(String string) {
+            //do nothing
+        }
+
+        @Override
+        public void setVersion(String version) {
+            this.version = version;
+        }
+
+        @Override
+        public Version getVersion() {
+            return new Version(version);
+        }
     }
 }
