@@ -14,17 +14,17 @@
             <button type="button"
                     class="btn btn-default"
                     ng-click="close()"
-                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && optionsSLD.enableRaster===rasterstyletype.none"
                     translate="edition.style.label.cancel">Cancel</button>
             <button type="button"
-                    ng-show="chooseType===true && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-show="chooseType===true && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && optionsSLD.enableRaster===rasterstyletype.none"
                     class="btn btn-add"
                     ng-click="createStyle();">
                 <span translate="sldeditor.button.create">Create</span>
             </button>
             <button type="button"
                     class="btn btn-add"
-                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor || optionsSLD.enableRasterPalette || optionsSLD.enableRasterCells"
+                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor || optionsSLD.enableRaster!==rasterstyletype.none"
                     ng-click="goBack();">
                 <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>
             </button>

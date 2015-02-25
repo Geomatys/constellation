@@ -18,7 +18,9 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
 
     .controller('StyleModalController', function($scope, Dashboard, $modalInstance, style, $cookieStore, dataListing,
                                                  provider, Growl, textService, newStyle, selectedLayer,selectedStyle,
-                                                 serviceName, exclude, $timeout,stylechooser,$modal) {
+                                                 serviceName, exclude, $timeout,stylechooser,$modal, rasterstyletype) {
+
+        $scope.rasterstyletype = rasterstyletype;
 
         /**
          * To fix angular bug with nested scope.
@@ -134,7 +136,6 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         name: ''
                     }
                 },
-                enableRasterPalette:false,
                 rasterCells:{
                     "cellSize":20,
                     "cellType":'point',
@@ -174,7 +175,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         }
                     }
                 },
-                enableRasterCells:false,
+                enableRaster:rasterstyletype.none,
                 selectedSymbolizerType:"",
                 selectedSymbolizer:null,
                 filtersEnabled:false,
@@ -389,8 +390,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             $scope.optionsSLD.enableRuleEditor = false;
             $scope.optionsSLD.enableAutoIntervalEditor = false;
             $scope.optionsSLD.enableAutoUniqueEditor = false;
-            $scope.optionsSLD.enableRasterPalette = false;
-            $scope.optionsSLD.enableRasterCells = false;
+            $scope.optionsSLD.enableRaster = rasterstyletype.none;
         };
 
         /**
@@ -674,7 +674,62 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     $scope.newStyle.rules.push(cellRule);
                     $scope.setSelectedRule(cellRule);
                     $scope.editRasterCells();
+                }else if(mode ==='raster_dynamic'){
+                    $scope.optionsSLD.rasterDynamic = {
+                        "components":{
+                            "red":{
+                                isOpen:true,
+                                name:"Red",
+                                band: {
+                                    "selected":{name:"0",minValue:0,maxValue:255}
+                                },
+                                minValue:0,
+                                maxValue:255
+                            },
+                            "green":{
+                                isOpen:true,
+                                name:"Green",
+                                band: {
+                                    "selected":{name:"0",minValue:0,maxValue:255}
+                                },
+                                minValue:0,
+                                maxValue:255
+                            },
+                            "blue":{
+                                isOpen:true,
+                                name:"Blue",
+                                band: {
+                                    "selected":{name:"0",minValue:0,maxValue:255}
+                                },
+                                minValue:0,
+                                maxValue:255
+                            },
+                            "alpha":{
+                                isOpen:true,
+                                name:"Alpha",
+                                band: {
+                                    "selected":{name:"0",minValue:0,maxValue:255}
+                                },
+                                minValue:0,
+                                maxValue:255
+                            }
+
+                        },
+                        "symbolPills":'color'
+                    };
+                    var dynamicRule = {
+                        "name": 'dynamic-rule-'+new Date().getTime(),
+                        "title":'',
+                        "description":'',
+                        "maxScale":500000000,
+                        "symbolizers": [{'@symbol':'raster'}],
+                        "filter": null
+                    };
+                    $scope.newStyle.rules.push(dynamicRule);
+                    $scope.setSelectedRule(dynamicRule);
+                    $scope.editRasterDynamic();
                 }
+
                 $scope.optionsSLD.filtersEnabled=false;
                 $scope.optionsSLD.filterMode='simple';
                 $scope.optionsSLD.filters=[{
@@ -771,8 +826,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 }
             }
             if(! existsCellSymbolizer(symbolizers)){
-                $scope.optionsSLD.enableRasterPalette = true;
-                $scope.optionsSLD.enableRasterCells = false;
+                $scope.optionsSLD.enableRaster = rasterstyletype.palette;
 
                 //init sld editor values with selected rule.
                 var channelSelection = symbolizers[0].channelSelection;
@@ -835,8 +889,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 $scope.optionsSLD.rasterPalette.palette.open = true;
             }else {
                 //open raster cells panel
-                $scope.optionsSLD.enableRasterPalette = false;
-                $scope.optionsSLD.enableRasterCells = true;
+                $scope.optionsSLD.enableRaster = rasterstyletype.cell;
                 if(symbolizers.length>1){
                     var symb = symbolizers[1];
                     $scope.optionsSLD.rasterCells.cellSize = symb.cellSize;
@@ -878,17 +931,24 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          */
         $scope.editRasterPalette = function() {
             if($scope.optionsSLD.rasterPalette) {
-                $scope.optionsSLD.enableRasterPalette = true;
-                $scope.optionsSLD.enableRasterCells = false;
+                $scope.optionsSLD.enableRaster = rasterstyletype.palette;
             }
         };
         /**
          * For Raster : make raster cells panel to visible
          */
         $scope.editRasterCells = function() {
-            if($scope.optionsSLD.rasterPalette) {
-                $scope.optionsSLD.enableRasterPalette = false;
-                $scope.optionsSLD.enableRasterCells = true;
+            if($scope.optionsSLD.rasterCells) {
+                $scope.optionsSLD.enableRaster = rasterstyletype.cell;
+            }
+        };
+
+        /**
+         * For Raster : make Dynamic range panel to visible
+         */
+        $scope.editRasterDynamic = function() {
+            if($scope.optionsSLD.rasterDynamic) {
+                $scope.optionsSLD.enableRaster = rasterstyletype.dynamic;
             }
         };
 

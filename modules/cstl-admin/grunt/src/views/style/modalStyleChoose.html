@@ -170,7 +170,7 @@
         <div class="modal-footer" style="margin-top: 0;">
             <button type="button"
                     class="btn btn-default"
-                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && optionsSLD.enableRaster===rasterstyletype.none"
                     ng-click="close()" >
                 <span translate="sldeditor.button.cancel">Cancel</span>
             </button>
@@ -182,20 +182,20 @@
             </button>
             <button type="button"
                     class="btn btn-add"
-                    ng-show="isSelectedChooser('edit') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-show="isSelectedChooser('edit') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && optionsSLD.enableRaster===rasterstyletype.none"
                     ng-disabled="!selected && isSelectedChooser('existing')"
                     ng-click="updateStyle();">
                 <span translate="sldeditor.button.validateandsave">Save and validate</span>
             </button>
             <button type="button"
                     class="btn btn-add"
-                    ng-show="(isSelectedChooser('new') || isSelectedChooser('duplicate')) && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells"
+                    ng-show="(isSelectedChooser('new') || isSelectedChooser('duplicate')) && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor && optionsSLD.enableRaster===rasterstyletype.none"
                     ng-click="createStyle();">
                 <span translate="sldeditor.button.create">Create</span>
             </button>
             <button type="button"
                     class="btn btn-add"
-                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor || optionsSLD.enableRasterPalette || optionsSLD.enableRasterCells"
+                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor || optionsSLD.enableRaster!==rasterstyletype.none"
                     ng-click="goBack();">
                 <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>
             </button>

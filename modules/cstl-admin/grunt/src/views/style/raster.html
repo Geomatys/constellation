@@ -1,7 +1,7 @@
 
 <div class="row">
     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-        <div ng-if="!optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells">
+        <div ng-if="optionsSLD.enableRaster===rasterstyletype.none">
             <div style="margin-bottom:0px;">
                 <div class="form-group col-xs-12" style="margin: 3px 0; height:35px;padding: 0;">
                     <label class="col-xs-5 col-sm-5 col-md-4 control-label"
@@ -37,6 +37,8 @@
                                        translate="edition.style.label.new.rules.raster_palette">Colors and Palette</a></li>
                                 <li><a ng-click="createRules('raster_cellule')"
                                        translate="edition.style.label.new.rules.raster_cellule">Group of cells</a></li>
+                                <li><a ng-click="createRules('raster_dynamic')"
+                                       translate="edition.style.label.new.rules.raster_dynamic">Dynamic ranges</a></li>
                             </ul>
                         </div>
                     </div>
@@ -82,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <div ng-if="optionsSLD.enableRasterPalette || optionsSLD.enableRasterCells">
+        <div ng-if="optionsSLD.enableRaster!==rasterstyletype.none">
             <ol class="breadcrumb col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <li>
                     <a ng-click="goBack()">
@@ -156,14 +158,19 @@
                     </form>
                 </div>
                 <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='symbols'}">
-                    <div ng-if="optionsSLD.enableRasterPalette && !optionsSLD.enableRasterCells">
+                    <div ng-if="optionsSLD.enableRaster===rasterstyletype.palette">
                         <div>
                             <ng-include src="'views/style/raster_sld.html'"></ng-include>
                         </div>
                     </div>
-                    <div ng-if="optionsSLD.enableRasterCells && !optionsSLD.enableRasterPalette">
+                    <div ng-if="optionsSLD.enableRaster===rasterstyletype.cell">
                         <div>
                             <ng-include src="'views/style/raster_cells.html'"></ng-include>
+                        </div>
+                    </div>
+                    <div ng-if="optionsSLD.enableRaster===rasterstyletype.dynamic">
+                        <div>
+                            <ng-include src="'views/style/raster_dynamic.html'"></ng-include>
                         </div>
                     </div>
                 </div>

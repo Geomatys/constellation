@@ -94,6 +94,17 @@ angular.module('cstl-services', ['cstl-restapi'])
 
         // Navigation additional buttons
         'cstl.navigation' : [] //keep empty since cstl declare its own links directly in the header, this array is overrided by subprojects.
+
+    })
+
+    // -------------------------------------------------------------------------
+    //  Enum raster sld type
+    // -------------------------------------------------------------------------
+    .constant('rasterstyletype', {
+        'none':'none',
+        'palette':'palette',
+        'cells':'cell',
+        'dynamic':'dynamic'
     })
 
     // -------------------------------------------------------------------------
