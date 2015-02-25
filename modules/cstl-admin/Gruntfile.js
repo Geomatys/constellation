@@ -41,6 +41,7 @@ module.exports = function(grunt) {
                         "SockJS":false,
                         "Dygraph":false,
                         "c3":false,
+                        "hljs":false,
                         "dataNotReady":true,
                         "cstlAdminApp":true,
                         "DataViewer":true,

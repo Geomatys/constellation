@@ -532,4 +532,25 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                     });
             }
         };
-    }]);
+    }])
+
+
+/**
+ * Custom directive for hightlight js that fix conflicts with source directive of angular-highlightjs library.
+ * Code inspired from http://stackoverflow.com/a/25583090/1284121
+ */
+    .directive('highlight', function(){
+        return {
+            restrict: 'EA',
+            link: function (scope, tElem, tAttrs) {
+                tElem.html('<pre><code class="hljs"></code></pre>');
+                var codeElem = tElem.find('code');
+
+                scope.$watch(tAttrs.source, function(value) {
+                    var highlightAuto = hljs.highlightAuto(hljs.fixMarkup(value));
+                    codeElem.html(highlightAuto.value);
+                    codeElem.addClass(highlightAuto.language);
+                });
+            }
+        };
+    });

@@ -21,7 +21,6 @@ angular.module('CstlAdminDep', [
     'debounce',
     // Libraries modules.
     'base64',
-    'hljs',
     'pascalprecht.translate',
     'rzModule',
     'angular-loading-bar',
