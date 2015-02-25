@@ -44,6 +44,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
@@ -55,6 +56,7 @@ import org.geotoolkit.style.MutableStyle;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
@@ -221,24 +223,33 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
 
         //build pyramid
         try {
-            for (CoordinateReferenceSystem pyramidCRS : pyramidCRSs) {
+
+            final GridCoverageReader reader = inCovRef.acquireReader();
+            final GridCoverageReadParam readParam = new GridCoverageReadParam();
+            readParam.setDeferred(true);
+            final GridCoverage coverage = reader.read(inCovRef.getImageIndex(), readParam);
+            inCovRef.recycle(reader);
+
+            if (coverage instanceof GridCoverageStack) {
+                throw new ProcessException("CoverageStack implementation not supported.", this, null);
+            }
+
+            final GridCoverage2D gridCoverage2D = (GridCoverage2D) coverage;
+            final CoordinateReferenceSystem coverageCRS = gridCoverage2D.getCoordinateReferenceSystem();
+
+            for (CoordinateReferenceSystem pyramidCRS2D : pyramidCRSs) {
 
                 final PyramidalCoverageReference outCovRef =
                         (PyramidalCoverageReference) getOrCreateCRef((XMLCoverageStore) outputCoverageStore, referenceName, PNG_FORMAT, ViewType.RENDERED);
-                final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
 
-                final GridCoverageReader reader = inCovRef.acquireReader();
-                final GridCoverageReadParam readParam = new GridCoverageReadParam();
-                readParam.setDeferred(true);
-                final GridCoverage coverage = reader.read(inCovRef.getImageIndex(), readParam);
-                inCovRef.recycle(reader);
-
-                if (coverage instanceof GridCoverageStack) {
-                    throw new ProcessException("CoverageStack implementation not supported.", this, null);
+                final Envelope pyramidEnv2D = getPyramidWorldEnvelope(pyramidCRS2D);
+                Envelope finalPyramidEnv = pyramidEnv2D;
+                if (coverageCRS instanceof CompoundCRS) {
+                    finalPyramidEnv = CRSUtilities.appendMissingDimensions(pyramidEnv2D, (CompoundCRS) coverageCRS);
                 }
 
-                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
-                pyramidStyledData(inCovRef, pyramidEnv, scales, outCovRef, style, update);
+                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, finalPyramidEnv.getCoordinateReferenceSystem());
+                pyramidStyledData(inCovRef, finalPyramidEnv, scales, outCovRef, style, update);
             }
         } catch (DataStoreException | FactoryException | OutOfDomainOfValidityException | TransformException e) {
             throw new ProcessException(e.getMessage(), this, e);

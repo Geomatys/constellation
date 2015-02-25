@@ -31,6 +31,7 @@ import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.internal.coverage.CoverageUtilities;
+import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -170,36 +171,18 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
 
     private double[] computeScales(GridCoverage2D coverage, final CoordinateReferenceSystem pyramidCRS)
             throws TransformException, OutOfDomainOfValidityException {
+
         final Envelope env = getPyramidWorldEnvelope(pyramidCRS);
-        final double spanX = env.getSpan(0);
+        final int minBOrdi = CRSUtilities.firstHorizontalAxis(env.getCoordinateReferenceSystem());
+        final double spanX = env.getSpan(minBOrdi);
 
         final GridGeometry2D gg = coverage.getGridGeometry();
         final Envelope covEnv   = CRS.transform(gg.getEnvelope(), env.getCoordinateReferenceSystem());
-        
-        
-        final double baseScale = covEnv.getSpan(0) / gg.getExtent2D().getSpan(0);
+
+        final double baseScale = covEnv.getSpan(minBOrdi) / gg.getExtent2D().getSpan(minBOrdi);
         double scale = spanX / TILE_SIZE;
         
         return (double[]) CoverageUtilities.toWellKnownScale(env, new NumberRange(Double.class, baseScale, true, scale, true)).getValue();
-        
-        
-        /*calculate scales
-        
-        double[] scales = new double[0];
-        while (true) {
-            if (scale <= baseScale) {
-                //fit to exact match to preserve base quality.
-                scale = baseScale;
-            }
-            scales = ArraysExt.insert(scales, scales.length, 1);
-            scales[scales.length - 1] = scale;
-
-            if (scale <= baseScale) {
-                break;
-            }
-            scale = scale / 2;
-        }
-        return scales;*/
     }
 
     /**

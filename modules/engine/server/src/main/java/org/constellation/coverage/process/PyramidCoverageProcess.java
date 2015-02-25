@@ -42,6 +42,7 @@ import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.interpolation.InterpolationCase;
+import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -49,6 +50,7 @@ import org.geotoolkit.referencing.OutOfDomainOfValidityException;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
@@ -60,7 +62,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.UPDATE;
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.DOMAIN;
@@ -197,14 +198,23 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
                 throw new ProcessException("CoverageStack implementation not supported.", this, null);
             }
 
+            final GridCoverage2D gridCoverage2D = (GridCoverage2D) coverage;
+            final CoordinateReferenceSystem coverageCRS = gridCoverage2D.getCoordinateReferenceSystem();
+
             final Map<Envelope, double[]> map = new HashMap<>();
-            for (CoordinateReferenceSystem pyramidCRS : pyramidCRSs) {
-                final Envelope pyramidEnv = getPyramidWorldEnvelope(pyramidCRS);
-                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS);
-                map.put(pyramidEnv, scales);
+            for (CoordinateReferenceSystem pyramidCRS2D : pyramidCRSs) {
+
+                final Envelope pyramidEnv2D = getPyramidWorldEnvelope(pyramidCRS2D);
+                Envelope finalPyramidEnv = pyramidEnv2D;
+                if (coverageCRS instanceof CompoundCRS) {
+                    finalPyramidEnv = CRSUtilities.appendMissingDimensions(pyramidEnv2D, (CompoundCRS) coverageCRS);
+                }
+
+                final double[] scales = getPyramidScales(gridCoverage2D, outCovRef, finalPyramidEnv.getCoordinateReferenceSystem());
+                map.put(finalPyramidEnv, scales);
 
                 //Prepare pyramid's mosaics.
-                CoverageUtilities.getOrCreatePyramid(outCovRef, pyramidEnv, tileDim, scales);
+                CoverageUtilities.getOrCreatePyramid(outCovRef, finalPyramidEnv, tileDim, scales);
             }
 
             pyramidData(inCovRef, outputCoverageStore, referenceName, map, tileDim, update);
