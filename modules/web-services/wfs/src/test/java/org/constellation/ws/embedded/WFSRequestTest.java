@@ -615,9 +615,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         Schema schema = (Schema) obj;
         if (localdb_active) {
-            assertEquals(17, schema.getElements().size());
+            assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
         } else {
-            assertEquals(13, schema.getElements().size());
+            assertEquals(2, schema.getIncludeOrImportOrRedefine().size());
         }
 
         try {
@@ -633,9 +633,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         schema = (Schema) obj;
         if (localdb_active) {
-            assertEquals(17, schema.getElements().size());
+            assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
         } else {
-            assertEquals(13, schema.getElements().size());
+            assertEquals(2, schema.getIncludeOrImportOrRedefine().size());
         }
 
     }
