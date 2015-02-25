@@ -574,7 +574,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          */     
         } else {
             Map<String, List<FeatureType>> typeMap = splitByNamespace(types);
-            schema = new Schema(FormChoice.QUALIFIED, null);
+            if (typeMap.containsKey(null)) {
+                final List<FeatureType> fts = typeMap.get(null);
+                schema = writer.getSchemaFromFeatureType(fts);
+                typeMap.remove(null);
+            } else {
+                schema = new Schema(FormChoice.QUALIFIED, null);
+            }
             for (String nmsp : typeMap.keySet()) {
                 final List<FeatureType> fts = typeMap.get(nmsp);
                 StringBuilder sb = new StringBuilder();
