@@ -40,6 +40,7 @@ import org.geotoolkit.referencing.OutOfDomainOfValidityException;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,8 +173,9 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
     private double[] computeScales(GridCoverage2D coverage, final CoordinateReferenceSystem pyramidCRS)
             throws TransformException, OutOfDomainOfValidityException {
 
-        final Envelope env = getPyramidWorldEnvelope(pyramidCRS);
-        final int minBOrdi = CRSUtilities.firstHorizontalAxis(env.getCoordinateReferenceSystem());
+        final SingleCRS pyramidCRS2D = org.apache.sis.referencing.CRS.getHorizontalComponent(pyramidCRS);
+        final Envelope env = getPyramidWorldEnvelope(pyramidCRS2D);
+        final int minBOrdi = CRSUtilities.firstHorizontalAxis(pyramidCRS2D);
         final double spanX = env.getSpan(minBOrdi);
 
         final GridGeometry2D gg = coverage.getGridGeometry();
