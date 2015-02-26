@@ -607,11 +607,6 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit</groupId>
-                <artifactId>geotk-coverage-dimap</artifactId>
-                <version>${geotoolkit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit</groupId>
                 <artifactId>geotk-metadata-sql</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>

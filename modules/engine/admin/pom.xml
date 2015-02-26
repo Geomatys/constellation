@@ -64,7 +64,7 @@
         </dependency>
         <dependency>
             <groupId>org.geotoolkit</groupId>
-            <artifactId>geotk-coverage-dimap</artifactId>
+            <artifactId>geotk-coverage-geotiff</artifactId>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit</groupId>
