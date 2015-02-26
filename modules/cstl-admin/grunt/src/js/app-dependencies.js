@@ -41,6 +41,7 @@ angular.module('CstlAdminDep', [
     'ui.bootstrap.typeahead',
     'ui.bootstrap.tpls-progressbar',
     'ui.bootstrap.progressbar',
+    'ngTagsInput',
     // Constellation modules.
     'cstl-directives',
     'cstl-restapi',
