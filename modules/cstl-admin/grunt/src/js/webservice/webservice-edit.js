@@ -959,7 +959,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
     })
 
     .controller('Step1WMTSInternalDataController', function($scope, dataListing, webService, Dashboard,Growl,
-                                                            provider, $cookieStore) {
+                                                            provider, $cookieStore,$filter) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -1039,7 +1039,8 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
          * depending on the property binded to checkbox.
          */
         $scope.selectAllData = function() {
-            $scope.values.listSelect = ($scope.dataSelect.all) ? $scope.wrap.fullList.slice(0) : [];
+            var array = $filter('filter')($scope.wrap.fullList, {'Type':$scope.wrap.filtertype, '$': $scope.wrap.filtertext},$scope.wrap.matchExactly);
+            $scope.values.listSelect = ($scope.dataSelect.all) ? array.slice(0) : [];
             $scope.previewData();
         };
         /**

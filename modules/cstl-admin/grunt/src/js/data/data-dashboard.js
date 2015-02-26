@@ -910,7 +910,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
     })
 
     .controller('DataModalController', function($scope, dataListing, webService, sos, sensor, Dashboard, $modalInstance,
-                                                 service, exclude, Growl,provider,$cookieStore) {
+                                                 service, exclude, Growl,provider,$cookieStore,$filter) {
         /**
          * To fix angular bug caused by nested scope issue in modal.
          */
@@ -1037,7 +1037,8 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          * depending on the property of checkbox selectAll.
          */
         $scope.selectAllData = function() {
-            $scope.values.listSelect = ($scope.dataSelect.all) ? $scope.wrap.fullList.slice(0) : [];
+            var array = $filter('filter')($scope.wrap.fullList, {'Type':$scope.wrap.filtertype, '$': $scope.wrap.filtertext},$scope.wrap.matchExactly);
+            $scope.values.listSelect = ($scope.dataSelect.all) ? array.slice(0) : [];
             if ($scope.service.type.toLowerCase() !== 'sos') {
                 $scope.previewData();
             }
