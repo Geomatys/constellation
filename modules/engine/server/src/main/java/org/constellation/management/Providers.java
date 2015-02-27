@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.iso.Names;
 
 /**
  * Providers MBean implementation.
@@ -58,7 +59,7 @@ public final class Providers implements ProvidersMBean{
         final List<String> names = new ArrayList<String>();
         try {
             for (Name n : DataProviders.getInstance().getKeys()) {
-                names.add(DefaultName.toJCRExtendedForm(n));
+                names.add(Names.toExpandedString(n));
             }
             Collections.sort(names);
         } catch (IllegalStateException ex) {

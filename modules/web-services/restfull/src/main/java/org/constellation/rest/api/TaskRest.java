@@ -32,7 +32,6 @@ import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.TaskParameterWithOwnerName;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -73,6 +72,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.sis.util.iso.Names;
 
 /**
  * RestFull API for task management/operations.
@@ -105,7 +105,7 @@ public class TaskRest {
         final List<Name> names = processBusiness.listProcess();
         final StringList lst = new StringList();
         for(Name n : names){
-            lst.getList().add(DefaultName.toJCRExtendedForm(n));
+            lst.getList().add(Names.toExpandedString(n));
         }
         return Response.ok(lst).build();
     }
