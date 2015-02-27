@@ -73,6 +73,8 @@ public final class WCSConstant {
     public static final String KEY_IDENTIFIER = "IDENTIFIER";
     /** Parameter used in getCoverage 1.0.0 */
     public static final String KEY_COVERAGE   = "COVERAGE";
+    /** Parameter used in getCoverage 2.0.0 */
+    public static final String KEY_COVERAGE_ID   = "COVERAGEID";
 
     /** BBOX for getCoverage in version 1.1.1 */
     public static final String KEY_BOUNDINGBOX = "BOUNDINGBOX";
@@ -251,10 +253,51 @@ public final class WCSConstant {
 
         OPERATIONS_METADATA_111 = OWSXmlFactory.buildOperationsMetadata("1.1.0", operations, null, constraints, null);
     }
+    
+    public static final AbstractOperationsMetadata OPERATIONS_METADATA_200;
+    static {
+        final List<AbstractDCP> dcps = new ArrayList<>();
+        dcps.add(WCSXmlFactory.buildDCP("2.0.0", "someURL", "someURL"));
+
+        final List<AbstractDCP> dcps2 = new ArrayList<>();
+        dcps2.add(WCSXmlFactory.buildDCP("2.0.0", null, "someURL"));
+
+        final List<AbstractOperation> operations = new ArrayList<>();
+
+        final List<AbstractDomain> gcParameters = new ArrayList<>();
+        gcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "AcceptVersions", Arrays.asList("1.0.0","2.0.0")));
+        gcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "AcceptFormats",  Arrays.asList("text/xml","application/vnd.ogc.wcs_xml")));
+        gcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Service",        Arrays.asList("WCS")));
+        gcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Sections",       Arrays.asList("ServiceIdentification","ServiceProvider","OperationsMetadata","Contents")));
+        AbstractOperation getCapabilities = WCSXmlFactory.buildOperation("2.0.0", dcps, gcParameters, null, "GetCapabilities");
+        operations.add(getCapabilities);
+
+        final List<AbstractDomain> gcoParameters = new ArrayList<>();
+        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Version", Arrays.asList("1.0.0","2.0.0")));
+        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Service", Arrays.asList("WCS")));
+        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Format",  Arrays.asList("image/gif","image/png","image/jpeg","matrix")));
+        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Store",   Arrays.asList("false")));
+        AbstractOperation getCoverage = WCSXmlFactory.buildOperation("2.0.0", dcps, gcoParameters, null, "GetCoverage");
+        operations.add(getCoverage);
+
+        final List<AbstractDomain> dcParameters = new ArrayList<>();
+        dcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Version", Arrays.asList("1.0.0","2.0.0")));
+        dcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Service", Arrays.asList("WCS")));
+        dcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Format",  Arrays.asList("text/xml")));
+        AbstractOperation describeCoverage = WCSXmlFactory.buildOperation("2.0.0", dcps, dcParameters, null, "DescribeCoverage");
+        operations.add(describeCoverage);
+
+        final List<AbstractDomain> constraints = new ArrayList<>();
+        constraints.add(WCSXmlFactory.buildDomain("2.0.0", "PostEncoding", Arrays.asList("XML")));
+
+        OPERATIONS_METADATA_200 = OWSXmlFactory.buildOperationsMetadata("2.0.0", operations, null, constraints, null);
+    }
 
     public static AbstractOperationsMetadata getOperationMetadata(final String version) {
         if (version.equals("1.0.0")) {
             return OPERATIONS_METADATA_100.clone();
+        } else if (version.equals("2.0.0")) {
+            return OPERATIONS_METADATA_200.clone();
         } else if (version.equals("1.1.1")){
             return OPERATIONS_METADATA_111.clone();
         } else {

@@ -101,6 +101,7 @@ import static org.constellation.coverage.ws.WCSConstant.KEY_GRIDORIGIN;
 import static org.constellation.coverage.ws.WCSConstant.KEY_GRIDTYPE;
 import static org.constellation.coverage.ws.WCSConstant.KEY_HEIGHT;
 import static org.constellation.coverage.ws.WCSConstant.KEY_IDENTIFIER;
+import static org.constellation.coverage.ws.WCSConstant.KEY_COVERAGE_ID;
 import static org.constellation.coverage.ws.WCSConstant.KEY_INTERPOLATION;
 import static org.constellation.coverage.ws.WCSConstant.KEY_RANGESUBSET;
 import static org.constellation.coverage.ws.WCSConstant.KEY_RESPONSE_CRS;
@@ -314,7 +315,7 @@ public class WCSService extends GridWebService<WCSWorker> {
 
     public RequestBase adaptQuery(final String request, final Worker w) throws CstlServiceException {
         if (GETCAPABILITIES.equalsIgnoreCase(request)) {
-            return adaptKvpGetCapabilitiesRequest();
+            return adaptKvpGetCapabilitiesRequest(w);
         } else if (GETCOVERAGE.equalsIgnoreCase(request)) {
             return adaptKvpGetCoverageRequest(w);
         } else if (DESCRIBECOVERAGE.equalsIgnoreCase(request)) {
@@ -332,7 +333,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @return a marshallable GetCapabilities request.
      * @throws CstlServiceException
      */
-    private GetCapabilities adaptKvpGetCapabilitiesRequest() throws CstlServiceException {
+    private GetCapabilities adaptKvpGetCapabilitiesRequest(final Worker w) throws CstlServiceException {
         final String service = getParameter(QueryConstants.SERVICE_PARAMETER, true);
         if (!service.equalsIgnoreCase("WCS")) {
             throw new CstlServiceException("The parameter SERVICE must be specified as WCS",
@@ -342,28 +343,29 @@ public class WCSService extends GridWebService<WCSWorker> {
         // TODO: find the best version when the WCS 1.1.1 will be fully implemented.
         //       For the moment, the version chosen is always the 1.0.0.
 
-//        String inputVersion = getParameter(QueryConstants.VERSION_PARAMETER, false);
-//        if (inputVersion == null) {
-//            inputVersion = getParameter("acceptversions", false);
-//            if (inputVersion == null) {
-//                inputVersion = getBestVersion(null).version.toString();
-//            } else {
-//                //we verify that the version is supported
-//                isVersionSupported(inputVersion);
-//            }
-//        }
-//        final ServiceDef finalVersion = getBestVersion(inputVersion);
+        String inputVersion = getParameter(QueryConstants.VERSION_PARAMETER, false);
+        if (inputVersion == null) {
+            inputVersion = getParameter("acceptversions", false);
+            if (inputVersion == null) {
+                inputVersion = w.getBestVersion(null).version.toString();
+            } else {
+                //we verify that the version is supported
+                w.checkVersionSupported(inputVersion, true);
+            }
+        }
+        final String finalVersion = w.getBestVersion(inputVersion).version.toString();
 
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
-        final String finalVersion = ServiceDef.WCS_1_0_0.version.toString();
+        
         if (finalVersion.equals("1.0.0")) {
             final String section = getParameter(KEY_SECTION, false);
             final Sections sections = OWSXmlFactory.buildSections(finalVersion, Arrays.asList(section));
             return WCSXmlFactory.createGetCapabilities(finalVersion, null, sections, null, updateSequence, service);
-        } else if (finalVersion.equals("1.1.1")) {
+            
+        } else if (finalVersion.equals("1.1.1") || finalVersion.equals("2.0.0")) {
             final String acceptformat = getParameter(ACCEPT_FORMATS_PARAMETER, false);
-            final AcceptFormats formats = OWSXmlFactory.buildAcceptFormat(updateSequence, Arrays.asList(acceptformat));
+            final AcceptFormats formats = OWSXmlFactory.buildAcceptFormat(finalVersion, Arrays.asList(acceptformat));
 
             //We transform the String of sections in a list.
             //In the same time we verify that the requested sections are valid.
@@ -386,7 +388,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                 requestedSections = SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
             }
             final Sections sections = OWSXmlFactory.buildSections(finalVersion, requestedSections);
-            final AcceptVersions versions = OWSXmlFactory.buildAcceptVersion(finalVersion, Arrays.asList(ServiceDef.WCS_1_1_1.version.toString()));
+            final AcceptVersions versions = OWSXmlFactory.buildAcceptVersion(finalVersion, Arrays.asList(finalVersion));
             return WCSXmlFactory.createGetCapabilities(finalVersion, versions, sections, formats, updateSequence, service);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -409,6 +411,8 @@ public class WCSService extends GridWebService<WCSWorker> {
             coverage = getParameter(KEY_COVERAGE, true);
         } else if ("1.1.1".equals(strVersion)) {
             coverage = getParameter(KEY_IDENTIFIER, true);
+        } else if ("2.0.0".equals(strVersion)) {
+            coverage = getParameter(KEY_COVERAGE_ID, true);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());

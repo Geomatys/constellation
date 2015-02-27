@@ -54,7 +54,8 @@ import java.util.logging.Level;
 import org.apache.sis.measure.NumberRange;
 import org.geotoolkit.image.coverage.GridCombineIterator;
 import org.geotoolkit.internal.referencing.CRSUtilities;
-
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.filestore.FileCoverageReference;
 
 /**
  * Regroups information about a {@linkplain org.constellation.provider.LayerDetails layer}.
@@ -231,6 +232,14 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
 
     @Override
     public String getImageFormat() {
+         if (ref instanceof FileCoverageReference) {
+            FileCoverageReference fref = (FileCoverageReference) ref;
+            if (fref.getSpi() != null && 
+                fref.getSpi().getMIMETypes() != null &&
+                fref.getSpi().getMIMETypes().length > 0) {
+                return fref.getSpi().getMIMETypes()[0];
+            }
+        }
         return "";
     }
 
@@ -256,5 +265,17 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
             ref.recycle(reader);
         }
     }
+    
+    @Override
+    public List<GridSampleDimension> getSampleDimensions() throws DataStoreException {
+        final GridCoverageReader reader = ref.acquireReader();
 
+        try {
+            return reader.getSampleDimensions(ref.getImageIndex());
+        } catch (CancellationException ex) {
+            throw new DataStoreException(ex);
+        } finally {
+            ref.recycle(reader);
+        }
+    }
 }

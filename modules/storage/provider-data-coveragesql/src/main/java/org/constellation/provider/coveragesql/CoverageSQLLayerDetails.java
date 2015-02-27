@@ -65,6 +65,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
+import org.geotoolkit.coverage.GridSampleDimension;
 
 
 /**
@@ -334,6 +335,12 @@ class CoverageSQLLayerDetails extends AbstractData implements CoverageData {
         final double min = Double.valueOf(split[0]);
         final double max = Double.valueOf(split[1]);
         return MeasurementRange.create(min, true, max, true, null);
+    }
+
+    @Override
+    public List<GridSampleDimension> getSampleDimensions() throws DataStoreException {
+        final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
+        return this.reader.getSampleDimensions(reference.getImageIndex());
     }
 
 }

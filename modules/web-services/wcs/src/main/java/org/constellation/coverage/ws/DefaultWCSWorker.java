@@ -86,6 +86,7 @@ import org.geotoolkit.wcs.xml.v111.FieldType;
 import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
+import org.geotoolkit.swe.xml.v200.Field;
 import org.opengis.coverage.grid.RectifiedGrid;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -108,6 +109,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.logging.Level;
+import javax.xml.namespace.QName;
 
 import org.apache.sis.util.CharSequences;
 import static org.constellation.coverage.ws.WCSConstant.ASCII_GRID;
@@ -129,6 +131,9 @@ import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_FORMATS_100;
 import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_FORMATS_111;
 import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_INTERPOLATIONS_V100;
 import static org.constellation.coverage.ws.WCSConstant.getOperationMetadata;
+import org.geotoolkit.coverage.Category;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.ows.xml.BoundingBox;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_CRS;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_DIMENSION_VALUE;
@@ -140,6 +145,14 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_QUERYABLE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.swe.xml.v200.AllowedValuesPropertyType;
+import org.geotoolkit.swe.xml.v200.AllowedValuesType;
+import org.geotoolkit.swe.xml.v200.DataRecordPropertyType;
+import org.geotoolkit.swe.xml.v200.DataRecordType;
+import org.geotoolkit.swe.xml.v200.QuantityType;
+import org.geotoolkit.swe.xml.v200.UnitReference;
+import org.geotoolkit.wcs.xml.v200.ServiceParametersType;
 
 // GeoAPI dependencies
 
@@ -243,6 +256,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 coverageOfferings.add(describeCoverage100(coverageName, coverageRef));
             } else if (version.equals("1.1.1")) {
                 coverageOfferings.add(describeCoverage111(coverageName, coverageRef));
+            } else if (version.equals("2.0.0")) {
+                coverageOfferings.add(describeCoverage200(coverageName, coverageRef));
             } else {
                 throw new CstlServiceException("The version number specified for this GetCoverage request " +
                         "is not handled.", NO_APPLICABLE_CODE, QueryConstants.VERSION_PARAMETER.toLowerCase());
@@ -407,6 +422,70 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
     }
+    
+    /**
+     * Returns the description of the coverage requested in version 2.0.0 of WCS standard.
+     *
+     * @param request a {@linkplain org.geotoolkit.wcs.xml.v200.DescribeCoverage describe coverage}
+     *                request done by the user.
+     * @return an XML document giving the full description of a coverage, in version 2.0.0.
+     *
+     * @throws CstlServiceException
+     */
+    private  CoverageInfo describeCoverage200(final String coverageName, final CoverageData coverageRef) throws CstlServiceException {
+        try {
+            
+            /*
+             * Spatial metadata
+             */
+            final org.geotoolkit.gml.xml.v321.EnvelopeType nativeEnvelope = new org.geotoolkit.gml.xml.v321.EnvelopeType(coverageRef.getEnvelope());
+
+            org.geotoolkit.gml.xml.v321.GridType grid = null;
+            try {
+                SpatialMetadata meta = coverageRef.getSpatialMetadata();
+                if (meta != null) {
+                    RectifiedGrid brutGrid =  meta.getInstanceForType(RectifiedGrid.class);
+                    if (brutGrid.getExtent() != null) {
+                        grid = new org.geotoolkit.gml.xml.v321.RectifiedGridType(brutGrid);
+                    }
+                }
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.WARNING, "Unable to get coverage spatial metadata", ex);
+            }
+
+            // spatial metadata
+            final org.geotoolkit.gml.xml.v321.DomainSetType domain = new org.geotoolkit.gml.xml.v321.DomainSetType(grid);
+
+            final List<GridSampleDimension> bands = coverageRef.getSampleDimensions();
+            final List<Field> fields = new ArrayList<>();
+            for (GridSampleDimension band : bands) {
+                final QuantityType quantity = new QuantityType();
+                if (band.getUnits() != null) {
+                    quantity.setUom(new UnitReference(band.getUnits().toString()));
+                }
+                // TODO select only one category => which one?
+                for (Category cat : band.getCategories()) {
+                    final AllowedValuesType av = new AllowedValuesType();
+                    if (cat.getName() != null) {
+                        av.setId(cat.getName().toString());
+                    }
+                    if (cat.getRange() != null) {
+                        av.setMin(cat.getRange().getMinDouble());
+                        av.setMax(cat.getRange().getMaxDouble());
+                    }
+                    quantity.setConstraint(new AllowedValuesPropertyType(av));
+                }
+                final Field f = new Field(band.getDescription().toString(), quantity);
+                fields.add(f);
+            }
+            final DataRecordType dataRecord = new DataRecordType(null, null, false, fields);
+            final DataRecordPropertyType rangeType = new DataRecordPropertyType(dataRecord);
+            final ServiceParametersType serviceParametersType = new ServiceParametersType(new QName("GridCoverage"), coverageRef.getImageFormat());
+            return new org.geotoolkit.wcs.xml.v200.CoverageDescriptionType(coverageName, nativeEnvelope, domain, rangeType, serviceParametersType);
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+    }
 
     /**
      * Describe the capabilities and the layers available for the WCS service.
@@ -497,11 +576,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 final CoverageInfo co;
                 if (version.equals("1.0.0")) {
                     co = getCoverageInfo100(layer, configLayer);
-                } else if (version.equals("1.1.1")) {
-                    co = getCoverageInfo111(layer, configLayer);
                 } else {
-                    throw new CstlServiceException("The version number specified for this request " +
-                            "is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
+                    co = getCoverageInfo(version, layer, configLayer);
                 }
                 /*
                 * coverage brief customisation
@@ -523,7 +599,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         }   catch (DataStoreException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
-        final Content contents = WCSXmlFactory.createContent("1.0.0", offBrief);
+        final Content contents = WCSXmlFactory.createContent(version, offBrief);
         final GetCapabilitiesResponse response = WCSXmlFactory.createCapabilitiesResponse(version, si, sp, om, contents, getCurrentUpdateSequence());
         putCapabilitiesInCache(version, null, response);
         return (GetCapabilitiesResponse) response.applySections(sections);
@@ -571,7 +647,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
         }
 
-        return WCSXmlFactory.createCoverageInfo("1.0.0", layerName, layerName, null, outputBBox);
+        return WCSXmlFactory.createCoverageInfo("1.0.0", layerName, layerName, null, outputBBox, null);
     }
 
     /**
@@ -583,7 +659,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private CoverageInfo getCoverageInfo111(final Data layer, final Layer configLayer) throws DataStoreException {
+    private CoverageInfo getCoverageInfo(final String version, final Data layer, final Layer configLayer) throws DataStoreException {
 
         final CoverageData coverageLayer = (CoverageData)layer;
         final String identifier;
@@ -593,17 +669,16 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             identifier = coverageLayer.getName().getLocalPart();
         }
 
-        final String title      = coverageLayer.getName().getLocalPart();
+        final String title       = coverageLayer.getName().getLocalPart();
         final CharSequence remark = CharSequences.toASCII(coverageLayer.getRemarks());
 
         final GeographicBoundingBox inputGeoBox = coverageLayer.getGeographicBoundingBox();
-        final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(inputGeoBox);
-
-        return WCSXmlFactory.createCoverageInfo("1.1.1", identifier, title,
-                (remark != null) ? remark.toString() : null, outputBBox);
+        final BoundingBox outputBBox  =  OWSXmlFactory.buildWGS84BoundingBox(version, inputGeoBox);
+        final String coverageSubType  = "GridCoverage";
+        return WCSXmlFactory.createCoverageInfo(version, identifier, title,
+                (remark != null) ? remark.toString() : null, outputBBox, coverageSubType);
     }
-
-
+    
     /**
      * Get the coverage values for a specific coverage specified.
      * According to the output format chosen, the response could be an

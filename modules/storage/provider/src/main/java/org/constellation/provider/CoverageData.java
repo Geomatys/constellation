@@ -18,7 +18,9 @@
  */
 package org.constellation.provider;
 
+import java.util.List;
 import org.apache.sis.storage.DataStoreException;
+import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 
 /**
@@ -50,4 +52,5 @@ public interface CoverageData extends Data {
 
     SpatialMetadata getSpatialMetadata() throws DataStoreException;
 
+    List<GridSampleDimension> getSampleDimensions() throws DataStoreException;
 }
