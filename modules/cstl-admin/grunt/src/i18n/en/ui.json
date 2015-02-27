@@ -1071,6 +1071,7 @@
     "sldeditor.edition.apply":"Apply",
     "sldeditor.edition.rasterCells.cellSize":"Cell size",
     "sldeditor.edition.rasterCells.cellType":"Cell type",
+    "sldeditor.edition.rasterdynamicrange.generate":"Apply",
     "sldeditor.edition.expression.btn.help":"Set expression value with attribute",
     "sldeditor.edition.expression.raster.btn.help":"Set an expression value",
 

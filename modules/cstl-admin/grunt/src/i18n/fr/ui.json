@@ -1047,6 +1047,7 @@
     "sldeditor.edition.apply":"Appliquer",
     "sldeditor.edition.rasterCells.cellSize":"Taille des cellules",
     "sldeditor.edition.rasterCells.cellType":"Type",
+    "sldeditor.edition.rasterdynamicrange.generate":"Appliquer",
     "sldeditor.edition.expression.btn.help":"Donner une expression en fonction d'un attribut",
     "sldeditor.edition.expression.raster.btn.help":"Donner un expression",
 

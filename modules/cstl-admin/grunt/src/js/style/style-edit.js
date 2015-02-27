@@ -175,6 +175,52 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         }
                     }
                 },
+                rasterDynamic : {
+                    "channels": [
+                        {
+                            "band":"",
+                            "colorSpaceComponent":"R",
+                            "lower":{
+                                "value":0
+                            },
+                            "upper":{
+                                "value":255
+                            }
+
+                        },
+                        {
+                            "band":"",
+                            "colorSpaceComponent":"G",
+                            "lower":{
+                                "value":0
+                            },
+                            "upper":{
+                                "value":255
+                            }
+                        },
+                        {
+                            "band":"",
+                            "colorSpaceComponent":"B",
+                            "lower":{
+                                "value":0
+                            },
+                            "upper":{
+                                "value":255
+                            }
+                        },
+                        {
+                            "band":"",
+                            "colorSpaceComponent":"A",
+                            "lower":{
+                                "value":0
+                            },
+                            "upper":{
+                                "value":255
+                            }
+                        }
+                    ],
+                    "symbolPills":'color'
+                },
                 enableRaster:rasterstyletype.none,
                 selectedSymbolizerType:"",
                 selectedSymbolizer:null,
@@ -676,45 +722,49 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     $scope.editRasterCells();
                 }else if(mode ==='raster_dynamic'){
                     $scope.optionsSLD.rasterDynamic = {
-                        "components":{
-                            "red":{
-                                isOpen:true,
-                                name:"Red",
-                                band: {
-                                    "selected":{name:"0",minValue:0,maxValue:255}
+                        "channels": [
+                            {
+                                "band":"",
+                                "colorSpaceComponent":"R",
+                                "lower":{
+                                    "value":0
                                 },
-                                minValue:0,
-                                maxValue:255
-                            },
-                            "green":{
-                                isOpen:true,
-                                name:"Green",
-                                band: {
-                                    "selected":{name:"0",minValue:0,maxValue:255}
-                                },
-                                minValue:0,
-                                maxValue:255
-                            },
-                            "blue":{
-                                isOpen:true,
-                                name:"Blue",
-                                band: {
-                                    "selected":{name:"0",minValue:0,maxValue:255}
-                                },
-                                minValue:0,
-                                maxValue:255
-                            },
-                            "alpha":{
-                                isOpen:true,
-                                name:"Alpha",
-                                band: {
-                                    "selected":{name:"0",minValue:0,maxValue:255}
-                                },
-                                minValue:0,
-                                maxValue:255
-                            }
+                                "upper":{
+                                    "value":255
+                                }
 
-                        },
+                            },
+                            {
+                                "band":"",
+                                "colorSpaceComponent":"G",
+                                "lower":{
+                                    "value":0
+                                },
+                                "upper":{
+                                    "value":255
+                                }
+                            },
+                            {
+                                "band":"",
+                                "colorSpaceComponent":"B",
+                                "lower":{
+                                    "value":0
+                                },
+                                "upper":{
+                                    "value":255
+                                }
+                            },
+                            {
+                                "band":"",
+                                "colorSpaceComponent":"A",
+                                "lower":{
+                                    "value":0
+                                },
+                                "upper":{
+                                    "value":255
+                                }
+                            }
+                        ],
                         "symbolPills":'color'
                     };
                     var dynamicRule = {
@@ -722,7 +772,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "title":'',
                         "description":'',
                         "maxScale":500000000,
-                        "symbolizers": [{'@symbol':'raster'}],
+                        "symbolizers": [{'@symbol':'dynamicrange'}],
                         "filter": null
                     };
                     $scope.newStyle.rules.push(dynamicRule);
@@ -825,7 +875,28 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     $scope.optionsSLD.rasterPalette.colorModel = 'rgb';
                 }
             }
-            if(! existsCellSymbolizer(symbolizers)){
+            if(existsCellSymbolizer(symbolizers)){
+                //open raster cells panel
+                $scope.optionsSLD.enableRaster = rasterstyletype.cell;
+                if(symbolizers.length>1){
+                    var symb = symbolizers[1];
+                    $scope.optionsSLD.rasterCells.cellSize = symb.cellSize;
+                    if(symb.rule && symb.rule.symbolizers && symb.rule.symbolizers.length>0){
+                        var cellType = symb.rule.symbolizers[0]['@symbol'];
+                        $scope.optionsSLD.rasterCells.cellType = cellType;
+                        if(cellType === 'point'){
+                            $scope.optionsSLD.rasterCells.pointSymbol = symb.rule.symbolizers[0];
+                        }else if(cellType === 'text'){
+                            $scope.optionsSLD.rasterCells.textSymbol = symb.rule.symbolizers[0];
+                        }
+                    }
+                }
+            }else if(existsDynamicSymbolizer(symbolizers)){
+                //open raster cells panel
+                $scope.optionsSLD.enableRaster = rasterstyletype.dynamic;
+                //TODO reload symbolizer on UI
+
+            }else {
                 $scope.optionsSLD.enableRaster = rasterstyletype.palette;
 
                 //init sld editor values with selected rule.
@@ -887,22 +958,6 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 //Add on graph the vertical thresholds
                 $scope.drawThresholds();
                 $scope.optionsSLD.rasterPalette.palette.open = true;
-            }else {
-                //open raster cells panel
-                $scope.optionsSLD.enableRaster = rasterstyletype.cell;
-                if(symbolizers.length>1){
-                    var symb = symbolizers[1];
-                    $scope.optionsSLD.rasterCells.cellSize = symb.cellSize;
-                    if(symb.rule && symb.rule.symbolizers && symb.rule.symbolizers.length>0){
-                        var cellType = symb.rule.symbolizers[0]['@symbol'];
-                        $scope.optionsSLD.rasterCells.cellType = cellType;
-                        if(cellType === 'point'){
-                            $scope.optionsSLD.rasterCells.pointSymbol = symb.rule.symbolizers[0];
-                        }else if(cellType === 'text'){
-                            $scope.optionsSLD.rasterCells.textSymbol = symb.rule.symbolizers[0];
-                        }
-                    }
-                }
             }
         };
 
@@ -1805,6 +1860,14 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             }
         };
 
+
+        /**
+         * Binding action to apply dynamic range
+         */
+        $scope.generateDynamicRange = function(){
+            $scope.newStyle.rules[0].symbolizers[0].channels = $scope.optionsSLD.rasterDynamic.channels;
+        };
+
         /**
          * Remove repartition entry and apply this change on the histogram.
          * @param point
@@ -2278,6 +2341,24 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 for(var i=0;i<symbolizers.length;i++){
                     var symb = symbolizers[i];
                     if(symb['@symbol']==='cell'){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        /**
+         * Returns true if there is a cell symbolizer in given array.
+         * Used to identify cellSymbolizers rule against Palette/colors rule
+         * @param symbolizers
+         * @returns {boolean}
+         */
+        var existsDynamicSymbolizer = function(symbolizers){
+            if(symbolizers) {
+                for(var i=0;i<symbolizers.length;i++){
+                    var symb = symbolizers[i];
+                    if(symb['@symbol']==='dynamicrange'){
                         return true;
                     }
                 }

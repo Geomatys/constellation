@@ -18,24 +18,7 @@
  */
 package org.constellation.admin;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-
+import com.google.common.base.Optional;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.StyleType;
@@ -47,18 +30,19 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.StyleBean;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
-import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.geotoolkit.display2d.ext.dynamicrange.DynamicRangeSymbolizer;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.sld.MutableLayer;
@@ -82,9 +66,24 @@ import org.opengis.style.TextSymbolizer;
 import org.opengis.util.FactoryException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Optional;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -747,7 +746,7 @@ public class StyleBusiness implements IStyleBusiness {
         for (final MutableFeatureTypeStyle fts : style.featureTypeStyles()) {
             for (final MutableRule rule : fts.rules()) {
                 for (final Symbolizer symbolizer : rule.symbolizers()) {
-                    if (symbolizer instanceof RasterSymbolizer) {
+                    if (symbolizer instanceof RasterSymbolizer || symbolizer instanceof DynamicRangeSymbolizer) {
                         return "COVERAGE";
                     }
                 }

@@ -28,5 +28,9 @@ import java.io.Serializable;
  */
 public interface StyleElement<T> extends Serializable {
 
+    /**
+     * Method do bind styleElement from constellation to geotoolkit
+     * @return
+     */
     public T toType();
 }

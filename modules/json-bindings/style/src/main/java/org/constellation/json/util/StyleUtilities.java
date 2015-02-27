@@ -37,6 +37,7 @@ import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PropertyDescription;
 import org.constellation.json.binding.ChannelSelection;
+import org.constellation.json.binding.DynamicRangeSymbolizer;
 import org.constellation.json.binding.LineSymbolizer;
 import org.constellation.json.binding.PointSymbolizer;
 import org.constellation.json.binding.PolygonSymbolizer;
@@ -155,6 +156,7 @@ public final class StyleUtilities extends Static {
     public static final Symbolizer DEFAULT_POLYGON_SYMBOLIZER      = new PolygonSymbolizer();
     public static final RasterSymbolizer DEFAULT_GREY_RASTER_SYMBOLIZER  = new RasterSymbolizer();
     public static final RasterSymbolizer DEFAULT_RGB_RASTER_SYMBOLIZER   = new RasterSymbolizer();
+    public static final DynamicRangeSymbolizer DEFAULT_RGB_DYNAMICRANGE_SYMBOLIZER   = new DynamicRangeSymbolizer();
     static {
         final ChannelSelection rgbSelection = new ChannelSelection();
         final SelectedChannelType red   = new SelectedChannelType();

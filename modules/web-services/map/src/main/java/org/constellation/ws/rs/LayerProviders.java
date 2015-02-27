@@ -65,6 +65,8 @@ import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
+import org.geotoolkit.metadata.ImageStatistics;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sld.xml.Specification;
@@ -106,8 +108,6 @@ import java.util.Map;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
-import org.geotoolkit.metadata.ImageStatistics;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
@@ -204,6 +204,7 @@ public final class LayerProviders {
         // Try to extract layer data info.
         try {
             if (layer instanceof FeatureData) {
+
                 return getFeatureDataDescription((FeatureData) layer,false);
             } else {
                 return getCoverageDataDescription(layer, dataBrief.getId(),false);
@@ -510,11 +511,12 @@ public final class LayerProviders {
                 // Bands description.
                 for (int i=0; i<stats.getBands().length; i++) {
                     final ImageStatistics.Band band = stats.getBand(i);
-                    final String bandName = String.valueOf(i);
+                    final String bandName = band.getName();
+                    String indice = String.valueOf(i);
                     final double min = band.getMin();
                     final double max = band.getMax();
                     double[] noData = band.getNoData();
-                    description.getBands().add(new BandDescription(bandName, min, max, noData));
+                    description.getBands().add(new BandDescription(indice, bandName, min, max, noData));
                 }
             }
         }

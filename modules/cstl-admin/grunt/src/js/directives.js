@@ -141,7 +141,6 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
             link: function(scope, element, attr) {
                 scope.$watch(attr.popover, function(options) {
                     options = options || {};
-                    element.popover('destroy');
                     element.popover({
                         animation: options.animation,
                         html:      options.html,

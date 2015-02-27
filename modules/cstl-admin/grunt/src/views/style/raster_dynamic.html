@@ -18,56 +18,64 @@
   -->
 
 <form class="form-horizontal form-style" role="form">
-    <accordion close-others="false" id="accordion">
-        <accordion-group heading="{{component.name}}" ng-repeat="component in optionsSLD.rasterDynamic.components" is-open="component.isOpen">
-                <accordion-heading>
-                     <div style="cursor: pointer;">
-                         <i class="pull-left glyphicon"
-                            ng-class="{'glyphicon-chevron-down': component.isOpen, 'glyphicon-chevron-right': !component.isOpen}"></i>
-                         <span style="margin-left: 10pt;font-size: 14px;">{{component.name}}</span>
-                     </div>
-                 </accordion-heading>
-                <div id="{{ component.name }}">
-                    <form name="paletteForm"
-                          class="form_classification form-horizontal form-style"
-                          role="form" novalidate>
-                        <div class="form-group">
-                            <label class="col-xs-5 col-sm-5 col-md-4 control-label"
-                                   translate="sldeditor.raster.1band.band">Band</label>
-                            <div class="col-xs-7 col-sm-7 col-md-8">
-                                <select class="form-control form-control-fix"
-                                        ng-if="dataProperties.bands.length>0"
-                                        ng-model="component.band.selected"
-                                        ng-options="dp.name for dp in $parent.dataProperties.bands">
-                                    <option value="none">none</option>
-                                </select>
-                                <input type="text"
-                                       ng-if="dataProperties.bands.length==0"
-                                       class="form-control form-control-fix"
-                                       ng-model="component.band.selected.name"/>
-                            </div>
-                        </div>
-                        <div class="form-group" ng-show="component.minValue !== undefined">
-
-                            <label class="col-xs-5 col-sm-5 col-md-4 control-label">
-                                <span translate="sldeditor.raster.expression">Expression</span>
-                                <span class="fa fa-info-circle" popover data-placement="top"
-                                      data-trigger="hover" data-container="#accordion"
-                                      data-content="variable available : min, max, mean, std, hist, histo_min, histo_max"></span>
-                            </label>
-                            <div class="col-xs-7 col-sm-7 col-md-8">
-                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5" style="padding: 0;">
-                                    <input type="text" id="minValue" class="form-control form-control-fix"
-                                           ng-model="component.minValue" required/>
-                                </div>
-                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2" style="padding: 0;">
-                                    <input type="text" id="maxValue"  class="form-control form-control-fix"
-                                           ng-model="component.maxValue" required/>
+    <div style="height: 500px;overflow: auto;">
+        <accordion close-others="false" id="accordion" style="height: 448px;">
+            <accordion-group heading="{{channel.colorSpaceComponent}}" ng-repeat="channel in optionsSLD.rasterDynamic.channels" is-open="channelOpen" ng-init="channelOpen=false">
+                    <accordion-heading>
+                         <div style="cursor: pointer;">
+                             <i class="pull-left glyphicon"
+                                ng-class="{'glyphicon-chevron-down': channelOpen, 'glyphicon-chevron-right': !channelOpen}"></i>
+                             <span style="margin-left: 10pt;font-size: 14px;">{{channel.colorSpaceComponent}}</span>
+                         </div>
+                     </accordion-heading>
+                    <div id="{{ channel.colorSpaceComponent }}">
+                        <form name="paletteForm"
+                              class="form_classification form-horizontal form-style"
+                              role="form" novalidate>
+                            <div class="form-group">
+                                <label class="col-xs-5 col-sm-5 col-md-4 control-label"
+                                       translate="sldeditor.raster.1band.band">Band</label>
+                                <div class="col-xs-7 col-sm-7 col-md-8">
+                                    <select class="form-control form-control-fix"
+                                            ng-if="dataProperties.bands.length>0"
+                                            ng-model="channel.band"
+                                            ng-options="dp.name as dp.name for dp in $parent.dataProperties.bands">
+                                    </select>
+                                    <input type="text"
+                                           ng-if="dataProperties.bands.length==0"
+                                           class="form-control form-control-fix"
+                                           ng-model="channel.band"/>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
-        </accordion-group>
-    </accordion>
+                            <div class="form-group">
+                                <label class="col-xs-5 col-sm-5 col-md-4 control-label">
+                                    <span translate="sldeditor.raster.expression">Expression</span>
+                                    <span class="fa fa-info-circle" popover data-placement="top"
+                                          data-content="variable available : min, max, mean, std, hist, histo_min, histo_max"
+                                          data-trigger="hover" data-container="#accordion"></span>
+                                </label>
+                                <div class="col-xs-7 col-sm-7 col-md-8">
+                                    <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5" style="padding: 0;">
+                                        <input type="text" id="minValue" class="form-control form-control-fix"
+                                               ng-model="channel.lower.value" required/>
+                                    </div>
+                                    <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2" style="padding: 0;">
+                                        <input type="text" id="maxValue"  class="form-control form-control-fix"
+                                               ng-model="channel.upper.value" required/>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+            </accordion-group>
+        </accordion>
+        <div class="form-group">
+            <button type="button"
+                    ng-click="generateDynamicRange();"
+                    class="btn btn-generer btn-default pull-right"
+                    style="margin-top: 10px;">
+                <span translate="sldeditor.edition.rasterdynamicrange.generate">Apply</span>
+            </button>
+        </div>
+    </div>
 </form>

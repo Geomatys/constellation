@@ -28,6 +28,7 @@ import java.io.Serializable;
  */
 public class BandDescription implements Serializable {
 
+    private String indice;
     private String name;
     private double minValue;
     private double maxValue;
@@ -36,11 +37,12 @@ public class BandDescription implements Serializable {
     public BandDescription() {
     }
 
-    public BandDescription(final String name, final double minValue, final double maxValue, final double[] noDataValues) {
-        this.name         = name;
-        this.minValue     = minValue;
-        this.maxValue     = maxValue;
-        this.noDataValues = noDataValues;
+    public BandDescription(final String indice, final String name, final double minValue, final double maxValue, final double[] noDataValues) {
+        this.indice         = indice;
+        this.name           = name;
+        this.minValue       = minValue;
+        this.maxValue       = maxValue;
+        this.noDataValues   = noDataValues;
     }
 
     public String getName() {
@@ -73,5 +75,13 @@ public class BandDescription implements Serializable {
 
     public void setNoDataValues(final double[] noDataValues) {
         this.noDataValues = noDataValues;
+    }
+
+    public String getIndice() {
+        return indice;
+    }
+
+    public void setIndice(String indice) {
+        this.indice = indice;
     }
 }
