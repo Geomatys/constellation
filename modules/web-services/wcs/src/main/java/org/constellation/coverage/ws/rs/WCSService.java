@@ -123,6 +123,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import org.geotoolkit.wcs.xml.v200.GetCoverageType;
 
 // J2SE dependencies
 // Constellation dependencies
@@ -252,6 +253,8 @@ public class WCSService extends GridWebService<WCSWorker> {
             format = "text/x-matrix";
         } else if (format.equalsIgnoreCase(ASCII_GRID)) {
             format = "text/x-ascii-grid";
+        } else if (format.equalsIgnoreCase(NETCDF)) {
+            format = "application/x-netcdf";
 
         // Convert the supported image type into known mime-type.
         } else if (format.equalsIgnoreCase(PNG)) {
@@ -434,12 +437,28 @@ public class WCSService extends GridWebService<WCSWorker> {
             return adaptKvpGetCoverageRequest100();
          } else if (strVersion.equals("1.1.1")) {
             return adaptKvpGetCoverageRequest111();
+         } else if (strVersion.equals("2.0.0")) {
+            return adaptKvpGetCoverageRequest200();
          } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
          }
     }
 
+    
+    /**
+     * Generate a marshallable {@linkplain org.geotoolkit.wcs.xml.v200.GetCoverage GetCoverage}
+     * request in version 1.0.0, from what the user specified.
+     *
+     * @return The GetCoverage request in version 2.0.0
+     * @throws CstlServiceException
+     */
+    private GetCoverage adaptKvpGetCoverageRequest200() throws CstlServiceException {
+        final String coverageID  = getParameter(KEY_COVERAGE_ID,  true);
+        final String format      = getParameter(KEY_FORMAT,  false);
+         return new GetCoverageType(coverageID, format);
+    }
+    
     /**
      * Generate a marshallable {@linkplain org.geotoolkit.wcs.xml.v100.GetCoverage GetCoverage}
      * request in version 1.0.0, from what the user specified.

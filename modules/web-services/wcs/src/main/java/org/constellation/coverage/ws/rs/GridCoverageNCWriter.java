@@ -40,6 +40,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.coverage.resample.ResampleProcess;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -49,14 +50,14 @@ import org.opengis.referencing.crs.CompoundCRS;
  * @author guilhem
  */
 @Provider
-@Produces("image/geotiff")
-public class GridCoverageWriter<T extends Entry> implements MessageBodyWriter<T> {
+@Produces("application/x-netcdf")
+public class GridCoverageNCWriter<T extends Entry> implements MessageBodyWriter<T> {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.coverage.ws.rs");
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
-        return Entry.class.isAssignableFrom(type);
+        return Entry.class.isAssignableFrom(type) && mt.toString().equals("application/x-netcdf");
     }
 
     @Override
@@ -66,9 +67,9 @@ public class GridCoverageWriter<T extends Entry> implements MessageBodyWriter<T>
 
     @Override
     public void writeTo(final T entry, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
-        final GridCoverage2D coverage = (GridCoverage2D) entry.getKey();
-        final SpatialMetadata metadata = (SpatialMetadata) entry.getValue();
-
+        final GridCoverage2D coverage    = (GridCoverage2D) entry.getKey();
+        final SpatialMetadata metadata   = (SpatialMetadata) entry.getValue();
+        
         // we don"t support 3D crs writing
         final GridCoverage2D outCoverage;
         if (coverage.getCoordinateReferenceSystem() instanceof CompoundCRS) {
@@ -80,15 +81,15 @@ public class GridCoverageWriter<T extends Entry> implements MessageBodyWriter<T>
         } else {
             outCoverage = coverage;
         }
-
-        IIOImage iioimage = new IIOImage(outCoverage.getRenderedImage(), null, metadata);
-        ImageWriter iowriter = ImageIO.getImageWritersByFormatName("geotiff").next();
-
+        
+        IIOImage iioimage                = new IIOImage(outCoverage.getRenderedImage(), null, metadata);
+        ImageWriter iowriter             = ImageIO.getImageWritersByFormatName("netcdf").next();
+        
         // TIFF writer do no support writing in output stream currently, we have to write in a file before
-        File f = File.createTempFile(coverage.getName().toString(), ".tiff");
+        File f = File.createTempFile(coverage.getName().toString(), ".nc");
         iowriter.setOutput(f);
         iowriter.write(null, iioimage, null);
-
+        
         byte[] buf = new byte[8192];
         FileInputStream is = new FileInputStream(f);
         int c = 0;
@@ -98,6 +99,26 @@ public class GridCoverageWriter<T extends Entry> implements MessageBodyWriter<T>
         }
         out.close();
         is.close();
+        
+
+        /*final ImageCoverageWriter writer = new ImageCoverageWriter();
+        
+        try {
+            writer.setOutput(out);
+            GridCoverageWriteParam param = new GridCoverageWriteParam();
+            param.setFormatName("geotiff");
+            writer.write(coverage, param);
+           
+        } catch (CoverageStoreException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            throw new IOException(ex);
+        } finally {
+            try {
+                writer.dispose();
+            } catch (CoverageStoreException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
+        }*/
 
     }
 }

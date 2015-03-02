@@ -697,20 +697,13 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         if (inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
                            MISSING_PARAMETER_VALUE, QueryConstants.VERSION_PARAMETER.toLowerCase());
-        } else if (!"1.0.0".equals(inputVersion) && !"1.1.1".equals(inputVersion)) {
+        } else if (!"1.0.0".equals(inputVersion) &&
+                   !"2.0.0".equals(inputVersion) &&
+                   !"1.1.1".equals(inputVersion)) {
             throw new CstlServiceException("The version number specified for this request " + inputVersion +
                     " is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
         }
-
-        Date date = null;
-        try {
-            date = TimeParser.toDate(request.getTime());
-        } catch (ParseException ex) {
-            throw new CstlServiceException("Parsing of the date failed. Please verify that the specified" +
-                    " date is compliant with the ISO-8601 standard.", ex, INVALID_PARAMETER_VALUE,
-                    KEY_TIME.toLowerCase());
-        }
-
+        
         final String coverageName = request.getCoverage();
         if (coverageName == null) {
             throw new CstlServiceException("You must specify the parameter: COVERAGE" , INVALID_PARAMETER_VALUE,
@@ -730,6 +723,19 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final CoverageData layerRef = (CoverageData) tmplayerRef;
         final Layer configLayer = getConfigurationLayer(tmpName, userLogin);
 
+        if ("2.0.0".equals(inputVersion)) {
+            return getCoverage200(request, layerRef, configLayer);
+        }
+        
+        Date date = null;
+        try {
+            date = TimeParser.toDate(request.getTime());
+        } catch (ParseException ex) {
+            throw new CstlServiceException("Parsing of the date failed. Please verify that the specified" +
+                    " date is compliant with the ISO-8601 standard.", ex, INVALID_PARAMETER_VALUE,
+                    KEY_TIME.toLowerCase());
+        }
+        
         // we verify the interpolation method even if we don't use it
         try {
             if (request.getInterpolationMethod() != null) {
@@ -878,6 +884,113 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support netcdf writing."),
                                            INVALID_FORMAT, KEY_FORMAT.toLowerCase());
+
+        } else if( format.equalsIgnoreCase(GEOTIFF) ){
+            try {
+                final SpatialMetadata metadata = layerRef.getSpatialMetadata();
+                final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, elevation, date);
+                return new SimpleEntry(coverage, metadata);
+            } catch (IOException | DataStoreException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+
+        } else {
+            // We are in the case of an image format requested.
+            //NOTE: ADRIAN HACKED HERE
+
+            // SCENE
+            final Map<String, Object> renderParameters = new HashMap<>();
+
+            renderParameters.put(KEY_TIME, date);
+            renderParameters.put("ELEVATION", elevation);
+            final SceneDef sdef = new SceneDef();
+
+            final List<DataReference> styles = configLayer.getStyles();
+            final MutableStyle style;
+            if (!styles.isEmpty()) {
+                final DataReference styleName = styles.get(0);
+                final MutableStyle incomingStyle = getStyle(styleName);
+                style = WCSUtils.filterStyle(incomingStyle, request.getRangeSubset());
+            } else {
+                style = null;
+            }
+            try {
+                final MapContext context = PortrayalUtil.createContext(layerRef, style, renderParameters);
+                sdef.setContext(context);
+            } catch (PortrayalException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+
+            // VIEW
+            final Double azimuth =  0.0; //HARD CODED SINCE PROTOCOL DOES NOT ALLOW
+            final ViewDef vdef = new ViewDef(refEnvel, azimuth);
+
+            // CANVAS
+            Color background = null;
+            if (MimeType.IMAGE_JPEG.equalsIgnoreCase(format)) {
+                background = Color.WHITE;
+            }
+            final CanvasDef cdef = new CanvasDef(size, background);
+
+            // IMAGE
+            final BufferedImage img;
+            try {
+                img = Cstl.getPortrayalService().portray(sdef, vdef, cdef);
+            } catch (PortrayalException ex) {
+                /*
+                 * TODO: the binding xml for WCS and GML do not support the exceptions format,
+                 * consequently we can't extract the exception output mime-type information from
+                 * the request. Maybe a more recent version of the GML 3 spec has fixed this bug ...
+                 */
+                //if (exceptions != null && exceptions.equalsIgnoreCase(EXCEPTIONS_INIMAGE)) {
+                //    img = Cstl.Portrayal.writeInImage(ex, abstractRequest.getSize());
+                //} else {
+                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                //}
+            }
+
+            return img;
+        }
+    }
+    
+    private Object getCoverage200(final GetCoverage request, final CoverageData layerRef, final Layer configLayer) throws CstlServiceException {
+        final Envelope refEnvel;
+        try {
+            refEnvel = layerRef.getEnvelope();
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+        Dimension size = new Dimension(500, 500);
+        Double elevation = null;
+        Date date = null;
+        
+        /*
+         * Generating the response.
+         * It can be a text one (format MATRIX) or an image one (png, gif ...).
+         */
+        final String format = request.getFormat();
+        if ( format.equalsIgnoreCase(MATRIX) || format.equalsIgnoreCase(ASCII_GRID)) {
+
+            //NOTE ADRIAN HACKED HERE
+            final RenderedImage image;
+            try {
+                final GridCoverage2D gridCov = layerRef.getCoverage(refEnvel, size, elevation, date);
+                image = gridCov.getRenderedImage();
+            } catch (IOException | DataStoreException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+
+            return image;
+
+        } else if( format.equalsIgnoreCase(NETCDF) ){
+
+            try {
+                final SpatialMetadata metadata = layerRef.getSpatialMetadata();
+                final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, elevation, date);
+                return new SimpleEntry(coverage, metadata);
+            } catch (IOException | DataStoreException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
 
         } else if( format.equalsIgnoreCase(GEOTIFF) ){
             try {
