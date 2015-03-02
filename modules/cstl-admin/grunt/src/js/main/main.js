@@ -99,6 +99,11 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
         });
     })
 
+    .controller('FooterController', function($scope,CstlConfig) {
+        var self = this;
+        self.cstlVersion=CstlConfig['cstl.version'];
+    })
+
     .controller('MainController', function($scope, $location, webService, dataListing, ProcessService, Growl, UserResource, GeneralService, TaskService) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {

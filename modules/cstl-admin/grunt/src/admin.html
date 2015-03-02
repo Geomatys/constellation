@@ -29,7 +29,9 @@
         </div>
         <div class="container" ng-view></div>
 
-        <div id="footer" ng-include="'footer.html'">
+        <div id="footer"
+             ng-controller="FooterController as footer"
+             ng-include="'footer.html'">
         </div>
 
 

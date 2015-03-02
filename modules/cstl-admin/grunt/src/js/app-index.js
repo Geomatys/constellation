@@ -77,6 +77,10 @@ angular.module('CstlIndexApp', [
             }
         });
     })
+    .controller('FooterController', function($scope,CstlConfig) {
+        var self = this;
+        self.cstlVersion=CstlConfig['cstl.version'];
+    })
 
     .controller('LanguageController', function($scope, $translate) {
         $scope.changeLanguage = function(languageKey) {

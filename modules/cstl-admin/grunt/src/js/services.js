@@ -87,7 +87,10 @@ angular.module('cstl-services', ['cstl-restapi'])
         'cookie.cstl.url':   'cstlUrl',
         'cookie.domain.id':  'cstlActiveDomainId',
         'cookie.user.id':    'cstlUserId',
-        'cookie.auth.token': 'access_token'
+        'cookie.auth.token': 'access_token',
+
+        //cstl version.
+        'cstl.version': (new Date()).getFullYear()
     })
 
     // -------------------------------------------------------------------------
