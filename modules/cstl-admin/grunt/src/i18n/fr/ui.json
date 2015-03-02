@@ -289,6 +289,8 @@
     "global.menu.admin.tasks":"Gestionnaire des tâches",
     "global.menu.admin.users": "Gestion des utilisateurs",
     "global.menu.data": "Méta/Données",
+    "global.menu.metadata": "Métadonnées",
+    "global.menu.thesaurus": "Thésaurus",
     "global.menu.sensor": "Capteurs",
     "global.menu.home": "Accueil",
     "global.menu.language": "Langue",

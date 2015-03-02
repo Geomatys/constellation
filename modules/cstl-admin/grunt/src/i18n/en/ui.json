@@ -760,6 +760,8 @@
     "global.menu.web-service": "Web Services",
     "global.menu.web-service.min": "Services",
     "global.menu.data": "Meta/Data",
+    "global.menu.metadata": "Metadata",
+    "global.menu.thesaurus": "Thesaurus",
     "global.menu.sensor": "Sensors",
     "global.menu.style": "Styles",
     "global.menu.mapcontext": "Map Context",

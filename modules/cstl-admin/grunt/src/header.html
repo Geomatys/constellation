@@ -4,11 +4,11 @@
 <ul class="nav navbar-right nav-pills ng-cloak nav-user pull-right">
     <li class="dropdown pointer" >
         <a class="dropdown-toggle" data-toggle="dropdown">
-                                <span>
-                                    <span class="glyphicon glyphicon-user"></span>
-                                    <span class="hidden-tablet" >{{firstname}} {{lastname}}</span>
-                                    <span class="fa fa-caret-down"></span>
-                                </span>
+            <span>
+                <span class="glyphicon glyphicon-user"></span>
+                <span class="hidden-tablet" >{{firstname}} {{lastname}}</span>
+                <span class="fa fa-caret-down"></span>
+            </span>
         </a>
         <ul class="dropdown-menu">
             <li>
@@ -38,11 +38,11 @@
         <ul class="nav nav-pills" ng-hide="authenticated">
             <li style="margin-left:2px;" class="dropdown pointer" ng-controller="LanguageController">
                 <a class="dropdown-toggle" data-toggle="dropdown">
-                                <span>
-                                    <span class="glyphicon glyphicon-flag"></span>&nbsp;
-                                    <span class="hidden-tablet" translate="global.menu.language">Language</span>
-                                    <b class="caret"></b>
-                                </span>
+                    <span>
+                        <span class="glyphicon glyphicon-flag"></span>&nbsp;
+                        <span class="hidden-tablet" translate="global.menu.language">Language</span>
+                        <b class="caret"></b>
+                    </span>
                 </a>
                 <ul class="dropdown-menu pull-right">
                     <li active-menu="en">
@@ -76,22 +76,28 @@
             <li>
                 <a ng-class="navClass('data')" href="#/data" id="dataLink">
                     <span class="glyphicon glyphicon-file"></span>
-                    <span translate="global.menu.data">Données</span>
+                    <span translate="global.menu.data">Data</span>
                 </a>
             </li>
-            <li>
+            <li class="hidden-sm" ng-repeat="page in navigationArray">
+                <a ng-class="navClass(page.cssClass)" href="{{page.href}}" id="{{page.id}}">
+                    <span class="{{page.iconClass}}"></span>
+                    <span translate="{{page.labelKey}}">{{page.defaultLabel}}</span>
+                </a>
+            </li>
+            <li ng-class="{'hidden-sm':navigationArray.length>1}">
                 <a ng-class="navClass('sensors')" href="#/sensors" id="sensorLink">
                     <span ng-class="navClass('sensors')" class="icon-menu-sensor"></span>
                     <span translate="global.menu.sensor">Sensor</span>
                 </a>
             </li>
-            <li>
+            <li ng-class="{'hidden-sm':navigationArray.length>0,'hidden-md':navigationArray.length>0}">
                 <a ng-class="navClass('styles')" href="#/styles" id="stylesLink">
                     <span class="fa fa-paint-brush"></span>
                     <span translate="global.menu.style">Styles</span>
                 </a>
             </li>
-            <li class="hidden-sm">
+            <li class="hidden-sm hidden-md">
                 <a ng-class="navClass('mapcontext')" href="#/mapcontext" id="mapcontextLink">
                     <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
                     <span translate="global.menu.mapcontext">Map context</span>
@@ -118,13 +124,32 @@
 
             <li class="dropdown pointer hidden-lg hidden-md hidden-xs">
                 <a class="dropdown-toggle" data-toggle="dropdown">
-                                <span>
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                    <span class="hidden-tablet" translate="global.menu.other">Other</span>
-                                    <b class="caret"></b>
-                                </span>
+                    <span>
+                        <span class="glyphicon glyphicon-plus"></span>
+                        <span class="hidden-tablet" translate="global.menu.other">Other</span>
+                        <b class="caret"></b>
+                    </span>
                 </a>
                 <ul class="dropdown-menu menu-other">
+                    <li ng-repeat="page in navigationArray">
+                        <a ng-class="navClass(page.cssClass)" href="{{page.href}}">
+                            <span class="{{page.iconClass}}"></span>
+                            <span translate="{{page.labelKey}}">{{page.defaultLabel}}</span>
+                        </a>
+                    </li>
+                    <li ng-if="navigationArray.length>1">
+                        <a ng-class="navClass('sensors')" href="#/sensors">
+                            <span ng-class="navClass('sensors')" class="icon-menu-sensor" style="width:12px; height:12px; color:transparent;">aa</span>
+                            <span ng-class="navClass('sensors')" class="icon-menu-sensor"></span>
+                            <span translate="global.menu.sensor">Sensor</span>
+                        </a>
+                    </li>
+                    <li ng-if="navigationArray.length>0">
+                        <a ng-class="navClass('styles')" href="#/styles">
+                            <span class="fa fa-paint-brush"></span>
+                            <span translate="global.menu.style">Styles</span>
+                        </a>
+                    </li>
                     <li>
                         <a ng-class="navClass('mapcontext')" href="#/mapcontext">
                             <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext" style="width:12px; height:12px; color:transparent;">aa</span>
@@ -149,13 +174,26 @@
 
             <li ng-if="hasRole('cstl-admin')" class="dropdown pointer hidden-lg hidden-sm hidden-xs">
                 <a class="dropdown-toggle" data-toggle="dropdown">
-                                <span>
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                    <span class="hidden-tablet" translate="global.menu.other">Other</span>
-                                    <b class="caret"></b>
-                                </span>
+                    <span>
+                        <span class="glyphicon glyphicon-plus"></span>
+                        <span class="hidden-tablet" translate="global.menu.other">Other</span>
+                        <b class="caret"></b>
+                    </span>
                 </a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu menu-other">
+                    <li ng-if="navigationArray.length>0">
+                        <a ng-class="navClass('styles')" href="#/styles">
+                            <span class="fa fa-paint-brush"></span>
+                            <span translate="global.menu.style">Styles</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-class="navClass('mapcontext')" href="#/mapcontext">
+                            <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext" style="width:12px; height:12px; color:transparent;">aa</span>
+                            <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
+                            <span translate="global.menu.mapcontext">Map context</span>
+                        </a>
+                    </li>
                     <li>
                         <a ng-class="navClass('tasks')" href="#/tasks">
                             <span class="glyphicon glyphicon-cog"></span>

@@ -90,7 +90,10 @@ angular.module('cstl-services', ['cstl-restapi'])
         'cookie.auth.token': 'access_token',
 
         //cstl version.
-        'cstl.version': (new Date()).getFullYear()
+        'cstl.version': (new Date()).getFullYear(),
+
+        // Navigation additional buttons
+        'cstl.navigation' : [] //keep empty since cstl declare its own links directly in the header, this array is overrided by subprojects.
     })
 
     // -------------------------------------------------------------------------
