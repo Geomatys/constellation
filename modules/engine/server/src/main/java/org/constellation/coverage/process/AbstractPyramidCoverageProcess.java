@@ -1,5 +1,6 @@
 package org.constellation.coverage.process;
 
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.measure.NumberRange;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.SpringHelper;
@@ -22,11 +23,9 @@ import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.Pyramid;
 import org.geotoolkit.coverage.PyramidSet;
 import org.geotoolkit.coverage.PyramidalCoverageReference;
-import org.geotoolkit.coverage.filestore.FileCoverageStoreFactory;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.GridGeometry2D;
 import org.geotoolkit.coverage.grid.ViewType;
-import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.feature.type.Name;
@@ -39,6 +38,7 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.OutOfDomainOfValidityException;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.operation.TransformException;
@@ -137,6 +137,36 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
      */
     protected Envelope getPyramidWorldEnvelope(CoordinateReferenceSystem crs){
         return CRS.getEnvelope(crs);
+    }
+
+    /**
+     * Change 2D part of input envelope with base 2D CRS validity domain.
+     * @param pyramidCRS2D 2D CRS of the final envelope.
+     * @param coverageEnvelope potentially nD Envelope in which 2D ranges will be changed.
+     * @return Envelope with same number of dimension than input {@code coverageEnvelope} and geographical
+     * CRS equals to {@code pyramidCRS2D}.
+     */
+    protected Envelope getFixedPyramidEnvelop(CoordinateReferenceSystem pyramidCRS2D,
+                                              Envelope coverageEnvelope) {
+
+        GeneralEnvelope finalPyramidEnv = GeneralEnvelope.castOrCopy(CRS.getEnvelope(pyramidCRS2D));
+        CoordinateReferenceSystem coverageCRS = coverageEnvelope.getCoordinateReferenceSystem();
+        if (coverageCRS instanceof CompoundCRS) {
+            finalPyramidEnv = GeneralEnvelope.castOrCopy(CRSUtilities.appendMissingDimensions(finalPyramidEnv, (CompoundCRS) coverageCRS));
+            assert finalPyramidEnv != null;
+
+            final int minOrdi0 = org.geotoolkit.coverage.CoverageUtilities.getMinOrdinate(coverageCRS);
+            final int minOrdi1 = minOrdi0 + 1;
+            final int nbDim   = coverageCRS.getCoordinateSystem().getDimension();
+
+            for (int d = 0; d < nbDim; d++) {
+                if (d != minOrdi0 && d != minOrdi1) {
+                    //set extra dimension range
+                    finalPyramidEnv.setRange(d, coverageEnvelope.getMinimum(d), coverageEnvelope.getMaximum(d));
+                }
+            }
+        }
+        return finalPyramidEnv;
     }
 
     /**

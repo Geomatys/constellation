@@ -235,20 +235,14 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
             }
 
             final GridCoverage2D gridCoverage2D = (GridCoverage2D) coverage;
-            final CoordinateReferenceSystem coverageCRS = gridCoverage2D.getCoordinateReferenceSystem();
-
             for (CoordinateReferenceSystem pyramidCRS2D : pyramidCRSs) {
 
                 final PyramidalCoverageReference outCovRef =
                         (PyramidalCoverageReference) getOrCreateCRef((XMLCoverageStore) outputCoverageStore, referenceName, PNG_FORMAT, ViewType.RENDERED);
 
-                final Envelope pyramidEnv2D = getPyramidWorldEnvelope(pyramidCRS2D);
-                Envelope finalPyramidEnv = pyramidEnv2D;
-                if (coverageCRS instanceof CompoundCRS) {
-                    finalPyramidEnv = CRSUtilities.appendMissingDimensions(pyramidEnv2D, (CompoundCRS) coverageCRS);
-                }
+                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, pyramidCRS2D);
 
-                final double[] scales = getPyramidScales((GridCoverage2D) coverage, outCovRef, finalPyramidEnv.getCoordinateReferenceSystem());
+                final Envelope finalPyramidEnv = getFixedPyramidEnvelop(pyramidCRS2D, coverage.getEnvelope());
                 pyramidStyledData(inCovRef, finalPyramidEnv, scales, outCovRef, style, update);
             }
         } catch (DataStoreException | FactoryException | OutOfDomainOfValidityException | TransformException e) {
