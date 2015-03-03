@@ -88,8 +88,10 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
     {
         final GridCoverageReader reader = ref.acquireReader();
 
-        final GridCoverageReadParam param = new GridCoverageReadParam();
-        param.setEnvelope(envelope);
+        GridCoverageReadParam param = new GridCoverageReadParam();
+        if (envelope != null) {
+            param.setEnvelope(envelope);
+        }
         try {
             return (GridCoverage2D) reader.read(ref.getImageIndex(), param);
         } catch (CancellationException ex) {

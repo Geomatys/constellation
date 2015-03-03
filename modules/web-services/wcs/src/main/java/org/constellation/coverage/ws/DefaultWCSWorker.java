@@ -110,6 +110,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
+import org.apache.sis.geometry.Envelopes;
 
 import org.apache.sis.util.CharSequences;
 import static org.constellation.coverage.ws.WCSConstant.ASCII_GRID;
@@ -152,7 +153,13 @@ import org.geotoolkit.swe.xml.v200.DataRecordPropertyType;
 import org.geotoolkit.swe.xml.v200.DataRecordType;
 import org.geotoolkit.swe.xml.v200.QuantityType;
 import org.geotoolkit.swe.xml.v200.UnitReference;
+import org.geotoolkit.wcs.xml.DomainSubset;
+import org.geotoolkit.wcs.xml.v200.DimensionSliceType;
+import org.geotoolkit.wcs.xml.v200.DimensionTrimType;
 import org.geotoolkit.wcs.xml.v200.ServiceParametersType;
+import org.opengis.coverage.grid.GridEnvelope;
+import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.referencing.operation.MathTransform;
 
 // GeoAPI dependencies
 
@@ -446,7 +453,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 if (meta != null) {
                     RectifiedGrid brutGrid =  meta.getInstanceForType(RectifiedGrid.class);
                     if (brutGrid.getExtent() != null) {
-                        grid = new org.geotoolkit.gml.xml.v321.RectifiedGridType(brutGrid);
+                        grid = new org.geotoolkit.gml.xml.v321.RectifiedGridType(brutGrid, meta.getInstanceForType(CoordinateReferenceSystem.class));
                     }
                 }
             } catch (DataStoreException ex) {
@@ -954,14 +961,66 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     }
     
     private Object getCoverage200(final GetCoverage request, final CoverageData layerRef, final Layer configLayer) throws CstlServiceException {
-        final Envelope refEnvel;
+        final SpatialMetadata metadata;
+        final GridCoverage2D gridCov;
+        final CoordinateReferenceSystem crs;
         try {
-            refEnvel = layerRef.getEnvelope();
-        } catch (DataStoreException ex) {
+            metadata = layerRef.getSpatialMetadata();
+            gridCov  = layerRef.getCoverage(null, null, null, null);
+            crs      = metadata.getInstanceForType(CoordinateReferenceSystem.class);
+        } catch (IOException | DataStoreException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
+        
+        final Envelope refEnvel;
+        if (request.getDomainSubset().isEmpty()) {
+            try {
+                refEnvel = layerRef.getEnvelope();
+            } catch (DataStoreException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+        } else {
+            
+            // build full envelope in pixel
+            MathTransform mt = gridCov.getGridGeometry().getGridToCRS(PixelInCell.CELL_CORNER);
+            GridEnvelope grid = gridCov.getGridGeometry().getExtent();
+            GeneralEnvelope env = new GeneralEnvelope(grid.getDimension());
+            for (int i = 0; i < grid.getDimension(); i++) {
+                env.setRange(i, grid.getLow(i), grid.getHigh(i));
+            }
+            
+            //trim / slice the envelope
+            for (DomainSubset subset : request.getDomainSubset()) {
+                if (subset instanceof DimensionTrimType) {
+                    final DimensionTrimType trim = (DimensionTrimType) subset;
+                    final int dimensionIndex = dimensionIndex(trim.getDimension(), crs);
+                    if (dimensionIndex == -1) {
+                        throw new CstlServiceException("There is no such dimension: " + trim.getDimension(), NO_APPLICABLE_CODE);
+                    } else {
+                        env.setRange(dimensionIndex, Integer.parseInt(trim.getTrimLow()), Integer.parseInt(trim.getTrimHigh()));
+                    }
+                    
+                } else if (subset instanceof DimensionSliceType) {
+                    final DimensionSliceType slice = (DimensionSliceType) subset;
+                    final int dimensionIndex = dimensionIndex(slice.getDimension(), crs);
+                    if (dimensionIndex == -1) {
+                        throw new CstlServiceException("There is no such dimension: " + slice.getDimension(), NO_APPLICABLE_CODE);
+                    } else {
+                        int slicePoint = Integer.parseInt(slice.getSlicePoint());
+                        env.setRange(dimensionIndex, slicePoint, slicePoint + 1);
+                    }
+                }
+            }
+            try {
+                env = Envelopes.transform(mt, env);
+                env.setCoordinateReferenceSystem(crs);
+            } catch (TransformException ex) {
+               throw new CstlServiceException("Unable to project the grid envelope to target CRS", ex, NO_APPLICABLE_CODE);
+            }
+            refEnvel = env;
+        }
+        
         Dimension size = new Dimension(500, 500);
-        Double elevation = null;
         Date date = null;
         
         /*
@@ -974,8 +1033,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             //NOTE ADRIAN HACKED HERE
             final RenderedImage image;
             try {
-                final GridCoverage2D gridCov = layerRef.getCoverage(refEnvel, size, elevation, date);
-                image = gridCov.getRenderedImage();
+                final GridCoverage2D coverage = layerRef.getCoverage(refEnvel, size, null, date);
+                image = coverage.getRenderedImage();
             } catch (IOException | DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
@@ -985,8 +1044,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         } else if( format.equalsIgnoreCase(NETCDF) ){
 
             try {
-                final SpatialMetadata metadata = layerRef.getSpatialMetadata();
-                final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, elevation, date);
+                final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, null, date);
                 return new SimpleEntry(coverage, metadata);
             } catch (IOException | DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
@@ -994,8 +1052,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
         } else if( format.equalsIgnoreCase(GEOTIFF) ){
             try {
-                final SpatialMetadata metadata = layerRef.getSpatialMetadata();
-                final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, elevation, date);
+                final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, null, date);
                 return new SimpleEntry(coverage, metadata);
             } catch (IOException | DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
@@ -1009,7 +1066,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             final Map<String, Object> renderParameters = new HashMap<>();
 
             renderParameters.put(KEY_TIME, date);
-            renderParameters.put("ELEVATION", elevation);
+            renderParameters.put("ELEVATION", null);
             final SceneDef sdef = new SceneDef();
 
             final List<DataReference> styles = configLayer.getStyles();
@@ -1058,6 +1115,15 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
             return img;
         }
+    }
+    
+    private int dimensionIndex(final String dimension, final CoordinateReferenceSystem crs) {
+        for (int i = 0; i < crs.getCoordinateSystem().getDimension(); i++) {
+            if (dimension.equals(crs.getCoordinateSystem().getAxis(i).getAbbreviation())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
