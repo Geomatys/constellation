@@ -19,7 +19,6 @@
 package org.constellation.provider;
 
 import org.apache.sis.measure.MeasurementRange;
-import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
@@ -33,8 +32,6 @@ import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
@@ -43,11 +40,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.FactoryException;
 
 import java.awt.*;
 import java.io.IOException;
@@ -59,6 +51,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
+import org.apache.sis.measure.NumberRange;
+import org.geotoolkit.image.coverage.GridCombineIterator;
+import org.geotoolkit.internal.referencing.CRSUtilities;
 
 
 /**
@@ -167,54 +162,14 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         final Envelope env = getEnvelope();
 
         final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
-
-        final TemporalCRS temporalCRS = org.apache.sis.referencing.CRS.getTemporalComponent(crs);
-        if (temporalCRS != null) {
-            try {
-                final CoordinateSystem cs = temporalCRS.getCoordinateSystem();
-                if (cs.getDimension() != 1) {
-                    throw new DataStoreException("Invalid temporal CRS : "+temporalCRS);
-                }
-
-                final CoordinateSystemAxis axis = cs.getAxis(0);
-
-                double[] temporalArray;
-                if (axis instanceof DiscreteCoordinateSystemAxis) {
-                    final DiscreteCoordinateSystemAxis discretAxis = (DiscreteCoordinateSystemAxis) axis;
-                    final int nbOrdinate = discretAxis.length();
-                    temporalArray = new double[nbOrdinate];
-
-                    for (int i = 0; i < nbOrdinate; i++) {
-                        final Comparable c = discretAxis.getOrdinateAt(i);
-                        if (c instanceof Date) {
-                            dates.add((Date) c);
-                        } else {
-                            temporalArray[i] = ((Number)c).doubleValue();
-                        }
-                    }
-                } else {
-                    temporalArray = new double[] {
-                            axis.getMinimumValue(),
-                            axis.getMaximumValue()
-                    };
-                }
-
-                // transformation needed.
-                int coordLength = temporalArray.length;
-                if (coordLength > 0) {
-                    //find transform from data temporal CRS to default temporal CRS
-                    final MathTransform transform = CRS.findMathTransform(temporalCRS, CommonCRS.Temporal.JAVA.crs());
-                    transform.transform(temporalArray, 0, temporalArray, 0, coordLength);
-
-                    for (int i = 0; i < coordLength; i++) {
-                        dates.add(new Date(Double.valueOf(temporalArray[i]).longValue()));
-                    }
-                }
-
-            } catch (FactoryException e) {
-                throw new DataStoreException(e.getMessage(), e);
-            } catch (TransformException e) {
-                throw new DataStoreException(e.getMessage(), e);
+//        final TemporalCRS temporalCRS = org.apache.sis.referencing.CRS.getTemporalComponent(crs);
+        final int tempIndex = CRSUtilities.getDimensionOf(crs, TemporalCRS.class);
+        if (tempIndex != -1) {
+            final GridCoverageReader reader = ref.acquireReader();
+            final NumberRange[] tempValues = GridCombineIterator.extractAxisRanges(reader.getGridGeometry(ref.getImageIndex()), tempIndex);
+            ref.recycle(reader);
+            for (NumberRange nR : tempValues) {
+                dates.add(new Date(Double.valueOf(nR.getMinDouble()).longValue()));
             }
         }
 
@@ -230,51 +185,18 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         final Envelope env = getEnvelope();
         final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
 
-        final VerticalCRS verticalCRS = org.apache.sis.referencing.CRS.getVerticalComponent(crs, true);
-        if (verticalCRS != null) {
-
-            try {
-                final CoordinateSystem cs = verticalCRS.getCoordinateSystem();
-                if (cs.getDimension() != 1) {
-                    throw new DataStoreException("Invalid vertical CRS : "+verticalCRS);
-                }
-
-                //find transform from data vertical CRS to default vertical CRS
-                final MathTransform transform = CRS.findMathTransform(verticalCRS, CommonCRS.Vertical.ELLIPSOIDAL.crs());
-
-                final CoordinateSystemAxis axis = cs.getAxis(0);
-                double[] elevationOrd;
-                if (axis instanceof DiscreteCoordinateSystemAxis) {
-                    final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
-                    final int nbOrdinate = discretAxis.length();
-
-                    elevationOrd = new double[nbOrdinate];
-                    for (int i = 0; i < nbOrdinate; i++) {
-                        elevationOrd[i] = ((Number)discretAxis.getOrdinateAt(i)).doubleValue();
-                    }
-
-                } else {
-                    elevationOrd = new double[] {
-                            axis.getMinimumValue(),
-                            axis.getMaximumValue()
-                    };
-                }
-
-                int coordLength = elevationOrd.length;
-                if (coordLength > 0) {
-                    transform.transform(elevationOrd, 0, elevationOrd, 0, coordLength);
-                    for (int i = 0; i < coordLength; i++) {
-                        elevations.add(elevationOrd[i]);
-                    }
-                }
-
-            } catch (FactoryException e) {
-                throw new DataStoreException(e.getMessage(), e);
-            } catch (TransformException e) {
-                throw new DataStoreException(e.getMessage(), e);
+        //final VerticalCRS verticalCRS = org.apache.sis.referencing.CRS.getVerticalComponent(crs, true);
+        final int tempIndex = CRSUtilities.getDimensionOf(crs, VerticalCRS.class);
+        if (tempIndex != -1) {
+            
+            final GridCoverageReader reader = ref.acquireReader();
+            final NumberRange[] tempValues = GridCombineIterator.extractAxisRanges(reader.getGridGeometry(ref.getImageIndex()), tempIndex);
+            ref.recycle(reader);
+            
+            for (NumberRange nR : tempValues) {
+                elevations.add(nR.getMinDouble());
             }
         }
-
         return elevations;
     }
 
@@ -293,7 +215,7 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         final GridCoverageReader reader = ref.acquireReader();
 
         try {
-            final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
+            final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(ref.getImageIndex());
             if (generalGridGeom == null || generalGridGeom.getEnvelope() == null) {
                 LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
                 return null;
