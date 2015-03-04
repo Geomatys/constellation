@@ -149,6 +149,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.measure.NumberRange;
 
 import org.apache.sis.util.CharSequences;
 import static org.constellation.api.CommonConstants.DEFAULT_CRS;
@@ -162,6 +163,10 @@ import static org.constellation.map.ws.WMSConstant.KEY_EXTRA_PARAMETERS;
 import static org.constellation.map.ws.WMSConstant.KEY_LAYER;
 import static org.constellation.map.ws.WMSConstant.KEY_LAYERS;
 import static org.constellation.map.ws.WMSConstant.KEY_TIME;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
+import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.image.coverage.GridCombineIterator;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
@@ -178,6 +183,7 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.createLegendURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
+import org.opengis.coverage.grid.GridCoverage;
 
 //Geoapi dependencies
 
@@ -461,74 +467,54 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 dimensions.add(dim);
             }
 
-            /*
-             * Create dimensions using CRS of the layer native envelope
-             */
-            Envelope nativeEnv;
-            try {
-                nativeEnv = layer.getEnvelope();
-            } catch (DataStoreException exception) {
-                throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
-            }
-
-            if (nativeEnv != null && nativeEnv.getCoordinateReferenceSystem() != null) {
-                final CoordinateReferenceSystem crs = nativeEnv.getCoordinateReferenceSystem();
-                final CoordinateSystem cs = crs.getCoordinateSystem();
-
-                final int nbDim = cs.getDimension();
-
-                for (int i = 0; i < nbDim; i++) {
-                    final CoordinateSystemAxis axis = cs.getAxis(i);
-                    final AxisDirection direction = axis.getDirection();
-                    final Unit axisUnit = axis.getUnit();
-
-                    final String directionName = direction.name();
-
-                    boolean addDimension = false;
-
-                    //valid axis if a common dimensions
-                    if (!COMMONS_DIM.contains(directionName)) {
-                        addDimension = true;
-
-                        //or a vertical direction without axis length unit.
-                    } else if (VERTICAL_DIM.contains(directionName) && axisUnit != null && !axisUnit.isCompatible(SI.METRE)) {
-                        addDimension = true;
-                    }
-
-                    if (addDimension) {
-                        final org.opengis.metadata.Identifier axisName = axis.getName();
-
-                        final String unit = (axisUnit != null) ? axisUnit.toString() : null;
+            final Object origin = layer.getOrigin();
+            
+            
+            //-- execute only if it is a CoverageReference
+            if (origin != null && origin instanceof CoverageReference) {
+                final CoverageReference covRef = (CoverageReference)origin;
+                GeneralGridGeometry gridGeom = null;
+                
+                //-- try to open coverage
+                try {
+                    final GridCoverageReader covReader = covRef.acquireReader();
+                    gridGeom = new GeneralGridGeometry(covReader.getGridGeometry(covRef.getImageIndex()));
+                    covRef.recycle(covReader);
+                } catch (DataStoreException ex) {
+                    throw new CstlServiceException(ex);
+                }
+                
+                final CoordinateReferenceSystem crsLayer                       = gridGeom.getCoordinateReferenceSystem();
+                final Map<Integer, CoordinateReferenceSystem> indexedDecompose = ReferencingUtilities.indexedDecompose(crsLayer);
+                
+                //-- for each CRS part if crs is not 2D part or Temporal or elevation add value
+                for (Integer key : indexedDecompose.keySet()) {
+                    final CoordinateReferenceSystem currentCrs = indexedDecompose.get(key);
+                    
+                    //-- in this case we add value only if crs is one dimensional -> 1 dimension -> getAxis(0).
+                    final CoordinateSystemAxis axis = currentCrs.getCoordinateSystem().getAxis(0);
+                    
+                    if (!COMMONS_DIM.contains(axis.getDirection().name())) {
+                        
+                        final NumberRange[] numberRanges = GridCombineIterator.extractAxisRanges(gridGeom, key);
+                        
+                        final StringBuilder values = new StringBuilder();
+                        for (int i = 0; i < numberRanges.length; i++) {
+                            final NumberRange numberRange = numberRanges[i];
+                            values.append(numberRange.getMinDouble());
+                            if (i != numberRanges.length - 1) values.append(',');
+                        }
+                        final String unitStr = (axis.getUnit() != null) ? axis.getUnit().toString() : null;
+                        final String defaut = (!(numberRanges.length != 0)) ? ""+numberRanges[0].getMinDouble() : null;
                         String unitSymbol;
                         try {
-                            unitSymbol = UnitFormat.getInstance().format(axisUnit);
+                            unitSymbol = UnitFormat.getInstance().format(axis.getUnit());
                         } catch (IllegalArgumentException e) {
                             // Workaround for one more bug in javax.measure...
-                            unitSymbol = unit;
+                            unitSymbol = unitStr;
                         }
-
-                        final LinkedList<String> valuesList = new LinkedList<>();
-                        if (axis instanceof DiscreteCoordinateSystemAxis) {
-                            final DiscreteCoordinateSystemAxis direcretAxis = (DiscreteCoordinateSystemAxis) axis;
-                            final int nbOrdiante = direcretAxis.length();
-                            for (int j = 0; j < nbOrdiante; j++) {
-                                valuesList.add(direcretAxis.getOrdinateAt(j).toString());
-                            }
-                        }
-
-                        final StringBuilder values = new StringBuilder();
-                        int index = 0;
-                        for (final String val : valuesList) {
-                            values.append(val);
-                            if (index++ < valuesList.size()-1) {
-                                values.append(",");
-                            }
-                        }
-
-                        final String defaut = !valuesList.isEmpty() ? valuesList.getFirst() : null;
-                        dim = createDimension(queryVersion, values.toString(), axisName.getCode(), unit,
+                        dim = createDimension(queryVersion, values.toString(), axis.getName().getCode(), unitStr,
                                 unitSymbol, defaut, null, null, null);
-
                         dimensions.add(dim);
                     }
                 }
