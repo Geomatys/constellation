@@ -397,20 +397,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 });
         };
 
-        /**
-         * Returns formatted name of data for given data's provider and data's name.
-         * @param providerName given provider name.
-         * @param dataName given data name.
-         * @returns {*}
-         */
-        $scope.getDisplayName = function(providerName, dataName) {
-            if (providerName === dataName){
-                return dataName;
-            } else {
-                return dataName + ' ( ' + providerName + ' ) ';
-            }
-        };
-
         $scope.showDataDashboardMap = function() {
             if (DataDashboardViewer.map) {
                 DataDashboardViewer.map.setTarget(undefined);
