@@ -467,6 +467,8 @@ public class DataRest {
                     subType = "shapefile";
                 } else if("mif".equalsIgnoreCase(fileExtension)){
                     subType = "MIF-MID";
+                } else if("gml".equalsIgnoreCase(fileExtension)){
+                    subType = "gml";
                 } else {
                     subType = null;
                 }
