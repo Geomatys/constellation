@@ -611,4 +611,138 @@ angular.module('cstl-services', ['cstl-restapi'])
         return {
             files : {file: null, mdFile: null}
         };
+    })
+
+    // -------------------------------------------------------------------------
+    //  DashboardHelper
+    // -------------------------------------------------------------------------
+
+    .factory('DashboardHelper', function($timeout) {
+        /**
+         * An helper service to manage dashboard features.
+         *
+         * Provides methods and variables to manage :
+         *  - text filter
+         *  - column sorting
+         *  - request status
+         *  - pagination
+         *  - item selection
+         *
+         * Query structure : { page: 1, size: 20, text: 'mytext', sort: { order: 'ASC', field: 'myfield' } }
+         *
+         * @constructor
+         * @param {Function} searchMethod The search method to call.
+         * @param {Function} selectMethod The search method to call.
+         * @param {Object} [defaultQuery] The initial query for search (default is { page: 1, size: 20 }).
+         */
+        function DashboardHelper(searchMethod, selectMethod, defaultQuery) {
+
+            var self = this;
+
+            var timeout = null;
+
+
+            // States on the search request status (-1 pending, 0 not sent, 1 success, 2 error).
+            self.searchStatus = 0;
+
+            // Search request criteria.
+            self.query = angular.extend({ page: 1, size: 20 }, angular.copy(defaultQuery));
+
+            // Search result page.
+            self.page = null;
+
+            // States on the selection request status (-1 pending, 0 not sent, 1 success, 2 error).
+            self.selectionStatus = 0;
+
+            // Selection result object.
+            self.selection = null;
+
+
+            // Sends the search query and gets the results.
+            self.search = function() {
+                self.searchStatus = -1;
+                searchMethod(self.query,
+                    function success(data) {
+                        self.searchStatus = 1;
+                        self.page = data;
+                    },
+                    function error() {
+                        self.searchStatus = 2;
+                        self.page = null;
+                    });
+            };
+
+            // Avoids too much HTTP requests on 'keyup' event for text filter.
+            self.searchTimeout = function(ms) {
+                self.searchStatus = -1;
+                self.query.page = 1;
+                $timeout.cancel(timeout);
+                timeout = $timeout(self.search, ms || 300);
+            };
+
+            // Selects an item requesting its details.
+            self.select = function(item, idField) {
+                self.selectionStatus = -1;
+                selectMethod({ id: item[idField || 'id'] },
+                    function success(data) {
+                        self.selectionStatus = 1;
+                        self.selection = data;
+                    },
+                    function error() {
+                        self.selectionStatus = 2;
+                        self.selection = null;
+                    });
+            };
+
+            // Modify the sort order for result items.
+            self.sortBy = function(field) {
+                if (self.isSortedBy(field)) {
+                    switch (self.query.sort.order) {
+                        case 'ASC':
+                            self.query.sort.order = 'DESC';
+                            break;
+                        case 'DESC':
+                            self.query.sort.order = 'ASC';
+                            break;
+                        default:
+                            self.query.sort.order = 'DESC';
+                            break;
+                    }
+                } else {
+                    self.query.sort = { field: field, order: 'DESC' };
+                }
+                self.search();
+            };
+
+            // Checks if the result items are sorted on the specified field.
+            self.isSortedBy = function(field) {
+                return self.query.sort && (self.query.sort.field === field);
+            };
+
+            // Returns the icon class to apply according the current sort order.
+            self.getOrderIcon = function(field) {
+                if (self.isSortedBy(field)) {
+                    switch (self.query.sort.order) {
+                        case 'ASC':
+                            return 'fa-caret-up';
+                        case 'DESC':
+                            return 'fa-caret-down';
+                    }
+                }
+                return null;
+            };
+
+            // Changes the page index for results.
+            self.setPage = function(page) {
+                self.query.page = page;
+                self.search();
+            };
+
+            // Reset search criteria.
+            self.resetCriteria = function() {
+                self.query = angular.extend({ page: 1, size: 20 }, angular.copy(defaultQuery));
+            };
+        }
+
+        return DashboardHelper;
     });
