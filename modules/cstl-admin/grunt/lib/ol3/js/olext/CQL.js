@@ -124,7 +124,7 @@ olext.Format.CQL = (function() {
         ],
 
         patterns = {
-            PROPERTY: /^[_a-zA-Z]\w*/,
+            PROPERTY: /^"*[_a-zA-Z]\w*"*/,
             COMPARISON: /^(=|<>|<=|<|>=|>|LIKE|ILIKE)/i,
             IS_NULL: /^IS NULL/i,
             COMMA: /^,/,

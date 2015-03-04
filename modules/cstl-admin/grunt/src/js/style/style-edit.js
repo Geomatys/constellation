@@ -1378,6 +1378,8 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 comparator = 'BETWEEN';
             }else if(olType ==='~'){
                 comparator = 'LIKE';
+            }else if(olType ==='!='){
+                comparator = '<>';
             }else {
                 comparator = olType;
             }
