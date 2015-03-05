@@ -25,6 +25,7 @@
                                             ng-if="dataProperties.bands.length>0"
                                             ng-model="channel.band"
                                             ng-options="dp.name as dp.name for dp in $parent.dataProperties.bands">
+                                        <option value=""></option>
                                     </select>
                                     <input type="text"
                                            ng-if="dataProperties.bands.length==0"

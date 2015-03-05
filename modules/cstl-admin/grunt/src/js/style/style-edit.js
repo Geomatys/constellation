@@ -702,7 +702,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "title":'',
                         "description":'',
                         "maxScale":500000000,
-                        "symbolizers": [{'@symbol':'raster'},{
+                        "symbolizers": [{
                             '@symbol':'cell',
                             "cellSize":20,
                             rule:{
@@ -876,8 +876,8 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             if(existsCellSymbolizer(symbolizers)){
                 //open raster cells panel
                 $scope.optionsSLD.enableRaster = $scope.rasterstyletype.cell;
-                if(symbolizers.length>1){
-                    var symb = symbolizers[1];
+                if(symbolizers.length>0){
+                    var symb = symbolizers[0];
                     $scope.optionsSLD.rasterCells.cellSize = symb.cellSize;
                     if(symb.rule && symb.rule.symbolizers && symb.rule.symbolizers.length>0){
                         var cellType = symb.rule.symbolizers[0]['@symbol'];
@@ -1978,13 +1978,13 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          * Apply and bind cell point symbolizer for current style
          */
         $scope.applyCellPointSymbolizer = function(){
-            $scope.optionsSLD.selectedRule.symbolizers[1].rule.symbolizers[0] = $scope.optionsSLD.rasterCells.pointSymbol;
+            $scope.optionsSLD.selectedRule.symbolizers[0].rule.symbolizers[0] = $scope.optionsSLD.rasterCells.pointSymbol;
         };
         /**
          * Apply and bind cell text symbolizer for current style
          */
         $scope.applyCellTextSymbolizer = function(){
-            $scope.optionsSLD.selectedRule.symbolizers[1].rule.symbolizers[0] = $scope.optionsSLD.rasterCells.textSymbol;
+            $scope.optionsSLD.selectedRule.symbolizers[0].rule.symbolizers[0] = $scope.optionsSLD.rasterCells.textSymbol;
         };
 
         /**
