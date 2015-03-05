@@ -186,7 +186,6 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                             "upper":{
                                 "value":255
                             }
-
                         },
                         {
                             "band":"",
@@ -221,7 +220,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     ],
                     "symbolPills":'color'
                 },
-                enableRaster:rasterstyletype.none,
+                enableRaster:$scope.rasterstyletype.none,
                 selectedSymbolizerType:"",
                 selectedSymbolizer:null,
                 filtersEnabled:false,
@@ -436,7 +435,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             $scope.optionsSLD.enableRuleEditor = false;
             $scope.optionsSLD.enableAutoIntervalEditor = false;
             $scope.optionsSLD.enableAutoUniqueEditor = false;
-            $scope.optionsSLD.enableRaster = rasterstyletype.none;
+            $scope.optionsSLD.enableRaster = $scope.rasterstyletype.none;
         };
 
         /**
@@ -732,7 +731,6 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                                 "upper":{
                                     "value":255
                                 }
-
                             },
                             {
                                 "band":"",
@@ -877,7 +875,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             }
             if(existsCellSymbolizer(symbolizers)){
                 //open raster cells panel
-                $scope.optionsSLD.enableRaster = rasterstyletype.cell;
+                $scope.optionsSLD.enableRaster = $scope.rasterstyletype.cell;
                 if(symbolizers.length>1){
                     var symb = symbolizers[1];
                     $scope.optionsSLD.rasterCells.cellSize = symb.cellSize;
@@ -892,12 +890,12 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     }
                 }
             }else if(existsDynamicSymbolizer(symbolizers)){
-                //open raster cells panel
-                $scope.optionsSLD.enableRaster = rasterstyletype.dynamic;
+                //open raster panel for dynamic symbolizer
+                $scope.optionsSLD.enableRaster = $scope.rasterstyletype.dynamic;
                 //TODO reload symbolizer on UI
 
             }else {
-                $scope.optionsSLD.enableRaster = rasterstyletype.palette;
+                $scope.optionsSLD.enableRaster = $scope.rasterstyletype.palette;
 
                 //init sld editor values with selected rule.
                 var channelSelection = symbolizers[0].channelSelection;
@@ -986,7 +984,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          */
         $scope.editRasterPalette = function() {
             if($scope.optionsSLD.rasterPalette) {
-                $scope.optionsSLD.enableRaster = rasterstyletype.palette;
+                $scope.optionsSLD.enableRaster = $scope.rasterstyletype.palette;
             }
         };
         /**
@@ -994,7 +992,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          */
         $scope.editRasterCells = function() {
             if($scope.optionsSLD.rasterCells) {
-                $scope.optionsSLD.enableRaster = rasterstyletype.cell;
+                $scope.optionsSLD.enableRaster = $scope.rasterstyletype.cell;
             }
         };
 
@@ -1003,7 +1001,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          */
         $scope.editRasterDynamic = function() {
             if($scope.optionsSLD.rasterDynamic) {
-                $scope.optionsSLD.enableRaster = rasterstyletype.dynamic;
+                $scope.optionsSLD.enableRaster = $scope.rasterstyletype.dynamic;
             }
         };
 
@@ -1569,6 +1567,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
 
         /**
          * function called for symbolizer line or polygon for stroke type
+         * @param symbolizer
          * @param traitType
          */
         $scope.addStrokeDashArray = function(symbolizer,traitType) {
@@ -1854,20 +1853,17 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                                 Growl('error', 'Error', 'Unable to get palette for '+$scope.layerName);
                             }
                         );
-
-
                         $scope.optionsSLD.rasterPalette.palette.open = true;
                     }
                 });
             }
         };
 
-
         /**
          * Binding action to apply dynamic range
          */
         $scope.generateDynamicRange = function(){
-            $scope.newStyle.rules[0].symbolizers[0].channels = $scope.optionsSLD.rasterDynamic.channels;
+            $scope.optionsSLD.selectedRule.symbolizers[0].channels = $scope.optionsSLD.rasterDynamic.channels;
         };
 
         /**
@@ -2598,7 +2594,6 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             );
 
         };
-
 
         /**
          * utility function that returns true if the expression is a number.

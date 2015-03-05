@@ -1074,6 +1074,8 @@
     "sldeditor.edition.rasterdynamicrange.generate":"Apply",
     "sldeditor.edition.expression.btn.help":"Set expression value with attribute",
     "sldeditor.edition.expression.raster.btn.help":"Set an expression value",
+    "sldeditor.edition.dynamicsymbolizer.expression.help.title":"About expression",
+    "sldeditor.edition.dynamicsymbolizer.expression.help":"available variable : min, max, mean, std, hist, histo_min, histo_max",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",

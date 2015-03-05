@@ -129,40 +129,6 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
     })
 
     // -------------------------------------------------------------------------
-    //  popover
-    // -------------------------------------------------------------------------
-
-    /**
-     * @see http://getbootstrap.com/javascript/#popover
-     */
-    .directive('popover', function() {
-        return {
-            restrict: 'A',
-            link: function(scope, element, attr) {
-                scope.$watch(attr.popover, function(options) {
-                    options = options || {};
-                    element.popover({
-                        animation: options.animation,
-                        html:      options.html,
-                        placement: options.placement,
-                        selector:  options.selector,
-                        trigger:   options.trigger,
-                        title:     options.title,
-                        content:   options.content,
-                        delay:     options.delay,
-                        container: options.container
-                    });
-                }, true);
-
-                element.on('$destroy', function() {
-                    element.popover('destroy');
-                });
-            }
-        };
-    })
-
-
-    // -------------------------------------------------------------------------
     //  Tooltip
     // -------------------------------------------------------------------------
 
