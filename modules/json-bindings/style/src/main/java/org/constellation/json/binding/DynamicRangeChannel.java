@@ -39,7 +39,7 @@ public class DynamicRangeChannel implements Serializable {
 
     public DynamicRangeChannel(DynamicRangeSymbolizer.DRChannel channel) {
         band = channel.getBand();
-        colorSpaceComponent = channel.getBand();
+        colorSpaceComponent = channel.getColorSpaceComponent();
         lower = new DynamicRangeBounds(channel.getLower());
         upper = new DynamicRangeBounds(channel.getUpper());
     }
