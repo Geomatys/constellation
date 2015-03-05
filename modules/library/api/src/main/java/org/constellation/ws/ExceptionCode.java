@@ -146,7 +146,62 @@ public final class ExceptionCode extends CodeList<ExceptionCode> {
      * Used by WMS.
      */
     public static final ExceptionCode INVALID_DIMENSION_VALUE = new ExceptionCode("INVALID_DIMENSION_VALUE");
+    
+    /**
+     * compression not supported.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode COMPRESSION_NOT_SUPPORTED = new ExceptionCode("CompressionNotSupported");
+    
+    /**
+     * Invalid compression value.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode COMPRESSION_INVALID = new ExceptionCode("CompressionInvalid");
+    
+    /**
+     * Invalid jpeg quality value.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode JPEG_QUALITY_INVALID = new ExceptionCode("JpegQualityInvalid");
+    
+    /**
+     * predictor not supported.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode PREDICTOR_NOT_SUPPORTED = new ExceptionCode("PredictorNotSupported");
+    
+    /**
+     * Invalid predictor value.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode PREDICTOR_INVALID = new ExceptionCode("PredictorInvalid");
 
+    /**
+     * Invalid interleaving value.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode INTERLEAVING_INVALID = new ExceptionCode("InterleavingInvalid");
+    
+    /**
+     * interleaving not supported.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode INTERLEAVING_NOT_SUPPORTED = new ExceptionCode("InterleavingNotSupported");
+
+    /**
+     * tiling not supported.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode TILING_NOT_SUPPORTED = new ExceptionCode("TilingNotSupported");
+    
+    /**
+     * invalid tiling value.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode TILING_INVALID = new ExceptionCode("TilingInvalid");
+    
+    
     /**
      * Constructs an enum with the given name. The new enum is
      * automatically added to the list returned by {@link #values}.

@@ -132,8 +132,12 @@ import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_FORMATS_100;
 import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_FORMATS_111;
 import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_INTERPOLATIONS_V100;
 import static org.constellation.coverage.ws.WCSConstant.getOperationMetadata;
+import org.constellation.coverage.ws.rs.GeotiffResponse;
+import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.coverage.Category;
 import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.gmlcov.geotiff.xml.v100.CompressionType;
+import org.geotoolkit.gmlcov.geotiff.xml.v100.ParametersType;
 import org.geotoolkit.ows.xml.BoundingBox;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_CRS;
@@ -156,6 +160,7 @@ import org.geotoolkit.swe.xml.v200.UnitReference;
 import org.geotoolkit.wcs.xml.DomainSubset;
 import org.geotoolkit.wcs.xml.v200.DimensionSliceType;
 import org.geotoolkit.wcs.xml.v200.DimensionTrimType;
+import org.geotoolkit.wcs.xml.v200.ExtensionType;
 import org.geotoolkit.wcs.xml.v200.ServiceParametersType;
 import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.referencing.datum.PixelInCell;
@@ -1028,7 +1033,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
          * It can be a text one (format MATRIX) or an image one (png, gif ...).
          */
         final String format = request.getFormat();
-        if ( format.equalsIgnoreCase(MATRIX) || format.equalsIgnoreCase(ASCII_GRID)) {
+        if (format.equalsIgnoreCase(MATRIX) || format.equalsIgnoreCase(ASCII_GRID)) {
 
             //NOTE ADRIAN HACKED HERE
             final RenderedImage image;
@@ -1041,7 +1046,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
             return image;
 
-        } else if( format.equalsIgnoreCase(NETCDF) ){
+        } else if (format.equalsIgnoreCase(NETCDF) ){
 
             try {
                 final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, null, date);
@@ -1050,10 +1055,48 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
 
-        } else if( format.equalsIgnoreCase(GEOTIFF) ){
+        } else if (format.equalsIgnoreCase(GEOTIFF) ){
             try {
-                final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, null, date);
-                return new SimpleEntry(coverage, metadata);
+                final GeotiffResponse response = new GeotiffResponse();
+                response.coverage = layerRef.getCoverage(refEnvel, size, null, date);
+                response.metadata = metadata;
+                if (request.getExtension() instanceof ExtensionType) {
+                    final ExtensionType ext = (ExtensionType) request.getExtension();
+                    final ParametersType geoExt = ext.getForClass(ParametersType.class);
+                    if (geoExt != null) {
+                        if (geoExt.getCompression() != null) {
+                            if (geoExt.getCompression() == CompressionType.LZW ||
+                                geoExt.getCompression() == CompressionType.PACK_BITS ||
+                                geoExt.getCompression() == CompressionType.NONE) {
+                                response.compression = geoExt.getCompression().value();
+                            } else {
+                                throw new CstlServiceException("Server does not support the requested compression.", ExceptionCode.COMPRESSION_NOT_SUPPORTED, geoExt.getCompression().value());
+                            }
+                        }
+                        if (geoExt.getInterleave() != null) {
+                            throw new CstlServiceException("Server does not support interleaving.", ExceptionCode.INTERLEAVING_NOT_SUPPORTED, geoExt.getInterleave().value());
+                        }
+                        if (geoExt.getPredictor() != null) {
+                            throw new CstlServiceException("Server does not support predictor.", ExceptionCode.PREDICTOR_NOT_SUPPORTED, geoExt.getPredictor().value());
+                        }
+                        if (geoExt.isTiling()) {
+                            if ("PackBits".equals(response.compression)) {
+                                throw new CstlServiceException("Server does not support Tiling for packbit compression.", ExceptionCode.TILING_NOT_SUPPORTED, "tiling");
+                            }
+                            if (geoExt.getTileheight() != null && geoExt.getTilewidth() != null &&
+                                geoExt.getTileheight() > 0 && geoExt.getTilewidth() > 0 &&
+                                (geoExt.getTileheight() % 16 == 0) && 
+                                (geoExt.getTilewidth() % 16 == 0)) {
+                                response.tiling     = true;
+                                response.tileHeight = geoExt.getTileheight();
+                                response.tileWidth  = geoExt.getTilewidth();
+                            } else {
+                                throw new CstlServiceException("Server does not support predictor.", ExceptionCode.TILING_INVALID, geoExt.getPredictor().value());
+                            }
+                        }
+                    }
+                }
+                return response;
             } catch (IOException | DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
