@@ -892,8 +892,9 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             }else if(existsDynamicSymbolizer(symbolizers)){
                 //open raster panel for dynamic symbolizer
                 $scope.optionsSLD.enableRaster = $scope.rasterstyletype.dynamic;
-                //TODO reload symbolizer on UI
-
+                if(symbolizers && symbolizers.length>0 && symbolizers[0].channels){
+                    $scope.optionsSLD.rasterDynamic.channels = symbolizers[0].channels;
+                }
             }else {
                 $scope.optionsSLD.enableRaster = $scope.rasterstyletype.palette;
 
