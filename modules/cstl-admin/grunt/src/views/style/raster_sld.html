@@ -37,12 +37,12 @@
                                         <select class="form-control form-control-fix"
                                                 ng-if="dataProperties.bands.length>0"
                                                 ng-model="optionsSLD.rasterPalette.band.selected"
-                                                ng-options="dp.name for dp in $parent.dataProperties.bands"
+                                                ng-options="dp.indice for dp in dataProperties.bands"
                                                 ng-change="fixRZSlider();"></select>
                                         <input type="text"
-                                               ng-if="dataProperties.bands.length==0"
+                                               ng-if="!dataProperties || dataProperties.bands.length==0"
                                                class="form-control form-control-fix"
-                                               ng-model="optionsSLD.rasterPalette.band.selected.name"/>
+                                               ng-model="optionsSLD.rasterPalette.band.selected.indice"/>
 									</div>
 								</div>
 								<div class="form-group" ng-show="optionsSLD.rasterPalette.band.selected.minValue !== undefined">
@@ -89,19 +89,19 @@
 											<span class="dropdown-arrow dropdown-arrow-inverse"></span>
 											<ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu"
 												style="overflow-y: auto; min-width: 70px; min-height: 108px;">
-												<li ng-click="$parent.choosePalette(1)">
+												<li ng-click="choosePalette(1)">
                                                     <a><img class="img_palette img_palette_ajust" src="img/palette1.png"/></a>
                                                 </li>
-												<li ng-click="$parent.choosePalette(2)">
+												<li ng-click="choosePalette(2)">
                                                     <a><img class="img_palette img_palette_ajust" src="img/palette2.png"/></a>
                                                 </li>
-												<li ng-click="$parent.choosePalette(3)">
+												<li ng-click="choosePalette(3)">
                                                     <a><img class="img_palette img_palette_ajust" src="img/palette3.png"/></a>
                                                 </li>
-												<li ng-click="$parent.choosePalette(4)">
+												<li ng-click="choosePalette(4)">
                                                     <a><img class="img_palette img_palette_ajust" src="img/palette4.png"/></a>
                                                 </li>
-												<li ng-click="$parent.choosePalette(5)">
+												<li ng-click="choosePalette(5)">
                                                     <a><img class="img_palette img_palette_ajust" src="img/palette5.png"/></a>
                                                 </li>
 											</ul>
@@ -227,8 +227,8 @@
 							<select class="form-control form-control-fix"
                                     ng-model="optionsSLD.rasterPalette.rgbChannels[0].name">
                                 <option value=""></option>
-                                <option ng-repeat="dp in $parent.dataProperties.bands"
-                                        ng-value="dp.name">{{dp.name}}</option>
+                                <option ng-repeat="dp in dataProperties.bands"
+                                        ng-value="dp.indice">{{dp.indice}}</option>
 							</select>
 						</div>
 					</div>
@@ -239,8 +239,8 @@
 							<select class="form-control form-control-fix"
                                     ng-model="optionsSLD.rasterPalette.rgbChannels[1].name">
                                 <option value=""></option>
-                                <option ng-repeat="dp in $parent.dataProperties.bands"
-                                        ng-value="dp.name">{{dp.name}}</option>
+                                <option ng-repeat="dp in dataProperties.bands"
+                                        ng-value="dp.indice">{{dp.indice}}</option>
 							</select>
 						</div>
 					</div>
@@ -251,8 +251,8 @@
 							<select class="form-control form-control-fix"
                                     ng-model="optionsSLD.rasterPalette.rgbChannels[2].name">
                                 <option value=""></option>
-                                <option ng-repeat="dp in $parent.dataProperties.bands"
-                                        ng-value="dp.name">{{dp.name}}</option>
+                                <option ng-repeat="dp in dataProperties.bands"
+                                        ng-value="dp.indice">{{dp.indice}}</option>
 							</select>
 						</div>
 					</div>
@@ -274,7 +274,7 @@
                             <select class="form-control form-control-fix"
                                     ng-model="optionsSLD.rasterPalette.greyChannel.name">
                                 <option value=""></option>
-                                <option ng-repeat="dp in $parent.dataProperties.bands" ng-value="dp.name">{{dp.name}}</option>
+                                <option ng-repeat="dp in dataProperties.bands" ng-value="dp.indice">{{dp.indice}}</option>
                             </select>
                         </div>
                     </div>

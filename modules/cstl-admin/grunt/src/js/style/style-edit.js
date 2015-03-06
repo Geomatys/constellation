@@ -112,7 +112,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     "symbolPills":'color',
                     "colorModel":'palette',
                     band: {
-                        "selected":{name:"0",minValue:0,maxValue:255}
+                        "selected":{name:"0",indice:"0",minValue:0,maxValue:255}
                     },
                     palette: {
                         "index": undefined,
@@ -622,7 +622,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "symbolPills":'color',
                         "colorModel":'palette',
                         band: {
-                            "selected":{name:"0",minValue:0,maxValue:255}
+                            "selected":{name:"0",indice:"0",minValue:0,maxValue:255}
                         },
                         palette: {
                             "index": undefined,
@@ -903,7 +903,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 if(channelSelection && channelSelection.greyChannel && $scope.optionsSLD.rasterPalette.band && $scope.dataBands) {
                     var bandIdentified = null;
                     for(var i=0;i<$scope.dataBands.length;i++){
-                        if($scope.dataBands[i].name === channelSelection.greyChannel.name){
+                        if($scope.dataBands[i].indice === channelSelection.greyChannel.name){
                             bandIdentified =$scope.dataBands[i];
                             break;
                         }
@@ -928,7 +928,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 }
                 //Load the selected band on the graph, the repartition of statistics is already present.
                 if($scope.dataBandsRepartition && $scope.optionsSLD.rasterPalette.band.selected){
-                    var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
+                    var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.indice;
                     if(!selectedBand){
                         selectedBand = 0;
                     }
@@ -1821,7 +1821,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                                     if($scope.dataBandsRepartition){
                                         var loader = $('#chart_ajax_loader');
                                         loader.show();
-                                        var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.name;
+                                        var selectedBand = $scope.optionsSLD.rasterPalette.band.selected.indice;
                                         var xArray=[],yArray=[];
                                         if($scope.dataBandsRepartition[selectedBand]){
                                             var repartition = $scope.dataBandsRepartition[selectedBand].distribution;
@@ -1999,7 +1999,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             //set channel selection
             rule.symbolizers[0].channelSelection = {
                 greyChannel :{
-                    name: $scope.optionsSLD.rasterPalette.band.selected.name
+                    name: $scope.optionsSLD.rasterPalette.band.selected.indice
                 },
                 rgbChannels : null
             };
