@@ -65,7 +65,7 @@
             <span class="label-data">{{jsonObject.field.name | translate}}</span>
             <span ng-if="!isDateField(jsonObject.field.render) && !isCodelistField(jsonObject.field.render)"
                   class="data"
-                  style="word-wrap: break-word;white-space:pre;">{{jsonObject.field.value}}</span>
+                  style="word-wrap: break-word;">{{jsonObject.field.value}}</span>
             <span ng-if="isDateField(jsonObject.field.render)"
                   class="data"
                   style="word-wrap: break-word;">{{jsonObject.field.value | date:'yyyy-MM-dd HH:mm:ss'}}</span>
