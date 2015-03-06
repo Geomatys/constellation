@@ -124,6 +124,8 @@ public final class WCSConstant {
 
     /** Parameter used in getCoverage */
     public static final String KEY_FORMAT = "FORMAT";
+    /** Parameter used in getCoverage v200*/
+    public static final String KEY_MEDIA_TYPE = "MEDIATYPE";
     /** Format value used in getCoverage */
     public static final String MATRIX     = "MATRIX";
     /** Format value used in getCoverage */

@@ -98,6 +98,8 @@ import org.opengis.util.FactoryException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.AbstractMap.SimpleEntry;
@@ -109,6 +111,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.logging.Level;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.apache.sis.geometry.Envelopes;
 
@@ -133,11 +137,19 @@ import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_FORMATS_111;
 import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_INTERPOLATIONS_V100;
 import static org.constellation.coverage.ws.WCSConstant.getOperationMetadata;
 import org.constellation.coverage.ws.rs.GeotiffResponse;
+import org.constellation.coverage.ws.rs.GridCoverageNCWriter;
+import org.constellation.coverage.ws.rs.GridCoverageWriter;
+import org.constellation.coverage.ws.rs.WCSResponseWrapper;
 import org.constellation.ws.ExceptionCode;
+import static org.constellation.ws.ExceptionCode.AXIS_LABEL_INVALID;
 import org.geotoolkit.coverage.Category;
 import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.gml.xml.v321.AssociationRoleType;
+import org.geotoolkit.gml.xml.v321.FileType;
 import org.geotoolkit.gmlcov.geotiff.xml.v100.CompressionType;
 import org.geotoolkit.gmlcov.geotiff.xml.v100.ParametersType;
+import org.geotoolkit.gmlcov.xml.v100.AbstractDiscreteCoverageType;
+import org.geotoolkit.gmlcov.xml.v100.ObjectFactory;
 import org.geotoolkit.ows.xml.BoundingBox;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_CRS;
@@ -162,6 +174,8 @@ import org.geotoolkit.wcs.xml.v200.DimensionSliceType;
 import org.geotoolkit.wcs.xml.v200.DimensionTrimType;
 import org.geotoolkit.wcs.xml.v200.ExtensionType;
 import org.geotoolkit.wcs.xml.v200.ServiceParametersType;
+import org.glassfish.jersey.media.multipart.BodyPart;
+import org.glassfish.jersey.media.multipart.MultiPart;
 import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
@@ -444,7 +458,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private  CoverageInfo describeCoverage200(final String coverageName, final CoverageData coverageRef) throws CstlServiceException {
+    private  org.geotoolkit.wcs.xml.v200.CoverageDescriptionType describeCoverage200(final String coverageName, final CoverageData coverageRef) throws CstlServiceException {
         try {
             
             /*
@@ -470,25 +484,27 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
             final List<GridSampleDimension> bands = coverageRef.getSampleDimensions();
             final List<Field> fields = new ArrayList<>();
-            for (GridSampleDimension band : bands) {
-                final QuantityType quantity = new QuantityType();
-                if (band.getUnits() != null) {
-                    quantity.setUom(new UnitReference(band.getUnits().toString()));
-                }
-                // TODO select only one category => which one?
-                for (Category cat : band.getCategories()) {
-                    final AllowedValuesType av = new AllowedValuesType();
-                    if (cat.getName() != null) {
-                        av.setId(cat.getName().toString());
+            if (bands != null) {
+                for (GridSampleDimension band : bands) {
+                    final QuantityType quantity = new QuantityType();
+                    if (band.getUnits() != null) {
+                        quantity.setUom(new UnitReference(band.getUnits().toString()));
                     }
-                    if (cat.getRange() != null) {
-                        av.setMin(cat.getRange().getMinDouble());
-                        av.setMax(cat.getRange().getMaxDouble());
+                    // TODO select only one category => which one?
+                    for (Category cat : band.getCategories()) {
+                        final AllowedValuesType av = new AllowedValuesType();
+                        if (cat.getName() != null) {
+                            av.setId(cat.getName().toString());
+                        }
+                        if (cat.getRange() != null) {
+                            av.setMin(cat.getRange().getMinDouble());
+                            av.setMax(cat.getRange().getMaxDouble());
+                        }
+                        quantity.setConstraint(new AllowedValuesPropertyType(av));
                     }
-                    quantity.setConstraint(new AllowedValuesPropertyType(av));
+                    final Field f = new Field(band.getDescription().toString(), quantity);
+                    fields.add(f);
                 }
-                final Field f = new Field(band.getDescription().toString(), quantity);
-                fields.add(f);
             }
             final DataRecordType dataRecord = new DataRecordType(null, null, false, fields);
             final DataRecordPropertyType rangeType = new DataRecordPropertyType(dataRecord);
@@ -966,6 +982,15 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     }
     
     private Object getCoverage200(final GetCoverage request, final CoverageData layerRef, final Layer configLayer) throws CstlServiceException {
+        boolean isMultiPart = false;
+        if (request.getMediaType() != null) {
+            if (request.getMediaType().equals("multipart/mixed")) {
+                isMultiPart = true;
+            } else {
+                throw new CstlServiceException("Only multipart/mixed is supported for mediaType parameter", INVALID_PARAMETER_VALUE);
+            }
+        }
+        
         final SpatialMetadata metadata;
         final GridCoverage2D gridCov;
         final CoordinateReferenceSystem crs;
@@ -1000,7 +1025,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     final DimensionTrimType trim = (DimensionTrimType) subset;
                     final int dimensionIndex = dimensionIndex(trim.getDimension(), crs);
                     if (dimensionIndex == -1) {
-                        throw new CstlServiceException("There is no such dimension: " + trim.getDimension(), NO_APPLICABLE_CODE);
+                        throw new CstlServiceException("There is no such dimension: " + trim.getDimension(), AXIS_LABEL_INVALID);
                     } else {
                         env.setRange(dimensionIndex, Integer.parseInt(trim.getTrimLow()), Integer.parseInt(trim.getTrimHigh()));
                     }
@@ -1009,7 +1034,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     final DimensionSliceType slice = (DimensionSliceType) subset;
                     final int dimensionIndex = dimensionIndex(slice.getDimension(), crs);
                     if (dimensionIndex == -1) {
-                        throw new CstlServiceException("There is no such dimension: " + slice.getDimension(), NO_APPLICABLE_CODE);
+                        throw new CstlServiceException("There is no such dimension: " + slice.getDimension(), AXIS_LABEL_INVALID);
                     } else {
                         int slicePoint = Integer.parseInt(slice.getSlicePoint());
                         env.setRange(dimensionIndex, slicePoint, slicePoint + 1);
@@ -1046,16 +1071,28 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
 
             return image;
 
-        } else if (format.equalsIgnoreCase(NETCDF) ){
+        } else if (format.equalsIgnoreCase(MimeType.NETCDF) ){
 
             try {
                 final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, null, date);
-                return new SimpleEntry(coverage, metadata);
+                final SimpleEntry response = new SimpleEntry(coverage, metadata);
+                if (isMultiPart) {
+                    final File img = File.createTempFile(coverage.getName().toString(), ".nc");
+                    GridCoverageNCWriter.writeInStream(response, new FileOutputStream(img));
+                    final WCSResponseWrapper xml = buildXmlPart(describeCoverage200(layerRef.getName().getLocalPart(), layerRef), format);
+                    final MultiPart multiPart = new MultiPart();
+                    multiPart.bodyPart(new BodyPart(xml, MediaType.APPLICATION_XML_TYPE))
+                             .bodyPart(new BodyPart(img,MediaType.valueOf(format)));
+                    return multiPart;
+                } else {
+                    return response;
+                }
+                
             } catch (IOException | DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
 
-        } else if (format.equalsIgnoreCase(GEOTIFF) ){
+        } else if (format.equalsIgnoreCase(MimeType.IMAGE_TIFF) ){
             try {
                 final GeotiffResponse response = new GeotiffResponse();
                 response.coverage = layerRef.getCoverage(refEnvel, size, null, date);
@@ -1096,7 +1133,16 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                         }
                     }
                 }
-                return response;
+                if (isMultiPart) {
+                    final File img = GridCoverageWriter.writeInFile(response);
+                    final WCSResponseWrapper xml = buildXmlPart(describeCoverage200(layerRef.getName().getLocalPart(), layerRef), format);
+                    final MultiPart multiPart = new MultiPart();
+                    multiPart.bodyPart(new BodyPart(xml, MediaType.APPLICATION_XML_TYPE))
+                             .bodyPart(new BodyPart(img,MediaType.valueOf(format)));
+                    return multiPart;
+                } else {
+                    return response;
+                }
             } catch (IOException | DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
@@ -1198,5 +1244,20 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         } else {
             return returnUpdateSequenceDocument(updateSequence);
         }
+    }
+
+    private WCSResponseWrapper buildXmlPart(org.geotoolkit.wcs.xml.v200.CoverageDescriptionType describeCoverage200, String mime) {
+        final org.geotoolkit.gml.xml.v321.RangeSetType rangeSet = new org.geotoolkit.gml.xml.v321.RangeSetType();
+        final FileType ft = new FileType();
+        ft.setMimeType(mime);
+        final String ext = WCSUtils.getExtension(mime);
+        ft.setRangeParameters(new AssociationRoleType("cid:" + describeCoverage200.getCoverageId() + ext, 
+                                                      "http://www.opengis.net/spec/GMLCOV_geotiff-coverages/1.0/conf/geotiff-coverage",
+                                                      "fileReference"));
+        ft.setFileReference("cid:" + describeCoverage200.getCoverageId() + ext);
+        rangeSet.setFile(ft);
+        final AbstractDiscreteCoverageType cov = new AbstractDiscreteCoverageType(describeCoverage200, rangeSet);
+        final ObjectFactory factory = new ObjectFactory();
+        return new WCSResponseWrapper(factory.createGridCoverage(cov));
     }
 }

@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import org.constellation.ws.MimeType;
 
 /**
  *
@@ -74,7 +75,7 @@ public final class WCSUtils {
     /**
      * Generates a style from a list of categories to highlight.
      *
-     * @param incomingStyle The source style.
+     * @param style The source style.
      * @param categories A list of categories to highlight in the returned style.
      * @return A style that highlights the categories selected.
      */
@@ -93,7 +94,7 @@ public final class WCSUtils {
         final PatternSymbolizer patterns = (PatternSymbolizer) symbol;
 
         final Map<Expression,List<Symbolizer>> oldThredholds = patterns.getRanges();
-        final LinkedHashMap<Expression,List<Symbolizer>> newThredholds = new LinkedHashMap<Expression, List<Symbolizer>>();
+        final LinkedHashMap<Expression,List<Symbolizer>> newThredholds = new LinkedHashMap<>();
         final List<Double[]> visibles = toRanges(categories);
 
         double from;
@@ -176,10 +177,10 @@ public final class WCSUtils {
     private static List<Double[]> toRanges(final RangeSubset ranges) throws IllegalArgumentException{
 
         if ( !(ranges instanceof org.geotoolkit.wcs.xml.v100.RangeSubsetType) ) {
-            return new ArrayList<Double[]>();
+            return new ArrayList<>();
         }
 
-        final List<Double[]> exts = new ArrayList<Double[]>();
+        final List<Double[]> exts = new ArrayList<>();
 
         final org.geotoolkit.wcs.xml.v100.RangeSubsetType rangeSubset =
                     (org.geotoolkit.wcs.xml.v100.RangeSubsetType) ranges;
@@ -233,29 +234,46 @@ public final class WCSUtils {
      * @return
      */
     public static List<DirectPositionType> buildPositions(final GeographicBoundingBox inputGeoBox, final SortedSet<Number> elevations) {
-        final List<Double> pos1 = new ArrayList<Double>();
+        final List<Double> pos1 = new ArrayList<>();
         pos1.add(inputGeoBox.getWestBoundLongitude());
         pos1.add(inputGeoBox.getSouthBoundLatitude());
-        final List<Double> pos2 = new ArrayList<Double>();
+        final List<Double> pos2 = new ArrayList<>();
         pos2.add(inputGeoBox.getEastBoundLongitude());
         pos2.add(inputGeoBox.getNorthBoundLatitude());
         if (elevations != null && elevations.size() >= 2) {
             pos1.add(elevations.first().doubleValue());
             pos2.add(elevations.last().doubleValue());
         }
-        final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+        final List<DirectPositionType> pos = new ArrayList<>();
         pos.add(new DirectPositionType(pos1));
         pos.add(new DirectPositionType(pos2));
         return pos;
     }
     
     public static List<Object> formatDateList(final SortedSet<Date> dates) {
-        final List<Object> times = new ArrayList<Object>();
+        final List<Object> times = new ArrayList<>();
         synchronized(FORMATTER) {
             for (Date d : dates) {
                 times.add(new TimePositionType(FORMATTER.format(d)));
             }
         }
         return times;
+    }
+    
+    public static String getExtension(String mime) {
+        final String ext;
+        switch (mime) {
+            case "image/tiff":           ext = ".tiff";break;
+            case "image/geotiff":        ext = ".tiff";break;
+            case "application/x-netcdf": ext = ".nc";break;
+            case "text/x-matrix":        ext = ".txt";break;
+            case "text/x-ascii-grid":    ext = ".asc";break;
+            case MimeType.IMAGE_PNG:     ext = ".png";break;
+            case MimeType.IMAGE_GIF:     ext = ".gif";break;
+            case MimeType.IMAGE_BMP:     ext = ".bmp";break;
+            case MimeType.IMAGE_JPEG:    ext = ".jpg";break;
+            default : ext = "";
+        }
+       return ext;
     }
 }

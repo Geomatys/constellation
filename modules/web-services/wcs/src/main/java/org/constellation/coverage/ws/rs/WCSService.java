@@ -103,6 +103,7 @@ import static org.constellation.coverage.ws.WCSConstant.KEY_HEIGHT;
 import static org.constellation.coverage.ws.WCSConstant.KEY_IDENTIFIER;
 import static org.constellation.coverage.ws.WCSConstant.KEY_COVERAGE_ID;
 import static org.constellation.coverage.ws.WCSConstant.KEY_INTERPOLATION;
+import static org.constellation.coverage.ws.WCSConstant.KEY_MEDIA_TYPE;
 import static org.constellation.coverage.ws.WCSConstant.KEY_RANGESUBSET;
 import static org.constellation.coverage.ws.WCSConstant.KEY_RESPONSE_CRS;
 import static org.constellation.coverage.ws.WCSConstant.KEY_RESX;
@@ -223,13 +224,13 @@ public class WCSService extends GridWebService<WCSWorker> {
                 }
                 serviceDef = worker.getVersionFromNumber(getcov.getVersion());
                 String format = getcov.getFormat();
-                if (!isSupportedFormat(format)){
+                if (!isSupportedFormat(getcov.getVersion().toString(), format)){
                     throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
                         "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT,
                         KEY_FORMAT.toLowerCase());
                 }
 
-                format = getOutputFormat(format);
+                format = getOutputFormat(format, getcov.getMediaType());
                 return Response.ok(worker.getCoverage(getcov), format).build();
             }
 
@@ -248,15 +249,17 @@ public class WCSService extends GridWebService<WCSWorker> {
         }
     }
 
-    private String getOutputFormat(String format) {
+    private String getOutputFormat(String format, String mediaType) {
+        if (mediaType != null) {
+            return mediaType;
+        }
+        
         if (format.equalsIgnoreCase(MATRIX)) {
-            format = "text/x-matrix";
+            format = MimeType.MATRIX;
         } else if (format.equalsIgnoreCase(ASCII_GRID)) {
-            format = "text/x-ascii-grid";
+            format = MimeType.ASCII_GRID;
         } else if (format.equalsIgnoreCase(NETCDF)) {
-            format = "application/x-netcdf";
-
-        // Convert the supported image type into known mime-type.
+            format = MimeType.NETCDF;
         } else if (format.equalsIgnoreCase(PNG)) {
             format = MimeType.IMAGE_PNG;
         } else if (format.equalsIgnoreCase(GIF)) {
@@ -273,15 +276,19 @@ public class WCSService extends GridWebService<WCSWorker> {
         return format;
     }
 
-    private boolean isSupportedFormat(final String format) {
-        return format.equalsIgnoreCase(MimeType.IMAGE_BMP)  ||format.equalsIgnoreCase(BMP)  ||
-               format.equalsIgnoreCase(MimeType.IMAGE_GIF)   ||format.equalsIgnoreCase(GIF)  ||
-               format.equalsIgnoreCase(MimeType.IMAGE_JPEG)  ||format.equalsIgnoreCase(JPEG) ||
-               format.equalsIgnoreCase(JPG)                  ||format.equalsIgnoreCase(TIF)  ||
-               format.equalsIgnoreCase(MimeType.IMAGE_TIFF)  ||format.equalsIgnoreCase(TIFF) ||
-               format.equalsIgnoreCase(MimeType.IMAGE_PNG)  ||format.equalsIgnoreCase(PNG)  ||
-               format.equalsIgnoreCase(GEOTIFF)              ||format.equalsIgnoreCase(NETCDF) ||
-               format.equalsIgnoreCase(MATRIX)               ||format.equalsIgnoreCase(ASCII_GRID);
+    private boolean isSupportedFormat(final String version, final String format) {
+        if (version.equals("2.0.0")) {
+            return format.equalsIgnoreCase(MimeType.IMAGE_TIFF) || format.equalsIgnoreCase(MimeType.NETCDF);
+        } else {
+            return format.equalsIgnoreCase(MimeType.IMAGE_BMP)  ||format.equalsIgnoreCase(BMP)  ||
+                   format.equalsIgnoreCase(MimeType.IMAGE_GIF)   ||format.equalsIgnoreCase(GIF)  ||
+                   format.equalsIgnoreCase(MimeType.IMAGE_JPEG)  ||format.equalsIgnoreCase(JPEG) ||
+                   format.equalsIgnoreCase(JPG)                  ||format.equalsIgnoreCase(TIF)  ||
+                   format.equalsIgnoreCase(MimeType.IMAGE_TIFF)  ||format.equalsIgnoreCase(TIFF) ||
+                   format.equalsIgnoreCase(MimeType.IMAGE_PNG)  ||format.equalsIgnoreCase(PNG)  ||
+                   format.equalsIgnoreCase(GEOTIFF)              ||format.equalsIgnoreCase(NETCDF) ||
+                   format.equalsIgnoreCase(MATRIX)               ||format.equalsIgnoreCase(ASCII_GRID);
+        }
     }
 
     /**
@@ -456,7 +463,8 @@ public class WCSService extends GridWebService<WCSWorker> {
     private GetCoverage adaptKvpGetCoverageRequest200() throws CstlServiceException {
         final String coverageID  = getParameter(KEY_COVERAGE_ID,  true);
         final String format      = getParameter(KEY_FORMAT,  false);
-         return new GetCoverageType(coverageID, format);
+        final String mediaType   = getParameter(KEY_MEDIA_TYPE,  false);
+         return new GetCoverageType(coverageID, format, mediaType);
     }
     
     /**
@@ -681,7 +689,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             while (tokens.hasMoreTokens()) {
                 final String value = tokens.nextToken();
                 String interpolation = null;
-                String rangeIdentifier = null;
+                String rangeIdentifier;
                 if (value.indexOf(':') != -1) {
                     rangeIdentifier = value.substring(0, rangeSubset.indexOf(':'));
                     interpolation = value.substring(rangeSubset.indexOf(':') + 1);

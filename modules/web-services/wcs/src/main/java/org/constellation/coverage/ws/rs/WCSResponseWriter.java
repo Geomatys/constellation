@@ -62,7 +62,11 @@ public class WCSResponseWriter<T extends Object> implements MessageBodyWriter<T>
     public void writeTo(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         try {
             Marshaller m = WCSMarshallerPool.getInstance().acquireMarshaller();
-            m.marshal(t, out);
+            Object o = t;
+            if (o instanceof WCSResponseWrapper) {
+                o = ((WCSResponseWrapper)o).response;
+            }
+            m.marshal(o, out);
             WCSMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the WCS response", ex);

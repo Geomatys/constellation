@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 /**
  * This class is here to initiate the webservice at startup instead of waiting for the first request to instanciate the service.
@@ -54,6 +55,14 @@ public class CstlApplication extends Application {
         return singletons;
     }
 
+    @Override
+    public Set<Class<?>> getClasses() {
+        Set<Class<?>> result = new HashSet<>(super.getClasses());
+        result.add(MultiPartFeature.class);
+        return result;
+    }
+
+    
 
     @PreDestroy
     public void destroy() {

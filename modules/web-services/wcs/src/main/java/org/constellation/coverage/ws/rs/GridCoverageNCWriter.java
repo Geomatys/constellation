@@ -61,6 +61,10 @@ public class GridCoverageNCWriter<T extends Entry> implements MessageBodyWriter<
 
     @Override
     public void writeTo(final T entry, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
+        writeInStream(entry, out);
+    }
+    
+    public static void writeInStream(final Entry entry, final OutputStream out) throws IOException {
         final GridCoverage2D coverage    = (GridCoverage2D) entry.getKey();
         final SpatialMetadata metadata   = (SpatialMetadata) entry.getValue();
         final IIOImage iioimage          = new IIOImage(coverage.getRenderedImage(), null, metadata);
@@ -68,6 +72,6 @@ public class GridCoverageNCWriter<T extends Entry> implements MessageBodyWriter<
         
         iowriter.setOutput(ImageIO.createImageOutputStream(out));
         iowriter.write(null, iioimage, null);
-        
+        iowriter.dispose();
     }
 }

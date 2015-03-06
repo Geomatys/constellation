@@ -201,6 +201,12 @@ public final class ExceptionCode extends CodeList<ExceptionCode> {
      */
     public static final ExceptionCode TILING_INVALID = new ExceptionCode("TilingInvalid");
     
+    /**
+     * invalid axis label value.
+     * Used by WCS 2.0
+     */
+    public static final ExceptionCode AXIS_LABEL_INVALID = new ExceptionCode("InvalidAxisLabel");
+    
     
     /**
      * Constructs an enum with the given name. The new enum is
