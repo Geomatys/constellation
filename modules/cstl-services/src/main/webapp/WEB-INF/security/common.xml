@@ -5,7 +5,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
 
-  <sec:global-method-security secured-annotations="enabled" jsr250-annotations="enabled" />
+  <sec:global-method-security secured-annotations="enabled" jsr250-annotations="enabled" pre-post-annotations="enabled" />
 
   <bean id="unauthorizedEntryPoint" class="org.constellation.engine.security.UnauthorizedEntryPoint" />
 

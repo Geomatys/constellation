@@ -4,6 +4,9 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
+
+  <bean id="cstlAuth" class="org.constellation.services.component.CstlSDIAuthorizationService" />
+
   <import resource="security/common.xml" />
 
   <bean id="cstlTokenService" class="org.constellation.services.component.TokenService" autowire="byType" />

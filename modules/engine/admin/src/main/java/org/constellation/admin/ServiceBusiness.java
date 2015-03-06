@@ -1,5 +1,22 @@
 package org.constellation.admin;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
@@ -15,11 +32,13 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Details;
 import org.constellation.engine.register.ConstellationPersistenceException;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceDetails;
 import org.constellation.engine.register.ServiceExtraConfig;
-import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
@@ -32,29 +51,11 @@ import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.util.FileUtilities;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.DatasetRepository;
 
 @Component
 @Primary
@@ -171,7 +172,9 @@ public class ServiceBusiness implements IServiceBusiness {
      */
     @Override
     @Transactional
-    public void start(final String serviceType, final String identifier) throws ConfigurationException {
+    @PreAuthorize("@cstlAuth.hasAccessToService(#serviceType, #identifier, 'start')")
+    //@PreAuthorize("@cstlAuth.hasAccessToService(#serviceType, #identifier, 'start') and @cstlAuth.hasAccessToService(#serviceType, #identifier, 'stop')")
+    public void start(final String serviceType, final String identifier) throws ConfigurationException {        
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
@@ -238,6 +241,7 @@ public class ServiceBusiness implements IServiceBusiness {
      */
     @Override
     @Transactional
+    @PreAuthorize("@cstlAuth.hasAccessToService(#serviceType, #identifier, 'stop')")
     public void stop(final String serviceType, final String identifier) throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
