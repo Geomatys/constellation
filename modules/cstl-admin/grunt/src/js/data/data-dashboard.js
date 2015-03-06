@@ -739,9 +739,11 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             });
             modal.result.then(function(result) {
                 if(!result){
+                    $scope.initAfterImport();
                     return;
                 }
                 if(!result.file){
+                    $scope.initAfterImport();
                     return;
                 }else {
                     dataListing.initMetadata({}, {values: {"providerId": result.file,
@@ -752,6 +754,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                         openModalEditor(null,result.file,result.type,"import",'data');
                     }, function () {//error
                         Growl('error', 'Error', 'Unable to prepare metadata for next step!');
+                        $scope.initAfterImport();
                     });
                 }
             });

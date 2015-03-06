@@ -192,11 +192,11 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
                             }
                         }
                     },function(response){//error
-                        Growl('error','Error','Data import failed');
+                        Growl('error','Error','An error occurred during data import. Please contact an administrator for more information.');
                         $modalInstance.close();
                 });
             } else {
-                Growl('error','Error','Data import failed');
+                Growl('error','Error','An error occurred during data import. Please contact an administrator for more information.');
                 $modalInstance.close();
             }
         };
