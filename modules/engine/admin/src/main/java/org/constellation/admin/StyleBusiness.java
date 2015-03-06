@@ -42,6 +42,7 @@ import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.geotoolkit.display2d.ext.cellular.CellSymbolizer;
 import org.geotoolkit.display2d.ext.dynamicrange.DynamicRangeSymbolizer;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -746,7 +747,9 @@ public class StyleBusiness implements IStyleBusiness {
         for (final MutableFeatureTypeStyle fts : style.featureTypeStyles()) {
             for (final MutableRule rule : fts.rules()) {
                 for (final Symbolizer symbolizer : rule.symbolizers()) {
-                    if (symbolizer instanceof RasterSymbolizer || symbolizer instanceof DynamicRangeSymbolizer) {
+                    if (symbolizer instanceof RasterSymbolizer ||
+                        symbolizer instanceof CellSymbolizer ||
+                        symbolizer instanceof DynamicRangeSymbolizer) {
                         return "COVERAGE";
                     }
                 }
