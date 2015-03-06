@@ -44,7 +44,7 @@ public class ProviderToDataReferenceDescriptor extends AbstractProcessDescriptor
     /*
      * Bundle path and keys
      */
-    private static final String BUNDLE = "org/constellation/process/service/bundle";
+    private static final String BUNDLE = "org/constellation/process/data/bundle";
     private static final String PROVIDER_TO_DATAREFERENCE_ABSTRACT_KEY   = "data.provider_to_data_reference_Abstract";
     private static final String PROVIDER_TO_DATAREFERENCE_DISPNAME_KEY   = "data.provider_to_data_reference_DispName";
     private static final String PROVIDER_ID_PARAM_REMARKS_KEY            = "data.provider_to_data_reference_Provider_id_Param";
