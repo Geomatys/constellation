@@ -512,7 +512,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * @param datas given list of {@link Data}.
      * @return the list of {@link DataBrief}.
      */
-    private List<DataBrief> getDataBriefFrom(final List<Data> datas) {
+    protected List<DataBrief> getDataBriefFrom(final List<Data> datas) {
         final List<DataBrief> dataBriefs = new ArrayList<>();
         for (final Data data : datas) {
             final List<Style> styles = styleRepository.findByData(data);
