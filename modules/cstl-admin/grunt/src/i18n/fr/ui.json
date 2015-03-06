@@ -975,6 +975,7 @@
     "sldeditor.raster.1band.Max": "Max.",
     "sldeditor.raster.1band.NaN": "NaN",
     "sldeditor.raster.3bands.titleTab": "Triples bandes",
+    "sldeditor.raster.repartition":"Répartition",
     "sldeditor.raster.expression":"Expression",
     "sldeditor.vector.polygon": "Polygone",
     "sldeditor.vector.line": "Ligne",
