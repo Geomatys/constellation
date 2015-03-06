@@ -18,6 +18,7 @@
  */
 package org.constellation.provider;
 
+import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.provider.configuration.Configurator.ProviderInformation;
@@ -27,6 +28,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.geometry.Envelope;
@@ -153,15 +155,17 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return provider;
     }
 
-    public Set<Name> testProvider(String id, final DataProviderFactory factory, final ParameterValueGroup params) throws DataStoreException {
+    public Set<Name> testProvider(String id, final DataProviderFactory factory,
+                                  final ParameterValueGroup params) throws DataStoreException {
         getProviders();
         final DataProvider provider = factory.createProvider(id, params);
         //test to read data
         Set<Name> names = new HashSet<>();
-        if (provider.getMainStore() instanceof FeatureStore) {
-            names = ((FeatureStore) provider.getMainStore()).getNames();
-        } else if (provider.getMainStore() instanceof CoverageStore) {
-            names = ((CoverageStore) provider.getMainStore()).getNames();
+        final DataStore ds = provider.getMainStore();
+        if (ds instanceof FeatureStore) {
+            names = ((FeatureStore) ds).getNames();
+        } else if (ds instanceof CoverageStore) {
+            names = ((CoverageStore) ds).getNames();
         }
         return names;
     }
@@ -171,21 +175,31 @@ public final class DataProviders extends Providers implements PropertyChangeList
         getProviders();
         final DataProvider provider = getProvider(id);
         //test getting CRS from data
-        if (provider.getMainStore() instanceof FeatureStore) {
-            final Set<Name> names =  ((FeatureStore) provider.getMainStore()).getNames();
-            for (Name name : names){
-                final Envelope envelope = ((FeatureStore) provider.getMainStore()).getEnvelope(QueryBuilder.all(name));
-                final CoordinateReferenceSystem coordinateReferenceSystem = envelope.getCoordinateReferenceSystem();
-                nameCoordinateReferenceSystemHashMap.put(name,coordinateReferenceSystem);
+        final DataStore store = provider.getMainStore();
+        if (store instanceof FeatureStore) {
+            final FeatureStore fs = (FeatureStore) store;
+            final Set<Name> names =  fs.getNames();
+            for (final Name name : names){
+                final FeatureType ft = fs.getFeatureType(name);
+                final CoordinateReferenceSystem crs = ft.getCoordinateReferenceSystem();
+                if(crs!=null) {
+                    nameCoordinateReferenceSystemHashMap.put(name,crs);
+                }
             }
-        } else if (provider.getMainStore() instanceof CoverageStore) {
-            final Set<Name> names = ((CoverageStore) provider.getMainStore()).getNames();
-            for (Name name : names){
-                final CoverageReference coverageReference = ((CoverageStore) provider.getMainStore()).getCoverageReference(name);
+        } else if (store instanceof CoverageStore) {
+            final CoverageStore cs = (CoverageStore) store;
+            final Set<Name> names = cs.getNames();
+            for (final Name name : names){
+                final CoverageReference coverageReference = cs.getCoverageReference(name);
                 final GridCoverageReader coverageReader = coverageReference.acquireReader();
-                final CoordinateReferenceSystem coordinateReferenceSystem = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
-                nameCoordinateReferenceSystemHashMap.put(name,coordinateReferenceSystem);
-                coverageReference.recycle(coverageReader);
+                try {
+                    final CoordinateReferenceSystem crs = coverageReader.getGridGeometry(coverageReference.getImageIndex()).getCoordinateReferenceSystem();
+                    if(crs!=null) {
+                        nameCoordinateReferenceSystemHashMap.put(name,crs);
+                    }
+                }finally {
+                    coverageReference.recycle(coverageReader);
+                }
             }
         }
         return nameCoordinateReferenceSystemHashMap;
