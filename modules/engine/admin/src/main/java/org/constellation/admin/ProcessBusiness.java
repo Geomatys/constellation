@@ -69,15 +69,12 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -105,6 +102,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 
 /**
@@ -187,27 +186,29 @@ public class ProcessBusiness implements IProcessBusiness {
         LOGGER.info("=== Starting directory watcher ===");
         try {
             directoryWatcher = new DirectoryWatcher(true);
-            directoryWatcher.start();
 
             final PathChangeListener pathListener = new PathChangeListener() {
                 @Override
                 public void pathChanged(PathChangedEvent event) {
-                    Path target = event.target;
+                    if (event.kind.equals(ENTRY_MODIFY) || event.kind.equals(ENTRY_CREATE)) {
 
-                    for (Map.Entry<Integer, Object> sTask : scheduledTasks.entrySet()) {
-                        if (sTask.getValue() instanceof Path && target.startsWith((Path) sTask.getValue())) {
-                            final Integer taskId = sTask.getKey();
-                            final TaskParameter taskParameter = taskParameterRepository.get(taskId);
-                            try {
-                                executeTaskParameter(taskParameter, null, taskParameter.getOwner());
-                            } catch (ConfigurationException ex) {
-                                LOGGER.warn(ex.getMessage(), ex);
+                        final Path target = event.target;
+                        for (Map.Entry<Integer, Object> sTask : scheduledTasks.entrySet()) {
+                            if (sTask.getValue() instanceof Path && target.startsWith((Path) sTask.getValue())) {
+                                final Integer taskId = sTask.getKey();
+                                final TaskParameter taskParameter = taskParameterRepository.get(taskId);
+                                try {
+                                    executeTaskParameter(taskParameter, null, taskParameter.getOwner());
+                                } catch (ConfigurationException ex) {
+                                    LOGGER.warn(ex.getMessage(), ex);
+                                }
                             }
                         }
                     }
                 }
             };
             directoryWatcher.addPathChangeListener(pathListener);
+            directoryWatcher.start();
 
         } catch (IOException ex) {
             LOGGER.error("=== Failed to start directory watcher ===\n"+ex.getLocalizedMessage(), ex);
@@ -668,16 +669,21 @@ public class ProcessBusiness implements IProcessBusiness {
                 }
 
             } else if ("FOLDER".equalsIgnoreCase(task.getTriggerType())) {
+
+                final File folder = new File(trigger);
+                final Path path = folder.toPath();
                 try {
-                    File folder = new File(trigger);
                     if (folder.exists() && folder.isDirectory()) {
-                        final Path path = folder.toPath();
-                        directoryWatcher.register(path);
                         scheduledTasks.put(task.getId(), path);
+                        directoryWatcher.register(path);
                     } else {
                         throw new ConstellationException("Invalid folder trigger : " + trigger);
                     }
                 } catch (IOException e) {
+                    // remove task from scheduled list
+                    if (scheduledTasks.containsKey(task.getId())) {
+                        scheduledTasks.remove(task.getId());
+                    }
                     throw new ConstellationException(e.getMessage(), e);
                 }
             }
