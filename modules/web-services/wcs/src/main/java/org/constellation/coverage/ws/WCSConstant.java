@@ -47,6 +47,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.geotoolkit.wcs.xml.ServiceMetadata;
+import org.geotoolkit.wcs.xml.v200.ServiceMetadataType;
 
 /**
  *  WCS Constants
@@ -73,7 +75,7 @@ public final class WCSConstant {
     public static final String KEY_IDENTIFIER = "IDENTIFIER";
     /** Parameter used in getCoverage 1.0.0 */
     public static final String KEY_COVERAGE   = "COVERAGE";
-    /** Parameter used in getCoverage 2.0.0 */
+    /** Parameter used in getCoverage 2.0.1 */
     public static final String KEY_COVERAGE_ID   = "COVERAGEID";
 
     /** BBOX for getCoverage in version 1.1.1 */
@@ -174,6 +176,12 @@ public final class WCSConstant {
          SUPPORTED_FORMATS_111.add("matrix");
          SUPPORTED_FORMATS_111.add("ascii-grid");
     }
+     
+     public static final List<String> SUPPORTED_FORMATS_200 = new ArrayList<>();
+     static {
+         SUPPORTED_FORMATS_200.add(MimeType.IMAGE_TIFF);
+         SUPPORTED_FORMATS_200.add(MimeType.NETCDF);
+    }
 
     /**
      * A list of supported interpolation
@@ -259,46 +267,64 @@ public final class WCSConstant {
     public static final AbstractOperationsMetadata OPERATIONS_METADATA_200;
     static {
         final List<AbstractDCP> dcps = new ArrayList<>();
-        dcps.add(WCSXmlFactory.buildDCP("2.0.0", "someURL", "someURL"));
+        dcps.add(WCSXmlFactory.buildDCP("2.0.1", "someURL", "someURL"));
 
         final List<AbstractDCP> dcps2 = new ArrayList<>();
-        dcps2.add(WCSXmlFactory.buildDCP("2.0.0", null, "someURL"));
+        dcps2.add(WCSXmlFactory.buildDCP("2.0.1", null, "someURL"));
 
         final List<AbstractOperation> operations = new ArrayList<>();
 
         final List<AbstractDomain> gcParameters = new ArrayList<>();
-        gcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "AcceptVersions", Arrays.asList("1.0.0","2.0.0")));
-        gcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "AcceptFormats",  Arrays.asList("text/xml","application/vnd.ogc.wcs_xml")));
-        gcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Service",        Arrays.asList("WCS")));
-        gcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Sections",       Arrays.asList("ServiceIdentification","ServiceProvider","OperationsMetadata","Contents")));
-        AbstractOperation getCapabilities = WCSXmlFactory.buildOperation("2.0.0", dcps, gcParameters, null, "GetCapabilities");
+        gcParameters.add(WCSXmlFactory.buildDomain("2.0.1", "AcceptVersions", Arrays.asList("1.0.0","2.0.1")));
+        gcParameters.add(WCSXmlFactory.buildDomain("2.0.1", "AcceptFormats",  Arrays.asList("text/xml","application/vnd.ogc.wcs_xml")));
+        gcParameters.add(WCSXmlFactory.buildDomain("2.0.1", "Service",        Arrays.asList("WCS")));
+        gcParameters.add(WCSXmlFactory.buildDomain("2.0.1", "Sections",       Arrays.asList("ServiceIdentification","ServiceProvider","OperationsMetadata","Contents")));
+        AbstractOperation getCapabilities = WCSXmlFactory.buildOperation("2.0.1", dcps, gcParameters, null, "GetCapabilities");
         operations.add(getCapabilities);
 
         final List<AbstractDomain> gcoParameters = new ArrayList<>();
-        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Version", Arrays.asList("1.0.0","2.0.0")));
-        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Service", Arrays.asList("WCS")));
-        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Format",  Arrays.asList("image/gif","image/png","image/jpeg","matrix")));
-        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Store",   Arrays.asList("false")));
-        AbstractOperation getCoverage = WCSXmlFactory.buildOperation("2.0.0", dcps, gcoParameters, null, "GetCoverage");
+        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.1", "Version", Arrays.asList("1.0.0","2.0.1")));
+        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.1", "Service", Arrays.asList("WCS")));
+        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.1", "Format",  SUPPORTED_FORMATS_200));
+        gcoParameters.add(WCSXmlFactory.buildDomain("2.0.1", "MediaType",  Arrays.asList("multipart/mixed")));
+        AbstractOperation getCoverage = WCSXmlFactory.buildOperation("2.0.1", dcps, gcoParameters, null, "GetCoverage");
         operations.add(getCoverage);
 
         final List<AbstractDomain> dcParameters = new ArrayList<>();
-        dcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Version", Arrays.asList("1.0.0","2.0.0")));
-        dcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Service", Arrays.asList("WCS")));
-        dcParameters.add(WCSXmlFactory.buildDomain("2.0.0", "Format",  Arrays.asList("text/xml")));
-        AbstractOperation describeCoverage = WCSXmlFactory.buildOperation("2.0.0", dcps, dcParameters, null, "DescribeCoverage");
+        dcParameters.add(WCSXmlFactory.buildDomain("2.0.1", "Version", Arrays.asList("1.0.0","2.0.1")));
+        dcParameters.add(WCSXmlFactory.buildDomain("2.0.1", "Service", Arrays.asList("WCS")));
+        dcParameters.add(WCSXmlFactory.buildDomain("2.0.1", "Format",  Arrays.asList("text/xml")));
+        AbstractOperation describeCoverage = WCSXmlFactory.buildOperation("2.0.1", dcps, dcParameters, null, "DescribeCoverage");
         operations.add(describeCoverage);
 
         final List<AbstractDomain> constraints = new ArrayList<>();
-        constraints.add(WCSXmlFactory.buildDomain("2.0.0", "PostEncoding", Arrays.asList("XML")));
+        constraints.add(WCSXmlFactory.buildDomain("2.0.1", "PostEncoding", Arrays.asList("XML")));
 
         OPERATIONS_METADATA_200 = OWSXmlFactory.buildOperationsMetadata("2.0.0", operations, null, constraints, null);
     }
-
+    
+    public static void applyProfile(final String version, final AbstractServiceIdentification si) {
+        if (version.equals("2.0.1")) {
+            si.getProfile().add("http://www.opengis.net/spec/WCS/2.0/conf/core");
+            si.getProfile().add("http://www.opengis.net/spec/WCS_protocol-binding_get-kvp/1.0/conf/get-kvp");
+            si.getProfile().add("http://www.opengis.net/spec/WCS_protocol-binding_post-xml/1.0/conf/post-xml");
+            si.getProfile().add("http://www.opengis.net/spec/GMLCOV/1.0/conf/multipart");
+            si.getProfile().add("http://www.opengis.net/spec/GMLCOV/1.0/conf/special-format");
+            si.getProfile().add("http://www.opengis.net/spec/GMLCOV_geotiff-coverages/1.0/conf/geotiff-coverage");
+        }
+    }
+    
+    public static ServiceMetadata getServiceMetadata(final String version) {
+        ServiceMetadata sm = null;
+        if (version.equals("2.0.1")) {
+            sm = new ServiceMetadataType(SUPPORTED_FORMATS_200);
+        }
+        return sm;
+    }
     public static AbstractOperationsMetadata getOperationMetadata(final String version) {
         if (version.equals("1.0.0")) {
             return OPERATIONS_METADATA_100.clone();
-        } else if (version.equals("2.0.0")) {
+        } else if (version.equals("2.0.1")) {
             return OPERATIONS_METADATA_200.clone();
         } else if (version.equals("1.1.1")){
             return OPERATIONS_METADATA_111.clone();
@@ -351,6 +377,6 @@ public final class WCSConstant {
         }
 
         // Create capabilities base.
-        return WCSXmlFactory.createCapabilitiesResponse(version, servIdent, servProv, null, null, null);
+        return WCSXmlFactory.createCapabilitiesResponse(version, servIdent, servProv, null, null, null, null);
     }
 }

@@ -46,7 +46,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
                 return [{ 'id': '1.1.0', 'checked': true}, { 'id': '2.0.0' }];
             }
             if ($scope.type === 'wcs') {
-                return [{ 'id': '1.0.0', 'checked': true}];
+                return [{ 'id': '1.0.0'}, { 'id': '2.0.1', 'checked': true}];
             }
             if ($scope.type === 'wmts') {
                 return [{ 'id': '1.0.0', 'checked': true}];

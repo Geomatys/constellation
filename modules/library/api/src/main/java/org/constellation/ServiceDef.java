@@ -49,7 +49,7 @@ public enum ServiceDef {
     WCS_1_1_0(Specification.WCS, Organization.OGC, "1.1.0", Profile.NONE, "1.1.0", true, true),
     WCS_1_1_1(Specification.WCS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0", true, true),
     WCS_1_1_2(Specification.WCS, Organization.OGC, "1.1.2", Profile.NONE, "1.1.0", true, false),
-    WCS_2_0_0(Specification.WCS, Organization.OGC, "2.0.0", Profile.NONE, "2.0.0", true, true),
+    WCS_2_0_0(Specification.WCS, Organization.OGC, "2.0.1", Profile.NONE, "2.0.0", true, true),
     // WFS service definitions
     WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.0.0", true, false),
     WFS_1_1_0(Specification.WFS, Organization.OGC, "1.1.0", Profile.NONE, "1.0.0", true, true),

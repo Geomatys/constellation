@@ -112,7 +112,6 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.apache.sis.geometry.Envelopes;
 
@@ -162,7 +161,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_QUERYABLE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
-import org.geotoolkit.ows.xml.OWSXmlFactory;
 import org.geotoolkit.swe.xml.v200.AllowedValuesPropertyType;
 import org.geotoolkit.swe.xml.v200.AllowedValuesType;
 import org.geotoolkit.swe.xml.v200.DataRecordPropertyType;
@@ -170,6 +168,7 @@ import org.geotoolkit.swe.xml.v200.DataRecordType;
 import org.geotoolkit.swe.xml.v200.QuantityType;
 import org.geotoolkit.swe.xml.v200.UnitReference;
 import org.geotoolkit.wcs.xml.DomainSubset;
+import org.geotoolkit.wcs.xml.ServiceMetadata;
 import org.geotoolkit.wcs.xml.v200.DimensionSliceType;
 import org.geotoolkit.wcs.xml.v200.DimensionTrimType;
 import org.geotoolkit.wcs.xml.v200.ExtensionType;
@@ -282,7 +281,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 coverageOfferings.add(describeCoverage100(coverageName, coverageRef));
             } else if (version.equals("1.1.1")) {
                 coverageOfferings.add(describeCoverage111(coverageName, coverageRef));
-            } else if (version.equals("2.0.0")) {
+            } else if (version.equals("2.0.1")) {
                 coverageOfferings.add(describeCoverage200(coverageName, coverageRef));
             } else {
                 throw new CstlServiceException("The version number specified for this GetCoverage request " +
@@ -450,11 +449,11 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     }
     
     /**
-     * Returns the description of the coverage requested in version 2.0.0 of WCS standard.
+     * Returns the description of the coverage requested in version 2.0.1 of WCS standard.
      *
      * @param request a {@linkplain org.geotoolkit.wcs.xml.v200.DescribeCoverage describe coverage}
      *                request done by the user.
-     * @return an XML document giving the full description of a coverage, in version 2.0.0.
+     * @return an XML document giving the full description of a coverage, in version 2.0.1.
      *
      * @throws CstlServiceException
      */
@@ -582,7 +581,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final AbstractOperationsMetadata om     = getOperationMetadata(version);
         om.updateURL(getServiceUrl());
 
-
+        WCSConstant.applyProfile(version, si);
+        
         final List<CoverageInfo> offBrief = new ArrayList<>();
         final List<Layer> layers = getConfigurationLayers(userLogin);
         try {
@@ -628,7 +628,8 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
         final Content contents = WCSXmlFactory.createContent(version, offBrief);
-        final GetCapabilitiesResponse response = WCSXmlFactory.createCapabilitiesResponse(version, si, sp, om, contents, getCurrentUpdateSequence());
+        final ServiceMetadata sm = WCSConstant.getServiceMetadata(version);
+        final GetCapabilitiesResponse response = WCSXmlFactory.createCapabilitiesResponse(version, si, sp, om, contents, getCurrentUpdateSequence(), sm);
         putCapabilitiesInCache(version, null, response);
         return (GetCapabilitiesResponse) response.applySections(sections);
     }
@@ -701,7 +702,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final CharSequence remark = CharSequences.toASCII(coverageLayer.getRemarks());
 
         final GeographicBoundingBox inputGeoBox = coverageLayer.getGeographicBoundingBox();
-        final BoundingBox outputBBox  =  OWSXmlFactory.buildWGS84BoundingBox(version, inputGeoBox);
+        final BoundingBox outputBBox  =  WCSXmlFactory.buildWGS84BoundingBox(version, inputGeoBox);
         final String coverageSubType  = "GridCoverage";
         return WCSXmlFactory.createCoverageInfo(version, identifier, title,
                 (remark != null) ? remark.toString() : null, outputBBox, coverageSubType);
@@ -726,7 +727,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             throw new CstlServiceException("The parameter version must be specified",
                            MISSING_PARAMETER_VALUE, QueryConstants.VERSION_PARAMETER.toLowerCase());
         } else if (!"1.0.0".equals(inputVersion) &&
-                   !"2.0.0".equals(inputVersion) &&
+                   !"2.0.1".equals(inputVersion) &&
                    !"1.1.1".equals(inputVersion)) {
             throw new CstlServiceException("The version number specified for this request " + inputVersion +
                     " is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
@@ -751,7 +752,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final CoverageData layerRef = (CoverageData) tmplayerRef;
         final Layer configLayer = getConfigurationLayer(tmpName, userLogin);
 
-        if ("2.0.0".equals(inputVersion)) {
+        if ("2.0.1".equals(inputVersion)) {
             return getCoverage200(request, layerRef, configLayer);
         }
         

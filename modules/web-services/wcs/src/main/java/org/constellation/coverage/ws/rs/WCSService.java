@@ -42,7 +42,6 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.ExceptionResponse;
-import org.geotoolkit.ows.xml.OWSXmlFactory;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
@@ -277,7 +276,7 @@ public class WCSService extends GridWebService<WCSWorker> {
     }
 
     private boolean isSupportedFormat(final String version, final String format) {
-        if (version.equals("2.0.0")) {
+        if (version.equals("2.0.1")) {
             return format.equalsIgnoreCase(MimeType.IMAGE_TIFF) || format.equalsIgnoreCase(MimeType.NETCDF);
         } else {
             return format.equalsIgnoreCase(MimeType.IMAGE_BMP)  ||format.equalsIgnoreCase(BMP)  ||
@@ -370,12 +369,12 @@ public class WCSService extends GridWebService<WCSWorker> {
         
         if (finalVersion.equals("1.0.0")) {
             final String section = getParameter(KEY_SECTION, false);
-            final Sections sections = OWSXmlFactory.buildSections(finalVersion, Arrays.asList(section));
+            final Sections sections = WCSXmlFactory.buildSections(finalVersion, Arrays.asList(section));
             return WCSXmlFactory.createGetCapabilities(finalVersion, null, sections, null, updateSequence, service);
             
-        } else if (finalVersion.equals("1.1.1") || finalVersion.equals("2.0.0")) {
+        } else if (finalVersion.equals("1.1.1") || finalVersion.equals("2.0.1")) {
             final String acceptformat = getParameter(ACCEPT_FORMATS_PARAMETER, false);
-            final AcceptFormats formats = OWSXmlFactory.buildAcceptFormat(finalVersion, Arrays.asList(acceptformat));
+            final AcceptFormats formats = WCSXmlFactory.buildAcceptFormat(finalVersion, Arrays.asList(acceptformat));
 
             //We transform the String of sections in a list.
             //In the same time we verify that the requested sections are valid.
@@ -397,8 +396,8 @@ public class WCSService extends GridWebService<WCSWorker> {
                 //if there is no requested Sections we add all the sections
                 requestedSections = SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
             }
-            final Sections sections = OWSXmlFactory.buildSections(finalVersion, requestedSections);
-            final AcceptVersions versions = OWSXmlFactory.buildAcceptVersion(finalVersion, Arrays.asList(finalVersion));
+            final Sections sections = WCSXmlFactory.buildSections(finalVersion, requestedSections);
+            final AcceptVersions versions = WCSXmlFactory.buildAcceptVersion(finalVersion, Arrays.asList(finalVersion));
             return WCSXmlFactory.createGetCapabilities(finalVersion, versions, sections, formats, updateSequence, service);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -421,7 +420,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             coverage = getParameter(KEY_COVERAGE, true);
         } else if ("1.1.1".equals(strVersion)) {
             coverage = getParameter(KEY_IDENTIFIER, true);
-        } else if ("2.0.0".equals(strVersion)) {
+        } else if ("2.0.1".equals(strVersion)) {
             coverage = getParameter(KEY_COVERAGE_ID, true);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -444,7 +443,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             return adaptKvpGetCoverageRequest100();
          } else if (strVersion.equals("1.1.1")) {
             return adaptKvpGetCoverageRequest111();
-         } else if (strVersion.equals("2.0.0")) {
+         } else if (strVersion.equals("2.0.1")) {
             return adaptKvpGetCoverageRequest200();
          } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -457,7 +456,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * Generate a marshallable {@linkplain org.geotoolkit.wcs.xml.v200.GetCoverage GetCoverage}
      * request in version 1.0.0, from what the user specified.
      *
-     * @return The GetCoverage request in version 2.0.0
+     * @return The GetCoverage request in version 2.0.1
      * @throws CstlServiceException
      */
     private GetCoverage adaptKvpGetCoverageRequest200() throws CstlServiceException {
