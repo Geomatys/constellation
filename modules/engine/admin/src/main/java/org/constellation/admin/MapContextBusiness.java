@@ -47,11 +47,17 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.ConfigurationException;
 
 @Component
 @Primary
 public class MapContextBusiness implements IMapContextBusiness {
 
+    private static final Logger LOGGER = Logging.getLogger(MapContextBusiness.class);
+    
     @Inject
     private MapContextRepository mapContextRepository;
 
@@ -304,7 +310,12 @@ public class MapContextBusiness implements IMapContextBusiness {
                 final Provider provider = providerRepository.findOne(data.getProvider());
 
                 final QName dataName = Util.parseQName(data.getName());
-                DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider.getIdentifier(), dataName);
+                DefaultMetadata metadata = null;
+                try {
+                    metadata = dataBusiness.loadIsoDataMetadata(provider.getIdentifier(), dataName);
+                } catch (ConfigurationException ex) {
+                    LOGGER.log(Level.FINE, null, ex);
+                }
                 if(metadata == null){
                     //try to get dataset metadata.
                     final Dataset dataset = dataBusiness.getDatasetForData(provider.getIdentifier(), dataName);

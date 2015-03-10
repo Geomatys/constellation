@@ -34,7 +34,6 @@ import org.constellation.engine.register.Provider;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
@@ -127,17 +126,17 @@ public interface IDataBusiness {
      * @param providerID given data provider id.
      * @param qName given data name.
      * @return {@link DefaultMetadata}
-     * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
+     * @throws ConfigurationException is thrown for UnsupportedEncodingException or JAXBException.
      */
-    DefaultMetadata loadIsoDataMetadata(String providerID, QName qName)  throws ConstellationException;
+    DefaultMetadata loadIsoDataMetadata(String providerID, QName qName)  throws ConfigurationException;
 
     /**
      * Returns {@link DefaultMetadata} for given dataId.
      * @param dataId given data id.
      * @return {@link DefaultMetadata}
-     * @throws ConstellationException is thrown for UnsupportedEncodingException or JAXBException.
+     * @throws ConfigurationException is thrown for UnsupportedEncodingException or JAXBException.
      */
-    DefaultMetadata loadIsoDataMetadata(int dataId) throws ConstellationException;
+    DefaultMetadata loadIsoDataMetadata(int dataId) throws ConfigurationException;
     
     Dataset getDatasetForData(String providerID, QName qName) throws ConstellationException;
 
@@ -325,11 +324,11 @@ public interface IDataBusiness {
 
     List<Data> getDataLinkedData(final int dataId);
     
-    String marshallMetadata(final DefaultMetadata metadata) throws JAXBException;
+    String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException;
     
-    DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException;
+    DefaultMetadata unmarshallMetadata(final String metadata) throws ConfigurationException;
 
-    DefaultMetadata unmarshallMetadata(final File metadata) throws JAXBException;
+    DefaultMetadata unmarshallMetadata(final File metadata) throws ConfigurationException;
     
     DefaultMetadata getMetadataFromDimap(final File metadata)throws ConfigurationException;
 

@@ -130,7 +130,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * Injected lucene index engine.
      */
     @Inject
-    private IndexEngine indexEngine;
+    protected IndexEngine indexEngine;
 
 
     @Autowired(required = false)
@@ -203,20 +203,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         String metadataId = null;
         if (metadata != null) {
             metadataId = metadata.getFileIdentifier();
-            try {
-                final MarshallerPool pool = getMarshallerPool();
-                if(pool != null){
-                    final Marshaller marshaller = pool.acquireMarshaller();
-                    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    marshaller.marshal(metadata, outputStream);
-                    pool.recycle(marshaller);
-                    metadataString = outputStream.toString();
-                }else {
-                    metadataString = marshallMetadata(metadata);
-                }
-            } catch (JAXBException ex) {
-                throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
-            }
+            metadataString = marshallMetadata(metadata);
         }
         return createDataset(identifier, metadataId, metadataString, owner);
     }
@@ -234,27 +221,13 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         if (dataset != null) {
             final Metadata metaRecord = metadataRepository.findByDatasetId(dataset.getId());
             if (metaRecord != null) {
-                final MarshallerPool pool = getMarshallerPool();
                 final String metadataStr = metaRecord.getMetadataIso();
-                if(metadataStr == null){
+                if (metadataStr == null) {
                     throw new ConfigurationException("Unable to get metadata for dataset identifier "+datasetIdentifier);
                 }
-                try {
-                    final DefaultMetadata metadata;
-                    if(pool != null) {
-                        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-                        final byte[] byteArray = metadataStr.getBytes();
-                        final ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-                        metadata = (DefaultMetadata) unmarshaller.unmarshal(bais);
-                        pool.recycle(unmarshaller);
-                    } else {
-                        metadata = unmarshallMetadata(metadataStr);
-                    }
-                    metadata.prune();
-                    return metadata;
-                } catch (JAXBException ex) {
-                    throw new ConfigurationException("Unable to unmarshall the dataset metadata", ex);
-                }
+                final DefaultMetadata metadata = unmarshallMetadata(metadataStr);
+                metadata.prune();
+                return metadata;
             }
         }
         return null;
@@ -312,21 +285,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Transactional
     public void updateMetadata(final String datasetIdentifier, final Integer domainId,
                                final DefaultMetadata metadata) throws ConfigurationException {
-        String metadataString = null;
-        try {
-            final MarshallerPool pool = getMarshallerPool();
-            if (pool != null) {
-                final Marshaller marshaller = pool.acquireMarshaller();
-                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                marshaller.marshal(metadata, outputStream);
-                pool.recycle(marshaller);
-                metadataString = outputStream.toString();
-            } else {
-                metadataString = marshallMetadata(metadata);
-            }
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
-        }
+        final String metadataString = marshallMetadata(metadata);
         
         final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
         if (dataset != null) {
@@ -662,12 +621,40 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         return null; //in constellation this should always return null, since this method can be overrided by sub-project.
     }
 
-    protected String marshallMetadata(final DefaultMetadata metadata) throws JAXBException {
-        return XML.marshal(metadata);
+    protected String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException {
+        try {
+            final MarshallerPool pool = getMarshallerPool();
+            if (pool != null) {
+                final Marshaller marshaller = pool.acquireMarshaller();
+                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                marshaller.marshal(metadata, outputStream);
+                pool.recycle(marshaller);
+                return outputStream.toString();
+            } else {
+                return XML.marshal(metadata);
+            }
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
+        }
     }
 
-    protected DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
-        return (DefaultMetadata) XML.unmarshal(metadata);
+    protected DefaultMetadata unmarshallMetadata(final String metadataStr) throws ConfigurationException {
+        try {
+            final MarshallerPool pool = getMarshallerPool();
+            final DefaultMetadata metadata;
+            if(pool != null) {
+                final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+                final byte[] byteArray = metadataStr.getBytes();
+                final ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+                metadata = (DefaultMetadata) unmarshaller.unmarshal(bais);
+                pool.recycle(unmarshaller);
+            } else {
+                metadata = (DefaultMetadata) XML.unmarshal(metadataStr);
+            }
+            return metadata;
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to unmarshall the dataset metadata", ex);
+        }
     }
 
     @Override

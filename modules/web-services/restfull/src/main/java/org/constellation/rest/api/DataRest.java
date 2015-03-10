@@ -369,7 +369,7 @@ public class DataRest {
         } else {
             try {
                 obj = dataBusiness.unmarshallMetadata(newFileMetaData);
-            } catch (JAXBException ex) {
+            } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
                 throw new ConstellationException("metadata file is incorrect");
             }
@@ -668,7 +668,7 @@ public class DataRest {
                 }
                 // for now we assume datasetID == providerID
                 datasetBusiness.updateMetadata(providerId, -1, metadata);
-            } catch (ConfigurationException | JAXBException ex) {
+            } catch (ConfigurationException ex) {
                 throw new ConstellationException("Error while saving dataset metadata, " + ex.getMessage());
             }
         }
@@ -1997,7 +1997,7 @@ public class DataRest {
     @Path("metadata/iso/{providerId}/{dataId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getIsoMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
+    public Response getIsoMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) throws ConfigurationException {
         final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
         if (metadata != null) {
             metadata.prune();

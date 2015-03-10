@@ -190,7 +190,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * Injected dataset repository.
      */
     @Inject
-    private DatasetRepository datasetRepository;
+    protected DatasetRepository datasetRepository;
     /**
      * Injected sensor repository.
      */
@@ -205,7 +205,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * Injected lucene index engine.
      */
     @Inject
-    private IndexEngine indexEngine;
+    protected IndexEngine indexEngine;
 
     /**
      * Injected data coverage job
@@ -236,24 +236,12 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Override
     public DefaultMetadata loadIsoDataMetadata(final String providerId,
-                                               final QName name) throws ConstellationException{
+                                               final QName name) throws ConfigurationException{
         DefaultMetadata result = null;
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
-        final MarshallerPool pool = getMarshallerPool();
-        try {
-            final Metadata metadata = metadataRepository.findByDataId(data.getId());
-            if (metadata != null && metadata.getMetadataIso() != null) {
-                if(pool != null){
-                    final InputStream sr = new ByteArrayInputStream(metadata.getMetadataIso().getBytes("UTF-8"));
-                    final Unmarshaller m = pool.acquireUnmarshaller();
-                    result = (DefaultMetadata) m.unmarshal(sr);
-                    pool.recycle(m);
-                }else {
-                    result = unmarshallMetadata(metadata.getMetadataIso());
-                }
-            }
-        } catch (UnsupportedEncodingException | JAXBException e) {
-            throw new ConstellationException(e);
+        final Metadata metadata = metadataRepository.findByDataId(data.getId());
+        if (metadata != null && metadata.getMetadataIso() != null) {
+            result = unmarshallMetadata(metadata.getMetadataIso());
         }
         return result;
     }
@@ -262,23 +250,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * {@inheritDoc}
      */
     @Override
-    public DefaultMetadata loadIsoDataMetadata(final int dataId) throws ConstellationException{
+    public DefaultMetadata loadIsoDataMetadata(final int dataId) throws ConfigurationException{
         DefaultMetadata result = null;
         final Metadata metadata = metadataRepository.findByDataId(dataId);
-        final MarshallerPool pool = getMarshallerPool();
-        try {
-            if (metadata != null && metadata.getMetadataIso() != null) {
-                if(pool != null){
-                    final InputStream sr = new ByteArrayInputStream(metadata.getMetadataIso().getBytes("UTF-8"));
-                    final Unmarshaller m = pool.acquireUnmarshaller();
-                    result = (DefaultMetadata) m.unmarshal(sr);
-                    pool.recycle(m);
-                } else {
-                    result = unmarshallMetadata(metadata.getMetadataIso());
-                }
-            }
-        } catch (UnsupportedEncodingException | JAXBException e) {
-            throw new ConstellationException(e);
+        if (metadata != null && metadata.getMetadataIso() != null) {
+            result = unmarshallMetadata(metadata.getMetadataIso());
         }
         return result;
     }
@@ -333,21 +309,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public void saveMetadata(final String providerId,
                              final QName name,
                              final DefaultMetadata metadata) throws ConfigurationException {
-        final String metadataStr;
-        try {
-            final MarshallerPool pool = getMarshallerPool();
-            if(pool != null) {
-                final Marshaller marshaller = pool.acquireMarshaller();
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(metadata, sw);
-                pool.recycle(marshaller);
-                metadataStr = sw.toString();
-            } else {
-                metadataStr = marshallMetadata(metadata);
-            }
-        } catch (JAXBException ex) {
-            throw new ConstellationException(ex);
-        }
+        
+        final String metadataStr = marshallMetadata(metadata);
+        
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         if (data != null) {
             // calculate completion rating
@@ -851,22 +815,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Override
     @Transactional
     public void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException {
-        final String metadataString;
-        try {
-            final MarshallerPool pool = getMarshallerPool();
-            if(pool != null) {
-                final Marshaller marshaller = pool.acquireMarshaller();
-                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                marshaller.marshal(metadata, outputStream);
-                pool.recycle(marshaller);
-                metadataString = outputStream.toString();
-            } else {
-                metadataString = marshallMetadata(metadata);
-            }
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
-        }
-
+        final String metadataString = marshallMetadata(metadata);
+        
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
             
@@ -1024,18 +974,56 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     @Override
-    public String marshallMetadata(final DefaultMetadata metadata) throws JAXBException {
-        return XML.marshal(metadata);
+    public String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException {
+        try {
+            final MarshallerPool pool = getMarshallerPool();
+            if (pool != null) {
+                final Marshaller marshaller = pool.acquireMarshaller();
+                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                marshaller.marshal(metadata, outputStream);
+                pool.recycle(marshaller);
+                return outputStream.toString();
+            } else {
+                return XML.marshal(metadata);
+            }
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
+        }
     }
 
     @Override
-    public DefaultMetadata unmarshallMetadata(final String metadata) throws JAXBException {
-        return (DefaultMetadata) XML.unmarshal(metadata);
+    public DefaultMetadata unmarshallMetadata(final String metadata) throws ConfigurationException {
+        try {
+            final MarshallerPool pool = getMarshallerPool();
+            if (pool != null) {
+                final InputStream sr = new ByteArrayInputStream(metadata.getBytes("UTF-8"));
+                final Unmarshaller m = pool.acquireUnmarshaller();
+                final DefaultMetadata result = (DefaultMetadata) m.unmarshal(sr);
+                pool.recycle(m);
+                return result;
+            } else {
+                return (DefaultMetadata) XML.unmarshal(metadata);
+            }
+        } catch (UnsupportedEncodingException | JAXBException ex) {
+            throw new ConfigurationException(ex);
+        }
     }
 
     @Override
-    public DefaultMetadata unmarshallMetadata(final File metadata) throws JAXBException {
-        return (DefaultMetadata) XML.unmarshal(metadata);
+    public DefaultMetadata unmarshallMetadata(final File metadata) throws ConfigurationException {
+        try {
+            final MarshallerPool pool = getMarshallerPool();
+            if (pool != null) {
+                final Unmarshaller m = pool.acquireUnmarshaller();
+                final DefaultMetadata result = (DefaultMetadata) m.unmarshal(metadata);
+                pool.recycle(m);
+                return result;
+            } else {
+                return (DefaultMetadata) XML.unmarshal(metadata);
+            }
+        } catch (JAXBException ex) {
+            throw new ConfigurationException(ex);
+        }
     }
 
     @Override
@@ -1318,11 +1306,13 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     @Transactional
+    @Override
     public void linkDataToData(final int dataId, final int childId) {
         dataRepository.linkDataToData(dataId, childId);
     }
 
     @Transactional
+    @Override
     public List<Data> getDataLinkedData(final int dataId){
         return dataRepository.getDataLinkedData(dataId);
     }
