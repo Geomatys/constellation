@@ -242,7 +242,7 @@ module.exports = function(grunt) {
                 src: ['<%= target_dir %>/js/cstl-index.js'],
                 dest: '<%= target_dir %>/js/cstl-index.js'
             }
-        }
+        },
 
 // TODO → Minify template files for better performances.
 // Previous attempts using following configuration with 'grunt-contrib-htmlmin' have broken some page layouts.
@@ -262,6 +262,17 @@ module.exports = function(grunt) {
 //                }]
 //            }
 //        }
+
+        // Watch for source changes.
+        watch: {
+            app: {
+                files: ['<%= src_dir %>/**'],
+                tasks: ['update'],
+                options: {
+                    spawn: false
+                }
+            }
+        }
     });
 
     // Load NPM tasks.
@@ -272,10 +283,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-ng-annotate');
 
     // Register tasks.
     grunt.registerTask('dev', ['jshint', 'clean', 'copy', 'less', 'concat']);
     grunt.registerTask('prod', ['jshint', 'clean', 'copy', 'less', 'concat', 'ngAnnotate', 'uglify']);
     grunt.registerTask('update', ['jshint', 'copy:app', 'less:app', 'concat:app', 'concat:app_index']);
+    grunt.registerTask('live', ['watch']);
 };
