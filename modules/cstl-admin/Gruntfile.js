@@ -147,7 +147,7 @@ module.exports = function(grunt) {
                     '<%= target_dir %>/css/font-awesome.min.css': '<%= lib_dir %>/font-awesome/less/font-awesome.less',
                     '<%= target_dir %>/css/highlight.min.css': '<%= lib_dir %>/highlight/less/highlight.less',
                     '<%= target_dir %>/css/jquery.min.css': '<%= lib_dir %>/jquery/less/jquery.less',
-                    '<%= target_dir %>/css/openlayers.min.css': '<%= lib_dir %>/ol3/ol-3.2.1/ol.less'
+                    '<%= target_dir %>/css/openlayers.min.css': '<%= lib_dir %>/ol3/ol-3.3.0/ol.less'
                 }
             }
         },
@@ -209,7 +209,7 @@ module.exports = function(grunt) {
                     '<%= target_dir %>/js/highlight.min.js': '<%= lib_dir %>/highlight/js/*.js',
                     '<%= target_dir %>/js/jquery.min.js': '<%= lib_dir %>/jquery/js/*.js',
                     '<%= target_dir %>/js/openlayers.min.js': [
-                        '<%= lib_dir %>/ol3/ol-3.2.1/ol.js',
+                        '<%= lib_dir %>/ol3/ol-3.3.0/ol.js',
                         '<%= lib_dir %>/ol3/js/olext/CQL.js'
                     ],
                     '<%= target_dir %>/js/sockjs.min.js': '<%= lib_dir %>/sockjs/js/*.js',
