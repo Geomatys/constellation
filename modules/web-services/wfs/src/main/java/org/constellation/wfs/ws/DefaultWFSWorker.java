@@ -952,6 +952,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                    "text/xml; subtype=gml/3.2".equals(request.getOutputFormat())   ||
                    "application/gml+xml; version=3.2".equals(request.getOutputFormat())) {
             gmlVersion = "3.2.1";
+        } else if ("application/json".equals(request.getOutputFormat())) {
+            gmlVersion = null;
         } else {
             throw new CstlServiceException("invalid outputFormat:" + request.getOutputFormat(), INVALID_PARAMETER_VALUE, "outputFormat");
         }

@@ -103,7 +103,7 @@ public final class WFSConstants {
     public final static MediaType GML_3_1_1 = new MediaType("text", "xml; subtype=gml/3.1.1");
 
     public final static MediaType GML_3_2_1 = new MediaType("application", "gml+xml; version=3.2");
-
+    
     public static final FilterCapabilities FILTER_CAPABILITIES_V110;
     static {
         final GeometryOperand[] geometryOperands = new GeometryOperand[4];
