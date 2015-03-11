@@ -75,7 +75,6 @@ import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.apache.sis.referencing.cs.DefaultCoordinateSystemAxis;
-import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
@@ -89,7 +88,6 @@ import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.PeriodUtilities;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wms.xml.AbstractBoundingBox;
 import org.geotoolkit.wms.xml.AbstractDimension;
 import org.geotoolkit.wms.xml.AbstractGeographicBoundingBox;
@@ -112,7 +110,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.EngineeringDatum;
 import org.opengis.referencing.operation.TransformException;
@@ -122,7 +119,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
 import javax.inject.Named;
-import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
@@ -141,12 +137,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.measure.NumberRange;
@@ -183,7 +179,6 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.createLegendURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
-import org.opengis.coverage.grid.GridCoverage;
 
 //Geoapi dependencies
 
@@ -212,7 +207,13 @@ import org.opengis.coverage.grid.GridCoverage;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
-
+    /**
+     * Temporal formatting for layer with TemporalCRS.
+     */
+    private static final DateFormat ISO8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    static {
+        ISO8601_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     /**
      * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
@@ -407,10 +408,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 dates = null;
             }
             if (dates != null && !(dates.isEmpty())) {
-                final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                final PeriodUtilities periodFormatter = new PeriodUtilities(df);
-                final String defaut = df.format(dates.last());
+                final PeriodUtilities periodFormatter = new PeriodUtilities(ISO8601_FORMAT);
+                final String defaut = ISO8601_FORMAT.format(dates.last());
                 dim = createDimension(queryVersion, "time", "ISO8601", defaut, null);
                 dim.setValue(periodFormatter.getDatesRespresentation(dates));
                 dimensions.add(dim);
@@ -468,13 +467,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
 
             final Object origin = layer.getOrigin();
-            
-            
+
             //-- execute only if it is a CoverageReference
             if (origin != null && origin instanceof CoverageReference) {
                 final CoverageReference covRef = (CoverageReference)origin;
                 GeneralGridGeometry gridGeom = null;
-                
+
                 //-- try to open coverage
                 try {
                     final GridCoverageReader covReader = covRef.acquireReader();
@@ -483,21 +481,21 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
-                
+
                 final CoordinateReferenceSystem crsLayer                       = gridGeom.getCoordinateReferenceSystem();
                 final Map<Integer, CoordinateReferenceSystem> indexedDecompose = ReferencingUtilities.indexedDecompose(crsLayer);
-                
+
                 //-- for each CRS part if crs is not 2D part or Temporal or elevation add value
                 for (Integer key : indexedDecompose.keySet()) {
                     final CoordinateReferenceSystem currentCrs = indexedDecompose.get(key);
-                    
+
                     //-- in this case we add value only if crs is one dimensional -> 1 dimension -> getAxis(0).
                     final CoordinateSystemAxis axis = currentCrs.getCoordinateSystem().getAxis(0);
-                    
+
                     if (!COMMONS_DIM.contains(axis.getDirection().name())) {
-                        
+
                         final NumberRange[] numberRanges = GridCombineIterator.extractAxisRanges(gridGeom, key);
-                        
+
                         final StringBuilder values = new StringBuilder();
                         for (int i = 0; i < numberRanges.length; i++) {
                             final NumberRange numberRange = numberRanges[i];
@@ -1014,17 +1012,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         // 2. VIEW
-        Envelope refEnv;
-        try {
-            final Date[] dates = new Date[2];
-            if (time != null && !time.isEmpty()) {
-                dates[0] = time.get(0);
-                dates[1] = time.get(time.size()-1);
-            }
-            refEnv = ReferencingUtilities.combine(getFI.getEnvelope2D(), dates, new Double[]{getFI.getElevation(), getFI.getElevation()});
-        } catch (TransformException ex) {
-            throw new CstlServiceException(ex);
-        }
+        final Envelope refEnv = buildRequestedViewEnvelope(getFI, layerRefs);
         final double azimuth = getFI.getAzimuth();
         final ViewDef vdef   = new ViewDef(refEnv,azimuth);
         try {
@@ -1275,29 +1263,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return handleExceptions(getMap, errorInImage, errorBlank, ex, NO_APPLICABLE_CODE, null);
         }
 
-
         // 2. VIEW
-        final Envelope refEnv;
-        try {
-            if (getMap.getEnvelope2D().getLowerCorner().getOrdinate(0) > getMap.getEnvelope2D().getUpperCorner().getOrdinate(0) ||
-                getMap.getEnvelope2D().getLowerCorner().getOrdinate(1) > getMap.getEnvelope2D().getUpperCorner().getOrdinate(1)) {
-                throw new CstlServiceException("BBOX parameter minimum is greater than the maximum", INVALID_PARAMETER_VALUE, KEY_BBOX.toLowerCase());
-            }
-            final List<Date> times = getMap.getTime();
-            final Date[] dates = new Date[2];
-            if (times != null && !times.isEmpty()) {
-                dates[0] = times.get(0);
-                dates[1] = times.get(times.size()-1);
-            }
-            refEnv = ReferencingUtilities.combine(getMap.getEnvelope2D(), dates, new Double[]{getMap.getElevation(), getMap.getElevation()});
-        } catch (TransformException ex) {
-            throw new CstlServiceException(ex);
-        }
-
-
+        final Envelope refEnv = buildRequestedViewEnvelope(getMap, layerRefs);
         final double azimuth = getMap.getAzimuth();
         final ViewDef vdef = new ViewDef(refEnv,azimuth);
-
 
         // 3. CANVAS
         final Dimension canvasDimension = getMap.getSize();
@@ -1331,6 +1300,103 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         return response;
+    }
+
+    /**
+     * Build request view envelope from request parameters and requested layers.
+     * Limitation : generate an envelope only with TIME and ELEVATION dimensions, all layers default values
+     * ar merge in one range instead of request each layers with his default value.
+     *
+     * TODO support cases defined in WMS spec. Annexe C and D. See CSTL-1245.
+     *
+     * @param request GetMap based request (GetMap and GetFeatureInfo)
+     * @param layers all layers requested
+     * @return view Envelope 2D, 3D or 4D depending of dimensions of layers and request.
+     * @throws CstlServiceException
+     */
+    public Envelope buildRequestedViewEnvelope(GetMap request, List<Data> layers) throws CstlServiceException {
+        final Envelope refEnv;
+        try {
+            //check envelope has positive span only if not a GetFeatureInfo request.
+            if (!(request instanceof GetFeatureInfo)) {
+                if (request.getEnvelope2D().getLowerCorner().getOrdinate(0) > request.getEnvelope2D().getUpperCorner().getOrdinate(0) ||
+                        request.getEnvelope2D().getLowerCorner().getOrdinate(1) > request.getEnvelope2D().getUpperCorner().getOrdinate(1)) {
+                    throw new CstlServiceException("BBOX parameter minimum is greater than the maximum", INVALID_PARAMETER_VALUE, KEY_BBOX.toLowerCase());
+                }
+            }
+
+            final Date[] time = new Date[2];
+            final List<Date> times = request.getTime();
+            if (times != null && !times.isEmpty()) {
+                time[0] = times.get(0);
+                time[1] = times.get(times.size()-1);
+            } else {
+
+                /*
+                    No time specified on request, find all defaultTime (last)
+                    of all layers and use defaults times to create request range.
+
+                    This behavior is not defined in WMS spec.
+                    It's an arbitrary behavior until getMap/getFeatureInfo request are refactored
+                    in CSTL-1245.
+                 */
+                final SortedSet<Date> defaultTimes = new TreeSet<>();
+                for (Data layer : layers) {
+                    try {
+                        ArrayList<Date> layerTimes = new ArrayList<>(layer.getAvailableTimes());
+                        if (layerTimes != null && !layerTimes.isEmpty()) {
+
+                            //get the last and previous date
+                            defaultTimes.add(layerTimes.get(layerTimes.size()-2));
+                        }
+                    } catch (DataStoreException e) {
+                        // no time found for layer, continue to next one
+                        LOGGER.log(Level.FINE, "Enable to extract layer available times for " + layer.getName(), e);
+                    }
+                }
+
+                if (!defaultTimes.isEmpty()) {
+                    // first and last layer defaults times
+                    time[0] = defaultTimes.first();
+                    time[1] = defaultTimes.last();
+                }
+            }
+
+            final Double[] vertical = new Double[2];
+            Double requestElevation = request.getElevation();
+            if (requestElevation != null) {
+                vertical[0] = vertical[1] = requestElevation;
+            } else {
+
+                //No time specified on request, find all defaultElevations (first)
+                //of all layers and use defaults elevations to create request range.
+                final SortedSet<Double> defaultElevations = new TreeSet<>();
+                for (Data layer : layers) {
+                    try {
+                        SortedSet<Number> layerElevations = layer.getAvailableElevations();
+                        if (layerElevations != null && !layerElevations.isEmpty()) {
+                            defaultElevations.add(layerElevations.first().doubleValue());
+                        }
+                    } catch (DataStoreException e) {
+                        // no time found for layer, continue to next one
+                        LOGGER.log(Level.FINE, "Enable to extract layer available times for " + layer.getName(), e);
+                    }
+                }
+
+                if (!defaultElevations.isEmpty()) {
+                    // first and last layer defaults times
+                    vertical[0] = defaultElevations.first();
+                    vertical[1] = defaultElevations.last();
+                }
+            }
+
+            // generate view envelope with 2D, time and vertical values.
+            // TODO add other dimensions (see CSTL-1245).
+            refEnv = ReferencingUtilities.combine(request.getEnvelope2D(), time, vertical);
+        } catch (TransformException ex) {
+            throw new CstlServiceException(ex);
+        }
+        return refEnv;
     }
 
     private PortrayalResponse handleExceptions(GetMap getMap, boolean errorInImage, boolean errorBlank,
@@ -1440,6 +1506,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return styles;
     }
 
+    /**
+     * Apply and transform recursively configuration {@link org.opengis.filter.Filter} and
+     * {@link org.constellation.configuration.DimensionDefinition} to all {@link org.geotoolkit.map.FeatureMapLayer} in
+     * input {@link org.geotoolkit.map.MapItem}.
+     * This method will only work on Feature layers.
+     *
+     * @param item root mapItem
+     * @param userLogin login used to get configuration.
+     */
     private void applyLayerFiltersAndDims(final MapItem item, final String userLogin){
 
         if(item instanceof FeatureMapLayer){
