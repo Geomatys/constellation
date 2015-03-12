@@ -96,11 +96,7 @@
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-feature-mapinfo</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>${spring-security.version}</version>
-        </dependency>
+       
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
@@ -141,6 +137,13 @@
             <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
+        
+         <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring-security.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.constellation.engine</groupId>
             <artifactId>cstl-indexing</artifactId>
