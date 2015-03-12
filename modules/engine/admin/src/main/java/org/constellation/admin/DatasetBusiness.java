@@ -38,6 +38,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
+import static org.constellation.admin.DataBusiness.LOGGER;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
 import org.constellation.admin.listener.DefaultDataBusinessListener;
@@ -131,6 +132,9 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      */
     @Inject
     protected IndexEngine indexEngine;
+    
+    @Inject
+    private org.constellation.security.SecurityManager securityManager;
 
 
     @Autowired(required = false)
@@ -186,11 +190,37 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      */
     @Override
     @Transactional
-    public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) {
+    public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) throws ConfigurationException {
         Dataset ds = new Dataset(identifier, owner, System.currentTimeMillis(), null);
         ds = datasetRepository.insert(ds);
         if (metadataId != null && metadataXml != null) {
-            final Metadata metadata = new Metadata(metadataId, metadataXml, null, ds.getId(), null, null);
+            final DefaultMetadata meta = unmarshallMetadata(metadataXml);
+            final Long dateStamp  = MetadataUtilities.extractDatestamp(meta);
+            final String title    = MetadataUtilities.extractTitle(meta);
+            final String parent   = MetadataUtilities.extractParent(meta);
+            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
+            Integer parentID      = null;   
+            if (parentRecord != null) {
+                parentID = parentRecord.getId();
+            }
+            String templateName = getTemplate(identifier, null);
+            final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            Integer userID = null;
+            if (user.isPresent()) {
+                userID = user.get().getId();
+            }
+            // calculate completion rating / elementary
+            Integer completion = null;
+            boolean elementary = false;
+            final Template template = Template.getInstance(templateName);
+            try {
+                completion = template.calculateMDCompletion(meta);
+                elementary = template.isElementary(meta);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+            }
+            final Metadata metadata = new Metadata(metadataId, metadataXml, null, ds.getId(), null, completion, 
+                    userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
             metadataRepository.create(metadata);
         }
         return ds;
@@ -289,15 +319,27 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         
         final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
         if (dataset != null) {
+            final Long dateStamp  = MetadataUtilities.extractDatestamp(metadata);
+            final String title    = MetadataUtilities.extractTitle(metadata);
+            final String parent   = MetadataUtilities.extractParent(metadata);
+            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
+            Integer parentID      = null;   
+            if (parentRecord != null) {
+                parentID = parentRecord.getId();
+            }
             
             // calculate completion rating
             List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
             Integer completion = null;
+            boolean elementary = false;
+            String templateName = null;
             if (!datas.isEmpty()) {
                 final String type = datas.get(0).getType();
-                final Template template = Template.getInstance(getTemplate(datasetIdentifier, type));
+                templateName = getTemplate(datasetIdentifier, type);
+                final Template template = Template.getInstance(templateName);
                 try {
                     completion = template.calculateMDCompletion(metadata);
+                    elementary = template.isElementary(metadata);
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
                 }
@@ -307,9 +349,20 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             if (metadataRecord != null) {
                 metadataRecord.setMetadataIso(metadataString);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
+                metadataRecord.setElementary(elementary);
+                metadataRecord.setTitle(title);
+                metadataRecord.setDatestamp(dateStamp);
+                metadataRecord.setParentIdentifier(parentID);
+                metadataRecord.setMdCompletion(completion);
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId(), null, completion);
+                final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+                Integer userID = null;
+                if (user.isPresent()) {
+                    userID = user.get().getId();
+                }
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId(), null, completion, 
+                        userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
                 metadataRepository.create(metadataRecord);
             }
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
@@ -334,13 +387,51 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                                final String metaId, final String metadataXml) throws ConfigurationException {
         final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
         if (dataset != null) {
+            final DefaultMetadata meta = unmarshallMetadata(metadataXml);
+            final Long dateStamp  = MetadataUtilities.extractDatestamp(meta);
+            final String title    = MetadataUtilities.extractTitle(meta);
+            final String parent   = MetadataUtilities.extractParent(meta);
+            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
+            Integer parentID      = null;   
+            if (parentRecord != null) {
+                parentID = parentRecord.getId();
+            }
+            // calculate completion rating
+            List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
+            Integer completion = null;
+            boolean elementary = false;
+            String templateName = null;
+            if (!datas.isEmpty()) {
+                final String type = datas.get(0).getType();
+                templateName = getTemplate(datasetIdentifier, type);
+                final Template template = Template.getInstance(templateName);
+                try {
+                    completion = template.calculateMDCompletion(meta);
+                    elementary = template.isElementary(meta);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+                }
+            }
+            
+            
             Metadata metadataRecord = metadataRepository.findByDatasetId(dataset.getId());
             if (metadataRecord != null) {
                 metadataRecord.setMetadataIso(metadataXml);
                 metadataRecord.setMetadataId(metaId);
+                metadataRecord.setElementary(elementary);
+                metadataRecord.setTitle(title);
+                metadataRecord.setDatestamp(dateStamp);
+                metadataRecord.setParentIdentifier(parentID);
+                metadataRecord.setMdCompletion(completion);
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metaId, metadataXml, null, dataset.getId(), null, null);
+                final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+                Integer userID = null;
+                if (user.isPresent()) {
+                    userID = user.get().getId();
+                }
+                metadataRecord = new Metadata(metaId, metadataXml, null, dataset.getId(), null, completion, 
+                        userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
                 metadataRepository.create(metadataRecord);
             }
         } else {

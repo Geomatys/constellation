@@ -19,6 +19,7 @@
 
 package org.constellation.admin;
 
+import com.google.common.base.Optional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.XML;
+import org.constellation.admin.util.MetadataUtilities;
 
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Dataset;
 import org.constellation.engine.register.Metadata;
@@ -39,6 +43,7 @@ import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.json.metadata.v2.Template;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -78,6 +83,12 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Inject
     protected MetadataRepository metadataRepository;
     
+    @Inject
+    private UserRepository userRepository;
+    
+    @Inject
+    private org.constellation.security.SecurityManager securityManager;
+    
     /**
      * Returns the xml as string representation of metadata for given metadata identifier.
      *
@@ -99,36 +110,49 @@ public class MetadataBusiness implements IMetadataBusiness {
     
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final String xml)  {
+    public boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
         final Metadata metadata = metadataRepository.findByMetadataId(metadataId);
+        
+        final DefaultMetadata meta;
+        try {
+            meta = (DefaultMetadata) unmarshallMetadata(xml);
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to unmarshalle metadata", ex);
+        }
+        final Long dateStamp      = MetadataUtilities.extractDatestamp(meta);
+        final String title        = MetadataUtilities.extractTitle(meta);
+        Integer parentID    = null;
+        final String parent   = MetadataUtilities.extractParent(meta);
+        Metadata parentRecord = metadataRepository.findByMetadataId(parent);
+        if (parentRecord != null) {
+            parentID = parentRecord.getId();
+        }
+        final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+        Integer userID = null;
+        if (user.isPresent()) {
+            userID = user.get().getId();
+        }
+        Integer completion  = null;
+        boolean elementary  = false;
+        String templateName = null;
+        
         if (metadata != null) {
             metadata.setMetadataId(metadataId);
             metadata.setMetadataIso(xml);
-            
-            // calculate completion rating
-            Integer completion = null;
-            if (metadata.getDatasetId() != null) {
-                final Dataset dataset = datasetRepository.findById(metadata.getDatasetId()); // calculate completion rating
-                try {
-                    List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
-                    if (!datas.isEmpty()) {
-                        final String type = datas.get(0).getType();
-                        final Template template = Template.getInstance(getDatasetTemplate(dataset.getIdentifier(), type));
-                        completion = template.calculateMDCompletion(unmarshallMetadata(xml));
-                    }
-                } catch (IOException | ConfigurationException | JAXBException ex) {
-                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
-                }
+            templateName = metadata.getProfile();
+            try {
+                // calculate completion rating
+                final Template template = Template.getInstance(templateName);
+                completion = template.calculateMDCompletion(meta);
+                elementary = template.isElementary(meta);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            if (metadata.getDataId() != null) {
-                final Data data = dataRepository.findById(metadata.getDataId());
-                try {
-                    final Template template = Template.getInstance(getDataTemplate(data.getName(), data.getNamespace(), data.getType()));
-                    completion = template.calculateMDCompletion(unmarshallMetadata(xml));
-                } catch (IOException | ConfigurationException | JAXBException ex) {
-                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
-                }
-            }
+            metadata.setElementary(elementary);
+            metadata.setTitle(title);
+            metadata.setDatestamp(dateStamp);
+            metadata.setParentIdentifier(parentID);
+            metadata.setMdCompletion(completion);
             metadata.setMdCompletion(completion);
             metadataRepository.update(metadata);
             return true;
@@ -138,41 +162,45 @@ public class MetadataBusiness implements IMetadataBusiness {
         // if the metadata is not yet present look for empty metadata object
         final Dataset dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (dataset != null) {
-            final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null, null);
-            Integer completion = null;
             try {
                 List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
                 if (!datas.isEmpty()) {
                     final String type = datas.get(0).getType();
-                    final Template template = Template.getInstance(getDatasetTemplate(dataset.getIdentifier(), type));
+                    templateName = getDatasetTemplate(dataset.getIdentifier(), type);
+                    final Template template = Template.getInstance(templateName);
                     completion = template.calculateMDCompletion(unmarshallMetadata(xml));
+                    elementary = template.isElementary(meta);
                 }
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            metadata2.setMdCompletion(completion);
+            final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null, completion, 
+                                    userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
             metadataRepository.create(metadata2);
             return true;
         }
+        
         // unsafe but no better way for now
         final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (data != null) {
-            final Metadata metadata2 = new Metadata(metadataId, xml, data.getId(), null, null, null);
             // calculate completion rating
-            Integer completion = null;
             try {
-                final Template template = Template.getInstance(getDataTemplate(data.getName(), data.getNamespace(), data.getType()));
+                templateName = getDataTemplate(data.getName(), data.getNamespace(), data.getType());
+                final Template template = Template.getInstance(templateName);
                 completion = template.calculateMDCompletion(unmarshallMetadata(xml));
+                elementary = template.isElementary(meta);
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            metadata2.setMdCompletion(completion);
+            final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null, completion, 
+                                    userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
             metadataRepository.create(metadata2);
             return true;
         }
         
         // save a new metadata (unliked to any data/dataset/service)
-        final Metadata metadata2 = new Metadata(metadataId, xml, null, null, null, null);
+        final Metadata metadata2 = new Metadata(metadataId, xml, null, null, null, completion, 
+                                    userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
         metadataRepository.create(metadata2);
         return true;
     }

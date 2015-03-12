@@ -195,7 +195,7 @@ public final class DefaultConfigurator implements Configurator {
     }
 
     private void checkDataUpdate(final org.constellation.engine.register.Provider pr,
-                                 final Integer datasetId) throws IOException{
+                                 final Integer datasetId) throws IOException, ConfigurationException{
         checkDataUpdate(pr,datasetId,true);
     }
 
@@ -208,7 +208,7 @@ public final class DefaultConfigurator implements Configurator {
      */
     private void checkDataUpdate(final org.constellation.engine.register.Provider pr,
                                  Integer datasetId,
-                                 final boolean createDatasetIfNull) throws IOException{
+                                 final boolean createDatasetIfNull) throws IOException, ConfigurationException{
 
         final List<org.constellation.engine.register.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
         final String type = pr.getType();

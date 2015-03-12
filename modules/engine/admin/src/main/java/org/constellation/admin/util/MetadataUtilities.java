@@ -80,6 +80,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opengis.metadata.identification.Identification;
 
 
 /**
@@ -571,5 +572,26 @@ public final class MetadataUtilities {
             sb.append(StringUtils.capitalize(s));
         }
         return sb.toString();
+    }
+    
+    public static Long extractDatestamp(final DefaultMetadata metadata){
+        if (metadata.getDateStamp() != null) {
+            return metadata.getDateStamp().getTime();
+        }
+        return null;
+    }
+    
+    public static String extractTitle(final DefaultMetadata metadata){
+        if (metadata.getIdentificationInfo() != null && !metadata.getIdentificationInfo().isEmpty()) {
+            final Identification id = metadata.getIdentificationInfo().iterator().next();
+            if (id.getCitation() != null && id.getCitation().getTitle() != null) {
+                return id.getCitation().getTitle().toString();
+            }
+        }
+        return null;
+    }
+    
+    public static String extractParent(final DefaultMetadata metadata){
+        return metadata.getParentIdentifier();
     }
 }

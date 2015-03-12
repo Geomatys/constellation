@@ -19,6 +19,7 @@
 package org.constellation.business;
 
 import java.util.List;
+import org.constellation.configuration.ConfigurationException;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -33,7 +34,7 @@ public interface IMetadataBusiness {
 
     List<String> getAllMetadata(final boolean includeService);
     
-    boolean updateMetadata(final String metadataId, final String xml);
+    boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException;
     
     List<String> getLinkedMetadataIDs(final String cswIdentifier);
     

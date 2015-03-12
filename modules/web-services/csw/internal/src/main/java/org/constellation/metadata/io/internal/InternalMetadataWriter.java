@@ -35,6 +35,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.constellation.admin.SpringHelper;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
@@ -102,7 +103,7 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
                 metadataBusiness.linkMetadataIDToCSW(identifier, id);
             }
             return success;
-        } catch (TransformerException ex) {
+        } catch (TransformerException | ConfigurationException ex) {
             throw new MetadataIoException("Unable to write the file.", ex, NO_APPLICABLE_CODE);
         }
     }

@@ -161,6 +161,10 @@ public class Template {
         reader.readTemplate(json, destination);
     }
     
+    public boolean isElementary(final Object metadata) throws IOException {
+       return false; //TODO
+    }
+    
     public int calculateMDCompletion(final Object metadata) throws IOException {
         final TemplateWriter writer = new TemplateWriter(standard);
         final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false);

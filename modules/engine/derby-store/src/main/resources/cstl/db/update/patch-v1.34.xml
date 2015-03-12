@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.34" author="glegal">
+        <addColumn schemaName="admin" tableName="metadata">
+            <column name="owner" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="metadata">
+            <column name="datestamp" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="metadata">
+            <column name="date_creation" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="metadata">
+            <column name="title" type="VARCHAR(500)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="metadata">
+            <column name="profile" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="metadata">
+            <column name="parent_identifier" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="metadata">
+            <column defaultValueBoolean="false" name="is_validated" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="metadata">
+            <column defaultValueBoolean="false" name="is_published" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <addColumn schemaName="admin" tableName="metadata">
+            <column defaultValueBoolean="false" name="elementary" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        
+        <addForeignKeyConstraint
+            baseTableSchemaName="admin" referencedTableSchemaName="admin"
+            constraintName="metadata_owner_fk" baseTableName="metadata"
+            baseColumnNames="owner" referencedTableName="cstl_user"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

@@ -124,6 +124,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
 import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.engine.register.Metadata;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.json.metadata.v2.Template;
@@ -314,11 +315,23 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         if (data != null) {
-            // calculate completion rating
+            final Long dateStamp  = MetadataUtilities.extractDatestamp(metadata);
+            final String title    = MetadataUtilities.extractTitle(metadata);
+            final String parent   = MetadataUtilities.extractParent(metadata);
+            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
+            Integer parentID      = null;   
+            if (parentRecord != null) {
+                parentID = parentRecord.getId();
+            }
+            
+            // calculate completion rating / elementary
             Integer completion = null;
-            final Template template = Template.getInstance(getTemplate(name, data.getType()));
+            boolean elementary = false;
+            String templateName = getTemplate(name, data.getType());
+            final Template template = Template.getInstance(templateName);
             try {
                 completion = template.calculateMDCompletion(metadata);
+                elementary = template.isElementary(metadata);
             } catch (IOException ex) {
                 LOGGER.warn("Error while calculating metadata completion", ex);
             }
@@ -327,9 +340,19 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord.setMetadataIso(metadataStr);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
                 metadataRecord.setMdCompletion(completion);
+                metadataRecord.setElementary(elementary);
+                metadataRecord.setTitle(title);
+                metadataRecord.setDatestamp(dateStamp);
+                metadataRecord.setParentIdentifier(parentID);
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataStr, data.getId(), null, null, completion);
+                final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+                Integer userID = null;
+                if (user.isPresent()) {
+                    userID = user.get().getId();
+                }
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataStr, data.getId(), null, null, completion, 
+                        userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
                 metadataRepository.create(metadataRecord);
             }    
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
@@ -819,12 +842,23 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
+            final Long dateStamp  = MetadataUtilities.extractDatestamp(metadata);
+            final String title    = MetadataUtilities.extractTitle(metadata);
+            final String parent   = MetadataUtilities.extractParent(metadata);
+            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
+            Integer parentID      = null;   
+            if (parentRecord != null) {
+                parentID = parentRecord.getId();
+            }
             
-            // calculate completion rating
+            // calculate completion rating / elementary
+            String templateName = getTemplate(dataName, data.getType());
             Integer completion = null;
-            final Template template = Template.getInstance(getTemplate(dataName, data.getType()));
+            boolean elementary = false;
+            final Template template = Template.getInstance(templateName);
             try {
                 completion = template.calculateMDCompletion(metadata);
+                elementary = template.isElementary(metadata);
             } catch (IOException ex) {
                 LOGGER.warn("Error while calculating metadata completion", ex);
             }
@@ -833,9 +867,20 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             if (metadataRecord != null) {
                 metadataRecord.setMetadataIso(metadataString);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
+                metadataRecord.setElementary(elementary);
+                metadataRecord.setTitle(title);
+                metadataRecord.setDatestamp(dateStamp);
+                metadataRecord.setParentIdentifier(parentID);
+                metadataRecord.setMdCompletion(completion);
                 metadataRepository.update(metadataRecord);
             } else {
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, data.getId(), null, null, completion);
+                final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+                Integer userID = null;
+                if (user.isPresent()) {
+                    userID = user.get().getId();
+                }
+                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, data.getId(), null, null, completion, 
+                        userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
                 metadataRepository.create(metadataRecord);
             }
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
