@@ -61,4 +61,6 @@ public interface LayerRepository {
     void updateLayerTitle(LayerSummary layerId);
 
     List<Layer> getLayersByLinkedStyle(final int styleId);
+
+    int getDataSet(String layer);
 }

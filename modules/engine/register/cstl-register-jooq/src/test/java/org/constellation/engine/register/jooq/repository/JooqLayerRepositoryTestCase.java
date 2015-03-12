@@ -32,4 +32,9 @@ public class JooqLayerRepositoryTestCase extends AbstractJooqTestTestCase {
     public void all() {
         dump(layerRepository.findAll());
     }
+    
+    @Test
+    public void getDataSet() {
+        layerRepository.getDataSet("zozo");
+    }
 }
