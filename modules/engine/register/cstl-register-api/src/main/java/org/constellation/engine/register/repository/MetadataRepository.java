@@ -37,6 +37,8 @@ public interface MetadataRepository {
     Metadata findByDatasetId(int id);
     
     Metadata findByMetadataId(String metadataId);
+
+    Metadata findById(int id);
     
     List<Metadata> findByCswId(Integer id);
 
