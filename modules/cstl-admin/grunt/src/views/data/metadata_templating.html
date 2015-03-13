@@ -112,7 +112,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.dateTypeCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -122,7 +121,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.maintenanceFrequencyCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -132,17 +130,15 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.localeCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
         <option value="">-----</option>
     </select>
-    <select ng-if="fieldObj.field.render.startsWith('extCodelist')"
+    <select ng-if="fieldObj.field.render.indexOf('extCodelist') == 0"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists[fieldObj.field.render] | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -158,7 +154,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="('theme.inspire.'+theme | translate) for theme in predefinedValues.inspireThemes | orderBy: '\'theme.inspire.\'+toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-change="updateIsoInspireSelectOneMenu(fieldObj.field.value,blockObj.block)"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
@@ -169,7 +164,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.topicCategoryCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -179,7 +173,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.topicCategoryCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -189,7 +182,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.cellGeometryCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -199,7 +191,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.pixelOrientationCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -209,23 +200,20 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-class="{'col-xs-8-important':fieldObj.field.multiplicity>1}"
-            ng-options="(code | translate) for code in codeLists.geometricObjectTypeCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;">
+            ng-options="(code | translate) for code in codeLists.geometricObjectTypeCodes | orderBy: 'toString() | translate'">
         <option value="">-----</option>
     </select>
     <select ng-if="fieldObj.field.render === 'KeywordType.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-class="{'col-xs-8-important':fieldObj.field.multiplicity>1}"
-            ng-options="(code | translate) for code in codeLists.keywordTypeCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;">
+            ng-options="(code | translate) for code in codeLists.keywordTypeCodes | orderBy: 'toString() | translate'">
         <option value="">-----</option>
     </select>
     <select ng-if="fieldObj.field.render === 'ReferenceSystemIdentifier.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="code for code in predefinedValues.referenceSystemIdentifier | orderBy: 'toString()'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -244,7 +232,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="format for format in predefinedValues.distributionFormat | orderBy: 'toString()'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -254,15 +241,13 @@
             class="form-control form-control-fix"
             ng-class="{'col-xs-8-important':fieldObj.field.multiplicity>1}"
             ng-model="fieldObj.field.value"
-            ng-options="(code | translate) for code in codeLists.classificationCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;">
+            ng-options="(code | translate) for code in codeLists.classificationCodes | orderBy: 'toString() | translate'">
         <option value="">-----</option>
     </select>
     <select ng-if="fieldObj.field.render === 'Specification.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="spec for spec in predefinedValues.specifications | orderBy: 'toString()'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -272,7 +257,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="('boolean.'+pass | translate) for pass in predefinedValues.resultPass | orderBy: '\'boolean.\'+toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -282,7 +266,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.roleCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -292,7 +275,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.coverageContentTypeCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -302,7 +284,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.restrictionCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -312,7 +293,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.dimensionNameTypeCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -322,17 +302,15 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.imagingConditionCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
         <option value="">-----</option>
     </select>
-        <select ng-if="fieldObj.field.render === 'ScopeCode.codelist'"
+    <select ng-if="fieldObj.field.render === 'ScopeCode.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="(code | translate) for code in codeLists.scopeCodes | orderBy: 'toString() | translate'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
@@ -342,7 +320,6 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="code for code in codeLists.characterSetCodes | orderBy: 'toString()'"
-            style="width:auto;min-width:165pt;height:30px;"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
