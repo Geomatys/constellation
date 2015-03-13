@@ -140,13 +140,15 @@ public class MetadataBusiness implements IMetadataBusiness {
             metadata.setMetadataId(metadataId);
             metadata.setMetadataIso(xml);
             templateName = metadata.getProfile();
-            try {
-                // calculate completion rating
-                final Template template = Template.getInstance(templateName);
-                completion = template.calculateMDCompletion(meta);
-                elementary = template.isElementary(meta);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+            if (templateName != null) {
+                try {
+                    // calculate completion rating
+                    final Template template = Template.getInstance(templateName);
+                    completion = template.calculateMDCompletion(meta);
+                    elementary = template.isElementary(meta);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+                }
             }
             metadata.setElementary(elementary);
             metadata.setTitle(title);
@@ -192,7 +194,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null, completion, 
+            final Metadata metadata2 = new Metadata(metadataId, xml, data.getId(), null, null, completion, 
                                     userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
             metadataRepository.create(metadata2);
             return true;
