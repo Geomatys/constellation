@@ -57,6 +57,7 @@ angular.module('CstlIndexApp', [
         $translateProvider.useLoader('$translatePartialLoader', {
             urlTemplate: 'i18n/{lang}/{part}.json'
         });
+        $translatePartialLoaderProvider.addPart('ui-menu');
         $translatePartialLoaderProvider.addPart('ui');
 
         $translateProvider.preferredLanguage('en');
