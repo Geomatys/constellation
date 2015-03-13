@@ -38,7 +38,6 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
-import static org.constellation.admin.DataBusiness.LOGGER;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
 import org.constellation.admin.listener.DefaultDataBusinessListener;
@@ -354,6 +353,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
                 metadataRecord.setMdCompletion(completion);
+                metadataRecord.setProfile(templateName);
                 metadataRepository.update(metadataRecord);
             } else {
                 final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
@@ -423,6 +423,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
                 metadataRecord.setMdCompletion(completion);
+                metadataRecord.setProfile(templateName);
                 metadataRepository.update(metadataRecord);
             } else {
                 final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());

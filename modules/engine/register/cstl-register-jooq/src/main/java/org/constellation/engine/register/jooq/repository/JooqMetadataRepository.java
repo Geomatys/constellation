@@ -48,6 +48,15 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                 .set(METADATA.METADATA_ISO, metadata.getMetadataIso())
                 .set(METADATA.SERVICE_ID, metadata.getServiceId())
                 .set(METADATA.MD_COMPLETION, metadata.getMdCompletion())
+                .set(METADATA.OWNER, metadata.getOwner())
+                .set(METADATA.PARENT_IDENTIFIER, metadata.getParentIdentifier())
+                .set(METADATA.DATESTAMP, metadata.getDatestamp())
+                .set(METADATA.DATE_CREATION, metadata.getDateCreation())
+                .set(METADATA.ELEMENTARY, metadata.isElementary())
+                .set(METADATA.IS_PUBLISHED, metadata.isIsPublished())
+                .set(METADATA.IS_VALIDATED, metadata.isIsValidated())
+                .set(METADATA.PROFILE, metadata.getProfile())
+                .set(METADATA.TITLE, metadata.getTitle())
                 .where(METADATA.ID.eq(metadata.getId())).execute();
         return metadata;
     }
@@ -61,6 +70,15 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setMetadataIso(metadata.getMetadataIso());
         metadataRecord.setServiceId(metadata.getServiceId());
         metadataRecord.setMdCompletion(metadata.getMdCompletion());
+        metadataRecord.setDateCreation(metadata.getDateCreation());
+        metadataRecord.setDatestamp(metadata.getDatestamp());
+        metadataRecord.setElementary(metadata.isElementary());
+        metadataRecord.setIsPublished(metadata.isIsPublished());
+        metadataRecord.setIsValidated(metadata.isIsPublished());
+        metadataRecord.setOwner(metadata.getOwner());
+        metadataRecord.setParentIdentifier(metadata.getParentIdentifier());
+        metadataRecord.setProfile(metadata.getProfile());
+        metadataRecord.setTitle(metadata.getTitle());
         metadataRecord.store();
         return metadataRecord.getId();
     }

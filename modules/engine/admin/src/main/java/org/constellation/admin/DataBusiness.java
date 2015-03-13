@@ -344,6 +344,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord.setTitle(title);
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
+                metadataRecord.setProfile(templateName);
                 metadataRepository.update(metadataRecord);
             } else {
                 final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
@@ -872,6 +873,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
                 metadataRecord.setMdCompletion(completion);
+                metadataRecord.setProfile(templateName);
                 metadataRepository.update(metadataRecord);
             } else {
                 final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
