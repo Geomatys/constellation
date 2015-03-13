@@ -276,7 +276,7 @@ public final class WFSConstants {
         operations.add(getCapabilities);
 
         final List<AbstractDomain> dfParameters = new ArrayList<>();
-        dfParameters.add(WFSXmlFactory.buildDomain("2.0.0", "outputFormat", Arrays.asList("application/gml+xml; version=3.2")));
+        dfParameters.add(WFSXmlFactory.buildDomain("2.0.0", "outputFormat", Arrays.asList("application/gml+xml; version=3.2", "application/schema+json")));
         dfParameters.add(serviceDomain);
         dfParameters.add(versionDomain);
         AbstractOperation describeFeatureType = WFSXmlFactory.buildOperation("2.0.0", dcps, dfParameters, null, "DescribeFeatureType");
@@ -284,7 +284,7 @@ public final class WFSConstants {
 
         final List<AbstractDomain> gfParameters = new ArrayList<>();
         gfParameters.add(WFSXmlFactory.buildDomain("2.0.0", "resultType",   Arrays.asList("results","hits")));
-        gfParameters.add(WFSXmlFactory.buildDomain("2.0.0", "outputFormat", Arrays.asList("application/gml+xml; version=3.2")));
+        gfParameters.add(WFSXmlFactory.buildDomain("2.0.0", "outputFormat", Arrays.asList("application/gml+xml; version=3.2", "application/json")));
         gfParameters.add(serviceDomain);
         gfParameters.add(versionDomain);
 

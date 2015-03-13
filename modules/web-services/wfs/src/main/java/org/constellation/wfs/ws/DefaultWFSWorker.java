@@ -474,7 +474,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public Schema describeFeatureType(final DescribeFeatureType request) throws CstlServiceException {
+    public Object describeFeatureType(final DescribeFeatureType request) throws CstlServiceException {
         LOGGER.log(logLevel, "DecribeFeatureType request proccesing");
         final long start = System.currentTimeMillis();
 
@@ -536,6 +536,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             } catch (SchemaException ex) {
                 LOGGER.log(Level.SEVERE, "error while excluding primary keys", ex);
             }
+        }
+        
+        if (request.getOutputFormat().equals("application/schema+json")) {
+            return new org.constellation.wfs.ws.rs.FeatureTypeList(types);
         }
         
         /*

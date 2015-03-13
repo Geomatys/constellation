@@ -1671,7 +1671,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         typeNames.add(new QName("http://www.opengis.net/gml/3.2", "Bridges"));
         DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
-        Schema result = worker.describeFeatureType(request);
+        Schema result = (Schema) worker.describeFeatureType(request);
 
         Schema ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/bridge2.xsd"));
 
@@ -1684,7 +1684,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         typeNames.add(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
         request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
-        result = worker.describeFeatureType(request);
+        result = (Schema) worker.describeFeatureType(request);
 
         ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling2.xsd"));
 
@@ -1698,7 +1698,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
             typeNames.add(new QName("http://www.opengis.net/sml/1.0", "System"));
             request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
-            result = worker.describeFeatureType(request);
+            result = (Schema) worker.describeFeatureType(request);
 
             ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system2.xsd"));
 

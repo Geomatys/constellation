@@ -73,7 +73,7 @@ public interface WFSWorker extends Worker {
      * @return A marshallable object representing a xsd.
      * @throws CstlServiceException
      */
-    Schema describeFeatureType(final DescribeFeatureType request) throws CstlServiceException;
+    Object describeFeatureType(final DescribeFeatureType request) throws CstlServiceException;
 
     /**
      * Allows retrieval of features from a web feature service.

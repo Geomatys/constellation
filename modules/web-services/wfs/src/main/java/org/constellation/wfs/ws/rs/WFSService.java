@@ -87,6 +87,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import javax.ws.rs.GET;
+import javax.ws.rs.PathParam;
 
 import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
 import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
@@ -113,8 +115,10 @@ import static org.constellation.wfs.ws.WFSConstants.STR_LIST_STORED_QUERIES;
 import static org.constellation.wfs.ws.WFSConstants.STR_LOCKFEATURE;
 import static org.constellation.wfs.ws.WFSConstants.STR_TRANSACTION;
 import static org.constellation.wfs.ws.WFSConstants.STR_XSD;
+import org.constellation.ws.WSEngine;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import org.geotoolkit.wfs.xml.WFSXmlFactory;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildAcceptFormat;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildAcceptVersion;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildBBOXFilter;
@@ -1052,5 +1056,27 @@ public class WFSService extends GridWebService<WFSWorker> {
             typeName = null;
         }
         return new GetXSD(typeName, targetNamespace, version);
+    }
+    
+    @GET
+    @Path("{version}/schema")
+    public Response processDescribeFeatureRestful(@PathParam("version") final String version) {
+        final DescribeFeatureType df = WFSXmlFactory.buildDecribeFeatureType(version, "WFS", null, null, null);
+        return treatIncomingRequest(df);
+    }
+    
+    @GET
+    @Path("{version}/{featureType}")
+    public Response processDescribeFeatureRestful(@PathParam("version") final String version, @PathParam("featureType") final String featureType) {
+        final List<QName> typenames = Arrays.asList(new QName(featureType));
+        final DescribeFeatureType df = WFSXmlFactory.buildDecribeFeatureType(version, "WFS", null, typenames, null);
+        return treatIncomingRequest(df);
+    }
+    
+     @GET
+    @Path("{version}/query")
+    public Response processListStoredQueriesRestful(@PathParam("version") final String version) {
+        final ListStoredQueries lsq = WFSXmlFactory.buildListStoredQueries(version, "WFS", null);
+        return treatIncomingRequest(lsq);
     }
 }
