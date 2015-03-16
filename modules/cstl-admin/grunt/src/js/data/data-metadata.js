@@ -555,43 +555,53 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          */
         $scope.updateIsoInspireSelectOneMenu = function(value,parentBlock) {
             if(value) {
-                var INSPIRE_ISO_MAP = {};
-                /* jshint ignore:start */
-                INSPIRE_ISO_MAP['Elevation'] = 'MD_TopicCategoryCode.elevation';
-                INSPIRE_ISO_MAP['Geology'] = 'MD_TopicCategoryCode.geoscientificInformation';
-                INSPIRE_ISO_MAP['Habitats and biotopes'] = 'MD_TopicCategoryCode.biota';
-                INSPIRE_ISO_MAP['Environmental monitoring facilities'] = 'MD_TopicCategoryCode.structure';
-                INSPIRE_ISO_MAP['Land cover'] = 'MD_TopicCategoryCode.imageryBaseMapsEarthCover';
-                INSPIRE_ISO_MAP['Species distribution'] = 'MD_TopicCategoryCode.biota';
-                INSPIRE_ISO_MAP['Land use'] = 'MD_TopicCategoryCode.planningCadastre';
-                INSPIRE_ISO_MAP['Area management/restriction/regulation zones and reporting units'] = 'MD_TopicCategoryCode.planningCadastre';
-                INSPIRE_ISO_MAP['Natural risk zones'] = 'MD_TopicCategoryCode.planningCadastre';
-                INSPIRE_ISO_MAP['Buildings'] = 'MD_TopicCategoryCode.structure';
-                INSPIRE_ISO_MAP['Oceanographic geographical features'] = 'MD_TopicCategoryCode.oceans';
-                INSPIRE_ISO_MAP['Bio-geographical regions'] = 'MD_TopicCategoryCode.biota';
-                INSPIRE_ISO_MAP['Sea regions'] = 'MD_TopicCategoryCode.oceans';
-                INSPIRE_ISO_MAP['Statistical units'] = 'MD_TopicCategoryCode.boundaries';
-                INSPIRE_ISO_MAP['Addresses'] = 'MD_TopicCategoryCode.location';
-                INSPIRE_ISO_MAP['Geographical names'] = 'MD_TopicCategoryCode.location';
-                INSPIRE_ISO_MAP['Hydrography'] = 'MD_TopicCategoryCode.inlandWaters';
-                INSPIRE_ISO_MAP['Cadastral parcels'] = 'MD_TopicCategoryCode.planningCadastre';
-                INSPIRE_ISO_MAP['Transport networks'] = 'MD_TopicCategoryCode.transportation';
-                INSPIRE_ISO_MAP['Protected sites'] = 'MD_TopicCategoryCode.environment';
-                INSPIRE_ISO_MAP['Administrative units'] = 'MD_TopicCategoryCode.boundaries';
-                INSPIRE_ISO_MAP['Orthoimagery'] = 'MD_TopicCategoryCode.imageryBaseMapsEarthCover';
-                INSPIRE_ISO_MAP['Meteorological geographical features'] = 'MD_TopicCategoryCode.climatologyMeteorologyAtmosphere';
-                INSPIRE_ISO_MAP['Atmospheric conditions'] = 'MD_TopicCategoryCode.climatologyMeteorologyAtmosphere';
-                INSPIRE_ISO_MAP['Agricultural and aquaculture facilities'] = 'MD_TopicCategoryCode.farming';
-                INSPIRE_ISO_MAP['Production and industrial facilities'] = 'MD_TopicCategoryCode.structure';
-                INSPIRE_ISO_MAP['Population distribution — demography'] = 'MD_TopicCategoryCode.society';
-                INSPIRE_ISO_MAP['Mineral resources'] = 'MD_TopicCategoryCode.economy';
-                INSPIRE_ISO_MAP['Human health and safety'] = 'MD_TopicCategoryCode.health';
-                INSPIRE_ISO_MAP['Utility and governmental services'] = 'MD_TopicCategoryCode.utilitiesCommunication';
-                INSPIRE_ISO_MAP['Soil'] = 'MD_TopicCategoryCode.geoscientificInformation';
-                INSPIRE_ISO_MAP['Energy resources'] = 'MD_TopicCategoryCode.economy';
-                /* jshint ignore:end */
-                var valueToSet=INSPIRE_ISO_MAP[value];
-                parentBlock.children[4].field.value=valueToSet;
+                var fieldIndexToChange = -1;
+                for(var i=0;i<parentBlock.children.length;i++){
+                    var fobj = parentBlock.children[i];
+                    if(fobj.field && fobj.field.render === 'ISO_INSPIRE.codelist') {
+                        fieldIndexToChange = i;
+                        break;
+                    }
+                }
+                if(fieldIndexToChange!==-1){
+                    var INSPIRE_ISO_MAP = {};
+                    /* jshint ignore:start */
+                    INSPIRE_ISO_MAP['Elevation'] = 'MD_TopicCategoryCode.elevation';
+                    INSPIRE_ISO_MAP['Geology'] = 'MD_TopicCategoryCode.geoscientificInformation';
+                    INSPIRE_ISO_MAP['Habitats and biotopes'] = 'MD_TopicCategoryCode.biota';
+                    INSPIRE_ISO_MAP['Environmental monitoring facilities'] = 'MD_TopicCategoryCode.structure';
+                    INSPIRE_ISO_MAP['Land cover'] = 'MD_TopicCategoryCode.imageryBaseMapsEarthCover';
+                    INSPIRE_ISO_MAP['Species distribution'] = 'MD_TopicCategoryCode.biota';
+                    INSPIRE_ISO_MAP['Land use'] = 'MD_TopicCategoryCode.planningCadastre';
+                    INSPIRE_ISO_MAP['Area management/restriction/regulation zones and reporting units'] = 'MD_TopicCategoryCode.planningCadastre';
+                    INSPIRE_ISO_MAP['Natural risk zones'] = 'MD_TopicCategoryCode.planningCadastre';
+                    INSPIRE_ISO_MAP['Buildings'] = 'MD_TopicCategoryCode.structure';
+                    INSPIRE_ISO_MAP['Oceanographic geographical features'] = 'MD_TopicCategoryCode.oceans';
+                    INSPIRE_ISO_MAP['Bio-geographical regions'] = 'MD_TopicCategoryCode.biota';
+                    INSPIRE_ISO_MAP['Sea regions'] = 'MD_TopicCategoryCode.oceans';
+                    INSPIRE_ISO_MAP['Statistical units'] = 'MD_TopicCategoryCode.boundaries';
+                    INSPIRE_ISO_MAP['Addresses'] = 'MD_TopicCategoryCode.location';
+                    INSPIRE_ISO_MAP['Geographical names'] = 'MD_TopicCategoryCode.location';
+                    INSPIRE_ISO_MAP['Hydrography'] = 'MD_TopicCategoryCode.inlandWaters';
+                    INSPIRE_ISO_MAP['Cadastral parcels'] = 'MD_TopicCategoryCode.planningCadastre';
+                    INSPIRE_ISO_MAP['Transport networks'] = 'MD_TopicCategoryCode.transportation';
+                    INSPIRE_ISO_MAP['Protected sites'] = 'MD_TopicCategoryCode.environment';
+                    INSPIRE_ISO_MAP['Administrative units'] = 'MD_TopicCategoryCode.boundaries';
+                    INSPIRE_ISO_MAP['Orthoimagery'] = 'MD_TopicCategoryCode.imageryBaseMapsEarthCover';
+                    INSPIRE_ISO_MAP['Meteorological geographical features'] = 'MD_TopicCategoryCode.climatologyMeteorologyAtmosphere';
+                    INSPIRE_ISO_MAP['Atmospheric conditions'] = 'MD_TopicCategoryCode.climatologyMeteorologyAtmosphere';
+                    INSPIRE_ISO_MAP['Agricultural and aquaculture facilities'] = 'MD_TopicCategoryCode.farming';
+                    INSPIRE_ISO_MAP['Production and industrial facilities'] = 'MD_TopicCategoryCode.structure';
+                    INSPIRE_ISO_MAP['Population distribution — demography'] = 'MD_TopicCategoryCode.society';
+                    INSPIRE_ISO_MAP['Mineral resources'] = 'MD_TopicCategoryCode.economy';
+                    INSPIRE_ISO_MAP['Human health and safety'] = 'MD_TopicCategoryCode.health';
+                    INSPIRE_ISO_MAP['Utility and governmental services'] = 'MD_TopicCategoryCode.utilitiesCommunication';
+                    INSPIRE_ISO_MAP['Soil'] = 'MD_TopicCategoryCode.geoscientificInformation';
+                    INSPIRE_ISO_MAP['Energy resources'] = 'MD_TopicCategoryCode.economy';
+                    /* jshint ignore:end */
+                    var valueToSet=INSPIRE_ISO_MAP[value];
+                    parentBlock.children[fieldIndexToChange].field.value=valueToSet;
+                }
             }
         };
 
