@@ -65,6 +65,7 @@
             <span class="label-data">{{jsonObject.field.name | translate}}</span>
             <span ng-if="!isDateField(jsonObject.field.render) && !isCodelistField(jsonObject.field.render)"
                   class="data"
+                  ng-style="jsonObject.field.render == 'web' ? {'max-width':'500px'}:{}"
                   style="word-wrap: break-word;">{{jsonObject.field.value}}</span>
             <span ng-if="isDateField(jsonObject.field.render)"
                   class="data"
