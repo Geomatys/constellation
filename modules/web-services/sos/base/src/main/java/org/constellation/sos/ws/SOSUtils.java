@@ -81,7 +81,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.text.DateFormatter;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
@@ -397,8 +396,8 @@ public final class SOSUtils {
      * we have to add empty token until we got the next phenomenon data.
      *
      * @param value the datablock builder.
-     * @param phenomenonIndex the current phenomenon index.
-     * @param phenomenonName the name of the current phenomenon.
+     * @param currentIndex the current phenomenon index.
+     * @param searchedField the name of the current phenomenon.
      *
      * @return the updated phenomenon index.
      */
@@ -574,7 +573,7 @@ public final class SOSUtils {
             if (geom != null) {
                 Geometry jtsGeometry = GeometrytoJTS.toJTS(geom);
                 // reproject to CRS:84
-                final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(), WGS84);
+                final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(true), WGS84);
                 return Arrays.asList(JTS.transform(jtsGeometry, mt));
             }
         } else {
