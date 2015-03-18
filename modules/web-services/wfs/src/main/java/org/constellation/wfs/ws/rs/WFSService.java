@@ -87,7 +87,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 
 import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
@@ -115,9 +118,12 @@ import static org.constellation.wfs.ws.WFSConstants.STR_LIST_STORED_QUERIES;
 import static org.constellation.wfs.ws.WFSConstants.STR_LOCKFEATURE;
 import static org.constellation.wfs.ws.WFSConstants.STR_TRANSACTION;
 import static org.constellation.wfs.ws.WFSConstants.STR_XSD;
-import org.constellation.ws.WSEngine;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import org.geotoolkit.wfs.xml.InsertElement;
+import org.geotoolkit.wfs.xml.Property;
+import org.geotoolkit.wfs.xml.ReplaceElement;
+import org.geotoolkit.wfs.xml.UpdateElement;
 import org.geotoolkit.wfs.xml.WFSXmlFactory;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildAcceptFormat;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildAcceptVersion;
@@ -138,6 +144,7 @@ import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildSections;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildSortBy;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildStoredQuery;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildTransaction;
+import org.w3c.dom.Node;
 
 // JAXB dependencies
 // jersey dependencies
@@ -473,7 +480,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         final Sections sections;
         final String section = getParameter(SECTIONS_PARAMETER, false);
         if (section != null && !section.equalsIgnoreCase("All")) {
-            final List<String> requestedSections = new ArrayList<String>();
+            final List<String> requestedSections = new ArrayList<>();
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
@@ -523,6 +530,8 @@ public class WFSService extends GridWebService<WFSWorker> {
             }
         }
 
+        final Integer startIndex = parseOptionalIntegerParam("StartIndex");
+
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
@@ -550,7 +559,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
 
         final String storedQuery = getParameter("storedquery_id", false);
-        final List<Parameter> parameters = new ArrayList<Parameter>();
+        final List<Parameter> parameters = new ArrayList<>();
         if (storedQuery != null) {
             // extract stored query params
             mandatory = false;
@@ -587,49 +596,17 @@ public class WFSService extends GridWebService<WFSWorker> {
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
         final String srsName = getParameter("srsName", false);
-
-        // TODO handle multiple properties and handle prefixed properties
-        String sortByParam = getParameter("sortBy", false);
-        final SortBy sortBy;
-        if (sortByParam != null) {
-            if (sortByParam.indexOf(':') != -1) {
-                sortByParam = sortByParam.substring(sortByParam.indexOf(':') + 1);
-            }
-            //we get the order
-            final SortOrder order;
-            if (sortByParam.indexOf(' ') != -1) {
-                final char cOrder = sortByParam.charAt(sortByParam.length() -1);
-                sortByParam = sortByParam.substring(0, sortByParam.indexOf(' '));
-                if (cOrder == 'D') {
-                    order = SortOrder.DESCENDING;
-                } else {
-                    order = SortOrder.ASCENDING;
-                }
-            } else {
-                order = SortOrder.ASCENDING;
-            }
-            sortBy =  buildSortBy(version, sortByParam, order);
-        } else {
-            sortBy = null;
-        }
-
-        final String propertyNameParam = getParameter("propertyName", false);
-        final List<String> propertyNames = new ArrayList<String>();
-        if (propertyNameParam != null) {
-            final StringTokenizer tokens = new StringTokenizer(propertyNameParam, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                propertyNames.add(token);
-            }
-        }
-
+        final SortBy sortBy = parseSortByParameter(version);
+        
+        final List<String> propertyNames = parseCommaSeparatedParameter("propertyName");
+        
         if (featureId != null) {
             final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, featureId);
             final Query query = buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
-            return buildGetFeature(version, service, handle, maxFeature, query, resultType, outputFormat);
+            return buildGetFeature(version, service, handle, startIndex, maxFeature, query, resultType, outputFormat);
         } else if (storedQuery != null) {
             final StoredQuery query = buildStoredQuery(version, storedQuery, handle, parameters);
-            return buildGetFeature(version, service, handle, maxFeature, query, resultType, outputFormat);
+            return buildGetFeature(version, service, handle, startIndex, maxFeature, query, resultType, outputFormat);
         }
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
@@ -641,7 +618,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
-            prefixMapping = new HashMap<String, String>();
+            prefixMapping = new HashMap<>();
         }
 
         final String bbox = getParameter("bbox", false);
@@ -671,26 +648,73 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         try {
             final Query query   = buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
-            final GetFeature gf = buildGetFeature(version, service, handle, maxFeature, query, resultType, outputFormat);
+            final GetFeature gf = buildGetFeature(version, service, handle, startIndex, maxFeature, query, resultType, outputFormat);
             gf.setPrefixMapping(prefixMapping);
             return gf;
         } catch (IllegalArgumentException ex) {
             throw new CstlServiceException(ex);
         }
     }
-
-    private GetPropertyValue createNewGetPropertyValueRequest(final Worker worker) throws CstlServiceException {
-        Integer maxFeature = null;
-        final String max = getParameter("maxfeatures", false);
+    
+    private SortBy parseSortByParameter(String version) {
+        // TODO handle multiple properties and handle prefixed properties
+        String sortByParam = getSafeParameter("sortBy");
+        final SortBy sortBy;
+        if (sortByParam != null) {
+            if (sortByParam.indexOf(':') != -1) {
+                sortByParam = sortByParam.substring(sortByParam.indexOf(':') + 1);
+            }
+            //we get the order
+            final SortOrder order;
+            if (sortByParam.indexOf(' ') != -1) {
+                final char cOrder = sortByParam.charAt(sortByParam.length() -1);
+                sortByParam = sortByParam.substring(0, sortByParam.indexOf(' '));
+                if (cOrder == 'D') {
+                    order = SortOrder.DESCENDING;
+                } else {
+                    order = SortOrder.ASCENDING;
+                }
+            } else {
+                order = SortOrder.ASCENDING;
+            }
+            sortBy =  buildSortBy(version, sortByParam, order);
+        } else {
+            sortBy = null;
+        }
+        return sortBy;
+    }
+    
+    private Integer parseOptionalIntegerParam(String paramName) throws CstlServiceException {
+        Integer result = null;
+        final String max = getParameter(paramName, false);
         if (max != null) {
             try {
-                maxFeature = Integer.parseInt(max);
+                result = Integer.parseInt(max);
             } catch (NumberFormatException ex) {
-                throw new CstlServiceException("Unable to parse the integer maxfeatures parameter" + max,
-                                                  INVALID_PARAMETER_VALUE, "MaxFeatures");
+                throw new CstlServiceException("Unable to parse the integer " + paramName + " parameter" + max,
+                                                  INVALID_PARAMETER_VALUE, paramName);
             }
 
         }
+        return result;
+    }
+    
+    private List<String> parseCommaSeparatedParameter(String paramName) throws CstlServiceException {
+        final String propertyNameParam = getParameter(paramName, false);
+        final List<String> results = new ArrayList<>();
+        if (propertyNameParam != null) {
+            final StringTokenizer tokens = new StringTokenizer(propertyNameParam, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                results.add(token);
+            }
+        }
+        return results;
+    }
+
+    private GetPropertyValue createNewGetPropertyValueRequest(final Worker worker) throws CstlServiceException {
+        final Integer maxFeature = parseOptionalIntegerParam("maxfeatures");
+        final Integer startIndex = parseOptionalIntegerParam("StartIndex");
         final String service = getParameter(SERVICE_PARAMETER, true);
         final String version = getParameter(VERSION_PARAMETER, true);
         final String handle  = getParameter(HANDLE,  false);
@@ -772,8 +796,9 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
 
         if (featureId != null) {
-            final Query query = buildQuery(version, null, typeNames, featureVersion, srsName, sortBy, propertyNames);
-            return buildGetPropertyValue(version, service, handle, maxFeature, featureId, query, resultType, outputFormat, valueReference);
+            final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, featureId);
+            final Query query = buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
+            return buildGetPropertyValue(version, service, handle, startIndex, maxFeature, query, resultType, outputFormat, valueReference);
         }
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
@@ -785,7 +810,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
-            prefixMapping = new HashMap<String, String>();
+            prefixMapping = new HashMap<>();
         }
 
         final String bbox = getParameter("bbox", false);
@@ -814,7 +839,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
 
         final Query query   = buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
-        final GetPropertyValue gf = buildGetPropertyValue(version, service, handle, maxFeature, null, query, resultType, outputFormat, valueReference);
+        final GetPropertyValue gf = buildGetPropertyValue(version, service, handle, startIndex, maxFeature, query, resultType, outputFormat, valueReference);
         gf.setPrefixMapping(prefixMapping);
         return gf;
     }
@@ -866,7 +891,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
-            prefixMapping = new HashMap<String, String>();
+            prefixMapping = new HashMap<>();
         }
 
         // TODO
@@ -902,7 +927,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
-            prefixMapping = new HashMap<String, String>();
+            prefixMapping = new HashMap<>();
         }
 
         // TODO
@@ -923,7 +948,7 @@ public class WFSService extends GridWebService<WFSWorker> {
      *                              or if a prefix is not bounded to a namespace in the mapping map.
      */
     private List<QName> extractTypeName(final String typeName, final Map<String, String> mapping) throws CstlServiceException {
-        final List<QName> typeNames = new ArrayList<QName>();
+        final List<QName> typeNames = new ArrayList<>();
         if (typeName != null) {
             final StringTokenizer tokens = new StringTokenizer(typeName, ",;");
             while (tokens.hasMoreTokens()) {
@@ -976,7 +1001,7 @@ public class WFSService extends GridWebService<WFSWorker> {
                 }
             }
             final StringReader sr                   = new StringReader(list.get(0));
-            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+            final Map<String, String> prefixMapping = new LinkedHashMap<>();
             final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(sr);
             final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
                     new Class[]{XMLEventReader.class}, new PrefixMappingInvocationHandler(rootEventReader, prefixMapping));
@@ -1059,6 +1084,35 @@ public class WFSService extends GridWebService<WFSWorker> {
     }
     
     @GET
+    @Path("{version}")
+    public Response processGetCapabilitiesRestful(@PathParam("version") final String version) throws CstlServiceException {
+        final Sections sections;
+        final String section = getSafeParameter(SECTIONS_PARAMETER);
+        if (section != null && !section.equalsIgnoreCase("All")) {
+            final List<String> requestedSections = new ArrayList<>();
+            final StringTokenizer tokens = new StringTokenizer(section, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                if (SectionsType.getExistingSections().contains(token)){
+                    requestedSections.add(token);
+                } else {
+                    throw new CstlServiceException("The section " + token + " does not exist",
+                                                  INVALID_PARAMETER_VALUE, "Sections");
+                }
+            }
+            sections = buildSections(version, requestedSections);
+        } else {
+            sections = null;
+
+        }
+        final List<String> versions = new ArrayList<>();
+        versions.add(version);
+        final AcceptVersions acceptVersions = buildAcceptVersion(version, versions);
+        final GetCapabilities gc = WFSXmlFactory.buildGetCapabilities(version, acceptVersions, sections, null, null, "WFS");
+        return treatIncomingRequest(gc);
+    }
+    
+    @GET
     @Path("{version}/schema")
     public Response processDescribeFeatureRestful(@PathParam("version") final String version) {
         final DescribeFeatureType df = WFSXmlFactory.buildDecribeFeatureType(version, "WFS", null, null, null);
@@ -1067,13 +1121,287 @@ public class WFSService extends GridWebService<WFSWorker> {
     
     @GET
     @Path("{version}/{featureType}")
-    public Response processDescribeFeatureRestful(@PathParam("version") final String version, @PathParam("featureType") final String featureType) {
-        final List<QName> typenames = Arrays.asList(new QName(featureType));
-        final DescribeFeatureType df = WFSXmlFactory.buildDecribeFeatureType(version, "WFS", null, typenames, null);
-        return treatIncomingRequest(df);
+    public Response processFeatureTypeRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType) throws CstlServiceException {
+        final Object request;
+        if (featureType.endsWith(".xsd") || featureType.endsWith(".jsd")) {
+            featureType = featureType.substring(0, featureType.length() - 4);
+            final List<QName> typeNames = Arrays.asList(new QName(featureType));
+            String outFormat = null;
+            if (featureType.endsWith(".jsd")) {
+                outFormat = "application/schema+json";
+            }
+                    
+            request = WFSXmlFactory.buildDecribeFeatureType(version, "WFS", null, typeNames, outFormat);
+        } else {
+            // TODO namespace param
+            final SortBy sortBy = parseSortByParameter(version);
+            String srsName       = getSafeParameter("srsName");
+            String resultTypeStr = getSafeParameter("resultType");
+            ResultTypeType resultType = ResultTypeType.RESULTS;
+            if (resultTypeStr != null) {
+                resultType = ResultTypeType.fromValue(resultTypeStr);
+            }
+            final Integer maxFeature = parseOptionalIntegerParam("count");
+            final Integer startIndex = parseOptionalIntegerParam("startIndex");
+            final String outputFormat = getSafeParameter("outputFormat");
+            final List<String> propertyNames = parseCommaSeparatedParameter("propertyName");
+            final List<QName> typeNames = Arrays.asList(new QName(featureType));
+            final Object xmlFilter  = getComplexParameter(FILTER, false);
+            XMLFilter filter;
+            final Map<String, String> prefixMapping;
+            if (xmlFilter instanceof XMLFilter) {
+                filter = (XMLFilter) xmlFilter;
+                prefixMapping = filter.getPrefixMapping();
+            } else {
+                filter = null;
+                prefixMapping = new HashMap<>();
+            }
+            
+            final Query query   = buildQuery(version, filter, typeNames, null, srsName, sortBy, propertyNames);
+            final GetFeature gf = WFSXmlFactory.buildGetFeature(version, "WFS", null, startIndex, maxFeature, query, resultType, outputFormat);
+            gf.setPrefixMapping(prefixMapping);
+            request = gf;
+        }
+        return treatIncomingRequest(request);
     }
     
-     @GET
+    @POST
+    @Path("{version}/{featureType}")
+    public Response processTransactionInsertRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType,
+            final Node in) throws CstlServiceException {
+        final String srsName = getSafeParameter("srsName");
+        final InsertElement elem = WFSXmlFactory.buildInsertElement(version, null, srsName, in); 
+        final Transaction request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, elem);
+        return treatIncomingRequest(request);
+    }
+    
+    @PUT
+    @Path("{version}/{featureType}")
+    public Response processTransactionReplaceRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType,
+            final Node in) throws CstlServiceException {
+        final String srsName = getSafeParameter("srsName");
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+        final XMLFilter filter;
+        final Map<String, String> prefixMapping;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
+        } else {
+            filter = null;
+            prefixMapping = new HashMap<>();
+        }
+        final ReplaceElement elem = WFSXmlFactory.buildReplaceElement(version, null, srsName, filter, in); 
+        final Transaction request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, elem);
+        request.setPrefixMapping(prefixMapping);
+        return treatIncomingRequest(request);
+    }
+    
+    @DELETE
+    @Path("{version}/{featureType}")
+    public Response processTransactionDeleteRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType) throws CstlServiceException {
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+        final XMLFilter filter;
+        final Map<String, String> prefixMapping;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
+        } else {
+            filter = null;
+            prefixMapping = new HashMap<>();
+        }
+        final DeleteElement elem = WFSXmlFactory.buildDeleteElement(version, filter, null, new QName(featureType)); 
+        final Transaction request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, elem);
+        request.setPrefixMapping(prefixMapping);
+        return treatIncomingRequest(request);
+    }
+    
+    @GET
+    @Path("{version}/{featureType}/{feature}")
+    public Response processGetFeatureRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType, 
+            @PathParam("feature") String feature) throws CstlServiceException {
+        final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, feature);
+        // TODO namespace param
+        final SortBy sortBy = parseSortByParameter(version);
+        final String srsName = getSafeParameter("srsName");
+        final String outputFormat = getSafeParameter("outputFormat");
+        String resultTypeStr = getSafeParameter("resultType");
+        ResultTypeType resultType = ResultTypeType.RESULTS;
+        if (resultTypeStr != null) {
+            resultType = ResultTypeType.fromValue(resultTypeStr);
+        }
+        final Integer maxFeature = parseOptionalIntegerParam("count");
+        final Integer startIndex = parseOptionalIntegerParam("startIndex");
+        final List<String> propertyNames = parseCommaSeparatedParameter("propertyName");
+        final List<QName> typeNames = Arrays.asList(new QName(featureType));
+        final Query query = buildQuery(version, filter, typeNames, null, srsName, sortBy, propertyNames);
+        final Object request = WFSXmlFactory.buildGetFeature(version, "WFS", null, startIndex, maxFeature, query, resultType, outputFormat);
+        return treatIncomingRequest(request);
+    }
+    
+    @PUT
+    @Path("{version}/{featureType}/{feature}")
+    public Response processTransactionReplaceRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType, 
+            @PathParam("feature") String feature, final Node in) throws CstlServiceException {
+        final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, feature);
+        final String srsName = getSafeParameter("srsName");
+        final ReplaceElement elem = WFSXmlFactory.buildReplaceElement(version, null, srsName, filter, in); 
+        final Transaction request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, elem);
+        return treatIncomingRequest(request);
+    }
+    
+    @DELETE
+    @Path("{version}/{featureType}/{feature}")
+    public Response processTransactionDeleteRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType, 
+            @PathParam("feature") String feature) throws CstlServiceException {
+        final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, feature);
+        final DeleteElement elem = WFSXmlFactory.buildDeleteElement(version, filter, null, new QName(featureType)); 
+        final Transaction request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, elem);
+        return treatIncomingRequest(request);
+    }
+    
+    @GET
+    @Path("{version}/{featureType}/property/{prop}")
+    public Response processGetPropertyValueRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType,
+            @PathParam("prop") String prop) throws CstlServiceException {
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+        final XMLFilter filter;
+        final Map<String, String> prefixMapping;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
+        } else {
+            filter = null;
+            prefixMapping = new HashMap<>();
+        }
+        // TODO namespace param
+        final SortBy sortBy = parseSortByParameter(version);
+        final String srsName = getSafeParameter("srsName");
+        final String outputFormat = getSafeParameter("outputFormat");
+        String resultTypeStr = getSafeParameter("resultType");
+        ResultTypeType resultType = ResultTypeType.RESULTS;
+        if (resultTypeStr != null) {
+            resultType = ResultTypeType.fromValue(resultTypeStr);
+        }
+        final Integer maxFeature = parseOptionalIntegerParam("count");
+        final Integer startIndex = parseOptionalIntegerParam("startIndex");
+        final List<QName> typeNames = Arrays.asList(new QName(featureType));
+        final List<String> propNames = Arrays.asList(prop);
+        final Query query = buildQuery(version, filter, typeNames, null, srsName, sortBy, propNames);
+        final GetPropertyValue request = WFSXmlFactory.buildGetPropertyValue(version, "WFS", null, startIndex, maxFeature, query, resultType, outputFormat, prop);
+        request.setPrefixMapping(prefixMapping);
+        return treatIncomingRequest(request);
+    }
+    
+    @PUT
+    @Path("{version}/{featureType}/property/{prop}")
+    public Response processTransactionUpdateRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType, 
+            @PathParam("prop") String prop, final InputStream in) throws CstlServiceException, JAXBException {
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+        final XMLFilter filter;
+        final Map<String, String> prefixMapping;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
+        } else {
+            filter = null;
+            prefixMapping = new HashMap<>();
+        }
+        final String srsName = getSafeParameter("srsName");
+        
+        /**
+         * getting the value is a little bit tricky. use inputFormat?
+         */
+        final Unmarshaller um = getMarshallerPool().acquireUnmarshaller();
+        final Object obj = um.unmarshal(in);
+        getMarshallerPool().recycle(um);
+        
+        final Property property = WFSXmlFactory.buildProperty(version, prop, obj);
+        final UpdateElement update = WFSXmlFactory.buildUpdateElement(version, null, srsName, filter, new QName(featureType), Arrays.asList(property));
+        final Transaction request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, update);
+        request.setPrefixMapping(prefixMapping);
+        return treatIncomingRequest(request);
+    }
+    
+    @DELETE
+    @Path("{version}/{featureType}/property/{prop}")
+    public Response processTransactionUpdateNullRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType, 
+            @PathParam("prop") String prop) throws CstlServiceException, JAXBException {
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+        final XMLFilter filter;
+        final Map<String, String> prefixMapping;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
+        } else {
+            filter = null;
+            prefixMapping = new HashMap<>();
+        }
+        final String srsName = getSafeParameter("srsName");
+        
+        final Property property = WFSXmlFactory.buildProperty(version, prop, null);
+        final UpdateElement update = WFSXmlFactory.buildUpdateElement(version, null, srsName, filter, new QName(featureType), Arrays.asList(property));
+        final Transaction request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, update);
+        request.setPrefixMapping(prefixMapping);
+        return treatIncomingRequest(request);
+    }
+    
+    @GET
+    @Path("{version}/{featureType}/{feature}/{prop}")
+    public Response processGetPropertyValueRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType, 
+            @PathParam("feature") String feature, @PathParam("prop") String prop) throws CstlServiceException {
+        final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, feature);
+        // TODO namespace param
+        final SortBy sortBy = parseSortByParameter(version);
+        final String srsName = getSafeParameter("srsName");
+        final String outputFormat = getSafeParameter("outputFormat");
+        String resultTypeStr = getSafeParameter("resultType");
+        ResultTypeType resultType = ResultTypeType.RESULTS;
+        if (resultTypeStr != null) {
+            resultType = ResultTypeType.fromValue(resultTypeStr);
+        }
+        final Integer maxFeature = parseOptionalIntegerParam("count");
+        final Integer startIndex = parseOptionalIntegerParam("startIndex");
+        final List<QName> typeNames = Arrays.asList(new QName(featureType));
+        final List<String> propNames = Arrays.asList(prop);
+        final Query query = buildQuery(version, filter, typeNames, null, srsName, sortBy, propNames);
+        final Object request = WFSXmlFactory.buildGetPropertyValue(version, "WFS", null, startIndex, maxFeature, query, resultType, outputFormat, prop);
+        return treatIncomingRequest(request);
+    }
+    
+    @PUT
+    @Path("{version}/{featureType}/{feature}/{prop}")
+    public Response processTransactionUpdateRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType, 
+            @PathParam("feature") String feature, @PathParam("prop") String prop, final InputStream in) throws CstlServiceException, JAXBException {
+        final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, feature);
+        final String srsName = getSafeParameter("srsName");
+        
+        /**
+         * getting the value is a little bit tricky. use inputFormat?
+         */
+        final Unmarshaller um = getMarshallerPool().acquireUnmarshaller();
+        final Object obj = um.unmarshal(in);
+        getMarshallerPool().recycle(um);
+        
+        final Property property = WFSXmlFactory.buildProperty(version, prop, obj);
+        final UpdateElement update = WFSXmlFactory.buildUpdateElement(version, null, srsName, filter, new QName(featureType), Arrays.asList(property));
+        final Object request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, update);
+        return treatIncomingRequest(request);
+    }
+    
+    @DELETE
+    @Path("{version}/{featureType}/{feature}/{prop}")
+    public Response processTransactionUpdateNullRestful(@PathParam("version") final String version, @PathParam("featureType") String featureType, 
+            @PathParam("feature") String feature, @PathParam("prop") String prop) throws CstlServiceException, JAXBException {
+        final XMLFilter filter = FilterXmlFactory.buildFeatureIDFilter(version, feature);
+        final String srsName = getSafeParameter("srsName");
+        
+        final Property property = WFSXmlFactory.buildProperty(version, prop, null);
+        final UpdateElement update = WFSXmlFactory.buildUpdateElement(version, null, srsName, filter, new QName(featureType), Arrays.asList(property));
+        final Object request = WFSXmlFactory.buildTransaction(version, "WFS", null, AllSomeType.ALL, update);
+        return treatIncomingRequest(request);
+    }
+    
+    @GET
     @Path("{version}/query")
     public Response processListStoredQueriesRestful(@PathParam("version") final String version) {
         final ListStoredQueries lsq = WFSXmlFactory.buildListStoredQueries(version, "WFS", null);

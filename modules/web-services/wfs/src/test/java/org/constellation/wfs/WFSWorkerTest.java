@@ -1386,7 +1386,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
         List<PropertyType> properties = new ArrayList<>();
-        UpdateElementType update = new UpdateElementType(properties, null, typeName, null);
+        UpdateElementType update = new UpdateElementType(null, properties, null, typeName, null);
         update.setInputFormat("bad inputFormat");
         TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, update);
 
@@ -1407,7 +1407,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
         typeName = new QName("http://www.opengis.net/gml", "Bridges");
         properties = new ArrayList<>();
         properties.add(new PropertyType(new QName("whatever"), new ValueType("someValue")));
-        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, null, typeName, null));
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(null, properties, null, typeName, null));
 
 
         try {
@@ -1428,7 +1428,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
         properties.add(new PropertyType(new QName("NAME"), new ValueType("someValue")));
         ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
         FilterType filter        = new FilterType(pe);
-        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, filter, typeName, null));
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(null, properties, filter, typeName, null));
 
 
         try {
@@ -1448,7 +1448,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
         properties.add(new PropertyType(new QName("FID"), new ValueType("999")));
         pe     = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
         filter = new FilterType(pe);
-        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, filter, typeName, null));
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(null, properties, filter, typeName, null));
 
 
         TransactionResponse result = worker.transaction(request);

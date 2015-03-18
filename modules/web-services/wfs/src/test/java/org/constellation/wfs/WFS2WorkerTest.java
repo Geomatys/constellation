@@ -244,7 +244,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 // PostGIS datastore
                 localdb_active = TestDatabaseHandler.hasLocalDatabase();
                 if (localdb_active) {
-                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();;
+                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
@@ -641,7 +641,8 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         /**
          * Test 1 : empty query => error
          */
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        Integer startIndex = null;
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, startIndex, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = null;
         try {
@@ -654,7 +655,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         /**
          * Test 2 : bad version => error
          */
-        request = new GetFeatureType("WFS", "1.2.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "1.2.0", null, startIndex, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
             result = worker.getFeature(request);
@@ -678,7 +679,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
          */
         List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = worker.getFeature(request);
 
@@ -703,7 +704,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         queries = new ArrayList<>();
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
 
         FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
 
@@ -718,7 +719,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/gml/3.2", "name"))));
 
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -745,7 +746,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         ComparisonOpsType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "name", Boolean.TRUE);
         FilterType filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -772,7 +773,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "//{http://www.opengis.net/gml}name", Boolean.TRUE);
         filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -799,7 +800,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         SpatialOpsType bbox = new BBOXType("{http://www.opengis.net/sampling/1.0}position", 65300.0, 1731360.0, 65500.0, 1731400.0, "urn:ogc:def:crs:epsg:7.6:27582");
         filter = new FilterType(bbox);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
        result = worker.getFeature(request);
 
@@ -826,7 +827,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         bbox = new BBOXType("position", 65300.0, 1731360.0, 65500.0, 1731400.0, "urn:ogc:def:crs:epsg:7.6:27582");
         filter = new FilterType(bbox);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -855,7 +856,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.ASC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -882,7 +883,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -909,7 +910,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, 2, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, 2, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         request.setStartIndex(2);
         result = worker.getFeature(request);
 
@@ -935,7 +936,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         queries = new ArrayList<>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
 
         resultHits = (FeatureCollectionType) worker.getFeature(request);
 
@@ -950,7 +951,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         pe = new PropertyIsEqualToType(new LiteralType("whatever"), "wrongProperty", Boolean.TRUE);
         filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
             worker.getFeature(request);
@@ -967,7 +968,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("wrongProperty"))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
             worker.getFeature(request);
@@ -990,7 +991,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
          */
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         String valueReference = "sampledFeature";
-        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1", valueReference);
+        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1", valueReference);
 
         Object result = worker.getPropertyValue(request);
 
@@ -1068,7 +1069,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
          */
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         String valueReference = "inputs";
-        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1", valueReference);
+        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1", valueReference);
 
         Object result = worker.getPropertyValue(request);
 
@@ -1132,7 +1133,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null));
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = worker.getFeature(request);
 
@@ -1160,7 +1161,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         query.setSrsName("EPSG:4326");
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -1189,7 +1190,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/sml/1.0", "phenomenons"))));
         queries.add(query);
 
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
 
         result = worker.getFeature(request);
 
@@ -1219,7 +1220,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         queries.add(query);
 
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
 
         result = worker.getFeature(request);
 
@@ -1249,7 +1250,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         queries.add(query);
 
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
 
         result = worker.getFeature(request);
 
@@ -1279,7 +1280,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         queries.add(query);
 
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
 
         result = worker.getFeature(request);
 
@@ -1337,7 +1338,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         queries.add(query);
 
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
 
         result = worker.getFeature(request);
 
@@ -1368,7 +1369,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         queries.add(query);
 
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
 
         result = worker.getFeature(request);
 
@@ -1413,7 +1414,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         selfJoinQuery.getAliases().add("a");
         selfJoinQuery.getAliases().add("b");
         queries.add(selfJoinQuery);
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = worker.getFeature(request);
 
@@ -1455,7 +1456,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         selfJoinQuery.getAliases().add("a");
         selfJoinQuery.getAliases().add("b");
         queries.add(selfJoinQuery);
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = worker.getFeature(request);
 
@@ -1487,7 +1488,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges")), null));
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = worker.getFeature(request);
 
@@ -1513,7 +1514,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("FID"))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -1538,7 +1539,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -1563,7 +1564,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -1579,7 +1580,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null);
         query.setSrsName("EPSG:27582");
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -1606,7 +1607,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.DESC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         
         result = worker.getFeature(request);
@@ -1634,7 +1635,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.ASC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -1734,7 +1735,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         QName typeName = new QName("http://www.opengis.net/gml/3.2", "Bridges");
         List<PropertyType> properties = new ArrayList<>();
-        UpdateType update = new UpdateType(properties, null, typeName, null);
+        UpdateType update = new UpdateType(null, properties, null, typeName, null);
         update.setInputFormat("bad inputFormat");
         TransactionType request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, update);
 
@@ -1755,7 +1756,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         typeName = new QName("http://www.opengis.net/gml/3.2", "Bridges");
         properties = new ArrayList<>();
         properties.add(new PropertyType(new ValueReference("whatever", UpdateActionType.REPLACE), "someValue"));
-        request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(properties, null, typeName, null));
+        request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(null, properties, null, typeName, null));
 
 
         try {
@@ -1776,7 +1777,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         properties.add(new PropertyType(new ValueReference("NAME", UpdateActionType.REPLACE), "someValue"));
         ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "bad", Boolean.TRUE);
         FilterType filter        = new FilterType(pe);
-        request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(properties, filter, typeName, null));
+        request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(null, properties, filter, typeName, null));
 
 
         try {
@@ -1796,7 +1797,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         properties.add(new PropertyType(new ValueReference("FID", UpdateActionType.REPLACE), "999"));
         pe     = new PropertyIsEqualToType(new LiteralType("Ashton"), "NAME", Boolean.TRUE);
         filter = new FilterType(pe);
-        request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(properties, filter, typeName, null));
+        request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(null, properties, filter, typeName, null));
 
 
         TransactionResponse result = worker.transaction(request);
@@ -1811,7 +1812,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
          */
          List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
-        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object resultGF = worker.getFeature(requestGF);
 
@@ -1867,7 +1868,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
          */
         List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
-        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object resultGF = worker.getFeature(requestGF);
 
@@ -1933,7 +1934,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
          */
         List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "NamedPlaces")), null));
-        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object resultGF = worker.getFeature(requestGF);
 
@@ -2199,7 +2200,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
          */
         final FilterType filter = new org.geotoolkit.ogc.xml.v200.FilterType(new org.geotoolkit.ogc.xml.v200.ResourceIdType("station-001"));
         final QueryType query = new QueryType(filter, null, "2.0.0");
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, Arrays.asList(query), ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, Arrays.asList(query), ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         
         Object result = worker.getFeature(request);
 
@@ -2227,7 +2228,8 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         /**
          * Test 1 : query on typeName samplingPoint with name parameter
          */
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        Integer startIndex = null;
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, startIndex, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         ObjectFactory factory = new ObjectFactory();
         List<ParameterType> params = new ArrayList<>();
         params.add(new ParameterType("name", "10972X0137-PONT"));
@@ -2255,7 +2257,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         /**
          * Test 2 : query on typeName samplingPoint with id parameter
          */
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, startIndex, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         params = new ArrayList<>();
         params.add(new ParameterType("id", "station-001"));
         query = new StoredQueryType("urn:ogc:def:query:OGC-WFS::GetFeatureById", null, params);
@@ -2282,7 +2284,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         /**
          * Test 3 : query on typeName samplingPoint with a BBOX parameter
          */
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, startIndex, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         params = new ArrayList<>();
         DirectPositionType lower = new DirectPositionType( 65300.0, 1731360.0);
         DirectPositionType upper = new DirectPositionType(65500.0, 1731400.0);
@@ -2313,7 +2315,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         /**
          * Test 4 : query with typeName parameter
          */
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, startIndex, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         params = new ArrayList<>();
         params.add(new ParameterType("typeName", new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")));
         query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", null, params);
@@ -2344,7 +2346,8 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         /**
          * Test 1 : query with id parameter
          */
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        Integer startIndex = null;
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, startIndex, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         ObjectFactory factory = new ObjectFactory();
         List<ParameterType> params = new ArrayList<>();
         params.add(new ParameterType("id", "station-001"));
@@ -2376,7 +2379,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
     public void schemaLocationTest() throws Exception {
         List<QueryType> queries = new ArrayList<>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
-        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         Object resultGF = worker.getFeature(requestGF);
 

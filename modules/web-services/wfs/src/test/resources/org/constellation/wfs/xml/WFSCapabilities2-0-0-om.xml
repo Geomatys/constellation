@@ -35,6 +35,7 @@
             <ns9:Parameter name="outputFormat">
                 <ns9:AllowedValues>
                     <ns9:Value>application/gml+xml; version=3.2</ns9:Value>
+                    <ns9:Value>application/schema+json</ns9:Value>
                 </ns9:AllowedValues>
             </ns9:Parameter>
             <ns9:Parameter name="Service">
@@ -64,6 +65,7 @@
             <ns9:Parameter name="outputFormat">
                 <ns9:AllowedValues>
                     <ns9:Value>application/gml+xml; version=3.2</ns9:Value>
+                    <ns9:Value>application/json</ns9:Value>
                 </ns9:AllowedValues>
             </ns9:Parameter>
             <ns9:Parameter name="Service">

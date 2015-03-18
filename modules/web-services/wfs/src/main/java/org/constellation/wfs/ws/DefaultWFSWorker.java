@@ -1229,9 +1229,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         }
                     } catch (IllegalArgumentException ex) {
                         throw new CstlServiceException(ex.getMessage(), ex, INVALID_VALUE);
-                    } catch (IOException ex) {
-                        throw new CstlServiceException(ex);
-                    } catch (XMLStreamException ex) {
+                    } catch (IOException | XMLStreamException ex) {
                         throw new CstlServiceException(ex);
                     }
                     final Name typeName;
@@ -1381,11 +1379,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                         value = JTS.transform((Geometry)value, CRS.findMathTransform(exposedCrs, trueCrs));
                                     }
 
-                                } catch (NoSuchAuthorityCodeException ex) {
-                                    Logging.unexpectedException(LOGGER, ex);
-                                } catch (TransformException ex) {
-                                    Logging.unexpectedException(LOGGER, ex);
-                                } catch (FactoryException ex) {
+                                } catch (TransformException | FactoryException ex) {
                                     Logging.unexpectedException(LOGGER, ex);
                                 } catch (IllegalArgumentException ex) {
                                     throw new CstlServiceException(ex);
@@ -1765,7 +1759,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         } else {
             for (QName q : query.getTypeNames()) {
                 for (Parameter param : parameters) {
-                    if (q.getLocalPart().indexOf("$" +  param.getName()) != -1) {
+                    if (q.getLocalPart().contains("$" +  param.getName())) {
                         toRemove.add(q);
                         if (!param.getContent().isEmpty() && param.getContent().get(0) instanceof QName) {
                             toAdd.add((QName)param.getContent().get(0));
@@ -1789,7 +1783,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (bb.getAny() != null && bb.getAny() instanceof String) {
                     String s = (String)bb.getAny();
                     for (Parameter param : parameters) {
-                        if (s.indexOf('$' + param.getName()) != -1) {
+                        if (s.contains('$' + param.getName())) {
                             bb.setAny(param.getContent().get(0));
                         }
                     }
@@ -1802,7 +1796,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     if (lit.getValue() instanceof String) {
                         String s = (String)lit.getValue();
                         for (Parameter param : parameters) {
-                            if (s.indexOf('$' + param.getName()) != -1) {
+                            if (s.contains('$' + param.getName())) {
                                 s = s.replace('$' + param.getName(), (String)param.getContent().get(0));
                             }
                         }
@@ -1818,7 +1812,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     if (lit.getValue() instanceof String) {
                         String s = (String)lit.getValue();
                         for (Parameter param : parameters) {
-                            if (s.indexOf('$' + param.getName()) != -1) {
+                            if (s.contains('$' + param.getName())) {
                                 s = s.replace('$' + param.getName(), (String)param.getContent().get(0));
                             }
                         }
