@@ -1088,6 +1088,10 @@
             <id>jboss</id>
             <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
         </repository>
+        <repository>
+            <id>dev</id>
+            <url>http://dev.geomatys.com/nexus/content/repositories/releases</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -1096,6 +1100,10 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+					 <id>dev</id>
+					 <url>http://dev.geomatys.com/nexus/content/repositories/releases</url>
         </pluginRepository>
         <pluginRepository>
             <id>maven.nexus</id>
