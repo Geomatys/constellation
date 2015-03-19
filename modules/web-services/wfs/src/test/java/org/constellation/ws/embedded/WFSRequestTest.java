@@ -95,8 +95,13 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import org.geotoolkit.ogc.xml.v200.ResourceIdType;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import org.geotoolkit.wfs.xml.v200.ActionResultsType;
+import org.geotoolkit.wfs.xml.v200.CreatedOrModifiedFeatureType;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
@@ -904,6 +909,439 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
         domCompare(expectedResult, sresult);
 
+    }
+    
+    @Test
+    @Order(order=13)
+    public void testWFSGetCapabilitiesREST() throws Exception {
+        waitForStart();
+
+        // Creates a valid GetCapabilities url.
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0");
+        
+        Object obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WFSCapabilitiesType);
+        
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0");
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof org.geotoolkit.wfs.xml.v200.WFSCapabilitiesType);
+    }
+    
+    @Test
+    @Order(order=14)
+    public void testWFSDescribeFeatureREST() throws Exception {
+        URL getfeatsUrl;
+        try {
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/schema");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        Object obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue(obj instanceof Schema);
+
+        Schema schema = (Schema) obj;
+        if (localdb_active) {
+            assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
+        } else {
+            assertEquals(2, schema.getIncludeOrImportOrRedefine().size());
+        }
+
+        try {
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test/2.0.0/schema");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue("was:" + obj, obj instanceof Schema);
+
+        schema = (Schema) obj;
+        if (localdb_active) {
+            assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
+        } else {
+            assertEquals(2, schema.getIncludeOrImportOrRedefine().size());
+        }
+        
+        try {
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test/2.0.0/BasicPolygons.xsd");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        
+         obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue("was:" + obj, obj instanceof Schema);
+
+        schema = (Schema) obj;
+        assertEquals(1, schema.getElements().size());
+        Assert.assertNotNull(schema.getElementByName("BasicPolygons"));
+
+    }
+    
+    private static final String WFS_GETFEATURE_FILTER = 
+              "filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%20xmlns:gml=%22http://www.opengis.net/gml%22%3E"
+            + "%3Cogc:PropertyIsEqualTo%3E"
+            + "%3Cogc:PropertyName%3Egml:name%3C/ogc:PropertyName%3E"
+            + "%3Cogc:Literal%3E10972X0137-PONT%3C/ogc:Literal%3E"
+            + "%3C/ogc:PropertyIsEqualTo%3E"
+            + "%3C/ogc:Filter%3E";
+    
+    private static final String WFS_GETFEATURE_FILTER_V2 = 
+            "filter=%3Cfes:Filter%20xmlns:fes=%22http://www.opengis.net/fes/2.0%22%20xmlns:gml=%22http://www.opengis.net/gml/3.2%22%3E"
+            + "%3Cfes:PropertyIsEqualTo%3E"
+            + "%3Cfes:ValueReference%3Egml:name%3C/fes:ValueReference%3E"
+            + "%3Cfes:Literal%3E10972X0137-PONT%3C/fes:Literal%3E"
+            + "%3C/fes:PropertyIsEqualTo%3E"
+            + "%3C/fes:Filter%3E";
+    @Test
+    @Order(order=15)
+    public void testWFSGetFeatureREST() throws Exception {
+        URL getfeatsUrl;
+        try {
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/SamplingPoint?" + WFS_GETFEATURE_FILTER);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        Object obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue(obj instanceof FeatureCollectionType);
+
+        FeatureCollectionType feat = (FeatureCollectionType) obj;
+        assertEquals(1, feat.getFeatureMember().size());
+
+        assertTrue("expected samplingPoint but was:" +  feat.getFeatureMember().get(0),
+                feat.getFeatureMember().get(0).getAbstractFeature() instanceof SamplingPointType);
+        SamplingPointType sp = (SamplingPointType) feat.getFeatureMember().get(0).getAbstractFeature();
+
+        assertEquals("10972X0137-PONT", sp.getName().getCode());
+   
+        
+        try {
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint?" + WFS_GETFEATURE_FILTER_V2);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue("was:" + obj, obj instanceof org.geotoolkit.wfs.xml.v200.FeatureCollectionType);
+
+        org.geotoolkit.wfs.xml.v200.FeatureCollectionType feat2 = (org.geotoolkit.wfs.xml.v200.FeatureCollectionType) obj;
+        assertEquals(1, feat2.getMember().size());
+        
+        MemberPropertyType member = feat2.getMember().get(0);
+        
+        final JAXBElement element = (JAXBElement) member.getContent().get(0);
+
+        assertTrue("expected samplingPoint but was:" +  element.getValue(), element.getValue() instanceof SamplingPointType);
+        sp = (SamplingPointType) element.getValue();
+
+        //assertEquals("10972X0137-PONT", sp.getName()); //TODO name attribute is moved to namespace GML 3.2 so the java binding does not match
+    }
+    
+    @Test
+    @Order(order=16)
+    public void testWFSTransactionInsertREST() throws Exception {
+
+        final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/SamplingPoint");
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-4.xml");
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof TransactionResponseType);
+
+        TransactionResponseType result = (TransactionResponseType) obj;
+
+        TransactionSummaryType sum        = new TransactionSummaryType(2, 0, 0);
+        List<InsertedFeatureType> insertedFeatures = new ArrayList<>();
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-014"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-013"), null));
+        InsertResultsType insertResult    = new InsertResultsType(insertedFeatures);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
+
+        assertEquals(ExpResult, result);
+
+
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-4.xml");
+
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+    }
+    
+    private static final String WFS_REPLACE_FILTER = 
+            "filter=%3Cfes:Filter%20xmlns:fes=%22http://www.opengis.net/fes/2.0%22%20xmlns:gml=%22http://www.opengis.net/gml/3.2%22%3E"
+            + "%3Cfes:PropertyIsEqualTo%3E"
+            + "%3Cfes:ValueReference%3Ename%3C/fes:ValueReference%3E"
+            + "%3Cfes:Literal%3E10972X0137-SOUPAS%3C/fes:Literal%3E"
+            + "%3C/fes:PropertyIsEqualTo%3E"
+            + "%3C/fes:Filter%3E";
+    
+    @Test
+    @Order(order=17)
+    public void testWFSTransactionReplaceREST() throws Exception {
+        
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint?" + WFS_REPLACE_FILTER);
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        putRequestFile(conec, "org/constellation/xml/Replace-SamplingPoint-1.xml");
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof org.geotoolkit.wfs.xml.v200.TransactionResponseType);
+
+        org.geotoolkit.wfs.xml.v200.TransactionResponseType result = (org.geotoolkit.wfs.xml.v200.TransactionResponseType) obj;
+
+        org.geotoolkit.wfs.xml.v200.TransactionSummaryType sum        = new org.geotoolkit.wfs.xml.v200.TransactionSummaryType(0, 0, 0, 1);
+        List<CreatedOrModifiedFeatureType> insertedFeatures = new ArrayList<>();
+        insertedFeatures.add(new CreatedOrModifiedFeatureType(new ResourceIdType("station-014"), null));
+        
+         ActionResultsType act = new ActionResultsType(insertedFeatures);
+        org.geotoolkit.wfs.xml.v200.TransactionResponseType ExpResult = new org.geotoolkit.wfs.xml.v200.TransactionResponseType(sum, null, null, act, "2.0.0");
+
+        assertEquals(ExpResult, result);
+
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/SamplingPoint");
+
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-5.xml");
+
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+    }
+    
+    private static final String WFS_DELETE_FILTER = 
+            "filter=%3Cfes:Filter%20xmlns:fes=%22http://www.opengis.net/fes/2.0%22%20xmlns:gml=%22http://www.opengis.net/gml/3.2%22%3E"
+            + "%3Cfes:PropertyIsEqualTo%3E"
+            + "%3Cfes:ValueReference%3Ename%3C/fes:ValueReference%3E"
+            + "%3Cfes:Literal%3E10972X0137-CALOS%3C/fes:Literal%3E"
+            + "%3C/fes:PropertyIsEqualTo%3E"
+            + "%3C/fes:Filter%3E";
+    
+    
+    @Test
+    @Order(order=18)
+    public void testWFSTransactionDeleteREST() throws Exception {
+        
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint?" + WFS_DELETE_FILTER);
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        Object obj = unmarshallResponseDelete(conec);
+
+        assertTrue(obj instanceof org.geotoolkit.wfs.xml.v200.TransactionResponseType);
+
+        org.geotoolkit.wfs.xml.v200.TransactionResponseType result = (org.geotoolkit.wfs.xml.v200.TransactionResponseType) obj;
+
+        org.geotoolkit.wfs.xml.v200.TransactionSummaryType sum        = new org.geotoolkit.wfs.xml.v200.TransactionSummaryType(0, 0, 1, 0);
+        
+        org.geotoolkit.wfs.xml.v200.TransactionResponseType ExpResult = new org.geotoolkit.wfs.xml.v200.TransactionResponseType(sum, null, null, null, "2.0.0");
+
+        assertEquals(ExpResult, result);
+
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/SamplingPoint");
+
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-6.xml");
+
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+    }
+    
+    @Test
+    @Order(order=19)
+    public void testWFSGetFeatureByIDREST() throws Exception {
+        
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/SamplingPoint/station-014");
+
+
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/xml/Replace-SamplingPoint-1.xml");
+
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+    }
+    
+    @Test
+    @Order(order=20)
+    public void testWFSTransactionReplaceByIdREST() throws Exception {
+        
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/station-014");
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        putRequestFile(conec, "org/constellation/xml/Replace-SamplingPoint-2.xml");
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof org.geotoolkit.wfs.xml.v200.TransactionResponseType);
+
+        org.geotoolkit.wfs.xml.v200.TransactionResponseType result = (org.geotoolkit.wfs.xml.v200.TransactionResponseType) obj;
+
+        org.geotoolkit.wfs.xml.v200.TransactionSummaryType sum        = new org.geotoolkit.wfs.xml.v200.TransactionSummaryType(0, 0, 0, 1);
+        List<CreatedOrModifiedFeatureType> insertedFeatures = new ArrayList<>();
+        insertedFeatures.add(new CreatedOrModifiedFeatureType(new ResourceIdType("station-014"), null));
+        
+         ActionResultsType act = new ActionResultsType(insertedFeatures);
+        org.geotoolkit.wfs.xml.v200.TransactionResponseType ExpResult = new org.geotoolkit.wfs.xml.v200.TransactionResponseType(sum, null, null, act, "2.0.0");
+
+        assertEquals(ExpResult, result);
+
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/SamplingPoint");
+
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-7.xml");
+
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+    }
+    
+    @Test
+    @Order(order=21)
+    public void testWFSTransactionDeleteByIdREST() throws Exception {
+        
+         
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/station-014");
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        Object obj = unmarshallResponseDelete(conec);
+
+        assertTrue(obj instanceof org.geotoolkit.wfs.xml.v200.TransactionResponseType);
+
+        org.geotoolkit.wfs.xml.v200.TransactionResponseType result = (org.geotoolkit.wfs.xml.v200.TransactionResponseType) obj;
+
+        org.geotoolkit.wfs.xml.v200.TransactionSummaryType sum        = new org.geotoolkit.wfs.xml.v200.TransactionSummaryType(0, 0, 1, 0);
+        
+        org.geotoolkit.wfs.xml.v200.TransactionResponseType ExpResult = new org.geotoolkit.wfs.xml.v200.TransactionResponseType(sum, null, null, null, "2.0.0");
+
+        assertEquals(ExpResult, result);
+
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/SamplingPoint");
+
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-3.xml");
+
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+    }
+    
+    @Test
+    @Order(order=22)
+    public void testWFSGetPropertyValueRESR() throws Exception {
+
+         /**
+         * Test 1 : query on typeName samplingPoint with HITS
+         */
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/property/sampledFeature?resultType=hits");
+
+        
+        Object result = unmarshallResponse(getCapsUrl.openConnection());
+
+        assertTrue("unexpected type: " + result.getClass().getName() + "\n" + result, result instanceof ValueCollectionType);
+        
+        assertTrue(result instanceof ValueCollection);
+        assertEquals(12, ((ValueCollection)result).getNumberReturned());
+
+        /**
+         * Test 2 : query on typeName samplingPoint with RESULTS
+         */
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/property/sampledFeature");
+        
+        String sresult = getStringResponse(getCapsUrl.openConnection());
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.embedded.ValueCollectionOM1.xml"));
+        domCompare(expectedResult, sresult);
+
+        /**
+         * Test 3 : query on typeName samplingPoint with RESULTS
+         */
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/property/position");
+        sresult = getStringResponse(getCapsUrl.openConnection());
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.embedded.ValueCollectionOM2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        domCompare(expectedResult, sresult);
+
+    }
+    
+    private static final String WFS_UPDATE_FILTER = 
+              "filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%20xmlns:gml=%22http://www.opengis.net/gml%22%3E"
+            + "%3Cogc:PropertyIsEqualTo%3E"
+            + "%3Cogc:PropertyName%3ENAME%3C/ogc:PropertyName%3E"
+            + "%3Cogc:Literal%3EAshton%3C/ogc:Literal%3E"
+            + "%3C/ogc:PropertyIsEqualTo%3E"
+            + "%3C/ogc:Filter%3E";
+    
+    
+    @Test
+    @Order(order=23)
+    public void testWFSTransactionUpdateREST() throws Exception {
+
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/NamedPlaces/property/the_geom?" + WFS_UPDATE_FILTER);
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        putRequestFile(conec, "org/constellation/xml/Update-NamedPlaces-2.xml");
+
+        // Try to unmarshall something from the response returned by the server.
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof TransactionResponseType);
+
+        TransactionResponseType result = (TransactionResponseType) obj;
+
+        TransactionSummaryType sum              = new TransactionSummaryType(0, 1, 0);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(ExpResult, result);
+
+
+        /**
+         * We verify that the namedPlaces have been changed
+         */
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/NamedPlaces");
+
+        // Try to unmarshall something from the response returned by the server.
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/namedPlacesCollection-6.xml");
+        xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
     }
 
     public static void domCompare(final Object actual, final Object expected) throws Exception {

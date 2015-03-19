@@ -279,9 +279,32 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         wr.flush();
         in.close();
     }
+    
+    protected static void putRequestFile(URLConnection conec, String filePath, String contentType) throws IOException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("PUT");
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", contentType);
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        final InputStream is = Util.getResourceAsStream(filePath);
+        final StringWriter sw = new StringWriter();
+        final BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        char[] buffer = new char[1024];
+        int size;
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        wr.write(sw.toString());
+        wr.flush();
+        in.close();
+    }
 
     protected static void postRequestFile(URLConnection conec, String filePath) throws IOException {
         postRequestFile(conec, filePath, "text/xml");
+    }
+    
+    protected static void putRequestFile(URLConnection conec, String filePath) throws IOException {
+        putRequestFile(conec, filePath, "text/xml");
     }
 
     protected static void postRequestPlain(URLConnection conec, String request) throws IOException {
