@@ -330,7 +330,7 @@
                                          style="padding-left:0;">
                                         <div class="item {{dataset.Type? ('dataset-data-'+dataset.Type | lowercase) : 'dataset-data'}}"
                                              ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id), 'style-small':dataCtrl.smallMode}"
-                                             ng-click="selectDS(dataset);selectDataSetChild(null,null);"
+                                             ng-click="selectDS(dataset);toggleDataSetFirstChild(dataset);"
                                              data-name="{{dataset.Name}}"
                                              ng-cloak>
                                             <div class="top">

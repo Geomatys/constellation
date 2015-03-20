@@ -101,6 +101,21 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             $scope.showDataDashboardMap();
         };
 
+        $scope.toggleDataSetFirstChild = function(parent) {
+            if(parent && $scope.selectedDS){
+                var item = null;
+                if(parent.Children.length===1){
+                    item = parent.Children[0];
+                }
+                if(item){
+                    $scope.dataCtrl.selectedDataSetChild = item;
+                }
+            }else {
+                $scope.dataCtrl.selectedDataSetChild = null;
+            }
+            $scope.showDataDashboardMap();
+        };
+
         /**
          * Toggle advanced data search view panel.
          */

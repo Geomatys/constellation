@@ -226,7 +226,7 @@
                             <div data-name="{{dataset.Name}}"
                                  class="item metadata"
                                  ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id), 'style-small':dataCtrl.smallMode}"
-                                 ng-click="selectDS(dataset);selectDataSetChild(null,null);"
+                                 ng-click="selectDS(dataset);toggleDataSetFirstChild(dataset);"
                                  ng-cloak>
                                 <div class="top">
                                     <span class="item-title csw-title"
