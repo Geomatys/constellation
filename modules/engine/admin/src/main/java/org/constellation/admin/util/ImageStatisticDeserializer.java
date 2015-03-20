@@ -49,12 +49,18 @@ public class ImageStatisticDeserializer extends JsonDeserializer<ImageStatistics
 
                     String minStr = bandNode.get("min").asText();
                     String maxStr = bandNode.get("max").asText();
+                    stats.getBand(b).setMin(Double.valueOf(minStr));
+                    stats.getBand(b).setMax(Double.valueOf(maxStr));
 
-                    double min = Double.valueOf(minStr);
-                    double max = Double.valueOf(maxStr);
+                    JsonNode meanNode = bandNode.get("mean");
+                    if (meanNode != null) {
+                        stats.getBand(b).setMean(meanNode.doubleValue());
+                    }
 
-                    stats.getBand(b).setMin(min);
-                    stats.getBand(b).setMax(max);
+                    JsonNode stdNode = bandNode.get("std");
+                    if (stdNode != null) {
+                        stats.getBand(b).setStd(stdNode.doubleValue());
+                    }
 
                     JsonNode noDataNode = bandNode.get("noData");
                     if (noDataNode != null && noDataNode.isArray()) {
