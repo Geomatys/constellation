@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326" xmlns:sampling="http://www.opengis.net/sampling/1.0"
+                                  xmlns:gml="http://www.opengis.net/gml"
+                                  xmlns:ogc="http://www.opengis.net/ogc"
+                                  xmlns:wfs="http://www.opengis.net/wfs"
+                                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <gml:surfaceMember>
+        <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+            <gml:exterior>
+                <gml:LinearRing>
+                    <gml:posList>0.002 0.0024 0.0042 0.0024 0.0042 6.0E-4 0.0014 6.0E-4 0.0014 0.001 0.002 0.0024</gml:posList>
+                </gml:LinearRing>
+            </gml:exterior>
+        </gml:Polygon>
+    </gml:surfaceMember>
+</gml:MultiSurface>
+

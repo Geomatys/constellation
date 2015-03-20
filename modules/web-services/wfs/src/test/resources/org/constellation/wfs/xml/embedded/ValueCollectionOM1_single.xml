@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:ValueCollection numberReturned="1" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+    <wfs:member>urn:-sandre:object:bdrhf:123X</wfs:member>
+</wfs:ValueCollection>

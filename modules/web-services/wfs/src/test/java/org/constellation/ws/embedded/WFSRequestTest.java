@@ -1260,7 +1260,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     
     @Test
     @Order(order=22)
-    public void testWFSGetPropertyValueRESR() throws Exception {
+    public void testWFSGetPropertyValueREST() throws Exception {
 
          /**
          * Test 1 : query on typeName samplingPoint with HITS
@@ -1342,6 +1342,120 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
         
         domCompare(xmlExpResult, xmlResult);
+    }
+    
+    @Test
+    @Order(order=23)
+    public void testWFSGetPropertyValueByIdREST() throws Exception {
+
+         /**
+         * Test 1 : query on typeName samplingPoint with HITS
+         */
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/station-004/sampledFeature");
+
+        String sresult = getStringResponse(getCapsUrl.openConnection());
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.embedded.ValueCollectionOM1_single.xml"));
+        domCompare(expectedResult, sresult);
+
+        /**
+         * Test 3 : query on typeName samplingPoint with RESULTS
+         */
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/station-004/position");
+        sresult = getStringResponse(getCapsUrl.openConnection());
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.embedded.ValueCollectionOM2_single.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        domCompare(expectedResult, sresult);
+
+    }
+    
+    @Test
+    @Order(order=24)
+    public void testWFSTransactionUpdateByIdREST() throws Exception {
+
+         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/NamedPlaces/NamedPlaces.1/the_geom");
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        putRequestFile(conec, "org/constellation/xml/Update-NamedPlaces-3.xml");
+
+        // Try to unmarshall something from the response returned by the server.
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof TransactionResponseType);
+
+        TransactionResponseType result = (TransactionResponseType) obj;
+
+        TransactionSummaryType sum              = new TransactionSummaryType(0, 1, 0);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(ExpResult, result);
+
+
+        /**
+         * We verify that the namedPlaces have been changed
+         */
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/NamedPlaces");
+
+        // Try to unmarshall something from the response returned by the server.
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/namedPlacesCollection-1.xml");
+        xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+    }
+
+    @Test
+    @Order(order=25)
+    public void testWFSTransactionUpdateNullByIdREST() throws Exception {
+
+         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/NamedPlaces/NamedPlaces.1/NAME");
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        // Try to unmarshall something from the response returned by the server.
+        Object obj = unmarshallResponseDelete(conec);
+
+        assertTrue(obj instanceof TransactionResponseType);
+
+        TransactionResponseType result = (TransactionResponseType) obj;
+
+        TransactionSummaryType sum              = new TransactionSummaryType(0, 1, 0);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(ExpResult, result);
+
+
+        /**
+         * We verify that the namedPlaces have been changed
+         */
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/NamedPlaces");
+
+        // Try to unmarshall something from the response returned by the server.
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/namedPlacesCollection-7.xml");
+        xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+    }
+    
+    @Test
+    @Order(order=26)
+    public void testWFSListStoredQueriesREST() throws Exception {
+
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
+
+        
+        Object obj = unmarshallResponse(getCapsUrl.openConnection());
+
+        assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof ListStoredQueriesResponseType);
+
     }
 
     public static void domCompare(final Object actual, final Object expected) throws Exception {

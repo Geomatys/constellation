@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:FeatureCollection timeStamp="" gml:id="id" numberOfFeatures="2" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs">
+    <gml:boundedBy>
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:4326">
+            <gml:lowerCorner>0.0014 -0.0011</gml:lowerCorner>
+            <gml:upperCorner>0.0042 0.0024</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
+    <gml:featureMember>
+        <gml:NamedPlaces gml:id="NamedPlaces.1">
+            <gml:the_geom>
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
+                    <gml:surfaceMember>
+                        <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+                            <gml:exterior>
+                                <gml:LinearRing>
+                                    <gml:posList>0.002 0.0024 0.0042 0.0024 0.0042 6.0E-4 0.0014 6.0E-4 0.0014 0.001 0.002 0.0024</gml:posList>
+                                </gml:LinearRing>
+                            </gml:exterior>
+                        </gml:Polygon>
+                    </gml:surfaceMember>
+                </gml:MultiSurface>
+            </gml:the_geom>
+            <gml:FID>117</gml:FID>
+            <gml:NAME></gml:NAME>
+        </gml:NamedPlaces>
+    </gml:featureMember>
+    <gml:featureMember>
+        <gml:NamedPlaces gml:id="NamedPlaces.2">
+            <gml:the_geom>
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
+                    <gml:surfaceMember>
+                        <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+                            <gml:exterior>
+                                <gml:LinearRing>
+                                    <gml:posList>0.0017 -0.0011 0.0017 -6.0E-4 0.0025 -6.0E-4 0.0025 -0.0011 0.0017 -0.0011</gml:posList>
+                                </gml:LinearRing>
+                            </gml:exterior>
+                        </gml:Polygon>
+                    </gml:surfaceMember>
+                </gml:MultiSurface>
+            </gml:the_geom>
+            <gml:FID>118</gml:FID>
+            <gml:NAME>Goose Island</gml:NAME>
+        </gml:NamedPlaces>
+    </gml:featureMember>
+</wfs:FeatureCollection>
