@@ -32,10 +32,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static org.constellation.engine.register.jooq.Tables.DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.TASK_PARAMETER;
 
 /**
  * @author Thomas Rouby (Geomatys)
@@ -101,6 +104,29 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
                 .where(Tables.TASK.TASK_PARAMETER_ID.eq(id))
                 .orderBy(Tables.TASK.DATE_END.desc())
                 .limit(limit).offset(offset)
+                .fetchInto(Task.class);
+    }
+
+
+    @Override
+    public List<Task> findDayTask(String process_authority) {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        
+        Long minValue = calendar.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        Long maxValue = calendar.getTimeInMillis();
+        
+        System.out.println(dsl.select().from(Tables.TASK).join(TASK_PARAMETER).onKey()
+                .where(TASK_PARAMETER.PROCESS_AUTHORITY.eq(process_authority)).and(Tables.TASK.DATE_END.between(minValue, maxValue))
+                .orderBy(Tables.TASK.DATE_END.desc()).getSQL());
+        
+        return dsl.select().from(Tables.TASK).join(TASK_PARAMETER).onKey()
+                .where(TASK_PARAMETER.PROCESS_AUTHORITY.eq(process_authority)).and(Tables.TASK.DATE_END.between(minValue, maxValue))
+                .orderBy(Tables.TASK.DATE_END.desc())
                 .fetchInto(Task.class);
     }
 }

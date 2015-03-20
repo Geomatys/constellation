@@ -37,4 +37,6 @@ public interface TaskRepository {
     List<Task> findRunningTasks(Integer id, Integer offset, Integer limit);
 
     List<Task> taskHistory(Integer id, Integer offset, Integer limit);
+    
+    List<Task> findDayTask(String process_authority);
 }
