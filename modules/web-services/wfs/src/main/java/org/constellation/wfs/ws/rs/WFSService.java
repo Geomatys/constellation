@@ -21,6 +21,7 @@ package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
 
+import java.io.IOException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
@@ -86,6 +87,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.logging.Level;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -121,9 +123,11 @@ import static org.constellation.wfs.ws.WFSConstants.STR_XSD;
 import org.constellation.ws.WSEngine;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wfs.xml.InsertElement;
 import org.geotoolkit.wfs.xml.Property;
 import org.geotoolkit.wfs.xml.ReplaceElement;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
 import org.geotoolkit.wfs.xml.UpdateElement;
 import org.geotoolkit.wfs.xml.WFSXmlFactory;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildAcceptFormat;
@@ -560,34 +564,14 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
 
         final String storedQuery = getParameter("storedquery_id", false);
-        final List<Parameter> parameters = new ArrayList<>();
+        final List<Parameter> parameters;
         if (storedQuery != null) {
-            // extract stored query params
             mandatory = false;
-            final List<ParameterExpression> params = worker.getParameterForStoredQuery(storedQuery);
-            for (ParameterExpression param : params) {
-                final String paramValue = getParameter(param.getName(), false);
-                if (paramValue != null) {
-                    // TODO handle different type
-                    final Object obj;
-                    if (param.getType().getLocalPart().equals("QName")) {
-                        final int separator = paramValue.indexOf(':');
-                        if (separator != -1) {
-                            final String prefix    = paramValue.substring(0, separator);
-                            final String namespac  = mapping.get(prefix);
-                            final String localPart = paramValue.substring(separator + 1);
-                            obj = new QName(namespac, localPart);
-                        } else {
-                            obj = new QName(paramValue);
-                        }
-                    } else {
-                        obj = paramValue;
-                    }
-                    parameters.add(buildParameter(version, param.getName(), obj));
-                }
-            }
+            // extract stored query params
+            parameters = extractParameters(worker, storedQuery, version, mapping);
+        } else {
+            parameters = new ArrayList<>();
         }
-
         final String typeName;
         if (version.equals("2.0.0")) {
             typeName = getParameter("typeNames", mandatory);
@@ -655,6 +639,35 @@ public class WFSService extends GridWebService<WFSWorker> {
         } catch (IllegalArgumentException ex) {
             throw new CstlServiceException(ex);
         }
+    }
+    
+    private List<Parameter> extractParameters(WFSWorker worker, final String storedQuery, final String version, Map<String,String> mapping) {
+        final List<Parameter> parameters = new ArrayList<>();
+        
+        // extract stored query params
+        final List<ParameterExpression> params = worker.getParameterForStoredQuery(storedQuery);
+        for (ParameterExpression param : params) {
+            final String paramValue = getSafeParameter(param.getName());
+            if (paramValue != null) {
+                // TODO handle different type
+                final Object obj;
+                if (param.getType().getLocalPart().equals("QName")) {
+                    final int separator = paramValue.indexOf(':');
+                    if (separator != -1) {
+                        final String prefix    = paramValue.substring(0, separator);
+                        final String namespac  = mapping.get(prefix);
+                        final String localPart = paramValue.substring(separator + 1);
+                        obj = new QName(namespac, localPart);
+                    } else {
+                        obj = new QName(paramValue);
+                    }
+                } else {
+                    obj = paramValue;
+                }
+                parameters.add(buildParameter(version, param.getName(), obj));
+            }
+        }
+        return parameters;
     }
     
     private SortBy parseSortByParameter(String version) {
@@ -1081,10 +1094,10 @@ public class WFSService extends GridWebService<WFSWorker> {
         return new GetXSD(typeName, targetNamespace, version);
     }
     
-    private Worker getWorker() {
+    private WFSWorker getWorker() {
         final String serviceID = getSafeParameter("serviceId");
         if (serviceID != null && WSEngine.serviceInstanceExist("WFS", serviceID)) {
-            return WSEngine.getInstance("WFS", serviceID);
+            return (WFSWorker) WSEngine.getInstance("WFS", serviceID);
         }
         return null;
     }
@@ -1581,6 +1594,168 @@ public class WFSService extends GridWebService<WFSWorker> {
                 worker.checkVersionSupported(version, true);
                 final ListStoredQueries lsq = WFSXmlFactory.buildListStoredQueries(version, "WFS", null);
                 return treatIncomingRequest(lsq);
+            } catch (IllegalArgumentException ex) {
+                return processExceptionResponse(new CstlServiceException(ex), null, worker);
+            } catch (CstlServiceException ex) {
+                return processExceptionResponse(ex, null, worker);
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();    
+    }
+    
+    @POST
+    @Path("{version}/query")
+    public Response processCreateStoredQueriesRestful(@PathParam("version") final String version, final InputStream queryStream) {
+        final Worker worker = getWorker();
+        if (worker != null) {
+            try {
+                worker.checkVersionSupported(version, true);
+                
+                final String queryString = FileUtilities.getStringFromStream(queryStream);
+                final Unmarshaller um    = getMarshallerPool().acquireUnmarshaller();
+                Object obj               = um.unmarshal(new StringReader(queryString));
+                getMarshallerPool().recycle(um);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
+                
+                if (obj instanceof Query) {
+                    // adHocQuery
+                    final String id = UUID.randomUUID().toString();
+                    List<ParameterExpression> parameters = extractPram(version, queryString);
+                    final StoredQueryDescription desc = WFSXmlFactory.buildStoredQueryDescription(version, id, (Query)obj, parameters);
+                    final CreateStoredQuery lsq = WFSXmlFactory.buildCreateStoredQuery(version, "WFS", null, Arrays.asList(desc));
+                    return treatIncomingRequest(lsq);
+                } else {
+                    throw new CstlServiceException("Unexpected content for query body");
+                }
+            } catch (IllegalArgumentException | JAXBException | IOException ex) {
+                return processExceptionResponse(new CstlServiceException(ex), null, worker);
+            } catch (CstlServiceException ex) {
+                return processExceptionResponse(ex, null, worker);
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();    
+    }
+    
+    public static List<ParameterExpression> extractPram(String version, String s) {
+        final List<ParameterExpression> results = new ArrayList<>();
+        int pos = s.indexOf("${");
+        while (pos != -1) {
+            int endPos = s.indexOf('}');
+            if (endPos != -1 && pos < endPos) {
+                results.add(WFSXmlFactory.buildParameterDescription(version, s.substring(pos + 2, endPos), new QName("http://www.w3.org/2001/XMLSchema", "string", "xs")));
+                s = s .substring(endPos + 1);
+            } else if (endPos < pos){
+                s = s .substring(endPos + 1);
+            }
+            pos = s.indexOf("${");
+        }
+        return results;
+    }
+    
+    @GET
+    @Path("{version}/query/{queryId}")
+    public Response processExecuteStoredQueriesRestful(@PathParam("version") final String version, @PathParam("queryId") final String queryId) {
+        final WFSWorker worker = getWorker();
+        if (worker != null) {
+            try {
+                worker.checkVersionSupported(version, true);
+                
+                final List<Parameter> params = extractParameters(worker, queryId, version, new HashMap<String, String>());
+                final StoredQuery query = WFSXmlFactory.buildStoredQuery(version, queryId, null, params);
+                final GetFeature lsq = WFSXmlFactory.buildGetFeature(version, "WFS", null, null, null, query, null, null);
+                return treatIncomingRequest(lsq);
+                
+            } catch (IllegalArgumentException ex) {
+                return processExceptionResponse(new CstlServiceException(ex), null, worker);
+            } catch (CstlServiceException ex) {
+                return processExceptionResponse(ex, null, worker);
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();    
+    }
+    
+    @POST
+    @Path("{version}/query/{queryId}")
+    public Response processCreateStoredQueriesRestful(@PathParam("version") final String version, @PathParam("queryId") final String queryId, final InputStream queryStream) {
+        final Worker worker = getWorker();
+        if (worker != null) {
+            try {
+                worker.checkVersionSupported(version, true);
+                final String queryString = FileUtilities.getStringFromStream(queryStream);
+                final Unmarshaller um    = getMarshallerPool().acquireUnmarshaller();
+                Object obj               = um.unmarshal(new StringReader(queryString));
+                getMarshallerPool().recycle(um);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
+                
+                if (obj instanceof Query) {
+                    final String id = queryId;
+                    List<ParameterExpression> parameters = extractPram(version, queryString);
+                    final StoredQueryDescription desc = WFSXmlFactory.buildStoredQueryDescription(version, id, (Query)obj, parameters);
+                    final CreateStoredQuery lsq = WFSXmlFactory.buildCreateStoredQuery(version, "WFS", null, Arrays.asList(desc));
+                    return treatIncomingRequest(lsq);
+                } else {
+                    throw new CstlServiceException("Unexpected content for query body");
+                }
+            } catch (IllegalArgumentException | JAXBException | IOException ex) {
+                return processExceptionResponse(new CstlServiceException(ex), null, worker);
+            } catch (CstlServiceException ex) {
+                return processExceptionResponse(ex, null, worker);
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();    
+    }
+    
+    @PUT
+    @Path("{version}/query/{queryId}")
+    public Response processUpdateStoredQueriesRestful(@PathParam("version") final String version, @PathParam("queryId") final String queryId, final InputStream queryStream) {
+        final Worker worker = getWorker();
+        if (worker != null) {
+            try {
+                worker.checkVersionSupported(version, true);
+                final String queryString = FileUtilities.getStringFromStream(queryStream);
+                final Unmarshaller um    = getMarshallerPool().acquireUnmarshaller();
+                Object obj               = um.unmarshal(new StringReader(queryString));
+                getMarshallerPool().recycle(um);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
+                
+                if (obj instanceof Query) {
+                    // REMOVE then INSERT
+                    final DropStoredQuery dsq = WFSXmlFactory.buildDropStoredQuery(version, "WFS", null, queryId);
+                    treatIncomingRequest(dsq);
+                    
+                    final String id = queryId;
+                    List<ParameterExpression> parameters = extractPram(version, queryString);
+                    final StoredQueryDescription desc = WFSXmlFactory.buildStoredQueryDescription(version, id, (Query)obj, parameters);
+                    final CreateStoredQuery csq = WFSXmlFactory.buildCreateStoredQuery(version, "WFS", null, Arrays.asList(desc));
+                    return treatIncomingRequest(csq);
+                } else {
+                    throw new CstlServiceException("Unexpected content for query body");
+                }
+            } catch (IllegalArgumentException | JAXBException | IOException ex) {
+                return processExceptionResponse(new CstlServiceException(ex), null, worker);
+            } catch (CstlServiceException ex) {
+                return processExceptionResponse(ex, null, worker);
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();    
+    }
+    
+    @DELETE
+    @Path("{version}/query/{queryId}")
+    public Response processDeleteStoredQueriesRestful(@PathParam("version") final String version, @PathParam("queryId") final String queryId) {
+        final Worker worker = getWorker();
+        if (worker != null) {
+            try {
+                worker.checkVersionSupported(version, true);
+                final DropStoredQuery lsq = WFSXmlFactory.buildDropStoredQuery(version, "WFS", null, queryId);
+                return treatIncomingRequest(lsq);
+                
             } catch (IllegalArgumentException ex) {
                 return processExceptionResponse(new CstlServiceException(ex), null, worker);
             } catch (CstlServiceException ex) {

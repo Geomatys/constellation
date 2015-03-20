@@ -366,7 +366,7 @@ public final class WFSConstants {
     static {
         TYPE_PARAM = new ParameterExpressionType("typeName", "type Parameter", "A parameter on the identifier of the featureType", new QName("http://www.w3.org/2001/XMLSchema", "QName", "xs"));
         IDENTIFIER_PARAM = new ParameterExpressionType("id", "id Parameter", "A parameter on the id of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
-        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$id"), "@id", true);
+        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("${id}"), "@id", true);
         IDENTIFIER_FILTER = new FilterType(pis);
         final QueryType query = new QueryType(IDENTIFIER_FILTER, null, "2.0.0");
         final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, null);

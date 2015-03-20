@@ -1775,63 +1775,64 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     private static void applyParameterOnFilter(final Filter filter, final List<? extends Parameter> parameters) throws CstlServiceException {
+        final Object filterObject;
         if (filter instanceof XMLFilter) {
-            final Object filterObject = ((XMLFilter)filter).getFilterObject();
-
-             if (filterObject instanceof BBOXType) {
-                final BBOXType bb = (BBOXType) filterObject;
-                if (bb.getAny() != null && bb.getAny() instanceof String) {
-                    String s = (String)bb.getAny();
-                    for (Parameter param : parameters) {
-                        if (s.contains('$' + param.getName())) {
-                            bb.setAny(param.getContent().get(0));
-                        }
-                    }
-                }
-
-            } else if (filterObject instanceof BinarySpatialOperator) {
-                final BinarySpatialOperator binary = (BinarySpatialOperator) filterObject;
-                if (binary.getExpression2() != null && binary.getExpression2() instanceof XMLLiteral) {
-                    final XMLLiteral lit = (XMLLiteral) binary.getExpression2();
-                    if (lit.getValue() instanceof String) {
-                        String s = (String)lit.getValue();
-                        for (Parameter param : parameters) {
-                            if (s.contains('$' + param.getName())) {
-                                s = s.replace('$' + param.getName(), (String)param.getContent().get(0));
-                            }
-                        }
-                        lit.getContent().clear();
-                        lit.setContent(s);
-                    }
-                }
-
-            } else if (filterObject instanceof BinaryComparisonOperator) {
-                final BinaryComparisonOperator binary = (BinaryComparisonOperator) filterObject;
-                if (binary.getExpression2() != null && binary.getExpression2() instanceof XMLLiteral) {
-                    final XMLLiteral lit = (XMLLiteral) binary.getExpression2();
-                    if (lit.getValue() instanceof String) {
-                        String s = (String)lit.getValue();
-                        for (Parameter param : parameters) {
-                            if (s.contains('$' + param.getName())) {
-                                s = s.replace('$' + param.getName(), (String)param.getContent().get(0));
-                            }
-                        }
-                        lit.getContent().clear();
-                        lit.setContent(s);
-                    }
-                }
-
-            } else if (filterObject instanceof BinaryLogicOperator) {
-                final BinaryLogicOperator binary = (BinaryLogicOperator) filterObject;
-                for (Filter child : binary.getChildren()) {
-                    applyParameterOnFilter(child, parameters);
-                }
-            } else {
-                throw new CstlServiceException("Unimplemented filter implementation:" + filterObject.getClass().getName(), NO_APPLICABLE_CODE);
-            }
-        } else if (filter != null){
-            throw new CstlServiceException("UnExpected filter implementation", NO_APPLICABLE_CODE);
+            filterObject = ((XMLFilter)filter).getFilterObject();
+        } else {
+            filterObject = filter;
         }
+
+        if (filterObject instanceof BBOXType) {
+           final BBOXType bb = (BBOXType) filterObject;
+           if (bb.getAny() != null && bb.getAny() instanceof String) {
+               String s = (String)bb.getAny();
+               for (Parameter param : parameters) {
+                   if (s.contains("${" + param.getName() + '}')) {
+                       bb.setAny(param.getContent().get(0));
+                   }
+               }
+           }
+
+       } else if (filterObject instanceof BinarySpatialOperator) {
+           final BinarySpatialOperator binary = (BinarySpatialOperator) filterObject;
+           if (binary.getExpression2() != null && binary.getExpression2() instanceof XMLLiteral) {
+               final XMLLiteral lit = (XMLLiteral) binary.getExpression2();
+               if (lit.getValue() instanceof String) {
+                   String s = (String)lit.getValue();
+                   for (Parameter param : parameters) {
+                       if (s.contains("${" + param.getName() + '}')) {
+                           s = s.replace("${" + param.getName()+ '}', (String)param.getContent().get(0));
+                       }
+                   }
+                   lit.getContent().clear();
+                   lit.setContent(s);
+               }
+           }
+
+       } else if (filterObject instanceof BinaryComparisonOperator) {
+           final BinaryComparisonOperator binary = (BinaryComparisonOperator) filterObject;
+           if (binary.getExpression2() != null && binary.getExpression2() instanceof XMLLiteral) {
+               final XMLLiteral lit = (XMLLiteral) binary.getExpression2();
+               if (lit.getValue() instanceof String) {
+                   String s = (String)lit.getValue();
+                   for (Parameter param : parameters) {
+                       if (s.contains("${"  + param.getName()+ '}')) {
+                           s = s.replace("${"  + param.getName()+ '}', (String)param.getContent().get(0));
+                       }
+                   }
+                   lit.getContent().clear();
+                   lit.setContent(s);
+               }
+           }
+
+       } else if (filterObject instanceof BinaryLogicOperator) {
+           final BinaryLogicOperator binary = (BinaryLogicOperator) filterObject;
+           for (Filter child : binary.getChildren()) {
+               applyParameterOnFilter(child, parameters);
+           }
+       } else  if (filter != null) {
+           throw new CstlServiceException("Unimplemented filter implementation:" + filterObject.getClass().getName(), NO_APPLICABLE_CODE);
+       }
     }
 
     /**

@@ -100,11 +100,15 @@ import org.geotoolkit.ogc.xml.v200.ResourceIdType;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.wfs.xml.v200.ActionResultsType;
+import org.geotoolkit.wfs.xml.v200.CreateStoredQueryResponseType;
 import org.geotoolkit.wfs.xml.v200.CreatedOrModifiedFeatureType;
+import org.geotoolkit.wfs.xml.v200.DropStoredQueryResponseType;
+import org.geotoolkit.wfs.xml.v200.StoredQueryListItemType;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
+import org.junit.Ignore;
 import org.springframework.test.context.ActiveProfiles;
 
 // Constellation dependencies
@@ -1412,7 +1416,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     @Order(order=25)
     public void testWFSTransactionUpdateNullByIdREST() throws Exception {
 
-         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/NamedPlaces/NamedPlaces.1/NAME");
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/NamedPlaces/NamedPlaces.1/NAME");
 
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
@@ -1456,6 +1460,118 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof ListStoredQueriesResponseType);
 
+    }
+    
+    @Test
+    @Order(order=27)
+    public void testWFSAdhocStoredQueriesREST() throws Exception {
+
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+        
+        postRequestFile(conec, "org/constellation/wfs/xml/embedded/AdhocQuery1.xml");
+        
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof CreateStoredQueryResponseType);
+        
+        // TODO at this point i don"t know how to retrieve the identifier
+        // SO i use the list operation
+        ListStoredQueriesResponseType listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
+        assertEquals(3, listQuery.getStoredQuery().size());
+        
+        String id = null;
+        for (StoredQueryListItemType item : listQuery.getStoredQuery()) {
+            if (!item.getId().equals("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById") &&
+                !item.getId().equals("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType")) {
+                id = item.getId();
+            }
+        }
+        Assert.assertNotNull(id);
+        
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/" + id);
+        
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/embedded/singleNamedPlaces.xml");
+        xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+        
+        Object response = unmarshallResponseDelete(getCapsUrl.openConnection());
+        
+        assertTrue(response instanceof DropStoredQueryResponseType);
+        
+        // verify that the query is removed
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
+        
+        listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
+        assertEquals(2, listQuery.getStoredQuery().size());
+    }
+    
+    @Test
+    @Order(order=28)
+    public void testWFSStoredQueriesREST() throws Exception {
+
+        // Creates a valid GetCapabilities url.
+        URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1");
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+        
+        postRequestFile(conec, "org/constellation/wfs/xml/embedded/StoredQuery1.xml");
+        
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof CreateStoredQueryResponseType);
+
+        // verify that the query is added
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
+        ListStoredQueriesResponseType listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
+        assertEquals(3, listQuery.getStoredQuery().size());
+        
+        // execute it
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1?param1=Goose%20Island");
+        
+        String xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/embedded/singleNamedPlaces.xml");
+        xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+        
+        // replace
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1");
+        conec = getCapsUrl.openConnection();
+        
+        putRequestFile(conec, "org/constellation/wfs/xml/embedded/StoredQuery2.xml");
+        
+        obj = unmarshallResponse(conec);
+        
+        assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof CreateStoredQueryResponseType);
+        
+        // execute it
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1?param1=Goose%20Island");
+        
+        xmlResult    = getStringResponse(getCapsUrl.openConnection());
+        xmlExpResult = getStringFromFile("org/constellation/wfs/xml/embedded/singleNamedPlaces2.xml");
+        xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
+        xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
+        
+        domCompare(xmlExpResult, xmlResult);
+        
+        // remove
+        Object response = unmarshallResponseDelete(getCapsUrl.openConnection());
+        
+        assertTrue(response instanceof DropStoredQueryResponseType);
+        
+        // verify that the query is removed
+        getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
+        
+        listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
+        assertEquals(2, listQuery.getStoredQuery().size());
     }
 
     public static void domCompare(final Object actual, final Object expected) throws Exception {

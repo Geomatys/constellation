@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<wfs:Query typeNames="NamedPlaces" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:wfs="http://www.opengis.net/wfs/2.0"> 
+    <fes:Filter>
+        <fes:PropertyIsNotEqualTo>
+            <fes:ValueReference>NAME</fes:ValueReference>
+            <fes:Literal>${param1}</fes:Literal>
+        </fes:PropertyIsNotEqualTo>
+    </fes:Filter>
+</wfs:Query>

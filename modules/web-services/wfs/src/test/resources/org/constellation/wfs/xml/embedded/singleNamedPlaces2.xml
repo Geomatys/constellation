@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs/2.0" timeStamp="" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/gml http://localhost:9090/wfs/default?request=DescribeFeatureType&amp;version=2.0.0&amp;service=WFS&amp;namespace=xmlns(ns1=http://www.opengis.net/gml)&amp;typenames=ns1:NamedPlaces http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd " numberReturned="1" numberMatched="1">
+    <wfs:boundedBy>
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:4326">
+            <gml:lowerCorner>0.0021 0.0025</gml:lowerCorner>
+            <gml:upperCorner>0.0045 0.0025</gml:upperCorner>
+        </gml:Envelope>
+    </wfs:boundedBy>
+    <wfs:member>
+        <gml:NamedPlaces xmlns:gml="http://www.opengis.net/gml" xmlns:wstxns1="http://www.opengis.net/gml/3.2" wstxns1:id="NamedPlaces.1">
+            <gml:the_geom>
+                <wstxns1:MultiSurface xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gco="http://www.isotc211.org/2005/gco" srsName="urn:ogc:def:crs:epsg:4326">
+                    <wstxns1:surfaceMember>
+                        <wstxns1:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+                            <wstxns1:exterior>
+                                <wstxns1:LinearRing srsName="urn:ogc:def:crs:epsg:4326">
+                                    <wstxns1:posList>0.0021 0.0025 0.0045 0.0025 0.0043 0.0025 0.0021 0.0025</wstxns1:posList>
+                                </wstxns1:LinearRing>
+                            </wstxns1:exterior>
+                        </wstxns1:Polygon>
+                    </wstxns1:surfaceMember>
+                </wstxns1:MultiSurface>
+            </gml:the_geom>
+            <gml:FID>117</gml:FID>
+            <gml:NAME>Ashton</gml:NAME>
+        </gml:NamedPlaces>
+    </wfs:member>
+</wfs:FeatureCollection>
