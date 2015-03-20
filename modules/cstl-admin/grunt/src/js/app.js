@@ -237,36 +237,50 @@ cstlAdminApp
         }]);
 
 
+function applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit) {
+    if (scrollPos > topHeight && blockHeight < limit ) {
+        if((scrollPos+blockHeight) <= (limit+topHeight)) {
+            blockInfo.css('padding-top', scrollPos - topHeight);
+        }
+    } else {
+        blockInfo.css('padding-top', 0);
+    }
+}
 
 $(window).scroll(function(){
-    if(window.location.hash.substring(1)==='/data'){
-        if ($(this).scrollTop() > 259) {
-            $('#block-information-right').css('padding-top', $(this).scrollTop() - 259);
-        } else {
-            $('#block-information-right').css('padding-top', 0);
-        }
-    }
-    else if(window.location.hash.substring(1)==='/styles' || window.location.hash.substring(1)==='/sensors' || window.location.hash.substring(1)==='/mapcontext'){
-        if ($(this).scrollTop() > 230) {
-            $('#block-information-right').css('padding-top', $(this).scrollTop() - 230);
-        } else {
-            $('#block-information-right').css('padding-top', 0);
-        }
-    }
-
-    else if(window.location.hash.substring(1)==='/tasks'){
-        if ($(this).scrollTop() > 190) {
-            $('#block-information-right').css('padding-top', $(this).scrollTop() - 190);
-        } else {
-            $('#block-information-right').css('padding-top', 0);
-        }
-    }
-    else{
-        if ($(this).scrollTop() > 250) {
-            $('#block-information-right').css('padding-top', $(this).scrollTop() - 250);
-        } else {
-            $('#block-information-right').css('padding-top', 0);
-        }
+    var limit,scrollPos,topHeight;
+    var blockInfo = $('#block-information-right');
+    var blockHeight = blockInfo.height();
+    if(window.location.hash.indexOf('/data') !== -1){
+        limit = $('#contentList').height();
+        scrollPos = $(this).scrollTop();
+        topHeight = $('#advancedSearchPanel').height() + 275;
+        applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit);
+    } else if(window.location.hash.indexOf('/metadata')!==-1){
+        limit = $('#contentList').height();
+        scrollPos = $(this).scrollTop();
+        topHeight = $('#advancedSearchPanel').height() + 240;
+        applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit);
+    } else if(window.location.hash.indexOf('/styles') !== -1 || window.location.hash.indexOf('/mapcontext') !== -1){
+        limit = $('#contentList').height();
+        scrollPos = $(this).scrollTop();
+        topHeight = 245;
+        applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit);
+    } else if(window.location.hash.indexOf('/sensors')!==-1){
+        limit = $('#contentList').height();
+        scrollPos = $(this).scrollTop();
+        topHeight = 240;
+        applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit);
+    } else if(window.location.hash.indexOf('/tasks') !==-1){
+        limit = $('#contentList').height();
+        scrollPos = $(this).scrollTop();
+        topHeight = 200;
+        applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit);
+    } else{
+        limit = $('#contentList').height();
+        scrollPos = $(this).scrollTop();
+        topHeight = 255;
+        applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit);
     }
 
 });

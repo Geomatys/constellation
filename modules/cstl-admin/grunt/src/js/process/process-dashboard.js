@@ -166,7 +166,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         $scope.toggleUpDownSelected = function() {
             var $header = $('#ProcessDashboard').find('.selected-item').find('.block-header');
             $header.nextAll().slideToggle(200);
-            $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+            $header.find('i').toggleClass('fa-chevron-down fa-chevron-up');
         };
 
         // Open the add task modal

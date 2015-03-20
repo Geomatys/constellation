@@ -75,6 +75,7 @@
             </div>
             <div class="dash-inner row">
                 <div class="pull-left"
+                     id="contentList"
                      style="width: 60%; margin-bottom: 5px;"
                      ng-init="sensorCtrl.smallMode=false">
                     <div id="list" data-role="list">
@@ -210,7 +211,6 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
-
                     <div id="block-information-right" style="padding: 10px;">
                         <div id="section">
                             <div class="alert alert-sos alert-info alert-data"
@@ -228,32 +228,32 @@
                                             title="{{sensorCtrl.selectedSensor.id}}">{{truncateTitleBlock(sensorCtrl.selectedSensor.id)}}</strong>
                                     <i class="fa fa-chevron-down pull-right"></i>
                                 </div>
-                                <div>
-                                <div class="block-content">
-                                    <div class="row description-block">
-                                        <div class="col-sm-3 col-md-2">
-                                            <img src="img/block-content-owner.svg" alt="" />
+                                <div style="display: none;">
+                                    <div class="block-content">
+                                        <div class="row description-block">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-owner.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{sensorCtrl.selectedSensor.owner}}</span>
+                                            </div>
                                         </div>
-                                        <div class="col-sm-9 col-md-10 description-text">
-                                            <span>{{sensorCtrl.selectedSensor.owner}}</span>
+                                        <div class="row description-block">
+                                            <div class="col-sm-3 col-md-2">
+                                                <img src="img/block-content-date.svg" alt="" />
+                                            </div>
+                                            <div class="col-sm-9 col-md-10 description-text">
+                                                <span>{{sensorCtrl.selectedSensor.createDate | date:'yyyy-MM-dd'}}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="row description-block">
-                                        <div class="col-sm-3 col-md-2">
-                                            <img src="img/block-content-date.svg" alt="" />
-                                        </div>
-                                        <div class="col-sm-9 col-md-10 description-text">
-                                            <span>{{sensorCtrl.selectedSensor.createDate | date:'yyyy-MM-dd'}}</span>
-                                        </div>
+                                    <div class="block-content" ng-if="sensorCtrl.selectedSensorsChild">
+                                        <h6 translate="label.title">Title</h6>
+                                        <span>{{truncateTitleBlock(sensorCtrl.selectedSensorsChild.id)}}</span>
+                                        <div class="separator"></div>
+                                        <h6 translate="label.type">Type</h6>
+                                        <span translate="label.sensor">sensor</span>
                                     </div>
-                                </div>
-                                <div class="block-content" ng-if="sensorCtrl.selectedSensorsChild">
-                                    <h6 translate="label.title">Title</h6>
-                                    <span>{{truncateTitleBlock(sensorCtrl.selectedSensorsChild.id)}}</span>
-                                    <div class="separator"></div>
-                                    <h6 translate="label.type">Type</h6>
-                                    <span translate="label.sensor">sensor</span>
-                                </div>
                                 </div>
                                 <div class="block-action">
                                     <div class="row">

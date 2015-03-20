@@ -81,7 +81,9 @@
                 </div>
             </div>
         </div>
-        <div class="dash-inner row" collapse="!dataCtrl.advancedMetadataSearch">
+        <div id="advancedSearchPanel"
+             class="dash-inner row"
+             collapse="!dataCtrl.advancedMetadataSearch">
             <form name="searchForm" class="advanced-search-dataset">
                 <div class="row" style="padding-right: 15px; padding-left: 15px;">
                     <div class="col-sm-4" ng-class="{'has-error': searchForm.title.$invalid}">
@@ -175,6 +177,7 @@
         </div>
         <div class="dash-inner row" style="padding-bottom: 10pt;">
             <div class="pull-left"
+                 id="contentList"
                  style="width: 60%;"
                  ng-init="dataCtrl.smallMode=false">
                 <div id="list" data-role="list">
@@ -346,30 +349,9 @@
                 </div>
             </div>
             <div class="pull-left" style="width: 40%;">
-
                 <div id="block-information-right">
-
-                    <!-- tabs -->
-                    <div style="padding:0 10px;">
-                        <ul class="nav nav-tabs">
-                            <li class="tab-metadata" ng-click="selectTabInfo('view')" ng-class="{'active':dataCtrl.currentTabInfo==='view'}">
-                                <a class="hidden-xs hidden-sm" translate="navtab.block.info.view">View </a>
-                                <a class="hidden-md hidden-lg fa fa-eye" style="font-size: 20px;"> </a>
-                            </li>
-                            <li class="tab-metadata" ng-click="selectTabInfo('info')" ng-class="{'active':dataCtrl.currentTabInfo==='info'}">
-                                <a class="hidden-xs hidden-sm" translate="navtab.block.info.info">Tools </a>
-                                <a class="hidden-md hidden-lg fa fa-info-circle" style="font-size: 20px;"> </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- map tab -->
-                    <div class="sous-block-information" ng-show="dataCtrl.currentTabInfo==='view'">
+                    <div class="sous-block-information">
                         <div id="metadataPreviewMap" class="dashboardmap metadata-dashboardmap"></div>
-                    </div>
-
-                    <!-- info tab -->
-                    <div class="sous-block-information" ng-show="dataCtrl.currentTabInfo==='info'">
                         <div>
                             <div class="alert alert-info alert-csw"
                                  ng-if="!selectedDS && !dataCtrl.selectedDataSetChild">
@@ -394,7 +376,7 @@
                                             title="{{dataCtrl.selectedDataSetChild.Name}}">{{truncateTitleBlock(dataCtrl.selectedDataSetChild.Name)}}</strong>
                                     <i class="fa fa-chevron-down pull-right"></i>
                                 </div>
-                                <div>
+                                <div style="display: none;">
                                     <div class="block-content"
                                          ng-if="selectedDS">
                                         <div class="row description-block">
@@ -472,8 +454,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>

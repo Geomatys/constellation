@@ -48,18 +48,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             $scope.$apply();
         });
 
-        /**
-         * Select tab in information block.
-         */
-        $scope.selectTabInfo = function(item) {
-            $scope.currentTabInfo = item;
-            if(item==='view') {
-                setTimeout(function () {
-                    $scope.showLayerDashboardMap();
-                }, 300);
-            }
-        };
-
         $scope.getCurrentLang = function() {
             var lang = $translate.use();
             if(!lang){
@@ -186,17 +174,14 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         );
                     });
                 });
-                $scope.currentTabInfo = 'info';
             } else if ($scope.type === 'sos') {
                 sos.sensorsTree({id: $routeParams.id}, function(sensors) {
                     Dashboard($scope, sensors.children, false);
                     $scope.layers = sensors.children;
 
                 }, function() { Growl('error','Error','Unable to list sensors'); });
-                $scope.currentTabInfo = 'info';
             } else if ($scope.type === 'wps') {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
-                $scope.currentTabInfo = 'info';
                 //@TODO get process list
             } else {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
@@ -207,7 +192,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         $scope.showLayerDashboardMap();
                     },300);
                 });
-                $scope.currentTabInfo = 'view';
             }
         };
 

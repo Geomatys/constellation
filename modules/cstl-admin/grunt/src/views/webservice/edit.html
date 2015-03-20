@@ -84,7 +84,7 @@
             <div class="tab-content">
                 <div class="tab-pane" ng-class="{active:tabdata}" ng-show="tabdata">
                     <div class="row" ng-init="initScope()">
-                        <div class="col-sm-8">
+                        <div class="col-sm-8" id="contentList">
                             <div class="frame dashboard">
                                 <div class="navbar title">
                                     <div class="navbar-inner">
@@ -436,11 +436,8 @@
                             </div>
                         </div>
 
-                        <!-- Information block -->
-                        <div id="block-information-right">
-                            <div class="col-sm-4">
-                                <div style="margin-bottom:10px;"
-                                     ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps' && service.type.toLowerCase() !== 'wmts'">
+                            <div id="block-information-right" class="col-sm-4">
+                                <div ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps' && service.type.toLowerCase() !== 'wmts'">
                                     <a data-toggle="modal"
                                        class="btn btn-add btn-lg btn-block"
                                        ng-click="showDataToAdd()" id="showDataToAdd">
@@ -449,8 +446,7 @@
                                         <span translate="service.edit.dashboard.action.add.button">Add</span>
                                     </a>
                                 </div>
-                                <div style="margin-bottom:10px;"
-                                     ng-if="service.type.toLowerCase() === 'wmts'">
+                                <div ng-if="service.type.toLowerCase() === 'wmts'">
                                     <a id="showDataToAddWMTS"
                                        data-toggle="modal"
                                        class="btn btn-add btn-lg btn-block"
@@ -460,37 +456,15 @@
                                         <span translate="service.edit.dashboard.wmts.action.addnewlayer.button">Add new layer</span>
                                     </a>
                                 </div>
-
-                                <!-- tabs -->
-                                <div  ng-if="service.type.toLowerCase() === 'wms' || service.type.toLowerCase() === 'wmts' || service.type.toLowerCase() === 'wfs' || service.type.toLowerCase() === 'wcs' ">
-                                    <ul class="nav nav-tabs">
-                                        <li class="tab-data" ng-click="selectTabInfo('view')" ng-class="{'active':currentTabInfo==='view'}">
-                                            <a class="hidden-xs hidden-sm" translate="navtab.block.info.view">View </a>
-                                            <a class="hidden-md hidden-lg fa fa-eye" style="font-size: 20px;"> </a>
-                                        </li>
-                                        <li class="tab-data" ng-click="selectTabInfo('info')" ng-class="{'active':currentTabInfo==='info'}">
-                                            <a class="hidden-xs hidden-sm" translate="navtab.block.info.info">Tools </a>
-                                            <a class="hidden-md hidden-lg fa fa-info-circle" style="font-size: 20px;"> </a>
-                                        </li>
-                                        <li class="tab-data" ng-click="selectTabInfo('assos')" ng-class="{'active':currentTabInfo==='assos'}" ng-if="service.type.toLowerCase() === 'wms'">
-                                            <a class="hidden-xs hidden-sm" translate="navtab.block.info.assos">Association </a>
-                                            <a class="hidden-md hidden-lg fa fa-link" style="font-size: 20px;"> </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <!-- map tab -->
-                                <div class="sous-block-information sous-block-information-service" ng-show="currentTabInfo==='view'">
-                                    <div id="wmtsPreviewMap" class="dashboardmap data-dashboardmap"
+                                <div class="sous-block-information sous-block-information-service">
+                                    <div id="wmtsPreviewMap"
+                                         class="dashboardmap data-dashboardmap"
                                          style="padding:0;"
                                          ng-if="service.type.toLowerCase() === 'wmts'"></div>
-                                    <div id="layerPreviewMap" class="dashboardmap data-dashboardmap"
+                                    <div id="layerPreviewMap"
+                                         class="dashboardmap data-dashboardmap"
                                          style="padding:0;"
                                          ng-if="service.type.toLowerCase() !== 'wmts' && service.type.toLowerCase() !== 'sos' && service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps'"></div>
-                                </div>
-
-                                <!-- info tab -->
-                                <div class="sous-block-information sous-block-information-service" ng-show="currentTabInfo==='info'">
                                     <div>
                                         <div class="alert alert-info alert-data"
                                              ng-class="{'alert-csw':type==='csw','alert-sos':type==='sos'}"
@@ -510,6 +484,7 @@
                                                     <i class="fa fa-chevron-down pull-right"></i>
                                                 </div>
                                                 <div class="block-content"
+                                                     style="display: none;"
                                                      ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
                                                     <div class="row description-block">
                                                         <div class="col-sm-3 col-md-2">
@@ -547,8 +522,8 @@
                                                                         id="deleteLayer"
                                                                         class="btn btn-danger"
                                                                         ng-click="deleteLayer();"
-                                                                    data-placement="bottom"
-                                                                    title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
+                                                                        data-placement="bottom"
+                                                                        title="{{'layer.listing.selected.delete.button' | translate }}" tooltip>
                                                                     <i class="glyphicon glyphicon-trash"></i>
                                                                 </button>
                                                             </span>
@@ -556,7 +531,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div ng-if="service.type.toLowerCase() === 'csw'">
                                                 <div class="block-header block-header-md"
                                                      ng-click="toggleUpDownSelected()">
@@ -564,7 +538,7 @@
                                                             title="{{selected.title ? selected.title : selected.identifier}}">{{selected.title ? truncateTitleBlock(selected.title) : truncateTitleBlock(selected.identifier)}}</strong>
                                                     <i class="fa fa-chevron-up pull-right"></i>
                                                 </div>
-                                                <div>
+                                                <div style="display: none;">
                                                     <div class="block-content">
                                                         <div class="row description-block"
                                                              ng-if="selected.creator">
@@ -667,31 +641,33 @@
                                                     <strong>{{truncateTitleBlock(selected.id)}}</strong>
                                                     <i class="fa fa-chevron-up pull-right"></i>
                                                 </div>
-                                                <div class="block-content">
-                                                    <div class="row description-block">
-                                                        <div class="col-sm-3 col-md-2">
-                                                            <img src="img/block-content-owner.svg" alt="" />
+                                                <div style="display: none;">
+                                                    <div class="block-content">
+                                                        <div class="row description-block">
+                                                            <div class="col-sm-3 col-md-2">
+                                                                <img src="img/block-content-owner.svg" alt="" />
+                                                            </div>
+                                                            <div class="col-sm-9 col-md-10 description-text">
+                                                                <span>{{selected.creator}}</span>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-sm-9 col-md-10 description-text">
-                                                            <span>{{selected.creator}}</span>
+                                                        <div class="row description-block">
+                                                            <div class="col-sm-3 col-md-2">
+                                                                <img src="img/block-content-date.svg" alt="" />
+                                                            </div>
+                                                            <div class="col-sm-9 col-md-10 description-text">
+                                                                <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="row description-block">
-                                                        <div class="col-sm-3 col-md-2">
-                                                            <img src="img/block-content-date.svg" alt="" />
-                                                        </div>
-                                                        <div class="col-sm-9 col-md-10 description-text">
-                                                            <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
-                                                        </div>
+                                                    <div class="block-content"
+                                                         ng-if="selectedSensorsChild != null">
+                                                        <h6 translate="label.title">Title</h6>
+                                                        <span>{{selectedSensorsChild.id}}</span>
+                                                        <div class="separator"></div>
+                                                        <h6 translate="label.type">Type</h6>
+                                                        <span translate="label.sensor">sensor</span>
                                                     </div>
-                                                </div>
-                                                <div class="block-content"
-                                                     ng-if="selectedSensorsChild != null">
-                                                    <h6 translate="label.title">Title</h6>
-                                                    <span>{{selectedSensorsChild.id}}</span>
-                                                    <div class="separator"></div>
-                                                    <h6 translate="label.type">Type</h6>
-                                                    <span translate="label.sensor">sensor</span>
                                                 </div>
                                                 <div class="block-action">
                                                     <div class="row">
@@ -723,43 +699,33 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div><!-- info tab end -->
-
-                                <!-- associations tab -->
-                                <div class="sous-block-information sous-block-information-service" ng-show="currentTabInfo==='assos'">
-                                    <div class="alert alert-info alert-data"
-                                         ng-class="{'alert-csw':type==='csw','alert-sos':type==='sos'}"
-                                         ng-show="!selected">
-                                        <h4 translate="label.no.selected.data">No selected data</h4>
-                                        <p translate="msg.no.selected.data.assos"
-                                           style="font-weight:normal;">Click on a data to display more information</p>
-                                    </div>
-
-                                    <div ng-if="selected">
+                                    <div ng-if="selected && service.type === 'wms'">
                                         <div class="row block-association"
                                              ng-init="assocStyle=false;">
-                                            <div class="col-sm-12">
+                                            <div class="col-sm-12" style="float: left;">
                                                 <div class="block-associated block-associated-style block-associated-style-service"
                                                      ng-click="assocStyle=!assocStyle;">
                                                     <div class="block-associated-nb">{{selected.TargetStyle.length}}</div>
                                                     <div class="block-associated-title"
                                                          translate="label.related.style">Associated Styles</div>
-                                                                <span class="fa icon-assoc-style "
-                                                                      ng-class="{'selected':assocStyle, 'fa-chevron-circle-up':assocStyle, 'fa-chevron-circle-down':!assocStyle}"
-                                                                      tooltip-placement="bottom"
-                                                                      tooltip-html-unsafe="{{'label.show.style' | translate }}"></span>
+                                                    <span class="fa icon-assoc-style "
+                                                          ng-class="{'selected':assocStyle, 'fa-chevron-circle-up':assocStyle, 'fa-chevron-circle-down':!assocStyle}"
+                                                          tooltip-placement="bottom"
+                                                          tooltip-html-unsafe="{{'label.show.style' | translate }}"></span>
                                                 </div>
-                                                            <span class="fa icon-assoc-style fa-plus "
-                                                                  style="right:70px;"
-                                                                  tooltip-placement="bottom"
-                                                                  tooltip-html-unsafe="{{'label.new.style' | translate }}"
-                                                                  ng-click="showStyleList();"></span>
+                                                <span class="fa icon-assoc-style fa-plus "
+                                                      style="right:70px;"
+                                                      tooltip-placement="bottom"
+                                                      tooltip-html-unsafe="{{'label.new.style' | translate }}"
+                                                      ng-click="showStyleList();"></span>
                                             </div>
                                         </div>
-                                        <div ng-if="assocStyle" class="col-sm-12 block-assoc">
+                                        <div ng-if="assocStyle"
+                                             class="col-sm-12 block-assoc"
+                                             style="float: left;">
                                             <div id="linkedList" class="block-content" >
-                                                            <span ng-show="selected.TargetStyle.length == 0"
-                                                                  translate="label.no.association">No association</span>
+                                                <span ng-show="selected.TargetStyle.length == 0"
+                                                      translate="label.no.association">No association</span>
                                                 <div ng-show="selected.TargetStyle.length > 0"
                                                      class="style btn-assoc-item"
                                                      ng-repeat="style in selected.TargetStyle"
@@ -774,9 +740,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div><!-- associations tab End -->
+                                </div>
                             </div>
-                        </div><!-- Information block End -->
+
                     </div>
                 </div>
                 <div class="tab-pane"

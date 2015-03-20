@@ -41,8 +41,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             published : null,
             observation : null,
             smallMode : false,
-            selectedDataSetChild : null,
-            currentTabInfo : 'view'
+            selectedDataSetChild : null
         };
         $scope.search = {};
         $scope.searchMD = {};
@@ -84,18 +83,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          */
         $scope.selectTab = function(item) {
             $scope.dataCtrl.currentTab = item;
-        };
-
-        /**
-         * Select tab in information block.
-         */
-        $scope.selectTabInfo = function(item) {
-            $scope.dataCtrl.currentTabInfo = item;
-            if(item==='view'){
-                setTimeout(function(){
-                    $scope.showDataDashboardMap();
-                },300);
-            }
         };
 
         /**

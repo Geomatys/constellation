@@ -65,6 +65,7 @@
             </div>
             <div class="dash-inner row">
                 <div class="pull-left"
+                     id="contentList"
                      style="width: 60%; margin-bottom: 5px;"
                      ng-init="small=false">
                     <div id="list" data-role="list">
@@ -213,30 +214,10 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
-
                     <div id="block-information-right">
-
-                        <!-- tabs -->
-                        <div style="padding:0 10px;">
-                            <ul class="nav nav-tabs">
-                                <li class="tab-mapcontext" ng-click="selectTabInfo('view')" ng-class="{'active':currentTabInfo==='view'}">
-                                    <a class="hidden-xs hidden-sm" translate="navtab.block.info.view">View </a>
-                                    <a class="hidden-md hidden-lg fa fa-eye" style="font-size: 20px;"> </a>
-                                </li>
-                                <li class="tab-mapcontext" ng-click="selectTabInfo('info')" ng-class="{'active':currentTabInfo==='info'}">
-                                    <a class="hidden-xs hidden-sm" translate="navtab.block.info.info">Tools </a>
-                                    <a class="hidden-md hidden-lg fa fa-info-circle" style="font-size: 20px;"> </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- map tab -->
-                        <div class="sous-block-information" ng-show="currentTabInfo==='view'">
-                            <div id="mapcontextPreviewMap" class="dashboardmap mapcontext-dashboardmap"></div>
-                        </div>
-
-                        <!-- info tab -->
-                        <div class="sous-block-information" ng-show="currentTabInfo==='info'">
+                        <div class="sous-block-information">
+                            <div id="mapcontextPreviewMap"
+                                 class="dashboardmap mapcontext-dashboardmap"></div>
                             <div>
                                 <div class="alert alert-info alert-mapcontext"
                                      ng-class="{hide: selected}">
@@ -253,7 +234,7 @@
                                                 title="{{selected.name}}">{{truncateTitleBlock(selected.name)}}</strong>
                                         <i class="fa fa-chevron-down pull-right"></i>
                                     </div>
-                                    <div class="block-content">
+                                    <div class="block-content" style="display: none;">
                                         <div class="row description-block" ng-if="selected.description">
                                             <div class="col-sm-3 col-md-2">
                                                 <img src="img/block-content-description.svg" alt="" />

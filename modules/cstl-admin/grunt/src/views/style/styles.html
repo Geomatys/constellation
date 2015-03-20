@@ -88,6 +88,7 @@
             </div>
             <div class="dash-inner row">
                 <div class="pull-left"
+                     id="contentList"
                      style="width: 60%;margin-bottom: 5px;"
                      ng-init="small=false">
                     <div id="list" data-role="list">
@@ -176,45 +177,23 @@
                     </div>
                 </div>
                 <div class="pull-left" style="width: 40%;">
-
                     <div id="block-information-right">
-                        <!-- tabs -->
-                        <div style="padding:0 10px;">
-                            <ul class="nav nav-tabs">
-                                <li class="tab-style" ng-click="selectTabInfo('view')" ng-class="{'active':styleCtrl.currentTabInfo==='view'}">
-                                    <a class="hidden-xs hidden-sm" translate="navtab.block.info.view">View </a>
-                                    <a class="hidden-md hidden-lg fa fa-eye" style="font-size: 20px;"> </a>
-                                </li>
-                                <li class="tab-style" ng-click="selectTabInfo('info')" ng-class="{'active':styleCtrl.currentTabInfo==='info'}">
-                                    <a class="hidden-xs hidden-sm" translate="navtab.block.info.info">Tools </a>
-                                    <a class="hidden-md hidden-lg fa fa-info-circle" style="font-size: 20px;"> </a>
-                                </li>
-                                <li class="tab-style" ng-click="selectTabInfo('assos')" ng-class="{'active':styleCtrl.currentTabInfo==='assos'}">
-                                    <a class="hidden-xs hidden-sm" translate="navtab.block.info.assos">Associations</a>
-                                    <a class="hidden-md hidden-lg fa fa-link" style="font-size: 20px;"> </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- map tab -->
-                        <div class="sous-block-information" ng-show="styleCtrl.currentTabInfo==='view'">
+                        <div class="sous-block-information">
                             <div id="stylePreviewMap" class="dashboardmap style-dashboardmap"></div>
-                        </div>
-
-                        <!-- info tab -->
-                        <div class="sous-block-information" ng-show="styleCtrl.currentTabInfo==='info'">
                             <div>
                                 <div class="alert alert-info alert-style" ng-class="{hide:selected}">
                                     <h4 translate="label.no.selected.style">No selected style</h4>
                                     <p translate="msg.no.selected.style">Click on a style to display more information</p>
                                 </div>
                                 <div class="selected-item" id="selected-item" ng-class="{hide: !selected}">
-                                    <div class="block-header block-header-style" ng-click="toggleUpDownSelected()">
+                                    <div class="block-header block-header-style"
+                                         ng-click="toggleUpDownSelected()">
                                         <strong class="item-title title-bloc"
                                                 title="{{selected.Name}}">{{truncateTitleBlock(selected.Name)}}</strong>
                                         <i class="fa fa-chevron-down pull-right"></i>
                                     </div>
                                     <div class="block-content"
+                                         style="display: none;"
                                          ng-class="{'block-vector':selected.Type=='VECTOR','block-raster':selected.Type=='COVERAGE'}">
                                         <div class="row description-block">
                                             <div class="col-sm-3 col-md-2">
@@ -259,42 +238,30 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-                        </div> <!-- info tab end-->
-
-
-                        <!-- associations tab -->
-                        <div class="sous-block-information" ng-show="styleCtrl.currentTabInfo==='assos'">
-                            <div class="alert alert-info alert-style"
-                                 ng-if="!selected">
-                                <h4 translate="label.no.selected.style">No selected style</h4>
-                                <p translate="msg.no.selected.style.assos"
-                                   style="font-weight:normal;">Click on a data to display data associations (Styles, Services, Sensors)</p>
-                            </div>
-
                             <div ng-if="selected">
                                 <div class="row block-association"
                                      ng-init="assocData=false;assocLayer=false;">
-                                    <div class="col-sm-12 col-md-10 col-md-offset-1">
+                                    <div class="col-sm-12" style="float: left;">
                                         <div class="block-associated block-associated-data"
                                              ng-click="assocData=!assocData;assocLayer=false;">
                                             <div class="block-associated-nb">{{selected.dataList.length}}</div>
                                             <div class="block-associated-title"
                                                  translate="label.related.data">Associated Data</div>
-                                                            <span class="fa icon-assoc-data"
-                                                                  ng-class="{'selected':assocData,'fa-chevron-circle-up':assocData,'fa-chevron-circle-down':!assocData}"
-                                                                  tooltip-placement="bottom"
-                                                                  tooltip-html-unsafe="{{'label.show.data' | translate }}"></span>
+                                            <span class="fa icon-assoc-data"
+                                                  ng-class="{'selected':assocData,'fa-chevron-circle-up':assocData,'fa-chevron-circle-down':!assocData}"
+                                                  tooltip-placement="bottom"
+                                                  tooltip-html-unsafe="{{'label.show.data' | translate }}"></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div ng-if="assocData"
-                                     class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
+                                     class="col-sm-12 block-assoc"
+                                     style="float: left;">
                                     <div id="linkedDataList" class="block-content" >
-                                                    <span ng-show="selected.dataList.length == 0"
-                                                          translate="label.no.association">No association</span>
+                                        <span ng-show="selected.dataList.length == 0"
+                                              translate="label.no.association">No association</span>
                                         <div ng-show="selected.dataList.length > 0"
                                              class="style btn-assoc-item"
                                              ng-repeat="data in selected.dataList"
@@ -316,24 +283,25 @@
                                 </div>
                                 <div class="row block-association"
                                      ng-init="assocData=false;assocLayer=false;">
-                                    <div class="col-sm-12 col-md-10 col-md-offset-1">
+                                    <div class="col-sm-12" style="float: left;">
                                         <div class="block-associated block-associated-layers"
                                              ng-click="assocData=false;assocLayer=!assocLayer;">
                                             <div class="block-associated-nb">{{selected.layersList.length}}</div>
                                             <div class="block-associated-title"
                                                  translate="label.related.layer">Associated Layers</div>
-                                                            <span class="fa icon-assoc-layer"
-                                                                  ng-class="{'selected':assocLayer,'fa-chevron-circle-up':assocLayer,'fa-chevron-circle-down':!assocLayer}"
-                                                                  tooltip-placement="bottom"
-                                                                  tooltip-html-unsafe="{{'label.show.layers' | translate }}"></span>
+                                            <span class="fa icon-assoc-layer"
+                                                  ng-class="{'selected':assocLayer,'fa-chevron-circle-up':assocLayer,'fa-chevron-circle-down':!assocLayer}"
+                                                  tooltip-placement="bottom"
+                                                  tooltip-html-unsafe="{{'label.show.layers' | translate }}"></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div ng-if="assocLayer"
-                                     class="col-sm-12 col-md-10 col-md-offset-1 block-assoc">
+                                     class="col-sm-12 block-assoc"
+                                     style="float: left;">
                                     <div id="linkedLayersList" class="block-content" >
-                                                    <span ng-show="selected.layersList.length == 0"
-                                                          translate="label.no.association">No association</span>
+                                        <span ng-show="selected.layersList.length == 0"
+                                              translate="label.no.association">No association</span>
                                         <div ng-show="selected.layersList.length > 0"
                                              class="style btn-assoc-item"
                                              ng-repeat="layer in selected.layersList"
@@ -354,7 +322,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div> <!-- association tab end -->
+                        </div>
                     </div>
                 </div>
             </div>

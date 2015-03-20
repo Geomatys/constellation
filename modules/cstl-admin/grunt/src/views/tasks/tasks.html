@@ -27,7 +27,10 @@
                 </div>
             </div>
             <div class="dash-inner row">
-                <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="small=false">
+                <div id="contentList"
+                     class="pull-left"
+                     style="width: 60%; margin-bottom: 5px;"
+                     ng-init="small=false">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-data pagination-task">
                             <strong class="col-lg-6 col-xs-8 col-md-6">
@@ -90,7 +93,6 @@
                                                 <span ng-if="task.statusList.length > 0">{{task.statusList.length}}</span>
                                                 <span translate="service.edit.dashboard.tasks.list.associated" ng-class="{hide:small}">associated tasks</span>
                                             </div>
-                                            <!--<span ng-if="task.statusList == null ||task.statusList.length == 0" translate="md.listing.no.data">No</span>-->
                                         </div>
                                     </div>
                                 </div>
@@ -178,7 +180,6 @@
                                 </div>
                                 <div class="block-content block-content-process" ng-show="selected.statusList.length > 0">
                                     <h6 translate="task.history">History</h6>
-
                                     <div class="row description-block">
                                         <table class="table table-condensed table-hover task-history"
                                                fixed-header table-height="215px" ng-model="selected.statusList">
@@ -196,11 +197,11 @@
                                                 <td>{{status.end | date:"dd/MM/yyyy h:mma"}}</td>
                                                 <td>{{status.status}}</td>
                                                 <td>
-                                                       <span ng-click="showMessage(status)"
-                                                             title="{{messageType(status) | translate }}" tooltip
-                                                             style="display: inline-block; cursor: pointer;">
-                                                           <i class="glyphicon glyphicon-info-sign"/>
-                                                       </span>
+                                                   <span ng-click="showMessage(status)"
+                                                         title="{{messageType(status) | translate }}" tooltip
+                                                         style="display: inline-block; cursor: pointer;">
+                                                       <i class="glyphicon glyphicon-info-sign"/>
+                                                   </span>
                                                 </td>
                                             </tr>
                                             </tbody>

@@ -29,8 +29,7 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
             cstlUrl:$cookieStore.get('cstlUrl'),
             currentStyleId:null,
             currentDataId:null,
-            currentLayerId:null,
-            currentTabInfo:'view'
+            currentLayerId:null
         };
 
         $scope.initStyleDashboard = function() {
@@ -71,18 +70,6 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                     Growl('error','Error','Unable to show styles list!');
                 }
             );
-        };
-
-        /**
-         * Select tab in information block.
-         */
-        $scope.selectTabInfo = function(item) {
-            $scope.styleCtrl.currentTabInfo = item;
-            if(item==='view') {
-                setTimeout(function () {
-                    $scope.previewStyledData(null, false);
-                }, 300);
-            }
         };
 
         /**
