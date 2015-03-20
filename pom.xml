@@ -1197,11 +1197,6 @@
                     <version>1.0.0-beta-1</version>
                 </plugin>
                 <plugin>
-                    <groupId>net.sf.alchim</groupId>
-                    <artifactId>yuicompressor-maven-plugin</artifactId>
-                    <version>1.1</version>
-                </plugin>
-                <plugin>
                     <groupId>net.sourceforge.maven-taglib</groupId>
                     <artifactId>maven-taglib-plugin</artifactId>
                     <version>2.4</version>
