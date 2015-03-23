@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Update the version number declared in the pom.xml files
+     and in a few Java source files. The Geotk version number
+     must be specified as a property on the command line. -->
+
+<project name="UpdateVersion" default="update">
+  <target name="update">
+    <replace dir="${cstl.dir}">
+      <include name="**/pom.xml"/>
+      <replacefilter token="${cstl.oldversion}" value="${cstl.version}"/>
+    </replace>
+  </target>
+</project>
