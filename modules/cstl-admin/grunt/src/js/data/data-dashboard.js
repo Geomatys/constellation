@@ -109,6 +109,8 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 }
                 if(item){
                     $scope.dataCtrl.selectedDataSetChild = item;
+                }else {
+                    $scope.dataCtrl.selectedDataSetChild = null;
                 }
             }else {
                 $scope.dataCtrl.selectedDataSetChild = null;
