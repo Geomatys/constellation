@@ -28,8 +28,10 @@ import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 import org.constellation.engine.register.jooq.tables.records.MetadataRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.MetadataRepository;
+import org.jooq.AggregateFunction;
 import org.jooq.Record;
 import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 /**
@@ -137,6 +139,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         return dsl.select(METADATA.fields()).from(METADATA, METADATA_X_CSW)
                   .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
                   .and(METADATA_X_CSW.CSW_ID.eq(id)).fetchInto(Metadata.class);
+    }
+
+    @Override
+    public Map<String,Integer> getProfilesCount() {
+        AggregateFunction<Integer> count = DSL.count(METADATA.PROFILE);
+        return dsl.select(METADATA.PROFILE, count ).from(METADATA).groupBy(METADATA.PROFILE).fetchMap(METADATA.PROFILE, count);
     }
 
     @Override

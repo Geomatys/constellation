@@ -47,6 +47,8 @@ public interface MetadataRepository {
     List<Metadata> findAll();
 
     List<Metadata> filterAndGet(final Map<String,Object> filterMap);
+
+    Map<String,Integer> getProfilesCount();
     
     MetadataXCsw addMetadataToCSW(final String metadataID, final int cswID);
     
