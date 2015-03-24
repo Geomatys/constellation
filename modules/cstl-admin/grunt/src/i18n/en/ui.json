@@ -457,6 +457,12 @@
     "label.show.services": "Show services",
     "label.show.data":"Show data",
     "label.show.layers":"Show layers",
+    "label.mdfilter.owner.me":"My metadata",
+    "label.mdfilter.owner.mygroup":"My user group",
+    "label.mdfilter.owner.all":"All users",
+    "label.mdfilter.profile.header":"Profile",
+    "label.mdfilter.profile.all":"All profiles",
+
     "dialog.message.confirm.delete.dataset":"Are you sure to delete the selected dataset?",
     "dialog.message.confirm.delete.data":"Are you sure to delete the selected data?",
     "dialog.message.confirm.delete.mapcontext":"Are you sure to delete the selected map context?",

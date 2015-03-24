@@ -471,6 +471,12 @@
     "label.show.services": "Afficher les services",
     "label.show.data":"Afficher les données",
     "label.show.layers":"Afficher les couches",
+    "label.mdfilter.owner.me":"Mes fiches",
+    "label.mdfilter.owner.mygroup":"Mon groupe",
+    "label.mdfilter.owner.all":"Tous",
+    "label.mdfilter.profile.header":"Profil",
+    "label.mdfilter.profile.all":"Tous",
+
     "dialog.message.confirm.delete.dataset":"Êtes vous sûre de vouloir supprimer le jeu de données ?",
     "dialog.message.confirm.delete.data":"Êtes vous sûre de vouloir supprimer la donnée ?",
     "dialog.message.confirm.delete.mapcontext":"Êtes vous sûre de vouloir supprimer la composition cartographique ?",

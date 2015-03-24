@@ -19,6 +19,8 @@
 package org.constellation.engine.register.jooq.repository;
 
 import java.util.List;
+import java.util.Map;
+
 import org.constellation.engine.register.Metadata;
 import org.constellation.engine.register.MetadataXCsw;
 import static org.constellation.engine.register.jooq.Tables.METADATA;
@@ -26,6 +28,8 @@ import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 import org.constellation.engine.register.jooq.tables.records.MetadataRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.MetadataRepository;
+import org.jooq.Record;
+import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Component;
 
 /**
@@ -133,6 +137,58 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         return dsl.select(METADATA.fields()).from(METADATA, METADATA_X_CSW)
                   .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
                   .and(METADATA_X_CSW.CSW_ID.eq(id)).fetchInto(Metadata.class);
+    }
+
+    @Override
+    public List<Metadata> filterAndGet(final Map<String,Object> filterMap) {
+        if(filterMap == null || filterMap.isEmpty()) {
+            return findAll();
+        }else {
+            SelectConditionStep<Record> condition = null;
+            for(final Map.Entry<String,Object> entry : filterMap.entrySet()) {
+                if("owner".equals(entry.getKey())) {
+                    if(condition == null) {
+                        condition = dsl.select().from(METADATA).where(METADATA.OWNER.equal((Integer)entry.getValue()));
+                    }else {
+                        condition = condition.and(METADATA.OWNER.equal((Integer)entry.getValue()));
+                    }
+                }else if("profile".equals(entry.getKey())) {
+                    if(condition == null) {
+                        condition = dsl.select().from(METADATA).where(METADATA.PROFILE.equal((String)entry.getValue()));
+                    }else {
+                        condition = condition.and(METADATA.PROFILE.equal((String)entry.getValue()));
+                    }
+                }else if("validated".equals(entry.getKey())) {
+                    if(condition == null) {
+                        condition = dsl.select().from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
+                    }else {
+                        condition = condition.and(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
+                    }
+                }else if("published".equals(entry.getKey())) {
+                    if(condition == null) {
+                        condition = dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
+                    }else {
+                        condition = condition.and(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
+                    }
+                }else if("level".equals(entry.getKey())) {
+                    if(condition == null) {
+                        condition = dsl.select().from(METADATA).where(METADATA.ELEMENTARY.equal((Boolean)entry.getValue()));
+                    }else {
+                        condition = condition.and(METADATA.ELEMENTARY.equal((Boolean)entry.getValue()));
+                    }
+                }else if("term".equals(entry.getKey())) {
+                    if(condition == null) {
+                        condition = dsl.select().from(METADATA).where(METADATA.METADATA_ISO.contains((String)entry.getValue()));
+                    }else {
+                        condition = condition.and(METADATA.METADATA_ISO.contains((String)entry.getValue()));
+                    }
+                }
+            }
+            if(condition == null) {
+                return findAll();
+            }
+            return condition.fetchInto(Metadata.class);
+        }
     }
     
 }
