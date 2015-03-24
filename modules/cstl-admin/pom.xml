@@ -42,7 +42,7 @@
         <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>0.0.16</version>
+            <version>${frontend.maven.plugin.version}</version>
             <executions>
                 <!-- Run grunt build -->
                 <execution>
@@ -78,6 +78,7 @@
     <codahale.metrics.version>3.0.1</codahale.metrics.version>
     <node.version>v0.10.31</node.version>
     <npm.version>1.4.23</npm.version>
+    <frontend.maven.plugin.version>0.0.23</frontend.maven.plugin.version>
 
     <!-- Grunt build properties -->
     <grunt.target.dir>${project.build.directory}/grunt-build</grunt.target.dir>
@@ -406,7 +407,7 @@
         <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>0.0.16</version>
+            <version>${frontend.maven.plugin.version}</version>
             <executions>
                 <!-- Download and install nodejs and npm (locally) -->
                 <execution>
