@@ -144,7 +144,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     @Override
     public Map<String,Integer> getProfilesCount() {
         AggregateFunction<Integer> count = DSL.count(METADATA.PROFILE);
-        return dsl.select(METADATA.PROFILE, count ).from(METADATA).groupBy(METADATA.PROFILE).fetchMap(METADATA.PROFILE, count);
+        return dsl.select(METADATA.PROFILE, count ).from(METADATA).groupBy(METADATA.PROFILE).orderBy(count.desc()).fetchMap(METADATA.PROFILE, count);
     }
 
     @Override

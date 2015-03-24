@@ -715,6 +715,14 @@
     "profile.password.verify": "Confirmer le mot de passe",
     "profile.language.choice": "Choix de la langue",
 
+    "profile_default_raster":"Données raster",
+    "profile_default_vector":"Données vecteur",
+    "profile_inspire_raster":"Données raster INSPIRE",
+    "profile_inspire_vector":"Données vecteur INSPIRE",
+    "profile_import":"Profil standard",
+    "profile_sensorml_component":"Profil SensorML composant",
+    "profile_sensorml_system":"Profil SensorML système",
+
     "server.choose.file": "Choisir un fichier sur le serveur",
     "server.create.button": "Créer",
     "server.next.button": "Suivant",

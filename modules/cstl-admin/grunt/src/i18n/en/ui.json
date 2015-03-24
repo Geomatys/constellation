@@ -841,6 +841,14 @@
     "profile.password.verify": "Checking password",
     "profile.language.choice": "Language choice",
 
+    "profile_default_raster":"Raster data",
+    "profile_default_vector":"Vector data",
+    "profile_inspire_raster":"Inspire raster",
+    "profile_inspire_vector":"Inspire vector",
+    "profile_import":"Standard profile",
+    "profile_sensorml_component":"SensorML component",
+    "profile_sensorml_system":"SensorML system",
+
     "sessions.title": "Active sessions for [<b>{{username}}</b>]",
     "sessions.table.ipaddress": "IP address",
     "sessions.table.useragent": "User Agent",
