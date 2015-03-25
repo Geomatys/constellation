@@ -476,6 +476,12 @@
     "label.mdfilter.owner.all":"Tous",
     "label.mdfilter.profile.header":"Profil",
     "label.mdfilter.profile.all":"Tous",
+    "label.mdfilter.completion.header":"Complétion",
+    "label.mdfilter.completion.none":"Aucune",
+    "label.mdfilter.completion.elementary":"Élémentaire",
+    "label.mdfilter.completion.extended":"Étendue",
+    "label.mdfilter.completion.completed":"Complète",
+    "label.mdfilter.completion.all":"Tous",
 
     "dialog.message.confirm.delete.dataset":"Êtes vous sûre de vouloir supprimer le jeu de données ?",
     "dialog.message.confirm.delete.data":"Êtes vous sûre de vouloir supprimer la donnée ?",

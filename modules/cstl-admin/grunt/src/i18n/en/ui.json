@@ -462,6 +462,12 @@
     "label.mdfilter.owner.all":"All users",
     "label.mdfilter.profile.header":"Profile",
     "label.mdfilter.profile.all":"All profiles",
+    "label.mdfilter.completion.header":"Completion",
+    "label.mdfilter.completion.none":"None",
+    "label.mdfilter.completion.elementary":"Elementary",
+    "label.mdfilter.completion.extended":"Extended",
+    "label.mdfilter.completion.completed":"Completed",
+    "label.mdfilter.completion.all":"All",
 
     "dialog.message.confirm.delete.dataset":"Are you sure to delete the selected dataset?",
     "dialog.message.confirm.delete.data":"Are you sure to delete the selected data?",
