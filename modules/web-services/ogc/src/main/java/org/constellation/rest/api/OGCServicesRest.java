@@ -35,6 +35,7 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.WebdavContext;
 import org.constellation.dto.Details;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -59,6 +60,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -161,7 +163,7 @@ public final class OGCServicesRest {
     @Path("domain/{domainId}")
     public Response addInstance(@PathParam("domainId") int domainId, final @PathParam("spec") String spec, final Details metadata) throws ConfigurationException {
         
-        org.constellation.engine.register.Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
+        Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
         if(service != null) {
             return ok(AcknowlegementType.failure("Instance already created"));
         }

@@ -18,25 +18,25 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Style;
-import org.constellation.engine.register.jooq.tables.Data;
-import org.constellation.engine.register.jooq.tables.DataXDomain;
-import org.constellation.engine.register.jooq.tables.records.ProviderRecord;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.jooq.UpdateConditionStep;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
 import static org.constellation.engine.register.jooq.Tables.DATA;
 import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.LAYER;
 import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import static org.constellation.engine.register.jooq.Tables.SERVICE;
 import static org.constellation.engine.register.jooq.Tables.STYLE;
+
+import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.Data;
+import org.constellation.engine.register.jooq.tables.DataXDomain;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
+import org.constellation.engine.register.jooq.tables.records.ProviderRecord;
+import org.constellation.engine.register.repository.ProviderRepository;
+import org.jooq.UpdateConditionStep;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JooqProviderRepository extends AbstractJooqRespository<ProviderRecord, Provider> implements
@@ -123,9 +123,9 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     }
 
     @Override
-    public List<org.constellation.engine.register.Data> findDatasByProviderId(Integer id) {
+    public List<org.constellation.engine.register.jooq.tables.pojos.Data> findDatasByProviderId(Integer id) {
         return dsl.select(DATA.fields()).from(DATA).join(PROVIDER).on(DATA.PROVIDER.eq(PROVIDER.ID))
-                .where(PROVIDER.ID.eq(id)).fetchInto(org.constellation.engine.register.Data.class);
+                .where(PROVIDER.ID.eq(id)).fetchInto(org.constellation.engine.register.jooq.tables.pojos.Data.class);
     }
 
     @Override

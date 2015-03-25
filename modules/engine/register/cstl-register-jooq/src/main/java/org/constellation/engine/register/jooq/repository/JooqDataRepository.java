@@ -18,15 +18,29 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import org.constellation.engine.register.*;
-import org.constellation.engine.register.helper.DataHelper;
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.DataI18n;
+import org.constellation.engine.register.jooq.tables.pojos.DataXData;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.jooq.tables.records.DataXDataRecord;
+import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.jooq.Condition;
@@ -34,16 +48,12 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.constellation.engine.register.jooq.Tables.*;
-import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
@@ -69,7 +79,8 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public Data create(Data data) {
-        DataRecord newRecord = DataHelper.copy(data, dsl.newRecord(DATA));
+        DataRecord newRecord = dsl.newRecord(DATA);
+        newRecord.from(data);
         newRecord.store();
         return newRecord.into(Data.class);
     }
@@ -162,16 +173,16 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
                 .set(DATA.NAMESPACE, data.getNamespace())
                 .set(DATA.OWNER, data.getOwner())
                 .set(DATA.PROVIDER, data.getProvider())
-                .set(DATA.SENSORABLE, data.isSensorable())
+                .set(DATA.SENSORABLE, data.getSensorable())
                 .set(DATA.SUBTYPE, data.getSubtype())
                 .set(DATA.TYPE, data.getType())
-                .set(DATA.INCLUDED, data.isIncluded())
+                .set(DATA.INCLUDED, data.getIncluded())
                 .set(DATA.DATASET_ID, data.getDatasetId())
                 .set(DATA.FEATURE_CATALOG, data.getFeatureCatalog())
                 .set(DATA.STATS_RESULT, data.getStatsResult())
                 .set(DATA.STATS_STATE, data.getStatsState())
-                .set(DATA.RENDERED, data.isRendered())
-                .set(DATA.HIDDEN, data.isHidden())
+                .set(DATA.RENDERED, data.getRendered())
+                .set(DATA.HIDDEN, data.getHidden())
                 .where(DATA.ID.eq(data.getId()))
                 .execute();
 

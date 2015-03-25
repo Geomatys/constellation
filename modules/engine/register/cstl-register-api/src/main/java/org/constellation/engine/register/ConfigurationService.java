@@ -18,14 +18,17 @@
  */
 package org.constellation.engine.register;
 
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.configuration.DataBrief;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.DataBrief;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 
 public interface ConfigurationService {
 

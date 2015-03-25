@@ -18,13 +18,14 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+
 import java.util.List;
 import java.util.Map;
 
-import org.constellation.engine.register.Metadata;
-import org.constellation.engine.register.MetadataXCsw;
-import static org.constellation.engine.register.jooq.Tables.METADATA;
-import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 import org.constellation.engine.register.jooq.tables.records.MetadataRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.MetadataRepository;
@@ -58,9 +59,9 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                 .set(METADATA.PARENT_IDENTIFIER, metadata.getParentIdentifier())
                 .set(METADATA.DATESTAMP, metadata.getDatestamp())
                 .set(METADATA.DATE_CREATION, metadata.getDateCreation())
-                .set(METADATA.ELEMENTARY, metadata.isElementary())
-                .set(METADATA.IS_PUBLISHED, metadata.isIsPublished())
-                .set(METADATA.IS_VALIDATED, metadata.isIsValidated())
+                .set(METADATA.ELEMENTARY, metadata.getElementary())
+                .set(METADATA.IS_PUBLISHED, metadata.getIsPublished())
+                .set(METADATA.IS_VALIDATED, metadata.getIsValidated())
                 .set(METADATA.PROFILE, metadata.getProfile())
                 .set(METADATA.TITLE, metadata.getTitle())
                 .where(METADATA.ID.eq(metadata.getId())).execute();
@@ -78,9 +79,9 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setMdCompletion(metadata.getMdCompletion());
         metadataRecord.setDateCreation(metadata.getDateCreation());
         metadataRecord.setDatestamp(metadata.getDatestamp());
-        metadataRecord.setElementary(metadata.isElementary());
-        metadataRecord.setIsPublished(metadata.isIsPublished());
-        metadataRecord.setIsValidated(metadata.isIsPublished());
+        metadataRecord.setElementary(metadata.getElementary());
+        metadataRecord.setIsPublished(metadata.getIsPublished());
+        metadataRecord.setIsValidated(metadata.getIsPublished());
         metadataRecord.setOwner(metadata.getOwner());
         metadataRecord.setParentIdentifier(metadata.getParentIdentifier());
         metadataRecord.setProfile(metadata.getProfile());

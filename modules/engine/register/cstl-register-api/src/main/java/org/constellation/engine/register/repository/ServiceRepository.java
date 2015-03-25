@@ -18,16 +18,16 @@
  */
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.ServiceDetails;
-import org.constellation.engine.register.ServiceExtraConfig;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.constellation.engine.register.Metadata;
+
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
+import org.constellation.engine.register.jooq.tables.pojos.ServiceExtraConfig;
 
 public interface ServiceRepository {
 	

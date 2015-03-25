@@ -18,7 +18,34 @@
  */
 package org.constellation.rest.api;
 
-import com.google.common.base.Optional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.logging.Level;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
@@ -27,11 +54,11 @@ import org.constellation.business.IMapContextBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Mapcontext;
-import org.constellation.engine.register.MapcontextStyledLayer;
-import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Mapcontext;
+import org.constellation.engine.register.jooq.tables.pojos.MapcontextStyledLayer;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.repository.MapContextRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.Providers;
@@ -55,22 +82,7 @@ import org.w3._2005.atom.FeedType;
 import org.w3._2005.atom.IdType;
 import org.w3._2005.atom.TextType;
 
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
-import java.util.logging.Level;
+import com.google.common.base.Optional;
 
 
 /**

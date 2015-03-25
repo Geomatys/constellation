@@ -25,13 +25,13 @@ import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.TestSamples;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;

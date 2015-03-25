@@ -18,13 +18,22 @@
  */
 package org.constellation.engine.register.jooq;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.DataBrief;
 import org.constellation.engine.register.ConfigurationService;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.ServiceExtraConfig;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.PropertyRepository;
@@ -35,15 +44,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 //import org.constellation.admin.util.IOUtilities;
 
@@ -188,14 +188,14 @@ public class JooqConfigurationService implements ConfigurationService {
     @Transactional
     public Object getConfiguration(String serviceType, String serviceID, String fileName, MarshallerPool pool)
             throws JAXBException, FileNotFoundException {
-        final org.constellation.engine.register.Service rec = serviceRepository.findByIdentifierAndType(serviceID,
+        final org.constellation.engine.register.jooq.tables.pojos.Service rec = serviceRepository.findByIdentifierAndType(serviceID,
                 ServiceDef.Specification.fromShortName(serviceType).name());
         if (rec != null) {
             String is = null;
             if (fileName == null) {
                 is = rec.getConfig();
             } else {
-                ServiceExtraConfig serviceExtraConfig = serviceRepository.getExtraConfig(rec.getId(), fileName);
+                org.constellation.engine.register.jooq.tables.pojos.ServiceExtraConfig serviceExtraConfig = serviceRepository.getExtraConfig(rec.getId(), fileName);
                 if (serviceExtraConfig != null) {
                     is = serviceExtraConfig.getContent();
                 }

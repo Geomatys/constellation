@@ -18,12 +18,12 @@
  */
 package org.constellation.business;
 
+import java.util.List;
+
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerSummary;
 import org.constellation.dto.AddLayer;
-
-import java.util.List;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -46,7 +46,7 @@ public interface ILayerBusiness {
 
     void remove(String spec, String serviceId, String layerId, String namespace) throws ConfigurationException;
 
-    List<org.constellation.engine.register.Layer> findByStyleId(final Integer styleId);
+    List<org.constellation.engine.register.jooq.tables.pojos.Layer> findByStyleId(final Integer styleId);
 
     List<LayerSummary> getLayerSummaryFromStyleId(final Integer styleId);
 

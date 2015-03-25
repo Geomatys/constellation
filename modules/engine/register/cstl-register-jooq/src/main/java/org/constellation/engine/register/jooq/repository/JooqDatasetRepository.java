@@ -18,13 +18,15 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import java.util.List;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Metadata;
-import org.constellation.engine.register.MetadataXCsw;
 import static org.constellation.engine.register.jooq.Tables.DATASET;
 import static org.constellation.engine.register.jooq.Tables.METADATA;
 import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+
+import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 import org.constellation.engine.register.jooq.tables.records.DatasetRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.DatasetRepository;

@@ -18,10 +18,10 @@
  */
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.Domain;
-
 import java.util.List;
 import java.util.Set;
+
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
 
 public interface DomainRepository {
   

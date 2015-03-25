@@ -22,7 +22,7 @@ import java.net.URL;
 
 import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;

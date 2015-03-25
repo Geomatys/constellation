@@ -18,9 +18,9 @@
  */
 package org.constellation.rest.api;
 
-import org.constellation.engine.register.CstlUser;
-
 import javax.ws.rs.core.Response;
+
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 
 public interface IUserService {
 

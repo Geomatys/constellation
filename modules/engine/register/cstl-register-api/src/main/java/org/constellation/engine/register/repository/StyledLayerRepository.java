@@ -1,8 +1,8 @@
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.StyledLayer;
-
 import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.pojos.StyledLayer;
 
 /**
  *

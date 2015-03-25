@@ -18,9 +18,9 @@
  */
 package org.constellation.admin.dto;
 
-import org.constellation.engine.register.Mapcontext;
-
 import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.pojos.Mapcontext;
 
 public class MapContextLayersDTO extends Mapcontext {
     private List<MapContextStyledLayerDTO> layers;

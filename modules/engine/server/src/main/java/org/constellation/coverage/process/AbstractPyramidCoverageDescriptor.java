@@ -1,8 +1,10 @@
 package org.constellation.coverage.process;
 
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Domain;
+import java.io.File;
+
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.provider.ProviderDescriptorConstant;
 import org.geotoolkit.coverage.CoverageReference;
@@ -12,8 +14,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
-
-import java.io.File;
 
 /**
  * @author Quentin Boileau (Geomatys)

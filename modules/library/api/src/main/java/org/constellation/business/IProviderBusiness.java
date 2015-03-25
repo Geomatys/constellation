@@ -18,6 +18,10 @@
  */
 package org.constellation.business;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.api.ProviderType;
@@ -25,15 +29,13 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
-import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.storage.DataStoreFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -41,11 +43,11 @@ import java.util.Set;
 public interface IProviderBusiness {
     List<String> getProviderIds();
 
-    List<org.constellation.engine.register.Provider> getProviders();
+    List<Provider> getProviders();
 
-    org.constellation.engine.register.Provider getProvider(int providerId);
+    Provider getProvider(int providerId);
 
-    org.constellation.engine.register.Provider getProvider(String providerId);
+    Provider getProvider(String providerId);
 
     Provider getProvider(String providerId, int domainId);
 
@@ -96,11 +98,11 @@ public interface IProviderBusiness {
 
     void update(int domainId, String id, ProviderConfiguration config) throws ConfigurationException;
 
-    org.constellation.engine.register.Provider storeProvider(String providerId, String o, ProviderType type, String factoryName, GeneralParameterValue config) throws IOException;
+    Provider storeProvider(String providerId, String o, ProviderType type, String factoryName, GeneralParameterValue config) throws IOException;
 
-    List<org.constellation.engine.register.Data> getDatasFromProviderId(Integer id);
+    List<Data> getDatasFromProviderId(Integer id);
 
-    List<org.constellation.engine.register.Style> getStylesFromProviderId(Integer id);
+    List<Style> getStylesFromProviderId(Integer id);
 
     void removeProvider(String providerId);
 

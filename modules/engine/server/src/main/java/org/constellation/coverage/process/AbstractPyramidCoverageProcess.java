@@ -1,14 +1,31 @@
 package org.constellation.coverage.process;
 
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.DOMAIN;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.IN_COVERAGE_REF;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.ORIGINAL_DATA;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PROVIDER_OUT_ID;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_CRS;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_DATASET;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_FOLDER;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_NAME;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.UPDATE;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import static org.geotoolkit.parameter.Parameters.value;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.measure.NumberRange;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.SpringHelper;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IProviderBusiness;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProvider;
@@ -46,23 +63,6 @@ import org.opengis.util.FactoryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.DOMAIN;
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.IN_COVERAGE_REF;
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.ORIGINAL_DATA;
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PROVIDER_OUT_ID;
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_CRS;
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_DATASET;
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_FOLDER;
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_NAME;
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.UPDATE;
-import static org.geotoolkit.parameter.Parameters.getOrCreate;
-import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * @author Quentin Boileau (Geomatys)

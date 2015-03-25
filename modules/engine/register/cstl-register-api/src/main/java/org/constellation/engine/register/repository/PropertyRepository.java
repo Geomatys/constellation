@@ -18,9 +18,9 @@
  */
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.Property;
-
 import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.pojos.Property;
 
 public interface PropertyRepository {
 

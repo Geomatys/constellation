@@ -1,9 +1,9 @@
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Sensor;
-
 import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Sensor;
 
 public interface SensorRepository {
 

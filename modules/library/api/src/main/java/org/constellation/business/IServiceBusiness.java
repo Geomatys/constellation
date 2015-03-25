@@ -18,16 +18,16 @@
  */
 package org.constellation.business;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.Details;
-import org.constellation.engine.register.Service;
-
-import java.util.List;
-import java.util.Map;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 
 /**
  * @author Cédric Briançon (Geomatys)

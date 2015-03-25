@@ -18,12 +18,14 @@ package org.constellation.admin;
 
 import java.io.StringReader;
 import java.util.List;
+
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.Service;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;

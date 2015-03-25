@@ -18,9 +18,9 @@
  */
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.TaskParameter;
-
 import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
 
 public interface TaskParameterRepository {
 

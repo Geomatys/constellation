@@ -1,6 +1,6 @@
 package org.constellation.admin.listener;
 
-import org.constellation.engine.register.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
 
 /**
  * Listener that make extension point for project based on Constellation that want to

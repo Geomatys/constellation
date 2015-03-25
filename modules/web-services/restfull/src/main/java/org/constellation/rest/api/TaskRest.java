@@ -18,7 +18,33 @@
  */
 package org.constellation.rest.api;
 
-import com.google.common.base.Optional;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.sis.util.iso.Names;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IProcessBusiness;
@@ -26,10 +52,10 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringMap;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Task;
-import org.constellation.engine.register.TaskParameter;
 import org.constellation.engine.register.TaskParameterWithOwnerName;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Task;
+import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
 import org.constellation.engine.register.repository.TaskParameterRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.geotoolkit.feature.type.Name;
@@ -48,31 +74,7 @@ import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.apache.sis.util.iso.Names;
+import com.google.common.base.Optional;
 
 /**
  * RestFull API for task management/operations.
@@ -415,7 +417,7 @@ public class TaskRest {
     @GET
     @Path("listTasks")
     public Response listTasks() {
-        final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks();
+        final List<Task> tasks = processBusiness.listRunningTasks();
         Map<Integer, List<TaskStatusDTO>> map = new HashMap<>();
 
         for (Task task : tasks) {
@@ -436,10 +438,10 @@ public class TaskRest {
     @GET
     @Path("listRunningTasks/{id}/{limit}")
     public Response listRunningTaskForTaskParameter(final @PathParam("id") Integer id, final @PathParam("limit") Integer limit) {
-        final List<org.constellation.engine.register.Task> tasks = processBusiness.listRunningTasks(id, 0, limit);
+        final List<Task> tasks = processBusiness.listRunningTasks(id, 0, limit);
 
         List<TaskStatusDTO> lst = new ArrayList<>();
-        for(org.constellation.engine.register.Task task : tasks) {
+        for(Task task : tasks) {
             lst.add(toTaskStatus(task));
         }
         return Response.ok(lst).build();
@@ -451,16 +453,16 @@ public class TaskRest {
     @GET
     @Path("taskHistory/{id}/{limit}")
     public Response listHistoryForTaskParameter(final @PathParam("id") Integer id, final @PathParam("limit") Integer limit) {
-        final List<org.constellation.engine.register.Task> tasks = processBusiness.listTaskHistory(id, 0, limit);
+        final List<Task> tasks = processBusiness.listTaskHistory(id, 0, limit);
 
         List<TaskStatusDTO> lst = new ArrayList<>();
-        for(org.constellation.engine.register.Task task : tasks) {
+        for(Task task : tasks) {
             lst.add(toTaskStatus(task));
         }
         return Response.ok(lst).build();
     }
 
-    private TaskStatusDTO toTaskStatus(org.constellation.engine.register.Task task) {
+    private TaskStatusDTO toTaskStatus(Task task) {
         final TaskStatusDTO status = new TaskStatusDTO();
         status.setId(task.getIdentifier());
         status.setTaskId(task.getTaskParameterId());

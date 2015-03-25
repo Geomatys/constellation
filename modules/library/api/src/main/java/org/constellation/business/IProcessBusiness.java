@@ -18,19 +18,18 @@
  */
 package org.constellation.business;
 
+import java.util.List;
+
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.ChainProcess;
-import org.constellation.engine.register.Task;
-import org.constellation.engine.register.TaskParameter;
+import org.constellation.engine.register.jooq.tables.pojos.ChainProcess;
+import org.constellation.engine.register.jooq.tables.pojos.Task;
+import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.process.*;
 import org.geotoolkit.process.Process;
+import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.chain.model.Chain;
 import org.quartz.JobListener;
-import org.quartz.SchedulerException;
-
-import java.util.List;
 
 /**
  *
@@ -77,9 +76,9 @@ public interface IProcessBusiness {
 
     Task getTask(String uuid);
 
-    Task addTask(org.constellation.engine.register.Task task) throws ConstellationException;
+    Task addTask(Task task) throws ConstellationException;
 
-    void updateTask(org.constellation.engine.register.Task task) throws ConstellationException;
+    void updateTask(Task task) throws ConstellationException;
 
     List<Task> listRunningTasks();
 

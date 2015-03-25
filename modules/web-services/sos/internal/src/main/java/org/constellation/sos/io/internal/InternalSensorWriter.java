@@ -19,8 +19,21 @@
 
 package org.constellation.sos.io.internal;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+
+import java.io.StringWriter;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.SensorBusiness;
+import org.constellation.engine.register.jooq.tables.pojos.Sensor;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.factory.SMLFactory;
@@ -28,22 +41,6 @@ import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import org.constellation.admin.SensorBusiness;
-import org.constellation.engine.register.Sensor;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import org.geotoolkit.sml.xml.SensorMLUtilities;
 
 /**

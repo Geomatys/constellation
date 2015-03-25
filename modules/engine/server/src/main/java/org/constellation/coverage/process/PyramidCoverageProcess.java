@@ -19,13 +19,34 @@
 
 package org.constellation.coverage.process;
 
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.DOMAIN;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.IN_COVERAGE_REF;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.ORIGINAL_DATA;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.OUT_PYRAMID_PROVIDER_CONF;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PROVIDER_OUT_ID;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_CRS;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_DATASET;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_FOLDER;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PYRAMID_NAME;
+import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.UPDATE;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import static org.geotoolkit.parameter.Parameters.value;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataBrief;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.geotoolkit.coverage.AbstractCoverageStoreFactory;
@@ -41,7 +62,6 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.image.coverage.GridCombineIterator;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -54,26 +74,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
-
-import javax.xml.namespace.QName;
-import java.awt.*;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.UPDATE;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.DOMAIN;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.IN_COVERAGE_REF;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.ORIGINAL_DATA;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.OUT_PYRAMID_PROVIDER_CONF;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.PROVIDER_OUT_ID;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.PYRAMID_CRS;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.PYRAMID_DATASET;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.PYRAMID_FOLDER;
-import static org.constellation.coverage.process.PyramidCoverageDescriptor.PYRAMID_NAME;
-import static org.geotoolkit.parameter.Parameters.getOrCreate;
-import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Process that create a pyramid "conform" from a CoverageReference.

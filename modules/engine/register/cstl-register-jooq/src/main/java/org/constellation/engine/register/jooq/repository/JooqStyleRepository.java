@@ -1,14 +1,17 @@
 package org.constellation.engine.register.jooq.repository;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Style;
-import org.constellation.engine.register.StyleI18n;
+import static org.constellation.engine.register.jooq.Tables.STYLE;
+import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
+import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
+
+import java.util.List;
+
 import org.constellation.engine.register.i18n.StyleWithI18N;
 import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Layer;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
+import org.constellation.engine.register.jooq.tables.pojos.StyleI18n;
 import org.constellation.engine.register.jooq.tables.records.StyleRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledDataRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledLayerRecord;
@@ -16,18 +19,14 @@ import org.constellation.engine.register.repository.StyleRepository;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.SelectConditionStep;
 import org.jooq.UpdateConditionStep;
-import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static org.constellation.engine.register.jooq.Tables.STYLE;
-import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
-import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 @Component
 public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, Style> implements StyleRepository {
@@ -133,7 +132,7 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
     @Override
-    public List<org.constellation.engine.register.Data> getLinkedData(int styleId) {
+    public List<Data> getLinkedData(int styleId) {
         return dsl.select().from(STYLED_DATA).where(STYLED_DATA.STYLE.eq(styleId)).fetchInto(Data.class);
     }
 

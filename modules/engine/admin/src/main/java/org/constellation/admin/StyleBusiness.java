@@ -18,7 +18,24 @@
  */
 package org.constellation.admin;
 
-import com.google.common.base.Optional;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.StyleType;
@@ -30,12 +47,12 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.StyleBean;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.Style;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Layer;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -69,22 +86,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import com.google.common.base.Optional;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -524,8 +526,13 @@ public class StyleBusiness implements IStyleBusiness {
                     return input.getId();
                 }
             }).orNull();
-            final Style newStyle = new Style(styleName, provider.getId(), getTypeFromMutableStyle(style), new Date().getTime(),
-                    sw.toString(), userId);
+            final Style newStyle = new Style();
+            newStyle.setName(styleName);
+            newStyle.setProvider(provider.getId());
+            newStyle.setType(getTypeFromMutableStyle(style));
+            newStyle.setDate(new Date().getTime());
+            newStyle.setBody(sw.toString());
+            newStyle.setOwner(userId);
             styleRepository.create(newStyle);
         }
     }

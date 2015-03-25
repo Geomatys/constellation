@@ -19,6 +19,20 @@
 
 package org.constellation.map.configuration;
 
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.imageio.spi.ServiceRegistry;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.configuration.ConfigurationException;
@@ -30,12 +44,12 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.engine.register.ConstellationPersistenceException;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.Style;
-import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Layer;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -52,23 +66,9 @@ import org.constellation.util.DataReference;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Optional;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.imageio.spi.ServiceRegistry;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.base.Optional;
 
 /**
  *

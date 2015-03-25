@@ -18,18 +18,10 @@
  */
 package org.constellation.rest.api;
 
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.engine.register.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -45,10 +37,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Domainrole;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Path("/1/domain/")
@@ -66,7 +65,7 @@ public class DomainRest {
         }
 
         public DomainWithUsers(Domain domain, List<CstlUser> users) {
-            super(domain.getId(), domain.getName(), domain.getDescription(), domain.isSystem());
+            super(domain.getId(), domain.getName(), domain.getDescription(), domain.getSystem());
             this.users = users;
         }
 

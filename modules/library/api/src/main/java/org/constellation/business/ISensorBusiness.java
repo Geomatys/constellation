@@ -18,12 +18,13 @@
  */
 package org.constellation.business;
 
-import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Sensor;
+import java.util.List;
 
 import javax.xml.namespace.QName;
-import java.util.List;
+
+import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Sensor;
 
 /**
  * @author Cédric Briançon (Geomatys)

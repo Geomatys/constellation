@@ -1,6 +1,6 @@
 package org.constellation.admin.listener;
 
-import org.constellation.engine.register.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
 
 /**
  * Empty implementation of IDataBusinessListener.

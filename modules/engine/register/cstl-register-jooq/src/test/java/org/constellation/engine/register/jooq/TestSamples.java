@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
 
 public class TestSamples {
 

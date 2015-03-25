@@ -3,6 +3,9 @@ package org.constellation.engine.register;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+
 public class DomainUser extends CstlUser {
 
     private List<Domain> domains = new ArrayList<Domain>();

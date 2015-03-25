@@ -32,11 +32,11 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Details;
 import org.constellation.engine.register.ConstellationPersistenceException;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.ServiceDetails;
-import org.constellation.engine.register.ServiceExtraConfig;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
+import org.constellation.engine.register.jooq.tables.pojos.ServiceExtraConfig;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.DomainRepository;
@@ -574,7 +574,7 @@ public class ServiceBusiness implements IServiceBusiness {
     }
 
     @Override
-    public org.constellation.engine.register.Service getServiceByIdentifierAndType(String serviceType, String identifier) {
+    public Service getServiceByIdentifierAndType(String serviceType, String identifier) {
         return serviceRepository.findByIdentifierAndType(identifier, serviceType);
     }
 

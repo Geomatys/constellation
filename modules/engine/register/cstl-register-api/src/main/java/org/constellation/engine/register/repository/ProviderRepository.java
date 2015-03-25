@@ -18,11 +18,11 @@
  */
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Style;
-
 import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
 
 public interface ProviderRepository {
 

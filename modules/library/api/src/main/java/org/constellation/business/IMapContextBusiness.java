@@ -18,13 +18,13 @@
  */
 package org.constellation.business;
 
+import java.util.List;
+
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.Mapcontext;
-import org.constellation.engine.register.MapcontextStyledLayer;
+import org.constellation.engine.register.jooq.tables.pojos.Mapcontext;
+import org.constellation.engine.register.jooq.tables.pojos.MapcontextStyledLayer;
 import org.opengis.util.FactoryException;
-
-import java.util.List;
 
 /**
  * @author Cédric Briançon (Geomatys)

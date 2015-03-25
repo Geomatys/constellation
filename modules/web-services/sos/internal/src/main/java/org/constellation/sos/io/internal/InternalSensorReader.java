@@ -21,19 +21,13 @@ package org.constellation.sos.io.internal;
 
 // J2SE dependencies
 
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.io.SensorReader;
-import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.util.StringUtilities;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V100;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V200;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V100;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,16 +35,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.inject.Inject;
-import org.constellation.admin.SensorBusiness;
-import org.constellation.engine.register.Sensor;
 
-import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V100;
-import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V200;
-import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V100;
-import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.SensorBusiness;
+import org.constellation.engine.register.jooq.tables.pojos.Sensor;
+import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.sos.io.SensorReader;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.util.StringUtilities;
 
 // Constellation dependencies
 // Geotoolkit dependendies

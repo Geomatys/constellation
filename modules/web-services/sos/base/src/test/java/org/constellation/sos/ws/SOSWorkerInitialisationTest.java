@@ -19,10 +19,20 @@
 
 package org.constellation.sos.ws;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.StringWriter;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.Marshaller;
+
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.SOSConfiguration;
-import org.constellation.engine.register.Service;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -39,17 +49,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.Marshaller;
-import java.io.StringWriter;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 // JUnit dependencies
@@ -109,8 +110,15 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
         /**
          * Test 1: No configuration file.
          */
-        Service service = new Service("default", "sos", System.currentTimeMillis(), null, null, "NOT_STARTED", "1.0.0");
-        int id =  serviceRepository.create(service);
+        
+        Service service = new Service();
+        service.setIdentifier("default");
+        service.setDate(System.currentTimeMillis());
+        service.setType("sos");
+        service.setStatus("NOT_STARTED");
+        service.setVersions("1.0.0");
+
+    	int id =  serviceRepository.create(service);
         assertTrue(id > 0);
         
         SOSworker worker = new SOSworker("default");

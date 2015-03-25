@@ -24,9 +24,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,6 +43,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -57,6 +58,7 @@ import org.constellation.admin.index.IndexEngine;
 import org.constellation.admin.listener.DefaultDataBusinessListener;
 import org.constellation.admin.listener.IDataBusinessListener;
 import org.constellation.admin.util.ImageStatisticDeserializer;
+import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.api.DataType;
 import org.constellation.api.PropertyConstants;
 import org.constellation.business.IConfigurationBusiness;
@@ -70,40 +72,38 @@ import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.CoverageMetadataBean;
-import org.constellation.dto.MetadataLists;
 import org.constellation.dto.FileBean;
+import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.Style;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Layer;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.json.metadata.v2.Template;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.token.TokenUtils;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.metadata.ImageStatistics;
+import org.geotoolkit.metadata.dimap.DimapAccessor;
+import org.geotoolkit.util.DomUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.PropertyType;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import java.nio.file.Paths;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.Restriction;
@@ -117,23 +117,22 @@ import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.DimensionNameType;
 import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.metadata.spatial.PixelOrientation;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
-import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.admin.util.MetadataUtilities;
-import org.constellation.engine.register.Metadata;
-import org.constellation.engine.register.repository.MetadataRepository;
-import org.constellation.json.metadata.v2.Template;
-import org.geotoolkit.metadata.ImageStatistics;
-import org.geotoolkit.metadata.dimap.DimapAccessor;
-import org.geotoolkit.util.DomUtilities;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -352,8 +351,21 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 if (user.isPresent()) {
                     userID = user.get().getId();
                 }
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataStr, data.getId(), null, null, completion, 
-                        userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
+                metadataRecord = new Metadata();
+                metadataRecord.setMetadataIso(metadataStr);
+                metadataRecord.setDataId(data.getId());
+                metadataRecord.setMdCompletion(completion);
+                metadataRecord.setOwner(userID);
+                metadataRecord.setDatestamp(dateStamp);
+                metadataRecord.setDateCreation(System.currentTimeMillis());
+                metadataRecord.setTitle(title);
+                metadataRecord.setProfile(templateName);
+                metadataRecord.setParentIdentifier(parentID);
+                metadataRecord.setElementary(elementary);
+                metadataRecord.setIsPublished(false);
+                metadataRecord.setIsValidated(false);
+                
+                
                 metadataRepository.create(metadataRecord);
             }    
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
@@ -522,11 +534,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setDatasetId(data.getDatasetId());
             db.setType(data.getType());
             db.setSubtype(data.getSubtype());
-            db.setSensorable(data.isSensorable());
+            db.setSensorable(data.getSensorable());
             db.setTargetSensor(sensorRepository.getLinkedSensors(data));
             db.setStatsResult(data.getStatsResult());
             db.setStatsState(data.getStatsState());
-            db.setRendered(data.isRendered());
+            db.setRendered(data.getRendered());
             
             final Metadata meta = metadataRepository.findByDataId(data.getId());
             if (meta != null) {
@@ -536,14 +548,14 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             final List<Data> linkedDataList = getDataLinkedData(data.getId());
             for(final Data d : linkedDataList){
                 if("pyramid".equalsIgnoreCase(d.getSubtype()) &&
-                        !d.isRendered()){
+                        !d.getRendered()){
                     final String pyramidProvId = getProviderIdentifier(d.getProvider());
                     db.setPyramidConformProviderId(pyramidProvId);
                     break;
                 }
             }
             //if the data is a pyramid itself. we need to fill the property to enable the picto of pyramided data.
-            if("pyramid".equalsIgnoreCase(data.getSubtype()) && !data.isRendered()){
+            if("pyramid".equalsIgnoreCase(data.getSubtype()) && !data.getRendered()){
                 db.setPyramidConformProviderId(providerId);
             }
 
@@ -731,7 +743,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             boolean remove = true;
             List<Data> providerData = dataRepository.findByProviderId(providerID);
             for (Data pdata : providerData) {
-                if (pdata.isIncluded()) {
+                if (pdata.getIncluded()) {
                     remove = false;
                     break;
                 }
@@ -881,8 +893,20 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 if (user.isPresent()) {
                     userID = user.get().getId();
                 }
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, data.getId(), null, null, completion, 
-                        userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
+                metadataRecord = new Metadata();
+                metadataRecord.setMetadataIso(metadataString);
+                metadataRecord.setMetadataId(metadata.getFileIdentifier());
+                metadataRecord.setElementary(elementary);
+                metadataRecord.setTitle(title);
+                metadataRecord.setDatestamp(dateStamp);
+                metadataRecord.setParentIdentifier(parentID);
+                metadataRecord.setMdCompletion(completion);
+                metadataRecord.setProfile(templateName);
+                metadataRecord.setDataId(data.getId());
+                metadataRecord.setDateCreation(System.currentTimeMillis());
+                metadataRecord.setOwner(userID);
+
+                        
                 metadataRepository.create(metadataRecord);
             }
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
@@ -917,7 +941,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
         final Data data = dataRepository.findById(dataId);
         if (data != null && DataType.COVERAGE.name().equals(data.getType()) &&
-                (data.isRendered() == null || !data.isRendered())) {
+                (data.getRendered() == null || !data.getRendered())) {
             try {
                 final String state = data.getStatsState();
                 final String result = data.getStatsResult();
@@ -986,7 +1010,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
             //compute statistics only on coverage data not rendered and without previous statistic computed.
             if (DataType.COVERAGE.name().equals(data.getType()) && !"pyramid".equalsIgnoreCase(data.getSubtype()) &&
-                    (data.isRendered() == null || !data.isRendered())) {
+                    (data.getRendered() == null || !data.getRendered())) {
 
                 String state = data.getStatsState();
                 if (isInit) {

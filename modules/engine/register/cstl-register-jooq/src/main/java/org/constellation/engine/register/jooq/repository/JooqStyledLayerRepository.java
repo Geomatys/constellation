@@ -18,14 +18,14 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import org.constellation.engine.register.StyledLayer;
-import org.constellation.engine.register.jooq.tables.records.StyledLayerRecord;
-import org.constellation.engine.register.repository.StyledLayerRepository;
-import org.springframework.stereotype.Component;
+import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
 
 import java.util.List;
 
-import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
+import org.constellation.engine.register.jooq.tables.pojos.StyledLayer;
+import org.constellation.engine.register.jooq.tables.records.StyledLayerRecord;
+import org.constellation.engine.register.repository.StyledLayerRepository;
+import org.springframework.stereotype.Component;
 
 
 @Component

@@ -18,12 +18,12 @@
  */
 package org.constellation.engine.register.repository;
 
-import org.constellation.configuration.LayerSummary;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Service;
-
 import java.util.List;
+
+import org.constellation.configuration.LayerSummary;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Layer;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 
 public interface LayerRepository {
 

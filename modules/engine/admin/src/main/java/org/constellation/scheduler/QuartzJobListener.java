@@ -20,13 +20,18 @@
 package org.constellation.scheduler;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
-import org.constellation.engine.register.Task;
+import org.constellation.engine.register.jooq.tables.pojos.Task;
 import org.constellation.util.ParamUtilities;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
@@ -39,11 +44,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Quartz Job listener attaching a listener on geotoolkit processes to track their state.
@@ -84,7 +85,7 @@ public class QuartzJobListener implements JobListener {
         final QuartzTask quartzTask = (QuartzTask) detail.getJobDataMap().get(QuartzJobListener.PROPERTY_TASK);
         final String quartzTaskId = quartzTask.getId();
 
-        final org.constellation.engine.register.Task taskEntity = new org.constellation.engine.register.Task();
+        final Task taskEntity = new Task();
         taskEntity.setIdentifier(UUID.randomUUID().toString());
         taskEntity.setState(TaskState.PENDING.name());
         taskEntity.setTaskParameterId(quartzTask.getTaskParameterId());
@@ -117,7 +118,7 @@ public class QuartzJobListener implements JobListener {
     
         private final String taskId;
         private final String title;
-        private final org.constellation.engine.register.Task taskEntity;
+        private final Task taskEntity;
         private IProcessBusiness processBusiness;
 
         public StateListener(String taskId, String title) {

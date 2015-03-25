@@ -20,6 +20,9 @@ package org.constellation.ws;
 
 //J2SE dependencies
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,9 +33,11 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.util.Version;
 import org.apache.sis.util.logging.Logging;
@@ -43,13 +48,11 @@ import org.constellation.admin.SpringHelper;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.Details;
-import org.constellation.engine.register.Service;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 import org.geotoolkit.util.StringUtilities;
 import org.opengis.util.CodeList;
 import org.xml.sax.SAXException;

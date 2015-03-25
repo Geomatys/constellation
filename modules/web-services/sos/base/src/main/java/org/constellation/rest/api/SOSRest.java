@@ -18,6 +18,27 @@
  */
 package org.constellation.rest.api;
 
+import static org.constellation.utils.RESTfulUtilities.ok;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.constellation.ServiceDef;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.ISensorBusiness;
@@ -28,8 +49,8 @@ import org.constellation.configuration.StringList;
 import org.constellation.dto.ObservationFilter;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Sensor;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Sensor;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
@@ -43,26 +64,6 @@ import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.netcdf.ExtractionResult;
 import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  *
@@ -298,7 +299,7 @@ public class SOSRest {
         // look for provider ids
         final Set<String> providerIDs = new HashSet<>();
         for (Data data : datas) {
-            final org.constellation.engine.register.Provider provider = providerBusiness.getProvider(data.getProvider());
+            final org.constellation.engine.register.jooq.tables.pojos.Provider provider = providerBusiness.getProvider(data.getProvider());
             providerIDs.add(provider.getIdentifier());
         }
         

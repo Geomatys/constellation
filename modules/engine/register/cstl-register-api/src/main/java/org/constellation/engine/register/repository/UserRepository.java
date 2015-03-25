@@ -18,13 +18,14 @@
  */
 package org.constellation.engine.register.repository;
 
-import com.google.common.base.Optional;
-import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.CstlUser;
-
 import java.util.List;
 import java.util.Map;
+
+import org.constellation.engine.register.DomainUser;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Domainrole;
+
+import com.google.common.base.Optional;
 
 
 public interface UserRepository {

@@ -18,18 +18,6 @@
  */
 package org.constellation.coverage;
 
-import org.constellation.admin.SpringHelper;
-import org.constellation.api.TaskState;
-import org.constellation.business.IProcessBusiness;
-import org.constellation.engine.register.Task;
-import org.constellation.provider.DataProviders;
-import org.geotoolkit.parameter.ParameterGroup;
-import org.geotoolkit.process.ProcessEvent;
-import org.geotoolkit.process.ProcessListener;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -37,6 +25,18 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.constellation.admin.SpringHelper;
+import org.constellation.api.TaskState;
+import org.constellation.business.IProcessBusiness;
+import org.constellation.engine.register.jooq.tables.pojos.Task;
+import org.constellation.provider.DataProviders;
+import org.geotoolkit.parameter.ParameterGroup;
+import org.geotoolkit.process.ProcessEvent;
+import org.geotoolkit.process.ProcessListener;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Listener for Pyramidal process loaded via {@link PyramidCoverageHelper}

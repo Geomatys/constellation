@@ -19,7 +19,24 @@
 
 package org.constellation.rest.api;
 
-import com.google.common.base.Optional;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.exception.ConstellationException;
@@ -28,22 +45,13 @@ import org.constellation.business.IDatasetBusiness;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.base.Optional;
 
 /**
  * RESTful API for dataset metadata.

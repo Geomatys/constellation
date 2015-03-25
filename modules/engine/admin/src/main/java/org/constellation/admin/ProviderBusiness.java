@@ -1,6 +1,28 @@
 package org.constellation.admin;
 
-import com.google.common.base.Optional;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+
+import java.awt.Dimension;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.storage.DataStoreException;
@@ -11,18 +33,33 @@ import org.constellation.api.ProviderType;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.business.IProviderBusiness;
-import org.constellation.configuration.*;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.CstlConfigurationRuntimeException;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
-import org.constellation.engine.register.*;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
+import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.provider.*;
+import org.constellation.provider.CoverageData;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviderFactory;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.ParamUtilities;
-import org.geotoolkit.coverage.*;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.CoverageStoreFactory;
+import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.coverage.CoverageUtilities;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.Pyramid;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -57,22 +94,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import com.google.common.base.Optional;
 
 @Component("providerBusiness")
 @Primary
@@ -179,7 +201,7 @@ public class ProviderBusiness implements IProviderBusiness {
     }
 
     @Override
-    public List<Data> getDatasFromProviderId(Integer id) {
+    public List<org.constellation.engine.register.jooq.tables.pojos.Data> getDatasFromProviderId(Integer id) {
         return providerRepository.findDatasByProviderId(id);
     }
 

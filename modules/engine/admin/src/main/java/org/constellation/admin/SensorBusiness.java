@@ -19,24 +19,24 @@
 
 package org.constellation.admin;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+
 import org.constellation.business.ISensorBusiness;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Sensor;
-import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Sensor;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Optional;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-
-import java.util.List;
+import com.google.common.base.Optional;
 
 @Component
 @Primary

@@ -20,28 +20,6 @@
 
 package org.constellation.metadata;
 
-import java.io.File;
-import java.io.StringWriter;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.xml.XML;
-import org.constellation.admin.SpringHelper;
-import org.constellation.api.ProviderType;
-import org.constellation.business.IDatasetBusiness;
-import org.constellation.business.IProviderBusiness;
-import org.constellation.business.IServiceBusiness;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.engine.register.Provider;
-import org.constellation.generic.database.Automatic;
-import org.constellation.provider.DataProviderFactory;
-import org.constellation.provider.DataProviders;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
@@ -52,6 +30,31 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
+
+import java.io.File;
+import java.io.StringWriter;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.xml.XML;
+import org.constellation.admin.SpringHelper;
+import org.constellation.api.ProviderType;
+import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.generic.database.Automatic;
+import org.constellation.provider.DataProviderFactory;
+import org.constellation.provider.DataProviders;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;

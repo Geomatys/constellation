@@ -21,8 +21,8 @@ package org.constellation.engine.register.repository;
 import java.util.List;
 import java.util.Map;
 
-import org.constellation.engine.register.Metadata;
-import org.constellation.engine.register.MetadataXCsw;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 
 /**
  *

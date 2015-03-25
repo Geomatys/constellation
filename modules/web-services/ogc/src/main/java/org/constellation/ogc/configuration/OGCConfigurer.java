@@ -19,18 +19,19 @@
 
 package org.constellation.ogc.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Details;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.ws.ServiceConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Describe methods which need to be specify by an implementation to manage
@@ -56,7 +57,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @return an {@link Instance} instance
      */
     public Instance getInstance(final String serviceType, final String identifier) throws ConfigurationException {
-        org.constellation.engine.register.Service service = serviceBusiness.getServiceByIdentifierAndType(serviceType, identifier);
+        Service service = serviceBusiness.getServiceByIdentifierAndType(serviceType, identifier);
         final Instance instance = new Instance(service.getId(), identifier, serviceType, ServiceStatus.valueOf(service.getStatus()));
         Details details = null;
         try {

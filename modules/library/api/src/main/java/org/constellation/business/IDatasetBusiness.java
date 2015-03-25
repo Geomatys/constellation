@@ -18,17 +18,17 @@
  */
 package org.constellation.business;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.w3c.dom.Node;
-
-import java.io.IOException;
-import java.util.List;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.w3c.dom.Node;
 
 /**
  * @author Cédric Briançon (Geomatys)

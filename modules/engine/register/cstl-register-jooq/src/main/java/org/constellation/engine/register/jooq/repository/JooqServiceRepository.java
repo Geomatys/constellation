@@ -18,13 +18,32 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+import static org.constellation.engine.register.jooq.Tables.SERVICE;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_DETAILS;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
+
 import java.util.Arrays;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.ServiceDetails;
-import org.constellation.engine.register.ServiceExtraConfig;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
+import org.constellation.engine.register.jooq.tables.pojos.ServiceExtraConfig;
 import org.constellation.engine.register.jooq.tables.records.ServiceDetailsRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
@@ -38,25 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import org.constellation.engine.register.Metadata;
-
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.LAYER;
-import static org.constellation.engine.register.jooq.Tables.METADATA;
-import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
-import static org.constellation.engine.register.jooq.Tables.SERVICE;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_DETAILS;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
 @Component
 public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord, Service> implements ServiceRepository {
@@ -144,7 +144,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         final ServiceDetails old = getServiceDetails(serviceDetails.getId(), serviceDetails.getLang());
         if (old!=null){
             dsl.update(SERVICE_DETAILS).set(SERVICE_DETAILS.CONTENT, serviceDetails.getContent())
-                    .set(SERVICE_DETAILS.DEFAULT_LANG, serviceDetails.isDefaultLang())
+                    .set(SERVICE_DETAILS.DEFAULT_LANG, serviceDetails.getDefaultLang())
                     .where(SERVICE_DETAILS.ID.eq(serviceDetails.getId()))
                     .and(SERVICE_DETAILS.LANG.eq(serviceDetails.getLang()))
 
@@ -154,7 +154,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
             newRecord.setContent(serviceDetails.getContent());
             newRecord.setLang(serviceDetails.getLang());
             newRecord.setId(serviceDetails.getId());
-            newRecord.setDefaultLang(serviceDetails.isDefaultLang());
+            newRecord.setDefaultLang(serviceDetails.getDefaultLang());
             newRecord.store();
         }
     }

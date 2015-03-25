@@ -47,9 +47,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>cstl-register-api</module>
-    
     <module>cstl-register-jooq</module>
-    <module>cstl-register-jooq-generated</module>
   </modules>
 
 </project>

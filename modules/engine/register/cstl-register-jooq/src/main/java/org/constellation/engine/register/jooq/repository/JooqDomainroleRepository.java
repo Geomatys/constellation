@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Domainrole;
+import org.constellation.engine.register.jooq.tables.pojos.Permission;
 import org.constellation.engine.register.jooq.tables.records.DomainroleRecord;
 import org.constellation.engine.register.jooq.tables.records.DomainroleXPermissionRecord;
 import org.constellation.engine.register.repository.DomainroleRepository;

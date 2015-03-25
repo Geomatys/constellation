@@ -1,12 +1,12 @@
 package org.constellation.admin.dto;
 
+import java.util.Collections;
+
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerSummary;
 import org.constellation.configuration.StyleBrief;
-import org.constellation.engine.register.MapcontextStyledLayer;
-
-import java.util.Collections;
+import org.constellation.engine.register.jooq.tables.pojos.MapcontextStyledLayer;
 
 public class MapContextStyledLayerDTO extends LayerSummary implements Comparable<MapContextStyledLayerDTO> {
     private Integer id;
@@ -42,14 +42,14 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.styleId = mapContextStyledLayer.getStyleId();
         this.order = mapContextStyledLayer.getLayerOrder();
         this.opacity = mapContextStyledLayer.getLayerOpacity();
-        this.visible = mapContextStyledLayer.isLayerVisible();
+        this.visible = mapContextStyledLayer.getLayerVisible();
         this.externalStyle = mapContextStyledLayer.getExternalStyle();
         this.externalServiceUrl = mapContextStyledLayer.getExternalServiceUrl();
         this.externalServiceVersion = mapContextStyledLayer.getExternalServiceVersion();
         this.externalLayer = mapContextStyledLayer.getExternalLayer();
         this.externalLayerExtent = mapContextStyledLayer.getExternalLayerExtent();
         this.dataId = mapContextStyledLayer.getDataId();
-        this.iswms = mapContextStyledLayer.isIswms();
+        this.iswms = mapContextStyledLayer.getIswms();
 
         super.setName(externalLayer);
         super.setAlias(externalLayer);
@@ -67,14 +67,14 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.styleId = mapContextStyledLayer.getStyleId();
         this.order = mapContextStyledLayer.getLayerOrder();
         this.opacity = mapContextStyledLayer.getLayerOpacity();
-        this.visible = mapContextStyledLayer.isLayerVisible();
+        this.visible = mapContextStyledLayer.getLayerVisible();
         this.externalStyle = mapContextStyledLayer.getExternalStyle();
         this.externalServiceUrl = mapContextStyledLayer.getExternalServiceUrl();
         this.externalServiceVersion = mapContextStyledLayer.getExternalServiceVersion();
         this.externalLayer = mapContextStyledLayer.getExternalLayer();
         this.externalLayerExtent = mapContextStyledLayer.getExternalLayerExtent();
         this.dataId = mapContextStyledLayer.getDataId();
-        this.iswms = mapContextStyledLayer.isIswms();
+        this.iswms = mapContextStyledLayer.getIswms();
     }
 
     public Integer getId() {

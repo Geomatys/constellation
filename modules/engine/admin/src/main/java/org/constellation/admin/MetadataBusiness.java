@@ -19,26 +19,26 @@
 
 package org.constellation.admin;
 
-import com.google.common.base.Optional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
+
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.util.MetadataUtilities;
-
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Metadata;
-import org.constellation.engine.register.Service;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.MetadataRepository;
@@ -48,6 +48,8 @@ import org.constellation.json.metadata.v2.Template;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Optional;
 
 /**
  * Business facade for metadata.
@@ -176,8 +178,19 @@ public class MetadataBusiness implements IMetadataBusiness {
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            final Metadata metadata2 = new Metadata(metadataId, xml, null, dataset.getId(), null, completion, 
-                                    userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
+            
+            final Metadata metadata2 = new Metadata();
+            metadata2.setMetadataId(metadataId);
+            metadata2.setMetadataIso(xml);
+            metadata2.setDataId(dataset.getId());
+            metadata2.setMdCompletion(completion);
+            metadata2.setOwner(userID);
+            metadata2.setDatestamp(dateStamp);
+            metadata2.setDateCreation(System.currentTimeMillis());
+            metadata2.setTitle(title);
+            metadata2.setProfile(templateName);
+            metadata2.setParentIdentifier(parentID);
+            metadata2.setElementary(elementary);
             metadataRepository.create(metadata2);
             return true;
         }
@@ -194,15 +207,37 @@ public class MetadataBusiness implements IMetadataBusiness {
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            final Metadata metadata2 = new Metadata(metadataId, xml, data.getId(), null, null, completion, 
-                                    userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
+            final Metadata metadata2 = new Metadata();
+            metadata2.setMetadataId(metadataId);
+            metadata2.setMetadataIso(xml);
+            metadata2.setDataId(data.getId());
+            metadata2.setMdCompletion(completion);
+            metadata2.setOwner(userID);
+            metadata2.setDatestamp(dateStamp);
+            metadata2.setDateCreation(System.currentTimeMillis());
+            metadata2.setTitle(title);
+            metadata2.setProfile(templateName);
+            metadata2.setParentIdentifier(parentID);
+            metadata2.setElementary(elementary);
             metadataRepository.create(metadata2);
             return true;
         }
         
         // save a new metadata (unliked to any data/dataset/service)
-        final Metadata metadata2 = new Metadata(metadataId, xml, null, null, null, completion, 
-                                    userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
+        
+        final Metadata metadata2 = new Metadata();
+        metadata2.setMetadataId(metadataId);
+        metadata2.setMetadataIso(xml);
+
+        metadata2.setMdCompletion(completion);
+        metadata2.setOwner(userID);
+        metadata2.setDatestamp(dateStamp);
+        metadata2.setDateCreation(System.currentTimeMillis());
+        metadata2.setTitle(title);
+        metadata2.setProfile(templateName);
+        metadata2.setParentIdentifier(parentID);
+        metadata2.setElementary(elementary);
+        
         metadataRepository.create(metadata2);
         return true;
     }

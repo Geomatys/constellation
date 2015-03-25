@@ -18,8 +18,17 @@
  */
 package org.constellation.services.web.rest;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
-import org.constellation.engine.register.Property;
+import org.constellation.engine.register.jooq.tables.pojos.Property;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.utils.JSonUtils;
 import org.springframework.http.HttpStatus;
@@ -29,14 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 
 @RestController
 public class ContactResource {

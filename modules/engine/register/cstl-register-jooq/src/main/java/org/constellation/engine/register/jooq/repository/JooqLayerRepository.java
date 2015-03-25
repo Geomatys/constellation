@@ -27,9 +27,9 @@ import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
 import java.util.List;
 
 import org.constellation.configuration.LayerSummary;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Service;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Layer;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.records.LayerRecord;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.jooq.DeleteConditionStep;

@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 
 import org.constellation.auth.transfer.TokenTransfer;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.services.component.TokenService;

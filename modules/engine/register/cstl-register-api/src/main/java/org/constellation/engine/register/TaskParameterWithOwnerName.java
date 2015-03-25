@@ -1,5 +1,7 @@
 package org.constellation.engine.register;
 
+import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
+
 /**
  * @author Thomas Rouby (Geomatys))
  */

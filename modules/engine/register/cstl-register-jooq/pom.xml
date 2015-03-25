@@ -17,7 +17,13 @@
   <dependencies>
     <dependency>
       <groupId>org.constellation.engine.register</groupId>
-      <artifactId>cstl-register-jooq-generated</artifactId>
+      <artifactId>cstl-register-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -56,45 +62,7 @@
   <build>
     <plugins>
 
-      <plugin>
-        <groupId>com.geomatys.maven</groupId>
-        <artifactId>geomatys-jooqhelper-plugin</artifactId>
-        <version>0.1.0</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>derby-store</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.constellation.engine.register</groupId>
-            <artifactId>cstl-register-api</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.constellation.engine.register</groupId>
-            <artifactId>cstl-register-jooq-generated</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-
-        </dependencies>
-        <executions>
-          <execution>
-            <id>jooq-helper</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <targetSchema>ADMIN</targetSchema>
-              <changeLog>cstl/db/db-changelog.xml</changeLog>
-              <pojoPackage>org.constellation.engine.register</pojoPackage>
-              <targetPackage>org.constellation.engine.register.helper</targetPackage>
-              <recordPackage>org.constellation.engine.register.jooq.tables.records</recordPackage>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+   
     </plugins>
   </build>
 

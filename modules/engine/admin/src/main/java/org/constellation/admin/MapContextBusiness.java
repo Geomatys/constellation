@@ -18,19 +18,48 @@
  */
 package org.constellation.admin;
 
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IMapContextBusiness;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.*;
-import org.constellation.engine.register.repository.*;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Layer;
+import org.constellation.engine.register.jooq.tables.pojos.Mapcontext;
+import org.constellation.engine.register.jooq.tables.pojos.MapcontextStyledLayer;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
+import org.constellation.engine.register.jooq.tables.pojos.StyledLayer;
+import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.engine.register.repository.MapContextRepository;
+import org.constellation.engine.register.repository.ProviderRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.engine.register.repository.StyleRepository;
+import org.constellation.engine.register.repository.StyledLayerRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.util.DataReference;
 import org.constellation.util.Util;
 import org.geotoolkit.referencing.CRS;
@@ -44,13 +73,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.ConfigurationException;
+import com.google.common.base.Optional;
 
 @Component
 @Primary
@@ -142,7 +165,7 @@ public class MapContextBusiness implements IMapContextBusiness {
             final Integer layerID = styledLayer.getLayerId();
             final Integer dataID = styledLayer.getDataId();
             if (layerID != null) {
-                final org.constellation.engine.register.Layer layer = layerRepository.findById(layerID);
+                final Layer layer = layerRepository.findById(layerID);
                 final Data data = dataRepository.findById(layer.getData());
                 final Provider provider = providerRepository.findOne(data.getProvider());
                 final QName name = new QName(layer.getNamespace(), layer.getName());
@@ -294,7 +317,7 @@ public class MapContextBusiness implements IMapContextBusiness {
                                                  final GeneralEnvelope ctxtEnv) throws FactoryException {
         GeneralEnvelope env = ctxtEnv;
         for (final MapcontextStyledLayer styledLayer : styledLayers) {
-            if (!styledLayer.isLayerVisible()) {
+            if (!styledLayer.getLayerVisible()) {
                 continue;
             }
             Integer layerID = styledLayer.getLayerId();

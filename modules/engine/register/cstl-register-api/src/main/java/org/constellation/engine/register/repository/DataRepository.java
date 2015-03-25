@@ -18,13 +18,13 @@
  */
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.i18n.DataWithI18N;
-
 import java.util.List;
 import java.util.Map;
-import org.constellation.engine.register.MetadataXCsw;
+
+import org.constellation.engine.register.i18n.DataWithI18N;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 
 public interface DataRepository {
 

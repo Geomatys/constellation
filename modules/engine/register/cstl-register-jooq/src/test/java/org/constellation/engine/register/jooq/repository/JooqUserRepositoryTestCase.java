@@ -18,9 +18,9 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
 import org.constellation.engine.register.jooq.TestSamples;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.repository.UserRepository;
 import org.junit.Assert;
 import org.junit.Test;

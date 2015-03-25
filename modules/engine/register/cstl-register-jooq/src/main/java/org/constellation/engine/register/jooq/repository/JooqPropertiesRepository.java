@@ -18,8 +18,12 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import org.constellation.engine.register.Property;
+import static org.constellation.engine.register.jooq.Tables.PROPERTY;
+
+import java.util.List;
+
 import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.pojos.Property;
 import org.constellation.engine.register.jooq.tables.records.PropertyRecord;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.jooq.DeleteConditionStep;
@@ -29,10 +33,6 @@ import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static org.constellation.engine.register.jooq.Tables.PROPERTY;
 
 @Component
 public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRecord, Property> implements

@@ -1,10 +1,14 @@
 package org.constellation.engine.register.i18n;
 
-import org.constellation.engine.register.Style;
-import org.constellation.engine.register.StyleI18n;
-
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.constellation.configuration.CstlConfigurationRuntimeException;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
+import org.constellation.engine.register.jooq.tables.pojos.StyleI18n;
+
+@SuppressWarnings("serial")
 public class StyleWithI18N extends Style {
     
     private Map<String, StyleI18n> styleI18ns;
@@ -22,5 +26,16 @@ public class StyleWithI18N extends Style {
     public Map<String, StyleI18n> getStyleI18ns() {
         return styleI18ns;
     }
+    
+    
+
+    private void copyFrom(Style data) {
+        try {
+            BeanUtils.copyProperties(this, data);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new CstlConfigurationRuntimeException(e);
+        }
+    }
+
     
 }

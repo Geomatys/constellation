@@ -1,14 +1,15 @@
 package org.constellation.engine.register.repository;
 
-import com.google.common.base.Optional;
-import org.apache.commons.lang3.tuple.Pair;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.CstlUser;
-
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Domainrole;
+import org.constellation.engine.register.jooq.tables.pojos.Permission;
+
+import com.google.common.base.Optional;
 
 public interface DomainroleRepository {
 

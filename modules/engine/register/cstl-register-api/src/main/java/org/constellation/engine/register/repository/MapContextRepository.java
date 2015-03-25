@@ -18,10 +18,10 @@
  */
 package org.constellation.engine.register.repository;
 
-import org.constellation.engine.register.Mapcontext;
-import org.constellation.engine.register.MapcontextStyledLayer;
-
 import java.util.List;
+
+import org.constellation.engine.register.jooq.tables.pojos.Mapcontext;
+import org.constellation.engine.register.jooq.tables.pojos.MapcontextStyledLayer;
 
 public interface MapContextRepository {
     Mapcontext findById(int id);

@@ -18,14 +18,14 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import org.constellation.engine.register.Service;
+import java.util.List;
+
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 public class JooqServicesRepositoryTestCase extends AbstractJooqTestTestCase {
 

@@ -1,22 +1,5 @@
 package org.constellation.admin;
 
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.api.PropertyConstants;
-import org.constellation.business.IConfigurationBusiness;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.engine.register.MetadataIOUtils;
-import org.constellation.engine.register.Property;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.repository.PropertyRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.utils.CstlMetadatas;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -24,8 +7,26 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.engine.register.Metadata;
+
+import javax.xml.bind.JAXBException;
+
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.api.PropertyConstants;
+import org.constellation.business.IConfigurationBusiness;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.engine.register.MetadataIOUtils;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.Property;
+import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.MetadataRepository;
+import org.constellation.engine.register.repository.PropertyRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.utils.CstlMetadatas;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Primary

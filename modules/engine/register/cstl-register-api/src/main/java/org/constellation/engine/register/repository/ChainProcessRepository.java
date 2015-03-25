@@ -20,7 +20,8 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
-import org.constellation.engine.register.ChainProcess;
+
+import org.constellation.engine.register.jooq.tables.pojos.ChainProcess;
 
 /**
  *

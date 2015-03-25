@@ -18,27 +18,19 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import org.constellation.engine.register.Task;
-import org.constellation.engine.register.TaskParameter;
-import org.constellation.engine.register.helper.TaskHelper;
-import org.constellation.engine.register.helper.TaskParameterHelper;
-import org.constellation.engine.register.jooq.tables.records.TaskParameterRecord;
-import org.constellation.engine.register.jooq.tables.records.TaskRecord;
-import org.constellation.engine.register.repository.TaskParameterRepository;
-import org.constellation.engine.register.jooq.Tables;
-import org.constellation.engine.register.repository.TaskRepository;
-import org.jooq.util.derby.sys.Sys;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import static org.constellation.engine.register.jooq.Tables.TASK_PARAMETER;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import static org.constellation.engine.register.jooq.Tables.DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.TASK_PARAMETER;
+import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.pojos.Task;
+import org.constellation.engine.register.jooq.tables.records.TaskRecord;
+import org.constellation.engine.register.repository.TaskRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Thomas Rouby (Geomatys)
@@ -56,7 +48,8 @@ public class JooqTaskRepository extends AbstractJooqRespository<TaskRecord, Task
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public Task create(Task task) {
-        TaskRecord newRecord = TaskHelper.copy(task, dsl.newRecord(Tables.TASK));
+        TaskRecord newRecord = dsl.newRecord(Tables.TASK);
+        newRecord.from(task);
         newRecord.store();
         return newRecord.into(Task.class);
     }

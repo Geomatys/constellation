@@ -19,10 +19,20 @@
 
 package org.constellation.admin;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -31,7 +41,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.google.common.base.Optional;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
@@ -49,11 +58,11 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.CstlUser;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Dataset;
-import org.constellation.engine.register.Metadata;
-import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Data;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.MetadataRepository;
@@ -77,6 +86,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.google.common.base.Optional;
 
 /**
  *
@@ -190,7 +201,11 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Override
     @Transactional
     public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) throws ConfigurationException {
-        Dataset ds = new Dataset(identifier, owner, System.currentTimeMillis(), null);
+        Dataset ds = new Dataset();
+        ds.setIdentifier(identifier);
+        ds.setOwner(owner);
+        ds.setDate(System.currentTimeMillis());
+
         ds = datasetRepository.insert(ds);
         if (metadataId != null && metadataXml != null) {
             final DefaultMetadata meta = unmarshallMetadata(metadataXml);
@@ -218,8 +233,19 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            final Metadata metadata = new Metadata(metadataId, metadataXml, null, ds.getId(), null, completion, 
-                    userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
+            final Metadata metadata = new Metadata();
+            metadata.setMetadataId(metadataId);
+            metadata.setMetadataIso(metadataXml);
+            metadata.setDataId(ds.getId());
+            metadata.setMdCompletion(completion);
+            metadata.setOwner(userID);
+            metadata.setDatestamp(dateStamp);
+            metadata.setDateCreation(System.currentTimeMillis());
+            metadata.setTitle(title);
+            metadata.setProfile(templateName);
+            metadata.setParentIdentifier(parentID);
+            metadata.setElementary(elementary);
+            
             metadataRepository.create(metadata);
         }
         return ds;
@@ -361,8 +387,21 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 if (user.isPresent()) {
                     userID = user.get().getId();
                 }
-                metadataRecord = new Metadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId(), null, completion, 
-                        userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
+                metadataRecord = new Metadata();
+                
+                metadataRecord.setMetadataId(metadata.getFileIdentifier());
+                metadataRecord.setMetadataIso(metadataString);
+                metadataRecord.setDataId(dataset.getId());
+                metadataRecord.setMdCompletion(completion);
+                metadataRecord.setOwner(userID);
+                metadataRecord.setDatestamp(dateStamp);
+                metadataRecord.setDateCreation(System.currentTimeMillis());
+                metadataRecord.setTitle(title);
+                metadataRecord.setProfile(templateName);
+                metadataRecord.setParentIdentifier(parentID);
+                metadataRecord.setElementary(elementary);
+                
+                
                 metadataRepository.create(metadataRecord);
             }
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
@@ -431,8 +470,19 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 if (user.isPresent()) {
                     userID = user.get().getId();
                 }
-                metadataRecord = new Metadata(metaId, metadataXml, null, dataset.getId(), null, completion, 
-                        userID, dateStamp, System.currentTimeMillis(), title, templateName, parentID, false, false, elementary);
+                metadataRecord = new Metadata();
+                metadataRecord.setMetadataId(metaId);
+                metadataRecord.setMetadataIso(metadataXml);
+                metadataRecord.setMetadataId(metaId);
+                metadataRecord.setDataId(dataset.getId());
+                metadataRecord.setElementary(elementary);
+                metadataRecord.setTitle(title);
+                metadataRecord.setDatestamp(dateStamp);
+                metadataRecord.setParentIdentifier(parentID);
+                metadataRecord.setMdCompletion(completion);
+                metadataRecord.setProfile(templateName);
+                
+
                 metadataRepository.create(metadataRecord);
             }
         } else {
@@ -661,7 +711,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 boolean remove = true;
                 List<Data> providerData = dataRepository.findByProviderId(providerID);
                 for (Data pdata : providerData) {
-                    if (pdata.isIncluded()) {
+                    if (pdata.getIncluded()) {
                         remove = false;
                         break;
                     }

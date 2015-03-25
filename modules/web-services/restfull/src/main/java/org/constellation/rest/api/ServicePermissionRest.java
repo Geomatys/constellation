@@ -1,14 +1,11 @@
 package org.constellation.rest.api;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Maps.EntryTransformer;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.PermissionConstants;
-import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.engine.register.repository.DomainroleRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
-import org.springframework.stereotype.Component;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -18,12 +15,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+
+import org.constellation.engine.register.PermissionConstants;
+import org.constellation.engine.register.jooq.tables.pojos.Domain;
+import org.constellation.engine.register.jooq.tables.pojos.Domainrole;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.DomainroleRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
+import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Maps.EntryTransformer;
 
 @Component
 @Path("/1/servicepermission")
