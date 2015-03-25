@@ -105,6 +105,7 @@ import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -298,17 +299,22 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     final PyramidalCoverageReference pmodel = (PyramidalCoverageReference) origin;
                     final PyramidSet set = pmodel.getPyramidSet();
 
-                    final Envelope env = set.getEnvelope();
-                    if (env == null) {
+                    final Envelope pyramidSetEnv = set.getEnvelope();
+                    if (pyramidSetEnv == null) {
                         throw new CstlServiceException("No valid extent for layer " + name);
                     }
-                /* We get pyramid set CRS components to identify additional dimensions. We remove horizontal component
-                 * from the list to ease further operations, and prepare WMTS dimension descriptors. Dimension allowed
-                 * values will be filled when we'll browse mosaics to build tile matrix capabilities.
-                 */
+
+                    final CoordinateReferenceSystem pyramidSetEnvCRS = pyramidSetEnv.getCoordinateReferenceSystem();
+                    final int xAxis = Math.max(0, CoverageUtilities.getMinOrdinate(pyramidSetEnvCRS));
+                    final int yAxis = xAxis + 1;
+
+                    /* We get pyramid set CRS components to identify additional dimensions. We remove horizontal component
+                     * from the list to ease further operations, and prepare WMTS dimension descriptors. Dimension allowed
+                     * values will be filled when we'll browse mosaics to build tile matrix capabilities.
+                     */
                     final HashMap<Integer, Dimension> dims = new HashMap<>();
                     final Map<Integer, CoordinateReferenceSystem> splittedCRS =
-                            ReferencingUtilities.indexedDecompose(env.getCoordinateReferenceSystem());
+                            ReferencingUtilities.indexedDecompose(pyramidSetEnvCRS);
                     final Iterator<Map.Entry<Integer, CoordinateReferenceSystem>> iterator = splittedCRS.entrySet().iterator();
                     while (iterator.hasNext()) {
                         final Map.Entry<Integer, CoordinateReferenceSystem> entry = iterator.next();
@@ -337,26 +343,31 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                         }
                     }
 
-                    final int xAxis = Math.max(0, CoverageUtilities.getMinOrdinate(env.getCoordinateReferenceSystem()));
-                    final int yAxis = xAxis + 1;
-                    final BoundingBoxType bbox = new WGS84BoundingBoxType(
-                            getCRSCode(env.getCoordinateReferenceSystem()),
-                            env.getMinimum(xAxis),
-                            env.getMinimum(yAxis),
-                            env.getMaximum(xAxis),
-                            env.getMaximum(yAxis));
-
+                    final Collection<Pyramid> pyramids = set.getPyramids();
+                    final List<BoundingBoxType> bboxList = new ArrayList<>();
+                    for (Pyramid pyramid : pyramids) {
+                        final GeneralEnvelope pyramidEnv = CoverageUtilities.getPyramidEnvelope(pyramid);
+                        final int envXAxis = Math.max(0, CoverageUtilities.getMinOrdinate(pyramid.getCoordinateReferenceSystem()));
+                        final int envYAxis = xAxis + 1;
+                        final BoundingBoxType bbox = new WGS84BoundingBoxType(
+                                getCRSCode(pyramid.getCoordinateReferenceSystem()),
+                                pyramidEnv.getMinimum(envXAxis),
+                                pyramidEnv.getMinimum(envYAxis),
+                                pyramidEnv.getMaximum(envXAxis),
+                                pyramidEnv.getMaximum(envYAxis));
+                        bboxList.add(bbox);
+                    }
 
                     final LayerType outputLayer = new LayerType(
                             name,
                             name,
                             name,
-                            bbox,
+                            bboxList,
                             WMTSConstant.DEFAULT_STYLES,
                             new ArrayList<>(dims.values()));
 
                 try {
-                    final Envelope crs84Env = CRS.transform(env, CommonCRS.defaultGeographic());
+                    final Envelope crs84Env = CRS.transform(pyramidSetEnv, CommonCRS.defaultGeographic());
                     outputLayer.getWGS84BoundingBox().add(new WGS84BoundingBoxType("CRS:84",
                             crs84Env.getMinimum(xAxis),
                             crs84Env.getMinimum(yAxis),
@@ -379,7 +390,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     }
                     outputLayer.setResourceURL(resources);
 
-                    for (Pyramid pr : set.getPyramids()) {
+                    for (Pyramid pr : pyramids) {
                         final TileMatrixSet tms = new TileMatrixSet();
                         tms.setIdentifier(new CodeType(pr.getId()));
                         tms.setSupportedCRS(getCRSCode(pr.getCoordinateReferenceSystem()));
