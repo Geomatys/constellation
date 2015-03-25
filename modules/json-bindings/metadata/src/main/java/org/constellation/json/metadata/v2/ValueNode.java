@@ -42,6 +42,8 @@ public class ValueNode {
     
     boolean multiple = false;
     
+   List<String> predefinedValues;
+    
     public ValueNode(String path, String type, int ordinal, ValueNode parent, String blockName, boolean strict) {
         this.path      = path;
         this.type      = type;
@@ -58,7 +60,11 @@ public class ValueNode {
         }
     }
     
-    public ValueNode(String path, String type, String defaultValue, String render, int ordinal, String value, ValueNode parent) {
+//    public ValueNode(String path, String type, String defaultValue, String render, int ordinal, String value, ValueNode parent) {
+//        this(path, type, defaultValue, render, ordinal, value, parent, null);
+//    }
+    
+    public ValueNode(String path, String type, String defaultValue, String render, int ordinal, String value, ValueNode parent, String fieldName) {
         this.path = path;
         this.type = type;
         if (path.indexOf('.') != -1) {
@@ -70,6 +76,7 @@ public class ValueNode {
         this.render       = render;
         this.ordinal      = ordinal;
         this.value        = value;
+        this.blockName    = fieldName;
         if (parent != null) {
             parent.addChild(this);
         }
@@ -87,9 +94,12 @@ public class ValueNode {
         this.strict       = node.strict;
         this.blockName    = node.blockName;
         this.multiple     = node.multiple;
+        this.strict       = node.strict;
         this.ordinal      = ordinal;
         this.parent       = parent;
         this.parent.addChild(this);
+        this.predefinedValues = node.predefinedValues;
+        
     }
     
     public ValueNode(ValueNode node) {
@@ -104,6 +114,8 @@ public class ValueNode {
         this.strict       = node.strict;
         this.blockName    = node.blockName;
         this.multiple     = node.multiple;
+        this.strict       = node.strict;
+        this.predefinedValues = node.predefinedValues;
         for (ValueNode child : node.children) {
             this.children.add(new ValueNode(child));
         }
@@ -132,6 +144,9 @@ public class ValueNode {
         this.value        = field.value;
         this.multiple     = field.getMultiplicity() > 1;
         this.ordinal      = ordinal;
+        this.strict       = field.isStrict();
+        this.blockName    = field.getName();
+        this.predefinedValues = field.getPredefinedValues();
         if (path.indexOf('.') != -1) {
             this.name = path.substring(path.lastIndexOf('.') + 1, path.length());
         } else {
@@ -185,6 +200,13 @@ public class ValueNode {
         this.ordinal = i;
     }
     
+    public List<String> getPredefinedValues() {
+        if (predefinedValues == null) {
+            predefinedValues = new ArrayList<>();
+        }
+        return predefinedValues;
+    } 
+    
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[ValueNode]\n");
@@ -205,6 +227,12 @@ public class ValueNode {
         if (blockName != null){
             sb.append("block name:").append(blockName).append('\n');
         }
+        if (predefinedValues != null) {
+            sb.append("predefined values:\n");
+            for (String pv : predefinedValues) {
+                sb.append(pv).append('\n');
+            }
+        }
         return sb.toString();
     }
 
@@ -220,6 +248,7 @@ public class ValueNode {
         hash = 97 * hash + Objects.hashCode(this.render);
         hash = 97 * hash + Objects.hashCode(this.strict);
         hash = 97 * hash + Objects.hashCode(this.blockName);
+        hash = 97 * hash + Objects.hashCode(this.getPredefinedValues());
         hash = 97 * hash + this.ordinal;
         return hash;
     }
@@ -240,6 +269,7 @@ public class ValueNode {
                    Objects.equals(this.children,      that.children) && 
                    Objects.equals(this.strict,        that.strict) &&
                    Objects.equals(this.blockName,     that.blockName) &&
+                   Objects.equals(this.getPredefinedValues(), that.getPredefinedValues()) &&
                    Objects.equals(this.getNumeratedPath(), that.getNumeratedPath());
         }
         return false;

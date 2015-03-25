@@ -33,7 +33,9 @@
                 "value" : "some title",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -48,7 +50,9 @@
                 "value" : "1970-05-10",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -63,7 +67,9 @@
                 "value" : "CI_DateTypeCode.creation",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -78,7 +84,9 @@
                 "value" : "MD_ScopeCode.dataset",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -93,7 +101,9 @@
                 "value" : "true",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -108,7 +118,9 @@
                 "value" : "some explanation",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -136,7 +148,9 @@
                 "value" : "hello",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -151,7 +165,9 @@
                 "value" : "world",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -166,7 +182,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -181,7 +199,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -196,7 +216,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -224,7 +246,9 @@
                 "value" : "this",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -239,7 +263,9 @@
                 "value" : "is",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -254,7 +280,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -269,7 +297,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -284,7 +314,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -321,7 +353,9 @@
                 "value" : null,
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -336,7 +370,9 @@
                 "value" : "MD_RestrictionCode.licence",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -351,7 +387,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -379,7 +417,9 @@
                 "value" : "some limitations",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -394,7 +434,9 @@
                 "value" : "MD_ClassificationCode.unclassified",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -409,7 +451,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -446,7 +490,9 @@
                 "value" : "metadata-id-0007",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -461,7 +507,9 @@
                 "value" : null,
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -476,7 +524,9 @@
                 "value" : "x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -491,7 +541,9 @@
                 "value" : "2011.03",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -506,7 +558,9 @@
                 "value" : "UTF-8",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -521,7 +575,9 @@
                 "value" : "LanguageCode.fra",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -536,7 +592,9 @@
                 "value" : "MD_ScopeCode.dataset",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }

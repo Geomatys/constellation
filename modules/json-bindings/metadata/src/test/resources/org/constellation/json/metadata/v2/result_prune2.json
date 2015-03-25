@@ -33,7 +33,9 @@
                 "value" : "metadata-id-0007",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -48,7 +50,9 @@
                 "value" : "LanguageCode.fra",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -63,7 +67,9 @@
                 "value" : "MD_ScopeCode.dataset",
                 "obligation" : "M",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }

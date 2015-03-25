@@ -33,7 +33,9 @@
                 "value" : "hello",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -48,7 +50,9 @@
                 "value" : "world",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -63,7 +67,9 @@
                 "value" : "GEMET",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -78,7 +84,9 @@
                 "value" : "2012-01-01",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -93,7 +101,9 @@
                 "value" : "CI_DateTypeCode.publication",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -121,7 +131,9 @@
                 "value" : "this",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -136,7 +148,9 @@
                 "value" : "is",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -151,7 +165,9 @@
                 "value" : "GEMET",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -166,7 +182,9 @@
                 "value" : "2012-01-01",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -181,7 +199,9 @@
                 "value" : "CI_DateTypeCode.publication",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -209,7 +229,9 @@
                 "value" : "you",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -224,7 +246,9 @@
                 "value" : "shall",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -239,7 +263,9 @@
                 "value" : "AGRO",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -254,7 +280,9 @@
                 "value" : "2012-01-01",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -269,7 +297,9 @@
                 "value" : "CI_DateTypeCode.creation",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -297,7 +327,9 @@
                 "value" : "not pass",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -312,7 +344,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -327,7 +361,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -342,7 +378,9 @@
                 "value" : null,
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }

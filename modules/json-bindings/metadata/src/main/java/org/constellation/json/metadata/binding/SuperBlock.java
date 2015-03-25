@@ -44,7 +44,7 @@ public class SuperBlock implements Serializable, IBlock {
     private List<BlockObj> children;
 
     public SuperBlock(){
-
+        this.children = new ArrayList<>();
     }
     
     public SuperBlock(SuperBlock sb){

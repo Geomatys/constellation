@@ -33,7 +33,9 @@
                 "value" : "EPSG:4326",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }
@@ -61,7 +63,9 @@
                 "value" : "1970-05-10",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             }, {
               "type" : "field",
@@ -76,7 +80,9 @@
                 "value" : "2012-01-01",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
               }
             } ]
           }

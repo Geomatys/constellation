@@ -46,7 +46,7 @@ public class Block implements Serializable, ChildEntity, IBlock {
     private List<ComponentObj> children;
     
     public Block(){
-
+        this.children = new ArrayList<>();
     }
     
     public Block(Block block){
@@ -198,6 +198,7 @@ public class Block implements Serializable, ChildEntity, IBlock {
         sb.append("name:").append(name).append('\n');
         sb.append("path:").append(path).append('\n');
         sb.append("type:").append(type).append('\n');
+        sb.append("strict:").append(strict).append('\n');
         sb.append("multiplicity:").append(multiplicity).append('\n');
         sb.append("children:").append(children.size());
         return sb.toString();

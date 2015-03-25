@@ -1,0 +1,56 @@
+{
+    "root": {
+        "name": "MD_Metadata",
+        "multiplicity": 1,
+        "children": [{
+                "superblock": {
+                    "name": "metadata.block.dataQuality",
+                    "multiplicity": 1,
+                    "help": "metadata.block.dataQuality_help",
+                    "path": null,
+                    "children": [{
+                            "type": "block",
+                            "block": {
+                                "name": "metadata.block.descriptiveKeyword_inspire",
+                                "multiplicity": 1,
+                                "help": "metadata.block.descriptiveKeyword_inspire_help",
+                                "path": null,
+                                "strict": true,
+                                "children": [{
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.keywordReserved",
+                                            "multiplicity": 62,
+                                            "help": "metadata.field.keywordReserved_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.keyword",
+                                            "render": "KEYWORD.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null,
+                                            "predefinedValues" : ["value1", "value2"],
+                                            "strict" : true
+                                        }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.keywordFree",
+                                            "multiplicity": 62,
+                                            "help": "metadata.field.keywordFree_help",
+                                            "path": "metadata.identificationInfo.descriptiveKeywords.keyword",
+                                            "render": "KEYWORD.text",
+                                            "obligation": "O",
+                                            "defaultValue": null,
+                                            "value": null,
+                                            "predefinedValues" : [ ],
+                                            "strict" : false
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

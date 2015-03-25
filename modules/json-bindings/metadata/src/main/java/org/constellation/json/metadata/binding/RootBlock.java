@@ -40,7 +40,7 @@ public class RootBlock implements Serializable {
     private List<SuperBlockObj> children;
 
     public RootBlock(){
-
+        this.children = new ArrayList<>();
     }
     
     public RootBlock(RootBlock block){
@@ -69,6 +69,9 @@ public class RootBlock implements Serializable {
     }
 
     public List<SuperBlockObj> getChildren() {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
         return children;
     }
     

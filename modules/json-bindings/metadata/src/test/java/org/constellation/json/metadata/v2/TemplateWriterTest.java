@@ -794,6 +794,45 @@ public class TemplateWriterTest {
         String resultJson = FileUtilities.getStringFromFile(resultFile);
         
         assertEquals(expectedJson, resultJson);
+    }
+    
+    @Test
+    public void testWriteKeywords3() throws IOException {
+        
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_keywords3.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        final InternationalString kw2 = new SimpleInternationalString("value1");
+        final InternationalString kw3 = new SimpleInternationalString("world");
+        final InternationalString kw4 = new SimpleInternationalString("value2");
+        keywords.setKeywords(Arrays.asList(kw1, kw2, kw3, kw4));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords));
+        metadata.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, false);
+        
+        
+        final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_keywords8.json");
+        String expectedJson = FileUtilities.getStringFromStream(resStream);
+
+        
+        File resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        String resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
     
     
     }

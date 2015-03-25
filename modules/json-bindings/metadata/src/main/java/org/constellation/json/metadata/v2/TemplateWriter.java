@@ -88,6 +88,10 @@ public class TemplateWriter extends AbstractTemplateHandler {
     }
     
     private ValueNode extractSubTreeFromMetadata(final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded) throws ParseException {
+        if (root.isField()) {
+            root.value = valueToString(root, metadata, false);
+            return root;
+        }
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             final ValueNode origNode = new ValueNode(node);
@@ -190,7 +194,9 @@ public class TemplateWriter extends AbstractTemplateHandler {
     private static boolean matchNode(final ValueNode origin, final ValueNode candidate) {
         if (Objects.equals(origin.type, candidate.type)) {
             if (origin.render != null && origin.render.contains("readonly") && !Objects.equals(origin.defaultValue, candidate.value)) {
-                    return false;
+                return false;
+            } else if (!origin.getPredefinedValues().isEmpty() && !origin.getPredefinedValues().contains(candidate.value)) {
+                return false;
             }
             for (ValueNode originChild : origin.children) {
                 final List<ValueNode> candidateChildren = candidate.getChildrenByName(originChild.name);

@@ -21,6 +21,8 @@ package org.constellation.json.metadata.binding;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Pojo class used for Jackson that represents the binding for field
@@ -43,6 +45,8 @@ public class Field implements Serializable {
     private String obligation;
     private String ignore;
     private String tag;
+    private List<String> predefinedValues;
+    private boolean strict;
 
     public Field() {
 
@@ -162,14 +166,52 @@ public class Field implements Serializable {
         this.tag = tag;
     }
     
+     /**
+     * @return the predefinedValues
+     */
+    public List<String> getPredefinedValues() {
+        if (predefinedValues == null) {
+            predefinedValues = new ArrayList<>();
+        }
+        return predefinedValues;
+    }
+
+    /**
+     * @param predefinedValues the predefinedValues to set
+     */
+    public void setPredefinedValues(List<String> predefinedValues) {
+        this.predefinedValues = predefinedValues;
+    }
+    
+    /**
+     * @return the strict
+     */
+    public boolean isStrict() {
+        return strict;
+    }
+
+    /**
+     * @param strict the strict to set
+     */
+    public void setStrict(boolean strict) {
+        this.strict = strict;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[Block]\n");
         sb.append("name:").append(name).append('\n');
         sb.append("path:").append(path).append('\n');
         sb.append("type:").append(type).append('\n');
+        sb.append("strict:").append(strict).append('\n');
         sb.append("multiplicity:").append(multiplicity).append('\n');
         sb.append("defaultValue:").append(defaultValue).append('\n');
+        if (predefinedValues != null) {
+            sb.append("predefined values:").append('\n');
+            for (String pv : predefinedValues) {
+                sb.append(pv).append('\n');
+            }
+        }
         sb.append("value:").append(value);
         return sb.toString();
     }

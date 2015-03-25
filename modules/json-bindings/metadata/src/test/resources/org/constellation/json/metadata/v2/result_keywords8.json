@@ -12,21 +12,55 @@
         "children" : [ {
           "type" : "block",
           "block" : {
-            "name" : "metadata.block.descriptiveKeyword",
-            "multiplicity" : 62,
-            "help" : "metadata.block.descriptiveKeyword_help",
-            "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0]",
+            "name" : "metadata.block.descriptiveKeyword_inspire",
+            "multiplicity" : 1,
+            "help" : "metadata.block.descriptiveKeyword_inspire_help",
+            "path" : null,
             "render" : null,
             "ignore" : null,
             "type" : null,
-            "strict" : false,
+            "strict" : true,
             "children" : [ {
               "type" : "field",
               "field" : {
-                "name" : "metadata.field.keyword",
+                "name" : "metadata.field.keywordReserved",
                 "multiplicity" : 62,
-                "help" : "metadata.field.keyword_help",
+                "help" : "metadata.field.keywordReserved_help",
                 "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[0]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "value1",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keywordReserved",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keywordReserved_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[1]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "value2",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keywordFree",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keywordFree_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[2]",
                 "type" : null,
                 "render" : "KEYWORD.text",
                 "defaultValue" : null,
@@ -40,61 +74,14 @@
             }, {
               "type" : "field",
               "field" : {
-                "name" : "metadata.field.keyword",
+                "name" : "metadata.field.keywordFree",
                 "multiplicity" : 62,
-                "help" : "metadata.field.keyword_help",
-                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[1]",
+                "help" : "metadata.field.keywordFree_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[3]",
                 "type" : null,
                 "render" : "KEYWORD.text",
                 "defaultValue" : null,
                 "value" : "world",
-                "obligation" : "O",
-                "ignore" : null,
-                "tag" : null,
-                "predefinedValues" : [ ],
-                "strict" : false
-              }
-            } ]
-          }
-        }, {
-          "type" : "block",
-          "block" : {
-            "name" : "metadata.block.descriptiveKeyword",
-            "multiplicity" : 62,
-            "help" : "metadata.block.descriptiveKeyword_help",
-            "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[1]",
-            "render" : null,
-            "ignore" : null,
-            "type" : null,
-            "strict" : false,
-            "children" : [ {
-              "type" : "field",
-              "field" : {
-                "name" : "metadata.field.keyword",
-                "multiplicity" : 62,
-                "help" : "metadata.field.keyword_help",
-                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[1].keyword[0]",
-                "type" : null,
-                "render" : "KEYWORD.text",
-                "defaultValue" : null,
-                "value" : "this",
-                "obligation" : "O",
-                "ignore" : null,
-                "tag" : null,
-                "predefinedValues" : [ ],
-                "strict" : false
-              }
-            }, {
-              "type" : "field",
-              "field" : {
-                "name" : "metadata.field.keyword",
-                "multiplicity" : 62,
-                "help" : "metadata.field.keyword_help",
-                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[1].keyword[1]",
-                "type" : null,
-                "render" : "KEYWORD.text",
-                "defaultValue" : null,
-                "value" : "is",
                 "obligation" : "O",
                 "ignore" : null,
                 "tag" : null,

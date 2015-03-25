@@ -40,6 +40,11 @@ public class RootObj implements Serializable {
     public RootObj(){
     }
     
+    public RootObj(RootBlock root, List<NodeType> nodeTypes){
+        this.root = root;
+        this.nodeTypes = nodeTypes;
+    }
+    
     public RootObj(RootObj rootObj){
         this.root = new RootBlock(rootObj.root);
         if (rootObj.nodeTypes != null) {

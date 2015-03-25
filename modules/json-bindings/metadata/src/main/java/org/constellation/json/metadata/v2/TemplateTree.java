@@ -150,10 +150,10 @@ public class TemplateTree {
         }
     }
 
-    public List<ValueNode> getNodesByPathAndParent(String path, ValueNode parent) {
+    public List<ValueNode> getNodesByFieldAndParent(String fieldName, ValueNode parent) {
         final List<ValueNode> results = new ArrayList<>();
         for (ValueNode node : nodes) {
-            if (node.path.equals(path) && (parent == null || node.hashParent(parent))) {
+            if (node.blockName != null && node.blockName.equals(fieldName) && (parent == null || node.hashParent(parent))) {
                 results.add(node);
             }
         }
@@ -339,7 +339,7 @@ public class TemplateTree {
     
     private static int updateRootObjFromTree(final FieldObj fieldObj, final Block owner, final TemplateTree tree, final ValueNode node, int fieldCount) {
         Field field = fieldObj.getField();
-        final List<ValueNode> fieldNodes = tree.getNodesByPathAndParent(field.getPath(), node);
+        final List<ValueNode> fieldNodes = tree.getNodesByFieldAndParent(field.getName(), node);
         
         if (fieldNodes.isEmpty()) {
             owner.removeField(fieldObj);
