@@ -331,6 +331,7 @@
                                         <div class="item {{dataset.Type? ('dataset-data-'+dataset.Type | lowercase) : 'dataset-data'}}"
                                              ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id), 'style-small':dataCtrl.smallMode}"
                                              ng-click="selectDS(dataset);toggleDataSetFirstChild(dataset);"
+                                             ng-show="dataset.Children.length!=1"
                                              data-name="{{dataset.Name}}"
                                              ng-cloak>
                                             <div class="top">
@@ -372,13 +373,13 @@
                                             </div>
                                         </div>
                                         <div class="item {{data.Type | lowercase}}"
-                                             style="margin-top: 0;"
-                                             ng-if="dataset.id==selectedDS.id"
+                                             ng-style="dataset.Children.length==1?'':'margin-top:0;'"
+                                             ng-if="dataset.id==selectedDS.id || dataset.Children.length==1"
                                              ng-repeat="data in dataset.Children"
                                              ng-class="{'selected':dataCtrl.selectedDataSetChild && (data.Id==dataCtrl.selectedDataSetChild.Id),
-                                                        'col-xs-11':dataCtrl.smallMode,
-                                                        'child':!dataCtrl.smallMode,
-                                                        'col-sm-offset-1':dataCtrl.smallMode,
+                                                        'col-xs-11':dataCtrl.smallMode && dataset.Children.length>1,
+                                                        'child':!dataCtrl.smallMode && dataset.Children.length>1,
+                                                        'col-sm-offset-1':dataCtrl.smallMode && dataset.Children.length>1,
                                                         'style-small':dataCtrl.smallMode}"
                                              ng-click="selectDataSetChild(data,dataset)"
                                              ng-cloak
