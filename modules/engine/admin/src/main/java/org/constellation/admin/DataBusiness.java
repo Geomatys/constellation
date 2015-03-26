@@ -906,6 +906,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord.setDateCreation(System.currentTimeMillis());
                 metadataRecord.setOwner(userID);
 
+                //TODO fulljooq
+                metadataRecord.setIsPublished(false);
+                metadataRecord.setIsValidated(false);
                         
                 metadataRepository.create(metadataRecord);
             }

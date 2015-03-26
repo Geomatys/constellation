@@ -246,6 +246,10 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             metadata.setParentIdentifier(parentID);
             metadata.setElementary(elementary);
             
+            //TODO fulljooq
+            metadata.setIsPublished(false);
+            metadata.setIsValidated(false);
+            
             metadataRepository.create(metadata);
         }
         return ds;
@@ -401,6 +405,9 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setParentIdentifier(parentID);
                 metadataRecord.setElementary(elementary);
                 
+                //TODO fulljooq
+                metadataRecord.setIsPublished(false);
+                metadataRecord.setIsValidated(false);
                 
                 metadataRepository.create(metadataRecord);
             }
@@ -482,7 +489,11 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setMdCompletion(completion);
                 metadataRecord.setProfile(templateName);
                 
+                //TODO fulljooq
+                metadataRecord.setIsPublished(false);
+                metadataRecord.setIsValidated(false);
 
+                
                 metadataRepository.create(metadataRecord);
             }
         } else {

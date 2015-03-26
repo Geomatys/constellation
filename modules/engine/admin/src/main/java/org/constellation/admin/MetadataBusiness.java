@@ -191,6 +191,11 @@ public class MetadataBusiness implements IMetadataBusiness {
             metadata2.setProfile(templateName);
             metadata2.setParentIdentifier(parentID);
             metadata2.setElementary(elementary);
+            
+            //TODO fulljooq
+            metadata2.setIsPublished(false);
+            metadata2.setIsValidated(false);
+            
             metadataRepository.create(metadata2);
             return true;
         }
