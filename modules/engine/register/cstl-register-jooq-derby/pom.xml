@@ -19,6 +19,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.1.0.Final</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.sis.core</groupId>
 			<artifactId>sis-utility</artifactId>
 		</dependency>
@@ -178,6 +183,7 @@
 								classes. -->
 							<daos>true</daos>
 							<fluentSetters>true</fluentSetters>
+							<validationAnnotations>true</validationAnnotations>
 						</generate>
 						<target>
 							<packageName>org.constellation.engine.register.jooq</packageName>
