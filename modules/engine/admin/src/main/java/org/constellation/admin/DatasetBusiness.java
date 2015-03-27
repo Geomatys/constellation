@@ -225,11 +225,11 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             }
             // calculate completion rating / elementary
             Integer completion = null;
-            boolean elementary = false;
+            String level = "NONE";
             final Template template = Template.getInstance(templateName);
             try {
                 completion = template.calculateMDCompletion(meta);
-                elementary = template.isElementary(meta);
+                level = template.getCompletion(meta);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
@@ -244,7 +244,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             metadata.setTitle(title);
             metadata.setProfile(templateName);
             metadata.setParentIdentifier(parentID);
-            metadata.setElementary(elementary);
+            metadata.setLevel(level);
             
             //TODO fulljooq
             metadata.setIsPublished(false);
@@ -360,7 +360,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             // calculate completion rating
             List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
             Integer completion = null;
-            boolean elementary = false;
+            String level = "NONE";
             String templateName = null;
             if (!datas.isEmpty()) {
                 final String type = datas.get(0).getType();
@@ -368,7 +368,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 final Template template = Template.getInstance(templateName);
                 try {
                     completion = template.calculateMDCompletion(metadata);
-                    elementary = template.isElementary(metadata);
+                    level = template.getCompletion(metadata);
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
                 }
@@ -378,7 +378,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             if (metadataRecord != null) {
                 metadataRecord.setMetadataIso(metadataString);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRecord.setElementary(elementary);
+                metadataRecord.setLevel(level);
                 metadataRecord.setTitle(title);
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
@@ -403,7 +403,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setTitle(title);
                 metadataRecord.setProfile(templateName);
                 metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setElementary(elementary);
+                metadataRecord.setLevel(level);
                 
                 //TODO fulljooq
                 metadataRecord.setIsPublished(false);
@@ -445,7 +445,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             // calculate completion rating
             List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
             Integer completion = null;
-            boolean elementary = false;
+            String level = "NONE";
             String templateName = null;
             if (!datas.isEmpty()) {
                 final String type = datas.get(0).getType();
@@ -453,7 +453,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 final Template template = Template.getInstance(templateName);
                 try {
                     completion = template.calculateMDCompletion(meta);
-                    elementary = template.isElementary(meta);
+                    level = template.getCompletion(meta);
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
                 }
@@ -464,7 +464,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             if (metadataRecord != null) {
                 metadataRecord.setMetadataIso(metadataXml);
                 metadataRecord.setMetadataId(metaId);
-                metadataRecord.setElementary(elementary);
+                metadataRecord.setLevel(level);
                 metadataRecord.setTitle(title);
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
@@ -482,7 +482,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setMetadataIso(metadataXml);
                 metadataRecord.setMetadataId(metaId);
                 metadataRecord.setDataId(dataset.getId());
-                metadataRecord.setElementary(elementary);
+                metadataRecord.setLevel(level);
                 metadataRecord.setTitle(title);
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);

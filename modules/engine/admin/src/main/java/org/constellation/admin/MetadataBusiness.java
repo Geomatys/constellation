@@ -135,7 +135,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             userID = user.get().getId();
         }
         Integer completion  = null;
-        boolean elementary  = false;
+        String level = "NONE";
         String templateName = null;
         
         if (metadata != null) {
@@ -147,12 +147,12 @@ public class MetadataBusiness implements IMetadataBusiness {
                     // calculate completion rating
                     final Template template = Template.getInstance(templateName);
                     completion = template.calculateMDCompletion(meta);
-                    elementary = template.isElementary(meta);
+                    level = template.getCompletion(meta);
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
                 }
             }
-            metadata.setElementary(elementary);
+            metadata.setLevel(level);
             metadata.setTitle(title);
             metadata.setDatestamp(dateStamp);
             metadata.setParentIdentifier(parentID);
@@ -173,7 +173,7 @@ public class MetadataBusiness implements IMetadataBusiness {
                     templateName = getDatasetTemplate(dataset.getIdentifier(), type);
                     final Template template = Template.getInstance(templateName);
                     completion = template.calculateMDCompletion(unmarshallMetadata(xml));
-                    elementary = template.isElementary(meta);
+                    level = template.getCompletion(meta);
                 }
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
@@ -190,7 +190,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             metadata2.setTitle(title);
             metadata2.setProfile(templateName);
             metadata2.setParentIdentifier(parentID);
-            metadata2.setElementary(elementary);
+            metadata2.setLevel(level);
             
             //TODO fulljooq
             metadata2.setIsPublished(false);
@@ -208,7 +208,7 @@ public class MetadataBusiness implements IMetadataBusiness {
                 templateName = getDataTemplate(data.getName(), data.getNamespace(), data.getType());
                 final Template template = Template.getInstance(templateName);
                 completion = template.calculateMDCompletion(unmarshallMetadata(xml));
-                elementary = template.isElementary(meta);
+                level = template.getCompletion(meta);
             } catch (IOException | ConfigurationException | JAXBException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
@@ -223,7 +223,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             metadata2.setTitle(title);
             metadata2.setProfile(templateName);
             metadata2.setParentIdentifier(parentID);
-            metadata2.setElementary(elementary);
+            metadata2.setLevel(level);
             metadataRepository.create(metadata2);
             return true;
         }
@@ -241,7 +241,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         metadata2.setTitle(title);
         metadata2.setProfile(templateName);
         metadata2.setParentIdentifier(parentID);
-        metadata2.setElementary(elementary);
+        metadata2.setLevel(level);
         
         metadataRepository.create(metadata2);
         return true;

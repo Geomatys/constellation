@@ -325,12 +325,12 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             
             // calculate completion rating / elementary
             Integer completion = null;
-            boolean elementary = false;
+            String level = "NONE";
             String templateName = getTemplate(name, data.getType());
             final Template template = Template.getInstance(templateName);
             try {
                 completion = template.calculateMDCompletion(metadata);
-                elementary = template.isElementary(metadata);
+                level = template.getCompletion(metadata);
             } catch (IOException ex) {
                 LOGGER.warn("Error while calculating metadata completion", ex);
             }
@@ -339,7 +339,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord.setMetadataIso(metadataStr);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
                 metadataRecord.setMdCompletion(completion);
-                metadataRecord.setElementary(elementary);
+                metadataRecord.setLevel(level);
                 metadataRecord.setTitle(title);
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
@@ -361,7 +361,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord.setTitle(title);
                 metadataRecord.setProfile(templateName);
                 metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setElementary(elementary);
+                metadataRecord.setLevel(level);
                 metadataRecord.setIsPublished(false);
                 metadataRecord.setIsValidated(false);
                 
@@ -867,11 +867,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             // calculate completion rating / elementary
             String templateName = getTemplate(dataName, data.getType());
             Integer completion = null;
-            boolean elementary = false;
+            String level = "NONE";
             final Template template = Template.getInstance(templateName);
             try {
                 completion = template.calculateMDCompletion(metadata);
-                elementary = template.isElementary(metadata);
+                level = template.getCompletion(metadata);
             } catch (IOException ex) {
                 LOGGER.warn("Error while calculating metadata completion", ex);
             }
@@ -880,7 +880,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             if (metadataRecord != null) {
                 metadataRecord.setMetadataIso(metadataString);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRecord.setElementary(elementary);
+                metadataRecord.setLevel(level);
                 metadataRecord.setTitle(title);
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
@@ -896,7 +896,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 metadataRecord = new Metadata();
                 metadataRecord.setMetadataIso(metadataString);
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRecord.setElementary(elementary);
+                metadataRecord.setLevel(level);
                 metadataRecord.setTitle(title);
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);

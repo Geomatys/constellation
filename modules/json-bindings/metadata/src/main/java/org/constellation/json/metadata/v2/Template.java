@@ -161,8 +161,8 @@ public class Template {
         reader.readTemplate(json, destination);
     }
     
-    public boolean isElementary(final Object metadata) throws IOException {
-       return false; //TODO
+    public String getCompletion(final Object metadata) throws IOException {
+       return "NONE"; //TODO
     }
     
     public int calculateMDCompletion(final Object metadata) throws IOException {

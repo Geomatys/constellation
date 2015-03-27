@@ -66,7 +66,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                 .set(METADATA.PARENT_IDENTIFIER, metadata.getParentIdentifier())
                 .set(METADATA.DATESTAMP, metadata.getDatestamp())
                 .set(METADATA.DATE_CREATION, metadata.getDateCreation())
-                .set(METADATA.ELEMENTARY, metadata.getElementary())
+                .set(METADATA.LEVEL, metadata.getLevel())
                 .set(METADATA.IS_PUBLISHED, metadata.getIsPublished())
                 .set(METADATA.IS_VALIDATED, metadata.getIsValidated())
                 .set(METADATA.PROFILE, metadata.getProfile())
@@ -86,7 +86,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setMdCompletion(metadata.getMdCompletion());
         metadataRecord.setDateCreation(metadata.getDateCreation());
         metadataRecord.setDatestamp(metadata.getDatestamp());
-        metadataRecord.setElementary(metadata.getElementary());
+        metadataRecord.setLevel(metadata.getLevel());
         metadataRecord.setIsPublished(metadata.getIsPublished());
         metadataRecord.setIsValidated(metadata.getIsValidated());
         metadataRecord.setOwner(metadata.getOwner());
@@ -164,7 +164,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         Collection<Field<?>> fields = new ArrayList<>();
         Collections.addAll(fields,METADATA.ID,METADATA.METADATA_ID,
                 METADATA.TITLE,METADATA.PROFILE,METADATA.OWNER,METADATA.DATESTAMP,
-                METADATA.DATE_CREATION,METADATA.MD_COMPLETION,METADATA.ELEMENTARY,
+                METADATA.DATE_CREATION,METADATA.MD_COMPLETION,METADATA.LEVEL,
                 METADATA.IS_VALIDATED,METADATA.IS_PUBLISHED);
         Select query = null;
         if(filterMap != null) {
@@ -195,9 +195,9 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                     }
                 }else if("level".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(fields).from(METADATA).where(METADATA.ELEMENTARY.equal((Boolean)entry.getValue()));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.LEVEL.equal((String)entry.getValue()));
                     }else {
-                        query = ((SelectConditionStep)query).and(METADATA.ELEMENTARY.equal((Boolean) entry.getValue()));
+                        query = ((SelectConditionStep)query).and(METADATA.LEVEL.equal((String) entry.getValue()));
                     }
                 }else if("term".equals(entry.getKey())) {
                     if(query == null) {
