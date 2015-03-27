@@ -1,5 +1,7 @@
 package org.constellation.util.json;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,6 +11,7 @@ import org.apache.sis.util.Static;
 import org.apache.sis.util.UnconvertibleObjectException;
 import org.geotoolkit.feature.IllegalAttributeException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -19,6 +22,11 @@ import java.util.Collection;
  * @author Quentin Boileau (Geomatys)
  */
 class JsonUtils extends Static {
+
+    /**
+     * Jackson JsonFactory used to create temporary JsonGenerators.
+     */
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     private JsonUtils(){}
 
@@ -83,9 +91,15 @@ class JsonUtils extends Static {
         } else {
             //fallback
             try {
+                //HACK : create a temporary writer to write object.
+                //In case of writeObject(value) fail input writer will not be in illegal state.
+                final JsonGenerator tempGenerator = JSON_FACTORY.createGenerator(new ByteArrayOutputStream(), JsonEncoding.UTF8);
+                tempGenerator.setCodec(new ObjectMapper());
+                tempGenerator.writeObject(value);
+
                 //using jackson auto mapping
                 writer.writeObject(value);
-            } catch (JsonProcessingException ex) {
+            } catch (Throwable ex) {
                 // last chance with converter and toString()
                 writer.writeString(ObjectConverters.convert(value, String.class));
             }
