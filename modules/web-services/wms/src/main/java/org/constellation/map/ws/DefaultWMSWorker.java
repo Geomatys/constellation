@@ -1347,7 +1347,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         if (layerTimes != null && !layerTimes.isEmpty()) {
 
                             //get the last and previous date
-                            defaultTimes.add(layerTimes.get(layerTimes.size()-2));
+                            defaultTimes.add(layerTimes.get(StrictMath.max(0, layerTimes.size()-2)));
                         }
                     } catch (DataStoreException e) {
                         // no time found for layer, continue to next one
