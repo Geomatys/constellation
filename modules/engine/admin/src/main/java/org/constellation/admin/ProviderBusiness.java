@@ -534,7 +534,7 @@ public class ProviderBusiness implements IProviderBusiness {
         final QName qName = new QName(namespace, dataName);
         final DataBrief inData = dataBusiness.getDataBrief(qName, providerId);
         if (inData != null){
-            // Execute in transaction to be ensure that taskParameter is in Database before run
+            // Execute in transaction to ensure that taskParameter is in Database before run
             // process in Quartz scheduler.
             Map<String, Object> result = SpringHelper.executeInTransaction(new TransactionCallback<Map<String, Object>>() {
                 @Override
