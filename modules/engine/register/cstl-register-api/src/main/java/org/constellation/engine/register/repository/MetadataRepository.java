@@ -46,7 +46,7 @@ public interface MetadataRepository {
 
     List<Metadata> findAll();
 
-    List<Metadata> filterAndGet(final Map<String,Object> filterMap);
+    Map<Integer, List> filterAndGet(final Map<String,Object> filterMap, final Map.Entry<String,String> sortEntry,final int pageNumber,final int rowsPerPage);
 
     Map<String,Integer> getProfilesCount();
     

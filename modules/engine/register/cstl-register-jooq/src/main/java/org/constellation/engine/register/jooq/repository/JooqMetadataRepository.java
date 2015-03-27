@@ -21,6 +21,10 @@ package org.constellation.engine.register.jooq.repository;
 import static org.constellation.engine.register.jooq.Tables.METADATA;
 import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +34,11 @@ import org.constellation.engine.register.jooq.tables.records.MetadataRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.jooq.AggregateFunction;
-import org.jooq.Record;
+import org.jooq.Field;
+import org.jooq.Select;
 import org.jooq.SelectConditionStep;
+import org.jooq.SelectLimitStep;
+import org.jooq.SortField;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
@@ -81,7 +88,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setDatestamp(metadata.getDatestamp());
         metadataRecord.setElementary(metadata.getElementary());
         metadataRecord.setIsPublished(metadata.getIsPublished());
-        metadataRecord.setIsValidated(metadata.getIsPublished());
+        metadataRecord.setIsValidated(metadata.getIsValidated());
         metadataRecord.setOwner(metadata.getOwner());
         metadataRecord.setParentIdentifier(metadata.getParentIdentifier());
         metadataRecord.setProfile(metadata.getProfile());
@@ -149,55 +156,80 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
 
     @Override
-    public List<Metadata> filterAndGet(final Map<String,Object> filterMap) {
-        if(filterMap == null || filterMap.isEmpty()) {
-            return findAll();
-        }else {
-            SelectConditionStep<Record> condition = null;
+    public Map<Integer, List> filterAndGet(final Map<String,Object> filterMap,
+                                       final Map.Entry<String,String> sortEntry,
+                                       final int pageNumber,
+                                       final int rowsPerPage) {
+        final Map<Integer,List> result = new HashMap<>();
+        Collection<Field<?>> fields = new ArrayList<>();
+        Collections.addAll(fields,METADATA.ID,METADATA.METADATA_ID,
+                METADATA.TITLE,METADATA.PROFILE,METADATA.OWNER,METADATA.DATESTAMP,
+                METADATA.DATE_CREATION,METADATA.MD_COMPLETION,METADATA.ELEMENTARY,
+                METADATA.IS_VALIDATED,METADATA.IS_PUBLISHED);
+        Select query = null;
+        if(filterMap != null) {
             for(final Map.Entry<String,Object> entry : filterMap.entrySet()) {
                 if("owner".equals(entry.getKey())) {
-                    if(condition == null) {
-                        condition = dsl.select().from(METADATA).where(METADATA.OWNER.equal((Integer)entry.getValue()));
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.OWNER.equal((Integer)entry.getValue()));
                     }else {
-                        condition = condition.and(METADATA.OWNER.equal((Integer)entry.getValue()));
+                        query = ((SelectConditionStep)query).and(METADATA.OWNER.equal((Integer)entry.getValue()));
                     }
                 }else if("profile".equals(entry.getKey())) {
-                    if(condition == null) {
-                        condition = dsl.select().from(METADATA).where(METADATA.PROFILE.equal((String)entry.getValue()));
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.PROFILE.equal((String)entry.getValue()));
                     }else {
-                        condition = condition.and(METADATA.PROFILE.equal((String)entry.getValue()));
+                        query = ((SelectConditionStep)query).and(METADATA.PROFILE.equal((String) entry.getValue()));
                     }
                 }else if("validated".equals(entry.getKey())) {
-                    if(condition == null) {
-                        condition = dsl.select().from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
                     }else {
-                        condition = condition.and(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
+                        query = ((SelectConditionStep)query).and(METADATA.IS_VALIDATED.equal((Boolean) entry.getValue()));
                     }
                 }else if("published".equals(entry.getKey())) {
-                    if(condition == null) {
-                        condition = dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
                     }else {
-                        condition = condition.and(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
+                        query = ((SelectConditionStep)query).and(METADATA.IS_PUBLISHED.equal((Boolean) entry.getValue()));
                     }
                 }else if("level".equals(entry.getKey())) {
-                    if(condition == null) {
-                        condition = dsl.select().from(METADATA).where(METADATA.ELEMENTARY.equal((Boolean)entry.getValue()));
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.ELEMENTARY.equal((Boolean)entry.getValue()));
                     }else {
-                        condition = condition.and(METADATA.ELEMENTARY.equal((Boolean)entry.getValue()));
+                        query = ((SelectConditionStep)query).and(METADATA.ELEMENTARY.equal((Boolean) entry.getValue()));
                     }
                 }else if("term".equals(entry.getKey())) {
-                    if(condition == null) {
-                        condition = dsl.select().from(METADATA).where(METADATA.METADATA_ISO.contains((String)entry.getValue()));
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.METADATA_ISO.contains((String)entry.getValue()));
                     }else {
-                        condition = condition.and(METADATA.METADATA_ISO.contains((String)entry.getValue()));
+                        query = ((SelectConditionStep)query).and(METADATA.METADATA_ISO.contains((String) entry.getValue()));
                     }
                 }
             }
-            if(condition == null) {
-                return findAll();
-            }
-            return condition.fetchInto(Metadata.class);
         }
+        if(sortEntry != null) {
+            final SortField f;
+            if("title".equals(sortEntry.getKey())){
+                f = "ASC".equals(sortEntry.getValue()) ? METADATA.TITLE.asc() : METADATA.TITLE.desc();
+            }else {
+                f = "ASC".equals(sortEntry.getValue()) ? METADATA.DATESTAMP.asc() : METADATA.DATESTAMP.desc();
+            }
+            if(query == null) {
+                query = dsl.select(fields).from(METADATA).orderBy(f);
+            }else {
+                query = ((SelectConditionStep)query).orderBy(f);
+            }
+        }
+
+        if(query == null) { //means there are no sorting and no filters
+            final int count = dsl.selectCount().from(METADATA).fetchOne(0,int.class);
+            result.put(count,dsl.select(fields).from(METADATA).limit(rowsPerPage).offset((pageNumber - 1) * rowsPerPage).fetchInto(Metadata.class));
+        }else {
+            final int count = dsl.fetchCount(query);
+            result.put(count, ((SelectLimitStep) query).limit(rowsPerPage).offset((pageNumber - 1) * rowsPerPage).fetchInto(Metadata.class));
+        }
+        return result;
     }
     
 }
