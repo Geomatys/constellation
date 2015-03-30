@@ -240,7 +240,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         DefaultMetadata result = null;
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         final Metadata metadata = metadataRepository.findByDataId(data.getId());
-        if (metadata != null && metadata.getMetadataIso() != null) {
+        if (metadata != null) {
             result = unmarshallMetadata(metadata.getMetadataIso());
         }
         return result;
@@ -253,7 +253,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     public DefaultMetadata loadIsoDataMetadata(final int dataId) throws ConfigurationException{
         DefaultMetadata result = null;
         final Metadata metadata = metadataRepository.findByDataId(dataId);
-        if (metadata != null && metadata.getMetadataIso() != null) {
+        if (metadata != null) {
             result = unmarshallMetadata(metadata.getMetadataIso());
         }
         return result;

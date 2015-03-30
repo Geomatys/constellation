@@ -75,11 +75,14 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.Unmarshaller;
+import org.apache.sis.xml.MarshallerPool;
 import org.opengis.metadata.identification.Identification;
 
 
@@ -470,17 +473,24 @@ public final class MetadataUtilities {
         return resultMetadata;
     }
     
-    public static DefaultMetadata getTemplateMetadata(final Properties prop) {
+    public static DefaultMetadata getTemplateMetadata(final Properties prop, final String templatePath, final MarshallerPool pool) {
         try {
             final TemplateEngine templateEngine = TemplateEngineFactory.getInstance(TemplateEngineFactory.GROOVY_TEMPLATE_ENGINE);
-            final InputStream stream = Util.getResourceAsStream("org/constellation/engine/template/mdTemplDataset.xml");
+            final InputStream stream = Util.getResourceAsStream(templatePath);
             final File templateFile = File.createTempFile("mdTemplDataset", ".xml");
             FileUtilities.buildFileFromStream(stream, templateFile);
             final String templateApplied = templateEngine.apply(templateFile, prop);
             
             //unmarshall the template
-            final DefaultMetadata meta = (DefaultMetadata) XML.unmarshal(templateApplied);
-            return meta;
+            if (pool != null) {
+                final Unmarshaller m = pool.acquireUnmarshaller();
+                final DefaultMetadata meta = (DefaultMetadata) m.unmarshal(new StringReader(templateApplied));
+                pool.recycle(m);
+                return meta;
+            } else {
+                final DefaultMetadata meta = (DefaultMetadata) XML.unmarshal(templateApplied);
+                return meta;
+            }
         } catch (TemplateEngineException | IOException | JAXBException ex) {
            LOGGER.log(Level.WARNING, null, ex);
         }

@@ -590,7 +590,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             }
         }
 
-        final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
+        final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop, "org/constellation/engine/template/mdTemplDataset.xml", getMarshallerPool());
 
         DefaultMetadata mergedMetadata;
         if (extractedMetadata != null) {
@@ -606,12 +606,12 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
 
         //merge with uploaded metadata
         DefaultMetadata uploadedMetadata;
-        try{
-            uploadedMetadata = getMetadata(providerId,-1);
-        }catch(Exception ex){
+        try {
+            uploadedMetadata = getMetadata(providerId, -1);
+        } catch (Exception ex) {
             uploadedMetadata = null;
         }
-        if(uploadedMetadata != null){
+        if (uploadedMetadata != null) {
             try {
                 mergedMetadata = MetadataUtilities.mergeMetadata(uploadedMetadata,mergedMetadata);
             } catch (NoSuchIdentifierException | ProcessException ex) {
