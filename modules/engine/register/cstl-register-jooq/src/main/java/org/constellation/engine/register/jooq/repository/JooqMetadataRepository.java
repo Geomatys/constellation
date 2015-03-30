@@ -68,8 +68,13 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         update.set(METADATA.DATESTAMP, metadata.getDatestamp());
         update.set(METADATA.DATE_CREATION, metadata.getDateCreation());
         update.set(METADATA.LEVEL, metadata.getLevel());
-        update.set(METADATA.IS_PUBLISHED, metadata.getIsPublished());
-        update.set(METADATA.IS_VALIDATED, metadata.getIsValidated());
+
+        if (metadata.getIsPublished() != null) update.set(METADATA.IS_PUBLISHED, metadata.getIsPublished());
+        else update.set(METADATA.IS_PUBLISHED, false);
+
+        if (metadata.getIsValidated() != null) update.set(METADATA.IS_VALIDATED, metadata.getIsValidated());
+        else update.set(METADATA.IS_VALIDATED, false);
+
         update.set(METADATA.PROFILE, metadata.getProfile());
         update.set(METADATA.TITLE, metadata.getTitle())
                 .where(METADATA.ID.eq(metadata.getId())).execute();
@@ -89,11 +94,16 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setDateCreation(metadata.getDateCreation());
         metadataRecord.setDatestamp(metadata.getDatestamp());
         metadataRecord.setLevel(metadata.getLevel());
-        metadataRecord.setIsPublished(metadata.getIsPublished());
-        metadataRecord.setIsValidated(metadata.getIsValidated());
         metadataRecord.setOwner(metadata.getOwner());
         metadataRecord.setProfile(metadata.getProfile());
         metadataRecord.setTitle(metadata.getTitle());
+
+        if (metadata.getIsPublished() != null) metadataRecord.setIsPublished(metadata.getIsPublished());
+        else metadataRecord.setIsPublished(false); //default
+
+        if (metadata.getIsValidated() != null) metadataRecord.setIsValidated(metadata.getIsValidated());
+        else metadataRecord.setIsValidated(false); //default
+
         metadataRecord.store();
         return metadataRecord.getId();
     }
