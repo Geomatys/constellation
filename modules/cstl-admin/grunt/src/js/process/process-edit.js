@@ -300,38 +300,41 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                     Growl('error', 'Error', 'Parameter '+parameter.name+' is mandatory');
                     return false;
                 }
+                var length = parameter.save.length;
 
-                //test cast
-                switch(parameter.binding) {
-                    case "java.lang.Integer" : //fall trough
-                    case "java.lang.Long" : //fall trough
-                    case "java.lang.Double" :
-                        if (!angular.isNumber(parameter.save)) {
-                            Growl('error', 'Error', 'Parameter '+parameter.name+' is not a Number');
-                            return false;
-                        }
-                        break;
-                }
-
-                //test restrictions
-                if (parameter.restriction) {
-                    var enumeration = parameter.restriction.enumeration;
-                    if (enumeration && enumeration.length > 0) {
-                        //only test primitive enumeration
-                        if (!angular.isObject(enumeration[0])) {
-                            if (enumeration.indexOf(parameter.save) === -1) {
-                                Growl('error', 'Error', 'Value of parameter ' + parameter.name + ' not valid.');
+                for (var i = 0; i < length; i++) {
+                    //test cast
+                    switch (parameter.binding) {
+                        case "java.lang.Integer" : //fall trough
+                        case "java.lang.Long" : //fall trough
+                        case "java.lang.Double" :
+                            if (!angular.isNumber(parameter.save[i])) {
+                                Growl('error', 'Error', 'Parameter ' + parameter.name + ' is not a Number');
                                 return false;
                             }
-                        }
+                            break;
                     }
 
-                    var range = parameter.restriction.range;
-                    if (range) {
-                        if (parameter.save < range[0] || parameter.save > range[1]) {
-                            Growl('error', 'Error', 'Value of parameter '+parameter.name+' not valid. ' +
-                                'Should be within range ['+range[0]+','+ range[1]+']');
-                            return false;
+                    //test restrictions
+                    if (parameter.restriction) {
+                        var enumeration = parameter.restriction.enumeration;
+                        if (enumeration && enumeration.length > 0) {
+                            //only test primitive enumeration
+                            if (!angular.isObject(enumeration[0])) {
+                                if (enumeration.indexOf(parameter.save[i]) === -1) {
+                                    Growl('error', 'Error', 'Value of parameter ' + parameter.name + ' not valid.');
+                                    return false;
+                                }
+                            }
+                        }
+
+                        var range = parameter.restriction.range;
+                        if (range) {
+                            if (parameter.save[i] < range[0] || parameter.save[i] > range[1]) {
+                                Growl('error', 'Error', 'Value of parameter ' + parameter.name + ' not valid. ' +
+                                'Should be within range [' + range[0] + ',' + range[1] + ']');
+                                return false;
+                            }
                         }
                     }
                 }
