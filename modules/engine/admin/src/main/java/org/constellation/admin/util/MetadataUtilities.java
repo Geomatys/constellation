@@ -82,6 +82,9 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.metadata.KeyNamePolicy;
+import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.metadata.ValueExistencePolicy;
 import org.apache.sis.xml.MarshallerPool;
 import org.opengis.metadata.identification.Identification;
 
@@ -471,6 +474,49 @@ public final class MetadataUtilities {
 
         resultMetadata = (DefaultMetadata) resultParameters.parameter(MergeDescriptor.RESULT_OUT_NAME).getValue();
         return resultMetadata;
+    }
+    
+    public static void merge(final MetadataStandard standard, final Object sourceMetadata, final Object targetMetadata) {
+        //transfomr metadatas to maps
+        final Map<String, Object> source = standard.asValueMap(sourceMetadata, KeyNamePolicy.JAVABEANS_PROPERTY, ValueExistencePolicy.NON_EMPTY);
+        final Map<String, Object> target = standard.asValueMap(targetMetadata, KeyNamePolicy.JAVABEANS_PROPERTY, ValueExistencePolicy.ALL);
+
+        //Iterate on sources to found object which need to be merged
+        for (final Map.Entry<String, Object> entry : source.entrySet()) {
+            //
+            final String propertyName = entry.getKey();
+            final Object sourceValue = entry.getValue();
+            final Object targetValue = target.get(propertyName);
+
+            //directly put if value is null on targer (they don't need merge)
+            if (targetValue == null) {
+                target.put(propertyName, sourceValue);
+            } else {
+                //if it's metadata object (DefaultMetadata, Extent, ...)
+                if (standard.isMetadata(targetValue.getClass())) {
+                    merge(standard, sourceValue, targetValue);
+                } else {
+                    //targetValue is a Collection
+                    if(targetValue instanceof Collection){
+                        Collection targetList = ((Collection) targetValue);
+                        Collection sourceList = ((Collection) sourceValue);
+                        //recursively merge
+                        if (targetList.size() > 0) {
+                            for (Object mergeElement : targetList) {
+                                for (Object sourceElement : sourceList) {
+                                    if (mergeElement.getClass().equals(sourceElement.getClass()) && standard.isMetadata(mergeElement.getClass())) {
+                                        merge(standard, sourceElement, mergeElement);
+                                    }
+                                }
+                            }
+                        } else {
+                            //list is empty on target : we add all other collection without merge
+                            ((Collection) targetValue).addAll((Collection) sourceValue);
+                        }
+                    }
+                }
+            }
+        }
     }
     
     public static DefaultMetadata getTemplateMetadata(final Properties prop, final String templatePath, final MarshallerPool pool) {
