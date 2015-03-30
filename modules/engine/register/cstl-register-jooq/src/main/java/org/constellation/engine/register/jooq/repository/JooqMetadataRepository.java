@@ -166,44 +166,52 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         return dsl.select(METADATA.PROFILE, count ).from(METADATA).groupBy(METADATA.PROFILE).orderBy(count.desc()).fetchMap(METADATA.PROFILE, count);
     }
 
+    /**
+     * Returns a map that contains id of metadata as key and the title of metadata as value.
+     * the filterMap passed in arguments is optional and can contains one or multiple filter on each field.
+     * This method is used for selection of rows to check the state when using server pagination,
+     * the pagination should not be included in this result to keep a list of all existing ids.
+     * @param filterMap
+     * @return
+     */
     @Override
-    public List findIds(final Map<String,Object> filterMap) {
+    public Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap) {
         Select query = null;
         if(filterMap != null) {
             for(final Map.Entry<String,Object> entry : filterMap.entrySet()) {
                 if("owner".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.OWNER.equal((Integer)entry.getValue()));
+                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.OWNER.equal((Integer)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.OWNER.equal((Integer)entry.getValue()));
                     }
                 }else if("profile".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.PROFILE.equal((String)entry.getValue()));
+                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.PROFILE.equal((String)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.PROFILE.equal((String) entry.getValue()));
                     }
                 }else if("validated".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
+                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.IS_VALIDATED.equal((Boolean) entry.getValue()));
                     }
                 }else if("published".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
+                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.IS_PUBLISHED.equal((Boolean) entry.getValue()));
                     }
                 }else if("level".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.LEVEL.equal((String)entry.getValue()));
+                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.LEVEL.equal((String)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.LEVEL.equal((String) entry.getValue()));
                     }
                 }else if("term".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.METADATA_ISO.contains((String)entry.getValue()));
+                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.METADATA_ISO.contains((String)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.METADATA_ISO.contains((String) entry.getValue()));
                     }
@@ -211,12 +219,23 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
             }
         }
         if(query == null) {
-            return dsl.select(METADATA.ID).from(METADATA).fetchInto(Integer.class);
+            return dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).fetchMap(METADATA.ID, METADATA.TITLE);
         }else {
-            return query.fetchInto(Integer.class);
+            return query.fetchMap(METADATA.ID,METADATA.TITLE);
         }
     }
 
+    /**
+     * Returns a singleton map that contains the total count of records as key,
+     * and the list of records as value.
+     * the list is resulted by filters, it use pagination and sorting.
+      
+     * @param filterMap
+     * @param sortEntry
+     * @param pageNumber
+     * @param rowsPerPage
+     * @return
+     */
     @Override
     public Map<Integer, List> filterAndGet(final Map<String,Object> filterMap,
                                        final Map.Entry<String,String> sortEntry,
