@@ -34,8 +34,8 @@
                 "obligation" : "O",
                 "ignore" : null,
                 "tag" : null,
-                "predefinedValues" : [ ],
-                "strict" : false
+                "predefinedValues" : [ "value1", "value2" ],
+                "strict" : true
               }
             }, {
               "type" : "field",
@@ -51,8 +51,8 @@
                 "obligation" : "O",
                 "ignore" : null,
                 "tag" : null,
-                "predefinedValues" : [ ],
-                "strict" : false
+                "predefinedValues" : [ "value1", "value2" ],
+                "strict" : true
               }
             }, {
               "type" : "field",

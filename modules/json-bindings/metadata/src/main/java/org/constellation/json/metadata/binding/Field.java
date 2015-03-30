@@ -64,6 +64,8 @@ public class Field implements Serializable {
         this.obligation   = field.obligation;
         this.ignore       = field.ignore;
         this.tag          = field.tag;
+        this.strict       = field.strict;
+        this.predefinedValues = field.predefinedValues;
     }
 
     public String getName() {

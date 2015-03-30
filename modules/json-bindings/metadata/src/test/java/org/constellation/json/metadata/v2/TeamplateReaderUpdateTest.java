@@ -1086,4 +1086,38 @@ public class TeamplateReaderUpdateTest {
         
         MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
     }
+    
+    @Test
+    public void testReadFromEmptyTemplateKeywords3() throws IOException, FactoryException {
+        InputStream stream = TemplateReaderTest.class.getResourceAsStream("profile_keywords3.json");
+        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        final DefaultDataIdentification pdataIdent = new DefaultDataIdentification();
+        
+        final DefaultKeywords pkeywords = new DefaultKeywords();
+        final InternationalString pkw1 = new SimpleInternationalString("hello");
+        
+        pkeywords.setKeywords(Arrays.asList(pkw1));
+        
+        pdataIdent.setDescriptiveKeywords(Arrays.asList(pkeywords));
+        previous.setIdentificationInfo(Arrays.asList(pdataIdent));
+        
+        
+        Object result = reader.readTemplate(root, previous);
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("hello");
+        keywords.setKeywords(Arrays.asList(kw1));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
 }

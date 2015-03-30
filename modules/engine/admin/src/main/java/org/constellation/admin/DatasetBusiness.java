@@ -236,7 +236,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             final Metadata metadata = new Metadata();
             metadata.setMetadataId(metadataId);
             metadata.setMetadataIso(metadataXml);
-            metadata.setDataId(ds.getId());
+            metadata.setDatasetId(ds.getId());
             metadata.setMdCompletion(completion);
             metadata.setOwner(userID);
             metadata.setDatestamp(dateStamp);
@@ -395,7 +395,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 
                 metadataRecord.setMetadataId(metadata.getFileIdentifier());
                 metadataRecord.setMetadataIso(metadataString);
-                metadataRecord.setDataId(dataset.getId());
+                metadataRecord.setDatasetId(dataset.getId());
                 metadataRecord.setMdCompletion(completion);
                 metadataRecord.setOwner(userID);
                 metadataRecord.setDatestamp(dateStamp);
@@ -481,13 +481,14 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 metadataRecord.setMetadataId(metaId);
                 metadataRecord.setMetadataIso(metadataXml);
                 metadataRecord.setMetadataId(metaId);
-                metadataRecord.setDataId(dataset.getId());
+                metadataRecord.setDatasetId(dataset.getId());
                 metadataRecord.setLevel(level);
                 metadataRecord.setTitle(title);
                 metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setParentIdentifier(parentID);
                 metadataRecord.setMdCompletion(completion);
                 metadataRecord.setProfile(templateName);
+                metadataRecord.setOwner(userID);
                 
                 //TODO fulljooq
                 metadataRecord.setIsPublished(false);

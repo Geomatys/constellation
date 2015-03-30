@@ -16,7 +16,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.KeyNamePolicy;
@@ -27,7 +26,6 @@ import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.iso.Types;
-import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.NilReason;
 import org.constellation.json.JsonMetadataConstants;
 import org.constellation.json.metadata.ParseException;
@@ -55,8 +53,6 @@ import org.opengis.util.InternationalString;
  * @author guilhem
  */
 public class TemplateReader extends AbstractTemplateHandler {
-    
-    private static final Logger LOGGER = Logging.getLogger(TemplateReader.class);
     
     private static final MetadataFactory
             DEFAULT   = new MetadataFactory(),
@@ -121,7 +117,9 @@ public class TemplateReader extends AbstractTemplateHandler {
                     }
                 } else {
                     if (node.isField()) {
-                        putValue(node, metadata);
+                        if (!hadAnotherSimilarField(tree, node)) {
+                            putValue(node, metadata);
+                        }
                     } else {
                         Object newValue = buildNewInstance(metadata, node);
                         putValue(node, metadata, newValue);
@@ -237,10 +235,41 @@ public class TemplateReader extends AbstractTemplateHandler {
         }
     }
     
+    private boolean hadAnotherSimilarField(TemplateTree tree, ValueNode n) throws ParseException {
+        if (n.value != null) return false;
+        
+        final List<ValueNode> nodes = tree.getNodesByPath(n.path);
+        for (ValueNode node : nodes) {
+            if (!node.blockName.equals(n.blockName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private boolean objectMatchStrictNode(final Object obj, ValueNode n, ReservedObjects reserved) throws ParseException {
         if (n.type != null) {
             Class type = readType(n);
             if (!type.isInstance(obj)) return false;
+        }
+        
+        if (n.isField() && n.render != null && n.render.contains("readonly") && n.defaultValue != null) {
+            if (obj == null) return false;
+            Class type      = obj.getClass();
+            Object defValue = convert(n.name, type, n.defaultValue);
+            if (!Objects.equals(obj, defValue)) {
+                return false;
+            }
+        } else if (n.isField() && !n.getPredefinedValues().isEmpty()) {
+            if (obj == null) return false;
+            Class type = obj.getClass();
+            final List<Object> predefinedValues = new ArrayList<>();
+            for (String predefinedValue : n.getPredefinedValues()) {
+                predefinedValues.add(convert(n.name, type, predefinedValue));
+            }
+            if (!predefinedValues.contains(obj)) {
+                return false;
+            }
         }
         
         for (ValueNode child : n.children) {
@@ -252,17 +281,8 @@ public class TemplateReader extends AbstractTemplateHandler {
                 c = Arrays.asList(childO);
             }
             for (Object o : c) {
-                if (child.isField() && child.render != null && child.render.contains("readonly") && child.defaultValue != null) {
-                    if (o == null) return false;
-                    Class type      = o.getClass();
-                    Object defValue = convert(child.name, type, child.defaultValue);
-                    if (!Objects.equals(o, defValue)) {
-                        return false;
-                    }
-                } else {
-                    if (!objectMatchStrictNode(o, child, reserved)) {
-                        return false;
-                    }
+                if (!objectMatchStrictNode(o, child, reserved)) {
+                    return false;
                 }
             }
             

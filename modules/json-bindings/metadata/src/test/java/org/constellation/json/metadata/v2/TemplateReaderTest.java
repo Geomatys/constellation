@@ -184,6 +184,35 @@ public class TemplateReaderTest {
     }
     
     @Test
+    public void testReadFromFilledTemplateKeywords3() throws IOException, FactoryException {
+        final InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_keywords8.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        
+        Object result = reader.readTemplate(root, new DefaultMetadata());
+        
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        final DefaultKeywords keywords = new DefaultKeywords();
+        final InternationalString kw1 = new SimpleInternationalString("value1");
+        final InternationalString kw2 = new SimpleInternationalString("value2");
+        final InternationalString kw3 = new SimpleInternationalString("hello");
+        final InternationalString kw4 = new SimpleInternationalString("world");
+        
+        keywords.setKeywords(Arrays.asList(kw1, kw2, kw3, kw4));
+        
+        dataIdent.setDescriptiveKeywords(Arrays.asList(keywords));
+        
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+    
+    @Test
     public void testReadFromFilledTemplateMultipleBlock() throws IOException, FactoryException {
         InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_multiple_block.json");
         RootObj root       =  objectMapper.readValue(stream, RootObj.class);
