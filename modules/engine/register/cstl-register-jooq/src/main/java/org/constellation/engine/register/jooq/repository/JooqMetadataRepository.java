@@ -39,6 +39,7 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectLimitStep;
 import org.jooq.SortField;
+import org.jooq.UpdateSetFirstStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
@@ -55,22 +56,22 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     
     @Override
     public Metadata update(Metadata metadata) {
-        dsl.update(METADATA)
-                .set(METADATA.DATASET_ID, metadata.getDatasetId())
-                .set(METADATA.DATA_ID, metadata.getDataId())
-                .set(METADATA.METADATA_ID, metadata.getMetadataId())
-                .set(METADATA.METADATA_ISO, metadata.getMetadataIso())
-                .set(METADATA.SERVICE_ID, metadata.getServiceId())
-                .set(METADATA.MD_COMPLETION, metadata.getMdCompletion())
-                .set(METADATA.OWNER, metadata.getOwner())
-                .set(METADATA.PARENT_IDENTIFIER, metadata.getParentIdentifier())
-                .set(METADATA.DATESTAMP, metadata.getDatestamp())
-                .set(METADATA.DATE_CREATION, metadata.getDateCreation())
-                .set(METADATA.LEVEL, metadata.getLevel())
-                .set(METADATA.IS_PUBLISHED, metadata.getIsPublished())
-                .set(METADATA.IS_VALIDATED, metadata.getIsValidated())
-                .set(METADATA.PROFILE, metadata.getProfile())
-                .set(METADATA.TITLE, metadata.getTitle())
+        UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
+        update.set(METADATA.METADATA_ID, metadata.getMetadataId());
+        update.set(METADATA.METADATA_ISO, metadata.getMetadataIso());
+        if (metadata.getDatasetId() != null) update.set(METADATA.DATASET_ID, metadata.getDatasetId());
+        if (metadata.getDataId() != null) update.set(METADATA.DATA_ID, metadata.getDataId());
+        if (metadata.getServiceId() != null) update.set(METADATA.SERVICE_ID, metadata.getServiceId());
+        if (metadata.getMdCompletion() != null) update.set(METADATA.MD_COMPLETION, metadata.getMdCompletion());
+        if (metadata.getParentIdentifier() != null) update.set(METADATA.PARENT_IDENTIFIER, metadata.getParentIdentifier());
+        update.set(METADATA.OWNER, metadata.getOwner());
+        update.set(METADATA.DATESTAMP, metadata.getDatestamp());
+        update.set(METADATA.DATE_CREATION, metadata.getDateCreation());
+        update.set(METADATA.LEVEL, metadata.getLevel());
+        update.set(METADATA.IS_PUBLISHED, metadata.getIsPublished());
+        update.set(METADATA.IS_VALIDATED, metadata.getIsValidated());
+        update.set(METADATA.PROFILE, metadata.getProfile());
+        update.set(METADATA.TITLE, metadata.getTitle())
                 .where(METADATA.ID.eq(metadata.getId())).execute();
         return metadata;
     }
@@ -78,19 +79,19 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     @Override
     public int create(Metadata metadata) {
         MetadataRecord metadataRecord = dsl.newRecord(METADATA);
-        metadataRecord.setDataId(metadata.getDataId());
-        metadataRecord.setDatasetId(metadata.getDatasetId());
         metadataRecord.setMetadataId(metadata.getMetadataId());
         metadataRecord.setMetadataIso(metadata.getMetadataIso());
-        metadataRecord.setServiceId(metadata.getServiceId());
-        metadataRecord.setMdCompletion(metadata.getMdCompletion());
+        if (metadata.getDataId() != null) metadataRecord.setDataId(metadata.getDataId());
+        if (metadata.getDatasetId() != null) metadataRecord.setDatasetId(metadata.getDatasetId());
+        if (metadata.getServiceId() != null) metadataRecord.setServiceId(metadata.getServiceId());
+        if (metadata.getMdCompletion() != null) metadataRecord.setMdCompletion(metadata.getMdCompletion());
+        if (metadata.getParentIdentifier() != null) metadataRecord.setParentIdentifier(metadata.getParentIdentifier());
         metadataRecord.setDateCreation(metadata.getDateCreation());
         metadataRecord.setDatestamp(metadata.getDatestamp());
         metadataRecord.setLevel(metadata.getLevel());
         metadataRecord.setIsPublished(metadata.getIsPublished());
         metadataRecord.setIsValidated(metadata.getIsValidated());
         metadataRecord.setOwner(metadata.getOwner());
-        metadataRecord.setParentIdentifier(metadata.getParentIdentifier());
         metadataRecord.setProfile(metadata.getProfile());
         metadataRecord.setTitle(metadata.getTitle());
         metadataRecord.store();
