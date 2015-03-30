@@ -157,6 +157,57 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
 
     @Override
+    public List findIds(final Map<String,Object> filterMap) {
+        Select query = null;
+        if(filterMap != null) {
+            for(final Map.Entry<String,Object> entry : filterMap.entrySet()) {
+                if("owner".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.OWNER.equal((Integer)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.OWNER.equal((Integer)entry.getValue()));
+                    }
+                }else if("profile".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.PROFILE.equal((String)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.PROFILE.equal((String) entry.getValue()));
+                    }
+                }else if("validated".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.IS_VALIDATED.equal((Boolean) entry.getValue()));
+                    }
+                }else if("published".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.IS_PUBLISHED.equal((Boolean) entry.getValue()));
+                    }
+                }else if("level".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.LEVEL.equal((String)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.LEVEL.equal((String) entry.getValue()));
+                    }
+                }else if("term".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(METADATA.ID).from(METADATA).where(METADATA.METADATA_ISO.contains((String)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.METADATA_ISO.contains((String) entry.getValue()));
+                    }
+                }
+            }
+        }
+        if(query == null) {
+            return dsl.select(METADATA.ID).from(METADATA).fetchInto(Integer.class);
+        }else {
+            return query.fetchInto(Integer.class);
+        }
+    }
+
+    @Override
     public Map<Integer, List> filterAndGet(final Map<String,Object> filterMap,
                                        final Map.Entry<String,String> sortEntry,
                                        final int pageNumber,

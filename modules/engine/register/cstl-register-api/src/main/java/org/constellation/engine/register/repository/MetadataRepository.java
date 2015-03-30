@@ -48,6 +48,8 @@ public interface MetadataRepository {
 
     Map<Integer, List> filterAndGet(final Map<String,Object> filterMap, final Map.Entry<String,String> sortEntry,final int pageNumber,final int rowsPerPage);
 
+    List findIds(final Map<String,Object> filterMap);
+
     Map<String,Integer> getProfilesCount();
     
     MetadataXCsw addMetadataToCSW(final String metadataID, final int cswID);
