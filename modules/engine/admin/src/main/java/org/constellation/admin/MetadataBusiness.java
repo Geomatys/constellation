@@ -182,7 +182,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             final Metadata metadata2 = new Metadata();
             metadata2.setMetadataId(metadataId);
             metadata2.setMetadataIso(xml);
-            metadata2.setDataId(dataset.getId());
+            metadata2.setDatasetId(dataset.getId());
             metadata2.setMdCompletion(completion);
             metadata2.setOwner(userID);
             metadata2.setDatestamp(dateStamp);
