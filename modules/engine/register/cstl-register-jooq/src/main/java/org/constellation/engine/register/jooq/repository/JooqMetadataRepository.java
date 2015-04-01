@@ -336,4 +336,10 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         return result;
     }
     
+    @Override
+    public int delete(int id) {
+        dsl.delete(METADATA_BBOX).where(METADATA_BBOX.METADATA_ID.eq(id)).execute();
+        return dsl.delete(METADATA).where(METADATA.ID.eq(id)).execute();
+    }
+    
 }

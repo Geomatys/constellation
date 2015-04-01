@@ -43,6 +43,8 @@ public interface MetadataRepository {
 
     Metadata findById(int id);
     
+    int delete(int id);
+    
     List<Metadata> findByCswId(Integer id);
 
     List<Metadata> findAll();
