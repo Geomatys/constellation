@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.json.JsonMetadataConstants;
@@ -352,7 +353,7 @@ public class TemplateTree {
                     field = owner.addField(fieldCount + 1, new Field(field));
                     fieldCount++;
                 } else {
-                    LOGGER.info("field value excluded for multiplicity purpose");
+                    LOGGER.log(Level.INFO, "field value excluded for multiplicity purpose:{0}", field.getPath());
                     continue;
                 }
             }

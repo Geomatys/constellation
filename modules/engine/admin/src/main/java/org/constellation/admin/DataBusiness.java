@@ -279,78 +279,6 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     }
 
     /**
-     * Proceed to save metadata for given data provider id and data name.
-     * @param providerId data provider id.
-     * @param name data name.
-     * @param metadata given {@link DefaultMetadata} to save.
-     * @throws ConstellationException is thrown for JAXBException.
-     */
-    @Transactional
-    public void saveMetadata(final String providerId,
-                             final QName name,
-                             final DefaultMetadata metadata) throws ConfigurationException {
-        
-        final String metadataStr = marshallMetadata(metadata);
-        
-        final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
-        if (data != null) {
-            final Long dateStamp  = MetadataUtilities.extractDatestamp(metadata);
-            final String title    = MetadataUtilities.extractTitle(metadata);
-            final String parent   = MetadataUtilities.extractParent(metadata);
-            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
-            Integer parentID      = null;   
-            if (parentRecord != null) {
-                parentID = parentRecord.getId();
-            }
-            
-            // calculate completion rating / elementary
-            Integer completion = null;
-            String level = "NONE";
-            String templateName = getTemplate(name, data.getType());
-            final Template template = Template.getInstance(templateName);
-            try {
-                completion = template.calculateMDCompletion(metadata);
-                level = template.getCompletion(metadata);
-            } catch (IOException ex) {
-                LOGGER.warn("Error while calculating metadata completion", ex);
-            }
-            Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
-            boolean update = metadataRecord != null;
-            if (!update) {
-                final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
-                Integer userID = null;
-                if (user.isPresent()) {
-                    userID = user.get().getId();
-                }
-                metadataRecord = new Metadata();
-                metadataRecord.setOwner(userID);
-                metadataRecord.setDateCreation(System.currentTimeMillis());
-            }
-            
-            metadataRecord.setTitle(title);
-            metadataRecord.setDatestamp(dateStamp);
-            metadataRecord.setParentIdentifier(parentID);
-            metadataRecord.setMetadataId(metadata.getFileIdentifier());
-            metadataRecord.setMetadataIso(metadataStr);
-            metadataRecord.setDataId(data.getId());
-            metadataRecord.setMdCompletion(completion);
-            metadataRecord.setProfile(templateName);
-            metadataRecord.setLevel(level);
-            metadataRecord.setIsPublished(false);
-            metadataRecord.setIsValidated(false);
-            
-            if (update) {
-                metadataRepository.update(metadataRecord);
-            } else {
-                metadataRepository.create(metadataRecord);
-            }
-            indexEngine.addMetadataToIndexForData(metadata, data.getId());
-            // update internal CSW index
-            updateInternalCSWIndex(metadata.getFileIdentifier(), 1, true); // TODO DOMAIN ID
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -662,8 +590,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Transactional
     public Data create(final QName name, final String providerIdentifier,
                        final String type, final boolean sensorable,
-                       final boolean included, final String subType, final String metadata) {
-        return create(name, providerIdentifier, type, sensorable, included, null, subType, metadata);
+                       final boolean included, final String subType, final String metadataXml) {
+        return create(name, providerIdentifier, type, sensorable, included, null, subType, metadataXml);
     }
 
     /**
@@ -1129,6 +1057,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     /**
      * {@inheritDoc }
      */
+    @Override
     public List<FileBean> getFilesFromPath(final String path, final boolean filtered, final boolean onlyXML) throws ConstellationException {
         final List<FileBean> listBean = new ArrayList<>();
         final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();

@@ -174,6 +174,8 @@ public class MetadataBusiness implements IMetadataBusiness {
         
         // if the metadata is not yet present look for empty metadata object
         final Dataset dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
+        // unsafe but no better way for now
+        final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
         if (!update && dataset != null) {
             List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
             if (!datas.isEmpty()) {
@@ -181,14 +183,11 @@ public class MetadataBusiness implements IMetadataBusiness {
                 templateName = getDatasetTemplate(dataset.getIdentifier(), type);
             }
             metadata.setDatasetId(dataset.getId());
+        } else if (!update && data != null) {
+            templateName = getDataTemplate(data.getName(), data.getNamespace(), data.getType());
+            metadata.setDataId(data.getId());
         } else {
-        
-            // unsafe but no better way for now
-            final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
-            if (!update && data != null) {
-                templateName = getDataTemplate(data.getName(), data.getNamespace(), data.getType());
-                metadata.setDataId(data.getId());
-            }
+            templateName = getTemplateFromMetadata(meta);
         }
         
         if (templateName != null) {
@@ -520,5 +519,10 @@ public class MetadataBusiness implements IMetadataBusiness {
             templateName = "profile_import";
         }
         return templateName;
+    }
+
+    
+    protected String getTemplateFromMetadata(DefaultMetadata meta) {
+        return null; // must be overriden
     }
 }
