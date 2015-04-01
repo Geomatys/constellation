@@ -20,6 +20,7 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 import java.util.Map;
+import org.constellation.engine.register.MetadataComplete;
 
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
@@ -30,9 +31,9 @@ import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
  */
 public interface MetadataRepository {
     
-    int create(Metadata metadata);
+    int create(MetadataComplete metadata);
     
-    Metadata update(Metadata metadata);
+    Metadata update(MetadataComplete metadata);
     
     Metadata findByDataId(int dataId);
 

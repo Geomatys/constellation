@@ -19,6 +19,7 @@
 package org.constellation.engine.register.jooq.repository;
 
 import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_BBOX;
 import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 
 import java.util.ArrayList;
@@ -27,9 +28,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.constellation.engine.register.MetadataComplete;
 
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
+import org.constellation.engine.register.jooq.tables.records.MetadataBboxRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.MetadataRepository;
@@ -55,7 +59,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
     
     @Override
-    public Metadata update(Metadata metadata) {
+    public Metadata update(MetadataComplete metadata) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.METADATA_ID, metadata.getMetadataId());
         update.set(METADATA.METADATA_ISO, metadata.getMetadataIso());
@@ -78,11 +82,27 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         update.set(METADATA.PROFILE, metadata.getProfile());
         update.set(METADATA.TITLE, metadata.getTitle())
                 .where(METADATA.ID.eq(metadata.getId())).execute();
+        
+        updateBboxes(metadata.getId(), metadata.getBboxes());
+        
         return metadata;
     }
-
+    
+    private void updateBboxes(int metadataID, List<MetadataBbox> bboxes) {
+        dsl.delete(METADATA_BBOX).where(METADATA_BBOX.METADATA_ID.eq(metadataID)).execute();
+        for (MetadataBbox bbox : bboxes) {
+            MetadataBboxRecord record = dsl.newRecord(METADATA_BBOX);
+            record.setMetadataId(metadataID);
+            record.setEast(bbox.getEast());
+            record.setWest(bbox.getWest());
+            record.setNorth(bbox.getNorth());
+            record.setSouth(bbox.getSouth());
+            record.store();
+        }
+    }
+    
     @Override
-    public int create(Metadata metadata) {
+    public int create(MetadataComplete metadata) {
         MetadataRecord metadataRecord = dsl.newRecord(METADATA);
         metadataRecord.setMetadataId(metadata.getMetadataId());
         metadataRecord.setMetadataIso(metadata.getMetadataIso());
@@ -105,6 +125,9 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         else metadataRecord.setIsValidated(false); //default
 
         metadataRecord.store();
+        
+        updateBboxes(metadataRecord.getId(), metadata.getBboxes());
+        
         return metadataRecord.getId();
     }
 

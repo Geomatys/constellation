@@ -59,6 +59,8 @@ import java.util.Set;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.constellation.dto.MetadataLists;
+import org.constellation.engine.register.MetadataComplete;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.Restriction;
@@ -147,6 +149,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (parentRecord != null) {
             parentID = parentRecord.getId();
         }
+        final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(meta);
         final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
         Integer userID = null;
         if (user.isPresent()) {
@@ -205,9 +208,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         metadata.setLevel(level);
         
         if (update) {
-            metadataRepository.update(metadata);
+            metadataRepository.update(new MetadataComplete(metadata, bboxes));
         } else {
-            metadataRepository.create(metadata);
+            metadataRepository.create(new MetadataComplete(metadata, bboxes));
         }
         return true;
     }

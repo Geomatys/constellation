@@ -8,12 +8,10 @@ import org.constellation.engine.register.jooq.tables.pojos.Domain;
 
 public class DomainUser extends CstlUser {
 
-    private List<Domain> domains = new ArrayList<Domain>();
-    
-    private List<String> roles = new ArrayList<String>();
+    private List<Domain> domains = new ArrayList<>();
 
-   
-   
+    private List<String> roles = new ArrayList<>();
+
     public List<String> getRoles() {
         return roles;
     }
@@ -24,7 +22,7 @@ public class DomainUser extends CstlUser {
 
     public void addRole(String role) {
         roles.add(role);
-        
+
     }
 
     public List<Domain> getDomains() {
@@ -37,11 +35,7 @@ public class DomainUser extends CstlUser {
 
     public void addDomain(Domain domain) {
         domains.add(domain);
-        
+
     }
 
-   
-    
-    
-    
 }

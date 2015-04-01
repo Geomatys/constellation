@@ -86,6 +86,10 @@ import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.ValueExistencePolicy;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.identification.Identification;
 
 
@@ -645,6 +649,26 @@ public final class MetadataUtilities {
             }
         }
         return null;
+    }
+
+    public static List<MetadataBbox> extractBbox(final DefaultMetadata metadata){
+        final List<MetadataBbox> results = new ArrayList<>();
+        if (metadata.getIdentificationInfo() != null && !metadata.getIdentificationInfo().isEmpty()) {
+            final Identification id = metadata.getIdentificationInfo().iterator().next();
+            for (Extent ex : id.getExtents()) {
+                for (GeographicExtent geoEx : ex.getGeographicElements()) {
+                    if (geoEx instanceof GeographicBoundingBox) {
+                        GeographicBoundingBox geobox = (GeographicBoundingBox) geoEx;
+                        final MetadataBbox bbox = new MetadataBbox(null, geobox.getEastBoundLongitude(), 
+                                                                         geobox.getWestBoundLongitude(),
+                                                                         geobox.getNorthBoundLatitude(),
+                                                                         geobox.getSouthBoundLatitude());
+                        results.add(bbox);
+                    }
+                }
+            }
+        }
+        return results;
     }
     
     public static String extractParent(final DefaultMetadata metadata){

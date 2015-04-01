@@ -88,6 +88,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Optional;
+import org.constellation.engine.register.MetadataComplete;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 
 /**
  *
@@ -217,7 +219,8 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             if (parentRecord != null) {
                 parentID = parentRecord.getId();
             }
-            String templateName = getTemplate(identifier, null);
+            final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(meta);
+            final String templateName = getTemplate(identifier, null);
             final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
             Integer userID = null;
             if (user.isPresent()) {
@@ -250,7 +253,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             metadata.setIsPublished(false);
             metadata.setIsValidated(false);
             
-            metadataRepository.create(metadata);
+            metadataRepository.create(new MetadataComplete(metadata, bboxes));
         }
         return ds;
     }
@@ -356,6 +359,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             if (parentRecord != null) {
                 parentID = parentRecord.getId();
             }
+            final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(metadata);
             
             // calculate completion rating
             List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
@@ -399,9 +403,9 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             metadataRecord.setIsPublished(false);
             metadataRecord.setIsValidated(false);
             if (update) {
-                metadataRepository.update(metadataRecord);
+                metadataRepository.update(new MetadataComplete(metadataRecord, bboxes));
             } else {
-                metadataRepository.create(metadataRecord);
+                metadataRepository.create(new MetadataComplete(metadataRecord, bboxes));
             }
             
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
@@ -420,13 +424,15 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
      * @param metaId metadata identifier.
      * @param metadataXml metadata as xml string content.
      * @throws ConfigurationException
-     */
+     
     @Transactional
     public void updateMetadata(final String datasetIdentifier, final Integer domainId,
                                final String metaId, final String metadataXml) throws ConfigurationException {
+        
+        final DefaultMetadata meta = unmarshallMetadata(metadataXml);
         final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
         if (dataset != null) {
-            final DefaultMetadata meta = unmarshallMetadata(metadataXml);
+            
             final Long dateStamp  = MetadataUtilities.extractDatestamp(meta);
             final String title    = MetadataUtilities.extractTitle(meta);
             final String parent   = MetadataUtilities.extractParent(meta);
@@ -488,7 +494,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
-    }
+    }*/
 
     /**
      * Proceed to extract metadata from reader and fill additional info

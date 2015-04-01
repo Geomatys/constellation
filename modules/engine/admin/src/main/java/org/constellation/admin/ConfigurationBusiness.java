@@ -12,11 +12,14 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.api.PropertyConstants;
 import org.constellation.business.IConfigurationBusiness;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.MetadataIOUtils;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.engine.register.jooq.tables.pojos.Property;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.MetadataRepository;
@@ -77,9 +80,10 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
                     final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(metadata.getMetadataIso());
                     CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType(), url, servMeta);
                     final String xml = MetadataIOUtils.marshallMetadataToString(servMeta);
+                    final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(servMeta);
                     metadata.setMetadataId(servMeta.getFileIdentifier());
                     metadata.setMetadataIso(xml);
-                    metadataRepository.update(metadata);
+                    metadataRepository.update(new MetadataComplete(metadata, bboxes));
                 }
             }
         } catch (JAXBException ex) {

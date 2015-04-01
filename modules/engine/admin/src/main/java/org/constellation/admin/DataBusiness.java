@@ -113,6 +113,8 @@ import org.xml.sax.SAXException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
+import org.constellation.engine.register.MetadataComplete;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 
 
 /**
@@ -769,6 +771,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             if (parentRecord != null) {
                 parentID = parentRecord.getId();
             }
+            final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(metadata);
             
             // calculate completion rating / elementary
             String templateName = getTemplate(dataName, data.getType());
@@ -807,9 +810,9 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             metadataRecord.setIsValidated(false);
             
             if (update) {
-                metadataRepository.update(metadataRecord);
+                metadataRepository.update(new MetadataComplete(metadataRecord, bboxes));
             } else {
-                metadataRepository.create(metadataRecord);
+                metadataRepository.create(new MetadataComplete(metadataRecord, bboxes));
             }
             
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
