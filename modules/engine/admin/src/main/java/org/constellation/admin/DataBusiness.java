@@ -25,17 +25,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -48,8 +44,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.Locales;
-import org.apache.sis.util.iso.Types;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
@@ -73,7 +67,6 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.FileBean;
-import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
@@ -104,19 +97,6 @@ import org.geotoolkit.metadata.dimap.DimapAccessor;
 import org.geotoolkit.util.DomUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.PropertyType;
-import org.opengis.metadata.citation.DateType;
-import org.opengis.metadata.constraint.Classification;
-import org.opengis.metadata.constraint.Restriction;
-import org.opengis.metadata.content.CoverageContentType;
-import org.opengis.metadata.content.ImagingCondition;
-import org.opengis.metadata.identification.KeywordType;
-import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.metadata.maintenance.MaintenanceFrequency;
-import org.opengis.metadata.maintenance.ScopeCode;
-import org.opengis.metadata.spatial.CellGeometry;
-import org.opengis.metadata.spatial.DimensionNameType;
-import org.opengis.metadata.spatial.GeometricObjectType;
-import org.opengis.metadata.spatial.PixelOrientation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -335,40 +315,38 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
                 LOGGER.warn("Error while calculating metadata completion", ex);
             }
             Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
-            if (metadataRecord != null) {
-                metadataRecord.setMetadataIso(metadataStr);
-                metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRecord.setMdCompletion(completion);
-                metadataRecord.setLevel(level);
-                metadataRecord.setTitle(title);
-                metadataRecord.setDatestamp(dateStamp);
-                metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setProfile(templateName);
-                metadataRepository.update(metadataRecord);
-            } else {
+            boolean update = metadataRecord != null;
+            if (!update) {
                 final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
                 Integer userID = null;
                 if (user.isPresent()) {
                     userID = user.get().getId();
                 }
                 metadataRecord = new Metadata();
-                metadataRecord.setMetadataIso(metadataStr);
-                metadataRecord.setDataId(data.getId());
-                metadataRecord.setMdCompletion(completion);
                 metadataRecord.setOwner(userID);
-                metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setDateCreation(System.currentTimeMillis());
-                metadataRecord.setTitle(title);
-                metadataRecord.setProfile(templateName);
-                metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setLevel(level);
-                metadataRecord.setIsPublished(false);
-                metadataRecord.setIsValidated(false);
-                
-                
+            }
+            
+            metadataRecord.setTitle(title);
+            metadataRecord.setDatestamp(dateStamp);
+            metadataRecord.setParentIdentifier(parentID);
+            metadataRecord.setMetadataId(metadata.getFileIdentifier());
+            metadataRecord.setMetadataIso(metadataStr);
+            metadataRecord.setDataId(data.getId());
+            metadataRecord.setMdCompletion(completion);
+            metadataRecord.setProfile(templateName);
+            metadataRecord.setLevel(level);
+            metadataRecord.setIsPublished(false);
+            metadataRecord.setIsValidated(false);
+            
+            if (update) {
+                metadataRepository.update(metadataRecord);
+            } else {
                 metadataRepository.create(metadataRecord);
-            }    
+            }
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
+            // update internal CSW index
+            updateInternalCSWIndex(metadata.getFileIdentifier(), 1, true); // TODO DOMAIN ID
         }
     }
 
@@ -376,11 +354,11 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * {@inheritDoc}
      */
     @Override
-    public CoverageMetadataBean loadDataMetadata(final String providerIdentifier,
+    public CoverageMetadataBean loadDataMetadata(final String providerId,
                                                  final QName name,
                                                  final MarshallerPool pool) throws ConstellationException {
         try {
-            final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerIdentifier);
+            final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
             if (data != null && data.getMetadata() != null) {
                 final InputStream sr = new ByteArrayInputStream(data.getMetadata().getBytes());
                 final Unmarshaller m = pool.acquireUnmarshaller();
@@ -399,8 +377,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * {@inheritDoc}
      */
     @Override
-    public DataBrief getDataBrief(QName fullName,Integer providerId) throws ConstellationException {
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderId(fullName.getLocalPart(),fullName.getNamespaceURI(), providerId);
+    public DataBrief getDataBrief(QName dataName,Integer providerId) throws ConstellationException {
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderId(dataName.getLocalPart(),dataName.getNamespaceURI(), providerId);
         final List<Data> datas = new ArrayList<>();
         datas.add(data);
         final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
@@ -442,8 +420,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Override
     public DataBrief getDataLayer(final String layerAlias,
-                                  final String dataProviderIdentifier) throws ConstellationException {
-        final Data data = layerRepository.findDatasFromLayerAlias(layerAlias, dataProviderIdentifier);
+                                  final String providerId) throws ConstellationException {
+        final Data data = layerRepository.findDatasFromLayerAlias(layerAlias, providerId);
         final List<Data> datas = new ArrayList<>();
         datas.add(data);
         final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
@@ -684,8 +662,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Transactional
     public Data create(final QName name, final String providerIdentifier,
                        final String type, final boolean sensorable,
-                       final boolean include, final String subType, final String metadata) {
-        return create(name, providerIdentifier, type, sensorable, include, null, subType, metadata);
+                       final boolean included, final String subType, final String metadata) {
+        return create(name, providerIdentifier, type, sensorable, included, null, subType, metadata);
     }
 
     /**
@@ -693,7 +671,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Override
     @Transactional
-    public Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean include, Boolean rendered, String subType, String metadataXml) {
+    public Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean included, Boolean rendered, String subType, String metadataXml) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
             Data data = new Data();
@@ -708,7 +686,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             data.setSensorable(sensorable);
             data.setType(type);
             data.setSubtype(subType);
-            data.setIncluded(include);
+            data.setIncluded(included);
             data.setMetadata(metadataXml);
             data.setRendered(rendered);
             data = dataRepository.create(data);
@@ -808,8 +786,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Override
     @Transactional
-    public synchronized void removeDataFromProvider(final String providerID) {
-        final Provider p = providerRepository.findByIdentifier(providerID);
+    public synchronized void removeDataFromProvider(final String providerId) {
+        final Provider p = providerRepository.findByIdentifier(providerId);
         if (p != null) {
             final List<Data> datas = dataRepository.findByProviderId(p.getId());
             for (final Data data : datas) {
@@ -877,41 +855,35 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             }
 
             Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
-            if (metadataRecord != null) {
-                metadataRecord.setMetadataIso(metadataString);
-                metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRecord.setLevel(level);
-                metadataRecord.setTitle(title);
-                metadataRecord.setDatestamp(dateStamp);
-                metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setMdCompletion(completion);
-                metadataRecord.setProfile(templateName);
-                metadataRepository.update(metadataRecord);
-            } else {
+            boolean update = metadataRecord != null;
+            if (!update) {
                 final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
                 Integer userID = null;
                 if (user.isPresent()) {
                     userID = user.get().getId();
                 }
                 metadataRecord = new Metadata();
-                metadataRecord.setMetadataIso(metadataString);
-                metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRecord.setLevel(level);
-                metadataRecord.setTitle(title);
-                metadataRecord.setDatestamp(dateStamp);
-                metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setMdCompletion(completion);
-                metadataRecord.setProfile(templateName);
-                metadataRecord.setDataId(data.getId());
                 metadataRecord.setDateCreation(System.currentTimeMillis());
                 metadataRecord.setOwner(userID);
-
-                //TODO fulljooq
-                metadataRecord.setIsPublished(false);
-                metadataRecord.setIsValidated(false);
-                        
+            }
+            metadataRecord.setDataId(data.getId());
+            metadataRecord.setMetadataIso(metadataString);
+            metadataRecord.setMetadataId(metadata.getFileIdentifier());
+            metadataRecord.setLevel(level);
+            metadataRecord.setTitle(title);
+            metadataRecord.setDatestamp(dateStamp);
+            metadataRecord.setParentIdentifier(parentID);
+            metadataRecord.setMdCompletion(completion);
+            metadataRecord.setProfile(templateName);
+            metadataRecord.setIsPublished(false);
+            metadataRecord.setIsValidated(false);
+            
+            if (update) {
+                metadataRepository.update(metadataRecord);
+            } else {
                 metadataRepository.create(metadataRecord);
             }
+            
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
             // update internal CSW index
             updateInternalCSWIndex(metadata.getFileIdentifier(), domainId, true);
@@ -1098,189 +1070,6 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         } catch (JAXBException ex) {
             throw new ConfigurationException(ex);
         }
-    }
-
-    @Override
-    public MetadataLists getMetadataCodeLists() {
-        final MetadataLists mdList = new MetadataLists();
-
-        //for role codes
-        final List<String> roleCodes = new LinkedList<>();
-        for (final org.opengis.metadata.citation.Role role : org.opengis.metadata.citation.Role.values()) {
-            final String standardName = Types.getStandardName(role.getClass());
-            final String code = role.identifier()!=null?role.identifier():role.name();
-            final String codeListName = standardName+"."+code;
-            roleCodes.add(codeListName);
-        }
-        Collections.sort(roleCodes);
-        mdList.setRoleCodes(roleCodes);
-
-        //for keyword type codes
-        final List<String> keywordTypesCodes = new LinkedList<>();
-        for (final KeywordType ktype : KeywordType.values()) {
-            final String standardName = Types.getStandardName(ktype.getClass());
-            final String code = ktype.identifier()!=null?ktype.identifier():ktype.name();
-            final String codeListName = standardName+"."+code;
-            keywordTypesCodes.add(codeListName);
-        }
-        Collections.sort(keywordTypesCodes);
-        mdList.setKeywordTypeCodes(keywordTypesCodes);
-
-        //for locale codes
-        final List<String> localeCodes = new LinkedList<>();
-        for (final Locale locale : Locales.ALL.getAvailableLanguages()) {
-            localeCodes.add("LanguageCode."+locale.getISO3Language());
-        }
-        // add missing locale (FRE)
-        localeCodes.add("LanguageCode.fre");
-        Collections.sort(localeCodes);
-        mdList.setLocaleCodes(localeCodes);
-
-        //for topic category codes
-        final List<String> topicCategoryCodes = new LinkedList<>();
-        for (final TopicCategory tc : TopicCategory.values()) {
-            final String standardName = Types.getStandardName(tc.getClass());
-            final String code = tc.identifier()!=null? tc.identifier(): tc.name();
-            final String codeListName = standardName+"."+code;
-            topicCategoryCodes.add(codeListName);
-        }
-        Collections.sort(topicCategoryCodes);
-        mdList.setTopicCategoryCodes(topicCategoryCodes);
-
-        //for date type codes
-        final List<String> dateTypeCodes = new LinkedList<>();
-        for (final DateType dateType : DateType.values()) {
-            final String standardName = Types.getStandardName(dateType.getClass());
-            final String code = dateType.identifier()!=null? dateType.identifier(): dateType.name();
-            final String codeListName = standardName+"."+code;
-            dateTypeCodes.add(codeListName);
-        }
-        Collections.sort(dateTypeCodes);
-        mdList.setDateTypeCodes(dateTypeCodes);
-
-        //for maintenanceFrequency codes
-        final List<String> maintenanceFrequencyCodes = new LinkedList<>();
-        for (final MaintenanceFrequency cl : MaintenanceFrequency.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            maintenanceFrequencyCodes.add(codeListName);
-        }
-        Collections.sort(maintenanceFrequencyCodes);
-        mdList.setMaintenanceFrequencyCodes(maintenanceFrequencyCodes);
-
-        //for GeometricObjectType codes
-        final List<String> geometricObjectTypeCodes = new LinkedList<>();
-        for (final GeometricObjectType got : GeometricObjectType.values()) {
-            final String standardName = Types.getStandardName(got.getClass());
-            final String code = got.identifier()!=null? got.identifier(): got.name();
-            final String codeListName = standardName+"."+code;
-            geometricObjectTypeCodes.add(codeListName);
-        }
-        Collections.sort(geometricObjectTypeCodes);
-        mdList.setGeometricObjectTypeCodes(geometricObjectTypeCodes);
-
-        //for Classification codes
-        final List<String> classificationCodes = new LinkedList<>();
-        for (final Classification cl : Classification.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            classificationCodes.add(codeListName);
-        }
-        Collections.sort(classificationCodes);
-        mdList.setClassificationCodes(classificationCodes);
-
-        // for characterSet codes
-        final List<String> characterSetCodes = new LinkedList<>();
-        final Set<String> keys = Charset.availableCharsets().keySet();
-        final List<String> keep = Arrays.asList("UTF-8","UTF-16","UTF-32",
-                "ISO-8859-1","ISO-8859-13","ISO-8859-15",
-                "ISO-8859-2","ISO-8859-3","ISO-8859-4",
-                "ISO-8859-5","ISO-8859-6","ISO-8859-7",
-                "ISO-8859-8","ISO-8859-9","Shift_JIS",
-                "EUC-JP","EUC-KR","US-ASCII","Big5","GB2312");
-        keep.retainAll(keys);
-        for (final String c : keep) {
-            characterSetCodes.add(c);
-        }
-        Collections.sort(characterSetCodes);
-        mdList.setCharacterSetCodes(characterSetCodes);
-
-        //for Restriction codes
-        final List<String> restrictionCodes = new LinkedList<>();
-        for (final Restriction cl : Restriction.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            restrictionCodes.add(codeListName);
-        }
-        Collections.sort(restrictionCodes);
-        mdList.setRestrictionCodes(restrictionCodes);
-
-        final List<String> dimensionNameTypeCodes = new LinkedList<>();
-        for (final DimensionNameType cl : DimensionNameType.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            dimensionNameTypeCodes.add(codeListName);
-        }
-        Collections.sort(dimensionNameTypeCodes);
-        mdList.setDimensionNameTypeCodes(dimensionNameTypeCodes);
-
-        final List<String> coverageContentTypeCodes = new LinkedList<>();
-        for (final CoverageContentType cl : CoverageContentType.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            coverageContentTypeCodes.add(codeListName);
-        }
-        Collections.sort(coverageContentTypeCodes);
-        mdList.setCoverageContentTypeCodes(coverageContentTypeCodes);
-
-        final List<String> imagingConditionCodes = new LinkedList<>();
-        for (final ImagingCondition cl : ImagingCondition.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            imagingConditionCodes.add(codeListName);
-        }
-        Collections.sort(imagingConditionCodes);
-        mdList.setImagingConditionCodes(imagingConditionCodes);
-
-        final List<String> cellGeometryCodes = new LinkedList<>();
-        for (final CellGeometry cl : CellGeometry.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            cellGeometryCodes.add(codeListName);
-        }
-        Collections.sort(cellGeometryCodes);
-        mdList.setCellGeometryCodes(cellGeometryCodes);
-
-        //for pixel orientation codes
-        final List<String> pixelOrientationCodes = new LinkedList<>();
-        for (final PixelOrientation cl : PixelOrientation.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            pixelOrientationCodes.add(codeListName);
-        }
-        Collections.sort(pixelOrientationCodes);
-        mdList.setPixelOrientationCodes(pixelOrientationCodes);
-
-        //for Scope codes
-        final List<String> scopeCodes = new LinkedList<>();
-        for (final ScopeCode cl : ScopeCode.values()) {
-            final String standardName = Types.getStandardName(cl.getClass());
-            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
-            final String codeListName = standardName+"."+code;
-            scopeCodes.add(codeListName);
-        }
-        Collections.sort(scopeCodes);
-        mdList.setScopeCodes(scopeCodes);
-
-        return mdList;
     }
 
     /**

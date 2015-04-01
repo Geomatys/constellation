@@ -20,6 +20,7 @@ package org.constellation.business;
 
 import java.util.List;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.dto.MetadataLists;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -41,4 +42,6 @@ public interface IMetadataBusiness {
     void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
     
     void unlinkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
+    
+    MetadataLists getMetadataCodeLists();
 }

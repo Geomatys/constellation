@@ -159,6 +159,7 @@ import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
+import org.constellation.business.IMetadataBusiness;
 
 /**
  * Manage data sending
@@ -202,6 +203,9 @@ public class DataRest {
 
     @Inject
     private IMapContextBusiness mapContextBusiness;
+    
+    @Inject
+    private IMetadataBusiness metadataBusiness;
 
     /**
      * Give metadata CodeLists (example {@link org.opengis.metadata.citation.Role} codes
@@ -213,7 +217,7 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getMetadataCodeLists() {
-        final MetadataLists mdList = dataBusiness.getMetadataCodeLists();
+        final MetadataLists mdList = metadataBusiness.getMetadataCodeLists();
         return Response.ok().entity(mdList).build();
     }
 

@@ -50,6 +50,28 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Set;
+import org.apache.sis.util.Locales;
+import org.apache.sis.util.iso.Types;
+import org.constellation.dto.MetadataLists;
+import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.constraint.Classification;
+import org.opengis.metadata.constraint.Restriction;
+import org.opengis.metadata.content.CoverageContentType;
+import org.opengis.metadata.content.ImagingCondition;
+import org.opengis.metadata.identification.KeywordType;
+import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.metadata.maintenance.MaintenanceFrequency;
+import org.opengis.metadata.maintenance.ScopeCode;
+import org.opengis.metadata.spatial.CellGeometry;
+import org.opengis.metadata.spatial.DimensionNameType;
+import org.opengis.metadata.spatial.GeometricObjectType;
+import org.opengis.metadata.spatial.PixelOrientation;
 
 /**
  * Business facade for metadata.
@@ -113,17 +135,13 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
-        final Metadata metadata = metadataRepository.findByMetadataId(metadataId);
+        Metadata metadata          = metadataRepository.findByMetadataId(metadataId);
+        final boolean update       = metadata != null;
+        final DefaultMetadata meta = (DefaultMetadata) unmarshallMetadata(xml);
         
-        final DefaultMetadata meta;
-        try {
-            meta = (DefaultMetadata) unmarshallMetadata(xml);
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("Unable to unmarshalle metadata", ex);
-        }
-        final Long dateStamp      = MetadataUtilities.extractDatestamp(meta);
-        final String title        = MetadataUtilities.extractTitle(meta);
-        Integer parentID    = null;
+        final Long dateStamp  = MetadataUtilities.extractDatestamp(meta);
+        final String title    = MetadataUtilities.extractTitle(meta);
+        Integer parentID      = null;
         final String parent   = MetadataUtilities.extractParent(meta);
         Metadata parentRecord = metadataRepository.findByMetadataId(parent);
         if (parentRecord != null) {
@@ -135,115 +153,63 @@ public class MetadataBusiness implements IMetadataBusiness {
             userID = user.get().getId();
         }
         Integer completion  = null;
-        String level = "NONE";
+        String level        = "NONE";
         String templateName = null;
         
         if (metadata != null) {
-            metadata.setMetadataId(metadataId);
-            metadata.setMetadataIso(xml);
             templateName = metadata.getProfile();
-            if (templateName != null) {
-                try {
-                    // calculate completion rating
-                    final Template template = Template.getInstance(templateName);
-                    completion = template.calculateMDCompletion(meta);
-                    level = template.getCompletion(meta);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
-                }
-            }
-            metadata.setLevel(level);
-            metadata.setTitle(title);
-            metadata.setDatestamp(dateStamp);
-            metadata.setParentIdentifier(parentID);
-            metadata.setMdCompletion(completion);
-            metadata.setMdCompletion(completion);
-            metadataRepository.update(metadata);
-            return true;
+        } else {
+            metadata = new Metadata();
         }
 
+        metadata.setOwner(userID);
+        metadata.setDatestamp(dateStamp);
+        metadata.setDateCreation(System.currentTimeMillis());
+        metadata.setTitle(title);
+        metadata.setMetadataId(metadataId);
+        metadata.setMetadataIso(xml);
+        metadata.setParentIdentifier(parentID);
+        metadata.setIsPublished(false);
+        metadata.setIsValidated(false);
         
         // if the metadata is not yet present look for empty metadata object
         final Dataset dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
-        if (dataset != null) {
-            try {
-                List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
-                if (!datas.isEmpty()) {
-                    final String type = datas.get(0).getType();
-                    templateName = getDatasetTemplate(dataset.getIdentifier(), type);
-                    final Template template = Template.getInstance(templateName);
-                    completion = template.calculateMDCompletion(unmarshallMetadata(xml));
-                    level = template.getCompletion(meta);
-                }
-            } catch (IOException | ConfigurationException | JAXBException ex) {
-                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+        if (!update && dataset != null) {
+            List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
+            if (!datas.isEmpty()) {
+                final String type = datas.get(0).getType();
+                templateName = getDatasetTemplate(dataset.getIdentifier(), type);
             }
-            
-            final Metadata metadata2 = new Metadata();
-            metadata2.setMetadataId(metadataId);
-            metadata2.setMetadataIso(xml);
-            metadata2.setDatasetId(dataset.getId());
-            metadata2.setMdCompletion(completion);
-            metadata2.setOwner(userID);
-            metadata2.setDatestamp(dateStamp);
-            metadata2.setDateCreation(System.currentTimeMillis());
-            metadata2.setTitle(title);
-            metadata2.setProfile(templateName);
-            metadata2.setParentIdentifier(parentID);
-            metadata2.setLevel(level);
-            
-            //TODO fulljooq
-            metadata2.setIsPublished(false);
-            metadata2.setIsValidated(false);
-            
-            metadataRepository.create(metadata2);
-            return true;
+            metadata.setDatasetId(dataset.getId());
+        } else {
+        
+            // unsafe but no better way for now
+            final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
+            if (!update && data != null) {
+                templateName = getDataTemplate(data.getName(), data.getNamespace(), data.getType());
+                metadata.setDataId(data.getId());
+            }
         }
         
-        // unsafe but no better way for now
-        final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
-        if (data != null) {
-            // calculate completion rating
+        if (templateName != null) {
             try {
-                templateName = getDataTemplate(data.getName(), data.getNamespace(), data.getType());
                 final Template template = Template.getInstance(templateName);
                 completion = template.calculateMDCompletion(unmarshallMetadata(xml));
                 level = template.getCompletion(meta);
-            } catch (IOException | ConfigurationException | JAXBException ex) {
+            } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
             }
-            final Metadata metadata2 = new Metadata();
-            metadata2.setMetadataId(metadataId);
-            metadata2.setMetadataIso(xml);
-            metadata2.setDataId(data.getId());
-            metadata2.setMdCompletion(completion);
-            metadata2.setOwner(userID);
-            metadata2.setDatestamp(dateStamp);
-            metadata2.setDateCreation(System.currentTimeMillis());
-            metadata2.setTitle(title);
-            metadata2.setProfile(templateName);
-            metadata2.setParentIdentifier(parentID);
-            metadata2.setLevel(level);
-            metadataRepository.create(metadata2);
-            return true;
         }
         
-        // save a new metadata (unliked to any data/dataset/service)
+        metadata.setProfile(templateName);
+        metadata.setMdCompletion(completion);
+        metadata.setLevel(level);
         
-        final Metadata metadata2 = new Metadata();
-        metadata2.setMetadataId(metadataId);
-        metadata2.setMetadataIso(xml);
-
-        metadata2.setMdCompletion(completion);
-        metadata2.setOwner(userID);
-        metadata2.setDatestamp(dateStamp);
-        metadata2.setDateCreation(System.currentTimeMillis());
-        metadata2.setTitle(title);
-        metadata2.setProfile(templateName);
-        metadata2.setParentIdentifier(parentID);
-        metadata2.setLevel(level);
-        
-        metadataRepository.create(metadata2);
+        if (update) {
+            metadataRepository.update(metadata);
+        } else {
+            metadataRepository.create(metadata);
+        }
         return true;
     }
 
@@ -334,8 +300,195 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
-    protected Object unmarshallMetadata(final String metadata) throws JAXBException {
-        return XML.unmarshal(metadata);
+    @Override
+    public MetadataLists getMetadataCodeLists() {
+        final MetadataLists mdList = new MetadataLists();
+
+        //for role codes
+        final List<String> roleCodes = new LinkedList<>();
+        for (final org.opengis.metadata.citation.Role role : org.opengis.metadata.citation.Role.values()) {
+            final String standardName = Types.getStandardName(role.getClass());
+            final String code = role.identifier()!=null?role.identifier():role.name();
+            final String codeListName = standardName+"."+code;
+            roleCodes.add(codeListName);
+        }
+        Collections.sort(roleCodes);
+        mdList.setRoleCodes(roleCodes);
+
+        //for keyword type codes
+        final List<String> keywordTypesCodes = new LinkedList<>();
+        for (final KeywordType ktype : KeywordType.values()) {
+            final String standardName = Types.getStandardName(ktype.getClass());
+            final String code = ktype.identifier()!=null?ktype.identifier():ktype.name();
+            final String codeListName = standardName+"."+code;
+            keywordTypesCodes.add(codeListName);
+        }
+        Collections.sort(keywordTypesCodes);
+        mdList.setKeywordTypeCodes(keywordTypesCodes);
+
+        //for locale codes
+        final List<String> localeCodes = new LinkedList<>();
+        for (final Locale locale : Locales.ALL.getAvailableLanguages()) {
+            localeCodes.add("LanguageCode."+locale.getISO3Language());
+        }
+        // add missing locale (FRE)
+        localeCodes.add("LanguageCode.fre");
+        Collections.sort(localeCodes);
+        mdList.setLocaleCodes(localeCodes);
+
+        //for topic category codes
+        final List<String> topicCategoryCodes = new LinkedList<>();
+        for (final TopicCategory tc : TopicCategory.values()) {
+            final String standardName = Types.getStandardName(tc.getClass());
+            final String code = tc.identifier()!=null? tc.identifier(): tc.name();
+            final String codeListName = standardName+"."+code;
+            topicCategoryCodes.add(codeListName);
+        }
+        Collections.sort(topicCategoryCodes);
+        mdList.setTopicCategoryCodes(topicCategoryCodes);
+
+        //for date type codes
+        final List<String> dateTypeCodes = new LinkedList<>();
+        for (final DateType dateType : DateType.values()) {
+            final String standardName = Types.getStandardName(dateType.getClass());
+            final String code = dateType.identifier()!=null? dateType.identifier(): dateType.name();
+            final String codeListName = standardName+"."+code;
+            dateTypeCodes.add(codeListName);
+        }
+        Collections.sort(dateTypeCodes);
+        mdList.setDateTypeCodes(dateTypeCodes);
+
+        //for maintenanceFrequency codes
+        final List<String> maintenanceFrequencyCodes = new LinkedList<>();
+        for (final MaintenanceFrequency cl : MaintenanceFrequency.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            maintenanceFrequencyCodes.add(codeListName);
+        }
+        Collections.sort(maintenanceFrequencyCodes);
+        mdList.setMaintenanceFrequencyCodes(maintenanceFrequencyCodes);
+
+        //for GeometricObjectType codes
+        final List<String> geometricObjectTypeCodes = new LinkedList<>();
+        for (final GeometricObjectType got : GeometricObjectType.values()) {
+            final String standardName = Types.getStandardName(got.getClass());
+            final String code = got.identifier()!=null? got.identifier(): got.name();
+            final String codeListName = standardName+"."+code;
+            geometricObjectTypeCodes.add(codeListName);
+        }
+        Collections.sort(geometricObjectTypeCodes);
+        mdList.setGeometricObjectTypeCodes(geometricObjectTypeCodes);
+
+        //for Classification codes
+        final List<String> classificationCodes = new LinkedList<>();
+        for (final Classification cl : Classification.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            classificationCodes.add(codeListName);
+        }
+        Collections.sort(classificationCodes);
+        mdList.setClassificationCodes(classificationCodes);
+
+        // for characterSet codes
+        final List<String> characterSetCodes = new LinkedList<>();
+        final Set<String> keys = Charset.availableCharsets().keySet();
+        final List<String> keep = Arrays.asList("UTF-8","UTF-16","UTF-32",
+                "ISO-8859-1","ISO-8859-13","ISO-8859-15",
+                "ISO-8859-2","ISO-8859-3","ISO-8859-4",
+                "ISO-8859-5","ISO-8859-6","ISO-8859-7",
+                "ISO-8859-8","ISO-8859-9","Shift_JIS",
+                "EUC-JP","EUC-KR","US-ASCII","Big5","GB2312");
+        keep.retainAll(keys);
+        for (final String c : keep) {
+            characterSetCodes.add(c);
+        }
+        Collections.sort(characterSetCodes);
+        mdList.setCharacterSetCodes(characterSetCodes);
+
+        //for Restriction codes
+        final List<String> restrictionCodes = new LinkedList<>();
+        for (final Restriction cl : Restriction.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            restrictionCodes.add(codeListName);
+        }
+        Collections.sort(restrictionCodes);
+        mdList.setRestrictionCodes(restrictionCodes);
+
+        final List<String> dimensionNameTypeCodes = new LinkedList<>();
+        for (final DimensionNameType cl : DimensionNameType.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            dimensionNameTypeCodes.add(codeListName);
+        }
+        Collections.sort(dimensionNameTypeCodes);
+        mdList.setDimensionNameTypeCodes(dimensionNameTypeCodes);
+
+        final List<String> coverageContentTypeCodes = new LinkedList<>();
+        for (final CoverageContentType cl : CoverageContentType.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            coverageContentTypeCodes.add(codeListName);
+        }
+        Collections.sort(coverageContentTypeCodes);
+        mdList.setCoverageContentTypeCodes(coverageContentTypeCodes);
+
+        final List<String> imagingConditionCodes = new LinkedList<>();
+        for (final ImagingCondition cl : ImagingCondition.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            imagingConditionCodes.add(codeListName);
+        }
+        Collections.sort(imagingConditionCodes);
+        mdList.setImagingConditionCodes(imagingConditionCodes);
+
+        final List<String> cellGeometryCodes = new LinkedList<>();
+        for (final CellGeometry cl : CellGeometry.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            cellGeometryCodes.add(codeListName);
+        }
+        Collections.sort(cellGeometryCodes);
+        mdList.setCellGeometryCodes(cellGeometryCodes);
+
+        //for pixel orientation codes
+        final List<String> pixelOrientationCodes = new LinkedList<>();
+        for (final PixelOrientation cl : PixelOrientation.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            pixelOrientationCodes.add(codeListName);
+        }
+        Collections.sort(pixelOrientationCodes);
+        mdList.setPixelOrientationCodes(pixelOrientationCodes);
+
+        //for Scope codes
+        final List<String> scopeCodes = new LinkedList<>();
+        for (final ScopeCode cl : ScopeCode.values()) {
+            final String standardName = Types.getStandardName(cl.getClass());
+            final String code = cl.identifier()!=null? cl.identifier(): cl.name();
+            final String codeListName = standardName+"."+code;
+            scopeCodes.add(codeListName);
+        }
+        Collections.sort(scopeCodes);
+        mdList.setScopeCodes(scopeCodes);
+
+        return mdList;
+    }
+    
+    protected Object unmarshallMetadata(final String metadata) throws ConfigurationException {
+        try {
+            return XML.unmarshal(metadata);
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to unmarshall metadata", ex);
+        }
     }
     
     protected String getDataTemplate(final String dataName, final String dataNamespace, final String dataType) throws ConfigurationException {

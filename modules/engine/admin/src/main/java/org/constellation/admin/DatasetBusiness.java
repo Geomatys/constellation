@@ -375,42 +375,35 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             }
             
             Metadata metadataRecord = metadataRepository.findByDatasetId(dataset.getId());
-            if (metadataRecord != null) {
-                metadataRecord.setMetadataIso(metadataString);
-                metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRecord.setLevel(level);
-                metadataRecord.setTitle(title);
-                metadataRecord.setDatestamp(dateStamp);
-                metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setMdCompletion(completion);
-                metadataRecord.setProfile(templateName);
-                metadataRepository.update(metadataRecord);
-            } else {
+            boolean update = metadataRecord != null;
+            if (!update) {
                 final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
                 Integer userID = null;
                 if (user.isPresent()) {
                     userID = user.get().getId();
                 }
                 metadataRecord = new Metadata();
-                
-                metadataRecord.setMetadataId(metadata.getFileIdentifier());
-                metadataRecord.setMetadataIso(metadataString);
-                metadataRecord.setDatasetId(dataset.getId());
-                metadataRecord.setMdCompletion(completion);
                 metadataRecord.setOwner(userID);
-                metadataRecord.setDatestamp(dateStamp);
                 metadataRecord.setDateCreation(System.currentTimeMillis());
-                metadataRecord.setTitle(title);
-                metadataRecord.setProfile(templateName);
-                metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setLevel(level);
-                
-                //TODO fulljooq
-                metadataRecord.setIsPublished(false);
-                metadataRecord.setIsValidated(false);
-                
+            }
+            
+            metadataRecord.setMetadataIso(metadataString);
+            metadataRecord.setMetadataId(metadata.getFileIdentifier());
+            metadataRecord.setLevel(level);
+            metadataRecord.setTitle(title);
+            metadataRecord.setDatasetId(dataset.getId());
+            metadataRecord.setDatestamp(dateStamp);
+            metadataRecord.setParentIdentifier(parentID);
+            metadataRecord.setMdCompletion(completion);
+            metadataRecord.setProfile(templateName);
+            metadataRecord.setIsPublished(false);
+            metadataRecord.setIsValidated(false);
+            if (update) {
+                metadataRepository.update(metadataRecord);
+            } else {
                 metadataRepository.create(metadataRecord);
             }
+            
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
             // update internal CSW index
             updateInternalCSWIndex(metadata.getFileIdentifier(), domainId, true);
@@ -459,44 +452,39 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 }
             }
             
-            
             Metadata metadataRecord = metadataRepository.findByDatasetId(dataset.getId());
-            if (metadataRecord != null) {
-                metadataRecord.setMetadataIso(metadataXml);
-                metadataRecord.setMetadataId(metaId);
-                metadataRecord.setLevel(level);
-                metadataRecord.setTitle(title);
-                metadataRecord.setDatestamp(dateStamp);
-                metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setMdCompletion(completion);
-                metadataRecord.setProfile(templateName);
-                metadataRepository.update(metadataRecord);
-            } else {
+            boolean update = metadataRecord != null;
+            if (!update) {
                 final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
                 Integer userID = null;
                 if (user.isPresent()) {
                     userID = user.get().getId();
                 }
                 metadataRecord = new Metadata();
-                metadataRecord.setMetadataId(metaId);
-                metadataRecord.setMetadataIso(metadataXml);
-                metadataRecord.setMetadataId(metaId);
-                metadataRecord.setDatasetId(dataset.getId());
-                metadataRecord.setLevel(level);
-                metadataRecord.setTitle(title);
-                metadataRecord.setDatestamp(dateStamp);
-                metadataRecord.setParentIdentifier(parentID);
-                metadataRecord.setMdCompletion(completion);
-                metadataRecord.setProfile(templateName);
                 metadataRecord.setOwner(userID);
-                
-                //TODO fulljooq
-                metadataRecord.setIsPublished(false);
-                metadataRecord.setIsValidated(false);
-
-                
+                metadataRecord.setDateCreation(System.currentTimeMillis());
+            }
+            metadataRecord.setMetadataIso(metadataXml);
+            metadataRecord.setMetadataId(metaId);
+            metadataRecord.setLevel(level);
+            metadataRecord.setTitle(title);
+            metadataRecord.setDatestamp(dateStamp);
+            metadataRecord.setParentIdentifier(parentID);
+            metadataRecord.setMdCompletion(completion);
+            metadataRecord.setProfile(templateName);
+            metadataRecord.setDatasetId(dataset.getId());
+            metadataRecord.setIsPublished(false);
+            metadataRecord.setIsValidated(false);
+            if (update) {
+                metadataRepository.update(metadataRecord);
+            } else {
                 metadataRepository.create(metadataRecord);
             }
+            
+            indexEngine.addMetadataToIndexForDataset(meta, dataset.getId());
+            // update internal CSW index
+            updateInternalCSWIndex(meta.getFileIdentifier(), domainId, true);
+            
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }

@@ -54,10 +54,10 @@ public interface IDataBusiness {
      *
      * Do not use this method to remove a data, use {@link #removeData(Integer)} instead.
      *
-     * @param qName given data name.
+     * @param name given data name.
      * @param providerIdentifier given provider identifier.
      */
-    void missingData(QName qName, String providerIdentifier);
+    void missingData(QName name, String providerIdentifier);
 
     /**
      * Set {@code updated} attribute to {@code false} in removed data and his children.
@@ -123,12 +123,12 @@ public interface IDataBusiness {
 
     /**
      * Returns {@link DefaultMetadata} for given providerId and data name.
-     * @param providerID given data provider id.
-     * @param qName given data name.
+     * @param providerId given data provider id.
+     * @param name given data name.
      * @return {@link DefaultMetadata}
      * @throws ConfigurationException is thrown for UnsupportedEncodingException or JAXBException.
      */
-    DefaultMetadata loadIsoDataMetadata(String providerID, QName qName)  throws ConfigurationException;
+    DefaultMetadata loadIsoDataMetadata(String providerId, QName name)  throws ConfigurationException;
 
     /**
      * Returns {@link DefaultMetadata} for given dataId.
@@ -166,22 +166,22 @@ public interface IDataBusiness {
      * Returns {@link DataBrief} for given layer alias and data provider identifier.
      *
      * @param layerAlias given layer name.
-     * @param providerid given data provider identifier.
+     * @param providerId given data provider identifier.
      * @return {@link DataBrief}.
      * @throws ConstellationException is thrown if result fails.
      */
-    DataBrief getDataLayer(String layerAlias, String providerid);
+    DataBrief getDataLayer(String layerAlias, String providerId);
 
     /**
      * Load a metadata for given data provider id and data name.
      *
      * @param providerId given data provider.
      * @param name given data name.
-     * @param instance marshaller pool.
+     * @param pool marshaller pool.
      * @return {@link CoverageMetadataBean}
      * @throws ConstellationException is thrown for JAXBException.
      */
-    CoverageMetadataBean loadDataMetadata(String providerId, QName name, MarshallerPool instance);
+    CoverageMetadataBean loadDataMetadata(String providerId, QName name, MarshallerPool pool);
 
     /**
      * Returns a list of {@link DataBrief} for given metadata identifier.
@@ -291,8 +291,6 @@ public interface IDataBusiness {
      * Search for data without statistics
      */
     void updateDataStatistics();
-
-    MetadataLists getMetadataCodeLists();
 
     /**
      * Update {@link org.constellation.engine.register.Data#isRendered()} attribute that define
