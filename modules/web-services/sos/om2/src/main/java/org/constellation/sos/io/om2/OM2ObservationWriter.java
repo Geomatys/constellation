@@ -926,8 +926,9 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                                 + " AND    \"id\" NOT IN (SELECT DISTINCT \"phenomenon\"        FROM \"om\".\"offering_observed_properties\")"
                                 + " AND    \"id\" NOT IN (SELECT DISTINCT \"component\"         FROM \"om\".\"components\")")) {
                             while (rs.next()) {
-                                stmtOP.addBatch("DELETE FROM \"om\".\"components\" WHERE \"phenomenon\"='" + rs.getString(1) + "';");
-                                stmtOP.addBatch("DELETE FROM \"om\".\"observed_properties\" WHERE \"id\"='" + rs.getString(1) + "';");
+                                final String key = encodeQuote(rs.getString(1));
+                                stmtOP.addBatch("DELETE FROM \"om\".\"components\" WHERE \"phenomenon\"='" + key + "';");
+                                stmtOP.addBatch("DELETE FROM \"om\".\"observed_properties\" WHERE \"id\"='" + key + "';");
                             }
                         }
                         stmtOP.executeBatch();
@@ -940,7 +941,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                             " AND    \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"offering_foi\")")) {
 
                         while (rs2.next()) {
-                            stmtFOI.addBatch("DELETE FROM \"om\".\"sampling_features\" WHERE \"id\"='" + rs2.getString(1) + "';");
+                            stmtFOI.addBatch("DELETE FROM \"om\".\"sampling_features\" WHERE \"id\"='" + encodeQuote(rs2.getString(1)) + "';");
                         }
                         stmtFOI.executeBatch();
                     }
@@ -950,7 +951,17 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             throw new DataStoreException("Error while removing procedure.", ex);
         }
     }
-    
+
+    /**
+     * Encode quotes in the given string, to make it work with SQL syntax.
+     *
+     * @param original Original string. May contain simple quote. Should not be {@code null}.
+     * @return The original string with quotes encoded. Never {@code null}.
+     */
+    private String encodeQuote(final String original) {
+        return original.replace("'", "''");
+    }
+
     /**
      * {@inheritDoc}
      */
