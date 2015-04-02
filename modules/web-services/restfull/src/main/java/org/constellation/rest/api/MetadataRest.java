@@ -2,6 +2,7 @@ package org.constellation.rest.api;
 
 import com.google.common.base.Optional;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.business.IMetadataBusiness;
 import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +45,8 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipOutputStream;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.json.metadata.v2.Template;
 
 /**
  * @author Mehdi Sidhoum (Geomatys).
@@ -60,6 +64,12 @@ public class MetadataRest {
      */
     @Inject
     private MetadataRepository metadataRepository;
+
+    /**
+     * Inject metadata business
+     */
+    @Inject
+    private IMetadataBusiness metadataBusiness;
 
     /**
      * Injected user repository.
@@ -386,7 +396,9 @@ public class MetadataRest {
     @POST
     @Path("/changeOwner/{ownerId}")
     public Response changeOwner(@PathParam("ownerId") final int ownerId,final List<MetadataBrief> metadataList) {
-        //TODO implements change of owner for metadata
+        for (MetadataBrief brief : metadataList) {
+            metadataRepository.changeOwner(brief.getId(), ownerId);
+        }
         return Response.ok("owner applied with success!").build();
     }
 
@@ -399,7 +411,9 @@ public class MetadataRest {
     @POST
     @Path("/changeValidation/{isvalid}")
     public Response changeValidation(@PathParam("isvalid") final boolean isvalid,final List<MetadataBrief> metadataList) {
-        //TODO implements change of validation for metadata
+        for (MetadataBrief brief : metadataList) {
+            metadataRepository.changeValidation(brief.getId(), isvalid);
+        }
         return Response.ok("validation applied with success!").build();
     }
 
@@ -412,8 +426,30 @@ public class MetadataRest {
     @POST
     @Path("/changePublication/{ispublished}")
     public Response changePublication(@PathParam("ispublished") final boolean ispublished,final List<MetadataBrief> metadataList) {
-        //TODO implements change of publication for metadata
+        for (MetadataBrief brief : metadataList) {
+            metadataRepository.changePublication(brief.getId(), ispublished);
+        }
         return Response.ok("Published state applied with success!").build();
+    }
+
+    @GET
+    @Path("metadataJson/iso/{metadataId}/{prune}")
+    public Response getIsoMetadataJson(final @PathParam("metadataId") int metadataId,
+                                       final @PathParam("prune") boolean prune) {
+        final StringWriter buffer = new StringWriter();
+        try{
+            DefaultMetadata metadata = metadataBusiness.getMetadata(metadataId);
+            if (metadata != null) {
+                metadata.prune();
+                //get template name
+                final String templateName = metadataRepository.findById(metadataId).getProfile();
+                final Template template = Template.getInstance(templateName);
+                template.write(metadata,buffer,prune);
+            }
+        } catch(Exception ex) {
+            LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
+        }
+        return Response.ok(buffer.toString()).build();
     }
 
 
