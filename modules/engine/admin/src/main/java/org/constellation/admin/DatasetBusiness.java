@@ -209,51 +209,9 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         ds.setDate(System.currentTimeMillis());
 
         ds = datasetRepository.insert(ds);
-        if (metadataId != null && metadataXml != null) {
+        if (metadataXml != null) {
             final DefaultMetadata meta = unmarshallMetadata(metadataXml);
-            final Long dateStamp  = MetadataUtilities.extractDatestamp(meta);
-            final String title    = MetadataUtilities.extractTitle(meta);
-            final String parent   = MetadataUtilities.extractParent(meta);
-            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
-            Integer parentID      = null;   
-            if (parentRecord != null) {
-                parentID = parentRecord.getId();
-            }
-            final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(meta);
-            final String templateName = getTemplate(identifier, null);
-            final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
-            Integer userID = null;
-            if (user.isPresent()) {
-                userID = user.get().getId();
-            }
-            // calculate completion rating / elementary
-            Integer completion = null;
-            String level = "NONE";
-            final Template template = Template.getInstance(templateName);
-            try {
-                completion = template.calculateMDCompletion(meta);
-                level = template.getCompletion(meta);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
-            }
-            final Metadata metadata = new Metadata();
-            metadata.setMetadataId(metadataId);
-            metadata.setMetadataIso(metadataXml);
-            metadata.setDatasetId(ds.getId());
-            metadata.setMdCompletion(completion);
-            metadata.setOwner(userID);
-            metadata.setDatestamp(dateStamp);
-            metadata.setDateCreation(System.currentTimeMillis());
-            metadata.setTitle(title);
-            metadata.setProfile(templateName);
-            metadata.setParentIdentifier(parentID);
-            metadata.setLevel(level);
-            
-            //TODO fulljooq
-            metadata.setIsPublished(false);
-            metadata.setIsValidated(false);
-            
-            metadataRepository.create(new MetadataComplete(metadata, bboxes));
+            updateMetadata(identifier, -1, meta);
         }
         return ds;
     }
@@ -290,25 +248,6 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 final DefaultMetadata metadata = unmarshallMetadata(metadataStr);
                 metadata.prune();
                 return metadata;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns {@link Node} that represents the metadata document of dataset.
-     * @param datasetIdentifier the given dataset identifier.
-     * @param domainId domain id.
-     * @return {@link Node}
-     * @throws ConfigurationException
-     */
-    @Override
-    public Node getMetadataNode(final String datasetIdentifier, int domainId) throws ConfigurationException {
-        final Dataset dataset = getDataset(datasetIdentifier, domainId);
-        if (dataset != null) {
-            final Metadata metaRecord = metadataRepository.findByDatasetId(dataset.getId());
-            if (metaRecord != null) {
-                return getNodeFromString(metaRecord.getMetadataIso());
             }
         }
         return null;
@@ -806,7 +745,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     }
 
     @Override
-    public DataSetBrief getDatasetBrief(Integer dataSetId, List<DataBrief> children, String owner) {
+    public DataSetBrief getDatasetBrief(Integer dataSetId, List<DataBrief> children) {
         final Dataset dataset = datasetRepository.findById(dataSetId);
         Integer completion = null;
         final Metadata meta = metadataRepository.findByDatasetId(dataSetId);
@@ -816,6 +755,14 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         String type = null;
         if (!children.isEmpty()) {
             type = children.get(0).getType();
+        }
+        final Optional<CstlUser> optUser = userRepository.findById(dataset.getOwner());
+        String owner = null;
+        if(optUser!=null && optUser.isPresent()){
+            final CstlUser user = optUser.get();
+            if(user != null){
+                owner = user.getLogin();
+            }
         }
         final DataSetBrief dsb = new DataSetBrief(dataset.getId(),
                 dataset.getIdentifier(),

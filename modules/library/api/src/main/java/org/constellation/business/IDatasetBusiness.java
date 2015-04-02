@@ -54,8 +54,6 @@ public interface IDatasetBusiness {
 
     List<Dataset> getAllDataset();
 
-    Node getMetadataNode(String identifier, int domainId) throws ConfigurationException;
-
     void linkDataTodataset(Dataset dataset, List<Data> datasFromProviderId);
 
     List<Dataset> searchOnMetadata(String search) throws IOException, ConstellationException;
@@ -64,6 +62,6 @@ public interface IDatasetBusiness {
     
     String getTemplate(final String datasetId, final String dataType) throws ConfigurationException;
     
-    DataSetBrief getDatasetBrief(final Integer dataSetId, List<DataBrief> children, String owner);
+    DataSetBrief getDatasetBrief(final Integer dataSetId, List<DataBrief> children);
 
 }

@@ -231,24 +231,8 @@ public class MetadataRest {
      */
     private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId){
         final Integer dataSetId = dataset.getId();
-        final Optional<CstlUser> optUser = userRepository.findById(dataset.getOwner());
-        String owner = null;
-        if(optUser!=null && optUser.isPresent()){
-            final CstlUser user = optUser.get();
-            if(user != null){
-                owner = user.getLogin();
-            }
-        }
         final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
-        final DataSetBrief dsb = datasetBusiness.getDatasetBrief(dataSetId, dataBriefList, owner);
-        try{
-            final Node nodeMetadata = datasetBusiness.getMetadataNode(dataset.getIdentifier(),domainId);
-            if(nodeMetadata!=null){
-                //@TODO fill the DataSetBrief properties for keywords, abstract and dateStamp
-            }
-        }catch(Exception ex){
-            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
-        }
+        final DataSetBrief dsb = datasetBusiness.getDatasetBrief(dataSetId, dataBriefList);
         return dsb;
     }
 

@@ -330,18 +330,15 @@ public class MapContextBusiness implements IMapContextBusiness {
                 }else {
                     data = dataRepository.findById(dataID);
                 }
-                final Provider provider = providerRepository.findOne(data.getProvider());
-
-                final QName dataName = Util.parseQName(data.getName());
                 DefaultMetadata metadata = null;
                 try {
-                    metadata = dataBusiness.loadIsoDataMetadata(provider.getIdentifier(), dataName);
+                    metadata = dataBusiness.loadIsoDataMetadata(dataID);
                 } catch (ConfigurationException ex) {
                     LOGGER.log(Level.FINE, null, ex);
                 }
                 if(metadata == null){
                     //try to get dataset metadata.
-                    final Dataset dataset = dataBusiness.getDatasetForData(provider.getIdentifier(), dataName);
+                    final Dataset dataset = dataBusiness.getDatasetForData(dataID);
                     if (dataset != null) {
                         try{
                             metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);

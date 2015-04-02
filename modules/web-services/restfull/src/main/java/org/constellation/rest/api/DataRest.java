@@ -977,18 +977,10 @@ public class DataRest {
      */
     private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId, List<DataBrief> children){
         final Integer dataSetId = dataset.getId();
-        final Optional<CstlUser> optUser = userRepository.findById(dataset.getOwner());
-        String owner = null;
-        if(optUser!=null && optUser.isPresent()){
-            final CstlUser user = optUser.get();
-            if (user != null) {
-                owner = user.getLogin();
-            }
-        }
         if (children == null) {
             children = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
         }
-        final DataSetBrief dsb = datasetBusiness.getDatasetBrief(dataSetId, children, owner);
+        final DataSetBrief dsb = datasetBusiness.getDatasetBrief(dataSetId, children);
         return dsb;
     }
 
