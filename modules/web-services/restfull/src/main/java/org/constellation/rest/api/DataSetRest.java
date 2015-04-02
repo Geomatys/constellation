@@ -61,15 +61,15 @@ import com.google.common.base.Optional;
  * @since 0.9
  */
 @Component
-@Path("/1/domain/{domainId}/metadata/")
+@Path("/1/domain/{domainId}/dataset/")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public class MetadataRest {
+public class DataSetRest {
 
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(MetadataRest.class);
+    private static final Logger LOGGER = Logging.getLogger(DataSetRest.class);
 
     /**
      * Injected dataset business.
@@ -102,7 +102,7 @@ public class MetadataRest {
      * @return
      */
     @DELETE
-    @Path("dataset/{datasetIdentifier}")
+    @Path("{datasetIdentifier}")
     public Response removeDataSet(@PathParam("domainId") final int domainId,
                                   @PathParam("datasetIdentifier") final String datasetIdentifier) {
         try{
@@ -115,7 +115,7 @@ public class MetadataRest {
     }
 
     @POST
-    @Path("dataset/create")
+    @Path("create")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createDataset(@PathParam("domainId") final int domainId,
@@ -160,7 +160,7 @@ public class MetadataRest {
      * @TODO is it the right place? perhaps it should be moved to DatasetRest facade.
      */
     @GET
-    @Path("dataset/all")
+    @Path("all")
     public Response getAllDataset(@PathParam("domainId") final int domainId) {
         final List<DataSetBrief> datasetBriefs = new ArrayList<>();
         final List<Dataset> datasets = datasetBusiness.getAllDataset();
@@ -179,7 +179,7 @@ public class MetadataRest {
      * @return the xml file
      */
     @GET
-    @Path("dataset/{datasetIdentifier}")
+    @Path("{datasetIdentifier}")
     @Produces(MediaType.APPLICATION_XML)
     public Response downloadMetadataForDataSet(@PathParam("domainId") final int domainId,
                                                @PathParam("datasetIdentifier") final String datasetIdentifier) {
@@ -204,7 +204,7 @@ public class MetadataRest {
      * @return {code Response} that contains all dataset that matches the lucene query.
      */
     @POST
-    @Path("dataset/find")
+    @Path("find")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response findDataset(@PathParam("domainId") final int domainId, final ParameterValues values) {

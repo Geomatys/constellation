@@ -173,12 +173,12 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     })
 
     .factory('datasetListing', function($resource) {
-        return $resource('@cstl/api/1/domain/$domainId/metadata/dataset/all;jsessionid=', {}, {
+        return $resource('@cstl/api/1/domain/$domainId/dataset/all;jsessionid=', {}, {
             'listAll':              {method: 'GET',    isArray: true },
-            'downloadMetadata':     {method: 'GET',    url: '@cstl/api/1/domain/$domainId/metadata/dataset/:datasetIdentifier;jsessionid='},
-            'deleteDataset':        {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/metadata/dataset/:datasetIdentifier;jsessionid='},
-            'createDataset':        {method: 'POST',   url: '@cstl/api/1/domain/$domainId/metadata/dataset/create;jsessionid='},
-            'findDataset':          {method: 'POST',   url: '@cstl/api/1/domain/$domainId/metadata/dataset/find;jsessionid=', isArray: true}
+            'downloadMetadata':     {method: 'GET',    url: '@cstl/api/1/domain/$domainId/dataset/:datasetIdentifier;jsessionid='},
+            'deleteDataset':        {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/dataset/:datasetIdentifier;jsessionid='},
+            'createDataset':        {method: 'POST',   url: '@cstl/api/1/domain/$domainId/dataset/create;jsessionid='},
+            'findDataset':          {method: 'POST',   url: '@cstl/api/1/domain/$domainId/dataset/find;jsessionid=', isArray: true}
         });
     })
 
