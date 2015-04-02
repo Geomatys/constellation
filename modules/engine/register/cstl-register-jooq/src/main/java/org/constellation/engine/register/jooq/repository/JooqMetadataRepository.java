@@ -337,9 +337,27 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
     
     @Override
-    public int delete(int id) {
+    public int delete(final int id) {
         dsl.delete(METADATA_BBOX).where(METADATA_BBOX.METADATA_ID.eq(id)).execute();
         return dsl.delete(METADATA).where(METADATA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public void changeOwner(final int id, final int owner) {
+        UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
+        update.set(METADATA.OWNER, owner).where(METADATA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public void changeValidation(int id, boolean validated) {
+        UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
+        update.set(METADATA.IS_VALIDATED, validated).where(METADATA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public void changePublication(int id, boolean published) {
+        UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
+        update.set(METADATA.IS_PUBLISHED, published).where(METADATA.ID.eq(id)).execute();
     }
     
 }

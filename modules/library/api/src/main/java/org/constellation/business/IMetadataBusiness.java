@@ -19,6 +19,7 @@
 package org.constellation.business;
 
 import java.util.List;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
 
@@ -44,4 +45,6 @@ public interface IMetadataBusiness {
     void unlinkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
     
     MetadataLists getMetadataCodeLists();
+    
+    DefaultMetadata getMetadata(final int id) throws ConfigurationException;
 }

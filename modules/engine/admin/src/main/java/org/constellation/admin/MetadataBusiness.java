@@ -303,6 +303,15 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
+    public DefaultMetadata getMetadata(final int id) throws ConfigurationException {
+        final Metadata metadata = metadataRepository.findById(id);
+        if (metadata != null) {
+            return (DefaultMetadata) unmarshallMetadata(metadata.getMetadataIso());
+        }
+        return null;
+    }
+    
+    @Override
     public MetadataLists getMetadataCodeLists() {
         final MetadataLists mdList = new MetadataLists();
 

@@ -58,4 +58,10 @@ public interface MetadataRepository {
     MetadataXCsw addMetadataToCSW(final String metadataID, final int cswID);
     
     void removeDataFromCSW(final String metadataID, final int cswID);
+    
+    void changeOwner(final int id, final int owner);
+    
+    void changeValidation(final int id, final boolean validated);
+    
+    void changePublication(final int id, final boolean published);
 }
