@@ -76,6 +76,7 @@ import static org.constellation.wps.ws.WPSConstant.PROCESS_PREFIX;
 import static org.constellation.wps.ws.WPSConstant.WPS_1_0_0;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import org.opengis.parameter.ParameterNotFoundException;
 
 /**
  * Set of utilities method used by WPS worker.
@@ -110,6 +111,43 @@ public class WPSUtils {
                     INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
         }
         return processDesc;
+    }
+
+    /**
+     * Get the type of the input/output parameter of a given process
+     * @param processIdentifier identifier of the desired process
+     * @param inOutIdentifier identifier of the desired input/output
+     * @return the type of the researched input/output
+     * @throws CstlServiceException when the given process identifier can not be found
+     * @throws ParameterNotFoundException when the input/output identifier can not be found
+     */
+    public static Class getIOClassFromIdentifier(final String processIdentifier, final String inOutIdentifier) throws CstlServiceException, ParameterNotFoundException {
+        ProcessDescriptor processDescriptor = getProcessDescriptor(processIdentifier);
+        GeneralParameterDescriptor gpd;
+        String ioCode = extractProcessIOCode(inOutIdentifier);
+
+        // We first try to get a descriptor from the InputDescriptor
+        try {
+            gpd = processDescriptor.getInputDescriptor().descriptor(ioCode);
+        }
+        catch (ParameterNotFoundException ex) {
+            // Then if the InputDescriptor returns nothing we try on the OutputDescriptor
+            gpd = processDescriptor.getOutputDescriptor().descriptor(ioCode);
+        }
+
+        // If the parameter descriptor is a group
+        // We don't go through the group hierarchy
+        if (gpd instanceof ParameterDescriptorGroup) {
+            ParameterDescriptorGroup pdg = ((ParameterDescriptorGroup)gpd);
+            throw new UnsupportedOperationException("Not implemented yet : the desired input/output is a group");
+        }
+        else {
+            // It should be a parameter descriptor
+            assert gpd instanceof ParameterDescriptor;
+
+            ParameterDescriptor paramDescriptor = (ParameterDescriptor)gpd;
+            return paramDescriptor.getValueClass();
+        }
     }
 
     /**

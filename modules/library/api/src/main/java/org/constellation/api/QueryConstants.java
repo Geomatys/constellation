@@ -19,11 +19,11 @@
 package org.constellation.api;
 
 /**
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public final class QueryConstants {
-    
+
     //basic parameters
     public static final String REQUEST_PARAMETER = "REQUEST";
     public static final String SERVICE_PARAMETER = "SERVICE";
@@ -33,7 +33,7 @@ public final class QueryConstants {
     public static final String ACCEPT_FORMATS_PARAMETER = "AcceptFormats";
     public static final String SECTIONS_PARAMETER = "Sections";
     public static final String SERVICE_PARAMETER_LC = "service";
-    
+
     private QueryConstants(){}
-    
+
 }

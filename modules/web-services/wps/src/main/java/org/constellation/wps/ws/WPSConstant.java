@@ -70,20 +70,50 @@ public final class WPSConstant {
     public static final String GETCAPABILITIES = "GetCapabilities";
     public static final String DESCRIBEPROCESS = "DescribeProcess";
     public static final String EXECUTE = "Execute";
-    
-    
+
+
     public static final String IDENTIFER_PARAMETER = "IDENTIFIER";
     public static final String LANGUAGE_PARAMETER = "LANGUAGE";
 
+    public static final String DATA_INPUTS_PARAMETER = "DATAINPUTS";
+    public static final String RESPONSE_DOCUMENT_PARAMETER = "RESPONSEDOCUMENT";
+    public static final String RAW_DATA_OUTPUT_PARAMETER = "RAWDATAOUTPUT";
+
+    // Input/output parameters
+    public static final String MIME_TYPE_PARAMETER = "MIMETYPE";
+    public static final String ENCODING_PARAMETER = "ENCODING";
+    public static final String SCHEMA_PARAMETER = "SCHEMA";
+    public static final String HREF_PARAMETER = "HREF";
+    // The WPS specification seems to accept either the attribute mimeType or format to set a mime type
+    public static final String FORMAT_PARAMETER = "FORMAT";
+    public static final String METHOD_PARAMETER = "METHOD";
+    public static final String HEADER_PARAMETER = "HEADER";
+    public static final String BODY_PARAMETER = "BODY";
+    public static final String BODY_REFERENCE_PARAMETER = "BODYREFERENCE";
+    public static final String DATA_TYPE_PARAMETER = "DATATYPE";
+    public static final String UOM_PARAMETER = "UOM";
+    public static final String AS_REFERENCE_PARAMETER = "asReference";
+
+    // CRS and BoundingBox identifier
+    public static final String BOUNDING_BOX_IDENTIFIER_PARAMETER = "ows:boundingbox";
+    public static final String CRS_IDENTIFIER_PARAMETER = "urn:ogc:def:crs";
+
+    // ResponseDocument options
+    public static final String LINEAGE_PARAMETER = "lineage";
+    public static final String STATUS_PARAMETER = "status";
+    public static final String STORE_EXECUTE_RESPONSE_PARAMETER = "storeExecuteResponse";
+
+
+
     /* Maximum size in megabytes for a complex input */
     public static final int MAX_MB_INPUT_COMPLEX = 100;
-    
-   
-    /** 
+
+
+    /**
      * Process identifier prefix to uniquely identifies process using OGC URN code.
      */
     public static final String PROCESS_PREFIX = "urn:ogc:cstl:wps:";
-    
+
     public static final AbstractOperationsMetadata OPERATIONS_METADATA;
 
     static {

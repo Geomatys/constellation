@@ -486,7 +486,7 @@ public class WPSWorker extends AbstractWorker {
             LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
             return false;
         }
-        
+
         return true;
     }
 
@@ -1484,8 +1484,16 @@ public class WPSWorker extends AbstractWorker {
         //support custom title/abstract.
         final LanguageStringType titleOut = requestedOutput.getTitle() != null ?
                 requestedOutput.getTitle() : WPSUtils.capitalizeFirstLetter(outputIdentifierCode);
-        final LanguageStringType abstractOut = requestedOutput.getAbstract() != null ?
-                requestedOutput.getAbstract() : WPSUtils.capitalizeFirstLetter(outputDescriptor.getRemarks().toString());
+
+        LanguageStringType abstractOut = requestedOutput.getAbstract();
+        if (abstractOut == null) {
+            if (outputDescriptor.getRemarks() != null) {
+                abstractOut = WPSUtils.capitalizeFirstLetter(outputDescriptor.getRemarks().toString());
+            } else {
+                abstractOut = WPSUtils.capitalizeFirstLetter("No description available");
+            }
+        }
+
         outData.setTitle(titleOut);
         outData.setAbstract(abstractOut);
 
