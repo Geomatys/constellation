@@ -95,12 +95,12 @@ public class MetadataRest {
     }
 
     /**
-     * @TODO to be removed, used only to fill metadata table to simulate several rows for dashboard page.
+     * TODO to be removed, used only to fill metadata table to simulate several rows for dashboard page.
      * @param count
      */
     @GET
     @Path("/mockup/{count}")
-    public void mockup(@PathParam("count") final Integer count) {
+    public Response mockup(@PathParam("count") final Integer count) {
         final List<String> profiles = new ArrayList<>();
         profiles.add("AccessProgram");
         profiles.add("Guideline");
@@ -130,6 +130,7 @@ public class MetadataRest {
             metadata.setIsPublished(metadata.getIsValidated() && (Math.random() < 0.5));
             metadataRepository.create(new MetadataComplete(metadata, new ArrayList<MetadataBbox>()));
         }
+        return Response.ok("Mockup metadata successfully!").build();
     }
 
     @POST
