@@ -182,6 +182,20 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         });
     })
 
+    .factory('Metadata', function($resource) {
+        return $resource('@cstl/api/1/metadata/:id', null, {
+            search:             {method: 'POST',    url: '@cstl/api/1/metadata/search',isArray: false},
+            create:             {method: 'PUT' },
+            profiles:           {method: 'GET',     url: '@cstl/api/1/metadata/profiles',isArray: true},
+            searchIds:          {method: 'POST',    url: '@cstl/api/1/metadata/searchIds',isArray: false},
+            delete:             {method: 'POST',    url: '@cstl/api/1/metadata/delete'},
+            exportMetadata:     {method: 'POST',    url: '@cstl/api/1/metadata/exportMetadata'},
+            changeOwner:        {method: 'POST',    url: '@cstl/api/1/metadata/changeOwner/:ownerId'},
+            changeValidation:   {method: 'POST',    url: '@cstl/api/1/metadata/changeValidation/:isvalid'},
+            changePublication:  {method: 'POST',    url: '@cstl/api/1/metadata/changePublication/:ispublished'}
+        });
+    })
+
     .factory('style', function($resource) {
         return $resource('@cstl/api/1/SP/:provider/style/available;jsessionid=', {}, {
 
