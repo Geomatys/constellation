@@ -35,7 +35,8 @@
                 "ignore" : null,
                 "tag" : null,
                 "predefinedValues" : [ ],
-                "strict" : false
+                "strict" : false,
+                "completion" : "elementary"
               }
             }, {
               "type" : "field",
@@ -52,7 +53,8 @@
                 "ignore" : null,
                 "tag" : null,
                 "predefinedValues" : [ ],
-                "strict" : false
+                "strict" : false,
+                "completion" : "elementary"
               }
             }, {
               "type" : "field",
@@ -69,7 +71,8 @@
                 "ignore" : null,
                 "tag" : null,
                 "predefinedValues" : [ ],
-                "strict" : false
+                "strict" : false,
+                "completion" : "elementary"
               }
             }, {
               "type" : "field",
@@ -86,7 +89,8 @@
                 "ignore" : null,
                 "tag" : null,
                 "predefinedValues" : [ ],
-                "strict" : false
+                "strict" : false,
+                "completion" : "elementary"
               }
             } ]
           }
@@ -116,7 +120,8 @@
                 "ignore" : null,
                 "tag" : null,
                 "predefinedValues" : [ ],
-                "strict" : false
+                "strict" : false,
+                "completion" : "elementary"
               }
             } ]
           }

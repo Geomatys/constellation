@@ -28,7 +28,8 @@
                                             "defaultValue": null,
                                             "value": null,
                                             "predefinedValues" : ["value1", "value2"],
-                                            "strict" : true
+                                            "strict" : true,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -42,7 +43,8 @@
                                             "defaultValue": null,
                                             "value": null,
                                             "predefinedValues" : [ ],
-                                            "strict" : false
+                                            "strict" : false,
+                                            "completion" : "elementary"
                                         }
                                     }
                                 ]

@@ -33,7 +33,8 @@
                 "value" : "hello",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "completion" : "elementary"
               }
             }, {
               "type" : "field",
@@ -48,7 +49,8 @@
                 "value" : "world",
                 "obligation" : "O",
                 "ignore" : null,
-                "tag" : null
+                "tag" : null,
+                "completion" : "elementary"
               }
             } ]
           }

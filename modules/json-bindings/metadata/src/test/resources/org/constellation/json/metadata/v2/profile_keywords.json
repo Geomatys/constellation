@@ -25,7 +25,8 @@
                                             "render": "KEYWORD.text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }
                                 ]

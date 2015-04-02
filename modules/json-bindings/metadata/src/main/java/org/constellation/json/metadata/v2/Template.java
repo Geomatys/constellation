@@ -6,13 +6,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.sis.metadata.MetadataStandard;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.json.metadata.binding.BlockObj;
 import org.constellation.json.metadata.binding.ComponentObj;
+import org.constellation.json.metadata.binding.Field;
 import org.constellation.json.metadata.binding.FieldObj;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.json.metadata.binding.SuperBlockObj;
@@ -23,6 +28,8 @@ import org.geotoolkit.sml.xml.v101.SensorMLStandard;
  * @author Guilhem Legal (Geomatys)
  */
 public class Template {
+    
+    private static final Logger LOGGER = Logging.getLogger(Template.class);
     
     /**
      * Pre-defined instances. This map shall not be modified after class initialization,
@@ -162,7 +169,51 @@ public class Template {
     }
     
     public String getCompletion(final Object metadata) throws IOException {
-       return "NONE"; //TODO
+        final TemplateWriter writer = new TemplateWriter(standard);
+        final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false);
+        return getCompletion(rootFilled);
+    }
+    
+    public String getCompletion(final RootObj metadataValues) {
+        Map<String, Boolean> completions = new HashMap<>();
+        completions.put("ELEMENTARY", Boolean.TRUE);
+        completions.put("EXTENDED",   Boolean.TRUE);
+        completions.put("COMPLETE",   Boolean.TRUE);
+        
+        final List<SuperBlockObj> superblocks = metadataValues.getRoot().getChildren();
+        for(final SuperBlockObj sb:superblocks){
+            final List<BlockObj> blocks = sb.getSuperblock().getChildren();
+            for(final BlockObj b:blocks){
+                final List<ComponentObj> fields = b.getBlock().getChildren();
+                for(final ComponentObj f:fields){
+                    final Field field = ((FieldObj)f).getField();
+                    final String value = field.value;
+                    final String completion = field.getCompletion();
+                    if (completion != null) {
+                        if (value == null || value.isEmpty()) {
+                            if (completions.containsKey(completion)) {
+                                completions.put(completion, false);
+                            } else {
+                                LOGGER.log(Level.WARNING, "unrecognized completion:{0}", completion);
+                            }
+                        }
+                    } else {
+                        LOGGER.log(Level.WARNING, "No completion for field: {0}", field.getName());
+                    }
+
+                }
+            }
+        }
+        if (completions.get("ELEMENTARY")) {
+            if (completions.get("EXTENDED")) {
+                if (completions.get("COMPLETE")) {
+                    return "COMPLETE";
+                }
+                return "EXTENDED";
+            }
+            return "ELEMENTARY";
+        }
+        return "NONE";
     }
     
     public int calculateMDCompletion(final Object metadata) throws IOException {

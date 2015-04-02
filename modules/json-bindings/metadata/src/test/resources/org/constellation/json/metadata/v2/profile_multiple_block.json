@@ -26,7 +26,8 @@
                                             "render": "KEYWORD.text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -38,7 +39,8 @@
                                             "render": "text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "block",
@@ -58,7 +60,8 @@
                                                         "render": "DATE.text",
                                                         "obligation": "O",
                                                         "defaultValue": null,
-                                                        "value": null
+                                                        "value": null,
+                                                        "completion" : "elementary"
                                                     }
                                                 }, {
                                                     "type": "field",
@@ -70,7 +73,8 @@
                                                         "render": "DATE.codelist",
                                                         "obligation": "O",
                                                         "defaultValue": null,
-                                                        "value": null
+                                                        "value": null,
+                                                        "completion" : "elementary"
                                                     }
                                                 }
                                             ]

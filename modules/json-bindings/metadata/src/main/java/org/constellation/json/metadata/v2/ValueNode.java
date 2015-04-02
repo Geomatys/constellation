@@ -43,6 +43,8 @@ public class ValueNode {
     boolean multiple = false;
     
    List<String> predefinedValues;
+   
+   String completion;
     
     public ValueNode(String path, String type, int ordinal, ValueNode parent, String blockName, boolean strict) {
         this.path      = path;
@@ -60,11 +62,7 @@ public class ValueNode {
         }
     }
     
-//    public ValueNode(String path, String type, String defaultValue, String render, int ordinal, String value, ValueNode parent) {
-//        this(path, type, defaultValue, render, ordinal, value, parent, null);
-//    }
-    
-    public ValueNode(String path, String type, String defaultValue, String render, int ordinal, String value, ValueNode parent, String fieldName) {
+    public ValueNode(String path, String type, String defaultValue, String render, int ordinal, String value, ValueNode parent, String fieldName, String completion) {
         this.path = path;
         this.type = type;
         if (path.indexOf('.') != -1) {
@@ -77,6 +75,7 @@ public class ValueNode {
         this.ordinal      = ordinal;
         this.value        = value;
         this.blockName    = fieldName;
+        this.completion   = completion;
         if (parent != null) {
             parent.addChild(this);
         }
@@ -97,9 +96,9 @@ public class ValueNode {
         this.strict       = node.strict;
         this.ordinal      = ordinal;
         this.parent       = parent;
+        this.completion   = node.completion;
         this.parent.addChild(this);
         this.predefinedValues = node.predefinedValues;
-        
     }
     
     public ValueNode(ValueNode node) {
@@ -115,6 +114,7 @@ public class ValueNode {
         this.blockName    = node.blockName;
         this.multiple     = node.multiple;
         this.strict       = node.strict;
+        this.completion   = node.completion;
         this.predefinedValues = node.predefinedValues;
         for (ValueNode child : node.children) {
             this.children.add(new ValueNode(child));
@@ -146,6 +146,7 @@ public class ValueNode {
         this.ordinal      = ordinal;
         this.strict       = field.isStrict();
         this.blockName    = field.getName();
+        this.completion   = field.getCompletion();
         this.predefinedValues = field.getPredefinedValues();
         if (path.indexOf('.') != -1) {
             this.name = path.substring(path.lastIndexOf('.') + 1, path.length());
@@ -224,6 +225,7 @@ public class ValueNode {
         sb.append("value:").append(value).append('\n');
         sb.append("default value:").append(defaultValue).append('\n');
         sb.append("strict:").append(strict).append('\n');
+        sb.append("completion:").append(completion).append('\n');
         if (blockName != null){
             sb.append("block name:").append(blockName).append('\n');
         }
@@ -248,6 +250,7 @@ public class ValueNode {
         hash = 97 * hash + Objects.hashCode(this.render);
         hash = 97 * hash + Objects.hashCode(this.strict);
         hash = 97 * hash + Objects.hashCode(this.blockName);
+        hash = 97 * hash + Objects.hashCode(this.completion);
         hash = 97 * hash + Objects.hashCode(this.getPredefinedValues());
         hash = 97 * hash + this.ordinal;
         return hash;
@@ -269,6 +272,7 @@ public class ValueNode {
                    Objects.equals(this.children,      that.children) && 
                    Objects.equals(this.strict,        that.strict) &&
                    Objects.equals(this.blockName,     that.blockName) &&
+                   Objects.equals(this.completion,    that.completion) &&
                    Objects.equals(this.getPredefinedValues(), that.getPredefinedValues()) &&
                    Objects.equals(this.getNumeratedPath(), that.getNumeratedPath());
         }

@@ -26,7 +26,8 @@
                                             "render": "decimal",
                                             "obligation": "M",
                                             "defaultValue": -180,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -38,7 +39,8 @@
                                             "render": "decimal",
                                             "obligation": "M",
                                             "defaultValue": 180,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -50,7 +52,8 @@
                                             "render": "decimal",
                                             "obligation": "M",
                                             "defaultValue": 90,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -62,7 +65,8 @@
                                             "render": "decimal",
                                             "obligation": "M",
                                             "defaultValue": -90,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }
                                 ]
@@ -86,7 +90,8 @@
                                             "render": "text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }
                                 ]

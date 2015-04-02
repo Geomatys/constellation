@@ -25,7 +25,8 @@
                                             "render": "Specification.codelist",
                                             "obligation": "M",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -37,7 +38,8 @@
                                             "render": "DATE.text",
                                             "obligation": "M",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -49,7 +51,8 @@
                                             "render": "CODELIST.readonly",
                                             "obligation": "M",
                                             "defaultValue": "CI_DateTypeCode.publication",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -61,7 +64,8 @@
                                             "render": "CODELIST.readonly",
                                             "obligation": "M",
                                             "defaultValue": "MD_ScopeCode.dataset",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }, {
                                         "type": "field",
@@ -73,7 +77,8 @@
                                             "render": "ResultPass.codelist",
                                             "obligation": "M",
                                             "defaultValue": "nilReason:unknown",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }, {
                                         "type": "field",
@@ -85,7 +90,8 @@
                                             "render": "textarea",
                                             "obligation": "M",
                                             "defaultValue": "See the referenced specification",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }
                                 ]
@@ -107,7 +113,8 @@
                                             "render": "KEYWORD.text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -119,7 +126,8 @@
                                             "render": "text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }, {
                                         "type": "field",
@@ -131,7 +139,8 @@
                                             "render": "DATE.text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }, {
                                         "type": "field",
@@ -143,7 +152,8 @@
                                             "render": "DATE.codelist",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }
                                 ]
@@ -175,7 +185,8 @@
                                             "render": "textarea",
                                             "obligation": "M",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -187,7 +198,8 @@
                                             "render": "Restriction.codelist",
                                             "obligation": "M",
                                             "defaultValue": "MD_RestrictionCode.licence",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }, {
                                         "type": "field",
@@ -199,7 +211,8 @@
                                             "render": "textarea",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }
                                 ]
@@ -222,7 +235,8 @@
                                             "render": "textarea",
                                             "obligation": "M",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -234,7 +248,8 @@
                                             "render": "Classification.codelist",
                                             "obligation": "M",
                                             "defaultValue": "MD_ClassificationCode.unclassified",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }, {
                                         "type": "field",
@@ -246,7 +261,8 @@
                                             "render": "textarea",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }
                                 ]
@@ -277,7 +293,8 @@
                                             "render": "readonly",
                                             "obligation": "M",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -289,7 +306,9 @@
                                             "render": "DATE.readonly",
                                             "obligation": "M",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
+                                            
                                         }
                                     }, {
                                         "type": "field",
@@ -301,7 +320,8 @@
                                             "render": "readonly",
                                             "obligation": "M",
                                             "defaultValue": "x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -313,7 +333,8 @@
                                             "render": "readonly",
                                             "obligation": "M",
                                             "defaultValue": "2011.03",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -325,7 +346,8 @@
                                             "render": "CharacterSet.codelist",
                                             "obligation": "M",
                                             "defaultValue": "UTF-8",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }, {
                                         "type": "field",
@@ -337,7 +359,8 @@
                                             "render": "Language.codelist",
                                             "obligation": "M",
                                             "defaultValue": "LanguageCode.fra",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }, {
                                         "type": "field",
@@ -349,7 +372,8 @@
                                             "render": "CODELIST.readonly",
                                             "obligation": "M",
                                             "defaultValue": "MD_ScopeCode.dataset",
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "extended"
                                         }
                                     }
                                 ]

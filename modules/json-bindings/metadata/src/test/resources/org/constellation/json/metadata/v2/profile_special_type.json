@@ -25,7 +25,8 @@
                                             "render": "text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }
                                 ]
@@ -47,7 +48,8 @@
                                             "render": "DATE.text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }, {
                                         "type": "field",
@@ -59,7 +61,8 @@
                                             "render": "DATE.text",
                                             "obligation": "O",
                                             "defaultValue": null,
-                                            "value": null
+                                            "value": null,
+                                            "completion" : "elementary"
                                         }
                                     }
                                 ]

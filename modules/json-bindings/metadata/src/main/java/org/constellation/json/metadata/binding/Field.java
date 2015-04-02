@@ -47,6 +47,7 @@ public class Field implements Serializable {
     private String tag;
     private List<String> predefinedValues;
     private boolean strict;
+    private String completion;
 
     public Field() {
 
@@ -65,6 +66,7 @@ public class Field implements Serializable {
         this.ignore       = field.ignore;
         this.tag          = field.tag;
         this.strict       = field.strict;
+        this.completion   = field.completion;
         this.predefinedValues = field.predefinedValues;
     }
 
@@ -216,5 +218,19 @@ public class Field implements Serializable {
         }
         sb.append("value:").append(value);
         return sb.toString();
+    }
+
+    /**
+     * @return the completion
+     */
+    public String getCompletion() {
+        return completion;
+    }
+
+    /**
+     * @param completion the completion to set
+     */
+    public void setCompletion(String completion) {
+        this.completion = completion;
     }
 }
