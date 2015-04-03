@@ -80,8 +80,8 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         else update.set(METADATA.IS_VALIDATED, false);
 
         update.set(METADATA.PROFILE, metadata.getProfile());
-        update.set(METADATA.TITLE, metadata.getTitle())
-                .where(METADATA.ID.eq(metadata.getId())).execute();
+        update.set(METADATA.TITLE, metadata.getTitle());
+        update.set(METADATA.RESUME, metadata.getResume()).where(METADATA.ID.eq(metadata.getId())).execute();                
         
         updateBboxes(metadata.getId(), metadata.getBboxes());
         
@@ -117,6 +117,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setOwner(metadata.getOwner());
         metadataRecord.setProfile(metadata.getProfile());
         metadataRecord.setTitle(metadata.getTitle());
+        metadataRecord.setResume(metadata.getResume());
 
         if (metadata.getIsPublished() != null) metadataRecord.setIsPublished(metadata.getIsPublished());
         else metadataRecord.setIsPublished(false); //default
@@ -269,7 +270,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         Collections.addAll(fields,METADATA.ID,METADATA.METADATA_ID,
                 METADATA.TITLE,METADATA.PROFILE,METADATA.OWNER,METADATA.DATESTAMP,
                 METADATA.DATE_CREATION,METADATA.MD_COMPLETION,METADATA.LEVEL,
-                METADATA.IS_VALIDATED,METADATA.IS_PUBLISHED);
+                METADATA.IS_VALIDATED,METADATA.IS_PUBLISHED,METADATA.RESUME);
         Select query = null;
         if(filterMap != null) {
             for(final Map.Entry<String,Object> entry : filterMap.entrySet()) {
@@ -358,6 +359,11 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     public void changePublication(int id, boolean published) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.IS_PUBLISHED, published).where(METADATA.ID.eq(id)).execute();
+    }
+ 
+    @Override
+    public List<MetadataBbox> getBboxes(int id) {
+        return dsl.select().from(METADATA_BBOX).where(METADATA_BBOX.METADATA_ID.eq(id)).fetchInto(MetadataBbox.class);
     }
     
 }

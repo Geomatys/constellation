@@ -284,6 +284,7 @@ public class MetadataRest {
         mdb.setLevelCompletion(md.getLevel());
         mdb.setIsValidated(md.getIsValidated());
         mdb.setIsPublished(md.getIsPublished());
+        mdb.setResume(md.getResume());
         return mdb;
     }
 

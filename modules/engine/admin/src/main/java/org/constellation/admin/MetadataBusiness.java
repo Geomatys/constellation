@@ -160,6 +160,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         
         final Long dateStamp  = MetadataUtilities.extractDatestamp(meta);
         final String title    = MetadataUtilities.extractTitle(meta);
+        final String resume   = MetadataUtilities.extractResume(meta);
         Integer parentID      = null;
         final String parent   = MetadataUtilities.extractParent(meta);
         Metadata parentRecord = metadataRepository.findByMetadataId(parent);
@@ -186,6 +187,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         metadata.setDatestamp(dateStamp);
         metadata.setDateCreation(System.currentTimeMillis());
         metadata.setTitle(title);
+        metadata.setResume(resume);
         metadata.setMetadataId(metadataId);
         metadata.setMetadataIso(xml);
         metadata.setParentIdentifier(parentID);

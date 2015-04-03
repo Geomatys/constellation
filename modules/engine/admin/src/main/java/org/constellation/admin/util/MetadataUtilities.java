@@ -650,6 +650,16 @@ public final class MetadataUtilities {
         }
         return null;
     }
+    
+    public static String extractResume(final DefaultMetadata metadata){
+        if (metadata.getIdentificationInfo() != null && !metadata.getIdentificationInfo().isEmpty()) {
+            final Identification id = metadata.getIdentificationInfo().iterator().next();
+            if (id.getAbstract() != null) {
+                return id.getAbstract().toString();
+            }
+        }
+        return null;
+    }
 
     public static List<MetadataBbox> extractBbox(final DefaultMetadata metadata){
         final List<MetadataBbox> results = new ArrayList<>();

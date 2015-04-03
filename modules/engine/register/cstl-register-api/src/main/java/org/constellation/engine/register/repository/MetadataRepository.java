@@ -23,6 +23,7 @@ import java.util.Map;
 import org.constellation.engine.register.MetadataComplete;
 
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 
 /**
@@ -42,6 +43,8 @@ public interface MetadataRepository {
     Metadata findByMetadataId(String metadataId);
 
     Metadata findById(int id);
+    
+    List<MetadataBbox> getBboxes(int id);
     
     int delete(int id);
     

@@ -765,6 +765,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         if (data != null) {
             final Long dateStamp  = MetadataUtilities.extractDatestamp(metadata);
             final String title    = MetadataUtilities.extractTitle(metadata);
+            final String resume   = MetadataUtilities.extractResume(metadata);
             final String parent   = MetadataUtilities.extractParent(metadata);
             Metadata parentRecord = metadataRepository.findByMetadataId(parent);
             Integer parentID      = null;   
@@ -802,6 +803,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             metadataRecord.setMetadataId(metadata.getFileIdentifier());
             metadataRecord.setLevel(level);
             metadataRecord.setTitle(title);
+            metadataRecord.setResume(resume);
             metadataRecord.setDatestamp(dateStamp);
             metadataRecord.setParentIdentifier(parentID);
             metadataRecord.setMdCompletion(completion);
