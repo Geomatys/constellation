@@ -116,20 +116,37 @@ public class MetadataBusiness implements IMetadataBusiness {
     private org.constellation.security.SecurityManager securityManager;
     
     /**
-     * Returns the xml as string representation of metadata for given metadata identifier.
-     *
-     * @param metadataId given metadata identifier
-     * @param includeService flag that indicates if service repository will be requested.
-     * @return String representation of metadata in xml.
+     * {@inheritDoc}
      */
     @Override
-    public String searchMetadata(final String metadataId, final boolean includeService)  {
+    public String searchMetadata(final String metadataId, final boolean includeService, final boolean onlyPublished)  {
         final Metadata metadata = metadataRepository.findByMetadataId(metadataId);
         if (metadata != null) {
             if (!includeService && metadata.getServiceId() != null) {
                 return null;
             }
+            if (onlyPublished && !metadata.getIsPublished()) {
+                return null;
+            }
             return metadata.getMetadataIso();
+        }
+        return null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Metadata searchFullMetadata(final String metadataId, final boolean includeService, final boolean onlyPublished)  {
+        final Metadata metadata = metadataRepository.findByMetadataId(metadataId);
+        if (metadata != null) {
+            if (!includeService && metadata.getServiceId() != null) {
+                return null;
+            }
+            if (onlyPublished && !metadata.getIsPublished()) {
+                return null;
+            }
+            return metadata;
         }
         return null;
     }
@@ -216,30 +233,27 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
 
     /**
-     * Returns {@code true} if the xml metadata exists for given metadata identifier.
-     *
-     * @param metadataID given metadata identifier.
-     * @param includeService flag that indicates if service repository will be requested.
-     * @return boolean to indicates if metadata is present or not.
+     * {@inheritDoc}
      */
     @Override
-    public boolean existInternalMetadata(final String metadataID, final boolean includeService) {
-        return searchMetadata(metadataID, includeService) != null;
+    public boolean existInternalMetadata(final String metadataID, final boolean includeService, final boolean onlyPublished) {
+        return searchMetadata(metadataID, includeService, onlyPublished) != null;
     }
 
     /**
-     * Returns a list of all metadata identifiers.
-     *
-     * @param includeService flag that indicates if service repository will be requested.
-     * @return List of string identifiers.
+     * {@inheritDoc}
      */
     @Override
-    public List<String> getInternalMetadataIds(final boolean includeService) {
+    public List<String> getInternalMetadataIds(final boolean includeService, final boolean onlyPublished) {
         final List<String> results = new ArrayList<>();
         final List<Metadata> metadatas = metadataRepository.findAll();
         for (final Metadata record : metadatas) {
             if (record.getServiceId() != null) {
                 if (includeService) {
+                    results.add(record.getMetadataId());
+                }
+            } else if (!record.getIsPublished()) {
+                if (!onlyPublished) {
                     results.add(record.getMetadataId());
                 }
             } else {
@@ -250,19 +264,20 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
 
     /**
-     * Returns all metadata stored in database.
-     *
-     * @param includeService given flag to include service's metadata
-     * @return List of all metadata as string xml stored in database.
+     * {@inheritDoc}
      */
     @Override
-    public List<String> getAllMetadata(final boolean includeService) {
+    public List<String> getAllMetadata(final boolean includeService, final boolean onlyPublished) {
         final List<String> results = new ArrayList<>();
         final List<Metadata> metadatas = metadataRepository.findAll();
         for (final Metadata record : metadatas) {
             if (record.getServiceId() != null) {
                 if (includeService) {
                     results.add(record.getMetadataIso());
+                }
+            } else if (!record.getIsPublished()) {
+                if (!onlyPublished) {
+                    results.add(record.getMetadataId());
                 }
             } else {
                 results.add(record.getMetadataIso());
@@ -271,14 +286,27 @@ public class MetadataBusiness implements IMetadataBusiness {
         return results;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<String> getLinkedMetadataIDs(final String cswIdentifier) {
+    public List<String> getLinkedMetadataIDs(final String cswIdentifier, final boolean includeService, final boolean onlyPublished) {
         final List<String> results = new ArrayList<>();
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {
             List<Metadata> metas = metadataRepository.findByCswId(service.getId());
-            for (Metadata meta : metas) {
-                results.add(meta.getMetadataId());
+            for (Metadata record : metas) {
+                if (record.getServiceId() != null) {
+                    if (includeService) {
+                        results.add(record.getMetadataIso());
+                    }
+                } else if (!record.getIsPublished()) {
+                    if (!onlyPublished) {
+                        results.add(record.getMetadataId());
+                    }
+                } else {
+                    results.add(record.getMetadataIso());
+                }
             }
         }
         return results;

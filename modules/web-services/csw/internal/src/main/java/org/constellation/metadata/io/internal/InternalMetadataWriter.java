@@ -36,6 +36,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.constellation.admin.SpringHelper;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
@@ -65,6 +66,8 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
     
     protected boolean partial = false;
     
+    private boolean onlyPublished = false;
+    
     protected final String id;
     
     protected final DocumentBuilderFactory dbf;
@@ -76,6 +79,9 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
         this.indexer = indexer;
         if (configuration.getCustomparameters().containsKey("partial")) {
             this.partial = Boolean.parseBoolean(configuration.getParameter("partial"));
+        }
+        if (configuration.getCustomparameters().containsKey("onlyPublished")) {
+            this.onlyPublished = Boolean.parseBoolean(configuration.getParameter("onlyPublished"));
         }
         this.id = serviceID;
         dbf = DocumentBuilderFactory.newInstance();
@@ -120,7 +126,7 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
 
     @Override
     public boolean isAlreadyUsedIdentifier(String metadataID) throws MetadataIoException {
-        return metadataBusiness.existInternalMetadata(metadataID, displayServiceMetadata);
+        return metadataBusiness.existInternalMetadata(metadataID, true, false);
     }
 
     @Override
@@ -157,23 +163,28 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
 
     @Override
     public void linkInternalMetadata(final String metadataID) throws MetadataIoException {
-        final String xml = metadataBusiness.searchMetadata(metadataID, displayServiceMetadata);
-        if (xml != null) {
-            try {
-                final InputSource source = new InputSource(new StringReader(xml));
-                final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-                final Document document = docBuilder.parse(source);
-                final Node n =  document.getDocumentElement();
+        final Metadata metadata = metadataBusiness.searchFullMetadata(metadataID, true, false);
+        if (metadata != null) {
+            if (displayServiceMetadata ||
+               (!displayServiceMetadata && metadata.getServiceId() == null) ||
+               !onlyPublished ||
+               (onlyPublished && metadata.getIsPublished())) {
+                try {
+                    final InputSource source = new InputSource(new StringReader(metadata.getMetadataIso()));
+                    final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+                    final Document document = docBuilder.parse(source);
+                    final Node n =  document.getDocumentElement();
 
-                if (indexer != null) {
-                    indexer.removeDocument(metadataID);
-                    indexer.indexDocument(n);
+                    if (indexer != null) {
+                        indexer.removeDocument(metadataID);
+                        indexer.indexDocument(n);
+                    }
+                } catch (SAXException | IOException | ParserConfigurationException ex) {
+                    throw new MetadataIoException(ex);
                 }
-                if (partial) {
-                    metadataBusiness.linkMetadataIDToCSW(metadataID, id);
-                }
-            } catch (SAXException | IOException | ParserConfigurationException ex) {
-                throw new MetadataIoException(ex);
+            }
+            if (partial) {
+                metadataBusiness.linkMetadataIDToCSW(metadataID, id);
             }
         }
     }

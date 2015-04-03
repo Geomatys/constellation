@@ -22,23 +22,72 @@ import java.util.List;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
+import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 
 /**
  * @author Cédric Briançon (Geomatys)
  */
 public interface IMetadataBusiness {
     
-    String searchMetadata(final String metadataId, final boolean includeService);
+    /**
+     * Returns the xml as string representation of metadata for given metadata identifier.
+     *
+     * @param metadataId given metadata identifier
+     * @param includeService flag that indicates if service repository will be requested.
+     * @param onlyPublished flag that indicates if it will return the unpublished metadata.
+     * @return String representation of metadata in xml.
+     */
+    String searchMetadata(final String metadataId, final boolean includeService, final boolean onlyPublished);
+    
+    /**
+     * Returns the metadata Pojo for given metadata identifier.
+     *
+     * @param metadataId given metadata identifier
+     * @param includeService flag that indicates if service repository will be requested.
+     * @param onlyPublished flag that indicates if it will return the unpublished metadata.
+     * @return String representation of metadata in xml.
+     */
+    Metadata searchFullMetadata(final String metadataId, final boolean includeService, final boolean onlyPublished);
 
-    boolean existInternalMetadata(final String metadataID, final boolean includeService);
+    /**
+     * Returns {@code true} if the xml metadata exists for given metadata identifier.
+     *
+     * @param metadataID given metadata identifier.
+     * @param includeService flag that indicates if service repository will be requested.
+     * @param onlyPublished flag that indicates if it will return the unpublished metadata.
+     * @return boolean to indicates if metadata is present or not.
+     */
+    boolean existInternalMetadata(final String metadataID, final boolean includeService, final boolean onlyPublished);
 
-    List<String> getInternalMetadataIds(final boolean includeService);
+    /**
+     * Returns a list of all metadata identifiers.
+     *
+     * @param includeService flag that indicates if service repository will be requested.
+     * @param onlyPublished flag that indicates if it will return the unpublished metadata.
+     * @return List of string identifiers.
+     */
+    List<String> getInternalMetadataIds(final boolean includeService, final boolean onlyPublished);
 
-    List<String> getAllMetadata(final boolean includeService);
+    /**
+     * Returns all metadata stored in database.
+     *
+     * @param includeService given flag to include service's metadata
+     * @param onlyPublished flag that indicates if it will return the unpublished metadata.
+     * @return List of all metadata as string xml stored in database.
+     */
+    List<String> getAllMetadata(final boolean includeService, final boolean onlyPublished);
     
     boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException;
     
-    List<String> getLinkedMetadataIDs(final String cswIdentifier);
+    /**
+     * Returns all the metadata associated with a csw service.
+     *
+     * @param cswIdentifier identifer of the CSW instance.
+     * @param includeService given flag to include service's metadata
+     * @param onlyPublished flag that indicates if it will return the unpublished metadata.
+     * @return List of all metadata as string xml stored in database.
+     */
+    List<String> getLinkedMetadataIDs(final String cswIdentifier, final boolean includeService, final boolean onlyPublished);
     
     void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
     

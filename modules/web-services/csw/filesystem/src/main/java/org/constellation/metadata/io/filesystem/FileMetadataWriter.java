@@ -422,7 +422,7 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
 
     @Override
     public void linkInternalMetadata(String metadataID) throws MetadataIoException {
-        final String xml = metadataBusiness.searchMetadata(metadataID, true);
+        final String xml = metadataBusiness.searchMetadata(metadataID, true, false);
         if (xml != null) {
             try {
                 final InputSource source = new InputSource(new StringReader(xml));
