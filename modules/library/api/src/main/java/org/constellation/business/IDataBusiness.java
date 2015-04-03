@@ -71,6 +71,9 @@ public interface IDataBusiness {
 
     /**
      * Proceed to create a new data for given parameters.
+     *
+     * TODO seems only used by Junit tests, should not be public in DataBusiness API.
+     *
      * @param name data name to create.
      * @param providerIdentifier provider identifier.
      * @param type data type.
@@ -78,6 +81,8 @@ public interface IDataBusiness {
      * @param included flag that indicates if data is included.
      * @param subType data subType.
      * @param metadataXml metadata of data.
+     * @deprecated seems only used by Junit tests use {@link #create(javax.xml.namespace.QName, String, String, boolean, boolean, Boolean, String, String)}
+     * instead.
      */
     Data create(QName name, String providerIdentifier, String type, boolean sensorable, boolean included, String subType, String metadataXml);
 
