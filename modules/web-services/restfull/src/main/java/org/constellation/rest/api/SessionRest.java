@@ -18,11 +18,8 @@
  */
 package org.constellation.rest.api;
 
-import com.google.common.base.Function;
-import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.security.Principal;
+import java.util.Enumeration;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,8 +33,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.security.Principal;
-import java.util.Enumeration;
+
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
 
 /**
  * RestFull user configuration service
@@ -82,10 +84,10 @@ public class SessionRest {
             LOGGER.warn(builder.toString());
             return Response.status(401).build();
         }
-        return userRepository.findOneWithRolesAndDomains(userPrincipal.getName())
-                .transform(new Function<DomainUser, Response>() {
+        return userRepository.findOne(userPrincipal.getName())
+                .transform(new Function<CstlUser, Response>() {
                     @Override
-                    public Response apply(DomainUser domainUser) {
+                    public Response apply(CstlUser domainUser) {
                         return Response.ok(domainUser).build();
                     }
                 }).or(Response.status(404).build());

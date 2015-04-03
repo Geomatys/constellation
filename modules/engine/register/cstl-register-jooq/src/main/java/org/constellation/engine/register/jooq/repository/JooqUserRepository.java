@@ -19,38 +19,22 @@
 package org.constellation.engine.register.jooq.repository;
 
 import static org.constellation.engine.register.jooq.Tables.CSTL_USER;
-import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 import static org.constellation.engine.register.jooq.Tables.USER_X_ROLE;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.jooq.Tables;
-import org.constellation.engine.register.jooq.tables.UserXDomainXDomainrole;
-import org.constellation.engine.register.jooq.tables.UserXRole;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
-import org.constellation.engine.register.jooq.tables.pojos.Domainrole;
 import org.constellation.engine.register.jooq.tables.records.CstlUserRecord;
 import org.constellation.engine.register.jooq.tables.records.UserXRoleRecord;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.jooq.Condition;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertSetMoreStep;
-import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Result;
-import org.jooq.SelectConditionStep;
 import org.jooq.UpdateConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,72 +46,10 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Autowired
-    private DomainRepository domainRepository;
 
-    private org.constellation.engine.register.jooq.tables.CstlUser userTable = CSTL_USER.as("u");
-    private UserXRole userXroleTable = Tables.USER_X_ROLE.as("uXr");
-    private org.constellation.engine.register.jooq.tables.Domain domainTable = Tables.DOMAIN.as("d");
-
-    private UserXDomainXDomainrole UDD = Tables.USER_X_DOMAIN_X_DOMAINROLE.as("uxdr");
 
     public JooqUserRepository() {
         super(CstlUser.class, CSTL_USER);
-    }
-
-    @Override
-    public List<DomainUser> findAllWithDomainAndRole() {
-
-        SelectConditionStep<Record> records = getSelectWithRolesAndDomains();
-
-        records.execute();
-
-        Result<Record> result = records.getResult();
-
-        List<DomainUser> dtos = mapUsers(result);
-
-        return dtos;
-
-    }
-
-    private SelectConditionStep<Record> getSelectWithRolesAndDomains() {
-        SelectConditionStep<Record> records = dsl.select().from(userTable).leftOuterJoin(UDD).on(userTable.ID.eq(UDD.USER_ID))
-                .leftOuterJoin(userXroleTable).on(userTable.ID.eq(userXroleTable.USER_ID)).leftOuterJoin(domainTable)
-                .on(domainTable.ID.eq(UDD.DOMAIN_ID)).where(userTable.ACTIVE.eq(true));
-        return records;
-    }
-
-    private List<DomainUser> mapUsers(Result<Record> result) {
-        List<DomainUser> dtos = new ArrayList<>();
-        Map<Record, Result<Record>> users = result.intoGroups(userTable.fields());
-        for (Entry<Record, Result<Record>> record : users.entrySet()) {
-            DomainUser userDTO = mapUser(record);
-
-            dtos.add(userDTO);
-        }
-        return dtos;
-    }
-
-    private DomainUser mapUser(Entry<Record, Result<Record>> record) {
-        DomainUser userDTO = record.getKey().into(DomainUser.class);
-
-        Map<Record, Result<Record>> roles = record.getValue().intoGroups(userXroleTable.fields());
-        for (Record roleRecord : roles.keySet()) {
-            String role = roleRecord.getValue(userXroleTable.ROLE);
-            if (role != null) {
-                userDTO.addRole(role);
-            }
-        }
-
-        Map<Record, Result<Record>> domains = record.getValue().intoGroups(domainTable.fields());
-        for (Entry<Record, Result<Record>> domainEntry : domains.entrySet()) {
-
-            Domain domain = domainEntry.getKey().into(Domain.class);
-            if (domain.getId() != null) {
-                userDTO.addDomain(domain);
-            }
-        }
-        return userDTO;
     }
 
     @Override
@@ -180,8 +102,6 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
     public int delete(int userId) {
         int deleteRole = deleteRole(userId);
 
-        int removeUserFromAllDomain = domainRepository.removeUserFromAllDomain(userId);
-        LOGGER.debug("Delete " + removeUserFromAllDomain + " domain references");
 
         LOGGER.debug("Delete " + deleteRole + " role references");
 
@@ -206,26 +126,7 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
 
     }
 
-    @Override
-    public Optional<DomainUser> findOneWithRolesAndDomains(String login) {
-        return fetchUserWithRolesAndDomains(userTable.LOGIN.eq(login));
-    }
 
-    private Optional<DomainUser> fetchUserWithRolesAndDomains(Condition condition) {
-        SelectConditionStep<Record> records = getSelectWithRolesAndDomains().and(condition);
-        if (records.execute() > 0) {
-            List<DomainUser> result = mapUsers(records.getResult());
-            DomainUser domainUser = result.get(0);
-            domainUser.setPassword(null);
-            return Optional.of(domainUser);
-        }
-        return Optional.absent();
-    }
-
-    @Override
-    public Optional<DomainUser> findOneWithRolesAndDomains(int id) {
-        return fetchUserWithRolesAndDomains(userTable.ID.eq(id));
-    }
 
     @Override
     public boolean isLastAdmin(int userId) {
@@ -263,34 +164,7 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
         return dsl.selectCount().from(CSTL_USER).where(CSTL_USER.LOGIN.eq(login)).fetchOne().value1() == 0;
     }
 
-    @Override
-    public List<CstlUser> findUsersByDomainId(int domainId) {
-        return findBy(CSTL_USER.ID.in(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID).from(USER_X_DOMAIN_X_DOMAINROLE)
-                .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))));
-    }
 
-    @Override
-    public Map<CstlUser, List<Domainrole>> findUsersWithDomainRoles(int domainId) {
-        Map<CstlUser, List<Domainrole>> result = new LinkedHashMap<>();
-        SelectConditionStep<Record> groupBy = dsl.select().from(CSTL_USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey().join(Tables.DOMAINROLE)
-                .onKey().where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId));
-        groupBy.execute();
-        Map<Record, Result<Record>> intoGroups = groupBy.getResult().intoGroups(Tables.CSTL_USER.fields());
-        for (Entry<Record, Result<Record>> userRecord : intoGroups.entrySet()) {
-            CstlUser user = userRecord.getKey().into(CstlUser.class);
 
-            result.put(user, userRecord.getValue().into(Domainrole.class));
-        }
-        return result;
-    }
-
-    @Override
-    public List<CstlUser> findUsersNotInDomain(int domainId) {
-        return dsl
-                .select()
-                .from(CSTL_USER)
-                .where(CSTL_USER.ID.notIn(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID).from(USER_X_DOMAIN_X_DOMAINROLE)
-                        .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId)))).and(CSTL_USER.ACTIVE.eq(true)).fetchInto(CstlUser.class);
-    }
 
 }

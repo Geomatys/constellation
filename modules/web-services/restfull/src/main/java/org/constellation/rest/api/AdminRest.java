@@ -141,7 +141,7 @@ public class AdminRest {
     @Path("/domain/{domainId}/instances/{lang}")
     public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang) throws ConfigurationException {
         final List<Instance> instances = new ArrayList<>();
-        final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainId(domainId, lang);
+        final List<ServiceDTO> services = serviceBusiness.getAllServices(lang);
         for (ServiceDTO service : services) {
             final Instance instance = convertToInstance(service);
             instances.add(instance);
@@ -153,7 +153,7 @@ public class AdminRest {
     @Path("/domain/{domainId}/instances/{lang}/{type}")
     public Response listInstancesByType(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @PathParam("type") String type) throws ConfigurationException {
         final List<Instance> instances = new ArrayList<>();
-        final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainIdAndType(domainId, lang, type);
+        final List<ServiceDTO> services = serviceBusiness.getAllServicesByType(lang, type);
         for (ServiceDTO service : services) {
             final Instance instance = convertToInstance(service);
             instances.add(instance);
@@ -165,7 +165,7 @@ public class AdminRest {
     @Path("/domain/{domainId}/service/layers/{lang}")
     public Response listServiceLayers(@PathParam("domainId") int domainId, @PathParam("lang") String lang) throws ConfigurationException {
         final List<ServiceLayersDTO> serviceLayers = new ArrayList<>();
-        final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainIdAndType(domainId, lang, "wms");
+        final List<ServiceDTO> services = serviceBusiness.getAllServicesByType(lang, "wms");
         for (final ServiceDTO service : services) {
             final List<Layer> layers = layerBusiness.getLayers("wms", service.getIdentifier(), securityManager.getCurrentUserLogin());
             final List<LayerSummary> layerSummaries = new ArrayList<>();

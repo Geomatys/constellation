@@ -18,15 +18,6 @@
  */
 package org.constellation.rest.api;
 
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.repository.DomainroleRepository;
-import org.constellation.engine.register.repository.UserRepository;
-import org.geotoolkit.util.StringUtilities;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,6 +32,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.repository.UserRepository;
+import org.geotoolkit.util.StringUtilities;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
  * RestFull user configuration service
@@ -60,30 +59,20 @@ public class UserRest  {
     @Inject
     private UserRepository userRepository;
     
-    @Inject
-    private DomainroleRepository domainroleRepository;
-    
+
     @GET
     @RolesAllowed("cstl-admin")
     public Response findAll(@QueryParam("withDomainAndRoles") boolean withDomainAndRole) {
-        if(withDomainAndRole) {
-            return Response.ok(userRepository.findAllWithDomainAndRole()).build();
-        }
         return Response.ok(userRepository.findAll()).build();
     }
 
     @GET
     @Path("{id}")
     public Response findOne(@PathParam("id") int id) {
-        return Response.ok(userRepository.findOneWithRolesAndDomains(id)).build();
+        return Response.ok(userRepository.findById(id)).build();
     }
     
     
-    @GET
-    @Path("{id}/domainroles/{domainId}")
-    public Response findDomainRoles(@PathParam("id") int id, @PathParam("domainId") int domainId) {
-        return Response.ok(domainroleRepository.findUserDomainroles(id, domainId)).build();
-    }
 
 
     @DELETE
@@ -100,7 +89,7 @@ public class UserRest  {
     @POST
     @Transactional
     @RolesAllowed("cstl-admin")
-    public Response post(DomainUser userDTO) {
+    public Response post(UserWithRole userDTO) {
         if (StringUtils.hasText(userDTO.getPassword()))
             userDTO.setPassword(StringUtilities.MD5encode(userDTO.getPassword()));
 
@@ -113,7 +102,7 @@ public class UserRest  {
     @PUT
     @Transactional
     @RolesAllowed("cstl-admin")
-    public Response put(DomainUser userDTO) {
+    public Response put(UserWithRole userDTO) {
         userRepository.update(userDTO, userDTO.getRoles());
 
         return Response.ok(userDTO).build();

@@ -21,28 +21,23 @@ package org.constellation.engine.register.jooq.repository;
 import static org.constellation.engine.register.jooq.Tables.DATA;
 import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
 import static org.constellation.engine.register.jooq.Tables.DATA_X_DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.METADATA;
 import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.DataI18n;
 import org.constellation.engine.register.jooq.tables.pojos.DataXData;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.jooq.tables.records.DataXDataRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.jooq.Condition;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -58,8 +53,6 @@ import com.google.common.collect.Maps;
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
 
-    @Autowired
-    private DomainRepository domainRepository;
 
     public JooqDataRepository() {
         super(Data.class, DATA);
@@ -188,21 +181,6 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     }
 
-    @Override
-    public Map<Domain, Boolean> getLinkedDomains(int dataId) {
-
-        List<Integer> domainIds = dsl.select(DATA_X_DOMAIN.DOMAIN_ID).from(DATA_X_DOMAIN).where(DATA_X_DOMAIN.DATA_ID.eq(dataId))
-                .fetch(DATA_X_DOMAIN.DOMAIN_ID);
-        Map<Domain, Boolean> result = new LinkedHashMap<>();
-        for (Domain domain : domainRepository.findByIds(domainIds)) {
-            result.put(domain, true);
-        }
-
-        for (Domain domain : domainRepository.findByIdsNotIn(domainIds)) {
-            result.put(domain, false);
-        }
-        return result;
-    }
 
     @Override
     public Data findByIdentifierWithEmptyMetadata(String localPart) {

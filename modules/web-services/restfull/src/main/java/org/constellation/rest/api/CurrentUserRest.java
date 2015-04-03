@@ -18,13 +18,6 @@
  */
 package org.constellation.rest.api;
 
-import com.google.common.base.Function;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.security.SecurityManagerHolder;
-import org.springframework.stereotype.Component;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -33,6 +26,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.security.SecurityManagerHolder;
+import org.springframework.stereotype.Component;
+
+import com.google.common.base.Function;
 
 /**
  * RestFull user configuration service
@@ -56,10 +57,10 @@ public class CurrentUserRest {
      */
     @GET
     public Response current() {
-        return userRepository.findOneWithRolesAndDomains(SecurityManagerHolder.getInstance().getCurrentUserLogin())
-                .transform(new Function<DomainUser, Response>() {
+        return userRepository.findOne(SecurityManagerHolder.getInstance().getCurrentUserLogin())
+                .transform(new Function<CstlUser, Response>() {
                     @Override
-                    public Response apply(DomainUser domainUser) {
+                    public Response apply(CstlUser domainUser) {
                         return Response.ok(domainUser).build();
                     }
                 }).or(Response.status(404).build());

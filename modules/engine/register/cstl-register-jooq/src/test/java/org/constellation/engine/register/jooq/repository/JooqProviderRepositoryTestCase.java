@@ -34,10 +34,6 @@ public class JooqProviderRepositoryTestCase extends AbstractJooqTestTestCase {
         dump(providerRepository.findAll());
     }
     
-    @Test
-    public void byDomain() {
-        dump(providerRepository.getProviderIdsForDomain(1));
-    }
     
     @Test
     public void getProviderParentIdOfLayer() {

@@ -62,7 +62,7 @@ public interface IProviderBusiness {
      *
      * @deprecated : Following procedure will be removed once the new DataStoreSource system will be created.
      */
-    Provider create(int domainId, String id, ProviderConfiguration config) throws ConfigurationException;
+    Provider create(String id, ProviderConfiguration config) throws ConfigurationException;
 
     /**
      * Create and save a provider object with given identifier. Input spi and configuration must be {@link org.geotoolkit.storage.DataStoreFactory}
@@ -77,7 +77,7 @@ public interface IProviderBusiness {
      *
      * @deprecated : Following procedure will be removed once the new DataStoreSource system will be created.
      */
-    Provider create(final int domainId, final String id, final DataStoreFactory spi, ParameterValueGroup spiConfiguration) throws ConfigurationException;
+    Provider create(final String id, final DataStoreFactory spi, ParameterValueGroup spiConfiguration) throws ConfigurationException;
 
     /**
      * Create and save a provider object with given identifier. Input spi and configuration must be {@link org.constellation.provider.DataProviderFactory}
@@ -92,11 +92,11 @@ public interface IProviderBusiness {
      *
      * @deprecated : Following procedure will be removed once the new DataStoreSource system will be created.
      */
-    Provider create(final int domainId, final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException;
+    Provider create(final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException;
 
     Set<Name> test(String providerIdentifier, ProviderConfiguration configuration) throws DataStoreException, ConfigurationException;
 
-    void update(int domainId, String id, ProviderConfiguration config) throws ConfigurationException;
+    void update( String id, ProviderConfiguration config) throws ConfigurationException;
 
     Provider storeProvider(String providerId, String o, ProviderType type, String factoryName, GeneralParameterValue config) throws IOException;
 
@@ -109,8 +109,6 @@ public interface IProviderBusiness {
     void removeAll();
 
     void updateParent(String id, String providerId);
-
-    List<Integer> getProviderIdsForDomain(int domainId);
 
     List<Provider> getProviderChildren(String id);
 
@@ -125,5 +123,7 @@ public interface IProviderBusiness {
      * @return {@link DataBrief}
      */
     DataBrief createPyramidConform(final String providerId,final String dataName, final String namespace,final int userId) throws ConstellationException;
+
+	List<Integer> getProviderIdsAsInt();
 
 }

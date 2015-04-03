@@ -479,7 +479,7 @@ public class DataRest {
                 config.setType("feature-store");
                 config.setSubType(subType);
                 config.getParameters().put("path",dataFile);
-                providerBusiness.create(domainId, providerIdentifier, config);
+                providerBusiness.create(providerIdentifier, config);
 
                 //set up user metadata
                 if (importedMetaData != null && !importedMetaData.isEmpty()) {
@@ -507,7 +507,7 @@ public class DataRest {
                 config.setType("coverage-store");
                 config.setSubType("coverage-file");
                 config.getParameters().put("path",dataFile);
-                final Provider finalProvider = providerBusiness.create(domainId, providerIdentifier, config);
+                final Provider finalProvider = providerBusiness.create(providerIdentifier, config);
 
                 //set up user metadata
                 if (importedMetaData != null && !importedMetaData.isEmpty()) {
@@ -550,7 +550,7 @@ public class DataRest {
                 config.setType("observation-store");
                 config.setSubType("observation-xml");
                 config.getParameters().put("path",dataFile);
-                providerBusiness.create(domainId, providerIdentifier, config);
+                providerBusiness.create(providerIdentifier, config);
 
                 //set up user metadata
                 if (importedMetaData != null && !importedMetaData.isEmpty()) {
@@ -562,7 +562,7 @@ public class DataRest {
                 config.setType("observation-store");
                 config.setSubType("observation-file");
                 config.getParameters().put("path",dataFile);
-                providerBusiness.create(domainId, providerIdentifier, config);
+                providerBusiness.create(providerIdentifier, config);
 
                 //set up user metadata
                 if (importedMetaData != null && !importedMetaData.isEmpty()) {
@@ -669,7 +669,7 @@ public class DataRest {
                     throw new ConstellationException("Cannot save uploaded metadata because it is not recognized as a valid file!");
                 }
                 // for now we assume datasetID == providerID
-                datasetBusiness.updateMetadata(providerId, -1, metadata);
+                datasetBusiness.updateMetadata(providerId, metadata);
             } catch (ConfigurationException ex) {
                 throw new ConstellationException("Error while saving dataset metadata, " + ex.getMessage());
             }
@@ -882,9 +882,9 @@ public class DataRest {
 
                 //Save metadata
                 if (dataset) {
-                    datasetBusiness.updateMetadata(ds.getIdentifier(), -1, metadata);
+                    datasetBusiness.updateMetadata(ds.getIdentifier(), metadata);
                 } else {
-                    dataBusiness.updateMetadata(provider, dataName, -1, metadata);
+                    dataBusiness.updateMetadata(provider, dataName, metadata);
                 }
             }
         } catch (ConfigurationException ex) {
@@ -920,7 +920,7 @@ public class DataRest {
                 metadata.setDateStamp(new Date());
 
                 //Save metadata
-                datasetBusiness.updateMetadata(identifier, -1, metadata);
+                datasetBusiness.updateMetadata(identifier, metadata);
 
             }
         } catch (ConfigurationException ex) {
@@ -1803,7 +1803,7 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getTopDataList(@PathParam("domainId") int domainId, @PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
-        final List<Integer> providerIds = providerBusiness.getProviderIdsForDomain(domainId);
+        final List<Integer> providerIds = providerBusiness.getProviderIdsAsInt();
         for (final Integer providerId : providerIds) {
             final Provider provider = providerBusiness.getProvider(providerId);
             final String parent = provider.getParent();
@@ -1855,7 +1855,7 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getPublishedDataList(@PathParam("domainId") int domainId, @PathParam("published") boolean published) {
         final List<DataBrief> briefs = new ArrayList<>();
-        final List<Integer> providerIds = providerBusiness.getProviderIdsForDomain(domainId);
+        final List<Integer> providerIds = providerBusiness.getProviderIdsAsInt();
         for (final Integer providerId : providerIds) {
             final Provider provider = providerBusiness.getProvider(providerId);
             final String parent = provider.getParent();
@@ -1918,7 +1918,7 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getSensorableDataList(@PathParam("domainId") int domainId, @PathParam("sensorable") boolean sensorable) {
         final List<DataBrief> briefs = new ArrayList<>();
-        final List<Integer> providerIds = providerBusiness.getProviderIdsForDomain(domainId);
+        final List<Integer> providerIds = providerBusiness.getProviderIdsAsInt();
         for (final Integer providerId : providerIds) {
             final Provider provider = providerBusiness.getProvider(providerId);
             final String parent = provider.getParent();

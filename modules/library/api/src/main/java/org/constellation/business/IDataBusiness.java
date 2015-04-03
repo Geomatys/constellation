@@ -200,22 +200,6 @@ public interface IDataBusiness {
     Provider getProvider(int dataId);
 
     /**
-     * Proceed to add a data domain.
-     * @param dataId given data Id.
-     * @param domainId given domain Id.
-     */
-    void addDataToDomain(int dataId, int domainId);
-
-    /**
-     * proceed to remove data from domain.
-     * synchronized method.
-     * @param dataId given data id.
-     * @param domainId given domain id.
-     * @throws CstlConfigurationRuntimeException
-     */
-    void removeDataFromDomain(int dataId, int domainId) throws CstlConfigurationRuntimeException;
-
-    /**
      * Returns a list of {@link DataBrief} for given dataSet id.
      *
      * @param datasetId the given dataSet id.
@@ -249,7 +233,7 @@ public interface IDataBusiness {
      */
     List<Data> findByDatasetId(final Integer datasetId);
 
-    void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException;
+    void updateMetadata(String providerId, QName dataName, DefaultMetadata metadata) throws ConfigurationException;
 
     String getTemplate(final QName dataName, final String dataType) throws ConfigurationException;
 

@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +32,6 @@ public class JooqServicesRepositoryTestCase extends AbstractJooqTestTestCase {
     @Autowired
     private ServiceRepository serviceRepository;
     
-    @Autowired
-    private DomainRepository domainRepository;
     
     @Test
     public void all() {
@@ -63,10 +60,6 @@ public class JooqServicesRepositoryTestCase extends AbstractJooqTestTestCase {
         dump(serviceRepository.getAccessiblesServicesByType(1, "looo"));
     }
     
-    @Test
-    public void findByDomain() {
-        dump(serviceRepository.findByDomain(1));
-    }
     
     @Test
     public void save() {

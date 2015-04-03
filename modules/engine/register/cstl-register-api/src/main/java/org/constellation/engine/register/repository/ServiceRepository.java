@@ -19,11 +19,9 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
@@ -38,11 +36,7 @@ public interface ServiceRepository {
     Service findById(int id);
     
     List<Service> findByDataId(int dataId);
-    
-    List<Service> findByDomain(int domainId);
-
-    List<Service> findByDomainAndType(int domainId, String type);
-    
+        
     List<Service> findByType(String type);
     
     Service findByIdentifierAndType(String id, String type);
@@ -68,8 +62,6 @@ public interface ServiceRepository {
     Service updateConfig(Service service);
 
     void updateExtraFile(Service service, String fileName, String config);
-
-    Map<Domain, Boolean> getLinkedDomains(int serviceId);
 
     Service findByMetadataId(String metadataId);
 

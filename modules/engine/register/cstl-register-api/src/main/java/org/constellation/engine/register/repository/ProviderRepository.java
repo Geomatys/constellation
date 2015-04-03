@@ -38,8 +38,6 @@ public interface ProviderRepository {
 
     public Provider findByIdentifierAndType(String providerIdentifier, String type);
 
-    public List<Integer> getProviderIdsForDomain(int activeDomainId);
-
     public Provider getProviderParentIdOfLayer(String serviceType, String serviceId, String layerid);
 
     public Provider insert(Provider newProvider);

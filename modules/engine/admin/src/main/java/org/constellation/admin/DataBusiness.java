@@ -60,7 +60,6 @@ import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDataCoverageJob;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.StyleBrief;
@@ -68,18 +67,18 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.ParameterValues;
+import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.jooq.tables.pojos.Layer;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -113,8 +112,6 @@ import org.xml.sax.SAXException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
-import org.constellation.engine.register.MetadataComplete;
-import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 
 
 /**
@@ -138,11 +135,6 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Inject
     private UserRepository userRepository;
-    /**
-     * Injected domain repository.
-     */
-    @Inject
-    private DomainRepository domainRepository;
     /**
      * Injected data repository.
      */
@@ -683,7 +675,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             // update internal CSW index
             Metadata metadata = metadataRepository.findByDataId(data.getId());
             if (metadata != null) {
-                updateInternalCSWIndex(metadata.getMetadataId(), 1, false); // TODO DOMAIN ID
+                updateInternalCSWIndex(metadata.getMetadataId(), false); // TODO DOMAIN ID
             }
         }
     }
@@ -691,25 +683,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     /**
      * {@inheritDoc}
      */
-    @Override
-    @Transactional
-    public void addDataToDomain(final int dataId, final int domainId) {
-        domainRepository.addDataToDomain(dataId, domainId);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public synchronized void removeDataFromDomain(final int dataId,
-                                                  final int domainId)throws CstlConfigurationRuntimeException {
-        final List<Domain> findByLinkedService = domainRepository.findByLinkedData(dataId);
-        if (findByLinkedService.size() == 1) {
-            throw new CstlConfigurationRuntimeException("Could not unlink last domain from a data").withErrorCode("error.data.lastdomain");
-        }
-        domainRepository.removeDataFromDomain(dataId, domainId);
-    }
 
     /**
      * {@inheritDoc}
@@ -758,7 +732,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
 
     @Override
     @Transactional
-    public void updateMetadata(String providerId, QName dataName, Integer domainId, DefaultMetadata metadata) throws ConfigurationException {
+    public void updateMetadata(String providerId, QName dataName, DefaultMetadata metadata) throws ConfigurationException {
         final String metadataString = marshallMetadata(metadata);
         
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
@@ -819,7 +793,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
             // update internal CSW index
-            updateInternalCSWIndex(metadata.getFileIdentifier(), domainId, true);
+            updateInternalCSWIndex(metadata.getFileIdentifier(), true);
         } else {
             throw new TargetNotFoundException("Data :" + dataName + " in provider:" + providerId +  " not found");
         }

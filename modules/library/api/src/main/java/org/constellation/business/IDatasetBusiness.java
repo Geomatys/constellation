@@ -41,7 +41,7 @@ public interface IDatasetBusiness {
 
     Dataset getDataset(String datasetId, int domainId);
 
-    void updateMetadata(final String datasetIdentifier, final Integer domainId,
+    void updateMetadata(final String datasetIdentifier,
                         final DefaultMetadata metadata) throws ConfigurationException;
 
     DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException;

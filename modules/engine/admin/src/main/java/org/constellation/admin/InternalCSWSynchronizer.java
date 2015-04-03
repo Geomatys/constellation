@@ -46,9 +46,9 @@ public class InternalCSWSynchronizer {
     @Inject
     protected ServiceRepository serviceRepository;
     
-    protected void updateInternalCSWIndex(final String metadataID, final int domainId, final boolean update) throws ConfigurationException {
+    protected void updateInternalCSWIndex(final String metadataID, final boolean update) throws ConfigurationException {
         try {
-            final List<Service> services = serviceRepository.findByDomainAndType(domainId, "csw");
+            final List<Service> services = serviceRepository.findByType("csw");
             for (Service service : services) {
             
                 final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();

@@ -1,6 +1,6 @@
 package org.constellation.coverage.process;
 
-import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.DOMAIN;
+
 import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.IN_COVERAGE_REF;
 import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.ORIGINAL_DATA;
 import static org.constellation.coverage.process.AbstractPyramidCoverageDescriptor.PROVIDER_OUT_ID;
@@ -25,8 +25,6 @@ import org.constellation.business.IDataBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
@@ -68,10 +66,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
  * @author Quentin Boileau (Geomatys)
  */
 public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess {
-    
-    @Autowired
-    private DomainRepository domainRepository;
-    
+        
     @Autowired
     protected IDataBusiness dataBusiness;
 
@@ -87,14 +82,13 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
     }
 
     protected static void fillParameters(CoverageReference inCoverageRef, Data orinigalData, String pyramidName,
-                                         String providerID, File pyramidFolder, Domain domain, Dataset dataset,
+                                         String providerID, File pyramidFolder, Dataset dataset,
                                          CoordinateReferenceSystem[] pyramidCRS, Boolean update, ParameterValueGroup params) {
         getOrCreate(IN_COVERAGE_REF, params).setValue(inCoverageRef);
         getOrCreate(ORIGINAL_DATA, params).setValue(orinigalData);
         getOrCreate(PYRAMID_NAME, params).setValue(pyramidName);
         getOrCreate(PROVIDER_OUT_ID, params).setValue(providerID);
         getOrCreate(PYRAMID_FOLDER, params).setValue(pyramidFolder);
-        getOrCreate(DOMAIN, params).setValue(domain);
         getOrCreate(PYRAMID_DATASET, params).setValue(dataset);
         getOrCreate(PYRAMID_CRS, params).setValue(pyramidCRS);
         getOrCreate(UPDATE, params).setValue(update);
@@ -227,7 +221,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
      * @return new provider
      * @throws ProcessException
      */
-    protected DataProvider createProvider(final String providerID, CoverageStore store, final Integer domainId,
+    protected DataProvider createProvider(final String providerID, CoverageStore store,
                                           final Integer datasetId) throws ProcessException {
         final DataProvider outProvider;
         try {
@@ -249,15 +243,6 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue(namespace);
             outProvider = DataProviders.getInstance().createProvider(providerID, factory, pparams, datasetId);
 
-            if (domainId != null) {
-                SpringHelper.executeInTransaction(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                        int count = domainRepository.addProviderDataToDomain(providerID, domainId);
-                        LOGGER.info("Added " + count + " data to domain " + domainId);
-                    }
-                });
-            }
 
         } catch (Exception ex) {
             throw new ProcessException("Failed to create pyramid provider "+ex.getMessage(), this, ex);

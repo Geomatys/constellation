@@ -18,16 +18,18 @@
  */
 package org.constellation.process.provider;
 
+import static org.constellation.process.provider.CreateProviderDescriptor.PROVIDER_TYPE;
+import static org.constellation.process.provider.CreateProviderDescriptor.SOURCE;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import static org.geotoolkit.parameter.Parameters.value;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
-import static org.constellation.process.provider.CreateProviderDescriptor.DOMAIN_ID;
-import static org.constellation.process.provider.CreateProviderDescriptor.PROVIDER_TYPE;
-import static org.constellation.process.provider.CreateProviderDescriptor.SOURCE;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
@@ -36,15 +38,10 @@ import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import org.constellation.provider.StyleProviders;
-
-import static org.geotoolkit.parameter.Parameters.getOrCreate;
-import static org.geotoolkit.parameter.Parameters.value;
-
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -52,8 +49,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Quentin Boileau (Geomatys).
  */
 public final class CreateProvider extends AbstractCstlProcess {
-    @Autowired
-    private DomainRepository domainRepository;
 
     public CreateProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
@@ -82,7 +77,6 @@ public final class CreateProvider extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
         final String providerType        = value(PROVIDER_TYPE, inputParameters);
         final ParameterValueGroup source = value(SOURCE, inputParameters);
-        final Integer domainId           = value(DOMAIN_ID, inputParameters);
 
         //initialize list of available Provider services
         final Map<String, ProviderFactory> services = new HashMap<>();
@@ -123,10 +117,6 @@ public final class CreateProvider extends AbstractCstlProcess {
                         }
                     }else {
                         DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source, null);
-                    }
-                    if (domainId != null) {
-                        int count = domainRepository.addProviderDataToDomain(id, domainId );
-                        LOGGER.info("Added " + count + " data to domain " + domainId);
                     }
                 } catch (ConfigurationException ex) {
                     throw new ProcessException("Failed to create provider : " + id+"  "+ex.getMessage(), this, ex);

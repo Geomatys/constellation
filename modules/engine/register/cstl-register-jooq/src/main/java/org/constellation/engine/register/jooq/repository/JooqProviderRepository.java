@@ -19,7 +19,6 @@
 package org.constellation.engine.register.jooq.repository;
 
 import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.LAYER;
 import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import static org.constellation.engine.register.jooq.Tables.SERVICE;
@@ -28,7 +27,6 @@ import static org.constellation.engine.register.jooq.Tables.STYLE;
 import java.util.List;
 
 import org.constellation.engine.register.jooq.tables.Data;
-import org.constellation.engine.register.jooq.tables.DataXDomain;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.jooq.tables.records.ProviderRecord;
@@ -45,8 +43,6 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     private org.constellation.engine.register.jooq.tables.Provider provider = PROVIDER.as("p");
 
     private Data data = DATA.as("d");
-
-    private DataXDomain dXd = DATA_X_DOMAIN.as("dXd");
 
     public JooqProviderRepository() {
         super(Provider.class, PROVIDER);
@@ -75,12 +71,6 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     @Override
     public Provider findByIdentifierAndType(String providerIdentifier, String type) {
         return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier)).and(PROVIDER.TYPE.eq(type)).fetchOneInto(Provider.class);
-    }
-
-    @Override
-    public List<Integer> getProviderIdsForDomain(int domainId) {
-        return dsl.selectDistinct(provider.ID).from(provider).join(data).on(provider.ID.eq(data.PROVIDER))
-                .join(dXd).on(data.ID.eq(dXd.DATA_ID)).where(dXd.DOMAIN_ID.eq(domainId)).fetch(provider.ID);
     }
 
     @Override

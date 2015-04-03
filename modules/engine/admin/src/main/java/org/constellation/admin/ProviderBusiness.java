@@ -43,11 +43,9 @@ import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.CoverageData;
-import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
@@ -123,9 +121,6 @@ public class ProviderBusiness implements IProviderBusiness {
     private UserRepository userRepository;
 
     @Inject
-    private DomainRepository domainRepository;
-
-    @Inject
     private ProviderRepository providerRepository;
 
     @Inject
@@ -195,10 +190,6 @@ public class ProviderBusiness implements IProviderBusiness {
         return providerRepository.findChildren(identifier);
     }
 
-    @Override
-    public List<Integer> getProviderIdsForDomain(int domainId) {
-        return providerRepository.getProviderIdsForDomain(domainId);
-    }
 
     @Override
     public List<org.constellation.engine.register.jooq.tables.pojos.Data> getDatasFromProviderId(Integer id) {
@@ -258,7 +249,7 @@ public class ProviderBusiness implements IProviderBusiness {
      */
     @Override
     @Transactional
-    public Provider create(final int domainId, final String id, final DataStoreFactory spi, ParameterValueGroup spiConfiguration) throws ConfigurationException {
+    public Provider create(final String id, final DataStoreFactory spi, ParameterValueGroup spiConfiguration) throws ConfigurationException {
         if (getProvider(id) != null) {
             throw new ConfigurationException("A provider already exists for name "+id);
         }
@@ -283,7 +274,7 @@ public class ProviderBusiness implements IProviderBusiness {
                 providerConfig.groups("choice").get(0).addGroup(spiConfiguration.getDescriptor().getName().getCode());
         Parameters.copy(spiConfiguration, choice);
 
-        return create(domainId, id, pFactory.getName(), providerConfig);
+        return create(id, pFactory.getName(), providerConfig);
     }
 
     /**
@@ -291,7 +282,7 @@ public class ProviderBusiness implements IProviderBusiness {
      */
     @Override
     @Transactional
-    public Provider create(final int domainId, final String id, final ProviderConfiguration config) throws ConfigurationException {
+    public Provider create(final String id, final ProviderConfiguration config) throws ConfigurationException {
         final String type = config.getType();
         final String subType = config.getSubType();
         final Map<String,String> inParams = config.getParameters();
@@ -302,7 +293,7 @@ public class ProviderBusiness implements IProviderBusiness {
         sources.parameter("id").setValue(id);
         sources.parameter("providerType").setValue(type);
         sources = fillProviderParameter(type, subType, inParams, sources);
-        return create(domainId, id, providerService.getName(), sources);
+        return create(id, providerService.getName(), sources);
     }
 
     /**
@@ -310,20 +301,18 @@ public class ProviderBusiness implements IProviderBusiness {
      */
     @Override
     @Transactional
-    public Provider create(final int domainId, final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException {
+    public Provider create(final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException {
         final DataProviderFactory providerSPI = DataProviders.getInstance().getFactory(providerSPIName);
         /////
         // WARNING : createProvider() will create provider, data list and dataset records in repositories.
         /////
         DataProviders.getInstance().createProvider(id, providerSPI, providerConfig, null);
-        final int count = domainRepository.addProviderDataToDomain(id, domainId);
-        LOGGER.info("Added " + count + " data to domain " + domainId);
         return getProvider(id);
     }
 
     @Override
     @Transactional
-    public void update(final int domainId, final String id, final ProviderConfiguration config) throws ConfigurationException {
+    public void update(final String id, final ProviderConfiguration config) throws ConfigurationException {
         final String type = config.getType();
         final String subType = config.getSubType();
         final Map<String, String> inParams = config.getParameters();
@@ -764,4 +753,15 @@ public class ProviderBusiness implements IProviderBusiness {
         }
         return result;
     }
+
+	@Override
+	public List<Integer> getProviderIdsAsInt() {
+	        final List<Integer> ids = new ArrayList<>();
+	        final List<Provider> providers = providerRepository.findAll();
+	        for (Provider p : providers) {
+	            ids.add(p.getId());
+	        }
+	        return ids;
+	    
+	}
 }

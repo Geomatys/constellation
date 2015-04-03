@@ -87,13 +87,9 @@ public interface IServiceBusiness {
 
     Instance getI18nInstance(String serviceType, String identifier, String lang);
 
-    List<ServiceDTO> getAllServicesByDomainId(int domainId, String lang) throws ConfigurationException;
+    List<ServiceDTO> getAllServices(String lang) throws ConfigurationException;
 
-    List<ServiceDTO> getAllServicesByDomainIdAndType(int domainId, String lang, String type) throws ConfigurationException;
-
-    void addServiceToDomain(int serviceId, int domainId);
-
-    void removeServiceFromDomain(int serviceId, int domainId);
+    List<ServiceDTO> getAllServicesByType(String lang, String type) throws ConfigurationException;
 
     void setInstanceDetails(String serviceType, String identifier, Details details, String language,
                             boolean default_) throws ConfigurationException;

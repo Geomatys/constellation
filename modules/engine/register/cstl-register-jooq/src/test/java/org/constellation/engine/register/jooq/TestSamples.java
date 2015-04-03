@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 
 public class TestSamples {
@@ -25,9 +24,6 @@ public class TestSamples {
         return user;
     }
 
-    public static Domain newDomain() {
-        return new Domain(1, "Domain1", "Test domain", false);
-    }
     
     
     public static Data newData(CstlUser owner, Provider provider) {

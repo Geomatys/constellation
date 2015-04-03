@@ -26,20 +26,17 @@ import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Details;
 import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
 import org.constellation.engine.register.jooq.tables.pojos.ServiceExtraConfig;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.UserRepository;
@@ -66,9 +63,6 @@ public class ServiceBusiness implements IServiceBusiness {
 
     @Inject
     private UserRepository userRepository;
-
-    @Inject
-    private DomainRepository domainRepository;
 
     @Inject
     private ServiceRepository serviceRepository;
@@ -153,9 +147,6 @@ public class ServiceBusiness implements IServiceBusiness {
         service.setVersions(versions);
 
         int serviceId = serviceRepository.create(service);
-        if (domainId != null) {
-            domainRepository.addServiceToDomain(serviceId, domainId);
-        }
         setInstanceDetails(serviceType, identifier, details, details.getLang(), true);
         return configuration;
     }
@@ -691,28 +682,12 @@ public class ServiceBusiness implements IServiceBusiness {
         return null;
     }
 
-    // Domain links
-    @Override
-    @Transactional
-    public void addServiceToDomain(int serviceId, int domainId) {
-        domainRepository.addServiceToDomain(serviceId, domainId);
-    }
+
 
     @Override
-    @Transactional
-    public synchronized void removeServiceFromDomain(int serviceId, int domainId) {
-        List<Domain> findByLinkedService = domainRepository.findByLinkedService(serviceId);
-        if (findByLinkedService.size() == 1) {
-            throw new CstlConfigurationRuntimeException("Could not unlink last domain from a service")
-                    .withErrorCode("error.service.lastdomain");
-        }
-        domainRepository.removeServiceFromDomain(serviceId, domainId);
-    }
-
-    @Override
-    public List<ServiceDTO> getAllServicesByDomainId(int domainId, String lang) throws ConfigurationException {
+    public List<ServiceDTO> getAllServices(String lang) throws ConfigurationException {
         List<ServiceDTO> serviceDTOs = new ArrayList<>();
-        List<Service> services = serviceRepository.findByDomain(domainId);
+        List<Service> services = serviceRepository.findAll();
         for (Service service : services) {
             final Details details = getInstanceDetails(service.getId(), lang);
             final ServiceDTO serviceDTO = convertIntoServiceDto(service, details);
@@ -722,9 +697,9 @@ public class ServiceBusiness implements IServiceBusiness {
     }
 
     @Override
-    public List<ServiceDTO> getAllServicesByDomainIdAndType(int domainId, String lang, String type) throws ConfigurationException {
+    public List<ServiceDTO> getAllServicesByType(String lang, String type) throws ConfigurationException {
         List<ServiceDTO> serviceDTOs = new ArrayList<>();
-        List<Service> services = serviceRepository.findByDomainAndType(domainId, type);
+        List<Service> services = serviceRepository.findByType(type);
         for (Service service : services) {
             final Details details = getInstanceDetails(service.getId(), lang);
             final ServiceDTO serviceDTO = convertIntoServiceDto(service, details);

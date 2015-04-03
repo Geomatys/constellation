@@ -62,7 +62,7 @@ public class ProviderBusinessTest implements ApplicationContextAware {
         final ParameterValueGroup config = cvgFactory.getParametersDescriptor().createValue();
         final URL dataPath = new URL("file:/path/to/anything");
         config.parameter(FileCoverageStoreFactory.PATH.getName().getCode()).setValue(dataPath);
-        Provider p = pBusiness.create(1, id, cvgFactory, config);
+        Provider p = pBusiness.create(id, cvgFactory, config);
         // TODO : Re-activate when auto-generated equals will be done.
         //Assert.assertEquals("Created provider must be equal to read one.", p, pBusiness.getProvider(id));
 
@@ -96,7 +96,7 @@ public class ProviderBusinessTest implements ApplicationContextAware {
                 providerConf.groups("choice").get(0).addGroup(config.getDescriptor().getName().getCode());
         Parameters.copy(config, choice);
 
-        Provider p = pBusiness.create(1, id, factory.getName(), providerConf);
+        Provider p = pBusiness.create(id, factory.getName(), providerConf);
         Provider read = pBusiness.getProvider(id);
         // TODO : Re-activate when auto-generated equals will be done.
         //Assert.assertEquals("Created provider must be equal to read one.", p, read);

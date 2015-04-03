@@ -47,7 +47,7 @@ public class StyledPyramidCoverageDescriptor extends AbstractPyramidCoverageDesc
 
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
             new GeneralParameterDescriptor[]{IN_COVERAGE_REF, ORIGINAL_DATA, PYRAMID_NAME, PYRAMID_FOLDER, STYLE,
-                    PROVIDER_OUT_ID, DOMAIN, PYRAMID_DATASET, PYRAMID_CRS, UPDATE});
+                    PROVIDER_OUT_ID, PYRAMID_DATASET, PYRAMID_CRS, UPDATE});
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
             new GeneralParameterDescriptor[]{OUT_PYRAMID_PROVIDER_CONF});

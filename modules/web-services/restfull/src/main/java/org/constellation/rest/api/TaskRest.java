@@ -454,7 +454,7 @@ public class TaskRest {
     @Produces({MediaType.APPLICATION_JSON})
     public Response getServiceProcessReferenceList(@PathParam("domainId") Integer domainId) throws ConfigurationException {
         final List<ServiceProcessReference> servicePRef = new ArrayList<>();
-        final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainId(domainId, null);
+        final List<ServiceDTO> services = serviceBusiness.getAllServices(null);
         if(services!=null){
             for(final ServiceDTO service : services){
                 final ServiceProcessReference ref = new ServiceProcessReference();

@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.provider.ProviderDescriptorConstant;
 import org.geotoolkit.coverage.CoverageReference;
@@ -58,8 +57,6 @@ public abstract class AbstractPyramidCoverageDescriptor extends AbstractCstlProc
 
     public static final String DOMAIN_NAME = "domain";
     private static final String DOMAIN_REMARKS = "Identifier of the domain to add data.";
-    public static final ParameterDescriptor<Domain> DOMAIN =
-            new DefaultParameterDescriptor(DOMAIN_NAME, DOMAIN_REMARKS, Domain.class, null, false);
 
     public static final String UPDATE_NAME = "update";
     private static final String UPDATE_REMARKS = "Flag that enable update of output pyramid tiles.";

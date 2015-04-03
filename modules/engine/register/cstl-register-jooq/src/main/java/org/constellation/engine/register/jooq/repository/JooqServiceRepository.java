@@ -25,13 +25,10 @@ import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
 import static org.constellation.engine.register.jooq.Tables.SERVICE;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_DETAILS;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,7 +36,6 @@ import java.util.Set;
 
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
@@ -47,13 +43,11 @@ import org.constellation.engine.register.jooq.tables.pojos.ServiceExtraConfig;
 import org.constellation.engine.register.jooq.tables.records.ServiceDetailsRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,8 +55,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord, Service> implements ServiceRepository {
 
-    @Autowired
-    private DomainRepository domainRepository;
 
     public JooqServiceRepository() {
         super(Service.class, SERVICE);
@@ -198,10 +190,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     public Map<String, Set<String>> getAccessiblesServicesByType(int domainId, String userName) {
 
         Result<Record2<String, String>> result = dsl.selectDistinct(SERVICE.IDENTIFIER, SERVICE.TYPE).from(SERVICE)
-                .join(Tables.SERVICE_X_DOMAIN).onKey().join(USER_X_DOMAIN_X_DOMAINROLE)
-                .on(Tables.SERVICE_X_DOMAIN.DOMAIN_ID.eq(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID)).join(Tables.CSTL_USER)
-                .on(Tables.CSTL_USER.ID.eq(USER_X_DOMAIN_X_DOMAINROLE.USER_ID))
-                .where(Tables.CSTL_USER.LOGIN.eq(userName).and(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))).fetch();
+                .fetch();
 
         Map<String, Set<String>> resultM = new HashMap<>();
 
@@ -237,20 +226,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         return serviceRecord.getId();
     }
 
-    @Override
-    public Map<Domain, Boolean> getLinkedDomains(int serviceId) {
-        List<Integer> domainIds = dsl.select(SERVICE_X_DOMAIN.DOMAIN_ID).from(SERVICE_X_DOMAIN)
-                .where(SERVICE_X_DOMAIN.SERVICE_ID.eq(serviceId)).fetch(SERVICE_X_DOMAIN.DOMAIN_ID);
-        Map<Domain, Boolean> result = new LinkedHashMap<>();
-        for (Domain domain : domainRepository.findByIds(domainIds)) {
-            result.put(domain, true);
-        }
-        
-        for (Domain domain : domainRepository.findByIdsNotIn(domainIds)) {
-            result.put(domain, false);
-        }
-        return result;
-    }
 
     @Override
     public Service findByMetadataId(String metadataId) {
@@ -263,18 +238,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         .fetchInto(Data.class);
     }
 
-    @Override
-    public List<Service> findByDomain(int domainId) {
-        return findBy(SERVICE.ID.in(dsl.select(Tables.SERVICE_X_DOMAIN.SERVICE_ID).from(SERVICE_X_DOMAIN)
-                .where(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId))));
-    }
 
-    @Override
-    public List<Service> findByDomainAndType(int domainId, String type) {
-        return dsl.select().from(SERVICE).join(SERVICE_X_DOMAIN).on(SERVICE_X_DOMAIN.SERVICE_ID.eq(SERVICE.ID))
-                .where(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId).and(SERVICE.TYPE.eq(type)))
-                .fetchInto(Service.class);
-    }
 
     @Override
     public Metadata getMetadata(Integer id) {

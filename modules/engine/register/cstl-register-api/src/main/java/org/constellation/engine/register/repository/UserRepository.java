@@ -19,11 +19,8 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
-import java.util.Map;
 
-import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Domainrole;
 
 import com.google.common.base.Optional;
 
@@ -32,10 +29,8 @@ public interface UserRepository {
 
     List<CstlUser> findAll();
     
-    List<DomainUser> findAllWithDomainAndRole();
     
-    List<CstlUser> findUsersByDomainId(int domainId);
-    
+
     CstlUser insert(CstlUser user, List<String> roles);
 
     /**
@@ -52,9 +47,6 @@ public interface UserRepository {
     
     int activate(int userId);
     
-    Optional<DomainUser> findOneWithRolesAndDomains(String login);
-    
-    Optional<DomainUser> findOneWithRolesAndDomains(int id);
 
     boolean isLastAdmin(int userId);
 
@@ -70,8 +62,5 @@ public interface UserRepository {
     
     boolean loginAvailable(String login);
 
-    Map<CstlUser, List<Domainrole>> findUsersWithDomainRoles(int domainId);
-
-    List<CstlUser> findUsersNotInDomain(int domainId);
     
 }

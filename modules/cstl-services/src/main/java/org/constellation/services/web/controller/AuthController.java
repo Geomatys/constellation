@@ -23,8 +23,6 @@ import javax.ws.rs.WebApplicationException;
 
 import org.constellation.auth.transfer.TokenTransfer;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Domain;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.services.component.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,8 +79,6 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private DomainRepository domainRepository;
 
     @Autowired
     @Qualifier("authenticationManager")
@@ -126,14 +122,8 @@ public class AuthController {
         Optional<CstlUser> findOne = userRepository.findOne(userDetails.getUsername());
 
         int id = findOne.get().getId();
-        Domain defaultDomain = domainRepository.findDefaultByUserId(id);
 
-        if (defaultDomain == null) {
-            // No domain associated.
-            return new ResponseEntity<TokenTransfer>(HttpStatus.FORBIDDEN);
-        }
-
-        return new ResponseEntity<TokenTransfer>(new TokenTransfer(createToken, id, defaultDomain.getId()), HttpStatus.OK);
+        return new ResponseEntity<TokenTransfer>(new TokenTransfer(createToken, id), HttpStatus.OK);
     }
 
    

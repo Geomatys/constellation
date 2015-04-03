@@ -126,7 +126,7 @@ public class ProviderRest {
     @Path("/{id}")
     public Response update(final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration config) {
         try {
-            providerBusiness.update(domainId, id, config);
+            providerBusiness.update(id, config);
         }catch(ConfigurationException ex){
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.status(500).entity(ex.getMessage()).build();
@@ -141,7 +141,7 @@ public class ProviderRest {
     @Path("/{id}")
     public Response create(final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration config) {
         try {
-            providerBusiness.create(domainId, id, config);
+            providerBusiness.create(id, config);
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity(ex.getLocalizedMessage()).build();
@@ -438,7 +438,7 @@ public class ProviderRest {
     public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) {
         // for now assume that providerID == datasetID
         try {
-            datasetBusiness.updateMetadata(providerId, domainId, metadata);
+            datasetBusiness.updateMetadata(providerId, metadata);
             return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         } catch (ConfigurationException e) {
             LOGGER.log(Level.WARNING, "Cannot update metadata for provider "+providerId+" for domain "+domainId, e);
