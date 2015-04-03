@@ -123,6 +123,18 @@
                 </div>
             </div>
             <div class="col-sm-6">
+                <form id="gsSourceForm">
+                    <fieldset>
+                        <div class="form-group">
+                            <label class="control-label" translate="service.config.source.partial">Partial data</label>
+                            <input type="checkbox" class="form-control" ng-model="source.automatic.customparameters[0].entry.value">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" translate="service.config.source.onlyPublished">Only published</label>
+                            <input type="checkbox" class="form-control" ng-model="source.automatic.customparameters[1].entry.value">
+                        </div>
+                    </fieldset>
+                </form>
             </div>
         </div>
 

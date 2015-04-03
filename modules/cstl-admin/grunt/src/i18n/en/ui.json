@@ -659,6 +659,8 @@
     "service.config.source.internal.title": "Internal (SGBDR)",
     "service.config.source.sos.title":"Sensors (SOS)",
     "service.config.source.transactional": "Transactional",
+    "service.config.source.partial": "Partial data",
+    "service.config.source.onlyPublished": "Only published data",
     "service.create.end.addlayers.label": "Add layers on service",
     "service.create.end.addmetadata.label": "View metadata on service",
     "service.create.end.description.label": "Service description",

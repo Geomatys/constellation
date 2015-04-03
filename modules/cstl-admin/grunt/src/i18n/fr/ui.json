@@ -770,6 +770,8 @@
     "service.config.source.internal.title": "Interne (SGBDR)",
     "service.config.source.sos.title":"Données de capteurs (SOS)",
     "service.config.source.transactional": "Transactionnel",
+    "service.config.source.partial": "Données partielles",
+    "service.config.source.onlyPublished": "Seulement les fiches publiées",
     "service.create.end.addlayers.label": "Ajouter des couches au service",
     "service.create.end.addmetadata.label": "Voir les métadonnées",
     "service.create.end.description.label": "Description du service",
