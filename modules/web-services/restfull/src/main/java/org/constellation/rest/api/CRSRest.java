@@ -84,7 +84,6 @@ public class CRSRest {
      * @return a list of {@link org.constellation.admin.dto.CoordinateReferenceSystemDTO}
      */
     @GET
-    @Path("/")
     @Produces("application/json")
     public Response getAllEPSG() {
         try {
