@@ -50,20 +50,16 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         UserDetails userDetails = userDetailsExtractor.userDetails(httpRequest);
 
         if (userDetails == null) {
-            if(unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
-                return;
+            if( ! unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
+                getAsHttpResponse(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
+            return;
         }
         
         try {
-
-            if (userDetails != null) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-                        userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(request, response);
         } finally {
             SecurityContextHolder.getContext().setAuthentication(null);

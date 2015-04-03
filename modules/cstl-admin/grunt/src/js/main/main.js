@@ -72,8 +72,6 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
             TokenService.renew();
         });
 
-        TokenService.renew();
-
         $http.get("app/conf").success(function(data){
             $scope.logout = function(){
               $http.delete('@cstl/spring/auth/logout').then(function() {

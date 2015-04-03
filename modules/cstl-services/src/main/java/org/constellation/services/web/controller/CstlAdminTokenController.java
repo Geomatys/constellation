@@ -38,7 +38,6 @@ public class CstlAdminTokenController {
     public void logout(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         HttpSession session = request.getSession(false);
         if(session != null) {
-            LOGGER.warn("Session ?");
             session.invalidate();
         }
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);

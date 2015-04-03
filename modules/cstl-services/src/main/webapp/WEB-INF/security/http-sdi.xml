@@ -14,20 +14,20 @@
   
   <http pattern="/api/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
     <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
-    <intercept-url pattern="/api/user/authenticate" access="permitAll()" />
+    <!--<intercept-url pattern="/api/user/authenticate" access="permitAll()" />-->
     <intercept-url pattern="/api/**" access="isAuthenticated()" />
   </http>
-  
-  
-  
-  <http pattern="/spring/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false"
-    entry-point-ref="unauthorizedEntryPoint">
-    <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
-    <intercept-url pattern="/spring/auth/**" access="isAuthenticated()" />
-    <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
+
+  <http pattern="/spring/auth/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false"
+          entry-point-ref="unauthorizedEntryPoint">
+        <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
+        <intercept-url pattern="/spring/auth/**" access="isAuthenticated()" />
+        <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
   </http>
 
-  <http pattern="/sql.jsp" create-session="never" use-expressions="true" entry-point-ref="unauthorizedEntryPoint" auto-config="false">
+
+
+    <http pattern="/sql.jsp" create-session="never" use-expressions="true" entry-point-ref="unauthorizedEntryPoint" auto-config="false">
     <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
     <intercept-url pattern="/sql.jsp" access="hasRole('cstl-admin')" />
     <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
