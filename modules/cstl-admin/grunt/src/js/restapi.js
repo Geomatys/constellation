@@ -192,7 +192,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             exportMetadata:     {method: 'POST',    url: '@cstl/api/1/metadata/exportMetadata'},
             changeOwner:        {method: 'POST',    url: '@cstl/api/1/metadata/changeOwner/:ownerId'},
             changeValidation:   {method: 'POST',    url: '@cstl/api/1/metadata/changeValidation/:isvalid'},
-            changePublication:  {method: 'POST',    url: '@cstl/api/1/metadata/changePublication/:ispublished'}
+            changePublication:  {method: 'POST',    url: '@cstl/api/1/metadata/changePublication/:ispublished'},
+            getMetadataJson :   {method: 'GET',     url: '@cstl/api/1/metadata/metadataJson/iso/:metadataId/:prune'}
         });
     })
 

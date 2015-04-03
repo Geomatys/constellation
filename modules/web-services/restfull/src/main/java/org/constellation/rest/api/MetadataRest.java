@@ -434,7 +434,7 @@ public class MetadataRest {
     }
 
     @GET
-    @Path("metadataJson/iso/{metadataId}/{prune}")
+    @Path("/metadataJson/iso/{metadataId}/{prune}")
     public Response getIsoMetadataJson(final @PathParam("metadataId") int metadataId,
                                        final @PathParam("prune") boolean prune) {
         final StringWriter buffer = new StringWriter();
