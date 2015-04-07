@@ -34,6 +34,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.constellation.engine.register.UserWithRole;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.repository.UserRepository;
 import org.slf4j.Logger;
@@ -84,10 +85,11 @@ public class SessionRest {
             LOGGER.warn(builder.toString());
             return Response.status(401).build();
         }
-        return userRepository.findOne(userPrincipal.getName())
-                .transform(new Function<CstlUser, Response>() {
+        return userRepository.findOneWithRole(userPrincipal.getName())
+                .transform(new Function<UserWithRole, Response>() {
                     @Override
-                    public Response apply(CstlUser domainUser) {
+                    public Response apply(UserWithRole domainUser) {
+                    	domainUser.setPassword("*******");
                         return Response.ok(domainUser).build();
                     }
                 }).or(Response.status(404).build());

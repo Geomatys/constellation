@@ -34,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.engine.register.UserWithRole;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.repository.UserRepository;
 import org.geotoolkit.util.StringUtilities;

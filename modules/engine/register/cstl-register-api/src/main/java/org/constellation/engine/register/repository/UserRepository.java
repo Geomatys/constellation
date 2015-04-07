@@ -20,6 +20,7 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 
+import org.constellation.engine.register.UserWithRole;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 
 import com.google.common.base.Optional;
@@ -61,6 +62,10 @@ public interface UserRepository {
     int countUser();
     
     boolean loginAvailable(String login);
+
+
+
+    Optional<UserWithRole> findOneWithRole(String name);
 
     
 }

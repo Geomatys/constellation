@@ -22,8 +22,11 @@ import static org.constellation.engine.register.jooq.Tables.CSTL_USER;
 import static org.constellation.engine.register.jooq.Tables.USER_X_ROLE;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.constellation.engine.register.UserWithRole;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.records.CstlUserRecord;
@@ -31,7 +34,9 @@ import org.constellation.engine.register.jooq.tables.records.UserXRoleRecord;
 import org.constellation.engine.register.repository.UserRepository;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertSetMoreStep;
+import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Result;
 import org.jooq.UpdateConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,129 +47,173 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Optional;
 
 @Component("cstlUserRepository")
-public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, CstlUser> implements UserRepository {
+public class JooqUserRepository extends
+		AbstractJooqRespository<CstlUserRecord, CstlUser> implements
+		UserRepository {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles
+			.lookup().lookupClass());
 
+	public JooqUserRepository() {
+		super(CstlUser.class, CSTL_USER);
+	}
 
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public CstlUser update(CstlUser user, List<String> roles) {
 
-    public JooqUserRepository() {
-        super(CstlUser.class, CSTL_USER);
-    }
+		UpdateConditionStep<CstlUserRecord> update = dsl.update(CSTL_USER)
+				.set(CSTL_USER.EMAIL, user.getEmail())
+				.set(CSTL_USER.LASTNAME, user.getLastname())
+				.set(CSTL_USER.FIRSTNAME, user.getFirstname())
+				.where(CSTL_USER.LOGIN.eq(user.getLogin()));
 
-    @Override
-    @Transactional(propagation = Propagation.MANDATORY)
-    public CstlUser update(CstlUser user, List<String> roles) {
+		update.execute();
 
-        UpdateConditionStep<CstlUserRecord> update = dsl.update(CSTL_USER).set(CSTL_USER.EMAIL, user.getEmail())
-                .set(CSTL_USER.LASTNAME, user.getLastname()).set(CSTL_USER.FIRSTNAME, user.getFirstname())
-                .where(CSTL_USER.LOGIN.eq(user.getLogin()));
+		DeleteConditionStep<UserXRoleRecord> deleteRoles = dsl.delete(
+				USER_X_ROLE).where(USER_X_ROLE.USER_ID.eq(user.getId()));
 
-        update.execute();
+		deleteRoles.execute();
 
-        DeleteConditionStep<UserXRoleRecord> deleteRoles = dsl.delete(USER_X_ROLE).where(USER_X_ROLE.USER_ID.eq(user.getId()));
+		insertRoles(user, roles);
 
-        deleteRoles.execute();
+		return user;
+	}
 
-        insertRoles(user, roles);
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public CstlUser insert(CstlUser user, List<String> roles) {
 
-        return user;
-    }
+		user.setActive(true);
+		CstlUserRecord newRecord = dsl.newRecord(CSTL_USER);
 
-    @Override
-    @Transactional(propagation = Propagation.MANDATORY)
-    public CstlUser insert(CstlUser user, List<String> roles) {
+		newRecord.from(user);
 
-        user.setActive(true);
-        CstlUserRecord newRecord = dsl.newRecord(CSTL_USER);
+		if (newRecord.store() > 0) {
+			user.setId(newRecord.getId());
+		}
 
-        newRecord.from(user);
+		insertRoles(user, roles);
 
-        if (newRecord.store() > 0) {
-            user.setId(newRecord.getId());
-        }
+		return user;
+	}
 
-        insertRoles(user, roles);
+	private void insertRoles(CstlUser user, List<String> roles) {
+		for (String role : roles) {
+			InsertSetMoreStep<UserXRoleRecord> insertRole = dsl
+					.insertInto(USER_X_ROLE)
+					.set(USER_X_ROLE.USER_ID, user.getId())
+					.set(USER_X_ROLE.ROLE, role);
+			insertRole.execute();
+		}
+	}
 
-        return user;
-    }
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public int delete(int userId) {
+		int deleteRole = deleteRole(userId);
 
-    private void insertRoles(CstlUser user, List<String> roles) {
-        for (String role : roles) {
-            InsertSetMoreStep<UserXRoleRecord> insertRole = dsl.insertInto(USER_X_ROLE).set(USER_X_ROLE.USER_ID, user.getId())
-                    .set(USER_X_ROLE.ROLE, role);
-            insertRole.execute();
-        }
-    }
+		LOGGER.debug("Delete " + deleteRole + " role references");
 
-    @Override
-    @Transactional(propagation = Propagation.MANDATORY)
-    public int delete(int userId) {
-        int deleteRole = deleteRole(userId);
+		return dsl.delete(CSTL_USER).where(CSTL_USER.ID.eq(userId)).execute();
 
+	}
 
-        LOGGER.debug("Delete " + deleteRole + " role references");
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public int desactivate(int userId) {
+		return dsl.update(Tables.CSTL_USER).set(CSTL_USER.ACTIVE, false)
+				.where(CSTL_USER.ID.eq(userId)).execute();
+	}
 
-        return dsl.delete(CSTL_USER).where(CSTL_USER.ID.eq(userId)).execute();
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public int activate(int userId) {
+		return dsl.update(Tables.CSTL_USER).set(CSTL_USER.ACTIVE, true)
+				.where(CSTL_USER.ID.eq(userId)).execute();
+	}
 
-    }
+	private int deleteRole(int userId) {
+		return dsl.delete(USER_X_ROLE).where(USER_X_ROLE.USER_ID.eq(userId))
+				.execute();
 
-    @Override
-    @Transactional(propagation = Propagation.MANDATORY)
-    public int desactivate(int userId) {
-        return dsl.update(Tables.CSTL_USER).set(CSTL_USER.ACTIVE, false).where(CSTL_USER.ID.eq(userId)).execute();
-    }
+	}
 
-    @Override
-    @Transactional(propagation = Propagation.MANDATORY)
-    public int activate(int userId) {
-        return dsl.update(Tables.CSTL_USER).set(CSTL_USER.ACTIVE, true).where(CSTL_USER.ID.eq(userId)).execute();
-    }
+	@Override
+	public boolean isLastAdmin(int userId) {
+		Record1<Integer> where = dsl
+				.selectCount()
+				.from(CSTL_USER)
+				.join(USER_X_ROLE)
+				.onKey()
+				.where(USER_X_ROLE.ROLE.eq("cstl-admin").and(
+						CSTL_USER.ID.ne(userId))).fetchOne();
+		return where.value1() == 0;
+	}
 
-    private int deleteRole(int userId) {
-        return dsl.delete(USER_X_ROLE).where(USER_X_ROLE.USER_ID.eq(userId)).execute();
+	@Override
+	public Optional<CstlUser> findOne(String login) {
+		if (login == null)
+			return Optional.absent();
+		return Optional.fromNullable(dsl.select().from(CSTL_USER)
+				.where(CSTL_USER.LOGIN.eq(login)).fetchOneInto(CstlUser.class));
+	}
 
-    }
+	@Override
+	public Optional<CstlUser> findById(Integer id) {
+		if (id == null)
+			return Optional.absent();
+		return Optional.fromNullable(dsl.select().from(CSTL_USER)
+				.where(CSTL_USER.ID.eq(id)).fetchOneInto(CstlUser.class));
+	}
 
+	@Override
+	public List<String> getRoles(int userId) {
+		return dsl.select().from(CSTL_USER)
+				.where(USER_X_ROLE.USER_ID.eq(userId)).fetch(USER_X_ROLE.ROLE);
+	}
 
+	@Override
+	public Optional<UserWithRole> findOneWithRole(String name) {
+		Map<CstlUserRecord, Result<Record>> fetchGroups = dsl.select()
+				.from(CSTL_USER).join(Tables.USER_X_ROLE).onKey()
+				.where(CSTL_USER.LOGIN.eq(name)).fetchGroups(CSTL_USER);
 
-    @Override
-    public boolean isLastAdmin(int userId) {
-        Record1<Integer> where = dsl.selectCount().from(CSTL_USER).join(USER_X_ROLE).onKey()
-                .where(USER_X_ROLE.ROLE.eq("cstl-admin").and(CSTL_USER.ID.ne(userId))).fetchOne();
-        return where.value1() == 0;
-    }
+		if (fetchGroups.isEmpty()) {
+			return Optional.absent();
+		}
 
-    @Override
-    public Optional<CstlUser> findOne(String login) {
-        if (login == null)
-            return Optional.absent();
-        return Optional.fromNullable(dsl.select().from(CSTL_USER).where(CSTL_USER.LOGIN.eq(login)).fetchOneInto(CstlUser.class));
-    }
+		List<UserWithRole> users = mapUserWithRole(fetchGroups);
+		return Optional.of(users.get(0));
 
-    @Override
-    public Optional<CstlUser> findById(Integer id) {
-        if (id == null)
-            return Optional.absent();
-        return Optional.fromNullable(dsl.select().from(CSTL_USER).where(CSTL_USER.ID.eq(id)).fetchOneInto(CstlUser.class));
-    }
+	}
 
-    @Override
-    public List<String> getRoles(int userId) {
-        return dsl.select().from(CSTL_USER).where(USER_X_ROLE.USER_ID.eq(userId)).fetch(USER_X_ROLE.ROLE);
-    }
+	private List<UserWithRole> mapUserWithRole(
+			Map<CstlUserRecord, Result<Record>> fetchGroups) {
 
-    @Override
-    public int countUser() {
-        return dsl.selectCount().from(CSTL_USER).fetchOne(0, int.class);
-    }
+		List<UserWithRole> ret = new ArrayList<>();
 
-    @Override
-    public boolean loginAvailable(String login) {
-        return dsl.selectCount().from(CSTL_USER).where(CSTL_USER.LOGIN.eq(login)).fetchOne().value1() == 0;
-    }
+		for (Map.Entry<CstlUserRecord, Result<Record>> e : fetchGroups
+				.entrySet()) {
+			UserWithRole userWithRole = e.getKey().into(UserWithRole.class);
+			List<String> roles = e.getValue()
+					.getValues(Tables.USER_X_ROLE.ROLE);
+			userWithRole.setRoles(roles);
+			ret.add(userWithRole);
+		}
 
+		return ret;
+	}
 
+	@Override
+	public int countUser() {
+		return dsl.selectCount().from(CSTL_USER).fetchOne(0, int.class);
+	}
 
+	@Override
+	public boolean loginAvailable(String login) {
+		return dsl.selectCount().from(CSTL_USER)
+				.where(CSTL_USER.LOGIN.eq(login)).fetchOne().value1() == 0;
+	}
 
 }

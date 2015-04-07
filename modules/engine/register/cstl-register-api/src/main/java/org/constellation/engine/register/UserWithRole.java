@@ -1,4 +1,4 @@
-package org.constellation.rest.api;
+package org.constellation.engine.register;
 
 import java.util.List;
 
