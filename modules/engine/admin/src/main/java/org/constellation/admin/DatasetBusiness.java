@@ -68,7 +68,6 @@ import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.json.metadata.v2.Template;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.security.SecurityManagerHolder;
@@ -88,8 +87,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Optional;
-import org.constellation.engine.register.MetadataComplete;
-import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
+import org.constellation.business.IMetadataBusiness;
 
 /**
  *
@@ -137,6 +135,8 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     /**
      * Injected metadata repository.
      */
+    @Inject
+    protected IMetadataBusiness metadataBusiness;
     @Inject
     protected MetadataRepository metadataRepository;
     /**
@@ -239,16 +239,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     public DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException {
         final Dataset dataset = getDataset(datasetIdentifier, domainId);
         if (dataset != null) {
-            final Metadata metaRecord = metadataRepository.findByDatasetId(dataset.getId());
-            if (metaRecord != null) {
-                final String metadataStr = metaRecord.getMetadataIso();
-                if (metadataStr == null) {
-                    throw new ConfigurationException("Unable to get metadata for dataset identifier "+datasetIdentifier);
-                }
-                final DefaultMetadata metadata = unmarshallMetadata(metadataStr);
-                metadata.prune();
-                return metadata;
-            }
+            return metadataBusiness.getIsoMetadataForDataset(dataset.getId());
         }
         return null;
     }
@@ -290,64 +281,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
         
         final Dataset dataset = datasetRepository.findByIdentifier(datasetIdentifier);
         if (dataset != null) {
-            final Long dateStamp  = MetadataUtilities.extractDatestamp(metadata);
-            final String title    = MetadataUtilities.extractTitle(metadata);
-            final String resume   = MetadataUtilities.extractResume(metadata);
-            final String parent   = MetadataUtilities.extractParent(metadata);
-            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
-            Integer parentID      = null;   
-            if (parentRecord != null) {
-                parentID = parentRecord.getId();
-            }
-            final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(metadata);
-            
-            // calculate completion rating
-            List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
-            Integer completion = null;
-            String level = "NONE";
-            String templateName = null;
-            if (!datas.isEmpty()) {
-                final String type = datas.get(0).getType();
-                templateName = getTemplate(datasetIdentifier, type);
-                final Template template = Template.getInstance(templateName);
-                try {
-                    completion = template.calculateMDCompletion(metadata);
-                    level = template.getCompletion(metadata);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
-                }
-            }
-            
-            Metadata metadataRecord = metadataRepository.findByDatasetId(dataset.getId());
-            boolean update = metadataRecord != null;
-            if (!update) {
-                final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
-                Integer userID = null;
-                if (user.isPresent()) {
-                    userID = user.get().getId();
-                }
-                metadataRecord = new Metadata();
-                metadataRecord.setOwner(userID);
-                metadataRecord.setDateCreation(System.currentTimeMillis());
-            }
-            
-            metadataRecord.setMetadataIso(metadataString);
-            metadataRecord.setMetadataId(metadata.getFileIdentifier());
-            metadataRecord.setLevel(level);
-            metadataRecord.setTitle(title);
-            metadataRecord.setResume(resume);
-            metadataRecord.setDatasetId(dataset.getId());
-            metadataRecord.setDatestamp(dateStamp);
-            metadataRecord.setParentIdentifier(parentID);
-            metadataRecord.setMdCompletion(completion);
-            metadataRecord.setProfile(templateName);
-            metadataRecord.setIsPublished(false);
-            metadataRecord.setIsValidated(false);
-            if (update) {
-                metadataRepository.update(new MetadataComplete(metadataRecord, bboxes));
-            } else {
-                metadataRepository.create(new MetadataComplete(metadataRecord, bboxes));
-            }
+            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId());
             
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
             // update internal CSW index
@@ -356,86 +290,6 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
     }
-
-    /**
-     * Proceed to update metadata for given dataset identifier.
-     *
-     * @param datasetIdentifier given dataset identifier.
-     * @param domainId domain id.
-     * @param metaId metadata identifier.
-     * @param metadataXml metadata as xml string content.
-     * @throws ConfigurationException
-     
-    @Transactional
-    public void updateMetadata(final String datasetIdentifier, final Integer domainId,
-                               final String metaId, final String metadataXml) throws ConfigurationException {
-        
-        final DefaultMetadata meta = unmarshallMetadata(metadataXml);
-        final Dataset dataset = datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
-        if (dataset != null) {
-            
-            final Long dateStamp  = MetadataUtilities.extractDatestamp(meta);
-            final String title    = MetadataUtilities.extractTitle(meta);
-            final String parent   = MetadataUtilities.extractParent(meta);
-            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
-            Integer parentID      = null;   
-            if (parentRecord != null) {
-                parentID = parentRecord.getId();
-            }
-            // calculate completion rating
-            List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
-            Integer completion = null;
-            String level = "NONE";
-            String templateName = null;
-            if (!datas.isEmpty()) {
-                final String type = datas.get(0).getType();
-                templateName = getTemplate(datasetIdentifier, type);
-                final Template template = Template.getInstance(templateName);
-                try {
-                    completion = template.calculateMDCompletion(meta);
-                    level = template.getCompletion(meta);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
-                }
-            }
-            
-            Metadata metadataRecord = metadataRepository.findByDatasetId(dataset.getId());
-            boolean update = metadataRecord != null;
-            if (!update) {
-                final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
-                Integer userID = null;
-                if (user.isPresent()) {
-                    userID = user.get().getId();
-                }
-                metadataRecord = new Metadata();
-                metadataRecord.setOwner(userID);
-                metadataRecord.setDateCreation(System.currentTimeMillis());
-            }
-            metadataRecord.setMetadataIso(metadataXml);
-            metadataRecord.setMetadataId(metaId);
-            metadataRecord.setLevel(level);
-            metadataRecord.setTitle(title);
-            metadataRecord.setDatestamp(dateStamp);
-            metadataRecord.setParentIdentifier(parentID);
-            metadataRecord.setMdCompletion(completion);
-            metadataRecord.setProfile(templateName);
-            metadataRecord.setDatasetId(dataset.getId());
-            metadataRecord.setIsPublished(false);
-            metadataRecord.setIsValidated(false);
-            if (update) {
-                metadataRepository.update(metadataRecord);
-            } else {
-                metadataRepository.create(metadataRecord);
-            }
-            
-            indexEngine.addMetadataToIndexForDataset(meta, dataset.getId());
-            // update internal CSW index
-            updateInternalCSWIndex(meta.getFileIdentifier(), domainId, true);
-            
-        } else {
-            throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
-        }
-    }*/
 
     /**
      * Proceed to extract metadata from reader and fill additional info
@@ -749,11 +603,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
     @Override
     public DataSetBrief getDatasetBrief(Integer dataSetId, List<DataBrief> children) {
         final Dataset dataset = datasetRepository.findById(dataSetId);
-        Integer completion = null;
-        final Metadata meta = metadataRepository.findByDatasetId(dataSetId);
-        if (meta != null) {
-            completion = meta.getMdCompletion();
-        }
+        Integer completion = metadataBusiness.getCompletionForDataset(dataSetId);
         String type = null;
         if (!children.isEmpty()) {
             type = children.get(0).getType();

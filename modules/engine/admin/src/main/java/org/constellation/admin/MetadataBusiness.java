@@ -154,6 +154,12 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
+        return updateMetadata(metadataId, xml, null, null);
+    }
+    
+    @Override
+    @Transactional
+    public boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID) throws ConfigurationException  {
         Metadata metadata          = metadataRepository.findByMetadataId(metadataId);
         final boolean update       = metadata != null;
         final DefaultMetadata meta = (DefaultMetadata) unmarshallMetadata(xml);
@@ -195,9 +201,19 @@ public class MetadataBusiness implements IMetadataBusiness {
         metadata.setIsValidated(false);
         
         // if the metadata is not yet present look for empty metadata object
-        final Dataset dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
-        // unsafe but no better way for now
-        final Data data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
+        final Dataset dataset;
+        if (datasetID != null) {
+            dataset = datasetRepository.findById(datasetID);
+        } else {
+            dataset = datasetRepository.findByIdentifierWithEmptyMetadata(metadataId);
+        }
+        final Data data;
+        if (dataID != null) {
+            data = dataRepository.findById(dataID);
+        } else {
+            // unsafe but no better way for now
+            data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
+        }
         if (!update && dataset != null) {
             List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
             if (!datas.isEmpty()) {
@@ -340,6 +356,69 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
+    
+    @Override
+    public DefaultMetadata getIsoMetadataForData(final int dataId) throws ConfigurationException {
+        final Metadata metadata = metadataRepository.findByDataId(dataId);
+        if (metadata != null) {
+            return (DefaultMetadata) unmarshallMetadata(metadata.getMetadataIso());
+        }
+        return null;
+    }
+    
+    @Override
+    public DefaultMetadata getIsoMetadataForDataset(final int datasetId) throws ConfigurationException {
+        final Metadata metadata = metadataRepository.findByDatasetId(datasetId);
+        if (metadata != null) {
+            return (DefaultMetadata) unmarshallMetadata(metadata.getMetadataIso());
+        }
+        return null;
+    }
+    
+    @Override
+    public Metadata getMetadataById(final int id) {
+        return metadataRepository.findById(id);
+    }
+    
+    @Override
+    public void updatePublication(final int id, final boolean newStatus) {
+        metadataRepository.changePublication(id, newStatus);
+    }
+    
+    @Override
+    public void updateValidation(int id, boolean newStatus) {
+        metadataRepository.changeValidation(id, newStatus);
+    }
+
+    @Override
+    public void updateOwner(int id, int newOwner) {
+        metadataRepository.changeOwner(id, newOwner);
+    }
+
+    @Override
+    public void deleteMetadata(int id) {
+        metadataRepository.delete(id);
+    }
+
+    @Override
+    public Integer getCompletionForData(int dataId) {
+        final Metadata metadata = metadataRepository.findByDataId(dataId);
+        if (metadata != null) {
+            return metadata.getMdCompletion();
+        }
+        return null;
+    }
+    
+    @Override
+    public Integer getCompletionForDataset(int datasetId) {
+        final Metadata metadata = metadataRepository.findByDatasetId(datasetId);
+        if (metadata != null) {
+            return metadata.getMdCompletion();
+        }
+        return null;
+    }
+    
+    
     
     @Override
     public MetadataLists getMetadataCodeLists() {

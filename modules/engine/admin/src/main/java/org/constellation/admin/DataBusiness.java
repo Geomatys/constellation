@@ -52,7 +52,6 @@ import org.constellation.admin.index.IndexEngine;
 import org.constellation.admin.listener.DefaultDataBusinessListener;
 import org.constellation.admin.listener.IDataBusinessListener;
 import org.constellation.admin.util.ImageStatisticDeserializer;
-import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.api.DataType;
 import org.constellation.api.PropertyConstants;
 import org.constellation.business.IConfigurationBusiness;
@@ -85,7 +84,6 @@ import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.json.metadata.v2.Template;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.token.TokenUtils;
@@ -112,6 +110,7 @@ import org.xml.sax.SAXException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
+import org.constellation.business.IMetadataBusiness;
 
 
 /**
@@ -174,6 +173,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      * Injected metadata repository.
      */
     @Inject
+    protected IMetadataBusiness metadataBusiness;
+    @Inject
     protected MetadataRepository metadataRepository;
     /**
      * Injected lucene index engine.
@@ -211,13 +212,8 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Override
     public DefaultMetadata loadIsoDataMetadata(final String providerId,
                                                final QName name) throws ConfigurationException{
-        DefaultMetadata result = null;
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
-        final Metadata metadata = metadataRepository.findByDataId(data.getId());
-        if (metadata != null) {
-            result = unmarshallMetadata(metadata.getMetadataIso());
-        }
-        return result;
+        return metadataBusiness.getIsoMetadataForData(data.getId());
     }
 
     /**
@@ -225,12 +221,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
      */
     @Override
     public DefaultMetadata loadIsoDataMetadata(final int dataId) throws ConfigurationException{
-        DefaultMetadata result = null;
-        final Metadata metadata = metadataRepository.findByDataId(dataId);
-        if (metadata != null) {
-            result = unmarshallMetadata(metadata.getMetadataIso());
-        }
-        return result;
+        return metadataBusiness.getIsoMetadataForData(dataId);
     }
 
     @Override
@@ -439,11 +430,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             db.setStatsResult(data.getStatsResult());
             db.setStatsState(data.getStatsState());
             db.setRendered(data.getRendered());
-            
-            final Metadata meta = metadataRepository.findByDataId(data.getId());
-            if (meta != null) {
-                db.setMdCompletion(meta.getMdCompletion());
-            }
+            db.setMdCompletion(metadataBusiness.getCompletionForData(data.getId()));
 
             final List<Data> linkedDataList = getDataLinkedData(data.getId());
             for(final Data d : linkedDataList){
@@ -737,59 +724,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
         
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
-            final Long dateStamp  = MetadataUtilities.extractDatestamp(metadata);
-            final String title    = MetadataUtilities.extractTitle(metadata);
-            final String resume   = MetadataUtilities.extractResume(metadata);
-            final String parent   = MetadataUtilities.extractParent(metadata);
-            Metadata parentRecord = metadataRepository.findByMetadataId(parent);
-            Integer parentID      = null;   
-            if (parentRecord != null) {
-                parentID = parentRecord.getId();
-            }
-            final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(metadata);
-            
-            // calculate completion rating / elementary
-            String templateName = getTemplate(dataName, data.getType());
-            Integer completion = null;
-            String level = "NONE";
-            final Template template = Template.getInstance(templateName);
-            try {
-                completion = template.calculateMDCompletion(metadata);
-                level = template.getCompletion(metadata);
-            } catch (IOException ex) {
-                LOGGER.warn("Error while calculating metadata completion", ex);
-            }
-
-            Metadata metadataRecord = metadataRepository.findByDataId(data.getId());
-            boolean update = metadataRecord != null;
-            if (!update) {
-                final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
-                Integer userID = null;
-                if (user.isPresent()) {
-                    userID = user.get().getId();
-                }
-                metadataRecord = new Metadata();
-                metadataRecord.setDateCreation(System.currentTimeMillis());
-                metadataRecord.setOwner(userID);
-            }
-            metadataRecord.setDataId(data.getId());
-            metadataRecord.setMetadataIso(metadataString);
-            metadataRecord.setMetadataId(metadata.getFileIdentifier());
-            metadataRecord.setLevel(level);
-            metadataRecord.setTitle(title);
-            metadataRecord.setResume(resume);
-            metadataRecord.setDatestamp(dateStamp);
-            metadataRecord.setParentIdentifier(parentID);
-            metadataRecord.setMdCompletion(completion);
-            metadataRecord.setProfile(templateName);
-            metadataRecord.setIsPublished(false);
-            metadataRecord.setIsValidated(false);
-            
-            if (update) {
-                metadataRepository.update(new MetadataComplete(metadataRecord, bboxes));
-            } else {
-                metadataRepository.create(new MetadataComplete(metadataRecord, bboxes));
-            }
+            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadataString, data.getId(), null);
             
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
             // update internal CSW index

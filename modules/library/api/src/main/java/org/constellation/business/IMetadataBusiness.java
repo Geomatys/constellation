@@ -79,6 +79,8 @@ public interface IMetadataBusiness {
     
     boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException;
     
+    boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID) throws ConfigurationException;
+    
     /**
      * Returns all the metadata associated with a csw service.
      *
@@ -96,4 +98,22 @@ public interface IMetadataBusiness {
     MetadataLists getMetadataCodeLists();
     
     DefaultMetadata getMetadata(final int id) throws ConfigurationException;
+    
+    Metadata getMetadataById(final int id);
+    
+    void updatePublication(final int id, final boolean newStatus);
+    
+    void updateValidation(final int id, final boolean newStatus);
+    
+    void updateOwner(final int id, final int newOwner);
+    
+    void deleteMetadata(final int id);
+    
+    Integer getCompletionForData(final int dataId);
+    
+    Integer getCompletionForDataset(final int datasetId);
+    
+    DefaultMetadata getIsoMetadataForData(final int dataId) throws ConfigurationException;
+    
+    DefaultMetadata getIsoMetadataForDataset(final int datasetId) throws ConfigurationException;
 }

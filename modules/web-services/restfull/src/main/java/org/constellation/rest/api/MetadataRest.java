@@ -291,7 +291,7 @@ public class MetadataRest {
     @GET
     @Path("/{id}")
     public MetadataBrief get(@PathParam("id") final Integer metadataId) {
-        final Metadata candidat = metadataRepository.findById(metadataId);
+        final Metadata candidat = metadataBusiness.getMetadataById(metadataId);
         if(candidat != null) {
             //@TODO get fully metadata including iso XML field
             return convertToMetadataBrief(candidat);
@@ -308,7 +308,7 @@ public class MetadataRest {
         //So we need to send an error message to prevent this case.
         //It would be great if we can returns the ids of metadata which cannot be deleted
         for (MetadataBrief brief : metadataList) {
-            metadataRepository.delete(brief.getId());
+            metadataBusiness.deleteMetadata(brief.getId());
         }
         return Response.ok("records deleted with success!").build();
     }
@@ -330,7 +330,7 @@ public class MetadataRest {
         directory.mkdir();
         final List<File> files = new ArrayList<>();
         for (final MetadataBrief brief : metadataList) {
-            final Metadata metadata = metadataRepository.findById(brief.getId());
+            final Metadata metadata = metadataBusiness.getMetadataById(brief.getId());
             if (metadata != null) {
                 try {
                     final File file = new File(directory, cleanFileName(metadata.getMetadataId()) + ".xml");
@@ -399,7 +399,7 @@ public class MetadataRest {
     @Path("/changeOwner/{ownerId}")
     public Response changeOwner(@PathParam("ownerId") final int ownerId,final List<MetadataBrief> metadataList) {
         for (MetadataBrief brief : metadataList) {
-            metadataRepository.changeOwner(brief.getId(), ownerId);
+            metadataBusiness.updateOwner(brief.getId(), ownerId);
         }
         return Response.ok("owner applied with success!").build();
     }
@@ -414,7 +414,7 @@ public class MetadataRest {
     @Path("/changeValidation/{isvalid}")
     public Response changeValidation(@PathParam("isvalid") final boolean isvalid,final List<MetadataBrief> metadataList) {
         for (MetadataBrief brief : metadataList) {
-            metadataRepository.changeValidation(brief.getId(), isvalid);
+            metadataBusiness.updateValidation(brief.getId(), isvalid);
         }
         return Response.ok("validation applied with success!").build();
     }
@@ -429,7 +429,7 @@ public class MetadataRest {
     @Path("/changePublication/{ispublished}")
     public Response changePublication(@PathParam("ispublished") final boolean ispublished,final List<MetadataBrief> metadataList) {
         for (MetadataBrief brief : metadataList) {
-            metadataRepository.changePublication(brief.getId(), ispublished);
+            metadataBusiness.updatePublication(brief.getId(), ispublished);
         }
         return Response.ok("Published state applied with success!").build();
     }
@@ -444,7 +444,7 @@ public class MetadataRest {
             if (metadata != null) {
                 metadata.prune();
                 //get template name
-                final String templateName = metadataRepository.findById(metadataId).getProfile();
+                final String templateName = metadataBusiness.getMetadataById(metadataId).getProfile();
                 final Template template = Template.getInstance(templateName);
                 template.write(metadata,buffer,prune);
             }
