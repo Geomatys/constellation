@@ -255,7 +255,8 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (update) {
             metadataRepository.update(new MetadataComplete(metadata, bboxes));
         } else {
-            metadataRepository.create(new MetadataComplete(metadata, bboxes));
+            int id = metadataRepository.create(new MetadataComplete(metadata, bboxes));
+            metadata.setId(id);
         }
         updateInternalCSWIndex(metadata, true);
         return true;
