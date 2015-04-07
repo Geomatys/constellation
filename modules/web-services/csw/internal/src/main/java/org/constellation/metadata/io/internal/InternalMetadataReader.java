@@ -86,9 +86,9 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     @Inject
     private IMetadataBusiness metadataBusiness;
     
-    private boolean partial = false;
+    private final boolean partial;
     
-    private boolean onlyPublished = false;
+    private final boolean onlyPublished;
     
     private final String id;
     
@@ -122,12 +122,8 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
             }
             setIsCacheEnabled(c);
         }
-        if (configuration.getCustomparameters().containsKey("partial")) {
-            this.partial = Boolean.parseBoolean(configuration.getParameter("partial"));
-        }
-        if (configuration.getCustomparameters().containsKey("onlyPublished")) {
-            this.onlyPublished = Boolean.parseBoolean(configuration.getParameter("onlyPublished"));
-        }
+        this.partial       = configuration.getBooleanParameter("partial", false);
+        this.onlyPublished = configuration.getBooleanParameter("onlyPublished", false);
     }
 
     /**
@@ -432,9 +428,9 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
         final List<Node> result = new ArrayList<>();
         final List<String> metadataIds;
         if (partial) {
-            metadataIds = metadataBusiness.getInternalMetadataIds(displayServiceMetadata, onlyPublished);
-        } else {
             metadataIds = metadataBusiness.getLinkedMetadataIDs(id, displayServiceMetadata, onlyPublished);
+        } else {
+            metadataIds = metadataBusiness.getInternalMetadataIds(displayServiceMetadata, onlyPublished);
         }
         for (String metadataID : metadataIds) {
             final String meta = metadataBusiness.searchMetadata(metadataID, displayServiceMetadata, onlyPublished);

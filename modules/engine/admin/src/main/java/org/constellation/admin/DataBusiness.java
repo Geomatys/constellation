@@ -66,13 +66,11 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Layer;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
-import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
@@ -111,6 +109,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.engine.register.repository.ServiceRepository;
 
 
 /**
@@ -124,7 +123,7 @@ import org.constellation.business.IMetadataBusiness;
 @Component("cstlDataBusiness")
 @DependsOn({"database-initer", "providerBusiness"})
 @Primary
-public class DataBusiness extends InternalCSWSynchronizer implements IDataBusiness {
+public class DataBusiness implements IDataBusiness {
     /**
      * Used for debugging purposes.
      */
@@ -197,6 +196,12 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
     @Autowired(required = false)
     private IDataBusinessListener dataBusinessListener = new DefaultDataBusinessListener();
 
+     /**
+     * Injected service repository.
+     */
+    @Inject
+    private ServiceRepository serviceRepository;
+    
     /**
      * {@inheritDoc}
      */
@@ -662,7 +667,7 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             // update internal CSW index
             Metadata metadata = metadataRepository.findByDataId(data.getId());
             if (metadata != null) {
-                updateInternalCSWIndex(metadata.getMetadataId(), false); // TODO DOMAIN ID
+                metadataBusiness.updateInternalCSWIndex(metadata, false); 
             }
         }
     }
@@ -727,8 +732,6 @@ public class DataBusiness extends InternalCSWSynchronizer implements IDataBusine
             metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadataString, data.getId(), null);
             
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
-            // update internal CSW index
-            updateInternalCSWIndex(metadata.getFileIdentifier(), true);
         } else {
             throw new TargetNotFoundException("Data :" + dataName + " in provider:" + providerId +  " not found");
         }

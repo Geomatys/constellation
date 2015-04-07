@@ -183,6 +183,14 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                   .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
                   .and(METADATA_X_CSW.CSW_ID.eq(id)).fetchInto(Metadata.class);
     }
+    
+    @Override
+    public boolean isLinkedMetadata(Integer metadataID, Integer cswID) {
+        return dsl.select(METADATA.fields()).from(METADATA, METADATA_X_CSW)
+                  .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
+                  .and(METADATA_X_CSW.CSW_ID.eq(cswID))
+                  .and(METADATA_X_CSW.METADATA_ID.eq(metadataID)).fetchOneInto(Metadata.class) != null;
+    }
 
     @Override
     public Map<String,Integer> getProfilesCount() {

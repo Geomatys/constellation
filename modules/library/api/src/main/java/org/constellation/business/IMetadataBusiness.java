@@ -95,19 +95,21 @@ public interface IMetadataBusiness {
     
     void unlinkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
     
+    boolean isLinkedMetadataToCSW(final int metadataID, final int cswID);
+    
     MetadataLists getMetadataCodeLists();
     
     DefaultMetadata getMetadata(final int id) throws ConfigurationException;
     
     Metadata getMetadataById(final int id);
     
-    void updatePublication(final int id, final boolean newStatus);
+    void updatePublication(final int id, final boolean newStatus) throws ConfigurationException;
     
     void updateValidation(final int id, final boolean newStatus);
     
     void updateOwner(final int id, final int newOwner);
     
-    void deleteMetadata(final int id);
+    void deleteMetadata(final int id) throws ConfigurationException;
     
     Integer getCompletionForData(final int dataId);
     
@@ -116,4 +118,6 @@ public interface IMetadataBusiness {
     DefaultMetadata getIsoMetadataForData(final int dataId) throws ConfigurationException;
     
     DefaultMetadata getIsoMetadataForDataset(final int datasetId) throws ConfigurationException;
+    
+    void updateInternalCSWIndex(final Metadata metadata, final boolean update) throws ConfigurationException;
 }

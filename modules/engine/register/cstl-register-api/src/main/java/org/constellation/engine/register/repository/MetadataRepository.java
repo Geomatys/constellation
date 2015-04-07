@@ -49,6 +49,8 @@ public interface MetadataRepository {
     int delete(int id);
     
     List<Metadata> findByCswId(Integer id);
+    
+    boolean isLinkedMetadata(Integer metadataID, Integer cswID);
 
     List<Metadata> findAll();
 

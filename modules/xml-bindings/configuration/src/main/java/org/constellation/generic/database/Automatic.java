@@ -621,6 +621,16 @@ public class Automatic extends AbstractConfigurationObject {
         return customparameters.get(key);
     }
 
+    public boolean getBooleanParameter(final String key, final boolean defaultValue) {
+        if (customparameters == null) {
+            customparameters = new HashMap<>();
+        }
+        if (customparameters.containsKey(key)) {
+            return Boolean.parseBoolean(customparameters.get(key));
+        }
+        return defaultValue;
+    }
+    
     public List<String> getParameterList(final String key) {
         final List<String> result = new ArrayList<>();
         if (customparameters == null) {

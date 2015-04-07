@@ -46,6 +46,7 @@ import java.util.zip.ZipOutputStream;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.json.metadata.v2.Template;
 
 /**
@@ -301,7 +302,7 @@ public class MetadataRest {
 
     @POST
     @Path("/delete")
-    public Response delete(final List<MetadataBrief> metadataList,@Context HttpServletRequest req) {
+    public Response delete(final List<MetadataBrief> metadataList,@Context HttpServletRequest req) throws ConfigurationException {
         //@TODO GEOC-113 implements delete method with permission of user
         //the user can select multiple records to delete,
         // but some of records can have a restricted permission for this user.
@@ -427,7 +428,7 @@ public class MetadataRest {
      */
     @POST
     @Path("/changePublication/{ispublished}")
-    public Response changePublication(@PathParam("ispublished") final boolean ispublished,final List<MetadataBrief> metadataList) {
+    public Response changePublication(@PathParam("ispublished") final boolean ispublished,final List<MetadataBrief> metadataList) throws ConfigurationException {
         for (MetadataBrief brief : metadataList) {
             metadataBusiness.updatePublication(brief.getId(), ispublished);
         }

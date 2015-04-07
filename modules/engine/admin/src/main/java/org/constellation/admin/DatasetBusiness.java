@@ -99,7 +99,7 @@ import org.constellation.business.IMetadataBusiness;
  */
 @Component("cstlDatasetBusiness")
 @Primary
-public class DatasetBusiness extends InternalCSWSynchronizer implements IDatasetBusiness {
+public class DatasetBusiness implements IDatasetBusiness {
 
     /**
      * Used for debugging purposes.
@@ -284,8 +284,6 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId());
             
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
-            // update internal CSW index
-            updateInternalCSWIndex(metadata.getFileIdentifier(), true);
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
         }
@@ -502,7 +500,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
                 involvedProvider.add(data.getProvider());
                 Metadata meta = metadataRepository.findByDataId(data.getId());
                 if (meta != null) {
-                    updateInternalCSWIndex(meta.getMetadataId(), false);
+                    metadataBusiness.updateInternalCSWIndex(meta, false);
                 }
                 dataRepository.removeDataFromAllCSW(data.getId());
             }
@@ -538,7 +536,7 @@ public class DatasetBusiness extends InternalCSWSynchronizer implements IDataset
             // update internal CSW index
             final Metadata meta = metadataRepository.findByDatasetId(ds.getId());
             if (meta != null) {
-                updateInternalCSWIndex(meta.getMetadataId(), false);
+                metadataBusiness.updateInternalCSWIndex(meta, false);
             }
         }
     }

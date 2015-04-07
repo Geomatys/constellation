@@ -50,17 +50,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Set;
+import javax.xml.bind.Unmarshaller;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
+import org.constellation.ServiceDef;
 import org.constellation.dto.MetadataLists;
 import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ICSWConfigurer;
+import org.constellation.ws.Refreshable;
+import org.constellation.ws.ServiceConfigurer;
+import org.constellation.ws.WSEngine;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.Restriction;
@@ -102,7 +112,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * Injected service repository.
      */
     @Inject
-    private ServiceRepository serviceRepository;
+    protected ServiceRepository serviceRepository;
     /**
      * Injected metadata repository.
      */
@@ -247,6 +257,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         } else {
             metadataRepository.create(new MetadataComplete(metadata, bboxes));
         }
+        updateInternalCSWIndex(metadata, true);
         return true;
     }
 
@@ -331,6 +342,11 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
+    public boolean isLinkedMetadataToCSW(final int metadataID, final int cswID) {
+        return metadataRepository.isLinkedMetadata(metadataID, cswID);
+    }
+    
+    @Override
     @Transactional
     public void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier) {
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
@@ -381,8 +397,13 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
-    public void updatePublication(final int id, final boolean newStatus) {
-        metadataRepository.changePublication(id, newStatus);
+    public void updatePublication(final int id, final boolean newStatus) throws ConfigurationException {
+        final Metadata metadata = metadataRepository.findById(id);
+        if (metadata != null) {
+            metadataRepository.changePublication(id, newStatus);
+            metadata.setIsPublished(newStatus);
+            updateInternalCSWIndex(metadata, false);
+        }
     }
     
     @Override
@@ -396,8 +417,12 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
 
     @Override
-    public void deleteMetadata(int id) {
-        metadataRepository.delete(id);
+    public void deleteMetadata(int id) throws ConfigurationException {
+        final Metadata metadata = metadataRepository.findById(id);
+        if (metadata != null) {
+            updateInternalCSWIndex(metadata, false);
+            metadataRepository.delete(id);
+        }
     }
 
     @Override
@@ -418,7 +443,37 @@ public class MetadataBusiness implements IMetadataBusiness {
         return null;
     }
     
-    
+    @Override
+    public void updateInternalCSWIndex(final Metadata metadata, final boolean update) throws ConfigurationException {
+        try {
+            final List<Service> services = serviceRepository.findByType("csw");
+            for (Service service : services) {
+            
+                final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                // read config to determine CSW type
+                final Automatic conf = (Automatic) um.unmarshal(new StringReader(service.getConfig()));
+                
+                if (conf.getFormat().equals("internal")) {
+                    boolean partial       = conf.getBooleanParameter("partial", false);
+                    boolean onlyPublished = conf.getBooleanParameter("onlyPublished", false);
+                    if ((partial && isLinkedMetadataToCSW(metadata.getId(), service.getId())) || !partial) {
+                        final ICSWConfigurer configurer = (ICSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
+                    
+                        configurer.removeFromIndex(service.getIdentifier(), metadata.getMetadataId());
+                        if (update) {
+                            if ((onlyPublished && metadata.getIsPublished()) || !onlyPublished) {
+                                configurer.addToIndex(service.getIdentifier(), metadata.getMetadataId());
+                            }
+                        }
+                        final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", service.getIdentifier());
+                        worker.refresh();
+                    }
+                }
+            }
+        } catch (JAXBException | CstlServiceException ex) {
+            throw new ConfigurationException("Error while updating internal CSW index", ex);
+        }
+    }
     
     @Override
     public MetadataLists getMetadataCodeLists() {
