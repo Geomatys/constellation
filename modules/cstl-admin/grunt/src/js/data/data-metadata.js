@@ -26,7 +26,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
 
         $scope.typeLabelKey = $scope.typeLabelKey || "metadata.edition.dataset.import";
         $scope.type = $scope.type || $routeParams.type; //type is one of 'vector' or 'raster' or 'observation'.
-        if ($scope.type !== null) {
+        if ($scope.type) {
             $scope.type = $scope.type.toLowerCase();
             $scope.typeLabelKey = "metadata.edition.dataset." + $scope.type;
         }
