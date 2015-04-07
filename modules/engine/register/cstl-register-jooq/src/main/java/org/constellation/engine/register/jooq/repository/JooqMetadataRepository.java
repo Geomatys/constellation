@@ -209,41 +209,43 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     @Override
     public Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap) {
         Select query = null;
+        Collection<Field<?>> fields = new ArrayList<>();
+        Collections.addAll(fields,METADATA.ID,METADATA.TITLE);
         if(filterMap != null) {
             for(final Map.Entry<String,Object> entry : filterMap.entrySet()) {
                 if("owner".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.OWNER.equal((Integer)entry.getValue()));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.OWNER.equal((Integer)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.OWNER.equal((Integer)entry.getValue()));
                     }
                 }else if("profile".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.PROFILE.equal((String)entry.getValue()));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.PROFILE.equal((String)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.PROFILE.equal((String) entry.getValue()));
                     }
                 }else if("validated".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.IS_VALIDATED.equal((Boolean) entry.getValue()));
                     }
                 }else if("published".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.IS_PUBLISHED.equal((Boolean) entry.getValue()));
                     }
                 }else if("level".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.LEVEL.equal((String)entry.getValue()));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.LEVEL.equal((String)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.LEVEL.equal((String) entry.getValue()));
                     }
                 }else if("term".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).where(METADATA.METADATA_ISO.contains((String)entry.getValue()));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.METADATA_ISO.contains((String)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.METADATA_ISO.contains((String) entry.getValue()));
                     }
@@ -251,7 +253,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
             }
         }
         if(query == null) {
-            return dsl.select(METADATA.ID,METADATA.TITLE).from(METADATA).fetchMap(METADATA.ID, METADATA.TITLE);
+            return dsl.select(fields).from(METADATA).fetchMap(METADATA.ID, METADATA.TITLE);
         }else {
             return query.fetchMap(METADATA.ID,METADATA.TITLE);
         }

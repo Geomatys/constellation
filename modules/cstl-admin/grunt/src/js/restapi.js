@@ -184,6 +184,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
 
     .factory('Metadata', function($resource) {
         return $resource('@cstl/api/1/metadata/:id', null, {
+            get:                {method: 'GET' },
             search:             {method: 'POST',    url: '@cstl/api/1/metadata/search',isArray: false},
             create:             {method: 'PUT' },
             profiles:           {method: 'GET',     url: '@cstl/api/1/metadata/profiles',isArray: true},
