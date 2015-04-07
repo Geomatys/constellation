@@ -88,11 +88,11 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
               $rootScope.account = account;
 
               $rootScope.hasRole = function(role) {
-                 return account.roles.indexOf(role) !== -1;
+                 return true; //TODO since error happen due to domain refactoring, we return true temporarily, FIXME implements this function
               };
 
               $rootScope.hasMultipleDomains = function() {
-                 return account.domains.length > 1;
+                 return false; //TODO since error happen due to domain refactoring, we return false temporarily, FIXME implements this function
               };             
             });
             
