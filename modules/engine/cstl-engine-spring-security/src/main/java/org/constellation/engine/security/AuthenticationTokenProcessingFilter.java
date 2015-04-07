@@ -21,11 +21,17 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
         @Override
         public boolean onUnauthorized(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-            return false;
+            return allowUnauthorized;
         }
     };
 
+    private boolean allowUnauthorized;
+
     private UserDetailsExtractor userDetailsExtractor;
+
+    public void setAllowUnauthorized(boolean allowUnauthorized) {
+        this.allowUnauthorized = allowUnauthorized;
+    }
 
     public void setUnauthorizedHandler(UnauthorizedHandler unauthorizedHandler) {
         this.unauthorizedHandler = unauthorizedHandler;
@@ -52,7 +58,9 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         if (userDetails == null) {
             if( ! unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
                 getAsHttpResponse(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
+            chain.doFilter(request, response);
             return;
         }
         
