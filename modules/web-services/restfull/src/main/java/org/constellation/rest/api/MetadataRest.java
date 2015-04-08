@@ -168,6 +168,14 @@ public class MetadataRest {
         return Response.ok("Mockup metadata successfully!").build();
     }
 
+    /**
+     * Proceed to get list of records {@link MetadataBrief} in Page object for dashboard.
+     * the list can be filtered, sorted and use the pagination.
+     *
+     * @param pagedSearch given params of filters, sorting and pagination served by a pojo {link PagedSearch}
+     * @param req the http request needed to get the current user.
+     * @return {link Page} of {@link MetadataBrief}
+     */
     @POST
     @Path("/search")
     public Page<MetadataBrief> search(final PagedSearch pagedSearch,@Context HttpServletRequest req) {
@@ -211,6 +219,14 @@ public class MetadataRest {
 
     }
 
+    /**
+     * Proceed to fill a map of filters used to search records.
+     * the filters are passed from a pojo {@link PagedSearch}
+     *
+     * @param pagedSearch {link PagedSearch} given filter params
+     * @param req given http request object to extract the user
+     * @return {@code Map} map of filters to send
+     */
     private Map<String,Object> prepareFilters(final PagedSearch pagedSearch, final HttpServletRequest req) {
         List<Filter> filters = pagedSearch.getFilters();
         final String searchTerm = pagedSearch.getText();
@@ -280,11 +296,20 @@ public class MetadataRest {
         return filterMap;
     }
 
+    /**
+     * Returns a singleton map that contains the total count of matched records for filtered list.
+     * and all records in a lightweight list of pojo {@link MetadataLightBrief}.
+     * it is usefull to proceed to select All metadata to proceed to do batch actions on them.
+     *
+     * @param pagedSearch given {@link PagedSearch} that does not contains the pagination.
+     * @param req the http request to extract the user infos
+     * @return singleton Map of couple total count, list of lightweight record.
+     */
     @POST
     @Path("/searchIds")
     public Map searchIds(final PagedSearch pagedSearch,@Context HttpServletRequest req) {
         final List<MetadataLightBrief> list = new ArrayList<>();
-        final Map<String,Object> filterMap = prepareFilters(pagedSearch,req);
+        final Map<String,Object> filterMap = prepareFilters(pagedSearch, req);
         final Map<Integer,String> map = metadataRepository.filterAndGetWithoutPagination(filterMap);
         if(map!=null){
             for(final Map.Entry<Integer,String> entry : map.entrySet()){
@@ -297,6 +322,12 @@ public class MetadataRest {
         return result;
     }
 
+    /**
+     * Utility method to convert a metadata db model to ui model.
+     *
+     * @param md given metadata from data base model to convert.
+     * @return {link MetadataBrief} converted pojo.
+     */
     private MetadataBrief convertToMetadataBrief(final Metadata md) {
         final MetadataBrief mdb = new MetadataBrief();
         mdb.setId(md.getId());
@@ -333,6 +364,17 @@ public class MetadataRest {
         return null;
     }
 
+    /**
+     * Proceed to delete a list of metadata.
+     * the http request provide the user that should be passed to check if the user can delete all record in the list.
+     * the method must returns an appropriate response in case of user does not have the permission to delete all records
+     * we need to return the id of metadata that cannot be deleted.
+     *
+     * @param metadataList given metadata list to delete.
+     * @param req http request that contains the user.
+     * @return Response that contains all neccessary info to inform the user about what records fails.
+     * @throws ConfigurationException
+     */
     @POST
     @Path("/delete")
     public Response delete(final List<MetadataBrief> metadataList,@Context HttpServletRequest req) throws ConfigurationException {
@@ -399,6 +441,12 @@ public class MetadataRest {
         return Response.ok(map).build();
     }
 
+    /**
+     * Utility function to clean the file name when exporting metadata to XML.
+     * TODO use commons-utils instead.
+     * @param s given string to clean
+     * @return String value
+     */
     private static String cleanFileName(String s) {
         s = s.replace(":", "_");
         s = s.replace("/", "_");
@@ -472,6 +520,14 @@ public class MetadataRest {
         return Response.ok("Published state applied with success!").build();
     }
 
+    /**
+     * Returns the json representation of metadata by using template for given metadata ID .
+     * the metadata can be pruned in case of displaying purposes, or set prune to false for edition purposes.
+     *
+     * @param metadataId given metadata ID
+     * @param prune flag that indicates if the metadata will be pruned or not to delete empty values.
+     * @return Response that contains the metadata in json format.
+     */
     @GET
     @Path("/metadataJson/iso/{metadataId}/{prune}")
     public Response getIsoMetadataJson(final @PathParam("metadataId") int metadataId,
@@ -532,6 +588,28 @@ public class MetadataRest {
             LOGGER.warning("Error while saving metadata");
         }
         return Response.ok("Metadata saved successfully!").build();
+    }
+
+    /**
+     * Proceed to duplicate metadata for given id.
+     * an optional title is given to set the new title of cloned metadata.
+     * if the given title is empty or null
+     *
+     * @param id given metadata id to duplicate
+     * @param title optional title
+     * @return Response
+     */
+    @POST
+    @Path("/duplicate/{id}")
+    public Response duplicateMetadata(@PathParam("id") final int id, final String title) {
+        //TODO implements duplication of record,
+        //TODO if given title is null or empty then we must copy the original title and add prefix '(Duplicated) ...'
+        if(!isBlank(title)){
+            //use the given title
+        }else {
+            //use the original title and add prefix '(Duplicated) '
+        }
+        return Response.ok("Metadata duplicated successfully!").build();
     }
 
 

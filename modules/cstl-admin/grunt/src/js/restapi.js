@@ -196,7 +196,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             changeValidation:   {method: 'POST',    url: '@cstl/api/1/metadata/changeValidation/:isvalid'},
             changePublication:  {method: 'POST',    url: '@cstl/api/1/metadata/changePublication/:ispublished'},
             saveMetadata:       {method: 'POST',    url: '@cstl/api/1/metadata/save/:metadataId/:profile'},
-            getMetadataJson :   {method: 'GET',     url: '@cstl/api/1/metadata/metadataJson/iso/:metadataId/:prune'}
+            getMetadataJson :   {method: 'GET',     url: '@cstl/api/1/metadata/metadataJson/iso/:metadataId/:prune'},
+            duplicate:          {method: 'POST',    url: '@cstl/api/1/metadata/duplicate/:id'}
         });
     })
 
