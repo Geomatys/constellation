@@ -258,7 +258,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             int id = metadataRepository.create(new MetadataComplete(metadata, bboxes));
             metadata.setId(id);
         }
-        updateInternalCSWIndex(metadata, true);
+        updateInternalCSWIndex(Arrays.asList(metadata), true);
         return true;
     }
 
@@ -403,8 +403,22 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (metadata != null) {
             metadataRepository.changePublication(id, newStatus);
             metadata.setIsPublished(newStatus);
-            updateInternalCSWIndex(metadata, false);
+            updateInternalCSWIndex(Arrays.asList(metadata), true);
         }
+    }
+    
+    @Override
+    public void updatePublication(final List<Integer> ids, final boolean newStatus) throws ConfigurationException {
+        final List<Metadata> toUpdate = new ArrayList<>();
+        for (Integer id : ids) {
+            final Metadata metadata = metadataRepository.findById(id);
+            if (metadata != null) {
+                metadataRepository.changePublication(id, newStatus);
+                metadata.setIsPublished(newStatus);
+                toUpdate.add(metadata);
+            }
+        }
+        updateInternalCSWIndex(toUpdate, true);
     }
     
     @Override
@@ -421,7 +435,24 @@ public class MetadataBusiness implements IMetadataBusiness {
     public void deleteMetadata(int id) throws ConfigurationException {
         final Metadata metadata = metadataRepository.findById(id);
         if (metadata != null) {
-            updateInternalCSWIndex(metadata, false);
+            updateInternalCSWIndex(Arrays.asList(metadata), false);
+            metadataRepository.delete(id);
+        }
+    }
+    
+    @Override
+    public void deleteMetadata(List<Integer> ids) throws ConfigurationException {
+        // First we update the csw index
+        final List<Metadata> toDelete = new ArrayList<>();
+        for (Integer id : ids) {
+            final Metadata metadata = metadataRepository.findById(id);
+            if (metadata != null) {
+                toDelete.add(metadata);
+            }
+        }
+        updateInternalCSWIndex(toDelete, false);
+        // then we remove the metadata from the database
+        for (Integer id : ids) {
             metadataRepository.delete(id);
         }
     }
@@ -445,7 +476,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
-    public void updateInternalCSWIndex(final Metadata metadata, final boolean update) throws ConfigurationException {
+    public void updateInternalCSWIndex(final List<Metadata> metadatas, final boolean update) throws ConfigurationException {
         try {
             final List<Service> services = serviceRepository.findByType("csw");
             for (Service service : services) {
@@ -457,15 +488,25 @@ public class MetadataBusiness implements IMetadataBusiness {
                 if (conf.getFormat().equals("internal")) {
                     boolean partial       = conf.getBooleanParameter("partial", false);
                     boolean onlyPublished = conf.getBooleanParameter("onlyPublished", false);
-                    if ((partial && isLinkedMetadataToCSW(metadata.getId(), service.getId())) || !partial) {
-                        final ICSWConfigurer configurer = (ICSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
-                    
-                        configurer.removeFromIndex(service.getIdentifier(), metadata.getMetadataId());
-                        if (update) {
-                            if ((onlyPublished && metadata.getIsPublished()) || !onlyPublished) {
-                                configurer.addToIndex(service.getIdentifier(), metadata.getMetadataId());
+                    final List<String> identifierToRemove = new ArrayList<>();
+                    final List<String> identifierToUpdate = new ArrayList<>();
+                    ICSWConfigurer configurer = null;
+                    for (Metadata metadata : metadatas) {
+                        if (!partial || (partial && isLinkedMetadataToCSW(metadata.getId(), service.getId()))) {
+                            if (configurer == null) {
+                                configurer = (ICSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
+                            }
+                            identifierToRemove.add(metadata.getMetadataId());
+                            if (update) {
+                                if ((onlyPublished && metadata.getIsPublished()) || !onlyPublished) {
+                                    identifierToUpdate.add(metadata.getMetadataId());
+                                }
                             }
                         }
+                    }
+                    if (configurer != null) {
+                        configurer.removeFromIndex(service.getIdentifier(), identifierToRemove);
+                        configurer.addToIndex(service.getIdentifier(), identifierToUpdate);
                         final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", service.getIdentifier());
                         worker.refresh();
                     }

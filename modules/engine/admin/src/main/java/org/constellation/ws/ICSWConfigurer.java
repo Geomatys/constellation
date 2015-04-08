@@ -44,7 +44,7 @@ public interface ICSWConfigurer {
      * @return
      * @throws ConfigurationException
      */
-    AcknowlegementType addToIndex(final String id, final String identifierList) throws ConfigurationException;
+    AcknowlegementType addToIndex(final String id, final List<String> identifierList) throws ConfigurationException;
 
     /**
      * Remove some CSW record to the index.
@@ -55,7 +55,7 @@ public interface ICSWConfigurer {
      * @return
      * @throws ConfigurationException
      */
-    AcknowlegementType removeFromIndex(final String id, final String identifierList) throws ConfigurationException;
+    AcknowlegementType removeFromIndex(final String id, final List<String> identifierList) throws ConfigurationException;
 
 
     /**

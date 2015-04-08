@@ -57,6 +57,7 @@ import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.index.tree.manager.NamedEnvelope;
+import org.geotoolkit.util.StringUtilities;
 
 /**
  *
@@ -92,13 +93,15 @@ public class CSWServicesRest {
     @PUT
     @Path("{id}/index/{metaID}")
     public Response AddToIndex(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
-        return ok(getConfigurer().addToIndex(id, metaID));
+        final List<String> identifiers = StringUtilities.toStringList(metaID);
+        return ok(getConfigurer().addToIndex(id, identifiers));
     }
 
     @DELETE
     @Path("{id}/index/{metaID}")
     public Response removeFromIndex(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
-        return ok(getConfigurer().removeFromIndex(id, metaID));
+        final List<String> identifiers = StringUtilities.toStringList(metaID);
+        return ok(getConfigurer().removeFromIndex(id, identifiers));
     }
 
     @POST

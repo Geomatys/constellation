@@ -87,6 +87,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Optional;
+import java.util.Arrays;
 import org.constellation.business.IMetadataBusiness;
 
 /**
@@ -500,7 +501,7 @@ public class DatasetBusiness implements IDatasetBusiness {
                 involvedProvider.add(data.getProvider());
                 Metadata meta = metadataRepository.findByDataId(data.getId());
                 if (meta != null) {
-                    metadataBusiness.updateInternalCSWIndex(meta, false);
+                    metadataBusiness.updateInternalCSWIndex(Arrays.asList(meta), false);
                 }
                 dataRepository.removeDataFromAllCSW(data.getId());
             }
@@ -536,7 +537,7 @@ public class DatasetBusiness implements IDatasetBusiness {
             // update internal CSW index
             final Metadata meta = metadataRepository.findByDatasetId(ds.getId());
             if (meta != null) {
-                metadataBusiness.updateInternalCSWIndex(meta, false);
+                metadataBusiness.updateInternalCSWIndex(Arrays.asList(meta), false);
             }
         }
     }

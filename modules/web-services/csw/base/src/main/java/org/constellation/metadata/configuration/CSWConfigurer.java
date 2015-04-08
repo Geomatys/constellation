@@ -209,16 +209,18 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
      * @throws ConfigurationException
      */
     @Override
-    public AcknowlegementType addToIndex(final String id, final String identifierList) throws ConfigurationException {
+    public AcknowlegementType addToIndex(final String id, final List<String> identifierList) throws ConfigurationException {
+        if (identifierList.isEmpty()) {
+            return new AcknowlegementType("Success", "warning: identifier list empty");
+        }
         LOGGER.info("Add to index requested");
-        final List<String> identifiers = StringUtilities.toStringList(identifierList);
         AbstractIndexer indexer  = null;
         try {
             final CSWMetadataReader reader  = getReader(id);
             final List<Object> objectToIndex = new ArrayList<>();
             if (reader != null) {
                 try {
-                    for (String identifier : identifiers) {
+                    for (String identifier : identifierList) {
                         final Object obj = reader.getMetadata(identifier, MetadataType.NATIVE);
                         if (obj == null) {
                             throw new ConfigurationException("Unable to find the metadata: " + identifier);
@@ -246,9 +248,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
                 indexer.destroy();
             }
         }
-
-        final String msg = "The specified record have been added to the CSW index";
-        return new AcknowlegementType("Success", msg);
+        return new AcknowlegementType("Success", "The specified record have been added to the CSW index");
     }
 
     /**
@@ -261,15 +261,17 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
      * @throws ConfigurationException
      */
     @Override
-    public AcknowlegementType removeFromIndex(final String id, final String identifierList) throws ConfigurationException {
+    public AcknowlegementType removeFromIndex(final String id, final List<String> identifierList) throws ConfigurationException {
+        if (identifierList.isEmpty()) {
+            return new AcknowlegementType("Success", "warning: identifier list empty");
+        }
         LOGGER.info("Remove from index requested");
-        final List<String> identifiers = StringUtilities.toStringList(identifierList);
         AbstractIndexer indexer  = null;
         try {
             final CSWMetadataReader reader  = getReader(id);
             indexer = getIndexer(id, reader);
             if (indexer != null) {
-                for (String metadataID : identifiers) {
+                for (String metadataID : identifierList) {
                     indexer.removeDocument(metadataID);
                 }
             } else {

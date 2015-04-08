@@ -308,9 +308,11 @@ public class MetadataRest {
         // but some of records can have a restricted permission for this user.
         //So we need to send an error message to prevent this case.
         //It would be great if we can returns the ids of metadata which cannot be deleted
+        List<Integer> ids = new ArrayList<>();
         for (MetadataBrief brief : metadataList) {
-            metadataBusiness.deleteMetadata(brief.getId());
+            ids.add(brief.getId());
         }
+        metadataBusiness.deleteMetadata(ids);
         return Response.ok("records deleted with success!").build();
     }
 
@@ -429,9 +431,11 @@ public class MetadataRest {
     @POST
     @Path("/changePublication/{ispublished}")
     public Response changePublication(@PathParam("ispublished") final boolean ispublished,final List<MetadataBrief> metadataList) throws ConfigurationException {
+        List<Integer> ids = new ArrayList<>();
         for (MetadataBrief brief : metadataList) {
-            metadataBusiness.updatePublication(brief.getId(), ispublished);
+            ids.add(brief.getId());
         }
+        metadataBusiness.updatePublication(ids, ispublished);
         return Response.ok("Published state applied with success!").build();
     }
 

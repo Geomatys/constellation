@@ -105,11 +105,15 @@ public interface IMetadataBusiness {
     
     void updatePublication(final int id, final boolean newStatus) throws ConfigurationException;
     
+    void updatePublication(final List<Integer> ids, final boolean newStatus) throws ConfigurationException;
+    
     void updateValidation(final int id, final boolean newStatus);
     
     void updateOwner(final int id, final int newOwner);
     
     void deleteMetadata(final int id) throws ConfigurationException;
+    
+    void deleteMetadata(final List<Integer> ids) throws ConfigurationException;
     
     Integer getCompletionForData(final int dataId);
     
@@ -119,5 +123,5 @@ public interface IMetadataBusiness {
     
     DefaultMetadata getIsoMetadataForDataset(final int datasetId) throws ConfigurationException;
     
-    void updateInternalCSWIndex(final Metadata metadata, final boolean update) throws ConfigurationException;
+    void updateInternalCSWIndex(final List<Metadata> metadatas, final boolean update) throws ConfigurationException;
 }
