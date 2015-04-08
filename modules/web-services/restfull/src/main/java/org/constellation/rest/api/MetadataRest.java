@@ -2,6 +2,7 @@ package org.constellation.rest.api;
 
 import com.google.common.base.Optional;
 import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.XML;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
@@ -9,6 +10,7 @@ import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.model.metadata.Filter;
 import org.constellation.model.metadata.MetadataBrief;
 import org.constellation.model.metadata.MetadataLightBrief;
@@ -36,6 +38,7 @@ import java.io.StringWriter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -478,7 +481,9 @@ public class MetadataRest {
         try{
             DefaultMetadata metadata = metadataBusiness.getMetadata(metadataId);
             if (metadata != null) {
-                metadata.prune();
+                if(prune){
+                    metadata.prune();
+                }
                 //get template name
                 final String templateName = metadataBusiness.getMetadataById(metadataId).getProfile();
                 final Template template = Template.getInstance(templateName);
@@ -488,6 +493,49 @@ public class MetadataRest {
             LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
         }
         return Response.ok(buffer.toString()).build();
+    }
+
+    /**
+     * TODO implements save metadata for given int ID and DefaultMetadata object
+     *
+     * Proceed to save metadata values for given metadataId and values
+     * using template defined by given profile.
+     *
+     * @param metadataId given metadata id
+     * @param profile given profile, can be another profile of metadata's own
+     * @param metadataValues {@code RootObj} metadata values to save
+     * @return {code Response}
+     */
+    @POST
+    @Path("/save/{metadataId}/{profile}")
+    public Response saveMetadata(@PathParam("metadataId") final int metadataId,
+                                 @PathParam("profile") final String profile,
+                                 final RootObj metadataValues) {
+        try {
+            // Get previously saved metadata
+            final DefaultMetadata metadata = metadataBusiness.getMetadata(metadataId);
+            if(metadata != null) {
+                //get template
+                final Template template = Template.getInstance(profile);
+                try{
+                    template.read(metadataValues,metadata,false);
+                }catch(IOException ex){
+                    LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
+                    return Response.status(500).entity(ex.getLocalizedMessage()).build();
+                }
+                //update dateStamp for metadata
+                //FIXME continuing to call deperecated method?
+                metadata.setDateStamp(new Date());
+
+                //Save metadata
+                //TODO should I call the save with arguments like that? maybe use integer ID instead of String fileIdentifier.
+                metadataBusiness.updateMetadata(metadata.getFileIdentifier(), XML.marshal(metadata));
+
+            }
+        } catch (Exception ex) {
+            LOGGER.warning("Error while saving metadata");
+        }
+        return Response.ok("Metadata saved successfully!").build();
     }
 
 

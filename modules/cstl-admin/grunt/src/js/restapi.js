@@ -195,6 +195,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             changeOwner:        {method: 'POST',    url: '@cstl/api/1/metadata/changeOwner/:ownerId'},
             changeValidation:   {method: 'POST',    url: '@cstl/api/1/metadata/changeValidation/:isvalid'},
             changePublication:  {method: 'POST',    url: '@cstl/api/1/metadata/changePublication/:ispublished'},
+            saveMetadata:       {method: 'POST',    url: '@cstl/api/1/metadata/save/:metadataId/:profile'},
             getMetadataJson :   {method: 'GET',     url: '@cstl/api/1/metadata/metadataJson/iso/:metadataId/:prune'}
         });
     })

@@ -677,13 +677,14 @@ public class DataRest {
     }
 
     /**
+     * Used to open metadata editor form.
+     * the metadata.prune() should never be called in this method.
      * Returns json result of template writer to apply a given template to metadata object.
      * The path of each fields/blocks will be numerated.
      * the returned json object will be used directly in html metadata editor.
      *
      * @param values given parameters.
      * @return {@code Response}
-     * @throws ConfigurationException
      */
     @POST
     @Path("metadata/dataset")
@@ -707,6 +708,15 @@ public class DataRest {
         return Response.ok(buffer.toString()).build();
     }
 
+    /**
+     * Used to open metadata editor form.
+     * the metadata.prune() should never be called in this method.
+     * Returns json result of template writer to apply a given template to metadata object.
+     *
+     * @param values given parameters to resolve the metadata object from database.
+     * @return {@code Response}
+     * @throws ConfigurationException
+     */
     @POST
     @Path("metadata/data")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -746,6 +756,8 @@ public class DataRest {
     }
 
     /**
+     * Called always with prune=true for display purposes of metadata.
+     * metadata.prune() is called to clean empty nodes.
      * For data, returns applied template for metadata for read mode only like metadata viewer.
      * for reference (consult) purposes only.
      *
@@ -799,6 +811,8 @@ public class DataRest {
     }
 
     /**
+     * Called always with prune=true for display purposes of metadata.
+     * metadata.prune() is called to clean empty nodes.
      * for Dataset, returns applied template for metadata for read mode only like metadata viewer.
      * for reference (consult) purposes only.
      *
