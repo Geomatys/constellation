@@ -164,8 +164,21 @@ public class MetadataBusiness implements IMetadataBusiness {
     
     @Override
     @Transactional
+    public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException  {
+        return updateMetadata(metadataId, metadata, null, null);
+    }
+    
+    @Override
+    @Transactional
     public boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
         return updateMetadata(metadataId, xml, null, null);
+    }
+    
+    @Override
+    @Transactional
+    public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID) throws ConfigurationException  {
+        final String xml = marshallMetadata(metadata);
+        return updateMetadata(metadataId, xml, dataID, datasetID);
     }
     
     @Override
@@ -704,6 +717,14 @@ public class MetadataBusiness implements IMetadataBusiness {
     protected Object unmarshallMetadata(final String metadata) throws ConfigurationException {
         try {
             return XML.unmarshal(metadata);
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to unmarshall metadata", ex);
+        }
+    }
+    
+    protected String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException {
+        try {
+            return XML.marshal(metadata);
         } catch (JAXBException ex) {
             throw new ConfigurationException("Unable to unmarshall metadata", ex);
         }

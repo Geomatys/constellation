@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -37,9 +36,7 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -81,10 +78,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.google.common.base.Optional;
 import java.util.Arrays;
@@ -162,8 +155,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     /**
-     * Get all dataset from dataset table.
-     * @return list of {@link Dataset}.
+     * {@inheritDoc}
      */
     @Override
     public List<Dataset> getAllDataset() {
@@ -171,10 +163,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     /**
-     * Get dataset for given identifier.
-     *
-     * @param identifier dataset identifier.
-     * @return {@link Dataset}.
+     * {@inheritDoc}
      */
     @Override
     public Dataset getDataset(final String identifier) {
@@ -182,12 +171,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     /**
-     * Create and insert then returns a new dataset for given parameters.
-     * @param identifier dataset identifier.
-     * @param metadataId metadata identifier.
-     * @param metadataXml metadata content as xml string.
-     * @param owner
-     * @return {@link Dataset}.
+     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -216,12 +200,9 @@ public class DatasetBusiness implements IDatasetBusiness {
         }
         return createDataset(identifier, metadataId, metadataString, owner);
     }
+    
     /**
-     * Get metadata for given dataset identifier.
-     *
-     * @param datasetIdentifier given dataset identifier.
-     * @return {@link org.apache.sis.metadata.iso.DefaultMetadata}.
-     * @throws ConfigurationException for JAXBException
+     * {@inheritDoc}
      */
     @Override
     public DefaultMetadata getMetadata(final String datasetIdentifier) throws ConfigurationException {
@@ -233,42 +214,16 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     /**
-     * Convert iso metadata string xml to w3c document.
-     *
-     * @param metadataStr the given metadata xml as string.
-     * @return {@link Node} that represents the metadata in w3c document format.
-     * @throws ConfigurationException
-     */
-    protected Node getNodeFromString(final String metadataStr) throws ConfigurationException {
-        if(metadataStr == null) {
-            return null;
-        }
-        try {
-            final InputSource source = new InputSource(new StringReader(metadataStr));
-            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-            final Document document = docBuilder.parse(source);
-            return document.getDocumentElement();
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            throw new ConfigurationException("Unable to get w3c node for metadata of dataset!", ex);
-        }
-    }
-
-    /**
-     * Proceed to update metadata for given dataset identifier.
-     *
-     * @param datasetIdentifier given dataset identifier.
-     * @param metadata metadata as {@link org.apache.sis.metadata.iso.DefaultMetadata} to update.
-     * @throws ConfigurationException
+     * {@inheritDoc}
      */
     @Override
     @Transactional
     public void updateMetadata(final String datasetIdentifier,
                                final DefaultMetadata metadata) throws ConfigurationException {
-        final String metadataString = marshallMetadata(metadata);
         
         final Dataset dataset = datasetRepository.findByIdentifier(datasetIdentifier);
         if (dataset != null) {
-            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadataString, null, dataset.getId());
+            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata, null, dataset.getId());
             
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
         } else {
@@ -277,12 +232,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     /**
-     * Proceed to extract metadata from reader and fill additional info
-     * then save metadata in dataset.
-     *
-     * @param providerId given provider identifier.
-     * @param dataType data type vector or raster.
-     * @throws ConfigurationException
+     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -399,10 +349,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     /**
-     * Proceed to link data to dataset.
-     *
-     * @param ds given dataset.
-     * @param datas given data to link.
+     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -414,11 +361,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     /**
-     * Search and returns result as list of {@link Dataset} for given query string.
-     * @param queryString the lucene query.
-     * @return list of {@link Dataset}
-     * @throws org.constellation.admin.exception.ConstellationException
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public List<Dataset> searchOnMetadata(final String queryString) throws IOException, ConstellationException {

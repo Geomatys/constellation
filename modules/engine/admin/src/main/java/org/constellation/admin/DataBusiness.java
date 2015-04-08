@@ -669,11 +669,6 @@ public class DataBusiness implements IDataBusiness {
     /**
      * {@inheritDoc}
      */
-
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional
     public synchronized void removeDataFromProvider(final String providerId) {
@@ -719,11 +714,9 @@ public class DataBusiness implements IDataBusiness {
     @Override
     @Transactional
     public void updateMetadata(String providerId, QName dataName, DefaultMetadata metadata) throws ConfigurationException {
-        final String metadataString = marshallMetadata(metadata);
-        
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
-            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadataString, data.getId(), null);
+            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata, data.getId(), null);
             
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
         } else {

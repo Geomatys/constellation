@@ -80,7 +80,11 @@ public interface IMetadataBusiness {
     
     boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException;
     
+    boolean updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException;
+    
     boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID) throws ConfigurationException;
+    
+    boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID) throws ConfigurationException;
     
     /**
      * Returns all the metadata associated with a csw service.

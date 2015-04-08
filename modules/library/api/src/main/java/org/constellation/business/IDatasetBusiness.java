@@ -34,25 +34,78 @@ import org.constellation.engine.register.jooq.tables.pojos.Dataset;
  */
 public interface IDatasetBusiness {
     
+    /**
+     * Create and insert then returns a new dataset for given parameters.
+     * @param identifier dataset identifier.
+     * @param metadataId metadata identifier.
+     * @param metadataXml metadata content as xml string.
+     * @param owner
+     * @return {@link Dataset}.
+     */
     Dataset createDataset(String identifier, String metadataId, String metadataXml, Integer owner) throws ConfigurationException;
     
     Dataset createDataset(String identifier, DefaultMetadata metadataXml, Integer owner) throws ConfigurationException;
 
+    /**
+     * Proceed to update metadata for given dataset identifier.
+     *
+     * @param datasetIdentifier given dataset identifier.
+     * @param metadata metadata as {@link org.apache.sis.metadata.iso.DefaultMetadata} to update.
+     * @throws ConfigurationException
+     */
     void updateMetadata(final String datasetIdentifier, final DefaultMetadata metadata) throws ConfigurationException;
 
+    /**
+     * Get metadata for given dataset identifier.
+     *
+     * @param datasetIdentifier given dataset identifier.
+     * @return {@link org.apache.sis.metadata.iso.DefaultMetadata}.
+     * @throws ConfigurationException for JAXBException
+     */
     DefaultMetadata getMetadata(final String datasetIdentifier) throws ConfigurationException;
 
-    void saveMetadata(final String providerIdentifier, final String dataType) throws ConfigurationException;
+    /**
+     * Proceed to extract metadata from reader and fill additional info
+     * then save metadata in dataset.
+     *
+     * @param providerId given provider identifier.
+     * @param dataType data type vector or raster.
+     * @throws ConfigurationException
+     */
+    void saveMetadata(final String providerId, final String dataType) throws ConfigurationException;
     
     void removeDataset(final String datasetIdentifier) throws ConfigurationException;
 
-    Dataset getDataset(String datasetId);
+    /**
+     * Get dataset for given identifier.
+     *
+     * @param identifier dataset identifier.
+     * @return {@link Dataset}.
+     */
+    Dataset getDataset(String identifier);
 
+    /**
+     * Get all dataset from dataset table.
+     * @return list of {@link Dataset}.
+     */
     List<Dataset> getAllDataset();
 
+    /**
+     * Proceed to link data to dataset.
+     *
+     * @param dataset given dataset.
+     * @param datasFromProviderId given data to link.
+     */
     void linkDataTodataset(Dataset dataset, List<Data> datasFromProviderId);
 
-    List<Dataset> searchOnMetadata(String search) throws IOException, ConstellationException;
+    /**
+     * Search and returns result as list of {@link Dataset} for given query string.
+     * @param queryString the lucene query.
+     * @return list of {@link Dataset}
+     * @throws org.constellation.admin.exception.ConstellationException
+     * @throws IOException
+     */
+    List<Dataset> searchOnMetadata(String queryString) throws IOException, ConstellationException;
     
     void addProviderDataToDataset(final String datasetId, final String providerId) throws ConfigurationException;
     

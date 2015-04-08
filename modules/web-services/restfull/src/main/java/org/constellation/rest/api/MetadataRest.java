@@ -2,7 +2,6 @@ package org.constellation.rest.api;
 
 import com.google.common.base.Optional;
 import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.XML;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
@@ -514,23 +513,20 @@ public class MetadataRest {
         try {
             // Get previously saved metadata
             final DefaultMetadata metadata = metadataBusiness.getMetadata(metadataId);
-            if(metadata != null) {
+            if (metadata != null) {
                 //get template
                 final Template template = Template.getInstance(profile);
-                try{
-                    template.read(metadataValues,metadata,false);
-                }catch(IOException ex){
+                try {
+                    template.read(metadataValues, metadata, false);
+                } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
                     return Response.status(500).entity(ex.getLocalizedMessage()).build();
                 }
                 //update dateStamp for metadata
-                //FIXME continuing to call deperecated method?
                 metadata.setDateStamp(new Date());
 
                 //Save metadata
-                //TODO should I call the save with arguments like that? maybe use integer ID instead of String fileIdentifier.
-                metadataBusiness.updateMetadata(metadata.getFileIdentifier(), XML.marshal(metadata));
-
+                metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata);
             }
         } catch (Exception ex) {
             LOGGER.warning("Error while saving metadata");
