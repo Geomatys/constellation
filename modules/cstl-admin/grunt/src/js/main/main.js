@@ -87,10 +87,29 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
               $scope.lastname = account.lastname;  
               $rootScope.account = account;
 
-              $rootScope.hasRole = function(role) {
-                 return true; //TODO since error happen due to domain refactoring, we return true temporarily, FIXME implements this function
-              };
-
+              if(account.roles){
+                $rootScope.hasRole = function(role) {
+                 return account.roles.indexOf(role) !== -1;
+                };
+                
+                if($rootScope.hasRole('cstl-admin')){
+                	$rootScope.hasPermission = function(perm) {
+                		return true;
+                	};
+                }else if($rootScope.hasRole('cstl-publish')){
+                	$rootScope.hasPermission = function(perm) {
+                		return perm === "publish" ||  perm === "data";
+                	};
+                } else if($rootScope.hasRole('cstl-data')){
+                	$rootScope.hasPermission = function(perm) {
+                		return perm === "data";
+                	};
+                }
+                
+              }
+              
+              
+              
               $rootScope.hasMultipleDomains = function() {
                  return false; //TODO since error happen due to domain refactoring, we return false temporarily, FIXME implements this function
               };             

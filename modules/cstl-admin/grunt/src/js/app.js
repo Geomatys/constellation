@@ -223,6 +223,7 @@ cstlAdminApp
             });
 
             $rootScope.hasRole = function(){return false;};
+            $rootScope.hasPermission = function(){return false;};
 
             // call on window is about to unload its resources (refresh page or close tab)
             window.addEventListener("beforeunload", function( event ) {

@@ -61,13 +61,13 @@
             </li>
         </ul>
         <ul class="nav nav-pills" ng-controller="navCtrl">
-            <li class="hidden-sm hidden-md">
+            <li ng-if="hasPermission('publish')" class="hidden-sm hidden-md">
                 <a ng-class="navClass('webservice')" href="#/webservice" id="webserviceLink">
                     <span class="glyphicon glyphicon-cloud"></span>
                     <span translate="global.menu.web-service">Services web</span>
                 </a>
             </li>
-            <li class="hidden-xs hidden-lg">
+            <li ng-if="hasPermission('publish')" class="hidden-xs hidden-lg">
                 <a ng-class="navClass('webservice')" href="#/webservice">
                     <span class="glyphicon glyphicon-cloud"></span>
                     <span translate="global.menu.web-service.min">Services web</span>
@@ -103,19 +103,19 @@
                     <span translate="global.menu.mapcontext">Map context</span>
                 </a>
             </li>
-            <li ng-if="!hasRole('cstl-admin')" class="hidden-sm">
+            <li ng-if="!hasPermission('admin')" class="hidden-sm">
                 <a ng-class="navClass('tasks')" href="#/tasks" id="task">
                     <span class="glyphicon glyphicon-cog"></span>
                     <span translate="global.menu.tasks">Tasks</span>
                 </a>
             </li>
-            <li ng-if="hasRole('cstl-admin')" class="hidden-sm hidden-md">
+            <li ng-if="hasPermission('admin')" class="hidden-sm hidden-md">
                 <a ng-class="navClass('tasks')" href="#/tasks" id="taskAdmin">
                     <span class="glyphicon glyphicon-cog"></span>
                     <span translate="global.menu.tasks">Tasks</span>
                 </a>
             </li>
-            <li class="hidden-sm hidden-md" ng-if="hasRole('cstl-admin')">
+            <li class="hidden-sm hidden-md" ng-if="hasPermission('admin')">
                 <a ng-class="navClass('admin')" href="#/admin" id="admin">
                     <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
                     <span translate="global.menu.admin.main">Administration</span>
@@ -163,7 +163,7 @@
                             <span translate="global.menu.tasks">Tasks</span>
                         </a>
                     </li>
-                    <li ng-if="hasRole('cstl-admin')">
+                    <li ng-if="hasPermission('admin')">
                         <a ng-class="navClass('admin')" href="#/admin">
                             <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
                             <span translate="global.menu.admin.main">Administration</span>
@@ -172,7 +172,7 @@
                 </ul>
             </li>
 
-            <li ng-if="hasRole('cstl-admin')" class="dropdown pointer hidden-lg hidden-sm hidden-xs">
+            <li ng-if="hasPermission('admin')" class="dropdown pointer hidden-lg hidden-sm hidden-xs">
                 <a class="dropdown-toggle" data-toggle="dropdown">
                     <span>
                         <span class="glyphicon glyphicon-plus"></span>
@@ -200,7 +200,7 @@
                             <span translate="global.menu.tasks">Tasks</span>
                         </a>
                     </li>
-                    <li ng-if="hasRole('cstl-admin')">
+                    <li ng-if="hasPermission('admin')">
                         <a ng-class="navClass('admin')" href="#/admin">
                             <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
                             <span translate="global.menu.admin.main">Administration</span>
