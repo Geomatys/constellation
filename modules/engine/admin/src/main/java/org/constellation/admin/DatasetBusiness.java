@@ -542,23 +542,6 @@ public class DatasetBusiness implements IDatasetBusiness {
         }
     }
     
-    @Override
-    public String getTemplate(final String datasetId, final String dataType) throws ConfigurationException {
-        //get template name
-        final String templateName;
-        if ("vector".equalsIgnoreCase(dataType)) {
-            //vector template
-            templateName = "profile_default_vector";
-        } else if ("raster".equalsIgnoreCase(dataType)) {
-            //raster template
-            templateName = "profile_default_raster";
-        } else {
-            //default template is import
-            templateName = "profile_import";
-        }
-        return templateName;
-    }
-    
     protected MarshallerPool getMarshallerPool() {
         return null; //in constellation this should always return null, since this method can be overrided by sub-project.
     }

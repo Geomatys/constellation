@@ -58,6 +58,7 @@ import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Set;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.constellation.ServiceDef;
@@ -232,7 +233,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             }
             metadata.setDatasetId(dataset.getId());
         } else if (!update && data != null) {
-            templateName = getDataTemplate(data.getName(), data.getNamespace(), data.getType());
+            templateName = getDataTemplate(new QName(data.getNamespace(), data.getName()) , data.getType());
             metadata.setDataId(data.getId());
         } else {
             templateName = getTemplateFromMetadata(meta);
@@ -708,7 +709,8 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
-    protected String getDataTemplate(final String dataName, final String dataNamespace, final String dataType) throws ConfigurationException {
+    @Override
+    public String getDataTemplate(final QName dataName, final String dataType) throws ConfigurationException {
         final String templateName;
         if ("vector".equalsIgnoreCase(dataType)) {
             //vector template
@@ -723,7 +725,8 @@ public class MetadataBusiness implements IMetadataBusiness {
         return templateName;
     }
     
-    protected String getDatasetTemplate(final String datasetId, final String dataType) throws ConfigurationException {
+    @Override
+    public String getDatasetTemplate(final String datasetId, final String dataType) throws ConfigurationException {
         //get template name
         final String templateName;
         if ("vector".equalsIgnoreCase(dataType)) {

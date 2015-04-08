@@ -240,8 +240,6 @@ public interface IDataBusiness {
 
     void updateMetadata(String providerId, QName dataName, DefaultMetadata metadata) throws ConfigurationException;
 
-    String getTemplate(final QName dataName, final String dataType) throws ConfigurationException;
-
     /**
      * Give subfolder list from a server file path
      *

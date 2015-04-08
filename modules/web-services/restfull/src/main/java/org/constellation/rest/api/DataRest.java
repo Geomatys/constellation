@@ -697,7 +697,7 @@ public class DataRest {
             final DefaultMetadata metadata  =  datasetBusiness.getMetadata(identifier, -1);
             if (metadata != null) {
                 //get template name
-                final String templateName = datasetBusiness.getTemplate(identifier, dataType);
+                final String templateName = metadataBusiness.getDatasetTemplate(identifier, dataType);
                 final Template template   = Template.getInstance(templateName);
                 template.write(metadata,buffer,false);
             }
@@ -732,9 +732,9 @@ public class DataRest {
                 //get template name
                 final String templateName;
                 if (datasetId != null) {
-                    templateName = datasetBusiness.getTemplate(datasetId, dataType);
+                    templateName = metadataBusiness.getDatasetTemplate(datasetId, dataType);
                 } else {
-                    templateName = dataBusiness.getTemplate(dataName, dataType);
+                    templateName = metadataBusiness.getDataTemplate(dataName, dataType);
                 }
                 final Template template = Template.getInstance(templateName);
                 template.write(metadata,buffer,false);
@@ -785,9 +785,9 @@ public class DataRest {
                 //get template name
                 final String templateName;
                 if (datasetId != null) {
-                    templateName = datasetBusiness.getTemplate(datasetId, type);
+                    templateName = metadataBusiness.getDatasetTemplate(datasetId, type);
                 } else {
-                    templateName = dataBusiness.getTemplate(dataName, type);
+                    templateName = metadataBusiness.getDataTemplate(dataName, type);
                 }
                 final Template template = Template.getInstance(templateName);
                 template.write(metadata,buffer,prune);
@@ -820,7 +820,7 @@ public class DataRest {
             if (metadata != null) {
                 metadata.prune();
                 //get template name
-                final String templateName = datasetBusiness.getTemplate(datasetIdentifier, type);
+                final String templateName = metadataBusiness.getDatasetTemplate(datasetIdentifier, type);
                 final Template template   = Template.getInstance(templateName);
                 template.write(metadata,buffer,prune);
             }
@@ -864,9 +864,9 @@ public class DataRest {
                 //get template name
                 final String templateName;
                 if (datasetId != null) {
-                    templateName = datasetBusiness.getTemplate(datasetId, type);
+                    templateName = metadataBusiness.getDatasetTemplate(datasetId, type);
                 } else {
-                    templateName = dataBusiness.getTemplate(dataName, type);
+                    templateName = metadataBusiness.getDataTemplate(dataName, type);
                 }
                 final Template template = Template.getInstance(templateName);
 
@@ -906,7 +906,7 @@ public class DataRest {
             final DefaultMetadata metadata = datasetBusiness.getMetadata(identifier, -1);
             if(metadata != null) {
                 //get template name
-                final String templateName = datasetBusiness.getTemplate(identifier, type);
+                final String templateName = metadataBusiness.getDatasetTemplate(identifier, type);
                 final Template template = Template.getInstance(templateName);
 
                 try{
@@ -956,7 +956,7 @@ public class DataRest {
                 final List<DataSetBrief> datasetBriefs = new ArrayList<>();
                 final List<Dataset> datasetList = datasetBusiness.searchOnMetadata(search);
                 for (final Dataset ds : datasetList) {
-                    final DataSetBrief dsb = buildDatsetBrief(ds,domainId,null);
+                    final DataSetBrief dsb = buildDatsetBrief(ds,null);
                     datasetBriefs.add(dsb);
                 }
                 for(final DataSetBrief dsb : datasetBriefs){
@@ -972,10 +972,9 @@ public class DataRest {
     /**
      * Build {@link DataSetBrief} instance from {@link Dataset} and domain id.
      * @param dataset given dataset object.
-     * @param domainId given domain id.
      * @return {@link DataSetBrief} built from the given dataset.
      */
-    private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId, List<DataBrief> children){
+    private DataSetBrief buildDatsetBrief(final Dataset dataset, List<DataBrief> children){
         final Integer dataSetId = dataset.getId();
         if (children == null) {
             children = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
@@ -1842,7 +1841,7 @@ public class DataRest {
         if(datasets!=null){
             for(final Dataset ds : datasets){
                 final List<DataBrief> briefs = new ArrayList<>();
-                final DataSetBrief dsb = buildDatsetBrief(ds,domainId,briefs);
+                final DataSetBrief dsb = buildDatsetBrief(ds,briefs);
                 datasetBriefs.add(dsb);
             }
         }
@@ -1905,7 +1904,7 @@ public class DataRest {
                 if(briefs.isEmpty()){
                     continue;
                 }
-                final DataSetBrief dsb = buildDatsetBrief(ds,domainId,briefs);
+                final DataSetBrief dsb = buildDatsetBrief(ds,briefs);
                 datasetBriefs.add(dsb);
             }
         }
@@ -1969,7 +1968,7 @@ public class DataRest {
                 if(briefs.isEmpty()){
                     continue;
                 }
-                final DataSetBrief dsb = buildDatsetBrief(ds,domainId,briefs);
+                final DataSetBrief dsb = buildDatsetBrief(ds,briefs);
                 datasetBriefs.add(dsb);
             }
         }

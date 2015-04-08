@@ -19,6 +19,7 @@
 package org.constellation.business;
 
 import java.util.List;
+import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
@@ -124,4 +125,8 @@ public interface IMetadataBusiness {
     DefaultMetadata getIsoMetadataForDataset(final int datasetId) throws ConfigurationException;
     
     void updateInternalCSWIndex(final List<Metadata> metadatas, final boolean update) throws ConfigurationException;
+    
+    String getDatasetTemplate(final String datasetId, final String dataType) throws ConfigurationException;
+    
+    String getDataTemplate(final QName dataName, final String dataType) throws ConfigurationException;
 }
