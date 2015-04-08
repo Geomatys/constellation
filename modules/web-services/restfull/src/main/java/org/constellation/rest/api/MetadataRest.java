@@ -16,6 +16,7 @@ import org.constellation.model.metadata.Page;
 import org.constellation.model.metadata.PagedSearch;
 import org.constellation.model.metadata.Profile;
 import org.constellation.model.metadata.Sort;
+import org.constellation.model.metadata.User;
 import org.geotoolkit.util.FileUtilities;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +51,9 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.json.metadata.v2.Template;
 
 /**
+ * Provides all necessary methods to serve rest api for metadata.
+ * Used by the new metadata dashboard page.
+ *
  * @author Mehdi Sidhoum (Geomatys).
  */
 @Component
@@ -58,6 +62,9 @@ import org.constellation.json.metadata.v2.Template;
 @Produces("application/json")
 public class MetadataRest {
 
+    /**
+     * Used for debugging purposes.
+     */
     private static final Logger LOGGER = Logging.getLogger(MetadataRest.class);
 
     /**
@@ -78,10 +85,14 @@ public class MetadataRest {
     @Inject
     private UserRepository userRepository;
 
-    public MetadataRest() {
+    public MetadataRest() {}
 
-    }
-
+    /**
+     * Returns the list of profiles used by metadata,
+     * the list contains only profiles used not all.
+     *
+     * @return List of {@link Profile}
+     */
     @GET
     @Path("/profiles")
     public List<Profile> getProfilesList() {
@@ -90,6 +101,26 @@ public class MetadataRest {
         if(map!=null){
             for(final Map.Entry<String,Integer> entry : map.entrySet()){
                 result.add(new Profile(entry.getKey(),entry.getValue()));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns the list of users to serve metadata owner property.
+     * since the UserRest api does not work yet,
+     * we use this method to serve the list of users.
+     *
+     * @return List of {@link User}
+     */
+    @GET
+    @Path("/usersList")
+    public List<User> getUsersList() {
+        final List<User> result = new ArrayList<>();
+        final List<CstlUser> users = userRepository.findAll();
+        if(users != null) {
+            for(final CstlUser u : users) {
+                result.add(new User(u.getId(),u.getLogin(),u.getEmail(),u.getLastname(),u.getFirstname(),u.getActive()));
             }
         }
         return result;
@@ -272,14 +303,14 @@ public class MetadataRest {
         mdb.setType(md.getProfile());
 
         final Optional<CstlUser> optUser = userRepository.findById(md.getOwner());
-        String owner = null;
+        User owner = null;
         if(optUser!=null && optUser.isPresent()){
             final CstlUser user = optUser.get();
             if(user != null){
-                owner = user.getLogin();
+                owner = new User(user.getId(),user.getLogin(),user.getEmail(),user.getLastname(),user.getFirstname(),user.getActive());
             }
         }
-        mdb.setOwner(owner);
+        mdb.setUser(owner);
         mdb.setUpdateDate(md.getDatestamp());
         mdb.setCreationDate(md.getDateCreation());
         mdb.setMdCompletion(md.getMdCompletion());
