@@ -281,6 +281,6 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         
         
         final Provider prov = providerBusiness.storeProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
-        datasetBusiness.createDataset(identifier, meta.getFileIdentifier(), sw.toString(), null);
+        datasetBusiness.createDataset(identifier, sw.toString(), null);
     }
 }

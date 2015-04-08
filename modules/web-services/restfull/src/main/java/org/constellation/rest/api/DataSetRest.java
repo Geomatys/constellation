@@ -51,6 +51,7 @@ import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
+import org.geotoolkit.util.FileUtilities;
 
 /**
  * RESTful API for dataset metadata.
@@ -131,13 +132,13 @@ public class DataSetRest {
                     return Response.status(Response.Status.CONFLICT).entity("failed").build();
                 }
                 
-                DefaultMetadata metadataISO = null;
+                String metadataXML = null;
                 if (metafile != null) {
-                    metadataISO = dataBusiness.unmarshallMetadata(new File(metafile));
+                    metadataXML = FileUtilities.getStringFromFile(new File(metafile));
                 }
 
                 Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
-                Dataset dataSet = datasetBusiness.createDataset(datasetIdentifier, metadataISO, user.get().getId());
+                Dataset dataSet = datasetBusiness.createDataset(datasetIdentifier, metadataXML, user.get().getId());
                 return Response.ok().status(Response.Status.CREATED)
                         .type(MediaType.APPLICATION_JSON)
                         .entity(dataSet)

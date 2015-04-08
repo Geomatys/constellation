@@ -854,6 +854,7 @@ public class DataBusiness implements IDataBusiness {
     }
 
     @Override
+    @Deprecated
     public DefaultMetadata unmarshallMetadata(final String metadata) throws ConfigurationException {
         try {
             final MarshallerPool pool = getMarshallerPool();
@@ -872,6 +873,7 @@ public class DataBusiness implements IDataBusiness {
     }
 
     @Override
+    @Deprecated
     public DefaultMetadata unmarshallMetadata(final File metadata) throws ConfigurationException {
         try {
             final MarshallerPool pool = getMarshallerPool();

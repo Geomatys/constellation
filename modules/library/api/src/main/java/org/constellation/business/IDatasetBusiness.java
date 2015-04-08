@@ -37,15 +37,12 @@ public interface IDatasetBusiness {
     /**
      * Create and insert then returns a new dataset for given parameters.
      * @param identifier dataset identifier.
-     * @param metadataId metadata identifier.
      * @param metadataXml metadata content as xml string.
      * @param owner
      * @return {@link Dataset}.
      */
-    Dataset createDataset(String identifier, String metadataId, String metadataXml, Integer owner) throws ConfigurationException;
+    Dataset createDataset(String identifier, String metadataXml, Integer owner) throws ConfigurationException;
     
-    Dataset createDataset(String identifier, DefaultMetadata metadataXml, Integer owner) throws ConfigurationException;
-
     /**
      * Proceed to update metadata for given dataset identifier.
      *

@@ -221,7 +221,7 @@ public final class DefaultConfigurator implements Configurator {
                 final Dataset dataset = datasetRepository.findByIdentifier(pr.getIdentifier());
                 if (dataset == null) {
                     if(createDatasetIfNull) {
-                        datasetId = datasetBusiness.createDataset(pr.getIdentifier(), null, null, pr.getOwner()).getId();
+                        datasetId = datasetBusiness.createDataset(pr.getIdentifier(), null, pr.getOwner()).getId();
                     }
                 }else {
                     datasetId = dataset.getId();

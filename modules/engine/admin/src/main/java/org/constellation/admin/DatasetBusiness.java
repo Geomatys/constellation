@@ -175,7 +175,7 @@ public class DatasetBusiness implements IDatasetBusiness {
      */
     @Override
     @Transactional
-    public Dataset createDataset(final String identifier, final String metadataId, final String metadataXml, final Integer owner) throws ConfigurationException {
+    public Dataset createDataset(final String identifier, final String metadataXml, final Integer owner) throws ConfigurationException {
         Dataset ds = new Dataset();
         ds.setIdentifier(identifier);
         ds.setOwner(owner);
@@ -189,18 +189,6 @@ public class DatasetBusiness implements IDatasetBusiness {
         return ds;
     }
 
-    @Override
-    @Transactional
-    public Dataset createDataset(String identifier, DefaultMetadata metadata, Integer owner) throws ConfigurationException {
-        String metadataString = null;
-        String metadataId = null;
-        if (metadata != null) {
-            metadataId = metadata.getFileIdentifier();
-            metadataString = marshallMetadata(metadata);
-        }
-        return createDataset(identifier, metadataId, metadataString, owner);
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -475,6 +463,7 @@ public class DatasetBusiness implements IDatasetBusiness {
         return null; //in constellation this should always return null, since this method can be overrided by sub-project.
     }
 
+    @Deprecated
     protected String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException {
         try {
             final MarshallerPool pool = getMarshallerPool();
@@ -492,6 +481,7 @@ public class DatasetBusiness implements IDatasetBusiness {
         }
     }
 
+    @Deprecated
     protected DefaultMetadata unmarshallMetadata(final String metadataStr) throws ConfigurationException {
         try {
             final MarshallerPool pool = getMarshallerPool();
