@@ -89,8 +89,8 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                 final ProcessContext config = new ProcessContext(processes);
                 config.getCustomParameters().put("shiroAccessible", "false");
 
-                serviceBusiness.create("wps", "default", config, null, null);
-                serviceBusiness.create("wps", "test",    config, null, null);
+                serviceBusiness.create("wps", "default", config, null);
+                serviceBusiness.create("wps", "test",    config, null);
 
                 final Map<String, Object> map = new HashMap<>();
                 map.put("wps", new WPSService());

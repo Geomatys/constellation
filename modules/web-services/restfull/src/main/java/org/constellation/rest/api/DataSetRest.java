@@ -49,7 +49,6 @@ import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Node;
 
 import com.google.common.base.Optional;
 
@@ -106,7 +105,7 @@ public class DataSetRest {
     public Response removeDataSet(@PathParam("domainId") final int domainId,
                                   @PathParam("datasetIdentifier") final String datasetIdentifier) {
         try{
-            datasetBusiness.removeDataset(datasetIdentifier, domainId);
+            datasetBusiness.removeDataset(datasetIdentifier);
             return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "Failed to remove dataset with identifier "+datasetIdentifier,ex);
@@ -166,7 +165,7 @@ public class DataSetRest {
         final List<Dataset> datasets = datasetBusiness.getAllDataset();
         if(datasets!=null){
             for(final Dataset ds : datasets){
-                final DataSetBrief dsb = buildDatsetBrief(ds,domainId);
+                final DataSetBrief dsb = buildDatsetBrief(ds);
                 datasetBriefs.add(dsb);
             }
         }
@@ -184,7 +183,7 @@ public class DataSetRest {
     public Response downloadMetadataForDataSet(@PathParam("domainId") final int domainId,
                                                @PathParam("datasetIdentifier") final String datasetIdentifier) {
         try{
-            final DefaultMetadata metadata  =  datasetBusiness.getMetadata(datasetIdentifier, domainId);
+            final DefaultMetadata metadata  =  datasetBusiness.getMetadata(datasetIdentifier);
             if (metadata != null) {
                 metadata.prune();
                 final String xmlStr = dataBusiness.marshallMetadata(metadata);
@@ -214,7 +213,7 @@ public class DataSetRest {
         try {
             datasetList = datasetBusiness.searchOnMetadata(search);
             for (final Dataset ds : datasetList) {
-                final DataSetBrief dsb = buildDatsetBrief(ds,domainId);
+                final DataSetBrief dsb = buildDatsetBrief(ds);
                 briefs.add(dsb);
             }
             return Response.ok(briefs).build();
@@ -224,12 +223,11 @@ public class DataSetRest {
     }
 
     /**
-     * Build {@link DataSetBrief} instance from {@link Dataset} and domain id.
+     * Build {@link DataSetBrief} instance from {@link Dataset}.
      * @param dataset given dataset object.
-     * @param domainId given domain id.
      * @return {@link DataSetBrief} built from the given dataset.
      */
-    private DataSetBrief buildDatsetBrief(final Dataset dataset,final int domainId){
+    private DataSetBrief buildDatsetBrief(final Dataset dataset){
         final Integer dataSetId = dataset.getId();
         final List<DataBrief> dataBriefList = dataBusiness.getDataBriefsFromDatasetId(dataSetId);
         final DataSetBrief dsb = datasetBusiness.getDatasetBrief(dataSetId, dataBriefList);

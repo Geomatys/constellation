@@ -95,7 +95,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
                 configuration.putParameter("transactionSecurized", "false");
                 configuration.putParameter("shiroAccessible", "false");
 
-                serviceBusiness.create("csw", "default", configuration, null, null);
+                serviceBusiness.create("csw", "default", configuration, null);
 
                 fillPoolAnchor((AnchoredMarshallerPool) pool);
                 Unmarshaller u = pool.acquireUnmarshaller();
@@ -113,7 +113,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
                 configuration.putParameter("transactionSecurized", "false");
                 configuration.putParameter("shiroAccessible", "false");
 
-                serviceBusiness.create("csw", "default", configuration, null, null);
+                serviceBusiness.create("csw", "default", configuration, null);
                 
                 worker = new CSWworker("default");
                 worker.setLogLevel(Level.FINER);

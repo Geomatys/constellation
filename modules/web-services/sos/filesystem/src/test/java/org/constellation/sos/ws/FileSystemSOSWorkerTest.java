@@ -106,7 +106,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
                 //we write the configuration file
                 
-                serviceBusiness.create("sos", "default", configuration, null, null);
+                serviceBusiness.create("sos", "default", configuration, null);
 
                 init();
                 worker = new SOSworker("default");
@@ -118,7 +118,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
                 
                 setUpClass();
                 
-                serviceBusiness.create("sos", "default", configuration, null, null);
+                serviceBusiness.create("sos", "default", configuration, null);
 
                 init();
                 worker = new SOSworker("default");

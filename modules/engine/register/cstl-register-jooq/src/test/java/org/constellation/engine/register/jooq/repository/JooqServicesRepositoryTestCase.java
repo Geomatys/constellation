@@ -57,7 +57,7 @@ public class JooqServicesRepositoryTestCase extends AbstractJooqTestTestCase {
     
     @Test
     public void findAccessibleServiceByType() {
-        dump(serviceRepository.getAccessiblesServicesByType(1, "looo"));
+        dump(serviceRepository.getAccessiblesServicesByType("looo"));
     }
     
     

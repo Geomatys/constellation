@@ -93,7 +93,7 @@ public class ServiceBusiness implements IServiceBusiness {
      */
     @Override
     @Transactional
-    public Object create(final String serviceType, final String identifier, Object configuration, Details details, final Integer domainId)
+    public Object create(final String serviceType, final String identifier, Object configuration, Details details)
             throws ConfigurationException {
 
         if (identifier == null || identifier.isEmpty()) {

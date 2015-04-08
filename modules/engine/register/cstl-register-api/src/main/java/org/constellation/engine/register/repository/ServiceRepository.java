@@ -55,7 +55,7 @@ public interface ServiceRepository {
     
     ServiceExtraConfig getExtraConfig(int id, String filename);
 
-    java.util.Map<String, Set<String>> getAccessiblesServicesByType(int domainId, String name);
+    java.util.Map<String, Set<String>> getAccessiblesServicesByType(String name);
 
     Service update(Service service);
 

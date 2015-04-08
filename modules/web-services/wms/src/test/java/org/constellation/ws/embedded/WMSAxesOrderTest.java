@@ -212,7 +212,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
 
-                serviceBusiness.create("wms", "default", config, null, null);
+                serviceBusiness.create("wms", "default", config, null);
                 if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "wms", null);
 
 
@@ -221,7 +221,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                 config2.getCustomParameters().put("shiroAccessible", "false");
 
 
-                serviceBusiness.create("wms", "wms1", config2, null, null);
+                serviceBusiness.create("wms", "wms1", config2, null);
                 if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "wms1", "wms", null);
 
                 initServer(null, null);

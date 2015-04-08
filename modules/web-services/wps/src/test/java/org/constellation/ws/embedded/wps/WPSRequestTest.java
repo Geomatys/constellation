@@ -99,8 +99,8 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
                 final ProcessContext config = new ProcessContext(processes);
                 config.getCustomParameters().put("shiroAccessible", "false");
 
-                serviceBusiness.create("wps", "default", config, null, null);
-                serviceBusiness.create("wps", "test",    config, null, null);
+                serviceBusiness.create("wps", "default", config, null);
+                serviceBusiness.create("wps", "test",    config, null);
 
                 new AdminWebdavService(); // force webdav registration
                 final Map<String, Object> map = new HashMap<>();

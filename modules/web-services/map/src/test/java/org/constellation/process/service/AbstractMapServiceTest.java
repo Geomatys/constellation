@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.constellation.process.service.ServiceProcessTest.serviceName;
-import org.constellation.ws.WSEngine;
 
 /**
  *
@@ -51,7 +50,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected void createInstance(final String identifier, LayerContext context) {
         final LayerContext configuration = context != null ? context : new LayerContext();
         try {
-            serviceBusiness.create(serviceName.toLowerCase(), identifier, configuration, null, null);
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, configuration, null);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
@@ -76,7 +75,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
      */
     protected void createCustomInstance(final String identifier, LayerContext context) {
         try {
-            serviceBusiness.create(serviceName.toLowerCase(), identifier, context, null, null);
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, context, null);
         }  catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating custom instance", ex);
         }

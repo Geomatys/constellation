@@ -112,14 +112,14 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
             configuration.getParameters().put("transactionSecurized", "false");
             
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
-                serviceBusiness.create("sos", "default", configuration, null, null);
+                serviceBusiness.create("sos", "default", configuration, null);
                 init();
                 worker = new SOSworker("default");
                 worker.setServiceUrl(URL);
                 worker.setLogLevel(Level.FINER);
             } else if (worker == null) {
                 serviceBusiness.delete("sos", "default");
-                serviceBusiness.create("sos", "default", configuration, null, null);
+                serviceBusiness.create("sos", "default", configuration, null);
                 init();
                 worker = new SOSworker("default");
                 worker.setServiceUrl(URL);

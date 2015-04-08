@@ -171,18 +171,6 @@ public class DatasetBusiness implements IDatasetBusiness {
     }
 
     /**
-     * Get dataset for given identifier and domain id.
-     *
-     * @param datasetIdentifier given dataset identifier.
-     * @param domainId domain id.
-     * @return {@link Dataset}.
-     */
-    @Override
-    public Dataset getDataset(final String datasetIdentifier, final int domainId) {
-        return datasetRepository.findByIdentifierAndDomainId(datasetIdentifier, domainId);
-    }
-
-    /**
      * Get dataset for given identifier.
      *
      * @param identifier dataset identifier.
@@ -229,16 +217,15 @@ public class DatasetBusiness implements IDatasetBusiness {
         return createDataset(identifier, metadataId, metadataString, owner);
     }
     /**
-     * Get metadata for given dataset identifier and domain id.
+     * Get metadata for given dataset identifier.
      *
      * @param datasetIdentifier given dataset identifier.
-     * @param domainId given domain id.
      * @return {@link org.apache.sis.metadata.iso.DefaultMetadata}.
      * @throws ConfigurationException for JAXBException
      */
     @Override
-    public DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException {
-        final Dataset dataset = getDataset(datasetIdentifier, domainId);
+    public DefaultMetadata getMetadata(final String datasetIdentifier) throws ConfigurationException {
+        final Dataset dataset = getDataset(datasetIdentifier);
         if (dataset != null) {
             return metadataBusiness.getIsoMetadataForDataset(dataset.getId());
         }
@@ -270,7 +257,6 @@ public class DatasetBusiness implements IDatasetBusiness {
      * Proceed to update metadata for given dataset identifier.
      *
      * @param datasetIdentifier given dataset identifier.
-     * @param domainId given domain id.
      * @param metadata metadata as {@link org.apache.sis.metadata.iso.DefaultMetadata} to update.
      * @throws ConfigurationException
      */
@@ -395,7 +381,7 @@ public class DatasetBusiness implements IDatasetBusiness {
         //merge with uploaded metadata
         DefaultMetadata uploadedMetadata;
         try {
-            uploadedMetadata = getMetadata(providerId, -1);
+            uploadedMetadata = getMetadata(providerId);
         } catch (Exception ex) {
             uploadedMetadata = null;
         }
@@ -474,7 +460,7 @@ public class DatasetBusiness implements IDatasetBusiness {
 
     @Override
     @Transactional
-    public void removeDataset(String datasetIdentifier, int domainId) throws ConfigurationException {
+    public void removeDataset(String datasetIdentifier) throws ConfigurationException {
         final Dataset ds = datasetRepository.findByIdentifier(datasetIdentifier);
         if (ds != null) {
             final Set<Integer> involvedProvider = new HashSet<>();

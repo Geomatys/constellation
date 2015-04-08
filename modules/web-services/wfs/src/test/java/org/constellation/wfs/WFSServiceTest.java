@@ -148,7 +148,7 @@ public class WFSServiceTest implements ApplicationContextAware {
                 config.getCustomParameters().put("transactionSecurized", "false");
                 config.getCustomParameters().put("transactionnal", "true");
 
-                serviceBusiness.create("wfs", "default", config, null, null);
+                serviceBusiness.create("wfs", "default", config, null);
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "wfs", null);
                 DataProviders.getInstance().reload();
                 service = new WFSService();

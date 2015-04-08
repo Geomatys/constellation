@@ -61,7 +61,6 @@ import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.StyledLayerRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.util.DataReference;
-import org.constellation.util.Util;
 import org.geotoolkit.referencing.CRS;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -74,6 +73,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
+import org.constellation.business.IMetadataBusiness;
 
 @Component
 @Primary
@@ -90,6 +90,9 @@ public class MapContextBusiness implements IMapContextBusiness {
     @Inject
     private DataRepository dataRepository;
 
+    @Inject
+    private IMetadataBusiness metadataBusiness;
+    
     @Inject
     private IDataBusiness dataBusiness;
 
@@ -332,7 +335,7 @@ public class MapContextBusiness implements IMapContextBusiness {
                 }
                 DefaultMetadata metadata = null;
                 try {
-                    metadata = dataBusiness.loadIsoDataMetadata(dataID);
+                    metadata = metadataBusiness.getIsoMetadataForData(dataID);
                 } catch (ConfigurationException ex) {
                     LOGGER.log(Level.FINE, null, ex);
                 }
@@ -341,7 +344,7 @@ public class MapContextBusiness implements IMapContextBusiness {
                     final Dataset dataset = dataBusiness.getDatasetForData(dataID);
                     if (dataset != null) {
                         try{
-                            metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                            metadata = datasetBusiness.getMetadata(dataset.getIdentifier());
                         }catch(Exception ex){
                             //skip for this layer
                             continue;

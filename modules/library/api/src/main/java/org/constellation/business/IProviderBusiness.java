@@ -49,12 +49,9 @@ public interface IProviderBusiness {
 
     Provider getProvider(String providerId);
 
-    Provider getProvider(String providerId, int domainId);
-
     /**
      * Create and save a provider object from input identifier and {@link org.constellation.configuration.ProviderConfiguration} object.
      *
-     * @param domainId identifier of the domain to put created provider into.
      * @param id The identifier (name) to give to the created provider.
      * @param config Serialized provider configuration (entire parameter group, as defined in the matching {@link org.constellation.provider.DataProviderFactory}.
      * @return A new {@link Provider} object, containing given configuration.
@@ -68,7 +65,6 @@ public interface IProviderBusiness {
      * Create and save a provider object with given identifier. Input spi and configuration must be {@link org.geotoolkit.storage.DataStoreFactory}
      * and its proper configuration filled from {@link org.geotoolkit.storage.DataStoreFactory#getParametersDescriptor()}.
      *
-     * @param domainId identifier of the domain to put created provider into.
      * @param id The identifier (name) to give to the created provider.
      * @param spi {@link org.geotoolkit.storage.DataStoreFactory} to identify underlying data source type.
      * @param spiConfiguration The configuration needed for spi parameter to open a valid data source.
@@ -83,7 +79,6 @@ public interface IProviderBusiness {
      * Create and save a provider object with given identifier. Input spi and configuration must be {@link org.constellation.provider.DataProviderFactory}
      * and its proper configuration filled from {@link org.constellation.provider.DataProviderFactory#getProviderDescriptor()}.
      *
-     * @param domainId identifier of the domain to put created provider into.
      * @param id The identifier (name) to give to the created provider.
      * @param providerSPIName Name of the {@link org.constellation.provider.DataProviderFactory} to identify underlying data source type.
      * @param providerConfig The configuration needed for providerSPI parameter to open a valid data source.
@@ -124,6 +119,6 @@ public interface IProviderBusiness {
      */
     DataBrief createPyramidConform(final String providerId,final String dataName, final String namespace,final int userId) throws ConstellationException;
 
-	List<Integer> getProviderIdsAsInt();
+    List<Integer> getProviderIdsAsInt();
 
 }

@@ -103,7 +103,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
                 configuration.putParameter("shiroAccessible", "false");
                 configuration.putParameter("locale", "en");
 
-                serviceBusiness.create("csw", "default", configuration, null, null);
+                serviceBusiness.create("csw", "default", configuration, null);
 
                 pool = EBRIMMarshallerPool.getInstance();
                 fillPoolAnchor((AnchoredMarshallerPool) pool);

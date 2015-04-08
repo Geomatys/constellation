@@ -28,7 +28,6 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.w3c.dom.Node;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -39,16 +38,13 @@ public interface IDatasetBusiness {
     
     Dataset createDataset(String identifier, DefaultMetadata metadataXml, Integer owner) throws ConfigurationException;
 
-    Dataset getDataset(String datasetId, int domainId);
+    void updateMetadata(final String datasetIdentifier, final DefaultMetadata metadata) throws ConfigurationException;
 
-    void updateMetadata(final String datasetIdentifier,
-                        final DefaultMetadata metadata) throws ConfigurationException;
-
-    DefaultMetadata getMetadata(final String datasetIdentifier, final int domainId) throws ConfigurationException;
+    DefaultMetadata getMetadata(final String datasetIdentifier) throws ConfigurationException;
 
     void saveMetadata(final String providerIdentifier, final String dataType) throws ConfigurationException;
     
-    void removeDataset(final String datasetIdentifier, final int domainId) throws ConfigurationException;
+    void removeDataset(final String datasetIdentifier) throws ConfigurationException;
 
     Dataset getDataset(String datasetId);
 

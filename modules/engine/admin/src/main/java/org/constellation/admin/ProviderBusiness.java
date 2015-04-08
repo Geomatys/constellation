@@ -143,11 +143,6 @@ public class ProviderBusiness implements IProviderBusiness {
     }
 
     @Override
-    public Provider getProvider(String providerIdentifier, int domainId) {
-        return providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
-    }
-
-    @Override
     public Provider getProvider(final int id) {
         return providerRepository.findOne(id);
     }

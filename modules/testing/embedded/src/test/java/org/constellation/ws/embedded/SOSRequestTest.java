@@ -152,8 +152,8 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
                     serviceBusiness.delete("sos", "test");
                 } catch (ConfigurationException ex) {}
                 
-                serviceBusiness.create("sos", "default", sosconf, null, null);
-                serviceBusiness.create("sos", "test", sosconf, null, null);
+                serviceBusiness.create("sos", "default", sosconf, null);
+                serviceBusiness.create("sos", "test", sosconf, null);
 
                 final Map<String, Object> map = new HashMap<>();
                 map.put("sos", new SOService());

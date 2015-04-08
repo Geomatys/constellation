@@ -119,7 +119,7 @@ public class TreeCloseTest implements ApplicationContextAware {
                 configuration.putParameter("transactionSecurized", "false");
                 configuration.putParameter("shiroAccessible", "false");
 
-                serviceBusiness.create("csw", "default", configuration, null, null);
+                serviceBusiness.create("csw", "default", configuration, null);
 
                 if (!dataDirectory.isDirectory()) {
                     throw new Exception("the data directory does no longer exist");

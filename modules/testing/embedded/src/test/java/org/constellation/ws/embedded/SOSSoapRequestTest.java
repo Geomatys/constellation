@@ -126,7 +126,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                 sosconf.setObservationTemplateIdBase("urn:ogc:object:observationTemplate:SunSpot:");
                 sosconf.setVerifySynchronization(false);
 
-                serviceBusiness.create("sos", "default", sosconf, null, null);
+                serviceBusiness.create("sos", "default", sosconf, null);
 
                 final Map<String, Object> map = new HashMap<>();
                 map.put("sos", new SOService());

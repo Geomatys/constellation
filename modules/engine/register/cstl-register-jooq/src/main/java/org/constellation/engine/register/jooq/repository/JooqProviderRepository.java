@@ -40,9 +40,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class JooqProviderRepository extends AbstractJooqRespository<ProviderRecord, Provider> implements
         ProviderRepository {
 
-    private org.constellation.engine.register.jooq.tables.Provider provider = PROVIDER.as("p");
+    private final org.constellation.engine.register.jooq.tables.Provider provider = PROVIDER.as("p");
 
-    private Data data = DATA.as("d");
+    private final Data data = DATA.as("d");
 
     public JooqProviderRepository() {
         super(Provider.class, PROVIDER);
@@ -140,12 +140,5 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     public List<Style> findStylesByProviderId(Integer providerId) {
         return dsl.select().from(STYLE).join(PROVIDER).on(STYLE.PROVIDER.eq(PROVIDER.ID))
                 .where(PROVIDER.ID.eq(providerId)).fetchInto(Style.class);
-    }
-
-    @Override
-    public Provider findByIdentifierAndDomainId(String providerIdentifier, Integer domainId) {
-        // @FIXME binding domainId
-        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier)).fetchOneInto(Provider.class);
-
     }
 }

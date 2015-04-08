@@ -119,7 +119,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
                 Automatic configuration = new Automatic("internal", nulll);
                 configuration.putParameter("shiroAccessible", "false");
 
-                serviceBusiness.create("csw", "default", configuration, null, null);
+                serviceBusiness.create("csw", "default", configuration, null);
 
                 worker = new CSWworker("default");
                 worker.setLogLevel(Level.FINER);

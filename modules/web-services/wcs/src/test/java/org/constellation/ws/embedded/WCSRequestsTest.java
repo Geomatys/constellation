@@ -203,10 +203,10 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
 
-                serviceBusiness.create("wcs", "default", config, null, null);
+                serviceBusiness.create("wcs", "default", config, null);
                 if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "wcs", null);
 
-                serviceBusiness.create("wcs", "test", config, null, null);
+                serviceBusiness.create("wcs", "test", config, null);
                 if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "wcs", null);
 
                 initServer(null, null);

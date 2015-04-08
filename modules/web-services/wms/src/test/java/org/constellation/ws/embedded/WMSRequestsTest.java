@@ -287,7 +287,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 config.getCustomParameters().put("shiroAccessible", "false");
                 config.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
 
-                serviceBusiness.create("wms", "default", config, null, null);
+                serviceBusiness.create("wms", "default", config, null);
                 if (localdb_active)layerBusiness.add("SST_tests",            null,           "coverageTestSrc", null, "default", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
@@ -308,7 +308,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 config2.getCustomParameters().put("shiroAccessible", "false");
                 config2.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
 
-                serviceBusiness.create("wms", "wms1", config2, null, null);
+                serviceBusiness.create("wms", "wms1", config2, null);
                 layerBusiness.add("Lakes",    "http://www.opengis.net/gml", "shapeSrc",        null, "wms1", "wms", null);
 
 
@@ -346,7 +346,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 details3.setName("wms2");
                 details3.setVersions(Arrays.asList("1.3.0"));
 
-                serviceBusiness.create("wms", "wms2", config3, details3, null);
+                serviceBusiness.create("wms", "wms2", config3, details3);
                 if (localdb_active) layerBusiness.add("SST_tests",            null,          "coverageTestSrc", null, "wms2", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "wms2", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "wms2", "wms", null);

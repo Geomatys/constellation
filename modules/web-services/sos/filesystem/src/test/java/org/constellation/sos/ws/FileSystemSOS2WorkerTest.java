@@ -109,7 +109,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             configuration.getParameters().put("transactionSecurized", "false");
             
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
-                serviceBusiness.create("sos", "default", configuration, null, null);
+                serviceBusiness.create("sos", "default", configuration, null);
 
 
                 init();
@@ -119,7 +119,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             } else if (worker == null) {
                 serviceBusiness.delete("sos", "default");
                 
-                serviceBusiness.create("sos", "default", configuration, null, null);
+                serviceBusiness.create("sos", "default", configuration, null);
 
                 init();
                 worker = new SOSworker("default");

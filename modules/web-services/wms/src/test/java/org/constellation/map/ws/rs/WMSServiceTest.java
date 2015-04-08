@@ -200,7 +200,7 @@ public class WMSServiceTest implements ApplicationContextAware {
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
 
-                serviceBusiness.create("wms", "default", config, null, null);
+                serviceBusiness.create("wms", "default", config, null);
                 if (localdb_active) layerBusiness.add("SST_tests",            null,          "coverageTestSrc", null, "default", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);

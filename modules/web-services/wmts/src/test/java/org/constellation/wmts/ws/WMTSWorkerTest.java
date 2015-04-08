@@ -89,7 +89,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
             
 
 
-            serviceBusiness.create("wmts", "default", new LayerContext(), null, null);
+            serviceBusiness.create("wmts", "default", new LayerContext(), null);
 
 
             worker = new DefaultWMTSWorker("default");

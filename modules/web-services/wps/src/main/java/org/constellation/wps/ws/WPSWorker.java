@@ -476,7 +476,7 @@ public class WPSWorker extends AbstractWorker {
             if (configuration == null) {
                 final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
                 webdavCtx.setId(webdavName);
-                serviceBusiness.create("webdav", webdavName, webdavCtx, new Details(),null);
+                serviceBusiness.create("webdav", webdavName, webdavCtx, new Details());
 
                 final Worker worker = WSEngine.buildWorker("WEBDAV", webdavName);
                 WSEngine.addServiceInstance("WEBDAV", webdavName, worker);

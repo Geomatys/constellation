@@ -57,11 +57,10 @@ public interface IServiceBusiness {
      * @param identifier The name to give to the service.
      * @param configuration An optional configuration specific to the queried type of service (WPS --> PRocessContext, etc.).
      * @param serviceMetadata An ISO 19115-2 metadata file to describe the service. If null a default empty metadata will be created.
-     * @param domainId A domain to put service into. Optional.
      * @return
      * @throws ConfigurationException
      */
-    Object create(String serviceType, String identifier, Object configuration, Details serviceMetadata, Integer domainId) throws ConfigurationException;
+    Object create(String serviceType, String identifier, Object configuration, Details serviceMetadata) throws ConfigurationException;
 
     List<String> getServiceIdentifiers(String wms);
 

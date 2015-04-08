@@ -168,7 +168,7 @@ public final class OGCServicesRest {
             return ok(AcknowlegementType.failure("Instance already created"));
         }
         
-        serviceBusiness.create(spec, metadata.getIdentifier(), null, metadata, domainId);
+        serviceBusiness.create(spec, metadata.getIdentifier(), null, metadata);
         
         return created(AcknowlegementType.success(spec.toUpperCase() + " service \"" + metadata.getIdentifier() + "\" successfully created."));
     }

@@ -187,7 +187,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
-    public Map<String, Set<String>> getAccessiblesServicesByType(int domainId, String userName) {
+    public Map<String, Set<String>> getAccessiblesServicesByType(String userName) {
 
         Result<Record2<String, String>> result = dsl.selectDistinct(SERVICE.IDENTIFIER, SERVICE.TYPE).from(SERVICE)
                 .fetch();
@@ -196,7 +196,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
         Map<String, Result<Record2<String, String>>> services = result.intoGroups(SERVICE.TYPE);
         for (Entry<String, Result<Record2<String, String>>> serviceEntry : services.entrySet()) {
-            resultM.put(serviceEntry.getKey(), new HashSet<String>(serviceEntry.getValue()
+            resultM.put(serviceEntry.getKey(), new HashSet<>(serviceEntry.getValue()
                     .getValues(SERVICE.IDENTIFIER)));
 
         }

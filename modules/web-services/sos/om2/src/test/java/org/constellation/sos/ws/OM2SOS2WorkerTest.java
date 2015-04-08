@@ -111,7 +111,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
                 configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
                 configuration.getParameters().put("transactionSecurized", "false");
 
-                serviceBusiness.create("sos", "default", configuration, null, null);
+                serviceBusiness.create("sos", "default", configuration, null);
                 init();
                 worker = new SOSworker("default");
                 worker.setServiceUrl(URL);

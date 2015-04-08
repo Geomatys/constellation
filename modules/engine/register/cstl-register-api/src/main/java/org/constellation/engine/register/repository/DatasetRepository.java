@@ -38,8 +38,6 @@ public interface DatasetRepository {
             
     Dataset findByMetadataId(String metadataId);
     
-    Dataset findByIdentifierAndDomainId(String datasetIdentifier, Integer domainId);
-    
     Dataset findByIdentifier(String datasetIdentifier);
     
     Dataset findByIdentifierWithEmptyMetadata(String datasetIdentifier);

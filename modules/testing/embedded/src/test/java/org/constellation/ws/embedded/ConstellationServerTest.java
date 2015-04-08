@@ -96,7 +96,7 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
                 final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
                 config2.putParameter("shiroAccessible", "false");
                 config2.putParameter("CSWCascading", "http://localhost:9090/csw/default");
-                serviceBusiness.create("csw", "csw2", config2, null, null);
+                serviceBusiness.create("csw", "csw2", config2, null);
 
 
                 final File dataDirectory = new File(configDirectory, "dataCsw");
@@ -123,7 +123,7 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
 
                 final Automatic config = new Automatic("filesystem", dataDirectory.getPath());
                 config.putParameter("shiroAccessible", "false");
-                serviceBusiness.create("csw", "default", config, null, null);
+                serviceBusiness.create("csw", "default", config, null);
 
                 final Map<String, Object> map = new HashMap<>();
                 map.put("sos", new SOService());

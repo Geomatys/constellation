@@ -135,14 +135,6 @@ public interface IDataBusiness {
      */
     DefaultMetadata loadIsoDataMetadata(String providerId, QName name)  throws ConfigurationException;
 
-    /**
-     * Returns {@link DefaultMetadata} for given dataId.
-     * @param dataId given data id.
-     * @return {@link DefaultMetadata}
-     * @throws ConfigurationException is thrown for UnsupportedEncodingException or JAXBException.
-     */
-    DefaultMetadata loadIsoDataMetadata(int dataId) throws ConfigurationException;
-    
     Dataset getDatasetForData(String providerID, QName qName) throws ConstellationException;
 
     Dataset getDatasetForData(int dataId) throws ConstellationException;

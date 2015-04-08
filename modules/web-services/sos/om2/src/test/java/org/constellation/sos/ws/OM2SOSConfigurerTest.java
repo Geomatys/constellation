@@ -108,7 +108,7 @@ public class OM2SOSConfigurerTest extends SOSConfigurerTest {
                 configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
                 configuration.getParameters().put("transactionSecurized", "false");
 
-                serviceBusiness.create("sos", "default", configuration, null, null);
+                serviceBusiness.create("sos", "default", configuration, null);
                 initialized = true;
             }
         } catch (Exception ex) {

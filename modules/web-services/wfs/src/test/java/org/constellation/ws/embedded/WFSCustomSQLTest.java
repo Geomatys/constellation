@@ -228,7 +228,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 config.getCustomParameters().put("transactionSecurized", "false");
                 config.getCustomParameters().put("transactionnal", "true");
 
-               serviceBusiness.create("WFS", "default", config, null, null);
+               serviceBusiness.create("WFS", "default", config, null);
                if (localdb_active) {
                    layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
                    layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);

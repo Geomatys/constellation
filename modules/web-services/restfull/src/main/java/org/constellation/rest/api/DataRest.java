@@ -497,7 +497,7 @@ public class DataRest {
                     importedDataReport.setVerifyCRS("success");
                 } catch (DataStoreException e) {
                     importedDataReport.setVerifyCRS("error");
-                    LOGGER.log(Level.INFO, "Cannot get CRS for provider "+providerIdentifier+" for domain "+domainId);
+                    LOGGER.log(Level.INFO, "Cannot get CRS for provider "+providerIdentifier);
                     //get a list of EPSG codes
                     importedDataReport.setCodes(getAllEpsgCodes());
                 }
@@ -525,7 +525,7 @@ public class DataRest {
                     importedDataReport.setVerifyCRS("success");
                 } catch (DataStoreException e) {
                     importedDataReport.setVerifyCRS("error");
-                    LOGGER.log(Level.INFO, "Cannot get CRS for provider "+providerIdentifier+" for domain "+domainId);
+                    LOGGER.log(Level.INFO, "Cannot get CRS for provider "+providerIdentifier);
                     //get a list of EPSG codes
                     importedDataReport.setCodes(getAllEpsgCodes());
                 }
@@ -695,7 +695,7 @@ public class DataRest {
         final String dataType           = values.getValues().get("type");
         final StringWriter buffer       = new StringWriter();
         try{
-            final DefaultMetadata metadata  =  datasetBusiness.getMetadata(identifier, -1);
+            final DefaultMetadata metadata  =  datasetBusiness.getMetadata(identifier);
             if (metadata != null) {
                 //get template name
                 final String templateName = metadataBusiness.getDatasetTemplate(identifier, dataType);
@@ -734,7 +734,7 @@ public class DataRest {
                 //try to get dataset metadata.
                 final Dataset dataset = dataBusiness.getDatasetForData(providerId, dataName);
                 if (dataset != null) {
-                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier());
                     datasetId = dataset.getIdentifier();
                 }
             }
@@ -788,7 +788,7 @@ public class DataRest {
                 //try to get dataset metadata.
                 final Dataset dataset = dataBusiness.getDatasetForData(providerId, dataName);
                 if (dataset != null) {
-                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier());
                     datasetId = dataset.getIdentifier();
                 }
             }
@@ -830,7 +830,7 @@ public class DataRest {
                                          final @PathParam("prune") boolean prune) {
         final StringWriter buffer = new StringWriter();
         try{
-            final DefaultMetadata metadata = datasetBusiness.getMetadata(datasetIdentifier,-1);
+            final DefaultMetadata metadata = datasetBusiness.getMetadata(datasetIdentifier);
             if (metadata != null) {
                 metadata.prune();
                 //get template name
@@ -870,7 +870,7 @@ public class DataRest {
             DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider, dataName);
             if(metadata == null){
                 //try to get dataset metadata.
-                metadata = datasetBusiness.getMetadata(ds.getIdentifier(),-1);
+                metadata = datasetBusiness.getMetadata(ds.getIdentifier());
                 dataset = true;
                 datasetId = ds.getIdentifier();
             }
@@ -917,7 +917,7 @@ public class DataRest {
                                     final RootObj metadataValues) {
         try {
             // Get previously saved metadata
-            final DefaultMetadata metadata = datasetBusiness.getMetadata(identifier, -1);
+            final DefaultMetadata metadata = datasetBusiness.getMetadata(identifier);
             if(metadata != null) {
                 //get template name
                 final String templateName = metadataBusiness.getDatasetTemplate(identifier, type);
@@ -984,7 +984,7 @@ public class DataRest {
     }
 
     /**
-     * Build {@link DataSetBrief} instance from {@link Dataset} and domain id.
+     * Build {@link DataSetBrief} instance from {@link Dataset}
      * @param dataset given dataset object.
      * @return {@link DataSetBrief} built from the given dataset.
      */
@@ -1017,7 +1017,7 @@ public class DataRest {
         final String mergeWithUploadedMD = values.getValues().get("mergeWithUploadedMD");
         DefaultMetadata uploadedMetadata;
         try{
-            uploadedMetadata = datasetBusiness.getMetadata(providerId,-1);
+            uploadedMetadata = datasetBusiness.getMetadata(providerId);
         }catch(Exception ex){
             uploadedMetadata = null;
         }
@@ -2046,12 +2046,12 @@ public class DataRest {
     public Response downloadMetadataForData(final @PathParam("providerId") String providerId,
                                             final @PathParam("dataId") int dataId) {
         try {
-            DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(dataId);
+            DefaultMetadata metadata = metadataBusiness.getIsoMetadataForData(dataId);
             if (metadata == null) {
                 //try to get dataset metadata.
                 final Dataset dataset = dataBusiness.getDatasetForData(dataId);
                 if (dataset != null) {
-                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier(),-1);
+                    metadata = datasetBusiness.getMetadata(dataset.getIdentifier());
                 }
             }
             if (metadata != null) {

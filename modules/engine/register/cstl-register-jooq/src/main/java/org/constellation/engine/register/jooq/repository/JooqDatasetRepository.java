@@ -103,13 +103,6 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
     
     @Override
-    public Dataset findByIdentifierAndDomainId(String datasetIdentifier, Integer domainId) {
-        // @FIXME binding domainId
-        return dsl.select().from(DATASET).where(DATASET.IDENTIFIER.eq(datasetIdentifier)).fetchOneInto(Dataset.class);
-
-    }
-
-    @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void remove(int id) {
         dsl.delete(DATASET).where(DATASET.ID.eq(id)).execute();

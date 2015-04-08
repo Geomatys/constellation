@@ -222,13 +222,6 @@ public class DataBusiness implements IDataBusiness {
         return metadataBusiness.getIsoMetadataForData(data.getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DefaultMetadata loadIsoDataMetadata(final int dataId) throws ConfigurationException{
-        return metadataBusiness.getIsoMetadataForData(dataId);
-    }
 
     @Override
     public Dataset getDatasetForData(final String providerId, final QName name) throws ConstellationException{

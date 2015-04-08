@@ -53,6 +53,4 @@ public interface ProviderRepository {
     public int update(Provider provider);
 
     public List<Style> findStylesByProviderId(Integer providerId);
-
-    public Provider findByIdentifierAndDomainId(String providerIdentifier, Integer domainId);
 }

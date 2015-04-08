@@ -40,7 +40,7 @@ public class DeleteWFSServiceTest extends DeleteServiceTest {
     protected void createInstance(final String identifier) {
         try {
             final LayerContext configuration = new LayerContext();
-            serviceBusiness.create(serviceName, identifier, configuration, null, null);
+            serviceBusiness.create(serviceName, identifier, configuration, null);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }

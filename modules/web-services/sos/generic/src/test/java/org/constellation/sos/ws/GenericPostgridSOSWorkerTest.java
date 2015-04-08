@@ -97,7 +97,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
         configuration.getParameters().put("transactionSecurized", "false");
 
 
-        serviceBusiness.create("sos", "default", configuration, null, null);
+        serviceBusiness.create("sos", "default", configuration, null);
 
         init();
         worker = new SOSworker("default");
