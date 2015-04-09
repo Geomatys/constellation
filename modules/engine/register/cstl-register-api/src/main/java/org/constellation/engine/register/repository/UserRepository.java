@@ -69,7 +69,7 @@ public interface UserRepository {
 
 
 
-	List<UserWithRole> findAllWithRole();
+	List<UserWithRole> findActivesWithRole();
 
     
 }

@@ -175,9 +175,9 @@ public class JooqUserRepository extends
 
 	
 	@Override
-	public List<UserWithRole> findAllWithRole() {
+	public List<UserWithRole> findActivesWithRole() {
 		Map<CstlUserRecord, Result<Record>> fetchGroups = dsl.select()
-				.from(CSTL_USER).join(Tables.USER_X_ROLE).onKey()
+				.from(CSTL_USER).join(Tables.USER_X_ROLE).onKey().where(CSTL_USER.ACTIVE.isTrue())
 				.fetchGroups(CSTL_USER);
 
 
