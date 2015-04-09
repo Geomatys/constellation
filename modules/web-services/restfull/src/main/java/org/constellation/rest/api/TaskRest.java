@@ -235,7 +235,6 @@ public class TaskRest {
     // <editor-fold defaultstate="collapsed" desc="TaskParameterAPI">
     @POST
     @Path("params/create")
-    @RolesAllowed("cstl-admin")
     public Response createParamsTask(final TaskParameter taskParameter, @Context HttpServletRequest req) throws ConfigurationException {
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 
@@ -257,7 +256,6 @@ public class TaskRest {
 
     @POST
     @Path("params/update")
-    @RolesAllowed("cstl-admin")
     public Response updateParamsTask(final TaskParameter taskParameter) throws ConfigurationException {
         try {
             processBusiness.testTaskParameter(taskParameter);
@@ -271,7 +269,6 @@ public class TaskRest {
 
     @GET
     @Path("params/get/{id}")
-    @RolesAllowed("cstl-admin")
     public Response getParamsTask(final @PathParam("id") Integer id) {
         final TaskParameter taskParameter = processBusiness.getTaskParameterById(id);
         if (taskParameter != null) {
@@ -282,7 +279,6 @@ public class TaskRest {
 
     @GET
     @Path("params/delete/{id}")
-    @RolesAllowed("cstl-admin")
     public Response deleteParamsTask(final @PathParam("id") Integer id) {
         final TaskParameter taskParameter = processBusiness.getTaskParameterById(id);
         if (taskParameter != null) {
@@ -294,7 +290,6 @@ public class TaskRest {
 
     @GET
     @Path("params/duplicate/{id}")
-    @RolesAllowed("cstl-admin")
     @Transactional
     public Response duplicateParamsTask(final @PathParam("id") Integer taskParameterIdForTemplate, @Context HttpServletRequest req) throws ConfigurationException {
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
@@ -313,7 +308,6 @@ public class TaskRest {
 
     @GET
     @Path("params/execute/{id}")
-    @RolesAllowed("cstl-admin")
     public Response executeParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req)
             throws ConfigurationException {
 
@@ -337,7 +331,6 @@ public class TaskRest {
 
     @GET
     @Path("params/schedule/start/{id}")
-    @RolesAllowed("cstl-admin")
     public Response startScheduleParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req) throws ConfigurationException {
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 
@@ -359,7 +352,6 @@ public class TaskRest {
 
     @GET
     @Path("params/schedule/stop/{id}")
-    @RolesAllowed("cstl-admin")
     public Response stopScheduleParamsTask(final @PathParam("id") Integer id, @Context HttpServletRequest req) throws ConfigurationException {
         final Optional<CstlUser> cstlUser = userRepository.findOne(req.getUserPrincipal().getName());
 
@@ -380,7 +372,6 @@ public class TaskRest {
 
     @GET
     @Path("params/list")
-    @RolesAllowed("cstl-admin")
     public Response listParamsTask() throws ConfigurationException {
 
         final List<? extends TaskParameter> all = taskParameterRepository.findAll();
@@ -390,7 +381,6 @@ public class TaskRest {
 
     @GET
     @Path("params/list/{type}")
-    @RolesAllowed("cstl-admin")
     public Response listParamsTaskByType(final @PathParam("type") String type) throws ConfigurationException {
 
         final List<? extends TaskParameter> all = taskParameterRepository.findAllByType(type);
