@@ -5,7 +5,7 @@ import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.geometry.Envelope;
 
-import static org.geotoolkit.process.test.testprocess.TestDescriptor.*;
+import static org.constellation.process.test.testprocess.TestDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.*;
 
 
