@@ -38,7 +38,7 @@
                         <td ng-click="predicate = 'email'; reverse=!reverse"
                             translate="settings.form.email">E-mail</td>
                         <td ng-click="predicate = 'roles'; reverse=!reverse"
-                            translate="settings.form.roles">Roles</td>
+                            translate="settings.form.role">Role</td>
                     </tr>
                     </thead>
 
@@ -48,7 +48,7 @@
                         <td ng-click="details($index)">{{user.firstname}}</td>
                         <td ng-click="details($index)">{{user.lastname}}</td>
                         <td ng-click="details($index)">{{user.email}}</td>
-                        <td ng-click="details($index)"><span ng-repeat="role in user.roles">{{role}}</span></td>
+                        <td ng-click="details($index)"><span ng-repeat="role in user.roles">{{role|roleLabel}}</span></td>
                         <td class="user-delete" ng-click="deleteUser($index)">
                             <span class="tooltipicon">
                                 <span class="glyphicon glyphicon-trash" tooltip data-placement="left" title="{{'tooltip.user.remove' | translate }}"></span>

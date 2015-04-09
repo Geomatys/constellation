@@ -20,8 +20,23 @@
 
 angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
+    .filter('roleLabel', function($filter) {
+        return function(key) {
+            switch (key) {
+                case 'cstl-admin':
+                    return $filter('translate')('settings.form.role.admin');
+                case 'cstl-publish':
+                    return $filter('translate')('settings.form.role.publish');
+                case 'cstl-data':
+                    return $filter('translate')('settings.form.role.data');
+                default:
+                    return key;
+            }
+        };
+    })
+
     .controller('UserController', function($scope, UserResource, $modal, Growl, $translate) {
-        $scope.list = UserResource.query({"withDomainAndRoles": true});
+        $scope.list = UserResource.query({"withRoles": true});
         $scope.details = function(i) {
             $modal.open({
                 templateUrl: 'views/admin/user/details.html',
@@ -45,7 +60,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 resolve: {
                     'isUpdate': function() {return false;},
                     'user': function(){
-                        return {roles:[]};
+                        return { roles: ['cstl-data'] };
                     }
                 }
             }).result.then(function(user){
@@ -72,23 +87,7 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
-        $scope.deleteTag = function(role){
-            var newRoles = [];
-            for(var i=0; i<user.roles.length; i++){
-                if(user.roles[i] !== role){
-                    newRoles[newRoles.length] = user.roles[i];
-                }
-            }
-            user.roles = newRoles;
-        };
 
-        $scope.addRole = function(role){
-            for(var i=0; i < $scope.user.roles.length; i++){
-                if(role === $scope.user.roles[i]){return;}
-            }
-
-            $scope.user.roles[$scope.user.roles.length]=role;
-        };
         var timeout=null;
         $scope.checkLogin = function(login){
             if(timeout){
@@ -104,9 +103,6 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 }
             }, 400);
         };
-
-
-
 
         $scope.save = function(){
             var userResource = new UserResource($scope.user);

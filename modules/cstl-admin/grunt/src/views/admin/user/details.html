@@ -66,20 +66,25 @@
 						</div>
 					</div>
 					<div class="form-group row" style="padding-left:30px; padding-right:15px;">
-						<label class="control-label col-sm-12" style="padding-left:0;" translate="settings.form.roles">Roles</label>
-						<div class="col-sm-12" style="padding-left:0;" >
-                            <div class="row" style="margin-left: 0; margin-right: 0;">
-                                <div class="tag-input-ctn">
-                                    <div data-ng-repeat="role in user.roles" class="input-tag">
-                                        {{ role }}
-                                        <div class="delete-tag" data-ng-click="deleteTag(role)">&times;</div>
-                                    </div>
-                                    <input type="text" data-tag-input="" data-ng-model="tagText"
-                                        data-new-tag="addTag()" data-delete-tag="deleteTag()">
-                                </div>
+						<label class="control-label col-sm-12" style="padding-left:0;" translate="settings.form.role">Role</label>
+						<div class="col-sm-12" style="padding-left:0;">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="roles" id="role1" value="cstl-admin" ng-model="user.roles[0]">
+                                    {{'settings.form.role.admin'|translate}}
+                                </label>
                             </div>
-                            <div class="row" style="margin-left: 0; margin-right: 0;">
-								<button type="button" class="btn btn-default" ng-click="addRole('cstl-admin')"><span translate="settings.form.roles.admin">Add admin role</span></button>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="roles" id="role2" value="cstl-publish" ng-model="user.roles[0]">
+                                    {{'settings.form.role.publish'|translate}}
+                                </label>
+                            </div>
+                            <div class="radio disabled">
+                                <label>
+                                    <input type="radio" name="roles" id="role3" value="cstl-data" ng-model="user.roles[0]">
+                                    {{'settings.form.role.data'|translate}}
+                                </label>
                             </div>
 						</div>
 					</div>
