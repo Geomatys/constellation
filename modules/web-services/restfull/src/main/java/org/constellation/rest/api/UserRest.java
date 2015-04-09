@@ -63,7 +63,10 @@ public class UserRest  {
 
     @GET
     @RolesAllowed("cstl-admin")
-    public Response findAll(@QueryParam("withDomainAndRoles") boolean withDomainAndRole) {
+    public Response findAll(@QueryParam("withRoles") boolean withRole) {
+    	if(withRole) 
+    		return 	Response.ok(userRepository.findAllWithRole()).build();
+    	
         return Response.ok(userRepository.findAll()).build();
     }
 

@@ -173,6 +173,17 @@ public class JooqUserRepository extends
 				.where(USER_X_ROLE.USER_ID.eq(userId)).fetch(USER_X_ROLE.ROLE);
 	}
 
+	
+	@Override
+	public List<UserWithRole> findAllWithRole() {
+		Map<CstlUserRecord, Result<Record>> fetchGroups = dsl.select()
+				.from(CSTL_USER).join(Tables.USER_X_ROLE).onKey()
+				.fetchGroups(CSTL_USER);
+
+
+		return mapUserWithRole(fetchGroups);
+	}
+	
 	@Override
 	public Optional<UserWithRole> findOneWithRole(String name) {
 		Map<CstlUserRecord, Result<Record>> fetchGroups = dsl.select()
@@ -215,5 +226,7 @@ public class JooqUserRepository extends
 		return dsl.selectCount().from(CSTL_USER)
 				.where(CSTL_USER.LOGIN.eq(login)).fetchOne().value1() == 0;
 	}
+
+	
 
 }

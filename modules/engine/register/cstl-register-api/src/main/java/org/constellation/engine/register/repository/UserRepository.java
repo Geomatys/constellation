@@ -67,5 +67,9 @@ public interface UserRepository {
 
     Optional<UserWithRole> findOneWithRole(String name);
 
+
+
+	List<UserWithRole> findAllWithRole();
+
     
 }
