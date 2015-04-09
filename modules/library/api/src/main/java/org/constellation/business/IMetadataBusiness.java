@@ -78,12 +78,54 @@ public interface IMetadataBusiness {
      */
     List<String> getAllMetadata(final boolean includeService, final boolean onlyPublished);
     
+    /**
+     * Update or create a new Metadata object.
+     * 
+     * @param metadataId identifier of the metadata.
+     * @param xml XML representation of the metadata.
+     * 
+     * @return true if the update succeed.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException
+     */
     boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException;
     
+    /**
+     * Update or create a new Metadata pojo.
+     * 
+     * @param metadataId identifier of the metadata.
+     * @param metadata Marshallable geotk metadata.
+     * 
+     * @return true if the update succeed.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException
+     */
     boolean updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException;
     
+    /**
+     * Update or create a new Metadata pojo.
+     * 
+     * @param metadataId identifier of the metadata.
+     * @param xml XML representation of the metadata.
+     * @param dataID Identifier of the linked data (can be {@code null})
+     * @param datasetID Identifier of the linked dataset (can be {@code null})
+     * @return true if the update succeed.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException
+     */
     boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID) throws ConfigurationException;
     
+    /**
+     * Update or create a new Metadata pojo.
+     * 
+     * @param metadataId identifier of the metadata.
+     * @param metadata Marshallable geotk metadata.
+     * @param dataID Identifier of the linked data (can be {@code null}).
+     * @param datasetID Identifier of the linked dataset (can be {@code null}).
+     *
+     * @return true if the update succeed.
+     * @throws org.constellation.configuration.ConfigurationException
+     */
     boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID) throws ConfigurationException;
     
     /**
@@ -92,40 +134,149 @@ public interface IMetadataBusiness {
      * @param cswIdentifier identifer of the CSW instance.
      * @param includeService given flag to include service's metadata
      * @param onlyPublished flag that indicates if it will return the unpublished metadata.
+     * 
      * @return List of all metadata as string xml stored in database.
      */
     List<String> getLinkedMetadataIDs(final String cswIdentifier, final boolean includeService, final boolean onlyPublished);
     
+    /**
+     * Build a link beetween a CSW service and a metadata.
+     * 
+     * @param metadataId Identifier of the geotk metadata object.
+     * @param cswIdentifier identifer of the CSW instance.
+     */
     void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
     
+    /**
+     * Remove the link beetween a CSW service and a metadata.
+     * 
+     * @param metadataId Identifier of the geotk metadata object.
+     * @param cswIdentifier identifer of the CSW instance.
+     */
     void unlinkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
     
+    /**
+     * Return {@code true} if the specified metadata is linked to the specified CSW service.
+     * @param metadataID Identifier of the geotk metadata object.
+     * @param cswID  identifer of the CSW instance.
+     * 
+     * @return {@code true} if the specified metadata is linked to the specified CSW service.
+     */
     boolean isLinkedMetadataToCSW(final int metadataID, final int cswID);
     
     MetadataLists getMetadataCodeLists();
     
+    /**
+     * Return the geotk metadata object the specified pojo identifier.
+     * 
+     * @param id identifier of the metadata pojo.
+     * 
+     * @return The geotk metadata object or {@code null} .
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     DefaultMetadata getMetadata(final int id) throws ConfigurationException;
     
+    /**
+     * Return the metadat pojo for the specified identifier.
+     * 
+     * @param id identifier of the metadata pojo.
+     * 
+     * @return The metadat pojo or {@code null}.
+     */
     Metadata getMetadataById(final int id);
     
+    /**
+     * Update the publication flag of a metadata.
+     * 
+     * @param id identifier of the metadata pojo.
+     * @param newStatus new publication status to set.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     void updatePublication(final int id, final boolean newStatus) throws ConfigurationException;
     
+    /**
+     * Update the publication flag for a list of metadata pojo.
+     * 
+     * @param ids List of metadata pojo identifier.
+     * @param newStatus new publication status to set.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     void updatePublication(final List<Integer> ids, final boolean newStatus) throws ConfigurationException;
     
+    /**
+     * Update the validation flag of a metadata.
+     * 
+     * @param id identifier of the metadata pojo.
+     * @param newStatus new validation status to set.
+     * 
+     */
     void updateValidation(final int id, final boolean newStatus);
     
+    /**
+     * Update the owner of a metadata.
+     * 
+     * @param id identifier of the metadata pojo.
+     * @param newOwner new owner identifier to set.
+     * 
+     */
     void updateOwner(final int id, final int newOwner);
     
+    /**
+     * Delete a metadata pojo.
+     * 
+     * @param id identifier of the metadata pojo.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     void deleteMetadata(final int id) throws ConfigurationException;
     
+    /**
+     * Delete a list of metadata pojo.
+     * 
+     * @param ids List of metadata pojo identifiers.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     void deleteMetadata(final List<Integer> ids) throws ConfigurationException;
     
+    /**
+     * Return a percentage of the metadata completion (related to the profile linked to the metadata pojo).
+     * The metadata pojo is retrieve from the linked specified data.
+     * 
+     * @param dataId identifier of the data.
+     * 
+     * @return an integer representing the percentage of completion or {@code null} if the data has no linked metadata.
+     */
     Integer getCompletionForData(final int dataId);
     
+    /**
+     * Return a percentage of the metadata completion (related to the profile linked to the metadata pojo).
+     * The metadata pojo is retrieve from the linked specified dataset.
+     * 
+     * @param datasetId identifier of the dataset.
+     * 
+     * @return an integer representing the percentage of completion or {@code null} if the dataset has no linked metadata.
+     */
     Integer getCompletionForDataset(final int datasetId);
     
+    /**
+     * Return the geotk metadata object linked with the specified data.
+     * 
+     * @param dataId identifier of the data.
+     * 
+     * @return The geotk metadata object or {@code null} if there is no metadata linked to the specified data.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     DefaultMetadata getIsoMetadataForData(final int dataId) throws ConfigurationException;
     
+    /**
+     * Return the geotk metadata object linked with the specified dataset.
+     * 
+     * @param datasetId identifier of the dataset.
+     * 
+     * @return The geotk metadata object or {@code null} if there is no metadata linked to the specified dataset.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     DefaultMetadata getIsoMetadataForDataset(final int datasetId) throws ConfigurationException;
     
     void updateInternalCSWIndex(final List<Metadata> metadatas, final boolean update) throws ConfigurationException;
@@ -133,4 +284,16 @@ public interface IMetadataBusiness {
     String getDatasetTemplate(final String datasetId, final String dataType) throws ConfigurationException;
     
     String getDataTemplate(final QName dataName, final String dataType) throws ConfigurationException;
+    
+    /**
+     * Duplicate a metadata pojo. Update the fileIdentifier and title of the geotk metadata.
+     * if (the specified newTitle is null, the new title of the metadata will be "old title" + "(1)".
+     * 
+     * @param id identifier of the metadata pojo.
+     * @param newTitle the new tittle to apply to the metadata object (can be {@code null}).
+     * 
+     * @return the new pojo created.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
+    Metadata duplicateMetadata(final int id, final String newTitle) throws ConfigurationException;
 }

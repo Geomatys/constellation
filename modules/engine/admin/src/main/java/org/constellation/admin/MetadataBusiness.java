@@ -57,6 +57,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.util.Locales;
@@ -67,6 +68,7 @@ import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.utils.MetadataFeeder;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ICSWConfigurer;
 import org.constellation.ws.Refreshable;
@@ -162,18 +164,27 @@ public class MetadataBusiness implements IMetadataBusiness {
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException  {
         return updateMetadata(metadataId, metadata, null, null);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
         return updateMetadata(metadataId, xml, null, null);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID) throws ConfigurationException  {
@@ -181,6 +192,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         return updateMetadata(metadataId, xml, dataID, datasetID);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID) throws ConfigurationException  {
@@ -356,11 +370,17 @@ public class MetadataBusiness implements IMetadataBusiness {
         return results;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isLinkedMetadataToCSW(final int metadataID, final int cswID) {
         return metadataRepository.isLinkedMetadata(metadataID, cswID);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier) {
@@ -370,6 +390,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public void unlinkMetadataIDToCSW(final String metadataId, final String cswIdentifier) {
@@ -379,6 +402,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DefaultMetadata getMetadata(final int id) throws ConfigurationException {
         final Metadata metadata = metadataRepository.findById(id);
@@ -388,6 +414,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DefaultMetadata getIsoMetadataForData(final int dataId) throws ConfigurationException {
         final Metadata metadata = metadataRepository.findByDataId(dataId);
@@ -397,6 +426,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DefaultMetadata getIsoMetadataForDataset(final int datasetId) throws ConfigurationException {
         final Metadata metadata = metadataRepository.findByDatasetId(datasetId);
@@ -406,11 +438,17 @@ public class MetadataBusiness implements IMetadataBusiness {
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Metadata getMetadataById(final int id) {
         return metadataRepository.findById(id);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updatePublication(final int id, final boolean newStatus) throws ConfigurationException {
         final Metadata metadata = metadataRepository.findById(id);
@@ -421,6 +459,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updatePublication(final List<Integer> ids, final boolean newStatus) throws ConfigurationException {
         final List<Metadata> toUpdate = new ArrayList<>();
@@ -435,16 +476,25 @@ public class MetadataBusiness implements IMetadataBusiness {
         updateInternalCSWIndex(toUpdate, true);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateValidation(int id, boolean newStatus) {
         metadataRepository.changeValidation(id, newStatus);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOwner(int id, int newOwner) {
         metadataRepository.changeOwner(id, newOwner);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteMetadata(int id) throws ConfigurationException {
         final Metadata metadata = metadataRepository.findById(id);
@@ -454,6 +504,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteMetadata(List<Integer> ids) throws ConfigurationException {
         // First we update the csw index
@@ -471,6 +524,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getCompletionForData(int dataId) {
         final Metadata metadata = metadataRepository.findByDataId(dataId);
@@ -480,6 +536,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Integer getCompletionForDataset(int datasetId) {
         final Metadata metadata = metadataRepository.findByDatasetId(datasetId);
@@ -767,4 +826,40 @@ public class MetadataBusiness implements IMetadataBusiness {
     protected String getTemplateFromMetadata(DefaultMetadata meta) {
         return null; // must be overriden
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Metadata duplicateMetadata(final int id, final String newTitle) throws ConfigurationException {
+        final Metadata meta = metadataRepository.findById(id);
+        if (meta != null) {
+            List<MetadataBbox> bboxes = metadataRepository.getBboxes(id);
+            final DefaultMetadata metaObj = (DefaultMetadata) unmarshallMetadata(meta.getMetadataIso());
+            MetadataFeeder feeder = new MetadataFeeder(metaObj);
+            String title;
+            if (newTitle != null) {
+                title = newTitle;
+                
+            } else {
+                String oldTitle = feeder.getTitle();
+                title = oldTitle + "(1)";
+            }
+            feeder.setTitle(title);
+            final String newMetadataID = UUID.randomUUID().toString();
+            metaObj.setFileIdentifier(newMetadataID);
+            
+            meta.setMetadataIso(marshallMetadata(metaObj));
+            meta.setMetadataId(newMetadataID);
+            meta.setTitle(title);
+            meta.setIsPublished(false);
+            meta.setIsValidated(false);
+            
+            final MetadataComplete duplicated = new MetadataComplete(meta, bboxes);
+            final int newID = metadataRepository.create(duplicated);
+            return metadataRepository.findById(newID);
+        }
+        return null;
+    }
+    
 }

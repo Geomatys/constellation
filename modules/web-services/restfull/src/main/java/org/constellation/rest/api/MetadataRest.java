@@ -633,12 +633,17 @@ public class MetadataRest {
     @POST
     @Path("/duplicate/{id}")
     public Response duplicateMetadata(@PathParam("id") final int id, final String title) {
-        //TODO implements duplication of record,
-        //TODO if given title is null or empty then we must copy the original title and add prefix '(Duplicated) ...'
-        if(!isBlank(title)){
-            //use the given title
-        }else {
-            //use the original title and add prefix '(Duplicated) '
+        try {
+            final String newTitle;
+            if(!isBlank(title)){
+                newTitle = title;
+            }else {
+                newTitle = null;
+            }
+            metadataBusiness.duplicateMetadata(id, newTitle);
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            return Response.status(500).entity(ex.getMessage()).build();
         }
         return Response.ok("Metadata duplicated successfully!").build();
     }
