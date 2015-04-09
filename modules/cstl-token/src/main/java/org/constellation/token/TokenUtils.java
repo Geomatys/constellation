@@ -143,12 +143,16 @@ public class TokenUtils {
      */
     public static String extract(HttpServletRequest request, String name) {
         String value = headers(request, name);
-        if (value != null)
-            return value;
+        if (value != null) {
+			LOGGER.debug("Extract token from header: " + value );        	
+        	return value;
+        }
 
         value = queryString(request, name);
-        if (value != null)
-            return value;
+        if (value != null) {
+        	LOGGER.debug("Extract token from query string: " + value );            	
+        	return value;
+        }
 
         return cookie(request, name);
         
@@ -194,6 +198,7 @@ public class TokenUtils {
                     }
                 }
             }
+        LOGGER.debug("Fail to extract token ");    
         return null;
     }
 

@@ -9,6 +9,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +19,9 @@ import org.springframework.web.filter.GenericFilterBean;
 
 public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationTokenProcessingFilter.class);
+	
     private UnauthorizedHandler unauthorizedHandler = new UnauthorizedHandler() {
 
         @Override
@@ -55,6 +60,10 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
         UserDetails userDetails = userDetailsExtractor.userDetails(httpRequest);
 
+        if(LOGGER.isDebugEnabled()) {
+        	LOGGER.debug(userDetails.getUsername() + ": " + userDetails.getAuthorities());
+        }
+        
         if (userDetails == null) {
             if( ! unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
                 getAsHttpResponse(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
