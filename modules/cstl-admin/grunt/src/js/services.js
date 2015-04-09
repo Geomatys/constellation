@@ -695,6 +695,7 @@ angular.module('cstl-services', ['cstl-restapi'])
             };
 
             // Modify the sort order for result items.
+            // like SQL order we use the ascending order by default
             self.sortBy = function(field) {
                 if (self.isSortedBy(field)) {
                     switch (self.query.sort.order) {
@@ -705,11 +706,11 @@ angular.module('cstl-services', ['cstl-restapi'])
                             self.query.sort.order = 'ASC';
                             break;
                         default:
-                            self.query.sort.order = 'DESC';
+                            self.query.sort.order = 'ASC';
                             break;
                     }
                 } else {
-                    self.query.sort = { field: field, order: 'DESC' };
+                    self.query.sort = { field: field, order: 'ASC' };
                 }
                 self.search();
             };
