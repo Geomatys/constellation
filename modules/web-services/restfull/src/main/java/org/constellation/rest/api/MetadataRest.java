@@ -354,6 +354,12 @@ public class MetadataRest {
         return mdb;
     }
 
+    /**
+     * Return metadata brief object as json for given id.
+     *
+     * @param metadataId given metadata id
+     * @return {@link MetadataBrief} object as json
+     */
     @GET
     @Path("/{id}")
     public MetadataBrief get(@PathParam("id") final Integer metadataId) {
@@ -362,6 +368,30 @@ public class MetadataRest {
             return convertToMetadataBrief(candidat);
         }
         return null;
+    }
+
+    /**
+     * Return stats counts of metadata as map object :
+     *  total count of metadata
+     *  total of metadata not validated
+     *  total of metadata not published
+     *  total of metadata published
+     *
+     * @return Response that contains the map.
+     */
+    @GET
+    @Path("/getStats")
+    public Response getStats() {
+        Map<String,Integer> map = new HashMap<>();
+
+        int total=0,waitingToValidate=0,waitingToPublish=0,published=0;
+        //TODO get all counts from metadataRepository or Business?
+
+        map.put("total", total);
+        map.put("waitingToValidate", waitingToValidate);
+        map.put("waitingToPublish", waitingToPublish);
+        map.put("published", published);
+        return Response.ok(map).build();
     }
 
     /**
