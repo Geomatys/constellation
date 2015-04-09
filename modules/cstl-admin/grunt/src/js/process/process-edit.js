@@ -53,6 +53,16 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                     }]
                 }
             })
+            .put('org.constellation.process.UserProcessReference', {
+                templateUrl: 'views/tasks/editor/user.html',
+                controller:'UserEditorController',
+                controllerAs: 'ec',
+                resolve : {
+                    'users': ['UserService', function(UserService) {
+                        return UserService.getUsers().$promise;
+                    }]
+                }
+            })
             .put('org.constellation.process.ServiceProcessReference', {
                 templateUrl: 'views/tasks/editor/service.html',
                 controller:'ServiceEditorController',
@@ -103,6 +113,27 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         //initialize parameter saved value
         if (parameter.save[valueIndex] === undefined) {
             parameter.save[valueIndex] = parameter.mandatory ? styles[0] : undefined;
+        }
+    })
+    
+    .controller('UserEditorController', function(parameter, valueIndex, users, $filter) {
+
+        var self = this;
+
+        //full list
+        self.users = users;
+
+        //apply filter
+        if (parameter.ext && parameter.ext.filter) {
+            self.users = $filter('filter')(self.users, parameter.ext.filter);
+        }
+
+        // add undefined if parameter optional
+        self.users = (parameter.mandatory ? [] : [undefined]).concat(self.users);
+
+        //initialize parameter saved value
+        if (parameter.save[valueIndex] === undefined) {
+            parameter.save[valueIndex] = parameter.mandatory ? users[0] : undefined;
         }
     })
 

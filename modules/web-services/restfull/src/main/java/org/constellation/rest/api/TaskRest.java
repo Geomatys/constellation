@@ -78,6 +78,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
+import org.constellation.process.UserProcessReference;
 
 /**
  * RestFull API for task management/operations.
@@ -488,6 +489,28 @@ public class TaskRest {
             }
         }
         return Response.ok(servicePRef).build();
+    }
+    
+    /**
+     * List all User as UserProcessReference to provider GUI editors.
+     * @return list of UserProcessReference
+     * @throws org.constellation.configuration.ConfigurationException
+     */
+    @GET
+    @Path("/list/userRef")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getUserProcessReferenceList() throws ConfigurationException {
+        final List<UserProcessReference> userPRef = new ArrayList<>();
+        final List<CstlUser> users = userRepository.findAll();
+        if(users!=null){
+            for(final CstlUser user : users){
+                final UserProcessReference ref = new UserProcessReference();
+                ref.setId(user.getId());
+                ref.setIdentifier(user.getLogin());
+                userPRef.add(ref);
+            }
+        }
+        return Response.ok(userPRef).build();
     }
     // </editor-fold>
 

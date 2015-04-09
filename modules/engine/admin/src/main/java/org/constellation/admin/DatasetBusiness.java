@@ -211,7 +211,7 @@ public class DatasetBusiness implements IDatasetBusiness {
         
         final Dataset dataset = datasetRepository.findByIdentifier(datasetIdentifier);
         if (dataset != null) {
-            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata, null, dataset.getId());
+            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata, null, dataset.getId(), null);
             
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
         } else {

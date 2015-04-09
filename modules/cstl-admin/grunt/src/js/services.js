@@ -821,6 +821,31 @@ angular.module('cstl-services', ['cstl-restapi'])
         };
 
     })
+    
+    // -------------------------------------------------------------------------
+    //  User service : get available users with a cache support
+    // -------------------------------------------------------------------------
+    .service('UserService', function(TaskService) {
+
+        var self = this;
+        self.users = null;
+
+        function init() {
+            self.users = TaskService.listUser();
+        }
+
+        self.getUsers = function() {
+            if (self.users === null) {
+                init();
+            }
+            return self.users;
+        };
+
+        self.refresh = function() {
+            init();
+        };
+
+    })
 
     // -------------------------------------------------------------------------
     //  CRS service

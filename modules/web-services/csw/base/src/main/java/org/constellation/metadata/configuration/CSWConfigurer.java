@@ -213,7 +213,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
         if (identifierList.isEmpty()) {
             return new AcknowlegementType("Success", "warning: identifier list empty");
         }
-        LOGGER.info("Add to index requested");
+        LOGGER.fine("Add to index requested");
         AbstractIndexer indexer  = null;
         try {
             final CSWMetadataReader reader  = getReader(id);
@@ -265,7 +265,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
         if (identifierList.isEmpty()) {
             return new AcknowlegementType("Success", "warning: identifier list empty");
         }
-        LOGGER.info("Remove from index requested");
+        LOGGER.finer("Remove from index requested");
         AbstractIndexer indexer  = null;
         try {
             final CSWMetadataReader reader  = getReader(id);
@@ -354,7 +354,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
     
     @Override
     public AcknowlegementType importRecord(final String id, final Node n) throws ConfigurationException {
-        LOGGER.info("Importing record");
+        LOGGER.fine("Importing record");
         final AbstractIndexer indexer = getIndexer(id, null);
         try {
             final MetadataWriter writer = getWriter(id, indexer);
@@ -371,7 +371,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
     }
     
     public AcknowlegementType importInternalData(String id, String metadataID) throws ConfigurationException {
-        LOGGER.info("Importing internal data");
+        LOGGER.fine("Importing internal data");
         final AbstractIndexer indexer = getIndexer(id, null);
         try {
             final MetadataWriter writer = getWriter(id, indexer);
@@ -687,6 +687,7 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
                     currentReader = cswfactory.getMetadataReader(config, serviceID);
                 }
                 final AbstractIndexer indexer = cswfactory.getIndexer(config, currentReader, "", currentReader.getAdditionalQueryablePathMap());
+                indexer.setLogLevel(Level.FINE);
                 if (indexer.needCreation()) {
                     indexer.createIndex();
                 }

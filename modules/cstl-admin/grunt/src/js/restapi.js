@@ -312,8 +312,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     .factory('TaskService', function($resource) {
         return $resource('@cstl/api/1/task', {}, {
             'listTasks':                {method: 'GET',     url: '@cstl/api/1/task/listTasks;jsessionid=',                           isArray: false },
-            'listRunningTasks':         {method: 'GET',     url: '@cstl/api/1/task/listRunningTasks/:id/:limit;jsessionid=',                isArray: true },
-            'taskHistory':              {method: 'GET',     url: '@cstl/api/1/task/taskHistory/:id/:limit;jsessionid=',                isArray: true },
+            'listRunningTasks':         {method: 'GET',     url: '@cstl/api/1/task/listRunningTasks/:id/:limit;jsessionid=',         isArray: true },
+            'taskHistory':              {method: 'GET',     url: '@cstl/api/1/task/taskHistory/:id/:limit;jsessionid=',              isArray: true },
             'listProcess':              {method: 'GET',     url: '@cstl/api/1/task/listProcesses;jsessionid=',                       isArray: false },
             'describeProcess':          {method: 'GET',     url: '@cstl/api/1/task/process/descriptor/:authority/:code;jsessionid=', isArray: false },
             'countProcess':             {method: 'GET',     url: '@cstl/api/1/task/countProcesses;jsessionid=' },
@@ -328,9 +328,10 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'startScheduleParamsTask':  {method: 'GET',     url: '@cstl/api/1/task/params/schedule/start/:id;jsessionid=',           isArray: false },
             'stopScheduleParamsTask':   {method: 'GET',     url: '@cstl/api/1/task/params/schedule/stop/:id;jsessionid=',            isArray: false },
             'duplicateParamsTask':      {method: 'GET',     url: '@cstl/api/1/task/params/duplicate/:id;jsessionid=',                isArray: false},
-            'listDataset':              {method: 'GET',     url: '@cstl/api/1/task/list/datasetRef;jsessionid=',  isArray: true },
-            'listService':              {method: 'GET',     url: '@cstl/api/1/task/list/serviceRef/domain/$domainId;jsessionid=',  isArray: true },
-            'listStyle':                {method: 'GET',     url: '@cstl/api/1/task/list/styleRef;jsessionid=',  isArray: true }
+            'listDataset':              {method: 'GET',     url: '@cstl/api/1/task/list/datasetRef;jsessionid=',                     isArray: true },
+            'listService':              {method: 'GET',     url: '@cstl/api/1/task/list/serviceRef/domain/$domainId;jsessionid=',    isArray: true },
+            'listStyle':                {method: 'GET',     url: '@cstl/api/1/task/list/styleRef;jsessionid=',                       isArray: true },
+            'listUser':                 {method: 'GET',     url: '@cstl/api/1/task/list/userRef;jsessionid=',                        isArray: true }
         });
     })
 

@@ -716,7 +716,7 @@ public class DataBusiness implements IDataBusiness {
     public void updateMetadata(String providerId, QName dataName, DefaultMetadata metadata) throws ConfigurationException {
         final Data data = dataRepository.findDataFromProvider(dataName.getNamespaceURI(), dataName.getLocalPart(), providerId);
         if (data != null) {
-            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata, data.getId(), null);
+            metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata, data.getId(), null, null);
             
             indexEngine.addMetadataToIndexForData(metadata, data.getId());
         } else {

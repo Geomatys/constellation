@@ -170,7 +170,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException  {
-        return updateMetadata(metadataId, metadata, null, null);
+        return updateMetadata(metadataId, metadata, null, null, null);
     }
     
     /**
@@ -179,7 +179,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     @Transactional
     public boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
-        return updateMetadata(metadataId, xml, null, null);
+        return updateMetadata(metadataId, xml, null, null, null);
     }
     
     /**
@@ -187,9 +187,18 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID) throws ConfigurationException  {
+    public boolean updateMetadata(final String metadataId, final String xml, final Integer owner) throws ConfigurationException  {
+        return updateMetadata(metadataId, xml, null, null, owner);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException  {
         final String xml = marshallMetadata(metadata);
-        return updateMetadata(metadataId, xml, dataID, datasetID);
+        return updateMetadata(metadataId, xml, dataID, datasetID, owner);
     }
     
     /**
@@ -197,7 +206,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID) throws ConfigurationException  {
+    public boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException  {
         Metadata metadata          = metadataRepository.findByMetadataId(metadataId);
         final boolean update       = metadata != null;
         final DefaultMetadata meta = (DefaultMetadata) unmarshallMetadata(xml);
@@ -212,10 +221,12 @@ public class MetadataBusiness implements IMetadataBusiness {
             parentID = parentRecord.getId();
         }
         final List<MetadataBbox> bboxes = MetadataUtilities.extractBbox(meta);
-        final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
-        Integer userID = null;
-        if (user.isPresent()) {
-            userID = user.get().getId();
+        Integer userID = owner;
+        if (userID == null) {
+            final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            if (user.isPresent()) {
+                userID = user.get().getId();
+            }
         }
         Integer completion  = null;
         String level        = "NONE";

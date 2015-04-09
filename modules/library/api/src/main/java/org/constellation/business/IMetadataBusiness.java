@@ -91,6 +91,19 @@ public interface IMetadataBusiness {
     boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException;
     
     /**
+     * Update or create a new Metadata object.
+     * 
+     * @param metadataId identifier of the metadata.
+     * @param xml XML representation of the metadata.
+     * @param owner User who owes the metadata.
+     * 
+     * @return true if the update succeed.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException
+     */
+    boolean updateMetadata(final String metadataId, final String xml, final Integer owner) throws ConfigurationException;
+    
+    /**
      * Update or create a new Metadata pojo.
      * 
      * @param metadataId identifier of the metadata.
@@ -109,11 +122,12 @@ public interface IMetadataBusiness {
      * @param xml XML representation of the metadata.
      * @param dataID Identifier of the linked data (can be {@code null})
      * @param datasetID Identifier of the linked dataset (can be {@code null})
+     * @param owner User who owes the metadata.
      * @return true if the update succeed.
      * 
      * @throws org.constellation.configuration.ConfigurationException
      */
-    boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID) throws ConfigurationException;
+    boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException;
     
     /**
      * Update or create a new Metadata pojo.
@@ -122,11 +136,12 @@ public interface IMetadataBusiness {
      * @param metadata Marshallable geotk metadata.
      * @param dataID Identifier of the linked data (can be {@code null}).
      * @param datasetID Identifier of the linked dataset (can be {@code null}).
+     * @param owner User who owes the metadata.
      *
      * @return true if the update succeed.
      * @throws org.constellation.configuration.ConfigurationException
      */
-    boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID) throws ConfigurationException;
+    boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException;
     
     /**
      * Returns all the metadata associated with a csw service.
