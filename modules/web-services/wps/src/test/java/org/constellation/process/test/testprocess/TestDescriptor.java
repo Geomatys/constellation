@@ -10,7 +10,7 @@ import org.apache.sis.util.iso.SimpleInternationalString;
 import org.geotoolkit.process.AbstractProcessDescriptor;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.test.TestProcessingRegistry;
+import org.constellation.process.test.TestProcessingRegistry;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
