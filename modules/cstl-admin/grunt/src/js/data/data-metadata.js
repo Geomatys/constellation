@@ -36,6 +36,8 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
 
         $scope.uriRegExp=/^([a-z][a-z0-9+.-]*):(?:\/\/((?:(?=((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*))(\3)@)?(?=(\[[0-9A-F:.]{2,}\]|(?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*))\5(?::(?=(\d*))\6)?)(\/(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*))\8)?|(\/?(?!\/)(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*))\10)?)(?:\?(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/?]|%[0-9A-F]{2})*))\11)?(?:#(?=((?:[a-z0-9-._~!$&'()*+,;=:@\/?]|%[0-9A-F]{2})*))\12)?$/i;
 
+        $scope.contentError = $scope.contentError || false;
+
         /**
          * Get all codelists for metadata editor
          */
@@ -132,9 +134,13 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                     function(response) {
                         if (response && response.root) {
                             $scope.metadataValues.push({"root":response.root});
+                            $scope.contentError = false;
+                        }else {
+                            $scope.contentError = true;
                         }
                     },
                     function(response) {
+                        $scope.contentError = true;
                         Growl('error','Error','The server returned an error!');
                     }
                 );
@@ -145,9 +151,13 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                     function(response) {
                         if (response && response.root) {
                             $scope.metadataValues.push({"root":response.root});
+                            $scope.contentError = false;
+                        }else {
+                            $scope.contentError = true;
                         }
                     },
                     function(response) {
+                        $scope.contentError = true;
                         Growl('error','Error','The server returned an error!');
                     }
                 );

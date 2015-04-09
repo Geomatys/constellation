@@ -749,6 +749,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
         $scope.type = type;
         $scope.template = template;
         $scope.theme = 'csw';
+        $scope.contentError = false;
 
         $scope.dismiss = function () {
             $modalInstance.dismiss('close');
@@ -766,9 +767,13 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 function(response){//success
                     if (response && response.root) {
                         $scope.metadataValues.push({"root":response.root});
+                        $scope.contentError = false;
+                    }else {
+                        $scope.contentError = true;
                     }
                 },
                 function(response){//error
+                    $scope.contentError = true;
                     Growl('error','Error','The server returned an error!');
                 }
             );
