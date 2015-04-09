@@ -657,6 +657,7 @@
     "metadata.edition.sensor.component":"Capteur composant",
     "metadata.edition.sensor.system":"Capteur système",
     "metadata.edition.placeholder.uri":"Example urn:ogc:def:identifierType:OGC:value",
+    "metadata.edition.content.error":"Erreur de chargement du contenu.",
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",
     "metrics.jvm.gc.marksweepcount": "Total de \"Mark Sweep\"",

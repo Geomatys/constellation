@@ -546,6 +546,7 @@ public class MetadataRest {
             }
         } catch(Exception ex) {
             LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
         return Response.ok(buffer.toString()).build();
     }

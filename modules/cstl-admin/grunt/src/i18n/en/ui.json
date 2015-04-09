@@ -613,6 +613,7 @@
     "metadata.edition.sensor.component":"Sensor component",
     "metadata.edition.sensor.system":"Sensor system",
     "metadata.edition.placeholder.uri":"Example urn:ogc:def:identifierType:OGC:value",
+    "metadata.edition.content.error":"Loading content error.",
 
     "msg.add.data.style.association": "Associate a style to the selected data",
     "msg.add.data.mapcontext.association": "Associate a mapcontext to the selected data.",

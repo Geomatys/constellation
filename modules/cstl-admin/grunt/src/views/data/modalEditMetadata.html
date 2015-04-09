@@ -8,6 +8,9 @@
             <div ng-if="metadataValues.length>0">
                 <div ng-include="'views/data/metadata_fragment.html'"></div>
             </div>
+            <div ng-if="metadataValues.length==0" class="row alert alert-danger" style="margin:0;">
+                <span translate="metadata.edition.content.error">Loading content error.</span>
+            </div>
         </div>
         <div class="modal-footer">
             <button type="button"
