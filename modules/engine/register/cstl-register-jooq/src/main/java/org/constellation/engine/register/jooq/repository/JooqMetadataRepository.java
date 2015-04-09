@@ -375,5 +375,20 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     public List<MetadataBbox> getBboxes(int id) {
         return dsl.select().from(METADATA_BBOX).where(METADATA_BBOX.METADATA_ID.eq(id)).fetchInto(MetadataBbox.class);
     }
+
+    @Override
+    public int countTotalMetadata() {
+        return dsl.select().from(METADATA).fetchCount();
+    }
+
+    @Override
+    public int countValidated(boolean status) {
+        return dsl.select().from(METADATA).where(METADATA.IS_VALIDATED.equal(status)).fetchCount();
+    }
+
+    @Override
+    public int countPublished(boolean status) {
+        return dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal(status)).fetchCount();
+    }
     
 }

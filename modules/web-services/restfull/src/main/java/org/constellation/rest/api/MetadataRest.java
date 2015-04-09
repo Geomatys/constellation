@@ -384,8 +384,10 @@ public class MetadataRest {
     public Response getStats() {
         Map<String,Integer> map = new HashMap<>();
 
-        int total=0,waitingToValidate=0,waitingToPublish=0,published=0;
-        //TODO get all counts from metadataRepository or Business?
+        final int total             = metadataBusiness.countTotal();
+        final int waitingToValidate = metadataBusiness.countValidated(false);
+        final int waitingToPublish  = metadataBusiness.countPublished(false);
+        final int published         = metadataBusiness.countPublished(true);
 
         map.put("total", total);
         map.put("waitingToValidate", waitingToValidate);

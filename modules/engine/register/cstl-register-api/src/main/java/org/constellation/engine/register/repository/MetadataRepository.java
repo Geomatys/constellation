@@ -69,4 +69,10 @@ public interface MetadataRepository {
     void changeValidation(final int id, final boolean validated);
     
     void changePublication(final int id, final boolean published);
+    
+    int countTotalMetadata();
+    
+    int countValidated(final boolean status);
+    
+    int countPublished(final boolean status);
 }

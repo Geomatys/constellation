@@ -279,10 +279,36 @@ public interface IMetadataBusiness {
      */
     DefaultMetadata getIsoMetadataForDataset(final int datasetId) throws ConfigurationException;
     
+    /**
+     * Update the CSW services index linked with the specified metadata pojos.
+     * 
+     * @param metadatas List of metadata pojos.
+     * @param update If {@code false} indicates that the metadata must be removed from the indexes.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     void updateInternalCSWIndex(final List<Metadata> metadatas, final boolean update) throws ConfigurationException;
     
+    /**
+     * Return the template name for the specified dataset.
+     * 
+     * @param datasetId identifier of the dataset.
+     * @param dataType Type of the dataset (VECTOR, COVERAGE, ..)
+     * 
+     * @return The template name for the specified dataset.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     String getDatasetTemplate(final String datasetId, final String dataType) throws ConfigurationException;
     
+    /**
+     * Return the template name for the specified data.
+     * 
+     * @param dataName identifier of the data.
+     * @param dataType Type of the dataset (VECTOR, COVERAGE, ..)
+     * 
+     * @return The template name for the specified data.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     String getDataTemplate(final QName dataName, final String dataType) throws ConfigurationException;
     
     /**
@@ -296,4 +322,29 @@ public interface IMetadataBusiness {
      * @throws org.constellation.configuration.ConfigurationException 
      */
     Metadata duplicateMetadata(final int id, final String newTitle) throws ConfigurationException;
+    
+    /**
+     * Count the number of metadata stored in the database.
+     * 
+     * @return The total count of metadata.
+     */
+    int countTotal();
+    
+    /**
+     * Count the number of metadata stored in the database whith the specified publication flag.
+     * 
+     * @param status Publication flag value.
+     * 
+     * @return The total count of metadata with the specified publication flag.
+     */
+    int countPublished(final boolean status);
+    
+    /**
+     * Count the number of metadata stored in the database whith the specified validation flag.
+     * 
+     * @param status Validation flag value.
+     * 
+     * @return The total count of metadata with the specified validation flag.
+     */
+    int countValidated(final boolean status);
 }

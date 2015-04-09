@@ -548,6 +548,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         return null;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateInternalCSWIndex(final List<Metadata> metadatas, final boolean update) throws ConfigurationException {
         try {
@@ -789,6 +792,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDataTemplate(final QName dataName, final String dataType) throws ConfigurationException {
         final String templateName;
@@ -805,6 +811,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         return templateName;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDatasetTemplate(final String datasetId, final String dataType) throws ConfigurationException {
         //get template name
@@ -860,6 +869,30 @@ public class MetadataBusiness implements IMetadataBusiness {
             return metadataRepository.findById(newID);
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int countTotal() {
+        return metadataRepository.countTotalMetadata();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int countPublished(final boolean status) {
+        return metadataRepository.countPublished(status);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int countValidated(final boolean status) {
+        return metadataRepository.countValidated(status);
     }
     
 }
