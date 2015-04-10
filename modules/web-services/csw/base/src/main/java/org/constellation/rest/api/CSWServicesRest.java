@@ -28,7 +28,7 @@ import org.constellation.dto.Details;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
-import org.constellation.json.metadata.Template;
+import org.constellation.json.metadata.v2.Template;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.configuration.CSWConfigurer;
@@ -49,6 +49,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -231,11 +232,11 @@ public class CSWServicesRest {
                         ((DefaultMetadata)metadata).prune();
                     }
 
-                    final StringBuilder buffer = new StringBuilder();
+                    final StringWriter writer = new StringWriter();
                     final String templateName = configurer.getTemplateName(id, metaID, type);
                     final Template template = Template.getInstance(templateName);
-                    template.write(metadata,buffer,prune);
-                    return Response.ok(buffer.toString()).build();
+                    template.write(metadata,writer,prune);
+                    return Response.ok(writer.toString()).build();
                 }
             }
         }catch(Exception ex){
