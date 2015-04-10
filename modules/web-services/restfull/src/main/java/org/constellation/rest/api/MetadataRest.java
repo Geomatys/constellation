@@ -584,6 +584,39 @@ public class MetadataRest {
     }
 
     /**
+     * Convert metadata in given profile and return the json representation of the resulted metadata.
+     *
+     * @param metadataId given metadata id
+     * @param prune optional flag that indicates if the prune will be applied
+     * @param profile the target  profile name
+     * @return {code Response}
+     */
+    @GET
+    @Path("/convertMDJson/{metadataId}/{prune}/{profile}")
+    public Response convertMetadataJson(final @PathParam("metadataId") int metadataId,
+                                        final @PathParam("prune") boolean prune,
+                                        final @PathParam("profile") String profile) {
+
+        //TODO implements convert metadata in given profile template and return the json.
+        final StringWriter buffer = new StringWriter();
+
+        try{
+            DefaultMetadata metadata = metadataBusiness.getMetadata(metadataId);
+            if (metadata != null) {
+                if(prune){
+                    metadata.prune();
+                }
+                //TODO
+            }
+        } catch(Exception ex) {
+            LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
+        }
+        return Response.ok(buffer.toString()).build();
+
+    }
+
+    /**
      * TODO implements save metadata for given int ID and DefaultMetadata object
      *
      * Proceed to save metadata values for given metadataId and values
