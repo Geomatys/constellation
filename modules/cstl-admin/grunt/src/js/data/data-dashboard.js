@@ -75,7 +75,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
          * Get cstl config to check for methods to import data.
          */
         $http.get("app/conf").success(function(data){
-            if(data['cstl.import.custom']) {
+            if(data['cstl.import.empty']) {
                 $scope.dataCtrl.availableWays.push(
                     {   name:'emptyDataset',
                         idHTML:'emptychoice',
