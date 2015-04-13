@@ -159,7 +159,16 @@ import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
+import java.util.HashSet;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.configuration.DataCustomConfiguration;
+import org.geotoolkit.coverage.CoverageStoreFactory;
+import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.data.FeatureStoreFactory;
+import org.geotoolkit.data.FeatureStoreFinder;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 /**
  * Manage data sending
@@ -577,6 +586,130 @@ public class DataRest {
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             return Response.status(500).entity(e.getLocalizedMessage()).build();
         }
+    }
+
+    /**
+     * List all FeatureStore and CoverageStore factories and there parameters.
+     * 
+     * @return Response {@link DataCustomConfiguration}
+     */
+    @GET
+    @Path("listStoreConfigurations")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getAllDataStoreConfigurations(){
+
+        final DataCustomConfiguration all = new DataCustomConfiguration();
+
+        //list feature store factories
+        for(FeatureStoreFactory factory : FeatureStoreFinder.getAllFactories(null)){
+            final DataCustomConfiguration.Type type = new DataCustomConfiguration.Type();
+            type.setId(factory.getIdentification().getCitation().getIdentifiers().iterator().next().getCode());
+            type.setTitle(String.valueOf(factory.getDisplayName()));
+            type.setCategory("feature-store");
+            if(factory.getDescription()!=null) type.setDescription(String.valueOf(factory.getDescription()));
+            final DataCustomConfiguration.Property prop = toDataStorePojo(factory.getParametersDescriptor());
+            type.setProperty(prop);
+
+            if(all.getTypes().isEmpty()){
+                //select the first type found
+                type.setSelected(true);
+            }
+            all.getTypes().add(type);
+        }
+
+        //list coverage store factories
+        for(CoverageStoreFactory factory : CoverageStoreFinder.getAllFactories(null)){
+            final DataCustomConfiguration.Type type = new DataCustomConfiguration.Type();
+            type.setId(factory.getIdentification().getCitation().getIdentifiers().iterator().next().getCode());
+            type.setTitle(String.valueOf(factory.getDisplayName()));
+            type.setCategory("coverage-store");
+            if(factory.getDescription()!=null) type.setDescription(String.valueOf(factory.getDescription()));
+            final DataCustomConfiguration.Property prop = toDataStorePojo(factory.getParametersDescriptor());
+            type.setProperty(prop);
+
+            if(all.getTypes().isEmpty()){
+                //select the first type found
+                type.setSelected(true);
+            }
+            all.getTypes().add(type);
+        }
+
+        return Response.ok(all).build();
+    }
+
+    /**
+     * Proceed to create new provider for given type.
+     *
+     * @param selected given selected type
+     * @return {@code Response}
+     */
+    @POST
+    @Path("putStoreConfigurations")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response putDataStoreConfiguration(final DataCustomConfiguration.Type selected) {
+        final ImportedData importedDataReport = new ImportedData();
+        try{
+            //create provider
+            final ProviderConfiguration provConfig = new ProviderConfiguration();
+            provConfig.setType(selected.getCategory());
+            provConfig.setSubType(selected.getId());
+
+            final DataCustomConfiguration.Property props = selected.getProperty();
+            props.toMap(provConfig.getParameters());
+
+            final String provId = selected.getId()+UUID.randomUUID().toString();
+            providerBusiness.create(provId, provConfig);
+
+
+            return Response.ok(importedDataReport).build();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            return Response.status(500).entity(e.getLocalizedMessage()).build();
+        }
+    }
+
+    private static final Set<Class> MARSHALLABLE = new HashSet<>();
+    static {
+        MARSHALLABLE.add(boolean.class);
+        MARSHALLABLE.add(byte.class);
+        MARSHALLABLE.add(short.class);
+        MARSHALLABLE.add(int.class);
+        MARSHALLABLE.add(long.class);
+        MARSHALLABLE.add(float.class);
+        MARSHALLABLE.add(double.class);
+        MARSHALLABLE.add(Boolean.class);
+        MARSHALLABLE.add(Byte.class);
+        MARSHALLABLE.add(Short.class);
+        MARSHALLABLE.add(Integer.class);
+        MARSHALLABLE.add(Long.class);
+        MARSHALLABLE.add(Float.class);
+        MARSHALLABLE.add(Double.class);
+        MARSHALLABLE.add(String.class);
+        MARSHALLABLE.add(Date.class);
+    }
+    private static DataCustomConfiguration.Property toDataStorePojo(GeneralParameterDescriptor desc){
+        final DataCustomConfiguration.Property prop = new DataCustomConfiguration.Property();
+        prop.setId(desc.getName().getCode());
+        if(desc.getDescription()!=null) prop.setDescription(String.valueOf(desc.getDescription()));
+        prop.setOptional(desc.getMinimumOccurs()==0);
+
+        if(desc instanceof ParameterDescriptorGroup){
+            final ParameterDescriptorGroup d = (ParameterDescriptorGroup)desc;
+            for(GeneralParameterDescriptor child : d.descriptors()){
+                prop.getProperties().add(toDataStorePojo(child));
+            }
+        }else if(desc instanceof ParameterDescriptor){
+            final ParameterDescriptor d = (ParameterDescriptor)desc;
+            final Object defaut = d.getDefaultValue();
+            if(defaut!=null && MARSHALLABLE.contains(defaut.getClass())){
+                prop.setValue(defaut);
+            }
+            prop.setType(d.getValueClass().getSimpleName());
+        }
+
+        return prop;
     }
 
     private List<String> getAllEpsgCodes() {

@@ -13,6 +13,9 @@
                 <h4 ng-if="import.currentStep === 'step1Database'"
                     class="modal-title"
                     translate="label.file.db">Database</h4>
+                <h4 ng-if="import.currentStep === 'step1Custom'"
+                    class="modal-title"
+                    translate="data.modal.custom.title">Other data type</h4>
                 <h4 ng-if="import.currentStep === 'step2Metadata'"
                     class="modal-title"
                     translate="data.modal.metadata">Metadata</h4>
@@ -32,6 +35,9 @@
                 </div>
                 <div ng-if="import.currentStep === 'step1Database'">
                     <div ng-include="'views/data/import/step1_database.html'"></div>
+                </div>
+                <div ng-if="import.currentStep === 'step1Custom'">
+                    <div ng-include="'views/data/import/step1_custom.html'"></div>
                 </div>
                 <div ng-if="import.currentStep === 'step2Metadata'">
                     <div ng-include="'views/data/import/step2_metadata.html'"></div>

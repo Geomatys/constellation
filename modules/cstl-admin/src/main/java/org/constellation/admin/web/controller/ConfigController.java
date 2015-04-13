@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.constellation.admin.security.CstlAdminLoginConfigurationService;
@@ -61,15 +62,16 @@ public class ConfigController {
 	 *   <li>/constellation</li>
 	 * </ul>
 	 * Current webapp context if running the same webapp (cstl-uberwar) 
-	 * @param request
-	 * @return
+	 * @param request {@code HttpServletRequest}
+	 * @return Map
 	 */
 	@RequestMapping(method=RequestMethod.GET)
 	public @ResponseBody
-	Map<Object, Object> get(HttpServletRequest request) {
+	Map<Object, Object> get(final HttpServletRequest request) {
+        final ServletContext servletCtxt = request.getServletContext();
 		Properties properties = new Properties();
 		String context;
-		if("true".equals(request.getServletContext().getInitParameter("cstl-uberwar"))) {
+		if("true".equals(servletCtxt.getInitParameter("cstl-uberwar"))) {
 		    //If run in a single war, handle the renaming of this war
 		    context = request.getContextPath();
 		}else {
@@ -81,6 +83,8 @@ public class ConfigController {
 		properties.put("cstl", context);
 		properties.put("token.life", TOKEN_LIFE);
 		properties.put("cstlLoginURL", env.getProperty("cstlLoginURL", cstlAdminLoginConfigurationService.getCstlLoginURL()));
+        properties.put("cstl.import.empty","true".equals(servletCtxt.getInitParameter("cstl.import.empty")));
+        properties.put("cstl.import.custom","true".equals(servletCtxt.getInitParameter("cstl.import.custom")));
 		return properties;
 	}
 

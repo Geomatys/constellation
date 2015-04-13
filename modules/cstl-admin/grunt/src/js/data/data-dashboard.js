@@ -21,7 +21,7 @@
 angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('DataController', function($scope, $routeParams, $location, Dashboard, webService, dataListing, datasetListing, DomainResource,
-                                            provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookieStore) {
+                                            provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookieStore,$http) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -68,14 +68,34 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 translateKey:'label.file.db',
                 defaultTranslateValue:'Database',
                 bindFunction:function(){$scope.showDatabasePopup();}
-            },
-            {   name:'emptyDataset',
-                idHTML:'emptychoice',
-                translateKey:'label.file.empty',
-                defaultTranslateValue:'Empty dataset',
-                bindFunction:function(){$scope.showEmptyDataSetPopup();}
             }
         ];
+
+        /**
+         * Get cstl config to check for methods to import data.
+         */
+        $http.get("app/conf").success(function(data){
+            if(data['cstl.import.custom']) {
+                $scope.dataCtrl.availableWays.push(
+                    {   name:'emptyDataset',
+                        idHTML:'emptychoice',
+                        translateKey:'label.file.empty',
+                        defaultTranslateValue:'Empty dataset',
+                        bindFunction:function(){$scope.showEmptyDataSetPopup();}
+                    }
+                );
+            }
+            if(data['cstl.import.custom']) {
+                $scope.dataCtrl.availableWays.push(
+                    {   name:'customDataset',
+                        idHTML:'customchoice',
+                        translateKey:'label.file.custom',
+                        defaultTranslateValue:'Other',
+                        bindFunction:function(){$scope.showCustomDataSetPopup();}
+                    }
+                );
+            }
+        });
 
         /**
          * Select appropriate tab 'tabdata' or 'tabmetadata'.
@@ -847,6 +867,20 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                             Growl('error', 'Error', 'Unable to save metadata');
                         });
                 }
+            });
+        };
+
+        $scope.showCustomDataSetPopup = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/data/modalImportData.html',
+                controller: 'ModalImportDataController',
+                resolve: {
+                    'firstStep': function() { return 'step1Custom'; },
+                    'importType': function() { return 'custom'; }
+                }
+            });
+            modal.result.then(function() {
+                $scope.initAfterImport();
             });
         };
 

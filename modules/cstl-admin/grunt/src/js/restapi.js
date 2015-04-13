@@ -168,7 +168,9 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             'unlinkFromDomain':     {method: 'DELETE',  url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
             'domains':              {method: 'GET',     url: '@cstl/api/1/dataXdomain/:dataId/user/$userId/domain', isArray: true},
             'findData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/find;jsessionid=', isArray: true},
-            'vectorColumns':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/:id/vector/columns;jsessionid='}
+            'vectorColumns':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/:id/vector/columns;jsessionid='},
+            'getStoreConfig':       {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/listStoreConfigurations'},
+            'putStoreConfig':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/putStoreConfigurations'}
         });
     })
 

@@ -1,0 +1,23 @@
+<div id="part1Custom" ng-controller="ModalImportCustomStep1Controller">
+    <form>
+        <div class="form-group">
+            <label for="factorySelect">Select method to import data</label>
+            <select id="factorySelect"
+                    class="form-control form-control-fix"
+                    ng-model="options.selectedType"
+                    ng-options="type as type.title for type in options.types">
+            </select>
+        </div>
+        <div ng-if="options.selectedType">
+            <hr/>
+            <p><label>Description:</label> {{options.selectedType.description}}</p>
+            <div class="form-group" ng-repeat="property in options.selectedType.property.Property">
+                <label>{{property.id}} {{property.optional ? '' : '(*)'}}</label>
+                <input type="text"
+                       class="form-control form-control-fix"
+                       ng-model="property.value"
+                       ng-required="! property.optional"/>
+            </div>
+        </div>
+    </form>
+</div>

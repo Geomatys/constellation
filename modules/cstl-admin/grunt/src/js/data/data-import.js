@@ -684,4 +684,53 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
                 Growl('error','Error','Unable to import sensor');
             });
         }
+    })
+
+    .controller('ModalImportCustomStep1Controller', function($scope, dataListing, Growl) {
+        var self = $scope;
+
+        self.import.allowNext = false;
+        self.import.allowSubmit = true;
+
+        self.options = {
+            config : null,
+            types : [],
+            selectedType : null
+        };
+
+        self.init = function() {
+            dataListing.getStoreConfig(
+                function success(response){
+                    self.options.config = response;
+                    if(response.Type) {
+                        self.options.types = response.Type;
+                    }else {
+                        self.options.types = [];
+                    }
+                },
+                function error(response){
+                    Growl('error', 'Error', 'An error happen when getting types');
+                    self.options.types = [];
+                }
+            );
+        };
+        self.init();
+
+        self.import.finish = function() {
+            if(self.options.selectedType) {
+                dataListing.putStoreConfig(self.options.selectedType,
+                    function success(response){
+                        Growl('success','Success','Configuration saved successfully!');
+                        self.close();
+                    },
+                    function error(response){
+                        Growl('error', 'Error', 'An error happen when saving configuration! '+response.data);
+                    }
+                );
+            } else {
+                self.close();
+            }
+        };
+
+
     });
