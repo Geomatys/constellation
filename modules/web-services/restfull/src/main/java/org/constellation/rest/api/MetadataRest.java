@@ -9,6 +9,7 @@ import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.engine.security.WorkspaceService;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.model.metadata.Filter;
 import org.constellation.model.metadata.MetadataBrief;
@@ -19,6 +20,8 @@ import org.constellation.model.metadata.Profile;
 import org.constellation.model.metadata.Sort;
 import org.constellation.model.metadata.User;
 import org.geotoolkit.util.FileUtilities;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -30,10 +33,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,8 +67,8 @@ import org.constellation.json.metadata.v2.Template;
  */
 @Component
 @Path("/1/metadata")
-@Consumes("application/json")
-@Produces("application/json")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class MetadataRest {
 
     /**
@@ -82,10 +89,16 @@ public class MetadataRest {
     private IMetadataBusiness metadataBusiness;
 
     /**
-     * Injected user repository.
+     * Inject user repository.
      */
     @Inject
     private UserRepository userRepository;
+
+    /**
+     * Inject workspaceService to serve upload directory.
+     */
+    @Inject
+    private WorkspaceService workspaceService;
 
     public MetadataRest() {}
 
@@ -681,6 +694,47 @@ public class MetadataRest {
             return Response.status(500).entity(ex.getMessage()).build();
         }
         return Response.ok("Metadata duplicated successfully!").build();
+    }
+
+    /**
+     * TODO save the uploaded metadata in db and return the metadataBrief in map
+     * Receive a {@code MultiPart} which contains xml file,
+     * the metadata will be stored in server and returns the generated Id
+     * and the nearest profile name that matches the metadata.
+     *
+     * @param mdFileIs {@code InputStream} the given xml stream
+     * @param fileMetaDetail {@code FormDataContentDisposition} the file
+     * @param request {@code HttpServletRequest} the hhtp request
+     * @return {@code Response} with 200 code if upload work, 500 if not work.
+     */
+    @POST
+    @Path("/upload")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadMetadata(@FormDataParam("metadataFileInput") InputStream mdFileIs,
+                                   @FormDataParam("metadataFileInput") FormDataContentDisposition fileMetaDetail,
+                                   @Context HttpServletRequest request) {
+
+        //TODO get user from request to set the owner for the uploaded metadata
+
+        final File uploadDirectory = workspaceService.getUploadDirectory();
+        final Map<String,String> map = new HashMap<>();
+        try {
+            final File newFileMetaData = new File(uploadDirectory, fileMetaDetail.getFileName());
+            if (mdFileIs != null) {
+                if (!uploadDirectory.exists()) {
+                    uploadDirectory.mkdir();
+                }
+                Files.copy(mdFileIs, newFileMetaData.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                //TODO unmarshall metadata file and save new record
+                //TODO get the metadata brief and store them into the map
+                map.put("record",null);
+            }
+        }catch(Exception ex) {
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            map.put("msg", ex.getLocalizedMessage());
+            return Response.status(500).entity(map).build();
+        }
+        return Response.ok(map).build();
     }
 
 
