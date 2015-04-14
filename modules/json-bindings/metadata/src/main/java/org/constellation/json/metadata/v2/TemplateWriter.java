@@ -26,6 +26,7 @@ import static org.constellation.json.JsonMetadataConstants.DATE_READ_ONLY;
 import org.constellation.json.metadata.ParseException;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.util.StringUtilities;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.util.Enumerated;
@@ -47,23 +48,25 @@ public class TemplateWriter extends AbstractTemplateHandler {
      * @param template
      * @param metadata
      * @param prune
+     * @param overwrite
      * @return 
+     * @throws org.constellation.json.metadata.ParseException 
      */
-    public RootObj writeTemplate(final RootObj template, final Object metadata, final boolean prune) throws ParseException {
+    public RootObj writeTemplate(final RootObj template, final Object metadata, final boolean prune, final boolean overwrite) throws ParseException {
         final TemplateTree tree  = TemplateTree.getTreeFromRootObj(template);
         
-        fillValueWithMetadata(tree, tree.getRoot(), metadata, new HashMap<String, Set<Object>>(), prune);
+        fillValueWithMetadata(tree, tree.getRoot(), metadata, new HashMap<String, Set<Object>>(), prune, overwrite);
         if (prune) {
             TemplateTree.pruneTree(tree, tree.getRoot());
         }
         return TemplateTree.getRootObjFromTree(template, tree, prune);
     }
     
-    private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded, final boolean prune) throws ParseException {
+    private void fillValueWithMetadata(final TemplateTree tree, final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded, final boolean prune, final boolean overwrite) throws ParseException {
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             final ValueNode origNode = new ValueNode(node);
-            final Object obj = getValue(node, metadata, excluded);
+            final Object obj = getValue(node, metadata, excluded, overwrite);
             if (obj instanceof Collection && !((Collection)obj).isEmpty())  {
                 final Iterator it = ((Collection)obj).iterator();
                 int i = node.ordinal;
@@ -71,17 +74,17 @@ public class TemplateWriter extends AbstractTemplateHandler {
                     Object child = it.next();
                     node = tree.duplicateNode(origNode, i);
                     if (node.isField()) {
-                        node.value = valueToString(node, child, !prune);
+                        node.value = valueToString(node, child, !prune, overwrite);
                     } else {
-                        fillValueWithMetadata(tree, node, child, excluded, prune);
+                        fillValueWithMetadata(tree, node, child, excluded, prune, overwrite);
                     }
                     i++;
                 }
             } else {
                 if (node.isField()) {
-                    node.value = valueToString(node, obj, !prune);
+                    node.value = valueToString(node, obj, !prune, overwrite);
                 } else {
-                    fillValueWithMetadata(tree, node, obj, excluded, prune);
+                    fillValueWithMetadata(tree, node, obj, excluded, prune, overwrite);
                 }
             }
         }
@@ -89,13 +92,13 @@ public class TemplateWriter extends AbstractTemplateHandler {
     
     private ValueNode extractSubTreeFromMetadata(final ValueNode root, final Object metadata, final  Map<String, Set<Object>> excluded) throws ParseException {
         if (root.isField()) {
-            root.value = valueToString(root, metadata, false);
+            root.value = valueToString(root, metadata, false, false);
             return root;
         }
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             final ValueNode origNode = new ValueNode(node);
-            final Object obj = getValue(node, metadata, excluded);
+            final Object obj = getValue(node, metadata, excluded, false);
             if (obj instanceof Collection && !((Collection)obj).isEmpty())  {
                 final Iterator it = ((Collection)obj).iterator();
                 int i = node.ordinal;
@@ -106,7 +109,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
                         node = new ValueNode(origNode, root, i);
                     }
                     if (node.isField()) {
-                        node.value = valueToString(node, child, false);
+                        node.value = valueToString(node, child, false, false);
                     } else {
                         extractSubTreeFromMetadata(node, child, excluded);
                     }
@@ -115,7 +118,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
                 }
             } else {
                 if (node.isField()) {
-                    node.value = valueToString(node, obj, false);
+                    node.value = valueToString(node, obj, false, false);
                 } else {
                     extractSubTreeFromMetadata(node, obj, excluded);
                 }
@@ -124,24 +127,25 @@ public class TemplateWriter extends AbstractTemplateHandler {
         return root;
     }
     
-    private Object getValue(final ValueNode node, Object metadata,  Map<String, Set<Object>> excluded) throws ParseException {
+    private Object getValue(final ValueNode node, Object metadata,  Map<String, Set<Object>> excluded, boolean overwrite) throws ParseException {
         if (metadata instanceof AbstractMetadata && !(metadata instanceof Period) && !(metadata instanceof Instant)) {
             Object obj = asFullMap(metadata).get(node.name);
             if (obj instanceof Collection) {
                 final Collection result = new ArrayList<>(); 
                 final Iterator it       = ((Collection)obj).iterator();
                 while (it.hasNext()) {
-                    final Object o = getSingleValue(node, it.next(), excluded);
+                    final Object o = getSingleValue(node, it.next(), excluded, overwrite);
                     if (o != null) result.add(o);
                 }
                 return result;
             } else {
-                return getSingleValue(node, obj, excluded);
+                return getSingleValue(node, obj, excluded, overwrite);
             }
         } else if (metadata instanceof Collection && ((Collection)metadata).isEmpty()) {
             return null;
             
         } else if (metadata != null) {
+            // TODO filter : type, default value, etc...
             final Method getter = ReflectionUtilities.getGetterFromName(node.name, metadata.getClass());
             if (getter != null) {
                 return ReflectionUtilities.invokeMethod(metadata, getter);
@@ -154,7 +158,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
         }
     }
     
-    private Object getSingleValue(final ValueNode node, Object metadata, Map<String, Set<Object>> excluded) throws ParseException {
+    private Object getSingleValue(final ValueNode node, Object metadata, Map<String, Set<Object>> excluded, boolean overwrite) throws ParseException {
         if (isExcluded(excluded, node, metadata)) return null;
         
         /*
@@ -177,7 +181,7 @@ public class TemplateWriter extends AbstractTemplateHandler {
         */
         } else if (node.type != null) {
             final Class type = readType(node);
-            if (type.isInstance(metadata) ) {
+            if (type.isInstance(metadata) || overwrite) {
                 exclude(excluded, node, metadata);
                 return metadata;
             }
@@ -215,15 +219,17 @@ public class TemplateWriter extends AbstractTemplateHandler {
         return false;
     }
     
-    private static String valueToString(final ValueNode n, final Object value, final boolean applyDefault) {
+    private static String valueToString(final ValueNode n, final Object value, final boolean applyDefault, final boolean overwrite) {
         final String p;
         // Null or empty collection
         if (value == null || value instanceof Collection) { 
-            if (applyDefault) {
+            if (applyDefault || overwrite) {
                 p = n.defaultValue;
             } else {
                 p = null;
             }
+        } else if (overwrite && n.defaultValue != null && n.render.toLowerCase().contains("readonly")) {
+            p = n.defaultValue;
         } else if (value instanceof Number) {
             p = value.toString();
         } else if (value instanceof Angle) {

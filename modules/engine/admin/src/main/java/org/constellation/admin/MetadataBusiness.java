@@ -491,6 +491,14 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    public void updateProfile(final Integer id, final String newProfile) throws ConfigurationException {
+        metadataRepository.changeProfile(id, newProfile);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void updateValidation(int id, boolean newStatus) {
         metadataRepository.changeValidation(id, newStatus);
     }

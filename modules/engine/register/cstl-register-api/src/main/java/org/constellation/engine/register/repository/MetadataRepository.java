@@ -70,6 +70,8 @@ public interface MetadataRepository {
     
     void changePublication(final int id, final boolean published);
     
+    void changeProfile(final int id, final String newProfile);
+    
     int countTotalMetadata();
     
     int countValidated(final boolean status);

@@ -142,17 +142,17 @@ public class Template {
      * @param metadata The metadata object to write.
      * @param out      Where to write the JSO file.
      * @param prune    {@code true} for omitting empty nodes.
+     * @param overwrite {@code true} for overwriting read-only nodes.
      *
      * @throws IOException if an error occurred while writing to {@code out}.
      */
-    public void write(final Object metadata, final Writer out, final boolean prune) throws IOException {
+    public void write(final Object metadata, final Writer out, final boolean prune, final boolean overwrite) throws IOException {
         final TemplateWriter writer     = new TemplateWriter(standard);
-        final RootObj rootFilled        = writer.writeTemplate(rootObj, metadata, prune);
+        final RootObj rootFilled        = writer.writeTemplate(rootObj, metadata, prune, overwrite);
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(out, rootFilled);
     }
 
-    
     /**
      * Parses the given JSON object and write the metadata values in the given metadata object.
      * The {@code skipNulls} argument is used in the same way than in the
@@ -165,12 +165,14 @@ public class Template {
      */
     public void read(final RootObj json, final Object destination, final boolean skipNulls) throws IOException {
         TemplateReader reader = new TemplateReader(standard, specialized);
+        //fix missing node types unsent by the UI
+        json.setNodeTypes(rootObj.getNodeTypes());
         reader.readTemplate(json, destination);
     }
     
     public String getCompletion(final Object metadata) throws IOException {
         final TemplateWriter writer = new TemplateWriter(standard);
-        final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false);
+        final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false, false);
         return getCompletion(rootFilled);
     }
     
@@ -218,7 +220,7 @@ public class Template {
     
     public int calculateMDCompletion(final Object metadata) throws IOException {
         final TemplateWriter writer = new TemplateWriter(standard);
-        final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false);
+        final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false, false);
         return calculateMDCompletion(rootFilled);
     }
     

@@ -833,7 +833,7 @@ public class DataRest {
                 //get template name
                 final String templateName = metadataBusiness.getDatasetTemplate(identifier, dataType);
                 final Template template   = Template.getInstance(templateName);
-                template.write(metadata,buffer,false);
+                template.write(metadata, buffer, false, false);
             }
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "error cannot get dataset Metadata.", ex);
@@ -880,7 +880,7 @@ public class DataRest {
                     templateName = metadataBusiness.getDataTemplate(dataName, dataType);
                 }
                 final Template template = Template.getInstance(templateName);
-                template.write(metadata,buffer,false);
+                template.write(metadata, buffer, false, false);
             }
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "error cannot get dataset Metadata.", ex);
@@ -935,7 +935,7 @@ public class DataRest {
                     templateName = metadataBusiness.getDataTemplate(dataName, type);
                 }
                 final Template template = Template.getInstance(templateName);
-                template.write(metadata,buffer,prune);
+                template.write(metadata, buffer, prune, false);
             }
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
@@ -969,7 +969,7 @@ public class DataRest {
                 //get template name
                 final String templateName = metadataBusiness.getDatasetTemplate(datasetIdentifier, type);
                 final Template template   = Template.getInstance(templateName);
-                template.write(metadata,buffer,prune);
+                template.write(metadata, buffer, false, prune);
             }
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);

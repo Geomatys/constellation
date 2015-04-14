@@ -235,7 +235,7 @@ public class CSWServicesRest {
                     final StringWriter writer = new StringWriter();
                     final String templateName = configurer.getTemplateName(id, metaID, type);
                     final Template template = Template.getInstance(templateName);
-                    template.write(metadata,writer,prune);
+                    template.write(metadata,writer,prune, false);
                     return Response.ok(writer.toString()).build();
                 }
             }

@@ -221,7 +221,7 @@ public class SensorRest {
                         templateName="profile_sensorml_system";
                     }
                     final Template template = Template.getInstance(templateName);
-                    template.write(sml,buffer,prune);
+                    template.write(sml,buffer,prune, false);
                 }
                 return Response.ok(buffer.toString()).build();
             } catch (Exception ex) {

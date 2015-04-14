@@ -1,0 +1,398 @@
+{
+  "root" : {
+    "name" : "MD_Metadata",
+    "multiplicity" : 1,
+    "children" : [ {
+      "superblock" : {
+        "name" : "metadata.block.dataQuality",
+        "multiplicity" : 1,
+        "help" : "metadata.block.dataQuality_help",
+        "path" : null,
+        "render" : null,
+        "children" : [ {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.report",
+            "multiplicity" : 1,
+            "help" : "metadata.block.report_help",
+            "path" : null,
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.report.specification.title",
+                "multiplicity" : 62,
+                "help" : "metadata.field.report.specification.title_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].specification[0].title[0]",
+                "type" : null,
+                "render" : "Specification.codelist",
+                "defaultValue" : null,
+                "value" : null,
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.report.specification.date",
+                "multiplicity" : 1,
+                "help" : "metadata.field.report.specification.date_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].specification[0].date[0].date[0]",
+                "type" : null,
+                "render" : "DATE.text",
+                "defaultValue" : null,
+                "value" : null,
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.dateType",
+                "multiplicity" : 1,
+                "help" : "metadata.field.dateType_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].specification[0].date[0].dateType[0]",
+                "type" : null,
+                "render" : "CODELIST.readonly",
+                "defaultValue" : "CI_DateTypeCode.publication",
+                "value" : "CI_DateTypeCode.publication",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.scopeLevel",
+                "multiplicity" : 1,
+                "help" : "metadata.field.scopeLevel_help",
+                "path" : "metadata[0].dataQualityInfo[0].scope[0].level[0]",
+                "type" : null,
+                "render" : "CODELIST.readonly",
+                "defaultValue" : "MD_ScopeCode.dataset",
+                "value" : "MD_ScopeCode.dataset",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "extended"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.resultPass",
+                "multiplicity" : 1,
+                "help" : "metadata.field.resultPass_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].pass[0]",
+                "type" : null,
+                "render" : "ResultPass.codelist",
+                "defaultValue" : "nilReason:unknown",
+                "value" : "nilReason:unknown",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "extended"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.resultExplanation",
+                "multiplicity" : 1,
+                "help" : "metadata.field.resultExplanation_help",
+                "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].explanation[0]",
+                "type" : null,
+                "render" : "textarea",
+                "defaultValue" : "See the referenced specification",
+                "value" : "See the referenced specification",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "extended"
+              }
+            } ]
+          }
+        }, {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.descriptiveKeyword",
+            "multiplicity" : 62,
+            "help" : "metadata.block.descriptiveKeyword_help",
+            "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0]",
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keyword",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keyword_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[0]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "hello",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.keyword",
+                "multiplicity" : 62,
+                "help" : "metadata.field.keyword_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].keyword[1]",
+                "type" : null,
+                "render" : "KEYWORD.text",
+                "defaultValue" : null,
+                "value" : "world",
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.thesaurusTitle",
+                "multiplicity" : 1,
+                "help" : "metadata.field.thesaurusTitle_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].thesaurusName[0].title[0]",
+                "type" : null,
+                "render" : "text",
+                "defaultValue" : null,
+                "value" : null,
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "extended"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.thesaurusDate",
+                "multiplicity" : 1,
+                "help" : "metadata.field.thesaurusDate_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].thesaurusName[0].date[0].date[0]",
+                "type" : null,
+                "render" : "DATE.text",
+                "defaultValue" : null,
+                "value" : null,
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "extended"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.thesaurusDateType",
+                "multiplicity" : 1,
+                "help" : "metadata.field.thesaurusDateType_help",
+                "path" : "metadata[0].identificationInfo[0].descriptiveKeywords[0].thesaurusName[0].date[0].dateType[0]",
+                "type" : null,
+                "render" : "DATE.codelist",
+                "defaultValue" : null,
+                "value" : null,
+                "obligation" : "O",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "extended"
+              }
+            } ]
+          }
+        } ]
+      }
+    }, {
+      "superblock" : {
+        "name" : "metadata.block.metadata",
+        "multiplicity" : 1,
+        "help" : "metadata.block.metadata_help",
+        "path" : null,
+        "render" : null,
+        "children" : [ {
+          "type" : "block",
+          "block" : {
+            "name" : "metadata.block.basic",
+            "multiplicity" : 1,
+            "help" : "metadata.block.basic_help",
+            "path" : null,
+            "render" : null,
+            "ignore" : null,
+            "type" : null,
+            "strict" : false,
+            "children" : [ {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.identifier",
+                "multiplicity" : 1,
+                "help" : "metadata.field.identifier_help",
+                "path" : "metadata[0].fileIdentifier[0]",
+                "type" : null,
+                "render" : "readonly",
+                "defaultValue" : null,
+                "value" : null,
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.dateStamp",
+                "multiplicity" : 1,
+                "help" : "metadata.field.dateStamp_help",
+                "path" : "metadata[0].dateStamp[0]",
+                "type" : null,
+                "render" : "DATE.readonly",
+                "defaultValue" : null,
+                "value" : null,
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.metadataStandardName",
+                "multiplicity" : 1,
+                "help" : "metadata.field.metadataStandardName_help",
+                "path" : "metadata[0].metadataStandardName[0]",
+                "type" : null,
+                "render" : "readonly",
+                "defaultValue" : "x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster",
+                "value" : "x-urn:schema:ISO19115:INSPIRE:dataset:geo-raster",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.metadataStandardVersion",
+                "multiplicity" : 1,
+                "help" : "metadata.field.metadataStandardVersion_help",
+                "path" : "metadata[0].metadataStandardVersion[0]",
+                "type" : null,
+                "render" : "readonly",
+                "defaultValue" : "2011.03",
+                "value" : "2011.03",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.characterSet",
+                "multiplicity" : 1,
+                "help" : "metadata.field.characterSet_help",
+                "path" : "metadata[0].characterSet[0]",
+                "type" : null,
+                "render" : "CharacterSet.codelist",
+                "defaultValue" : "UTF-8",
+                "value" : "UTF-16",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.metadatalanguage",
+                "multiplicity" : 1,
+                "help" : "metadata.field.metadatalanguage_help",
+                "path" : "metadata[0].language[0]",
+                "type" : null,
+                "render" : "Language.codelist",
+                "defaultValue" : "LanguageCode.fra",
+                "value" : "LanguageCode.eng",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            }, {
+              "type" : "field",
+              "field" : {
+                "name" : "metadata.field.hierarchyLevel",
+                "multiplicity" : 1,
+                "help" : "metadata.field.hierarchyLevel_help",
+                "path" : "metadata[0].hierarchyLevel[0]",
+                "type" : null,
+                "render" : "CODELIST.readonly",
+                "defaultValue" : "MD_ScopeCode.dataset",
+                "value" : "MD_ScopeCode.dataset",
+                "obligation" : "M",
+                "ignore" : null,
+                "tag" : null,
+                "predefinedValues" : [ ],
+                "strict" : false,
+                "completion" : "elementary"
+              }
+            } ]
+          }
+        } ]
+      }
+    } ]
+  },
+  "nodeTypes" : [ {
+    "path" : "metadata.dataQualityInfo.report",
+    "type" : "org.opengis.metadata.quality.DomainConsistency"
+  }, {
+    "path" : "metadata.dataQualityInfo.report.result",
+    "type" : "org.opengis.metadata.quality.ConformanceResult"
+  }, {
+    "path" : "metadata.identificationInfo",
+    "type" : "org.opengis.metadata.identification.DataIdentification"
+  } ]
+}

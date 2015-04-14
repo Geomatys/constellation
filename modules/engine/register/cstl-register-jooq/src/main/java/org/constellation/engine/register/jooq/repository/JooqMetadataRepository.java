@@ -370,6 +370,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.IS_PUBLISHED, published).where(METADATA.ID.eq(id)).execute();
     }
+    
+    @Override
+    public void changeProfile(int id, String newProfile) {
+        UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
+        update.set(METADATA.PROFILE, newProfile).where(METADATA.ID.eq(id)).execute();
+    }
  
     @Override
     public List<MetadataBbox> getBboxes(int id) {

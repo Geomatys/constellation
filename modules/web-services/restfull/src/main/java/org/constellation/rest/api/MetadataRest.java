@@ -587,7 +587,7 @@ public class MetadataRest {
                 //get template name
                 final String templateName = metadataBusiness.getMetadataById(metadataId).getProfile();
                 final Template template = Template.getInstance(templateName);
-                template.write(metadata,buffer,prune);
+                template.write(metadata,buffer,prune, false);
             }
         } catch(Exception ex) {
             LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
@@ -619,7 +619,10 @@ public class MetadataRest {
                 if(prune){
                     metadata.prune();
                 }
-                //TODO
+                Template newTemplate = Template.getInstance(profile);
+                if (newTemplate != null) {
+                    newTemplate.write(metadata, buffer, false, true);
+                }
             }
         } catch(Exception ex) {
             LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
@@ -647,8 +650,17 @@ public class MetadataRest {
                                  final RootObj metadataValues) {
         try {
             // Get previously saved metadata
-            final DefaultMetadata metadata = metadataBusiness.getMetadata(metadataId);
-            if (metadata != null) {
+            final Metadata pojo      = metadataBusiness.getMetadataById(metadataId);
+            if (pojo != null) {
+                
+                // detect profile change
+                final DefaultMetadata metadata;
+                if (!pojo.getProfile().equals(profile)) {
+                    metadata = new DefaultMetadata();
+                    metadataBusiness.updateProfile(metadataId, profile);
+                } else {
+                    metadata = metadataBusiness.getMetadata(metadataId);
+                }
                 //get template
                 final Template template = Template.getInstance(profile);
                 try {

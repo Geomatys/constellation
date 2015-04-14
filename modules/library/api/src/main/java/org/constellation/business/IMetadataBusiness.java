@@ -221,6 +221,16 @@ public interface IMetadataBusiness {
     void updatePublication(final List<Integer> ids, final boolean newStatus) throws ConfigurationException;
     
     /**
+     * Update the profile for a metadata pojo.
+     * 
+     * @param id metadata pojo identifier.
+     * @param newProfile new profile to set.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
+    void updateProfile(final Integer id, final String newProfile) throws ConfigurationException;
+    
+    /**
      * Update the validation flag of a metadata.
      * 
      * @param id identifier of the metadata pojo.
