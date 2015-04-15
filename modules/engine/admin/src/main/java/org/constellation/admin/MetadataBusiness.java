@@ -780,7 +780,8 @@ public class MetadataBusiness implements IMetadataBusiness {
         return mdList;
     }
     
-    protected Object unmarshallMetadata(final String metadata) throws ConfigurationException {
+    @Override
+    public Object unmarshallMetadata(final String metadata) throws ConfigurationException {
         try {
             return XML.unmarshal(metadata);
         } catch (JAXBException ex) {

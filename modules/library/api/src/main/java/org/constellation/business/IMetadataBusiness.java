@@ -396,4 +396,6 @@ public interface IMetadataBusiness {
      * @return The total count of metadata with the specified validation flag.
      */
     int countValidated(final boolean status);
+    
+    Object unmarshallMetadata(final String metadata) throws ConfigurationException;
 }

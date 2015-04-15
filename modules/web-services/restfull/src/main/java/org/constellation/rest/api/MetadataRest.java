@@ -608,11 +608,9 @@ public class MetadataRest {
     public Response getNewMetadataJson(final @PathParam("profile") String profile) {
         final StringWriter buffer = new StringWriter();
         try{
-            //TODO create new Metadata and do not save it.
-
             //get template name
             final Template template = Template.getInstance(profile);
-            //template.write(newMetadata,buffer,false, false);
+            template.write(new DefaultMetadata(), buffer, false, false);
 
         } catch(Exception ex) {
             LOGGER.log(Level.WARNING, "An error happen when building json representation of new metadata for profile "+profile, ex);
@@ -635,9 +633,7 @@ public class MetadataRest {
                                         final @PathParam("prune") boolean prune,
                                         final @PathParam("profile") String profile) {
 
-        //TODO implements convert metadata in given profile template and return the json.
         final StringWriter buffer = new StringWriter();
-
         try{
             DefaultMetadata metadata = metadataBusiness.getMetadata(metadataId);
             if (metadata != null) {
@@ -658,8 +654,6 @@ public class MetadataRest {
     }
 
     /**
-     * TODO implements save metadata for given int ID and DefaultMetadata object
-     *
      * Proceed to save metadata values for given metadataId and values
      * using template defined by given profile.
      *
@@ -704,8 +698,6 @@ public class MetadataRest {
     }
 
     /**
-     * TODO implements create new metadata for given profile and metadataValues
-     *
      * Proceed to create new metadata for given profile and values.
      *
      * @param profile given profile
@@ -716,10 +708,14 @@ public class MetadataRest {
     @Path("/createNew/{profile}")
     public Response createNewMetadata(@PathParam("profile") final String profile,final RootObj metadataValues) {
         try {
-            //TODO Create new metadata
-
             //get template
             final Template template = Template.getInstance(profile);
+            final DefaultMetadata metadata = new DefaultMetadata();
+            template.read(metadataValues, metadata, true);
+            String identifier = UUID.randomUUID().toString();
+            metadata.setFileIdentifier(identifier);
+            metadata.setDateStamp(new Date());
+            metadataBusiness.updateMetadata(identifier, metadata);
 
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, "An error happen when creating new metadata.", ex);
@@ -756,7 +752,6 @@ public class MetadataRest {
     }
 
     /**
-     * TODO save the uploaded metadata in db and return the metadataBrief in map
      * Receive a {@code MultiPart} which contains xml file,
      * the metadata will be stored in server and returns the generated Id
      * and the nearest profile name that matches the metadata.
@@ -773,10 +768,8 @@ public class MetadataRest {
                                    @FormDataParam("metadataFileInput") FormDataContentDisposition fileMetaDetail,
                                    @Context HttpServletRequest request) {
 
-        //TODO get user from request to set the owner for the uploaded metadata
-
         final File uploadDirectory = workspaceService.getUploadDirectory();
-        final Map<String,String> map = new HashMap<>();
+        final Map<String,Object> map = new HashMap<>();
         try {
             final File newFileMetaData = new File(uploadDirectory, fileMetaDetail.getFileName());
             if (mdFileIs != null) {
@@ -784,9 +777,21 @@ public class MetadataRest {
                     uploadDirectory.mkdir();
                 }
                 Files.copy(mdFileIs, newFileMetaData.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                //TODO unmarshall metadata file and save new record
-                //TODO get the metadata brief and store them into the map
-                map.put("record",null);
+                
+                final String xml = FileUtilities.getStringFromFile(newFileMetaData);
+                final DefaultMetadata iso = (DefaultMetadata) metadataBusiness.unmarshallMetadata(xml);
+                
+                String identifier = iso.getFileIdentifier();
+                if (metadataBusiness.existInternalMetadata(identifier, true, false)) {
+                    identifier = UUID.randomUUID().toString();
+                    iso.setFileIdentifier(identifier);
+                    map.put("msg", "Identifier already used. Generating new one.");
+                }
+                metadataBusiness.updateMetadata(identifier, iso);
+                
+                final Metadata meta = metadataBusiness.searchFullMetadata(identifier, true, false);
+                MetadataBrief brief = convertToMetadataBrief(meta);
+                map.put("record",brief);
             }
         }catch(Exception ex) {
             LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
