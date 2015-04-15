@@ -260,7 +260,7 @@ $(window).scroll(function(){
     } else if(window.location.hash.indexOf('/metadata')!==-1){
         limit = $('#contentList').height();
         scrollPos = $(this).scrollTop();
-        topHeight = $('#advancedSearchPanel').height() + 240;
+        topHeight = $('#advancedSearchPanel').height() + 275;
         applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit);
     } else if(window.location.hash.indexOf('/styles') !== -1 || window.location.hash.indexOf('/mapcontext') !== -1){
         limit = $('#contentList').height();

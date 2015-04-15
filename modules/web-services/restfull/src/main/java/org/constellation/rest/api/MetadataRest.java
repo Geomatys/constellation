@@ -597,6 +597,31 @@ public class MetadataRest {
     }
 
     /**
+     * TODO implements method
+     * Returns the json representation of metadata by using template for new metadata with default values.
+     *
+     * @param profile the given profile name
+     * @return Response that contains the metadata in json format.
+     */
+    @GET
+    @Path("/metadataJson/new/{profile}")
+    public Response getNewMetadataJson(final @PathParam("profile") String profile) {
+        final StringWriter buffer = new StringWriter();
+        try{
+            //TODO create new Metadata and do not save it.
+
+            //get template name
+            final Template template = Template.getInstance(profile);
+            //template.write(newMetadata,buffer,false, false);
+
+        } catch(Exception ex) {
+            LOGGER.log(Level.WARNING, "An error happen when building json representation of new metadata for profile "+profile, ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
+        }
+        return Response.ok(buffer.toString()).build();
+    }
+
+    /**
      * Convert metadata in given profile and return the json representation of the resulted metadata.
      *
      * @param metadataId given metadata id
@@ -663,12 +688,8 @@ public class MetadataRest {
                 }
                 //get template
                 final Template template = Template.getInstance(profile);
-                try {
-                    template.read(metadataValues, metadata, false);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
-                    return Response.status(500).entity(ex.getLocalizedMessage()).build();
-                }
+                template.read(metadataValues, metadata, false);
+
                 //update dateStamp for metadata
                 metadata.setDateStamp(new Date());
 
@@ -676,7 +697,33 @@ public class MetadataRest {
                 metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata);
             }
         } catch (Exception ex) {
-            LOGGER.warning("Error while saving metadata");
+            LOGGER.log(Level.WARNING, "error while saving metadata.", ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
+        }
+        return Response.ok("Metadata saved successfully!").build();
+    }
+
+    /**
+     * TODO implements create new metadata for given profile and metadataValues
+     *
+     * Proceed to create new metadata for given profile and values.
+     *
+     * @param profile given profile
+     * @param metadataValues {@code RootObj} metadata values to save
+     * @return {code Response}
+     */
+    @POST
+    @Path("/createNew/{profile}")
+    public Response createNewMetadata(@PathParam("profile") final String profile,final RootObj metadataValues) {
+        try {
+            //TODO Create new metadata
+
+            //get template
+            final Template template = Template.getInstance(profile);
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "An error happen when creating new metadata.", ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
         return Response.ok("Metadata saved successfully!").build();
     }
