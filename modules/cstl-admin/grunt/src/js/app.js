@@ -69,14 +69,6 @@ cstlAdminApp
                     templateUrl: 'views/admin/main.html',
                     controller: 'AdminController'
                 })
-                .when('/admin/groups', {
-                    templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
-                })
-                .when('/admin/domains', {
-                    templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
-                })
                 .when('/admin/domainmembers/:domainId', {
                     //templateUrl: 'views/admin/domain/members.html',
                     //controller: 'DomainMembersController'

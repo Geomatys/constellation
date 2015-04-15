@@ -32,10 +32,7 @@ angular.module('cstl-admin', ['cstl-admin-system',
             'system_about':    { name: 'system_about',    url: 'views/admin/about.html'           },
             'tasks_manager':   { name: 'tasks_manager',   url: 'views/admin/tasks_manager.html'   },
             'planning':        { name: 'planning',        url: 'views/admin/planning.html'        },
-            'users':           { name: 'users',           url: 'views/admin/users.html'           },
-            'groups':          { name: 'groups',          url: 'views/admin/groups.html'          },
-            'domains':         { name: 'domains',         url: 'views/admin/domains.html'         },
-            'domainmembers':   { name: 'domainmembers',   url: 'views/admin/domain/members.html'  }
+            'users':           { name: 'users',           url: 'views/admin/users.html'           }
         };
 
         $scope.currentView = viewUrls.system_state;
@@ -60,11 +57,5 @@ angular.module('cstl-admin', ['cstl-admin-system',
             $scope.changeView('planning');
         } else if ($location.url() === '/admin/users') {
             $scope.changeView('users');
-        } else if ($location.url() === '/admin/groups') {
-            $scope.changeView('groups');
-        } else if ($location.url() === '/admin/domains') {
-            $scope.changeView('domains');
-        } else if ($location.url().indexOf('/admin/domainmembers/') !== -1) {
-            $scope.changeView('domainmembers');
         }
     });
