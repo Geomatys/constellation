@@ -246,7 +246,7 @@ public final class LayerProviders {
             final QueryBuilder qb = new QueryBuilder();
             qb.setProperties(new String[]{property});
             qb.setTypeName(layer.getName());
-            final FeatureCollection<Feature> collection = session.getFeatureCollection(qb.buildQuery());
+            final FeatureCollection collection = session.getFeatureCollection(qb.buildQuery());
 
             // Visit collection.
             final Object[] values = new Object[collection.size()];

@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
+import org.geotoolkit.feature.Feature;
 
 /**
  * Default layer details for a datastore type.
@@ -278,7 +279,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
     @Override
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
         final SortedSet<Date> dates = new TreeSet<>();
-        FeatureIterator<SimpleFeature> features = null;
+        FeatureIterator features = null;
         if(dateStartField != null){
             try{
                 final AttributeDescriptor desc = (AttributeDescriptor)
@@ -301,10 +302,10 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
                 builder.setVersionDate(versionDate);
                 final Query query = builder.buildQuery();
 
-                final FeatureCollection<SimpleFeature> coll = store.createSession(false).getFeatureCollection(query);
+                final FeatureCollection coll = store.createSession(false).getFeatureCollection(query);
                 features = coll.iterator();
                 while(features.hasNext()){
-                    final SimpleFeature sf = features.next();
+                    final Feature sf = features.next();
                     final Date date = dateStartField.evaluate(sf,Date.class);
                     if(date != null){
                         dates.add(date);
@@ -327,7 +328,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
     @Override
     public SortedSet<Number> getAvailableElevations() throws DataStoreException {
         final SortedSet<Number> elevations = new TreeSet<>();
-        FeatureIterator<SimpleFeature> features = null;
+        FeatureIterator features = null;
         if (elevationStartField != null) {
 
             try {
@@ -350,10 +351,10 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
                 builder.setVersionDate(versionDate);
                 final Query query = builder.buildQuery();
 
-                final FeatureCollection<SimpleFeature> coll = store.createSession(false).getFeatureCollection(query);
+                final FeatureCollection coll = store.createSession(false).getFeatureCollection(query);
                 features = coll.iterator();
                 while(features.hasNext()){
-                    final SimpleFeature sf = features.next();
+                    final Feature sf = features.next();
                     final Number ele = elevationStartField.evaluate(sf,Number.class);
                     if(ele != null){
                         elevations.add(ele);

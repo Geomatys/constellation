@@ -422,7 +422,7 @@ public final class ConvertersJaxbToGeotk {
 
         private String referenceId;
 
-        public ReferenceCollectionWrapper(final FeatureCollection<?> originalFC, final String collectionId) {
+        public ReferenceCollectionWrapper(final FeatureCollection originalFC, final String collectionId) {
             super(originalFC);
             this.referenceId = collectionId;
         }

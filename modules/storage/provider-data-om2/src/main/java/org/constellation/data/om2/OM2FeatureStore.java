@@ -132,7 +132,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public FeatureReader<FeatureType, Feature> getFeatureReader(final Query query) throws DataStoreException {
+    public FeatureReader getFeatureReader(final Query query) throws DataStoreException {
         final FeatureType sft = getFeatureType(query.getTypeName());
         try {
             return handleRemaining(new OMReader(sft), query);
