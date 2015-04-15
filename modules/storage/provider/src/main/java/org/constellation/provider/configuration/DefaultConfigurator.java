@@ -19,13 +19,16 @@
 
 package org.constellation.provider.configuration;
 
+import com.vividsolutions.jts.geom.Geometry;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.xml.bind.JAXBException;
@@ -69,9 +72,15 @@ import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.feature.type.AttributeDescriptor;
+import org.geotoolkit.feature.type.AttributeType;
+import org.geotoolkit.feature.type.ComplexType;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.GeometryDescriptor;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.PropertyDescriptor;
+import org.geotoolkit.feature.type.PropertyType;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.image.io.metadata.SpatialMetadataFormat;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
@@ -80,6 +89,7 @@ import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Symbolizer;
+import org.opengis.util.GenericName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Node;
@@ -276,11 +286,8 @@ public final class DefaultConfigurator implements Configurator {
                         } catch (DataStoreException ex) {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
-                        if (fType != null && fType.getGeometryDescriptor() != null &&
-                                fType.getGeometryDescriptor().getType() != null &&
-                                fType.getGeometryDescriptor().getType().getBinding() != null) {
-                            subType = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
-                        } else {
+                        subType = findGeometryType(fType, null);
+                        if(subType==null){
                             // A feature that does not contain geometry, we hide it
                             included = false;
                         }
@@ -417,6 +424,39 @@ public final class DefaultConfigurator implements Configurator {
     public void removeProviderConfiguration(String providerId) throws ConfigurationException {
         dataBusiness.removeDataFromProvider(providerId);
         providerBusiness.removeProvider(providerId);
+    }
+
+    private static String findGeometryType(ComplexType ft, Set<GenericName> visited){
+        if(ft==null) return null;
+
+        if(visited==null) visited = new HashSet<>();
+        if(visited.contains(ft.getName())) return null;
+        visited.add(ft.getName());
+
+        if(ft instanceof FeatureType){
+            GeometryDescriptor gd = ((FeatureType)ft).getGeometryDescriptor();
+            if(gd!=null){
+                return gd.getType().getBinding().getSimpleName();
+            }
+        }
+
+        for(PropertyDescriptor pd : ft.getDescriptors()){
+            final PropertyType type = pd.getType();
+
+            if(type instanceof ComplexType){
+                String subType = findGeometryType((ComplexType)type, visited);
+                if(subType!=null){
+                    return subType;
+                }
+            }else if(type instanceof AttributeType){
+                final Class<?> valueClass = type.getBinding();
+                if(Geometry.class.isAssignableFrom(valueClass)){
+                    return valueClass.getSimpleName();
+                }
+            }
+        }
+
+        return null;
     }
 
 }
