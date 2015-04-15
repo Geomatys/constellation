@@ -44,16 +44,32 @@ public interface MetadataRepository {
 
     Metadata findById(int id);
     
+    List<Metadata> findAll(final boolean includeService, final boolean onlyPublished);
+    
+    List<String> findAllIsoMetadata(final boolean includeService, final boolean onlyPublished);
+            
     List<MetadataBbox> getBboxes(int id);
     
     int delete(int id);
     
     List<Metadata> findByCswId(Integer id);
     
+    List<String> findMetadataIDByCswId(final Integer id, final boolean includeService, final boolean onlyPublished);
+    
+    int countMetadataByCswId(final Integer id, final boolean includeService, final boolean onlyPublished);
+
+    List<String> findMetadataID(final boolean includeService, final boolean onlyPublished);
+    
+    int countMetadata(final boolean includeService, final boolean onlyPublished);
+    
     boolean isLinkedMetadata(Integer metadataID, Integer cswID);
+    
+    boolean isLinkedMetadata(String metadataID, String cswID);
+    
+    boolean isLinkedMetadata(String metadataID, String cswID, final boolean includeService, final boolean onlyPublished);
 
     List<Metadata> findAll();
-
+    
     Map<Integer, List> filterAndGet(final Map<String,Object> filterMap, final Map.Entry<String,String> sortEntry,final int pageNumber,final int rowsPerPage);
 
     Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap);

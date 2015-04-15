@@ -314,22 +314,12 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public List<String> getInternalMetadataIds(final boolean includeService, final boolean onlyPublished) {
-        final List<String> results = new ArrayList<>();
-        final List<Metadata> metadatas = metadataRepository.findAll();
-        for (final Metadata record : metadatas) {
-            if (record.getServiceId() != null) {
-                if (includeService) {
-                    results.add(record.getMetadataId());
-                }
-            } else if (!record.getIsPublished()) {
-                if (!onlyPublished) {
-                    results.add(record.getMetadataId());
-                }
-            } else {
-                results.add(record.getMetadataId());
-            }
-        }
-        return results;
+        return metadataRepository.findMetadataID(includeService, onlyPublished);
+    }
+    
+    @Override
+    public int getInternalMetadataCount(final boolean includeService, final boolean onlyPublished) {
+        return metadataRepository.countMetadata(includeService, onlyPublished);
     }
 
     /**
@@ -337,22 +327,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public List<String> getAllMetadata(final boolean includeService, final boolean onlyPublished) {
-        final List<String> results = new ArrayList<>();
-        final List<Metadata> metadatas = metadataRepository.findAll();
-        for (final Metadata record : metadatas) {
-            if (record.getServiceId() != null) {
-                if (includeService) {
-                    results.add(record.getMetadataIso());
-                }
-            } else if (!record.getIsPublished()) {
-                if (!onlyPublished) {
-                    results.add(record.getMetadataId());
-                }
-            } else {
-                results.add(record.getMetadataIso());
-            }
-        }
-        return results;
+        return metadataRepository.findAllIsoMetadata(includeService, onlyPublished);
     }
     
     /**
@@ -363,22 +338,19 @@ public class MetadataBusiness implements IMetadataBusiness {
         final List<String> results = new ArrayList<>();
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {
-            List<Metadata> metas = metadataRepository.findByCswId(service.getId());
-            for (Metadata record : metas) {
-                if (record.getServiceId() != null) {
-                    if (includeService) {
-                        results.add(record.getMetadataIso());
-                    }
-                } else if (!record.getIsPublished()) {
-                    if (!onlyPublished) {
-                        results.add(record.getMetadataId());
-                    }
-                } else {
-                    results.add(record.getMetadataIso());
-                }
-            }
+            results.addAll(metadataRepository.findMetadataIDByCswId(service.getId(), includeService, onlyPublished));
         }
         return results;
+    }
+    
+    @Override
+    public int getLinkedMetadataCount(final String cswIdentifier, final boolean includeService, final boolean onlyPublished) {
+        int count = 0;
+        final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
+        if (service != null) {
+            count = metadataRepository.countMetadataByCswId(service.getId(), includeService, onlyPublished);
+        }
+        return count;
     }
     
     /**
@@ -387,6 +359,19 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     public boolean isLinkedMetadataToCSW(final int metadataID, final int cswID) {
         return metadataRepository.isLinkedMetadata(metadataID, cswID);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isLinkedMetadataToCSW(final String metadataID, final String cswID) {
+        return metadataRepository.isLinkedMetadata(metadataID, cswID);
+    }
+    
+    @Override
+    public boolean isLinkedMetadataToCSW(final String metadataID, final String cswID, final boolean includeService, final boolean onlyPublished) {
+        return metadataRepository.isLinkedMetadata(metadataID, cswID, includeService, onlyPublished);
     }
     
     /**

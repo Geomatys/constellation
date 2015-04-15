@@ -139,7 +139,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
      */
     @Override
     public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        if (partial && !metadataBusiness.getLinkedMetadataIDs(id, displayServiceMetadata, onlyPublished).contains(identifier)) {
+        if (partial && !metadataBusiness.isLinkedMetadataToCSW(identifier, id, displayServiceMetadata, onlyPublished)) {
             return null;
         }
         final String metadataString = metadataBusiness.searchMetadata(identifier, displayServiceMetadata, onlyPublished);
@@ -166,7 +166,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
         if (partial) {
-            return metadataBusiness.getLinkedMetadataIDs(id, displayServiceMetadata, onlyPublished).contains(identifier);
+            return metadataBusiness.isLinkedMetadataToCSW(identifier, id, displayServiceMetadata, onlyPublished);
         }
         return metadataBusiness.existInternalMetadata(identifier, displayServiceMetadata, onlyPublished);
     }
@@ -442,9 +442,9 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
    @Override
     public int getEntryCount() throws MetadataIoException {
         if (partial) {
-            return metadataBusiness.getLinkedMetadataIDs(id, displayServiceMetadata, onlyPublished).size();
+            return metadataBusiness.getLinkedMetadataCount(id, displayServiceMetadata, onlyPublished);
         }
-        return metadataBusiness.getInternalMetadataIds(displayServiceMetadata, onlyPublished).size();
+        return metadataBusiness.getInternalMetadataCount(displayServiceMetadata, onlyPublished);
     }
 
     /**

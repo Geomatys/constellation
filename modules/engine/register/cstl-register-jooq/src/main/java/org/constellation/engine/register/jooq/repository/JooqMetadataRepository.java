@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.constellation.engine.register.MetadataComplete;
+import static org.constellation.engine.register.jooq.Tables.SERVICE;
 
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
@@ -39,8 +40,11 @@ import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.engine.register.repository.MetadataRepository;
 import org.jooq.AggregateFunction;
 import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
 import org.jooq.SelectLimitStep;
 import org.jooq.SortField;
 import org.jooq.UpdateSetFirstStep;
@@ -185,11 +189,152 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
     
     @Override
+    public List<String> findMetadataIDByCswId(final Integer id, final boolean includeService, final boolean onlyPublished) {
+        SelectConditionStep<Record1<String>> query = 
+               dsl.select(METADATA.METADATA_ID).from(METADATA, METADATA_X_CSW)
+                  .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
+                  .and(METADATA_X_CSW.CSW_ID.eq(id));
+        
+        if (!includeService) {
+            query = query.and(METADATA.SERVICE_ID.isNull());
+        }
+        if (onlyPublished) {
+            query = query.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+        }
+        return query.fetchInto(String.class);
+    }
+    
+    @Override
+    public int countMetadataByCswId(final Integer id, final boolean includeService, final boolean onlyPublished) {
+        SelectConditionStep<Record1<String>> query = 
+               dsl.select(METADATA.METADATA_ID).from(METADATA, METADATA_X_CSW)
+                  .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
+                  .and(METADATA_X_CSW.CSW_ID.eq(id));
+        
+        if (!includeService) {
+            query = query.and(METADATA.SERVICE_ID.isNull());
+        }
+        if (onlyPublished) {
+            query = query.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+        }
+        return query.fetchCount();
+    }
+    
+    @Override
+    public List<String> findMetadataID(final boolean includeService, final boolean onlyPublished) {
+        SelectJoinStep<Record1<String>> query =  dsl.select(METADATA.METADATA_ID).from(METADATA);
+        if (includeService && !onlyPublished) {
+            return query.fetchInto(String.class);
+        }
+        SelectConditionStep<Record1<String>> filterQuery = null;
+        if (!includeService) {
+            filterQuery = query.where(METADATA.SERVICE_ID.isNull());
+        }
+        if (onlyPublished) {
+            if (filterQuery == null) {
+                filterQuery = query.where(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+            } else {
+                filterQuery = filterQuery.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+            }
+        }
+        return filterQuery.fetchInto(String.class);
+    }
+    
+    @Override
+    public int countMetadata(final boolean includeService, final boolean onlyPublished) {
+        SelectJoinStep<Record1<String>> query =  dsl.select(METADATA.METADATA_ID).from(METADATA);
+        if (includeService && !onlyPublished) {
+            return query.fetchCount();
+        }
+        SelectConditionStep<Record1<String>> filterQuery = null;
+        if (!includeService) {
+            filterQuery = query.where(METADATA.SERVICE_ID.isNull());
+        }
+        if (onlyPublished) {
+            if (filterQuery == null) {
+                filterQuery = query.where(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+            } else {
+                filterQuery = filterQuery.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+            }
+        }
+        return filterQuery.fetchCount();
+    }
+    
+    @Override
+    public List<Metadata> findAll(final boolean includeService, final boolean onlyPublished) {
+        SelectJoinStep<Record> query =  dsl.select(METADATA.fields()).from(METADATA);
+        if (includeService && !onlyPublished) {
+            return query.fetchInto(Metadata.class);
+        }
+        SelectConditionStep<Record> filterQuery = null;
+        if (!includeService) {
+            filterQuery = query.where(METADATA.SERVICE_ID.isNull());
+        }
+        if (onlyPublished) {
+            if (filterQuery == null) {
+                filterQuery = query.where(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+            } else {
+                filterQuery = filterQuery.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+            }
+        }
+        return filterQuery.fetchInto(Metadata.class);
+    }
+    
+    @Override
+    public List<String> findAllIsoMetadata(final boolean includeService, final boolean onlyPublished) {
+        SelectJoinStep<Record1<String>> query =  dsl.select(METADATA.METADATA_ISO).from(METADATA);
+        if (includeService && !onlyPublished) {
+            return query.fetchInto(String.class);
+        }
+        SelectConditionStep<Record1<String>> filterQuery = null;
+        if (!includeService) {
+            filterQuery = query.where(METADATA.SERVICE_ID.isNull());
+        }
+        if (onlyPublished) {
+            if (filterQuery == null) {
+                filterQuery = query.where(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+            } else {
+                filterQuery = filterQuery.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+            }
+        }
+        return filterQuery.fetchInto(String.class);
+    }
+    
+    @Override
     public boolean isLinkedMetadata(Integer metadataID, Integer cswID) {
         return dsl.select(METADATA.fields()).from(METADATA, METADATA_X_CSW)
                   .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
                   .and(METADATA_X_CSW.CSW_ID.eq(cswID))
                   .and(METADATA_X_CSW.METADATA_ID.eq(metadataID)).fetchOneInto(Metadata.class) != null;
+    }
+    
+    @Override
+    public boolean isLinkedMetadata(String metadataID, String cswID) {
+        return dsl.select(METADATA.fields()).from(METADATA, METADATA_X_CSW, SERVICE)
+                  .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
+                  .and(METADATA_X_CSW.CSW_ID.eq(SERVICE.ID))
+                  .and(SERVICE.IDENTIFIER.eq(cswID))
+                  .and(SERVICE.TYPE.eq("csw"))
+                  .and(METADATA.METADATA_ID.eq(metadataID)).fetchOneInto(Metadata.class) != null;
+    }
+    
+    @Override
+    public boolean isLinkedMetadata(String metadataID, String cswID, final boolean includeService, final boolean onlyPublished) {
+        SelectConditionStep<Record> query = dsl.select(METADATA.fields()).from(METADATA, METADATA_X_CSW, SERVICE)
+                  .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
+                  .and(METADATA_X_CSW.CSW_ID.eq(SERVICE.ID))
+                  .and(SERVICE.IDENTIFIER.eq(cswID))
+                  .and(SERVICE.TYPE.eq("csw"))
+                  .and(METADATA.METADATA_ID.eq(metadataID));
+        
+        if (!includeService) {
+            query = query.and(METADATA.SERVICE_ID.isNull());
+        }
+        if (onlyPublished) {
+            query = query.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+        }
+        
+        return query.fetchOneInto(Metadata.class) != null;
     }
 
     @Override

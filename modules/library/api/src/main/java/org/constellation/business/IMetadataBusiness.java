@@ -68,6 +68,8 @@ public interface IMetadataBusiness {
      * @return List of string identifiers.
      */
     List<String> getInternalMetadataIds(final boolean includeService, final boolean onlyPublished);
+    
+    int getInternalMetadataCount(final boolean includeService, final boolean onlyPublished);
 
     /**
      * Returns all metadata stored in database.
@@ -144,15 +146,17 @@ public interface IMetadataBusiness {
     boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException;
     
     /**
-     * Returns all the metadata associated with a csw service.
+     * Returns all the metadata identifier associated with a csw service.
      *
      * @param cswIdentifier identifer of the CSW instance.
      * @param includeService given flag to include service's metadata
      * @param onlyPublished flag that indicates if it will return the unpublished metadata.
      * 
-     * @return List of all metadata as string xml stored in database.
+     * @return List of all metadata identifiers stored in database.
      */
     List<String> getLinkedMetadataIDs(final String cswIdentifier, final boolean includeService, final boolean onlyPublished);
+    
+    int getLinkedMetadataCount(final String cswIdentifier, final boolean includeService, final boolean onlyPublished);
     
     /**
      * Build a link beetween a CSW service and a metadata.
@@ -172,12 +176,32 @@ public interface IMetadataBusiness {
     
     /**
      * Return {@code true} if the specified metadata is linked to the specified CSW service.
+     * @param metadataID Identifier of the metadata pojo.
+     * @param cswID identifer of the CSW instance.
+     * 
+     * @return {@code true} if the specified metadata is linked to the specified CSW service.
+     */
+    boolean isLinkedMetadataToCSW(final int metadataID, final int cswID);
+    
+    /**
+     * Return {@code true} if the specified metadata is linked to the specified CSW service.
+     * @param metadataID Identifier of the metadata pojo.
+     * @param cswID identifer of the CSW instance.
+     * @param includeService given flag to include service's metadata
+     * @param onlyPublished flag that indicates if it will return the unpublished metadata.
+     * 
+     * @return {@code true} if the specified metadata is linked to the specified CSW service.
+     */
+    boolean isLinkedMetadataToCSW(final String metadataID, final String cswID, final boolean includeService, final boolean onlyPublished);
+    
+    /**
+     * Return {@code true} if the specified metadata is linked to the specified CSW service.
      * @param metadataID Identifier of the geotk metadata object.
      * @param cswID  identifer of the CSW instance.
      * 
      * @return {@code true} if the specified metadata is linked to the specified CSW service.
      */
-    boolean isLinkedMetadataToCSW(final int metadataID, final int cswID);
+    boolean isLinkedMetadataToCSW(final String metadataID, final String cswID);
     
     MetadataLists getMetadataCodeLists();
     
