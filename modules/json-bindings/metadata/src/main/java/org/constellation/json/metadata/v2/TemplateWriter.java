@@ -168,6 +168,12 @@ public class TemplateWriter extends AbstractTemplateHandler {
          * The matching point are read-only fields and types.
          */
         if (node.strict) {
+            if (node.type != null) {
+                final Class type = readType(node);
+                if (!type.isInstance(metadata)) {
+                    return null;
+                }
+            }
             final ValueNode candidate = extractSubTreeFromMetadata(new ValueNode(node), metadata, new HashMap<String, Set<Object>>());
             if (matchNode(node, candidate)) {
                 exclude(excluded, node, metadata);
