@@ -789,9 +789,8 @@ public class MetadataRest {
                 }else {
                     map.put("renewId", false);
                 }
-                if (metadataBusiness.getTemplateFromMetadata(iso) == null) {
-                    map.put("usedDefaultProfile",true);
-                }
+                map.put("usedDefaultProfile",metadataBusiness.getTemplateFromMetadata(iso) == null);
+
                 metadataBusiness.updateMetadata(identifier, iso);
 
                 final Metadata meta = metadataBusiness.searchFullMetadata(identifier, true, false);
