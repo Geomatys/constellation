@@ -597,7 +597,6 @@ public class MetadataRest {
     }
 
     /**
-     * TODO implements method
      * Returns the json representation of metadata by using template for new metadata with default values.
      *
      * @param profile the given profile name
