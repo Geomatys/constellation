@@ -908,4 +908,32 @@ public class MetadataBusiness implements IMetadataBusiness {
         return metadataRepository.countValidated(status);
     }
     
+    @Override
+    public void askForValidation(final int metadataID) {
+        final Metadata metadata = metadataRepository.findById(metadataID);
+        if (metadata != null) {
+            final String validationState;
+            if (metadata.getValidatedState() == null) {
+                validationState = metadata.getMetadataIso();
+            } else {
+                validationState = metadata.getValidatedState();
+            }
+            metadataRepository.setValidationRequired(metadataID, "REQUIRED", validationState);
+        }
+    }
+
+    @Override
+    public void denyValidation(final int metadataID, final String comment) {
+        metadataRepository.denyValidation(metadataID, comment);
+    }
+    
+    @Override
+    public void acceptValidation(final int metadataID) {
+        final Metadata metadata = metadataRepository.findById(metadataID);
+        if (metadata != null) {
+            metadataRepository.changeValidation(metadataID, true);
+            metadataRepository.setValidationRequired(metadataID, "NONE", metadata.getMetadataIso());
+        }
+    }
+    
 }

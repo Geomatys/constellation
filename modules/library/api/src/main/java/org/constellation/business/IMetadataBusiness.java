@@ -400,4 +400,10 @@ public interface IMetadataBusiness {
     Object unmarshallMetadata(final String metadata) throws ConfigurationException;
     
     String getTemplateFromMetadata(DefaultMetadata meta);
+    
+    void askForValidation(final int metadataID);
+    
+    void denyValidation(final int metadataID, final String comment);
+    
+    void acceptValidation(final int metadataID);
 }

@@ -82,7 +82,10 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
 
         if (metadata.getIsValidated() != null) update.set(METADATA.IS_VALIDATED, metadata.getIsValidated());
         else update.set(METADATA.IS_VALIDATED, false);
-
+        
+        update.set(METADATA.VALIDATION_REQUIRED, metadata.getValidationRequired());
+        update.set(METADATA.COMMENT, metadata.getComment());
+        update.set(METADATA.VALIDATED_STATE, metadata.getValidatedState());
         update.set(METADATA.PROFILE, metadata.getProfile());
         update.set(METADATA.TITLE, metadata.getTitle());
         update.set(METADATA.RESUME, metadata.getResume()).where(METADATA.ID.eq(metadata.getId())).execute();                
@@ -122,13 +125,17 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setProfile(metadata.getProfile());
         metadataRecord.setTitle(metadata.getTitle());
         metadataRecord.setResume(metadata.getResume());
+        metadataRecord.setValidatedState(metadata.getValidatedState());
+        metadataRecord.setComment(metadata.getComment());
+        metadataRecord.setValidationRequired(metadata.getValidationRequired());
 
         if (metadata.getIsPublished() != null) metadataRecord.setIsPublished(metadata.getIsPublished());
         else metadataRecord.setIsPublished(false); //default
 
         if (metadata.getIsValidated() != null) metadataRecord.setIsValidated(metadata.getIsValidated());
         else metadataRecord.setIsValidated(false); //default
-
+        
+        
         metadataRecord.store();
         
         updateBboxes(metadataRecord.getId(), metadata.getBboxes());
@@ -540,6 +547,20 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     @Override
     public int countPublished(boolean status) {
         return dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal(status)).fetchCount();
+    }
+
+    @Override
+    public void setValidationRequired(int id, String state, String validationState) {
+        UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
+        update.set(METADATA.VALIDATION_REQUIRED, state)
+              .set(METADATA.VALIDATED_STATE, validationState).where(METADATA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public void denyValidation(int id, String comment) {
+        UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
+        update.set(METADATA.VALIDATION_REQUIRED, "REJECTED")
+              .set(METADATA.COMMENT, comment).where(METADATA.ID.eq(id)).execute();
     }
     
 }

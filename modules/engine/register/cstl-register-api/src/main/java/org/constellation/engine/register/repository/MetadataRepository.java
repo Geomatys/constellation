@@ -93,4 +93,8 @@ public interface MetadataRepository {
     int countValidated(final boolean status);
     
     int countPublished(final boolean status);
+    
+    void setValidationRequired(final int id, final String state, final String validationState);
+    
+    void denyValidation(final int id, final String comment);
 }

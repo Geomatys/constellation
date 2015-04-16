@@ -32,7 +32,9 @@ public class MetadataComplete extends Metadata {
     private List<MetadataBbox> bboxes = new ArrayList<>();
 
     public MetadataComplete() {
-        super(Integer.SIZE, null, null, Integer.SIZE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.SIZE, Long.MIN_VALUE, Long.MIN_VALUE, null, null, Integer.MIN_VALUE, Boolean.TRUE, Boolean.TRUE, null, null);
+        super(Integer.SIZE, null, null, Integer.SIZE, Integer.MIN_VALUE, Integer.MIN_VALUE, 
+              Integer.MIN_VALUE, Integer.SIZE, Long.MIN_VALUE, Long.MIN_VALUE, null, null, 
+              Integer.MIN_VALUE, Boolean.TRUE, Boolean.TRUE, null, null, "NONE", null, null);
     }
     
     public MetadataComplete(Metadata metadata, List<MetadataBbox> bboxes) {
@@ -52,7 +54,10 @@ public class MetadataComplete extends Metadata {
               metadata.getIsValidated(),
               metadata.getIsPublished(),
               metadata.getLevel(),
-              metadata.getResume());
+              metadata.getResume(),
+              metadata.getValidationRequired(),
+              metadata.getValidatedState(),
+              metadata.getComment());
         this.bboxes = bboxes;
         
     }
