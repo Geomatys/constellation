@@ -785,9 +785,14 @@ public class MetadataRest {
                 if (metadataBusiness.existInternalMetadata(identifier, true, false)) {
                     identifier = UUID.randomUUID().toString();
                     iso.setFileIdentifier(identifier);
-                    map.put("msg", "Identifier already used. Generating new one.");
+                    map.put("renewId", true);
+                }else {
+                    map.put("renewId", false);
                 }
                 metadataBusiness.updateMetadata(identifier, iso);
+
+                //TODO set flag that indicates if the profile was not found and the default profile was used (OtherCBResource)
+                map.put("usedDefaultProfile",false);
                 
                 final Metadata meta = metadataBusiness.searchFullMetadata(identifier, true, false);
                 MetadataBrief brief = convertToMetadataBrief(meta);
