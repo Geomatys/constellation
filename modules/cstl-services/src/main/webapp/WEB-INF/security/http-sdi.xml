@@ -4,13 +4,18 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
   <http pattern="/spring/oauth2/**" security="none" />
-  
-  <http pattern="/WS/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
+
+
+  <http pattern="/WS/configuration/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
     <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
     <intercept-url pattern="/WS/configuration/**" access="hasRole('cstl-admin')" />
+  </http>
+
+  <http pattern="/WS/*/admin/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
+    <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
     <intercept-url pattern="/WS/*/admin/**" access="hasRole('cstl-admin')" />
   </http>
-  
+
   
   <http pattern="/api/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
     <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
