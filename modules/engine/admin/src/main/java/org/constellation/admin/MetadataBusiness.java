@@ -22,6 +22,7 @@ package org.constellation.admin;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -888,7 +889,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
-    public int countTotal() {
+    public int countTotal(final Map<String,Object> filterMap) {
         return metadataRepository.countTotalMetadata();
     }
 
@@ -896,7 +897,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
-    public int countPublished(final boolean status) {
+    public int countPublished(final boolean status,final Map<String,Object> filterMap) {
         return metadataRepository.countPublished(status);
     }
     
@@ -904,7 +905,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
-    public int countValidated(final boolean status) {
+    public int countValidated(final boolean status,final Map<String,Object> filterMap) {
         return metadataRepository.countValidated(status);
     }
     

@@ -203,7 +203,8 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             getNewMetadataJson: {method: 'GET',     url: '@cstl/api/1/metadata/metadataJson/new/:profile'},
             convertMetadataJson:{method: 'GET',     url: '@cstl/api/1/metadata/convertMDJson/:metadataId/:prune/:profile'},
             duplicate:          {method: 'POST',    url: '@cstl/api/1/metadata/duplicate/:id'},
-            getStats:           {method: 'GET',     url: '@cstl/api/1/metadata/getStats'}
+            getStats:           {method: 'GET',     url: '@cstl/api/1/metadata/getStats'},
+            computeFullStats:   {method: 'POST',    url: '@cstl/api/1/metadata/computeFullStats'}
         });
     })
 

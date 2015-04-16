@@ -536,17 +536,17 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
 
     @Override
     public int countTotalMetadata() {
-        return dsl.select().from(METADATA).fetchCount();
+        return dsl.fetchCount(dsl.select().from(METADATA));
     }
 
     @Override
     public int countValidated(boolean status) {
-        return dsl.select().from(METADATA).where(METADATA.IS_VALIDATED.equal(status)).fetchCount();
+        return dsl.fetchCount(dsl.select().from(METADATA).where(METADATA.IS_VALIDATED.equal(status)));
     }
 
     @Override
     public int countPublished(boolean status) {
-        return dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal(status)).fetchCount();
+        return dsl.fetchCount(dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal(status)));
     }
 
     @Override

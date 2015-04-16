@@ -17,6 +17,7 @@ import org.constellation.model.metadata.MetadataLightBrief;
 import org.constellation.model.metadata.Page;
 import org.constellation.model.metadata.PagedSearch;
 import org.constellation.model.metadata.Profile;
+import org.constellation.model.metadata.Search;
 import org.constellation.model.metadata.Sort;
 import org.constellation.model.metadata.User;
 import org.geotoolkit.util.FileUtilities;
@@ -397,15 +398,93 @@ public class MetadataRest {
     public Response getStats() {
         Map<String,Integer> map = new HashMap<>();
 
-        final int total             = metadataBusiness.countTotal();
-        final int waitingToValidate = metadataBusiness.countValidated(false);
-        final int waitingToPublish  = metadataBusiness.countPublished(false);
-        final int published         = metadataBusiness.countPublished(true);
+        final int total             = metadataBusiness.countTotal(null);
+        final int waitingToValidate = metadataBusiness.countValidated(false,null);
+        final int waitingToPublish  = metadataBusiness.countPublished(false,null);
+        final int published         = metadataBusiness.countPublished(true,null);
 
         map.put("total", total);
         map.put("waitingToValidate", waitingToValidate);
         map.put("waitingToPublish", waitingToPublish);
         map.put("published", published);
+        return Response.ok(map).build();
+    }
+
+    /**
+     * TODO get all needed stats for given filters
+     *
+     * @param search pojo that contains filters.
+     * @return Response map with all metadata stats.
+     */
+    @POST
+    @Path("/computeFullStats")
+    public Response computeFullStats(final Search search) {
+        final Map<String,Object> map = new HashMap<>();
+        final List<Filter> filters = search.getFilters();
+        final Map<String,Object> filterMap = new HashMap<>();
+        if(filters != null) {
+            for(final Filter f : filters) {
+                if("owner".equals(f.getField())) {
+                    String value = f.getValue();
+                    if("_all".equals(value)) {
+                        continue; //no need to filter on owner field if we ask all owners
+                    }
+                    try{
+                        final int userId = Integer.valueOf(value);
+                        filterMap.put("owner",userId);
+                    }catch(Exception ex) {
+                        //do nothing
+                    }
+                }else if("group".equals(f.getField())) {
+                    String value = f.getValue();
+                    if("_all".equals(value)) {
+                        continue; //no need to filter on group field if we ask all groups
+                    }
+                    try{
+                        final int groupId = Integer.valueOf(value);
+                        filterMap.put("group",groupId);
+                    }catch(Exception ex) {
+                        //do nothing
+                    }
+                }else if ("period".equals(f.getField())) {
+                    final String value = f.getValue();
+                    if("_all".equals(value)) {
+                        continue; //no need to filter on period if we ask from the beginning.
+                    }
+                    long delta;
+                    final long currentTs= System.currentTimeMillis();
+                    final long dayTms = 1000*60*60*24L;
+                    if("week".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*7);
+                    }else if("month".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*30);
+                    }else if("3months".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*90);
+                    }else if("6months".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*180);
+                    }else if("year".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*365);
+                    }else {
+                        continue;
+                    }
+                    filterMap.put("period",delta);
+                }
+            }
+        }
+
+        Map<String,Integer> general = new HashMap<>();
+        final int total             = metadataBusiness.countTotal(filterMap);
+        final int waitingToValidate = metadataBusiness.countValidated(false,filterMap);
+        final int waitingToPublish  = metadataBusiness.countPublished(false,filterMap);
+        final int published         = metadataBusiness.countPublished(true,filterMap);
+
+        general.put("total", total);
+        general.put("waitingToValidate", waitingToValidate);
+        general.put("waitingToPublish", waitingToPublish);
+        general.put("published", published);
+
+        map.put("general",general);
+
         return Response.ok(map).build();
     }
 

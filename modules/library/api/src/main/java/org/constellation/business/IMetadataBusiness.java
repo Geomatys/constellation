@@ -19,6 +19,7 @@
 package org.constellation.business;
 
 import java.util.List;
+import java.util.Map;
 import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.configuration.ConfigurationException;
@@ -374,28 +375,32 @@ public interface IMetadataBusiness {
     
     /**
      * Count the number of metadata stored in the database.
-     * 
+     *
+     * @param filterMap Filters which is optional.
+     *
      * @return The total count of metadata.
      */
-    int countTotal();
+    int countTotal(final Map<String,Object> filterMap);
     
     /**
      * Count the number of metadata stored in the database whith the specified publication flag.
      * 
      * @param status Publication flag value.
+     * @param filterMap Filters which is optional.
      * 
      * @return The total count of metadata with the specified publication flag.
      */
-    int countPublished(final boolean status);
+    int countPublished(final boolean status,final Map<String,Object> filterMap);
     
     /**
      * Count the number of metadata stored in the database whith the specified validation flag.
      * 
      * @param status Validation flag value.
-     * 
+     * @param filterMap Filters which is optional.
+     *
      * @return The total count of metadata with the specified validation flag.
      */
-    int countValidated(final boolean status);
+    int countValidated(final boolean status,final Map<String,Object> filterMap);
     
     Object unmarshallMetadata(final String metadata) throws ConfigurationException;
     
