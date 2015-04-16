@@ -398,4 +398,6 @@ public interface IMetadataBusiness {
     int countValidated(final boolean status);
     
     Object unmarshallMetadata(final String metadata) throws ConfigurationException;
+    
+    String getTemplateFromMetadata(DefaultMetadata meta);
 }

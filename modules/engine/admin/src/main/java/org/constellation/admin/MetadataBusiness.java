@@ -277,15 +277,18 @@ public class MetadataBusiness implements IMetadataBusiness {
             templateName = getTemplateFromMetadata(meta);
         }
         
-        if (templateName != null) {
-            try {
-                final Template template = Template.getInstance(templateName);
-                completion = template.calculateMDCompletion(unmarshallMetadata(xml));
-                level = template.getCompletion(meta);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
-            }
+        if (templateName == null) {
+            templateName = getDefaultTemplate();
         }
+        
+        try {
+            final Template template = Template.getInstance(templateName);
+            completion = template.calculateMDCompletion(unmarshallMetadata(xml));
+            level = template.getCompletion(meta);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+        }
+        
         
         metadata.setProfile(templateName);
         metadata.setMdCompletion(completion);
@@ -837,7 +840,12 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
 
     
-    protected String getTemplateFromMetadata(DefaultMetadata meta) {
+    @Override
+    public String getTemplateFromMetadata(DefaultMetadata meta) {
+        return null; // must be overriden
+    }
+    
+    protected String getDefaultTemplate() {
         return null; // must be overriden
     }
 

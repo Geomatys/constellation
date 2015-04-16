@@ -789,11 +789,11 @@ public class MetadataRest {
                 }else {
                     map.put("renewId", false);
                 }
+                if (metadataBusiness.getTemplateFromMetadata(iso) == null) {
+                    map.put("usedDefaultProfile",true);
+                }
                 metadataBusiness.updateMetadata(identifier, iso);
 
-                //TODO set flag that indicates if the profile was not found and the default profile was used (OtherCBResource)
-                map.put("usedDefaultProfile",false);
-                
                 final Metadata meta = metadataBusiness.searchFullMetadata(identifier, true, false);
                 MetadataBrief brief = convertToMetadataBrief(meta);
                 map.put("record",brief);
