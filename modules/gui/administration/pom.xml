@@ -5,12 +5,12 @@
     <parent>
         <artifactId>gui</artifactId>
         <groupId>org.constellation</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <groupId>org.constellation.gui</groupId>
     <artifactId>administration</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>administration gui part</name>
