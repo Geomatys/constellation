@@ -51,6 +51,14 @@ public class SuperBlockObj implements Serializable {
     public void setSuperblock(SuperBlock superblock) {
         this.superblock = superblock;
     }
+
+    public static SuperBlockObj diff(SuperBlockObj originalSB, SuperBlockObj modifiedSB) {
+        final SuperBlock sb = SuperBlock.diff(originalSB.superblock, modifiedSB.superblock);
+        if (sb != null) {
+            return new SuperBlockObj(sb);
+        }
+        return null;
+    }
     
     @Override
     public String toString() {

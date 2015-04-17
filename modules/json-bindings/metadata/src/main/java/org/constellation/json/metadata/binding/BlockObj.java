@@ -19,6 +19,7 @@
 
 package org.constellation.json.metadata.binding;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.io.Serializable;
 
 /**
@@ -28,7 +29,9 @@ import java.io.Serializable;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class BlockObj extends ComponentObj implements Serializable {
+
     private Block block;
 
     public BlockObj() {
@@ -50,14 +53,28 @@ public class BlockObj extends ComponentObj implements Serializable {
     public void setBlock(Block block) {
         this.block = block;
     }
-    
+
     @Override
-    public String toString() {
-        return "[BlockObj]\nsuperBlock:" + block;
+    public String getPath() {
+        return block.getPath();
+    }
+    
+    public static BlockObj diff(BlockObj originalB, BlockObj modifiedB) {
+        final Block b = Block.diff(originalB.block, modifiedB.block);
+        if (b != null) {
+            return new BlockObj(b);
+        }
+        return null;
     }
 
     @Override
     public void updatePath(final String oldPrefix, final String newPrefix) {
         block.updatePath(oldPrefix, newPrefix);
     }
+    
+    @Override
+    public String toString() {
+        return "[BlockObj]\nsuperBlock:" + block;
+    }
+
 }

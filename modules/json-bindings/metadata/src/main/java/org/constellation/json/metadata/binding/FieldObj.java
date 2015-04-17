@@ -19,6 +19,7 @@
 
 package org.constellation.json.metadata.binding;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.io.Serializable;
 
 /**
@@ -28,6 +29,7 @@ import java.io.Serializable;
  * @author Mehdi Sidhoum (Geomatys).
  * @since 0.9
  */
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class FieldObj extends ComponentObj implements Serializable {
 
     private Field field;
@@ -52,6 +54,15 @@ public class FieldObj extends ComponentObj implements Serializable {
 
     public void setField(Field field) {
         this.field = field;
+    }
+    
+    @Override
+    public String getPath() {
+        return field.getPath();
+    }
+    
+    public static boolean diff(FieldObj original, FieldObj modified) {
+        return Field.diff(original.field, modified.field);
     }
     
     @Override

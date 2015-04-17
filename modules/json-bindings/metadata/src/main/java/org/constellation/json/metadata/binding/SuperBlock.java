@@ -78,6 +78,15 @@ public class SuperBlock implements Serializable, IBlock {
     public List<BlockObj> getChildren() {
         return children;
     }
+    
+    public BlockObj getChildrenByPath(final String path) {
+        for (BlockObj b : children) {
+            if (b.getBlock().getPath().equals(path)) {
+                return b;
+            }
+        }
+        return null;
+    }
 
     public void setChildren(List<BlockObj> children) {
         this.children = children;
@@ -141,6 +150,36 @@ public class SuperBlock implements Serializable, IBlock {
             }
         }
         
+    }
+    
+    public static SuperBlock diff(SuperBlock original, SuperBlock modified) {
+        final SuperBlock result = new SuperBlock();
+        boolean add = false;
+        for (BlockObj originalB : original.children) {
+            final BlockObj modifiedB = modified.getChildrenByPath(originalB.getBlock().getPath());
+            if (modifiedB == null) {
+                result.getChildren().add(new BlockObjDiff(originalB, "REMOVED"));
+                add = true;
+            } else {
+                final BlockObj modif = BlockObj.diff(originalB, modifiedB) ;
+                if (modif != null) {
+                    result.getChildren().add(modif);
+                    add = true;
+                }
+            }
+            
+        }
+        // look for Added bo
+        for (BlockObj modifiedB : modified.children) {
+            if (original.getChildrenByPath(modifiedB.getBlock().getPath()) == null) {
+                result.getChildren().add(new BlockObjDiff(modifiedB, "ADDED"));
+                add = true;
+            }
+        }
+        if (add) {
+            return result;
+        }
+        return null;
     }
     
     @Override

@@ -75,6 +75,15 @@ public class RootBlock implements Serializable {
         return children;
     }
     
+    public SuperBlockObj getChildrenByName(final String name) {
+        for (SuperBlockObj sbo : children) {
+            if (sbo.getSuperblock().getName().equals(name)) {
+                return sbo;
+            }
+        }
+        return null;
+    }
+    
     public void remove(SuperBlock sb) {
         for (SuperBlockObj sbo : children) {
             if (sbo.getSuperblock().getName().equals(sb.getName())) {
@@ -109,5 +118,28 @@ public class RootBlock implements Serializable {
         sb.append("multiplicity:").append(multiplicity).append('\n');
         sb.append("children:").append(children.size());
         return sb.toString();
+    }
+    
+    public static RootBlock diff(final RootBlock original, final RootBlock modified) {
+        final RootBlock result = new RootBlock();
+        for (SuperBlockObj originalSB : original.children) {
+            final SuperBlockObj modifiedSB = modified.getChildrenByName(originalSB.getSuperblock().getName());
+            if (modifiedSB == null) {
+                result.getChildren().add(new SuperBlockObjDiff(originalSB, "REMOVED"));
+            } else {
+                final SuperBlockObj modif = SuperBlockObj.diff(originalSB, modifiedSB) ;
+                if (modif != null) {
+                    result.getChildren().add(modif);
+                }
+            }
+            
+        }
+        // look for Added sbo
+        for (SuperBlockObj modifiedSB : modified.children) {
+            if (original.getChildrenByName(modifiedSB.getSuperblock().getName()) == null) {
+                result.getChildren().add(new SuperBlockObjDiff(modifiedSB, "ADDED"));
+            }
+        }
+        return result;
     }
 }

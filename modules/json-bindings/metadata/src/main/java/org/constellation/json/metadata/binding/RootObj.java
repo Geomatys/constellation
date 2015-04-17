@@ -103,4 +103,8 @@ public class RootObj implements Serializable {
     public String toString() {
         return "[BlockObj]\nroot:" + root;
     }
+    
+    public static RootObj diff(final RootObj original, final RootObj modified) {
+        return new RootObj(RootBlock.diff(original.root, modified.root), null);
+    }
 }

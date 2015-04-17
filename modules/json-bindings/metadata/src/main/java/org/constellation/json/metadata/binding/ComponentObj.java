@@ -19,4 +19,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public abstract class ComponentObj {
     
     abstract void updatePath(final String oldPrefix, final String newPrefix);
+    
+    abstract String getPath();
 }

@@ -120,6 +120,15 @@ public class Block implements Serializable, ChildEntity, IBlock {
         return true;
     }
     
+    public ComponentObj getChildrenByPath(final String path) {
+        for (ComponentObj b : children) {
+            if (path.equals(b.getPath())) {
+                return b;
+            }
+        }
+        return null;
+    }
+    
     public String getHelp() {
         return help;
     }
@@ -190,6 +199,64 @@ public class Block implements Serializable, ChildEntity, IBlock {
      */
     public void setStrict(boolean strict) {
         this.strict = strict;
+    }
+    
+    public static Block diff(Block original, Block modified) {
+        final Block result = new Block();
+        boolean add = false;
+        for (ComponentObj originalChild : original.children) {
+            if (originalChild instanceof BlockObj) {
+                final BlockObj originalB     = (BlockObj) originalChild;
+                final ComponentObj modifiedB = modified.getChildrenByPath(originalB.getBlock().getPath());
+                if (modifiedB == null) {
+                    result.getChildren().add(new BlockObjDiff(originalB, "REMOVED"));
+                    add = true;
+                } else if (modifiedB instanceof BlockObj){
+                    final BlockObj modif = BlockObj.diff(originalB, (BlockObj) modifiedB) ;
+                    if (modif != null) {
+                        result.getChildren().add(modif);
+                        add = true;
+                    }
+                } else {
+                    throw new IllegalStateException("A block is now a field!");
+                }
+            } else if (originalChild instanceof FieldObj) {
+                final FieldObj originalF     = (FieldObj) originalChild;
+                final ComponentObj modifiedF = modified.getChildrenByPath(originalF.getField().getPath());
+                if (modifiedF == null) {
+                    result.getChildren().add(new FieldObjDiff(originalF, "REMOVED"));
+                    add = true;
+                } else if (modifiedF instanceof FieldObj){
+                    if (FieldObj.diff(originalF, (FieldObj) modifiedF)) {
+                        result.getChildren().add(new FieldObjDiff(originalF, "REMOVED"));
+                        result.getChildren().add(new FieldObjDiff((FieldObj) modifiedF, "ADDED"));
+                        add = true;
+                    }
+                } else {
+                    throw new IllegalStateException("A field is now a block!");
+                }
+            }
+        }
+        // look for Added child
+        for (ComponentObj modifiedChild : modified.children) {
+            if (modifiedChild instanceof BlockObj) {
+                BlockObj modifiedB = (BlockObj)modifiedChild;
+                if (original.getChildrenByPath(modifiedB.getBlock().getPath()) == null) {
+                    result.getChildren().add(new BlockObjDiff(modifiedB, "ADDED"));
+                    add = true;
+                }
+            } else if (modifiedChild instanceof FieldObj) {
+                FieldObj modifiedF = (FieldObj)modifiedChild;
+                if (original.getChildrenByPath(modifiedF.getField().getPath()) == null) {
+                    result.getChildren().add(new FieldObjDiff(modifiedF, "ADDED"));
+                    add = true;
+                }
+            }
+        }
+        if (add) {
+            return result;
+        }
+        return null;
     }
     
     @Override

@@ -201,6 +201,10 @@ public class Field implements Serializable {
         this.strict = strict;
     }
     
+    public static boolean diff(Field original, Field modified) {
+        return !original.value.equals(modified.value);
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[Block]\n");
