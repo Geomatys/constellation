@@ -74,7 +74,7 @@ public interface MetadataRepository {
 
     Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap);
 
-    Map<String,Integer> getProfilesCount();
+    Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap);
     
     MetadataXCsw addMetadataToCSW(final String metadataID, final int cswID);
     

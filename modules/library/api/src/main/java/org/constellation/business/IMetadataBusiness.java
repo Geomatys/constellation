@@ -391,6 +391,13 @@ public interface IMetadataBusiness {
      * @return The total count of metadata with the specified publication flag.
      */
     int countPublished(final boolean status,final Map<String,Object> filterMap);
+
+    /**
+     * Returns map of distribution of used profiles.
+     * @param filterMap optional filters
+     * @return Map
+     */
+    Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap);
     
     /**
      * Count the number of metadata stored in the database whith the specified validation flag.

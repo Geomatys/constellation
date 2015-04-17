@@ -908,6 +908,13 @@ public class MetadataBusiness implements IMetadataBusiness {
     public int countValidated(final boolean status,final Map<String,Object> filterMap) {
         return metadataRepository.countValidated(status);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap) {
+        return metadataRepository.getProfilesCount(filterMap);
+    }
     
     @Override
     public void askForValidation(final int metadataID) {

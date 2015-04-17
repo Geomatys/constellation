@@ -113,7 +113,7 @@ public class MetadataRest {
     @Path("/profiles")
     public List<Profile> getProfilesList() {
         final List<Profile> result = new ArrayList<>();
-        final Map<String,Integer> map = metadataRepository.getProfilesCount();
+        final Map<String,Integer> map = metadataRepository.getProfilesCount(null);
         if(map!=null){
             for(final Map.Entry<String,Integer> entry : map.entrySet()){
                 result.add(new Profile(entry.getKey(),entry.getValue()));
@@ -473,6 +473,7 @@ public class MetadataRest {
         }
 
         Map<String,Integer> general = new HashMap<>();
+        //TODO implements with filters
         final int total             = metadataBusiness.countTotal(filterMap);
         final int waitingToValidate = metadataBusiness.countValidated(false,filterMap);
         final int waitingToPublish  = metadataBusiness.countPublished(false,filterMap);
@@ -482,6 +483,22 @@ public class MetadataRest {
         general.put("waitingToValidate", waitingToValidate);
         general.put("waitingToPublish", waitingToPublish);
         general.put("published", published);
+
+        //Get profiles distribution counts
+        //TODO implements with filters
+        final List<Profile> profiles = new ArrayList<>();
+        final Map<String,Integer> profilesMap = metadataBusiness.getProfilesCount(filterMap);
+        if(profilesMap!=null){
+            for(final Map.Entry<String,Integer> entry : profilesMap.entrySet()){
+                profiles.add(new Profile(entry.getKey(),entry.getValue()));
+            }
+        }
+        map.put("repartitionProfiles",profiles);
+
+        //Get completion counts for metadata in 10 categories (10%, 20%, ... 100%)
+        final int[] completionArray = new int[10];
+        //TODO implements with filters
+        map.put("completionPercents",completionArray);
 
         map.put("general",general);
 

@@ -345,7 +345,8 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
 
     @Override
-    public Map<String,Integer> getProfilesCount() {
+    public Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap) {
+        //TODO take in account the filters
         AggregateFunction<Integer> count = DSL.count(METADATA.PROFILE);
         return dsl.select(METADATA.PROFILE, count ).from(METADATA).groupBy(METADATA.PROFILE).orderBy(count.desc()).fetchMap(METADATA.PROFILE, count);
     }
