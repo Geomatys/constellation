@@ -166,6 +166,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             		  ":org.geotoolkit.ogc.xml.v110"  +
                           ":org.geotoolkit.wfs.xml.v200"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
+                          ":org.geotoolkit.gml.xml.v321"  +
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.apache.sis.internal.jaxb.geometry"), null);
             setXMLContext(pool);
