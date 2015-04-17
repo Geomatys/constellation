@@ -496,7 +496,19 @@ public class WFSService extends GridWebService<WFSWorker> {
 
     private GetFeature createNewGetFeatureRequest(final WFSWorker worker) throws CstlServiceException {
         Integer maxFeature = null;
-        final String max = getParameter("maxfeatures", false);
+
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        final String version = getParameter(VERSION_PARAMETER, true);
+        worker.checkVersionSupported(version, false);
+        final String handle  = getParameter(HANDLE,  false);
+        final String outputFormat  = getParameter("outputFormat", false);
+
+        final String max;
+        if (version.equals("2.0.0")) {
+            max = getParameter("count", false);
+        } else {
+            max = getParameter("maxfeatures", false);
+        }
         if (max != null) {
             try {
                 maxFeature = Integer.parseInt(max);
@@ -504,14 +516,7 @@ public class WFSService extends GridWebService<WFSWorker> {
                 throw new CstlServiceException("Unable to parse the integer maxfeatures parameter" + max,
                                                   INVALID_PARAMETER_VALUE, "MaxFeatures");
             }
-
         }
-        final String service = getParameter(SERVICE_PARAMETER, true);
-        final String version = getParameter(VERSION_PARAMETER, true);
-        worker.checkVersionSupported(version, false);
-        final String handle  = getParameter(HANDLE,  false);
-        final String outputFormat  = getParameter("outputFormat", false);
-
 
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
