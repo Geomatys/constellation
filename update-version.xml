@@ -5,10 +5,16 @@
      must be specified as a property on the command line. -->
 
 <project name="UpdateVersion" default="update">
-  <target name="update">
-    <replace dir="${cstl.dir}">
-      <include name="**/pom.xml"/>
-      <replacefilter token="${cstl.oldversion}" value="${cstl.version}"/>
-    </replace>
-  </target>
+    <target name="update" depends="updateGeotkVersion">
+        <replace dir="${cstl.dir}">
+            <include name="**/pom.xml"/>
+            <replacefilter token="${cstl.oldversion}" value="${cstl.version}"/>
+        </replace>
+    </target>
+    <target name="updateGeotkVersion">
+        <replace dir="${cstl.dir}">
+            <include name="pom.xml"/>
+            <replacefilter token="&lt;geotoolkit.version&gt;${geotk.oldversion}&lt;/geotoolkit.version&gt;" value="&lt;geotoolkit.version&gt;${geotk.version}&lt;/geotoolkit.version&gt;"/>
+        </replace>
+    </target>
 </project>
