@@ -31,8 +31,6 @@ import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.feature.simple.SimpleFeature;
-import org.geotoolkit.feature.simple.SimpleFeatureType;
 import org.geotoolkit.feature.type.AttributeDescriptor;
 import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.feature.type.Name;
@@ -283,7 +281,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
         if(dateStartField != null){
             try{
                 final AttributeDescriptor desc = (AttributeDescriptor)
-                        dateStartField.evaluate((SimpleFeatureType)store.getFeatureType(name));
+                        dateStartField.evaluate(store.getFeatureType(name));
 
                 if(desc == null){
                     LOGGER.log(Level.WARNING , "Invalide field : "+ dateStartField + " Doesnt exists in layer :" + name);
@@ -333,7 +331,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
 
             try {
                 final AttributeDescriptor desc = (AttributeDescriptor)
-                        elevationStartField.evaluate((SimpleFeatureType)store.getFeatureType(name));
+                        elevationStartField.evaluate(store.getFeatureType(name));
                 if(desc == null){
                     LOGGER.log(Level.WARNING , "Invalide field : "+ elevationStartField + " Doesnt exists in layer :" + name);
                     return elevations;
