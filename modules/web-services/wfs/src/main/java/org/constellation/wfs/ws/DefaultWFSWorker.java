@@ -164,6 +164,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -178,7 +179,9 @@ import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V200;
 import static org.constellation.wfs.ws.WFSConstants.TYPE_PARAM;
 import static org.constellation.wfs.ws.WFSConstants.UNKNOW_TYPENAME;
 import org.geotoolkit.data.FeatureStoreRuntimeException;
+import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.data.session.Session;
+import org.geotoolkit.feature.xml.XSDFeatureStore;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
@@ -492,6 +495,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final JAXBFeatureTypeWriter writer  = new JAXBFeatureTypeWriter(gmlVersion);
         final List<QName> names             = request.getTypeName();
         final List<FeatureType> types       = new ArrayList<>();
+        final Map<String, String> locations = new HashMap<>();
 
         if (names.isEmpty()) {
             //search all types
@@ -500,7 +504,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (!(layer instanceof FeatureData)) {continue;}
 
                 try {
-                    types.add(getFeatureTypeFromLayer((FeatureData)layer));
+                    FeatureData fLayer = (FeatureData)layer;
+                    ExtendedFeatureStore store = (ExtendedFeatureStore) fLayer.getStore();
+                    if (store.getWrapped() instanceof XSDFeatureStore) {
+                        locations.putAll(((XSDFeatureStore)store.getWrapped()).getSchema(layer.getName()));
+                    } else {
+                        types.add(getFeatureTypeFromLayer(fLayer));
+                    }
                 } catch (DataStoreException ex) {
                     LOGGER.log(Level.WARNING, "error while getting featureType for:{0}", layer.getName());
                 }
@@ -522,9 +532,15 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
 
                 try {
-                    types.add(getFeatureTypeFromLayer((FeatureData)layer));
+                    FeatureData fLayer = (FeatureData)layer;
+                    ExtendedFeatureStore store = (ExtendedFeatureStore) fLayer.getStore();
+                    if (store.getWrapped() instanceof XSDFeatureStore) {
+                        locations.putAll(((XSDFeatureStore)fLayer.getStore()).getSchema(layer.getName()));
+                    } else {
+                        types.add(getFeatureTypeFromLayer(fLayer));
+                    }
                 } catch (DataStoreException ex) {
-                    LOGGER.log(Level.WARNING, "error while getting featureType for:"+ layer.getName(), ex);
+                    LOGGER.log(Level.WARNING, "error while getting featureType for:{0}", layer.getName());
                 }
             }
         }
@@ -599,6 +615,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
         }
         
+        for (Entry<String, String> location : locations.entrySet()) {
+            schema.addImport(new Import(location.getKey(), location.getValue()));
+        }
+        
         LOGGER.log(logLevel, "DescribeFeatureType treated in {0}ms", (System.currentTimeMillis() - start));
         return schema;
     }
@@ -612,6 +632,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     return false;
                 }
             }
+        } else if (types.isEmpty()) {
+            return false;
         }
         return true;
     }
@@ -700,7 +722,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     private FeatureType getFeatureTypeFromLayer(final FeatureData fld) throws DataStoreException {
         return fld.getStore().getFeatureType(fld.getName());
     }
-
+    
 
     private LinkedHashMap<String,? extends Query> extractStoredQueries(final FeatureRequest request) throws CstlServiceException {
         final List<? extends Query> queries = request.getQuery();
