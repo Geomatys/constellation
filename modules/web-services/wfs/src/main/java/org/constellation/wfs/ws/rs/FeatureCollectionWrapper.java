@@ -37,13 +37,16 @@ public class FeatureCollectionWrapper {
 
     private final String wfsVersion;
 
+    private final boolean writeSingleFeature;
+
     public FeatureCollectionWrapper(final FeatureCollection featureCollection, final Map<String, String> schemaLocations, final String gmlVersion,
-            final String wfsVersion, final int nbMatched) {
+            final String wfsVersion, final int nbMatched, boolean writeSingleFeature) {
         this.featureCollection = featureCollection;
         this.gmlVersion = gmlVersion;
         this.wfsVersion = wfsVersion;
         this.schemaLocations = schemaLocations;
         this.nbMatched = nbMatched;
+        this.writeSingleFeature = writeSingleFeature;
     }
 
     /**
@@ -81,5 +84,8 @@ public class FeatureCollectionWrapper {
         return nbMatched;
     }
 
+    public boolean isWriteSingleFeature() {
+        return writeSingleFeature;
+    }
 
 }

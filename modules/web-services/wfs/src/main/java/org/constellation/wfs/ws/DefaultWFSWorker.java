@@ -165,6 +165,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.wfs.ws.WFSConstants.GetXSD;
@@ -265,7 +267,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
            final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, typeNames);
            final ObjectFactory factory = new ObjectFactory();
            queryEx.getContent().add(factory.createQuery(query));
-           final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
+           final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("urn:ogc:def:query:OGC-WFS::GetFeatureById", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
            storedQueries.add(idQ);
        }
 
@@ -696,8 +698,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
 
-    private List<? extends Query> extractStoredQueries(final FeatureRequest request) throws CstlServiceException {
+    private LinkedHashMap<String,? extends Query> extractStoredQueries(final FeatureRequest request) throws CstlServiceException {
         final List<? extends Query> queries = request.getQuery();
+        final LinkedHashMap<String,Query> result = new LinkedHashMap<String, Query>();
+        for(int i=0,n=queries.size();i<n;i++){
+            result.put(""+i, queries.get(i));
+        }
+
         for (StoredQuery storedQuery : request.getStoredQuery()) {
             StoredQueryDescription description = null;
             final List<? extends Parameter> parameters = storedQuery.getParameter();
@@ -718,7 +725,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         if (content instanceof Query) {
                             final Query query = WFSXmlFactory.cloneQuery((Query)content);
                             applyParameterOnQuery(query, parameters);
-                            ((List)queries).add(query);
+                            result.put(description.getId(), query);
                         } else {
                             throw new CstlServiceException("unexpected query object: " + content, INVALID_PARAMETER_VALUE, "storedQuery");
                         }
@@ -726,7 +733,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
             }
         }
-        return queries;
+        return result;
     }
 
     private List<String> extractPropertyNames(final List<Object> properties) {
@@ -826,9 +833,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if ((request.getQuery() == null || request.getQuery().isEmpty()) && (request.getStoredQuery() == null || request.getStoredQuery().isEmpty())) {
             throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
         }
-        final List<? extends Query> queries = extractStoredQueries(request);
+        final LinkedHashMap<String, ? extends Query> queries = extractStoredQueries(request);
 
-        for (final Query query : queries) {
+        for (final Query query : queries.values()) {
 
             final List<QName> typeNames;
             final Map<String, QName> aliases = new HashMap<>();
@@ -976,7 +983,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             return buildFeatureCollection(currentVersion, "collection-1", featureCollection.size(), calendar);
         }
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
-        return new FeatureCollectionWrapper(featureCollection, schemaLocations, gmlVersion, currentVersion, (int)nbMatched);
+
+        if(queries.size()==1 && queries.containsKey("urn:ogc:def:query:OGC-WFS::GetFeatureById")){
+            return new FeatureCollectionWrapper(featureCollection, schemaLocations, gmlVersion, currentVersion, (int)nbMatched,true);
+        }else{
+            return new FeatureCollectionWrapper(featureCollection, schemaLocations, gmlVersion, currentVersion, (int)nbMatched,false);
+        }
+        
     }
 
     @Override
@@ -995,7 +1008,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final String userLogin                     = getUserLogin();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         final String currentVersion                = request.getVersion().toString();
-        final List<? extends Query> queries        = extractStoredQueries(request);
+        final Collection<? extends Query> queries  = extractStoredQueries(request).values();
         final Integer maxFeatures                  = request.getCount();
         final Map<String, String> schemaLocations  = new HashMap<>();
         final List<FeatureCollection> collections  = new ArrayList<>();

@@ -37,6 +37,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.data.FeatureIterator;
+import org.geotoolkit.data.FeatureStoreUtilities;
+import org.geotoolkit.data.memory.GenericEmptyFeatureIterator;
+import org.geotoolkit.feature.Feature;
 
 /**
  *
@@ -62,7 +66,23 @@ public class FeatureCollectionWriter<T extends FeatureCollectionWrapper> impleme
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         try {
             final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(t.getGmlVersion(), t.getWfsVersion(), t.getSchemaLocations());
-            featureWriter.write(t.getFeatureCollection(), out, t.getNbMatched());
+            if(t.isWriteSingleFeature()){
+                //write a single feature without collection element container
+                final FeatureIterator ite = t.getFeatureCollection().iterator();
+                try{
+                    if(ite.hasNext()){
+                        Feature f = ite.next();
+                        featureWriter.write(f, out, t.getNbMatched());
+                    }else{
+                        //write an empty collection
+                        featureWriter.write(GenericEmptyFeatureIterator.wrap(t.getFeatureCollection()), out, t.getNbMatched());
+                    }
+                }finally{
+                    ite.close();
+                }
+            }else{
+                featureWriter.write(t.getFeatureCollection(), out, t.getNbMatched());
+            }
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
         } catch (DataStoreException ex) {
