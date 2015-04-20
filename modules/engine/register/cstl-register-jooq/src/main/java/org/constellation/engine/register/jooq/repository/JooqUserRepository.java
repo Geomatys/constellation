@@ -187,7 +187,7 @@ public class JooqUserRepository extends
 	@Override
 	public Optional<UserWithRole> findOneWithRole(String name) {
 		Map<CstlUserRecord, Result<Record>> fetchGroups = dsl.select()
-				.from(CSTL_USER).join(Tables.USER_X_ROLE).onKey()
+				.from(CSTL_USER).leftOuterJoin(Tables.USER_X_ROLE).onKey()
 				.where(CSTL_USER.LOGIN.eq(name)).fetchGroups(CSTL_USER);
 
 		if (fetchGroups.isEmpty()) {
