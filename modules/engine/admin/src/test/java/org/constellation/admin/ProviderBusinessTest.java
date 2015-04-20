@@ -94,7 +94,7 @@ public class ProviderBusinessTest implements ApplicationContextAware {
         providerConf.parameter("providerType").setValue(ProviderBusiness.SPI_NAMES.COVERAGE_SPI_NAME.name);
         final ParameterValueGroup choice =
                 providerConf.groups("choice").get(0).addGroup(config.getDescriptor().getName().getCode());
-        Parameters.copy(config, choice);
+        org.apache.sis.parameter.Parameters.copy(config, choice);
 
         Provider p = pBusiness.create(id, factory.getName(), providerConf);
         Provider read = pBusiness.getProvider(id);

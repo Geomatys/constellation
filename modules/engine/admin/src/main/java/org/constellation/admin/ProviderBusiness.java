@@ -267,7 +267,7 @@ public class ProviderBusiness implements IProviderBusiness {
         providerConfig.parameter("providerType").setValue(providerType);
         final ParameterValueGroup choice =
                 providerConfig.groups("choice").get(0).addGroup(spiConfiguration.getDescriptor().getName().getCode());
-        Parameters.copy(spiConfiguration, choice);
+        org.apache.sis.parameter.Parameters.copy(spiConfiguration, choice);
 
         return create(id, pFactory.getName(), providerConfig);
     }
@@ -340,7 +340,7 @@ public class ProviderBusiness implements IProviderBusiness {
             case "feature-store":
                 boolean foundProvider = false;
                 try {
-                    
+
                     final Path filePath;
                     if (inParams.get("path") != null) {
                         filePath = Paths.get(inParams.get("path"));
@@ -413,14 +413,14 @@ public class ProviderBusiness implements IProviderBusiness {
                         final FeatureStoreFactory featureFactory = FeatureStoreFinder.getFactoryById(subType);
                         final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
                         final ParameterValueGroup choice = ParametersExt.getOrCreateGroup(sources.groups("choice").get(0),cvgConfig.getDescriptor().getName().getCode());
-                        Parameters.copy(cvgConfig, choice);
+                        org.apache.sis.parameter.Parameters.copy(cvgConfig, choice);
                         foundProvider = true;
                     }
-                    
+
                     if(!foundProvider) {
                         throw new ConfigurationException("No provider found to resolve the data!");
                     }
-                    
+
                 } catch (MalformedURLException e) {
                     LOGGER.log(Level.WARNING, "unable to create url from path", e);
                 }
@@ -430,7 +430,7 @@ public class ProviderBusiness implements IProviderBusiness {
                 // TODO : remove this crappy hack after provider system refactoring.
                 final String filePath = inParams.get("path");
                 if (filePath != null ) {
-                    
+
                     try {
                         inParams.put("path", Paths.get(filePath).toUri().toURL().toString());
                     } catch (MalformedURLException e) {
@@ -441,7 +441,7 @@ public class ProviderBusiness implements IProviderBusiness {
                 final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, cvgFactory.getParametersDescriptor(), true);
                 final ParameterValueGroup choice =
                         sources.groups("choice").get(0).addGroup(cvgConfig.getDescriptor().getName().getCode());
-                Parameters.copy(cvgConfig, choice);
+                org.apache.sis.parameter.Parameters.copy(cvgConfig, choice);
                 break;
 
             case "observation-store":
@@ -757,6 +757,6 @@ public class ProviderBusiness implements IProviderBusiness {
 	            ids.add(p.getId());
 	        }
 	        return ids;
-	    
+
 	}
 }

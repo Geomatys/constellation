@@ -129,7 +129,7 @@ import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.geometry.Envelopes;
+import org.apache.sis.geometry.Envelopes;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.parameter.ParametersExt;
@@ -212,7 +212,7 @@ public class DataRest {
 
     @Inject
     private IMapContextBusiness mapContextBusiness;
-    
+
     @Inject
     private IMetadataBusiness metadataBusiness;
 
@@ -590,7 +590,7 @@ public class DataRest {
 
     /**
      * List all FeatureStore and CoverageStore factories and there parameters.
-     * 
+     *
      * @return Response {@link DataCustomConfiguration}
      */
     @GET
