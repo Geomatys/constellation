@@ -212,8 +212,7 @@ public class MetadataRest {
         final int pageNumber = pagedSearch.getPage();
         final int rowsPerPage = pagedSearch.getSize();
 
-        //TODO use metadataBusiness instead of metadataRepository because the implementation can differ for example to treat the filter  for group
-        final Map<Integer,List> result = metadataRepository.filterAndGet(filterMap,sortEntry,pageNumber,rowsPerPage);
+        final Map<Integer,List> result = metadataBusiness.filterAndGet(filterMap,sortEntry,pageNumber,rowsPerPage);
         final Map.Entry<Integer,List> entry = result.entrySet().iterator().next();
         final int total = entry.getKey();
 
@@ -367,8 +366,8 @@ public class MetadataRest {
     public Map searchIds(final PagedSearch pagedSearch,@Context HttpServletRequest req) {
         final List<MetadataLightBrief> list = new ArrayList<>();
         final Map<String,Object> filterMap = prepareFilters(pagedSearch, req);
-        //TODO use metadataBusiness instead of metadataRepository because the implementation can differ for example to treat the filter  for group
-        final Map<Integer,String> map = metadataRepository.filterAndGetWithoutPagination(filterMap);
+        
+        final Map<Integer,String> map = metadataBusiness.filterAndGetWithoutPagination(filterMap);
         if(map!=null){
             for(final Map.Entry<Integer,String> entry : map.entrySet()){
                 list.add(new MetadataLightBrief(entry.getKey(),entry.getValue()));

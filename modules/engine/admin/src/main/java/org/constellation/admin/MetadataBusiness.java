@@ -961,4 +961,13 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
+    @Override
+    public Map<Integer, List> filterAndGet(final Map<String,Object> filterMap, final Map.Entry<String,String> sortEntry,final int pageNumber,final int rowsPerPage) {
+        return metadataRepository.filterAndGet(filterMap, sortEntry, pageNumber, rowsPerPage);
+    }
+    
+    @Override
+    public Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap) {
+        return metadataRepository.filterAndGetWithoutPagination(filterMap);
+    }
 }

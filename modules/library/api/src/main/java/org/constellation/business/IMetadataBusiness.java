@@ -420,4 +420,8 @@ public interface IMetadataBusiness {
     void denyValidation(final int metadataID, final String comment);
     
     void acceptValidation(final int metadataID);
+    
+    Map<Integer, List> filterAndGet(final Map<String,Object> filterMap, final Map.Entry<String,String> sortEntry,final int pageNumber,final int rowsPerPage);
+    
+    Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap);
 }
