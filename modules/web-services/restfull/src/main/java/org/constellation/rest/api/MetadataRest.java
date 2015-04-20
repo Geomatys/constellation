@@ -209,6 +209,7 @@ public class MetadataRest {
         final int pageNumber = pagedSearch.getPage();
         final int rowsPerPage = pagedSearch.getSize();
 
+        //TODO use metadataBusiness instead of metadataRepository because the implementation can differ for example to treat the filter  for group
         final Map<Integer,List> result = metadataRepository.filterAndGet(filterMap,sortEntry,pageNumber,rowsPerPage);
         final Map.Entry<Integer,List> entry = result.entrySet().iterator().next();
         final int total = entry.getKey();
@@ -256,22 +257,61 @@ public class MetadataRest {
         if(filters != null) {
             for(final Filter f : filters) {
                 if("owner".equals(f.getField())) {
-                    String login = f.getValue();
-                    if("_all".equals(login)) {
+                    String value = f.getValue();
+                    if("_all".equals(value)) {
                         continue; //no need to filter on owner field if we ask all users
                     }
-                    if("_me".equals(login)) {
-                        //get user login
-                        login = req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : null;
-                    }
-                    final Optional<CstlUser> optUser = userRepository.findOne(login);
-                    if(optUser!=null && optUser.isPresent()){
-                        final CstlUser user = optUser.get();
-                        if(user != null){
-                            filterMap.put(f.getField(),user.getId());
+                    try{
+                        final int userId = Integer.valueOf(value);
+                        filterMap.put("owner",userId);
+                    }catch(Exception ex) {
+                        //try as login
+                        if("_me".equals(value)) {
+                            //get user login
+                            value = req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : null;
+                        }
+                        final Optional<CstlUser> optUser = userRepository.findOne(value);
+                        if(optUser!=null && optUser.isPresent()){
+                            final CstlUser user = optUser.get();
+                            if(user != null){
+                                filterMap.put(f.getField(),user.getId());
+                            }
                         }
                     }
-                }else if("profile".equals(f.getField())) {
+                } else if("group".equals(f.getField())) {
+                    String value = f.getValue();
+                    if("_all".equals(value)) {
+                        continue; //no need to filter on group field if we ask all groups
+                    }
+                    try{
+                        final int groupId = Integer.valueOf(value);
+                        filterMap.put("group",groupId);
+                    }catch(Exception ex) {
+                        //do nothing
+                    }
+                } else if ("period".equals(f.getField())) {
+                    final String value = f.getValue();
+                    if("_all".equals(value)) {
+                        continue; //no need to filter on period if we ask from the beginning.
+                    }
+                    long delta;
+                    final long currentTs= System.currentTimeMillis();
+                    final long dayTms = 1000*60*60*24L;
+                    if("week".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*7);
+                    }else if("month".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*30);
+                    }else if("3months".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*90);
+                    }else if("6months".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*180);
+                    }else if("year".equalsIgnoreCase(value)) {
+                        delta = currentTs - (dayTms*365);
+                    }else {
+                        continue;
+                    }
+                    filterMap.put("period",delta);
+                } else if("profile".equals(f.getField())) {
                     if(! "_all".equals(f.getValue())){
                         filterMap.put(f.getField(),f.getValue());
                     }
@@ -324,6 +364,7 @@ public class MetadataRest {
     public Map searchIds(final PagedSearch pagedSearch,@Context HttpServletRequest req) {
         final List<MetadataLightBrief> list = new ArrayList<>();
         final Map<String,Object> filterMap = prepareFilters(pagedSearch, req);
+        //TODO use metadataBusiness instead of metadataRepository because the implementation can differ for example to treat the filter  for group
         final Map<Integer,String> map = metadataRepository.filterAndGetWithoutPagination(filterMap);
         if(map!=null){
             for(final Map.Entry<Integer,String> entry : map.entrySet()){
@@ -476,8 +517,8 @@ public class MetadataRest {
         Map<String,Integer> general = new HashMap<>();
         
         final int total             = metadataBusiness.countTotal(filterMap);
-        final int waitingToValidate = metadataBusiness.countValidated(false,filterMap);
-        final int waitingToPublish  = metadataBusiness.countPublished(false,filterMap);
+        final int waitingToValidate = metadataBusiness.countValidated(false, filterMap);
+        final int waitingToPublish  = metadataBusiness.countPublished(false, filterMap);
         final int published         = metadataBusiness.countPublished(true,filterMap);
 
         general.put("total", total);

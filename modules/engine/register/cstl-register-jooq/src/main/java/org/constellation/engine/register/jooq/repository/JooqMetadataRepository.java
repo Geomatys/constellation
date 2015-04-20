@@ -395,6 +395,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.TITLE.contains((String) entry.getValue())).or(METADATA.RESUME.contains((String)entry.getValue()));
                     }
+                }else if ("period".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.DATESTAMP.greaterOrEqual((Long)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.DATESTAMP.greaterOrEqual((Long) entry.getValue()));
+                    }
                 }
             }
         }
@@ -465,6 +471,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                         query = dsl.select(fields).from(METADATA).where(METADATA.TITLE.contains((String)entry.getValue())).or(METADATA.RESUME.contains((String)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.TITLE.contains((String) entry.getValue())).or(METADATA.RESUME.contains((String)entry.getValue()));
+                    }
+                }else if ("period".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.DATESTAMP.greaterOrEqual((Long)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.DATESTAMP.greaterOrEqual((Long) entry.getValue()));
                     }
                 }
             }
