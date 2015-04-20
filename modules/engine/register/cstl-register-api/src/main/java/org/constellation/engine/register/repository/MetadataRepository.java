@@ -88,11 +88,11 @@ public interface MetadataRepository {
     
     void changeProfile(final int id, final String newProfile);
     
-    int countTotalMetadata();
+    int countTotalMetadata(final Map<String,Object> filterMap);
     
-    int countValidated(final boolean status);
+    int countValidated(final boolean status,final Map<String,Object> filterMap);
     
-    int countPublished(final boolean status);
+    int countPublished(final boolean status,final Map<String,Object> filterMap);
     
     void setValidationRequired(final int id, final String state, final String validationState);
     

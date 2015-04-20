@@ -890,7 +890,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public int countTotal(final Map<String,Object> filterMap) {
-        return metadataRepository.countTotalMetadata();
+        return metadataRepository.countTotalMetadata(filterMap);
     }
 
     /**
@@ -898,7 +898,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public int countPublished(final boolean status,final Map<String,Object> filterMap) {
-        return metadataRepository.countPublished(status);
+        return metadataRepository.countPublished(status,filterMap);
     }
     
     /**
@@ -906,12 +906,13 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public int countValidated(final boolean status,final Map<String,Object> filterMap) {
-        return metadataRepository.countValidated(status);
+        return metadataRepository.countValidated(status, filterMap);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap) {
         return metadataRepository.getProfilesCount(filterMap);
     }

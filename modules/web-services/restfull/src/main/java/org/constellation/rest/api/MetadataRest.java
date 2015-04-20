@@ -113,7 +113,7 @@ public class MetadataRest {
     @Path("/profiles")
     public List<Profile> getProfilesList() {
         final List<Profile> result = new ArrayList<>();
-        final Map<String,Integer> map = metadataRepository.getProfilesCount(null);
+        final Map<String,Integer> map = metadataBusiness.getProfilesCount(new HashMap<String, Object>());
         if(map!=null){
             for(final Map.Entry<String,Integer> entry : map.entrySet()){
                 result.add(new Profile(entry.getKey(),entry.getValue()));
@@ -396,12 +396,13 @@ public class MetadataRest {
     @GET
     @Path("/getStats")
     public Response getStats() {
-        Map<String,Integer> map = new HashMap<>();
+        final Map<String,Integer> map = new HashMap<>();
 
-        final int total             = metadataBusiness.countTotal(null);
-        final int waitingToValidate = metadataBusiness.countValidated(false,null);
-        final int waitingToPublish  = metadataBusiness.countPublished(false,null);
-        final int published         = metadataBusiness.countPublished(true,null);
+        final Map<String, Object> emptyFilter = new HashMap<>();
+        final int total             = metadataBusiness.countTotal(emptyFilter);
+        final int waitingToValidate = metadataBusiness.countValidated(false, emptyFilter);
+        final int waitingToPublish  = metadataBusiness.countPublished(false, emptyFilter);
+        final int published         = metadataBusiness.countPublished(true,  emptyFilter);
 
         map.put("total", total);
         map.put("waitingToValidate", waitingToValidate);

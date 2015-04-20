@@ -344,13 +344,6 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         return query.fetchOneInto(Metadata.class) != null;
     }
 
-    @Override
-    public Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap) {
-        //TODO take in account the filters
-        AggregateFunction<Integer> count = DSL.count(METADATA.PROFILE);
-        return dsl.select(METADATA.PROFILE, count ).from(METADATA).groupBy(METADATA.PROFILE).orderBy(count.desc()).fetchMap(METADATA.PROFILE, count);
-    }
-
     /**
      * Returns a map that contains id of metadata as key and the title of metadata as value.
      * the filterMap passed in arguments is optional and can contains one or multiple filter on each field.
@@ -536,18 +529,87 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
 
     @Override
-    public int countTotalMetadata() {
-        return dsl.fetchCount(dsl.select().from(METADATA));
+    public Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap) {
+        final Integer owner   = (Integer) filterMap.get("owner");
+        final Long period     = (Long)    filterMap.get("period");
+        
+        
+        AggregateFunction<Integer> count = DSL.count(METADATA.PROFILE);
+        
+        SelectJoinStep select = dsl.select(METADATA.PROFILE, count ).from(METADATA);
+        SelectConditionStep cond = null;
+        if (owner != null) {
+            cond = select.where(METADATA.OWNER.eq(owner));
+            select = null;
+        }
+        if (period != null) {
+            if (select == null) {
+                cond = cond.and(METADATA.DATESTAMP.greaterOrEqual(period));
+            } else {
+                cond = select.where(METADATA.DATESTAMP.greaterOrEqual(period));
+                select = null;
+            }
+        }
+        if (select != null) {
+            return select.groupBy(METADATA.PROFILE).orderBy(count.desc()).fetchMap(METADATA.PROFILE, count);
+        } else {
+            return cond.groupBy(METADATA.PROFILE).orderBy(count.desc()).fetchMap(METADATA.PROFILE, count);
+        }
+    }
+    
+    @Override
+    public int countTotalMetadata(final Map<String,Object> filterMap) {
+        final Integer owner   = (Integer) filterMap.get("owner");
+        final Long period     = (Long)    filterMap.get("period");
+        
+        SelectJoinStep select = dsl.select().from(METADATA);
+        SelectConditionStep cond = null;
+        if (owner != null) {
+            cond = select.where(METADATA.OWNER.eq(owner));
+            select = null;
+        }
+        if (period != null) {
+            if (select == null) {
+                cond = cond.and(METADATA.DATESTAMP.greaterOrEqual(period));
+            } else {
+                cond = select.where(METADATA.DATESTAMP.greaterOrEqual(period));
+                select = null;
+            }
+        }
+        if (select != null) {
+            return dsl.fetchCount(select);
+        } else {
+            return dsl.fetchCount(cond);
+        }
     }
 
     @Override
-    public int countValidated(boolean status) {
-        return dsl.fetchCount(dsl.select().from(METADATA).where(METADATA.IS_VALIDATED.equal(status)));
+    public int countValidated(boolean status, final Map<String,Object> filterMap) {
+        final Integer owner   = (Integer) filterMap.get("owner");
+        final Long period     = (Long)    filterMap.get("period");
+        SelectConditionStep cond = dsl.select().from(METADATA).where(METADATA.IS_VALIDATED.equal(status));
+        if (owner != null) {
+            cond = cond.and(METADATA.OWNER.eq(owner));
+        }
+        if (period != null) {
+            cond = cond.and(METADATA.DATESTAMP.greaterOrEqual(period));
+        }
+        return dsl.fetchCount(cond);
     }
 
     @Override
-    public int countPublished(boolean status) {
-        return dsl.fetchCount(dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal(status)));
+    public int countPublished(boolean status, final Map<String,Object> filterMap) {
+        final Integer owner   = (Integer) filterMap.get("owner");
+        final Long period     = (Long)    filterMap.get("period");
+        
+        SelectConditionStep cond = dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal(status));
+        if (owner != null) {
+            cond = cond.and(METADATA.OWNER.eq(owner));
+        }
+        if (period != null) {
+            cond = cond.and(METADATA.DATESTAMP.greaterOrEqual(period));
+        }
+        return dsl.fetchCount(cond);
     }
 
     @Override
