@@ -339,7 +339,7 @@ angular.module('cstl-services', ['cstl-restapi'])
             scope.wrap.matchExactly = scope.wrap.matchExactly || false;
             scope.wrap.filtertext = scope.wrap.filtertext || "";
             scope.wrap.filtertype = scope.wrap.filtertype || undefined;
-            scope.wrap.ordertype = scope.wrap.ordertype || (scope.service && scope.service.type && scope.service.type.toLowerCase()==='sos') ? "id" : (scope.service && scope.service.type && scope.service.type.toLowerCase==='csw') ? "title" : "Name";
+            scope.wrap.ordertype = scope.wrap.ordertype || ((scope.service && scope.service.type && scope.service.type.toLowerCase()==='sos') ? "id" : (scope.service && scope.service.type && scope.service.type.toLowerCase==='csw') ? "title" : "Name");
             scope.wrap.orderreverse = scope.wrap.orderreverse || false;
             scope.wrap.countdata = scope.wrap.countdata || 0;
             scope.wrap.nbbypage = scope.wrap.nbbypage || 10;
