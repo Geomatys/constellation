@@ -83,7 +83,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         if (metadata.getIsValidated() != null) update.set(METADATA.IS_VALIDATED, metadata.getIsValidated());
         else update.set(METADATA.IS_VALIDATED, false);
         
-        update.set(METADATA.VALIDATION_REQUIRED, metadata.getValidationRequired());
+        if (metadata.getValidationRequired() != null) update.set(METADATA.VALIDATION_REQUIRED, metadata.getValidationRequired());
         update.set(METADATA.COMMENT, metadata.getComment());
         update.set(METADATA.VALIDATED_STATE, metadata.getValidatedState());
         update.set(METADATA.PROFILE, metadata.getProfile());
@@ -125,9 +125,9 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         metadataRecord.setProfile(metadata.getProfile());
         metadataRecord.setTitle(metadata.getTitle());
         metadataRecord.setResume(metadata.getResume());
-        metadataRecord.setValidatedState(metadata.getValidatedState());
         metadataRecord.setComment(metadata.getComment());
-        metadataRecord.setValidationRequired(metadata.getValidationRequired());
+        metadataRecord.setValidatedState(metadata.getValidatedState());
+        if (metadata.getValidationRequired() != null) metadataRecord.setValidationRequired(metadata.getValidationRequired());
 
         if (metadata.getIsPublished() != null) metadataRecord.setIsPublished(metadata.getIsPublished());
         else metadataRecord.setIsPublished(false); //default
