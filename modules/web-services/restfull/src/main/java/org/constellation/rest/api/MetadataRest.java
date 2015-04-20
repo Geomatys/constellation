@@ -474,7 +474,7 @@ public class MetadataRest {
         }
 
         Map<String,Integer> general = new HashMap<>();
-        //TODO implements with filters
+        
         final int total             = metadataBusiness.countTotal(filterMap);
         final int waitingToValidate = metadataBusiness.countValidated(false,filterMap);
         final int waitingToPublish  = metadataBusiness.countPublished(false,filterMap);
@@ -486,7 +486,6 @@ public class MetadataRest {
         general.put("published", published);
 
         //Get profiles distribution counts
-        //TODO implements with filters
         final List<Profile> profiles = new ArrayList<>();
         final Map<String,Integer> profilesMap = metadataBusiness.getProfilesCount(filterMap);
         if(profilesMap!=null){
