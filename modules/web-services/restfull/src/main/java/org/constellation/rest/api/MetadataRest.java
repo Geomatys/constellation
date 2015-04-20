@@ -12,8 +12,10 @@ import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.engine.security.WorkspaceService;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.model.metadata.Filter;
+import org.constellation.model.metadata.GroupStatBrief;
 import org.constellation.model.metadata.MetadataBrief;
 import org.constellation.model.metadata.MetadataLightBrief;
+import org.constellation.model.metadata.OwnerStatBrief;
 import org.constellation.model.metadata.Page;
 import org.constellation.model.metadata.PagedSearch;
 import org.constellation.model.metadata.Profile;
@@ -133,6 +135,7 @@ public class MetadataRest {
     @Path("/usersList")
     public List<User> getUsersList() {
         final List<User> result = new ArrayList<>();
+        //TODO use userBusiness because the implementation can differ since the user have groups in sub project.
         final List<CstlUser> users = userRepository.findAll();
         if(users != null) {
             for(final CstlUser u : users) {
@@ -390,6 +393,7 @@ public class MetadataRest {
         mdb.setTitle(md.getTitle());
         mdb.setType(md.getProfile());
 
+        //TODO use userBusiness because the implementation can differ since the user have groups in sub project.
         final Optional<CstlUser> optUser = userRepository.findById(md.getOwner());
         User owner = null;
         if(optUser!=null && optUser.isPresent()){
@@ -539,6 +543,14 @@ public class MetadataRest {
         //Get completion counts for metadata in 10 categories (10%, 20%, ... 100%)
         final int[] completionArray = metadataBusiness.countInCompletionRange(filterMap);
         map.put("completionPercents",completionArray);
+
+        //TODO get the list of groups by passing filterMap, with stats toValidate,toPublish,published for each group
+        final List<OwnerStatBrief> contributorsStatList = new ArrayList<>();
+        map.put("contributorsStatList",contributorsStatList);
+
+        //TODO the list in cstl is always empty since groups are not implemented yet, the business for subproject will return completed list.
+        final List<GroupStatBrief> groupsStatList = new ArrayList<>();
+        map.put("groupsStatList",groupsStatList);
 
         map.put("general",general);
 
