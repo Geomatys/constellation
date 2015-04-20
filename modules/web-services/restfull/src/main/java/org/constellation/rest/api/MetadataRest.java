@@ -496,8 +496,7 @@ public class MetadataRest {
         map.put("repartitionProfiles",profiles);
 
         //Get completion counts for metadata in 10 categories (10%, 20%, ... 100%)
-        final int[] completionArray = new int[10];
-        //TODO implements with filters
+        final int[] completionArray = metadataBusiness.countInCompletionRange(filterMap);
         map.put("completionPercents",completionArray);
 
         map.put("general",general);

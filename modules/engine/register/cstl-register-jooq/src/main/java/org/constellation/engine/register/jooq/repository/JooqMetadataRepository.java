@@ -558,6 +558,21 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
     
     @Override
+    public int countInCompletionRange(final Map<String,Object> filterMap, final int minCompletion, final int maxCompletion) {
+        final Integer owner   = (Integer) filterMap.get("owner");
+        final Long period     = (Long)    filterMap.get("period");
+        
+        SelectConditionStep cond = dsl.select().from(METADATA).where(METADATA.MD_COMPLETION.between(minCompletion, maxCompletion));
+        if (owner != null) {
+            cond = cond.and(METADATA.OWNER.eq(owner));
+        }
+        if (period != null) {
+            cond = cond.and(METADATA.DATESTAMP.greaterOrEqual(period));
+        }
+        return dsl.fetchCount(cond);
+    }
+    
+    @Override
     public int countTotalMetadata(final Map<String,Object> filterMap) {
         final Integer owner   = (Integer) filterMap.get("owner");
         final Long period     = (Long)    filterMap.get("period");

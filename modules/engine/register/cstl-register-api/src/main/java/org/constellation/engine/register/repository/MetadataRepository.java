@@ -94,6 +94,8 @@ public interface MetadataRepository {
     
     int countPublished(final boolean status,final Map<String,Object> filterMap);
     
+    int countInCompletionRange(final Map<String,Object> filterMap, final int minCompletion, final int maxCompletion);
+    
     void setValidationRequired(final int id, final String state, final String validationState);
     
     void denyValidation(final int id, final String comment);

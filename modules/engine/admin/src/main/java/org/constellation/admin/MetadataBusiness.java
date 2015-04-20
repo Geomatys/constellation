@@ -892,6 +892,22 @@ public class MetadataBusiness implements IMetadataBusiness {
     public int countTotal(final Map<String,Object> filterMap) {
         return metadataRepository.countTotalMetadata(filterMap);
     }
+    
+    @Override
+    public int[] countInCompletionRange(final Map<String,Object> filterMap) {
+        final int[] completionArray = new int[10];
+        completionArray[0] = metadataRepository.countInCompletionRange(filterMap, 0,  10);
+        completionArray[1] = metadataRepository.countInCompletionRange(filterMap, 11, 20);
+        completionArray[2] = metadataRepository.countInCompletionRange(filterMap, 21, 30);
+        completionArray[3] = metadataRepository.countInCompletionRange(filterMap, 31, 40);
+        completionArray[4] = metadataRepository.countInCompletionRange(filterMap, 41, 50);
+        completionArray[5] = metadataRepository.countInCompletionRange(filterMap, 51, 60);
+        completionArray[6] = metadataRepository.countInCompletionRange(filterMap, 61, 70);
+        completionArray[7] = metadataRepository.countInCompletionRange(filterMap, 71, 80);
+        completionArray[8] = metadataRepository.countInCompletionRange(filterMap, 81, 90);
+        completionArray[9] = metadataRepository.countInCompletionRange(filterMap, 91, 100);
+        return completionArray;
+    }
 
     /**
      * {@inheritDoc}

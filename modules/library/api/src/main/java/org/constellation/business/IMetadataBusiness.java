@@ -382,6 +382,8 @@ public interface IMetadataBusiness {
      */
     int countTotal(final Map<String,Object> filterMap);
     
+    int[] countInCompletionRange(final Map<String,Object> filterMap);
+    
     /**
      * Count the number of metadata stored in the database whith the specified publication flag.
      * 
