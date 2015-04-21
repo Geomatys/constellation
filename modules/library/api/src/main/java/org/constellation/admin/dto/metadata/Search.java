@@ -1,4 +1,4 @@
-package org.constellation.model.metadata;
+package org.constellation.admin.dto.metadata;
 
 import javax.validation.Valid;
 import java.io.Serializable;

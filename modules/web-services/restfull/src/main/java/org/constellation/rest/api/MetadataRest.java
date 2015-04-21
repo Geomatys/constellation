@@ -11,17 +11,17 @@ import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.engine.security.WorkspaceService;
 import org.constellation.json.metadata.binding.RootObj;
-import org.constellation.model.metadata.Filter;
-import org.constellation.model.metadata.GroupStatBrief;
-import org.constellation.model.metadata.MetadataBrief;
-import org.constellation.model.metadata.MetadataLightBrief;
-import org.constellation.model.metadata.OwnerStatBrief;
-import org.constellation.model.metadata.Page;
-import org.constellation.model.metadata.PagedSearch;
-import org.constellation.model.metadata.Profile;
-import org.constellation.model.metadata.Search;
-import org.constellation.model.metadata.Sort;
-import org.constellation.model.metadata.User;
+import org.constellation.admin.dto.metadata.Filter;
+import org.constellation.admin.dto.metadata.GroupStatBrief;
+import org.constellation.admin.dto.metadata.MetadataBrief;
+import org.constellation.admin.dto.metadata.MetadataLightBrief;
+import org.constellation.admin.dto.metadata.OwnerStatBrief;
+import org.constellation.admin.dto.metadata.Page;
+import org.constellation.admin.dto.metadata.PagedSearch;
+import org.constellation.admin.dto.metadata.Profile;
+import org.constellation.admin.dto.metadata.Search;
+import org.constellation.admin.dto.metadata.Sort;
+import org.constellation.admin.dto.metadata.User;
 import org.geotoolkit.util.FileUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -139,7 +139,7 @@ public class MetadataRest {
         final List<CstlUser> users = userRepository.findAll();
         if(users != null) {
             for(final CstlUser u : users) {
-                result.add(new User(u.getId(),u.getLogin(),u.getEmail(),u.getLastname(),u.getFirstname(),u.getActive()));
+                result.add(new User(u.getId(),u.getLogin(),u.getEmail(),u.getLastname(),u.getFirstname(),u.getActive(),null));
             }
         }
         return result;
@@ -398,7 +398,7 @@ public class MetadataRest {
         if(optUser!=null && optUser.isPresent()){
             final CstlUser user = optUser.get();
             if(user != null){
-                owner = new User(user.getId(),user.getLogin(),user.getEmail(),user.getLastname(),user.getFirstname(),user.getActive());
+                owner = new User(user.getId(),user.getLogin(),user.getEmail(),user.getLastname(),user.getFirstname(),user.getActive(),null);
             }
         }
         mdb.setUser(owner);

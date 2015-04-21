@@ -1,4 +1,4 @@
-package org.constellation.model.metadata;
+package org.constellation.admin.dto.metadata;
 
 import java.io.Serializable;
 
@@ -13,18 +13,20 @@ public class User implements Serializable {
     private String firstname;
     private boolean active;
 
+    private GroupBrief group;
     public User() {
 
     }
 
     public User(final int id,final String login,final String email,final String lastname,
-                final String firstname,final boolean active) {
+                final String firstname,final boolean active, final GroupBrief group) {
         this.id = id;
         this.login = login;
         this.email = email;
         this.lastname = lastname;
         this.firstname = firstname;
         this.active = active;
+        this.group = group;
     }
 
     public int getId() {
@@ -73,5 +75,13 @@ public class User implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public GroupBrief getGroup() {
+        return group;
+    }
+
+    public void setGroup(GroupBrief group) {
+        this.group = group;
     }
 }

@@ -177,8 +177,8 @@
     <properties>
         <!-- Define parent projects versions -->
         <shiro.version>1.2.1</shiro.version>
-        <geoapi.version>4.0-M02</geoapi.version>
-        <sis.version>0.5-jdk7</sis.version>
+        <geoapi.version>4.0-SNAPSHOT</geoapi.version>
+        <sis.version>0.6-jdk7-SNAPSHOT</sis.version>
         <geotoolkit.version>4.0-SNAPSHOT</geotoolkit.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jersey.version>2.12</jersey.version>

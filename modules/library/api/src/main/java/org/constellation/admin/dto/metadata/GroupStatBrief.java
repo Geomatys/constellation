@@ -1,4 +1,4 @@
-package org.constellation.model.metadata;
+package org.constellation.admin.dto.metadata;
 
 import java.io.Serializable;
 
@@ -7,8 +7,7 @@ import java.io.Serializable;
  * @author Mehdi Sidhoum (Geomatys).
  */
 public class GroupStatBrief implements Serializable {
-    private int id;
-    private String name;
+    private GroupBrief group;
 
     private int toValidate;
     private int toPublish;
@@ -16,28 +15,19 @@ public class GroupStatBrief implements Serializable {
 
     public GroupStatBrief() {}
 
-    public GroupStatBrief(final int id, final String name,final int toValidate, final int toPublish, final int published) {
-        this.id = id;
-        this.name = name;
+    public GroupStatBrief(final GroupBrief group,final int toValidate, final int toPublish, final int published) {
+        this.group = group;
         this.toValidate = toValidate;
         this.toPublish = toPublish;
         this.published = published;
     }
 
-    public int getId() {
-        return id;
+    public GroupBrief getGroup() {
+        return group;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setGroup(GroupBrief group) {
+        this.group = group;
     }
 
     public int getToValidate() {
