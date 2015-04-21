@@ -8,13 +8,13 @@ import java.io.Serializable;
  * @author Mehdi Sidhoum (Geomatys).
  */
 public class GroupBrief implements Serializable{
-    private int id;
+    private Integer id;
     private String name;
 
     public GroupBrief() {
     }
 
-    public GroupBrief(int id, String name) {
+    public GroupBrief(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -27,11 +27,11 @@ public class GroupBrief implements Serializable{
         this.name = name;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 }
