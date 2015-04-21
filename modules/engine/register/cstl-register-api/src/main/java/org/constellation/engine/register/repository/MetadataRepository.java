@@ -99,4 +99,6 @@ public interface MetadataRepository {
     void setValidationRequired(final int id, final String state, final String validationState);
     
     void denyValidation(final int id, final String comment);
+    
+    boolean existInternalMetadata(final String metadataID, final boolean includeService, final boolean onlyPublished);
 }

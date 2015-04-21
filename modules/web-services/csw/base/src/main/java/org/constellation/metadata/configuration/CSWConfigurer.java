@@ -217,30 +217,25 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
         AbstractIndexer indexer  = null;
         try {
             final CSWMetadataReader reader  = getReader(id);
-            final List<Object> objectToIndex = new ArrayList<>();
             if (reader != null) {
-                try {
-                    for (String identifier : identifierList) {
-                        final Object obj = reader.getMetadata(identifier, MetadataType.NATIVE);
-                        if (obj == null) {
-                            throw new ConfigurationException("Unable to find the metadata: " + identifier);
+                indexer = getIndexer(id, reader);
+                if (indexer != null) {
+                    try {
+                        for (String identifier : identifierList) {
+                            final Object obj = reader.getMetadata(identifier, MetadataType.NATIVE);
+                            if (obj == null) {
+                                throw new ConfigurationException("Unable to find the metadata: " + identifier);
+                            }
+                            indexer.indexDocument(obj);
                         }
-                        objectToIndex.add(obj);
+                    } catch (MetadataIoException ex) {
+                        throw new ConfigurationException(ex);
                     }
-                } catch (MetadataIoException ex) {
-                    throw new ConfigurationException(ex);
+                } else {
+                    throw new ConfigurationException("Unable to create an indexer for the id:" + id);
                 }
             } else {
                 throw new ConfigurationException("Unable to create a reader for the id:" + id);
-            }
-
-            indexer = getIndexer(id, reader);
-            if (indexer != null) {
-                for (Object obj : objectToIndex) {
-                    indexer.indexDocument(obj);
-                }
-            } else {
-                throw new ConfigurationException("Unable to create an indexer for the id:" + id);
             }
 
         } finally {

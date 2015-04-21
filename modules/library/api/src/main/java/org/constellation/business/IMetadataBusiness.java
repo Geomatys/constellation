@@ -27,6 +27,7 @@ import org.constellation.admin.dto.metadata.OwnerStatBrief;
 import org.constellation.admin.dto.metadata.User;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
+import org.constellation.engine.register.MetadataWithState;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 
 /**
@@ -340,7 +341,7 @@ public interface IMetadataBusiness {
      * 
      * @throws org.constellation.configuration.ConfigurationException 
      */
-    void updateInternalCSWIndex(final List<Metadata> metadatas, final boolean update) throws ConfigurationException;
+    void updateInternalCSWIndex(final List<MetadataWithState> metadatas, final boolean update) throws ConfigurationException;
     
     /**
      * Return the template name for the specified dataset.
@@ -428,9 +429,9 @@ public interface IMetadataBusiness {
     
     Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap);
     
-    List<OwnerStatBrief> getOwnerStatBriefs();
+    List<OwnerStatBrief> getOwnerStatBriefs(final Map<String, Object> filter);
     
-    List<GroupStatBrief> getGroupStatBriefs();
+    List<GroupStatBrief> getGroupStatBriefs(final Map<String, Object> filter);
     
     List<User> getUsers();
     

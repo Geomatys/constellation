@@ -82,6 +82,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Optional;
 import java.util.Arrays;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.engine.register.MetadataWithState;
 
 /**
  *
@@ -418,7 +419,7 @@ public class DatasetBusiness implements IDatasetBusiness {
                 involvedProvider.add(data.getProvider());
                 Metadata meta = metadataRepository.findByDataId(data.getId());
                 if (meta != null) {
-                    metadataBusiness.updateInternalCSWIndex(Arrays.asList(meta), false);
+                    metadataBusiness.updateInternalCSWIndex(Arrays.asList(new MetadataWithState(meta, meta.getIsPublished())), false);
                 }
                 dataRepository.removeDataFromAllCSW(data.getId());
             }
@@ -454,7 +455,7 @@ public class DatasetBusiness implements IDatasetBusiness {
             // update internal CSW index
             final Metadata meta = metadataRepository.findByDatasetId(ds.getId());
             if (meta != null) {
-                metadataBusiness.updateInternalCSWIndex(Arrays.asList(meta), false);
+                metadataBusiness.updateInternalCSWIndex(Arrays.asList(new MetadataWithState(meta, meta.getIsPublished())), false);
             }
         }
     }

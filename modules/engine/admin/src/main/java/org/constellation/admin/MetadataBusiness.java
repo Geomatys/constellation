@@ -70,6 +70,7 @@ import org.constellation.admin.dto.metadata.OwnerStatBrief;
 import org.constellation.admin.dto.metadata.User;
 import org.constellation.dto.MetadataLists;
 import org.constellation.engine.register.MetadataComplete;
+import org.constellation.engine.register.MetadataWithState;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -236,11 +237,13 @@ public class MetadataBusiness implements IMetadataBusiness {
         Integer completion  = null;
         String level        = "NONE";
         String templateName = null;
-        
+        final boolean previousPublishState;
         if (metadata != null) {
             templateName = metadata.getProfile();
+            previousPublishState = metadata.getIsPublished();
         } else {
             metadata = new Metadata();
+            previousPublishState = false;
         }
 
         metadata.setOwner(userID);
@@ -305,7 +308,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             int id = metadataRepository.create(new MetadataComplete(metadata, bboxes));
             metadata.setId(id);
         }
-        updateInternalCSWIndex(Arrays.asList(metadata), true);
+        updateInternalCSWIndex(Arrays.asList(new MetadataWithState(metadata, previousPublishState)), true);
         return true;
     }
 
@@ -314,7 +317,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public boolean existInternalMetadata(final String metadataID, final boolean includeService, final boolean onlyPublished) {
-        return searchMetadata(metadataID, includeService, onlyPublished) != null;
+        return metadataRepository.existInternalMetadata(metadataID, includeService, onlyPublished);
     }
 
     /**
@@ -458,8 +461,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         final Metadata metadata = metadataRepository.findById(id);
         if (metadata != null) {
             metadataRepository.changePublication(id, newStatus);
+            final boolean prev = metadata.getIsPublished();
             metadata.setIsPublished(newStatus);
-            updateInternalCSWIndex(Arrays.asList(metadata), true);
+            updateInternalCSWIndex(Arrays.asList(new MetadataWithState(metadata, prev)), true);
         }
     }
     
@@ -468,13 +472,14 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public void updatePublication(final List<Integer> ids, final boolean newStatus) throws ConfigurationException {
-        final List<Metadata> toUpdate = new ArrayList<>();
+        final List<MetadataWithState> toUpdate = new ArrayList<>();
         for (Integer id : ids) {
             final Metadata metadata = metadataRepository.findById(id);
             if (metadata != null) {
                 metadataRepository.changePublication(id, newStatus);
+                final boolean prev = metadata.getIsPublished();
                 metadata.setIsPublished(newStatus);
-                toUpdate.add(metadata);
+                toUpdate.add(new MetadataWithState(metadata, prev));
             }
         }
         updateInternalCSWIndex(toUpdate, true);
@@ -511,7 +516,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public void deleteMetadata(int id) throws ConfigurationException {
         final Metadata metadata = metadataRepository.findById(id);
         if (metadata != null) {
-            updateInternalCSWIndex(Arrays.asList(metadata), false);
+            updateInternalCSWIndex(Arrays.asList(new MetadataWithState(metadata, metadata.getIsPublished())), false);
             metadataRepository.delete(id);
         }
     }
@@ -522,11 +527,11 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     public void deleteMetadata(List<Integer> ids) throws ConfigurationException {
         // First we update the csw index
-        final List<Metadata> toDelete = new ArrayList<>();
+        final List<MetadataWithState> toDelete = new ArrayList<>();
         for (Integer id : ids) {
             final Metadata metadata = metadataRepository.findById(id);
             if (metadata != null) {
-                toDelete.add(metadata);
+                toDelete.add(new MetadataWithState(metadata, metadata.getIsPublished()));
             }
         }
         updateInternalCSWIndex(toDelete, false);
@@ -564,7 +569,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
-    public void updateInternalCSWIndex(final List<Metadata> metadatas, final boolean update) throws ConfigurationException {
+    public void updateInternalCSWIndex(final List<MetadataWithState> metadatas, final boolean update) throws ConfigurationException {
         try {
             final List<Service> services = serviceRepository.findByType("csw");
             for (Service service : services) {
@@ -578,21 +583,23 @@ public class MetadataBusiness implements IMetadataBusiness {
                     boolean onlyPublished = conf.getBooleanParameter("onlyPublished", false);
                     final List<String> identifierToRemove = new ArrayList<>();
                     final List<String> identifierToUpdate = new ArrayList<>();
-                    ICSWConfigurer configurer = null;
-                    for (Metadata metadata : metadatas) {
+                    boolean needRefresh = false;
+                    for (MetadataWithState metadata : metadatas) {
                         if (!partial || (partial && isLinkedMetadataToCSW(metadata.getId(), service.getId()))) {
-                            if (configurer == null) {
-                                configurer = (ICSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
-                            }
-                            identifierToRemove.add(metadata.getMetadataId());
+                            if (!onlyPublished  || onlyPublished && metadata.isPreviousPublishState()) {
+                                identifierToRemove.add(metadata.getMetadataId());
+                                needRefresh = true;
+                            } 
                             if (update) {
                                 if ((onlyPublished && metadata.getIsPublished()) || !onlyPublished) {
                                     identifierToUpdate.add(metadata.getMetadataId());
+                                    needRefresh = true;
                                 }
                             }
                         }
                     }
-                    if (configurer != null) {
+                    if (needRefresh) {
+                        ICSWConfigurer configurer = (ICSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
                         configurer.removeFromIndex(service.getIdentifier(), identifierToRemove);
                         configurer.addToIndex(service.getIdentifier(), identifierToUpdate);
                         final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", service.getIdentifier());
@@ -976,10 +983,9 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
-    public List<OwnerStatBrief> getOwnerStatBriefs() {
+    public List<OwnerStatBrief> getOwnerStatBriefs(final Map<String, Object> filter) {
         final List<OwnerStatBrief> briefs = new ArrayList<>();
         for (CstlUser user : userRepository.findAll()) {
-            final Map<String, Object> filter = new HashMap<>();
             filter.put("owner", user.getId());
             final int toValidate = metadataRepository.countValidated(false, filter);
             final int toPublish  = metadataRepository.countPublished(false, filter);
@@ -991,7 +997,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
-    public List<GroupStatBrief> getGroupStatBriefs() {
+    public List<GroupStatBrief> getGroupStatBriefs(final Map<String, Object> filter) {
         return new ArrayList<>();
     }
     

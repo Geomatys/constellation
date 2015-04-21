@@ -110,6 +110,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
 import java.util.Arrays;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.engine.register.MetadataWithState;
 import org.constellation.engine.register.repository.ServiceRepository;
 
 
@@ -661,7 +662,7 @@ public class DataBusiness implements IDataBusiness {
             // update internal CSW index
             Metadata metadata = metadataRepository.findByDataId(data.getId());
             if (metadata != null) {
-                metadataBusiness.updateInternalCSWIndex(Arrays.asList(metadata), false); 
+                metadataBusiness.updateInternalCSWIndex(Arrays.asList(new MetadataWithState(metadata, metadata.getIsPublished())), false); 
             }
         }
     }

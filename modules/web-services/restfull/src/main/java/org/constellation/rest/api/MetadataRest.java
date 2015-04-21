@@ -452,18 +452,7 @@ public class MetadataRest {
         final Map<String,Object> filterMap = new HashMap<>();
         if(filters != null) {
             for(final Filter f : filters) {
-                if("owner".equals(f.getField())) {
-                    String value = f.getValue();
-                    if("_all".equals(value)) {
-                        continue; //no need to filter on owner field if we ask all owners
-                    }
-                    try{
-                        final int userId = Integer.valueOf(value);
-                        filterMap.put("owner",userId);
-                    }catch(Exception ex) {
-                        //do nothing
-                    }
-                }else if("group".equals(f.getField())) {
+                if("group".equals(f.getField())) {
                     String value = f.getValue();
                     if("_all".equals(value)) {
                         continue; //no need to filter on group field if we ask all groups
@@ -526,10 +515,10 @@ public class MetadataRest {
         final int[] completionArray = metadataBusiness.countInCompletionRange(filterMap);
         map.put("completionPercents",completionArray);
 
-        final List<OwnerStatBrief> contributorsStatList = metadataBusiness.getOwnerStatBriefs();
+        final List<OwnerStatBrief> contributorsStatList = metadataBusiness.getOwnerStatBriefs(new HashMap<>(filterMap));
         map.put("contributorsStatList",contributorsStatList);
 
-        final List<GroupStatBrief> groupsStatList = metadataBusiness.getGroupStatBriefs();
+        final List<GroupStatBrief> groupsStatList = metadataBusiness.getGroupStatBriefs(new HashMap<>(filterMap));
         map.put("groupsStatList",groupsStatList);
 
         map.put("general",general);

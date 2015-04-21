@@ -327,7 +327,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     
     @Override
     public boolean isLinkedMetadata(String metadataID, String cswID, final boolean includeService, final boolean onlyPublished) {
-        SelectConditionStep<Record> query = dsl.select(METADATA.fields()).from(METADATA, METADATA_X_CSW, SERVICE)
+        SelectConditionStep query = dsl.select(METADATA.ID).from(METADATA, METADATA_X_CSW, SERVICE)
                   .where(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
                   .and(METADATA_X_CSW.CSW_ID.eq(SERVICE.ID))
                   .and(SERVICE.IDENTIFIER.eq(cswID))
@@ -341,7 +341,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
             query = query.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
         }
         
-        return query.fetchOneInto(Metadata.class) != null;
+        return query.fetchOne() != null;
     }
 
     /**
@@ -651,6 +651,21 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.VALIDATION_REQUIRED, "REJECTED")
               .set(METADATA.COMMENT, comment).where(METADATA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public boolean existInternalMetadata(String metadataID, boolean includeService, boolean onlyPublished) {
+        SelectConditionStep query = dsl.select(METADATA.ID).from(METADATA)
+                                       .where(METADATA.METADATA_ID.eq(metadataID));
+        
+        if (!includeService) {
+            query = query.and(METADATA.SERVICE_ID.isNull());
+        }
+        if (onlyPublished) {
+            query = query.and(METADATA.IS_PUBLISHED.eq(Boolean.TRUE));
+        }
+        
+        return query.fetchOne() != null;
     }
     
 }
