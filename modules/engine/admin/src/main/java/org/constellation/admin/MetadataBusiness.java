@@ -212,7 +212,8 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException  {
+    public boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID,
+                                  final Integer owner) throws ConfigurationException  {
         Metadata metadata          = metadataRepository.findByMetadataId(metadataId);
         final boolean update       = metadata != null;
         final DefaultMetadata meta = (DefaultMetadata) unmarshallMetadata(xml);
@@ -271,33 +272,40 @@ public class MetadataBusiness implements IMetadataBusiness {
             // unsafe but no better way for now
             data = dataRepository.findByIdentifierWithEmptyMetadata(metadataId);
         }
-        if (!update && dataset != null) {
-            List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
-            if (!datas.isEmpty()) {
-                final String type = datas.get(0).getType();
-                templateName = getDatasetTemplate(dataset.getIdentifier(), type);
+
+        if (!update) {
+            if (dataset != null) {
+                List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
+                if (!datas.isEmpty()) {
+                    final String type = datas.get(0).getType();
+                    templateName = getDatasetTemplate(dataset.getIdentifier(), type);
+                }
+                metadata.setDatasetId(dataset.getId());
+            } else if (data != null) {
+                templateName = getDataTemplate(new QName(data.getNamespace(), data.getName()), data.getType());
+                metadata.setDataId(data.getId());
+            } else {
+                templateName = getTemplateFromMetadata(meta);
             }
-            metadata.setDatasetId(dataset.getId());
-        } else if (!update && data != null) {
-            templateName = getDataTemplate(new QName(data.getNamespace(), data.getName()) , data.getType());
-            metadata.setDataId(data.getId());
-        } else {
-            templateName = getTemplateFromMetadata(meta);
         }
         
         if (templateName == null) {
             templateName = getDefaultTemplate();
         }
-        
-        try {
-            final Template template = Template.getInstance(templateName);
-            completion = template.calculateMDCompletion(unmarshallMetadata(xml));
-            level = template.getCompletion(meta);
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+
+        //paranoiac check
+        if (templateName != null) {
+            try {
+                final Template template = Template.getInstance(templateName);
+                completion = template.calculateMDCompletion(unmarshallMetadata(xml));
+                level = template.getCompletion(meta);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Error while calculating metadata completion", ex);
+            }
+        } else {
+            LOGGER.log(Level.WARNING, "Template name not defined for metadata "+metadataId+" in "+(update ? "update" : "create")+ " mode.");
         }
-        
-        
+
         metadata.setProfile(templateName);
         metadata.setMdCompletion(completion);
         metadata.setLevel(level);
@@ -858,7 +866,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     protected String getDefaultTemplate() {
-        return null; // must be overriden
+        return "profile_import"; // must be overriden
     }
 
     /**
