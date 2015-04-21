@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.admin.dto.metadata.GroupStatBrief;
+import org.constellation.admin.dto.metadata.OwnerStatBrief;
+import org.constellation.admin.dto.metadata.User;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
@@ -424,4 +427,12 @@ public interface IMetadataBusiness {
     Map<Integer, List> filterAndGet(final Map<String,Object> filterMap, final Map.Entry<String,String> sortEntry,final int pageNumber,final int rowsPerPage);
     
     Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap);
+    
+    List<OwnerStatBrief> getOwnerStatBriefs();
+    
+    List<GroupStatBrief> getGroupStatBriefs();
+    
+    List<User> getUsers();
+    
+    User getUser(int id);
 }

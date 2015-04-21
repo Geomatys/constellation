@@ -55,6 +55,7 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Set;
@@ -64,6 +65,9 @@ import javax.xml.namespace.QName;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.constellation.ServiceDef;
+import org.constellation.admin.dto.metadata.GroupStatBrief;
+import org.constellation.admin.dto.metadata.OwnerStatBrief;
+import org.constellation.admin.dto.metadata.User;
 import org.constellation.dto.MetadataLists;
 import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
@@ -124,7 +128,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     protected MetadataRepository metadataRepository;
     
     @Inject
-    private UserRepository userRepository;
+    protected UserRepository userRepository;
     
     @Inject
     private org.constellation.security.SecurityManager securityManager;
@@ -969,5 +973,47 @@ public class MetadataBusiness implements IMetadataBusiness {
     @Override
     public Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap) {
         return metadataRepository.filterAndGetWithoutPagination(filterMap);
+    }
+    
+    @Override
+    public List<OwnerStatBrief> getOwnerStatBriefs() {
+        final List<OwnerStatBrief> briefs = new ArrayList<>();
+        for (CstlUser user : userRepository.findAll()) {
+            final Map<String, Object> filter = new HashMap<>();
+            filter.put("owner", user.getId());
+            final int toValidate = metadataRepository.countValidated(false, filter);
+            final int toPublish  = metadataRepository.countPublished(false, filter);
+            final int published  = metadataRepository.countPublished(true, filter);
+            final User userBrief = new User(user.getId(), user.getLogin(), user.getEmail(), user.getLastname(), user.getFirstname(), user.getActive(), null);
+            briefs.add(new OwnerStatBrief(userBrief, toValidate, toPublish, published));
+        }
+        return briefs;
+    }
+    
+    @Override
+    public List<GroupStatBrief> getGroupStatBriefs() {
+        return new ArrayList<>();
+    }
+    
+    @Override
+    public List<User> getUsers() {
+        final List<User> results = new ArrayList<>();
+        for (CstlUser u : userRepository.findAll()) {
+            results.add(new User(u.getId(), u.getLogin(), u.getEmail(), u.getLastname(), u.getFirstname(), u.getActive(), null));
+        }
+        return results;
+    }
+    
+    @Override
+    public User getUser(final int id) {
+        final Optional<CstlUser> optUser = userRepository.findById(id);
+        User owner = null;
+        if (optUser != null && optUser.isPresent()) {
+            final CstlUser user = optUser.get();
+            if (user != null) {
+                owner = new User(user.getId(), user.getLogin(), user.getEmail(), user.getLastname(), user.getFirstname(), user.getActive(), null);
+            }
+        }
+        return owner;
     }
 }

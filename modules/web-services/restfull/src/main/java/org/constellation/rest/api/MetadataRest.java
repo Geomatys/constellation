@@ -134,15 +134,7 @@ public class MetadataRest {
     @GET
     @Path("/usersList")
     public List<User> getUsersList() {
-        final List<User> result = new ArrayList<>();
-        //TODO use userBusiness because the implementation can differ since the user have groups in sub project.
-        final List<CstlUser> users = userRepository.findAll();
-        if(users != null) {
-            for(final CstlUser u : users) {
-                result.add(new User(u.getId(),u.getLogin(),u.getEmail(),u.getLastname(),u.getFirstname(),u.getActive(),null));
-            }
-        }
-        return result;
+        return metadataBusiness.getUsers();
     }
 
     /**
@@ -391,16 +383,7 @@ public class MetadataRest {
         mdb.setFileIdentifier(md.getMetadataId());
         mdb.setTitle(md.getTitle());
         mdb.setType(md.getProfile());
-
-        //TODO use userBusiness because the implementation can differ since the user have groups in sub project.
-        final Optional<CstlUser> optUser = userRepository.findById(md.getOwner());
-        User owner = null;
-        if(optUser!=null && optUser.isPresent()){
-            final CstlUser user = optUser.get();
-            if(user != null){
-                owner = new User(user.getId(),user.getLogin(),user.getEmail(),user.getLastname(),user.getFirstname(),user.getActive(),null);
-            }
-        }
+        User owner = metadataBusiness.getUser(md.getOwner());
         mdb.setUser(owner);
         mdb.setUpdateDate(md.getDatestamp());
         mdb.setCreationDate(md.getDateCreation());
@@ -543,12 +526,10 @@ public class MetadataRest {
         final int[] completionArray = metadataBusiness.countInCompletionRange(filterMap);
         map.put("completionPercents",completionArray);
 
-        //TODO get the list of groups by passing filterMap, with stats toValidate,toPublish,published for each group
-        final List<OwnerStatBrief> contributorsStatList = new ArrayList<>();
+        final List<OwnerStatBrief> contributorsStatList = metadataBusiness.getOwnerStatBriefs();
         map.put("contributorsStatList",contributorsStatList);
 
-        //TODO the list in cstl is always empty since groups are not implemented yet, the business for subproject will return completed list.
-        final List<GroupStatBrief> groupsStatList = new ArrayList<>();
+        final List<GroupStatBrief> groupsStatList = metadataBusiness.getGroupStatBriefs();
         map.put("groupsStatList",groupsStatList);
 
         map.put("general",general);
