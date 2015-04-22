@@ -51,7 +51,7 @@ cstlLoginApp.controller("login", function($scope, $http){
         password:undefined
     };
 
-    $scope.login = function(){
+    $scope.login = function(target){
         $http.post(cstlUrl + 'spring/login', {username: $scope.formInputs.username,
                                                        password: $scope.formInputs.password})
             .success(function(resp){
@@ -60,7 +60,7 @@ cstlLoginApp.controller("login", function($scope, $http){
                     $.cookie('access_token', resp.token, { path : '/' });
                     $.cookie('cstlActiveDomainId', 1, { path : '/' });
                     $.cookie('cstlUserId', resp.userId, { path : '/' });
-                    window.location.href="admin.html";
+                    window.location.href= target ? target : "admin.html";
                 }
             }).error(function(resp){
                 jQuery('#msg-error').show('fade');

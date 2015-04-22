@@ -29,38 +29,7 @@
     <div>
 		<div class="row">
 			<div class="col-md-4"></div>
-			<div class="col-md-4">
-				<h1 translate="login.title">Authentication</h1>
-				<div id="msg-error"
-                     style="display:none;border-color:#D89A9A; background-color:#FFC0CB;padding: 8px;"
-                     class="alert"
-                     translate="login.error">Login or password incorrect.</div>
-				<form id="loginForm" class="form" role="form" ng-submit="login()" form-autofill-fix>
-					<div class="form-group">
-						<label for="username"
-                               translate="login.form.username">Login</label>
-						<input id="username"
-                               type="text"
-                               class="form-control"
-                               name="username"
-							   placeholder="login"
-                               ng-model="formInputs.username"/>
-					</div>
-					<div class="form-group">
-						<label for="password"
-                               translate="login.form.password">Password</label>
-						<input id="password"
-                               type="password"
-                               class="form-control"
-                               name="password"
-							   placeholder="password"
-                               ng-model="formInputs.password"/>
-					</div>
-					<button id="submitLogin"
-                            type="submit"
-                            class="btn btn-primary">Login</button>
-				</form>
-			</div>
+            <div class="col-md-4" ng-include="'views/parts/login-form.html'"></div>
 			<div class="col-md-4"></div>
 		</div>
 	</div>
