@@ -20,9 +20,8 @@
         <!--[if lt IE 10]><p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p><![endif]-->
 
         <div id="header" ng-controller="HeaderController">
-            <a id="brand" href="#">
-                <img src="img/constellation-menu.svg"/>
-            </a>
+            <div ng-include="'views/parts/header-logo.html'">
+            </div>
             <div id="navigation" class="ng-cloak">
                 <div class="navbar navbar-right">
                     <ul class="nav nav-pills">
