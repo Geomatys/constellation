@@ -8,7 +8,7 @@
     <target name="update" depends="updateGeotkVersion">
         <replace dir="${cstl.dir}">
             <include name="**/pom.xml"/>
-            <replacefilter token="${cstl.oldversion}" value="${cstl.version}"/>
+            <replacefilter token="&lt;version&gt;${cstl.oldversion}&lt;/version&gt;" value="&lt;version&gt;${cstl.version}&lt;/version&gt;"/>
         </replace>
     </target>
     <target name="updateGeotkVersion">
