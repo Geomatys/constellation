@@ -3,11 +3,8 @@ package org.constellation.rest.api;
 import com.google.common.base.Optional;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.business.IMetadataBusiness;
-import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
-import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
-import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.engine.security.WorkspaceService;
 import org.constellation.json.metadata.binding.RootObj;
@@ -80,12 +77,6 @@ public class MetadataRest {
     private static final Logger LOGGER = Logging.getLogger(MetadataRest.class);
 
     /**
-     * Inject metadata repository
-     */
-    @Inject
-    private MetadataRepository metadataRepository;
-
-    /**
      * Inject metadata business
      */
     @Inject
@@ -135,46 +126,6 @@ public class MetadataRest {
     @Path("/usersList")
     public List<User> getUsersList() {
         return metadataBusiness.getUsers();
-    }
-
-    /**
-     * TODO to be removed, used only to fill metadata table to simulate several rows for dashboard page.
-     * @param count number of mocked metadata to create
-     */
-    @GET
-    @Path("/mockup/{count}")
-    public Response mockup(@PathParam("count") final Integer count) {
-        final List<String> profiles = new ArrayList<>();
-        profiles.add("AccessProgram");
-        profiles.add("Guideline");
-        profiles.add("MarketingToolkit");
-        profiles.add("Organisation");
-        profiles.add("OtherCBResource");
-        profiles.add("OtherDocument");
-        profiles.add("QuickWin");
-        profiles.add("RawDataCatalog");
-        profiles.add("RawEOProduct");
-        profiles.add("Software");
-        profiles.add("ScientificPublication");
-        for(int i=0;i<count;i++) {
-            final Metadata metadata = new Metadata();
-            metadata.setMetadataId(UUID.randomUUID().toString());
-            metadata.setMetadataIso("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gco=\"http://www.isotc211.org/2005/gco\" xmlns:fra=\"http://www.cnig.gouv.fr/2005/fra\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:srv=\"http://www.isotc211.org/2005/srv\" xmlns:gml=\"http://www.opengis.net/gml/3.2\" xmlns:gts=\"http://www.isotc211.org/2005/gts\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:gmi=\"http://www.isotc211.org/2005/gmi\" xmlns:gmx=\"http://www.isotc211.org/2005/gmx\"><gmd:fileIdentifier><gco:CharacterString>" + UUID.randomUUID().toString() + "</gco:CharacterString></gmd:fileIdentifier><gmd:language><gmd:LanguageCode codeList=\"http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#LanguageCode\" codeListValue=\"eng\" codeSpace=\"eng\">English</gmd:LanguageCode></gmd:language><gmd:characterSet><gmd:MD_CharacterSetCode codeList=\"http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode\" codeListValue=\"utf8\">UTF-8</gmd:MD_CharacterSetCode></gmd:characterSet><gmd:contact><gmd:CI_ResponsibleParty><gmd:individualName><gco:CharacterString>Geomatys User</gco:CharacterString></gmd:individualName><gmd:contactInfo><gmd:CI_Contact><gmd:address><gmd:CI_Address><gmd:electronicMailAddress><gco:CharacterString>test@test.com</gco:CharacterString></gmd:electronicMailAddress></gmd:CI_Address></gmd:address></gmd:CI_Contact></gmd:contactInfo></gmd:CI_ResponsibleParty></gmd:contact><gmd:dateStamp><gco:DateTime>2015-03-26T11:26:00+01:00</gco:DateTime></gmd:dateStamp><gmd:metadataStandardName><gco:CharacterString>ISO19115</gco:CharacterString></gmd:metadataStandardName><gmd:metadataStandardVersion><gco:CharacterString>2003/Cor.1:2006</gco:CharacterString></gmd:metadataStandardVersion><gmd:identificationInfo><gmd:MD_DataIdentification><gmd:citation><gmd:CI_Citation><gmd:title><gco:CharacterString>holuhraun_oli_2014249_653_geo</gco:CharacterString></gmd:title></gmd:CI_Citation></gmd:citation><gmd:extent><gmd:EX_Extent><gmd:geographicElement><gmd:EX_GeographicBoundingBox><gmd:extentTypeCode><gco:Boolean>true</gco:Boolean></gmd:extentTypeCode><gmd:westBoundLongitude><gco:Decimal>-17.46653783459498</gco:Decimal></gmd:westBoundLongitude><gmd:eastBoundLongitude><gco:Decimal>-15.920336221182728</gco:Decimal></gmd:eastBoundLongitude><gmd:southBoundLatitude><gco:Decimal>64.56546890901124</gco:Decimal></gmd:southBoundLatitude><gmd:northBoundLatitude><gco:Decimal>65.06696897623314</gco:Decimal></gmd:northBoundLatitude></gmd:EX_GeographicBoundingBox></gmd:geographicElement></gmd:EX_Extent></gmd:extent></gmd:MD_DataIdentification></gmd:identificationInfo></gmd:MD_Metadata>");
-            metadata.setDataId(null);
-            metadata.setMdCompletion((int) (Math.random() * 100));
-            metadata.setOwner(Math.random() < 0.5 ? 1 : 2);
-            metadata.setDatestamp(System.currentTimeMillis());
-            metadata.setDateCreation(System.currentTimeMillis() - (1000 * 60 * 60 * 24));
-            metadata.setTitle("mocked_" + UUID.randomUUID().toString());
-            metadata.setResume("Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un peintre anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n'a pas fait que survivre cinq siècles, mais s'est aussi adapté à la bureautique informatique, sans que son contenu n'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.");
-            metadata.setProfile(profiles.get( (int)(Math.random() * 10)  ));
-            metadata.setParentIdentifier(null);
-            metadata.setLevel(Math.random() < 0.5 ? "NONE" : "ELEMENTARY");
-            metadata.setIsValidated(Math.random() < 0.5);
-            metadata.setIsPublished(metadata.getIsValidated() && (Math.random() < 0.5));
-            metadataRepository.create(new MetadataComplete(metadata, new ArrayList<MetadataBbox>()));
-        }
-        return Response.ok("Mockup metadata successfully!").build();
     }
 
     /**
@@ -281,7 +232,21 @@ public class MetadataRest {
                         final int groupId = Integer.valueOf(value);
                         filterMap.put("group",groupId);
                     }catch(Exception ex) {
-                        //do nothing
+                        //try for case of current user's group
+                        if("_mygroup".equals(value)) {
+                            //try to find the user's group from login
+                            final String login = req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : null;
+                            final Optional<CstlUser> optUser = userRepository.findOne(login);
+                            if(optUser!=null && optUser.isPresent()){
+                                final CstlUser user = optUser.get();
+                                if(user != null){
+                                    final User pojoUser = metadataBusiness.getUser(user.getId());
+                                    if(pojoUser != null && pojoUser.getGroup() != null) {
+                                        filterMap.put("group",pojoUser.getGroup().getId());
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else if ("period".equals(f.getField())) {
                     final String value = f.getValue();
