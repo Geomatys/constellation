@@ -348,8 +348,10 @@ public class MetadataRest {
         mdb.setFileIdentifier(md.getMetadataId());
         mdb.setTitle(md.getTitle());
         mdb.setType(md.getProfile());
-        User owner = metadataBusiness.getUser(md.getOwner());
-        mdb.setUser(owner);
+        if(md.getOwner() != null){
+            User owner = metadataBusiness.getUser(md.getOwner());
+            mdb.setUser(owner);
+        }
         mdb.setUpdateDate(md.getDatestamp());
         mdb.setCreationDate(md.getDateCreation());
         mdb.setMdCompletion(md.getMdCompletion());
