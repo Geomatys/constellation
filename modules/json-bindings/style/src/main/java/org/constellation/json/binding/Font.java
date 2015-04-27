@@ -60,12 +60,14 @@ public final class Font implements StyleElement<org.opengis.style.Font> {
             size = CQL.write(sizeExp);
         }
         final Expression weightExp = font.getWeight();
-        if (weightExp != null) {
-            bold = "bold".equals(CQL.write(weightExp));
+        final String weightStr = CQL.write(weightExp);
+        if (weightExp != null && weightStr != null) {
+            bold = weightStr.toLowerCase().contains("bold");
         }
         final Expression styleExp = font.getStyle();
-        if (styleExp != null) {
-            italic = "italic".equals(CQL.write(styleExp));
+        final String styleStr = CQL.write(styleExp);
+        if (styleExp != null && styleStr != null) {
+            italic = styleStr.toLowerCase().contains("italic");
         }
         for (final Expression fam : font.getFamily()) {
             family.add(fam.evaluate(null, String.class));
