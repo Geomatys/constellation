@@ -22,6 +22,7 @@ package org.constellation.scheduler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,6 +56,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class QuartzJobListener implements JobListener {
 
     private static final Logger LOGGER = Logging.getLogger(QuartzJobListener.class);
+    private static final int ROUND_SCALE = 2;
+
     public static final String PROPERTY_TASK = "task";
     private IProcessBusiness processBusiness;
 
@@ -135,7 +138,7 @@ public class QuartzJobListener implements JobListener {
             taskEntity.setState(TaskState.RUNNING.name());
             taskEntity.setDateStart(System.currentTimeMillis());
             taskEntity.setMessage(toString(event.getTask()));
-            taskEntity.setProgress((double) event.getProgress());
+            roundProgression(event);
             updateTask(taskEntity);
         }
 
@@ -143,7 +146,7 @@ public class QuartzJobListener implements JobListener {
         public void progressing(ProcessEvent event) {
             taskEntity.setState(TaskState.RUNNING.name());
             taskEntity.setMessage(toString(event.getTask()));
-            taskEntity.setProgress((double) event.getProgress());
+            roundProgression(event);
 
             ParameterValueGroup output = event.getOutput();
             if (output != null) {
@@ -161,7 +164,7 @@ public class QuartzJobListener implements JobListener {
         public void paused(ProcessEvent event) {
             taskEntity.setState(TaskState.PAUSED.name());
             taskEntity.setMessage(toString(event.getTask()));
-            taskEntity.setProgress((double) event.getProgress());
+            roundProgression(event);
             updateTask(taskEntity);
         }
 
@@ -169,7 +172,7 @@ public class QuartzJobListener implements JobListener {
         public void resumed(ProcessEvent event) {
             taskEntity.setState(TaskState.RUNNING.name());
             taskEntity.setMessage(toString(event.getTask()));
-            taskEntity.setProgress((double) event.getProgress());
+            roundProgression(event);
             updateTask(taskEntity);
         }
 
@@ -178,7 +181,7 @@ public class QuartzJobListener implements JobListener {
             taskEntity.setState(TaskState.SUCCEED.name());
             taskEntity.setDateEnd(System.currentTimeMillis());
             taskEntity.setMessage(toString(event.getTask()));
-            taskEntity.setProgress((double) event.getProgress());
+            roundProgression(event);
 
             ParameterValueGroup output = event.getOutput();
             if (output != null) {
@@ -225,6 +228,18 @@ public class QuartzJobListener implements JobListener {
             taskStatus.setOutput(taskEntity.getTaskOutput());
 
             SpringHelper.sendEvent(taskStatus);
+        }
+
+        /**
+         * Round event progression value to {@link #ROUND_SCALE} before
+         * set to taskEntity object.
+         *
+         * @param event ProcessEvent
+         */
+        private void roundProgression(ProcessEvent event) {
+            BigDecimal progress = new BigDecimal(event.getProgress());
+            progress = progress.setScale(ROUND_SCALE, BigDecimal.ROUND_HALF_UP);
+            taskEntity.setProgress(progress.doubleValue());
         }
 
         private String toString(InternationalString str){
