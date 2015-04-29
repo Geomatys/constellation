@@ -866,7 +866,7 @@
     "settings.form.button.close":"Annuler",
     "settings.form.modal.title": "Nouvel utilisateur",
     "settings.form.function": "Fonction",
-    "settings.form.picture": "Photo du profile",
+    "settings.form.picture": "Photo du profil",
     "settings.form.picture.change": "Changer la photo",
     "settings.messages.error": "<strong>Une erreur est survenue !</strong> Votre profil ne peut pas être sauvegardé.",
     "settings.messages.success": "<strong>Votre profil a été sauvegardé !</strong>",
