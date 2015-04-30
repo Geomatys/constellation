@@ -79,6 +79,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opengis.metadata.identification.ServiceIdentification;
 
 
 /**
@@ -383,7 +384,7 @@ public class MetadataFeeder {
     }
 
     public void setCitationIdentifier(final String fileIdentifier) {
-        final DefaultDataIdentification id = (DefaultDataIdentification) getIdentification(eater);
+        final AbstractIdentification id = (AbstractIdentification) getIdentification(eater);
         DefaultCitation citation = (DefaultCitation) id.getCitation();
         if (citation == null) {
             citation = new DefaultCitation();
@@ -477,9 +478,12 @@ public class MetadataFeeder {
     }
 
     protected String getDataLanguage() {
-        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
-        if (!identification.getLanguages().isEmpty()) {
-            return identification.getLanguages().iterator().next().getLanguage();
+        final Identification identificationI = getIdentification(eater);
+        if (identificationI instanceof DataIdentification) {
+            final DataIdentification identification = (DataIdentification) getIdentification(eater);
+            if (!identification.getLanguages().isEmpty()) {
+                return identification.getLanguages().iterator().next().getLanguage();
+            }
         }
         return null;
     }
@@ -505,17 +509,20 @@ public class MetadataFeeder {
         if (dataLocale == null) {
             return;
         }
-        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
-        if (identification.getLanguages() == null) {
-            identification.setLanguages(Collections.singletonList(dataLocale));
-        } else {
-            identification.getLanguages().clear();
-            identification.getLanguages().add(dataLocale);
+        final Identification identificationI = getIdentification(eater);
+        if (identificationI instanceof DefaultDataIdentification) {
+            final DefaultDataIdentification identification = (DefaultDataIdentification) identificationI;
+            if (identification.getLanguages() == null) {
+                identification.setLanguages(Collections.singletonList(dataLocale));
+            } else {
+                identification.getLanguages().clear();
+                identification.getLanguages().add(dataLocale);
+            }
         }
     }
 
     public String getTopicCategory() {
-        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
+        final Identification identification = getIdentification(eater);
         if (!identification.getTopicCategories().isEmpty()) {
             return identification.getTopicCategories().iterator().next().identifier();
         }
@@ -524,7 +531,7 @@ public class MetadataFeeder {
 
     public List<String> getAllTopicCategory() {
         List<String> result = new ArrayList<>();
-        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
+        final Identification identification = getIdentification(eater);
         if (!identification.getTopicCategories().isEmpty()) {
             final Collection<TopicCategory> topicCategories = identification.getTopicCategories();//.iterator().next().identifier();
             for (TopicCategory topicCategory : topicCategories){
@@ -545,11 +552,21 @@ public class MetadataFeeder {
             return;
         }
         final TopicCategory topic = TopicCategory.valueOf(topicCategoryName);
-        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
-        if (identification.getTopicCategories() == null) {
-            identification.setTopicCategories(Collections.singletonList(topic));
-        } else {
-            identification.getTopicCategories().add(topic);
+        final Identification identificationI = getIdentification(eater);
+        if (identificationI instanceof DefaultDataIdentification) {
+            final DefaultDataIdentification identification = (DefaultDataIdentification) identificationI;
+            if (identification.getTopicCategories() == null) {
+                identification.setTopicCategories(Collections.singletonList(topic));
+            } else {
+                identification.getTopicCategories().add(topic);
+            }
+        } else if (identificationI instanceof DefaultServiceIdentification) {
+            final DefaultServiceIdentification identification = (DefaultServiceIdentification) identificationI;
+            if (identification.getTopicCategories() == null) {
+                identification.setTopicCategories(Collections.singletonList(topic));
+            } else {
+                identification.getTopicCategories().add(topic);
+            }
         }
     }
 
@@ -558,12 +575,23 @@ public class MetadataFeeder {
             return;
         }
         final TopicCategory topic = TopicCategory.valueOf(topicCategoryName);
-        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
-        if (identification.getTopicCategories() == null) {
-            identification.setTopicCategories(Collections.singletonList(topic));
-        } else {
-            identification.getTopicCategories().clear();
-            identification.getTopicCategories().add(topic);
+        final Identification identificationI = getIdentification(eater);
+        if (identificationI instanceof DefaultDataIdentification) {
+            final DefaultDataIdentification identification = (DefaultDataIdentification) identificationI;
+            if (identification.getTopicCategories() == null) {
+                identification.setTopicCategories(Collections.singletonList(topic));
+            } else {
+                identification.getTopicCategories().clear();
+                identification.getTopicCategories().add(topic);
+            }
+        } else if (identificationI instanceof DefaultServiceIdentification) {
+            final DefaultServiceIdentification identification = (DefaultServiceIdentification) identificationI;
+            if (identification.getTopicCategories() == null) {
+                identification.setTopicCategories(Collections.singletonList(topic));
+            } else {
+                identification.getTopicCategories().clear();
+                identification.getTopicCategories().add(topic);
+            }
         }
     }
 

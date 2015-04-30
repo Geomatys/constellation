@@ -20,16 +20,6 @@
 
 package org.constellation.metadata;
 
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -46,15 +36,10 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.SpringHelper;
-import org.constellation.api.ProviderType;
-import org.constellation.business.IDatasetBusiness;
-import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IMetadataBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.generic.database.Automatic;
-import org.constellation.provider.DataProviderFactory;
-import org.constellation.provider.DataProviders;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
@@ -65,7 +50,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -78,10 +62,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
     private IServiceBusiness serviceBusiness;
 
     @Inject
-    private IProviderBusiness providerBusiness;
-    
-    @Inject
-    private IDatasetBusiness datasetBusiness;
+    private IMetadataBusiness metadataBusiness;
     
     @PostConstruct
     public void setUpClass() {
@@ -251,19 +232,6 @@ public class InternalCSWworkerTest extends CSWworkerTest {
 
     public void writeProvider(String resourceName, String identifier) throws Exception {
 
-        final DataProviderFactory service = DataProviders.getInstance().getFactory("coverage-sql");
-        final ParameterValueGroup source = service.getProviderDescriptor().createValue();
-        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(identifier);
-
         Unmarshaller u = pool.acquireUnmarshaller();
         u.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
         Object obj = u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
@@ -280,7 +248,6 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         pool.recycle(m);
         
         
-        final Provider prov = providerBusiness.storeProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
-        datasetBusiness.createDataset(identifier, sw.toString(), null);
+        metadataBusiness.updateMetadata(identifier, sw.toString());
     }
 }
