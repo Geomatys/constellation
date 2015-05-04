@@ -18,22 +18,37 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATASET;
-import static org.constellation.engine.register.jooq.Tables.METADATA;
-import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
-
-import java.util.List;
-
+import org.constellation.engine.register.domain.Page;
+import org.constellation.engine.register.domain.PageImpl;
+import org.constellation.engine.register.domain.Pageable;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 import org.constellation.engine.register.jooq.tables.records.DatasetRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
+import org.constellation.engine.register.jooq.util.JooqUtils;
+import org.constellation.engine.register.pojo.DatasetItem;
 import org.constellation.engine.register.repository.DatasetRepository;
+import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.UpdateConditionStep;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.constellation.engine.register.jooq.Tables.CSTL_USER;
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATASET;
+import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+import static org.constellation.engine.register.jooq.Tables.SENSORED_DATA;
 
 /**
  *
@@ -42,6 +57,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord, Dataset> implements
         DatasetRepository {
+
+    private static final Field[] ITEM_FIELDS = new Field[]{
+            DATASET.ID.as("id"),
+            DATASET.IDENTIFIER.as("identifier"),
+            DATASET.DATE.as("creation_date"),
+            DATASET.OWNER.as("owner_id"),
+            CSTL_USER.LOGIN.as("owner_login"),
+            countDataInDataset(DATASET.ID).asField("data_count")};
+
  
     public JooqDatasetRepository() {
         super(Dataset.class, DATASET);
@@ -156,5 +180,62 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     public void removeAllDatasetFromCSW(int serviceID) {
          dsl.delete(METADATA_X_CSW).where(METADATA_X_CSW.CSW_ID.eq(serviceID)).execute();
     }
-    
+
+    @Override
+    public Page<DatasetItem> fetchPage(Pageable pageable, boolean excludeEmpty, String textFilter, Boolean hasLayerData, Boolean hasSensorData) {
+        // Query filters.
+        Condition condition = DSL.trueCondition();
+        if (isNotBlank(textFilter)) {
+            condition = condition.and(DATASET.IDENTIFIER.likeIgnoreCase(textFilter));
+        }
+        if (excludeEmpty) {
+            condition = condition.and(countDataInDataset(DATASET.ID).asField().greaterThan(0));
+        }
+        if (hasLayerData != null) {
+            Field<Integer> countLayerData = countLayerDataInDataset(DATASET.ID).asField();
+            condition = condition.and(hasLayerData ? countLayerData.greaterThan(0) : countLayerData.eq(0));
+        }
+        if (hasSensorData != null) {
+            Field<Integer> countSensorData = countSensorDataInDataset(DATASET.ID).asField();
+            condition = condition.and(hasSensorData ? countSensorData.greaterThan(0) : countSensorData.eq(0));
+        }
+
+        // Content query.
+        List<DatasetItem> content = dsl.select(ITEM_FIELDS).from(DATASET)
+                .leftOuterJoin(CSTL_USER).on(DATASET.OWNER.eq(CSTL_USER.ID)) // style -> cstl_user
+                .where(condition)
+                .orderBy(JooqUtils.sortFields(pageable, ITEM_FIELDS))
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .fetchInto(DatasetItem.class);
+
+        // Total query.
+        Long total = dsl.select(DSL.countDistinct(DATASET.ID)).from(DATASET)
+                .leftOuterJoin(CSTL_USER).on(DATASET.OWNER.eq(CSTL_USER.ID)) // style -> cstl_user
+                .where(condition)
+                .fetchOne(0, Long.class);
+
+        return new PageImpl<>(pageable, content, total);
+    }
+
+    // -------------------------------------------------------------------------
+    //  Private utility methods
+    // -------------------------------------------------------------------------
+
+    private static SelectConditionStep<Record1<Integer>> countDataInDataset(Field<Integer> datasetId) {
+        return DSL.selectCount().from(DATA)
+                .where(DATA.DATASET_ID.eq(datasetId));
+    }
+
+    private static SelectConditionStep<Record1<Integer>> countLayerDataInDataset(Field<Integer> datasetId) {
+        return DSL.selectCount().from(LAYER)
+                .join(DATA).on(LAYER.DATA.eq(DATA.ID)) // layer -> data
+                .where(DATA.DATASET_ID.eq(datasetId));
+    }
+
+    private static SelectConditionStep<Record1<Integer>> countSensorDataInDataset(Field<Integer> datasetId) {
+        return DSL.selectCount().from(SENSORED_DATA)
+                .join(DATA).on(SENSORED_DATA.DATA.eq(DATA.ID)) // sensored_data -> data
+                .where(DATA.DATASET_ID.eq(datasetId));
+    }
 }

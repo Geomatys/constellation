@@ -19,10 +19,13 @@
 
 package org.constellation.engine.register.repository;
 
-import java.util.List;
-
+import org.constellation.engine.register.domain.Page;
+import org.constellation.engine.register.domain.Pageable;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
+import org.constellation.engine.register.pojo.DatasetItem;
+
+import java.util.List;
 
 /**
  *
@@ -55,4 +58,6 @@ public interface DatasetRepository {
     void removeDatasetFromAllCSW(final int datasetID);
     
     void removeAllDatasetFromCSW(final int serviceID);
+
+    Page<DatasetItem> fetchPage(Pageable pageable, boolean excludeEmpty, String textFilter, Boolean hasLayerData, Boolean hasSensorData);
 }
