@@ -20,18 +20,8 @@
     </div>
 </div>
 
-<ul class="nav nav-tabs" id="navtabsData">
-    <li class="active tab-data" style="margin-left: 10px;">
-        <a ng-click="selectTab('tabdata')" data-toggle="tab" id="dataTab">
-            <span translate="data.dashboard.tab.data">Data</span>
-        </a>
-    </li>
-    <li class="tab-metadata">
-        <a ng-click="selectTab('tabmetadata')" data-toggle="tab" id="metadataTab">
-            <span translate="data.dashboard.tab.metadata">Metadata</span>
-        </a>
-    </li>
-</ul>
+<div ng-include="'views/data/data-nav-tabs.html'">
+</div>
 
 <div class="tab-content" ng-if="dataCtrl.currentTab==='tabdata'">
     <div class="tab-pane" ng-class="{'active':dataCtrl.currentTab==='tabdata'}" style="padding-top:0;">
