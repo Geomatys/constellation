@@ -138,7 +138,7 @@
     <select ng-if="fieldObj.field.render.indexOf('extCodelist') == 0"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
-            ng-options="(code | translate) for code in codeLists[fieldObj.field.render] | orderBy: 'toString() | translate'"
+            ng-options="(code | translate) for code in (fieldObj.field.predefinedValues && fieldObj.field.predefinedValues.length > 0 ? fieldObj.field.predefinedValues : codeLists[fieldObj.field.render]) | orderBy: 'toString() | translate'"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
