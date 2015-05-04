@@ -244,6 +244,15 @@
             ng-options="(code | translate) for code in codeLists.classificationCodes | orderBy: 'toString() | translate'">
         <option value="">-----</option>
     </select>
+    <select ng-if="fieldObj.field.render === 'predefinedValues.select'"
+            class="form-control form-control-fix"
+            ng-model="fieldObj.field.value"
+            ng-options="predef for predef in fieldObj.field.predefinedValues | orderBy: 'toString()'"
+            ng-required="fieldObj.field.obligation === 'M'"
+            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
+            dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
+        <option value="">-----</option>
+    </select>
     <select ng-if="fieldObj.field.render === 'Specification.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
@@ -257,6 +266,15 @@
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
             ng-options="('boolean.'+pass | translate) for pass in predefinedValues.resultPass | orderBy: '\'boolean.\'+toString() | translate'"
+            ng-required="fieldObj.field.obligation === 'M'"
+            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
+            dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
+        <option value="">-----</option>
+    </select>
+    <select ng-if="fieldObj.field.render === 'predefinedValues.select.ResultPass'"
+            class="form-control form-control-fix"
+            ng-model="fieldObj.field.value"
+            ng-options="('boolean.'+pass | translate) for pass in fieldObj.field.predefinedValues | orderBy: '\'boolean.\'+toString() | translate'"
             ng-required="fieldObj.field.obligation === 'M'"
             ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
