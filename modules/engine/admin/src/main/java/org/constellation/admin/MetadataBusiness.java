@@ -281,10 +281,11 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (!update) {
             if (dataset != null) {
                 List<Data> datas = dataRepository.findByDatasetId(dataset.getId());
+                String type = null;
                 if (!datas.isEmpty()) {
-                    final String type = datas.get(0).getType();
-                    templateName = getDatasetTemplate(dataset.getIdentifier(), type);
+                    type = datas.get(0).getType();
                 }
+                templateName = getDatasetTemplate(dataset.getIdentifier(), type);
                 metadata.setDatasetId(dataset.getId());
             } else if (data != null) {
                 templateName = getDataTemplate(new QName(data.getNamespace(), data.getName()), data.getType());
