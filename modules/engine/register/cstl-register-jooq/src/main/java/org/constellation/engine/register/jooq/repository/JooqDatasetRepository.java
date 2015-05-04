@@ -182,7 +182,13 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
 
     @Override
-    public Page<DatasetItem> fetchPage(Pageable pageable, boolean excludeEmpty, String textFilter, Boolean hasLayerData, Boolean hasSensorData) {
+    public Page<DatasetItem> fetchPage(Pageable pageable,
+                                       boolean excludeEmpty,
+                                       String textFilter,
+                                       Boolean hasVectorData,
+                                       Boolean hasCoverageData,
+                                       Boolean hasLayerData,
+                                       Boolean hasSensorData) {
         // Query filters.
         Condition condition = DSL.trueCondition();
         if (isNotBlank(textFilter)) {
@@ -190,6 +196,14 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
         }
         if (excludeEmpty) {
             condition = condition.and(countDataInDataset(DATASET.ID).asField().greaterThan(0));
+        }
+        if (hasVectorData != null) {
+            Field<Integer> countVectorData = countDataOfTypeInDataset(DATASET.ID, "VECTOR").asField();
+            condition = condition.and(hasVectorData ? countVectorData.greaterThan(0) : countVectorData.eq(0));
+        }
+        if (hasCoverageData != null) {
+            Field<Integer> countCoverageData = countDataOfTypeInDataset(DATASET.ID, "COVERAGE").asField();
+            condition = condition.and(hasCoverageData ? countCoverageData.greaterThan(0) : countCoverageData.eq(0));
         }
         if (hasLayerData != null) {
             Field<Integer> countLayerData = countLayerDataInDataset(DATASET.ID).asField();
@@ -225,6 +239,11 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     private static SelectConditionStep<Record1<Integer>> countDataInDataset(Field<Integer> datasetId) {
         return DSL.selectCount().from(DATA)
                 .where(DATA.DATASET_ID.eq(datasetId));
+    }
+
+    private static SelectConditionStep<Record1<Integer>> countDataOfTypeInDataset(Field<Integer> datasetId, String type) {
+        return DSL.selectCount().from(DATA)
+                .where(DATA.DATASET_ID.eq(datasetId)).and(DATA.TYPE.eq(type));
     }
 
     private static SelectConditionStep<Record1<Integer>> countLayerDataInDataset(Field<Integer> datasetId) {

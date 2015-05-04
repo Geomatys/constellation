@@ -59,5 +59,11 @@ public interface DatasetRepository {
     
     void removeAllDatasetFromCSW(final int serviceID);
 
-    Page<DatasetItem> fetchPage(Pageable pageable, boolean excludeEmpty, String textFilter, Boolean hasLayerData, Boolean hasSensorData);
+    Page<DatasetItem> fetchPage(Pageable pageable,
+                                boolean excludeEmpty,
+                                String textFilter,
+                                Boolean hasVectorData,
+                                Boolean hasCoverageData,
+                                Boolean hasLayerData,
+                                Boolean hasSensorData);
 }

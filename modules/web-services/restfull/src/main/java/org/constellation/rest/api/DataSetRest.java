@@ -281,6 +281,8 @@ public class DataSetRest {
                 pageRequest,
                 search.isExcludeEmpty(),
                 search.getText(),
+                search.getHasVectorData(),
+                search.getHasCoverageData(),
                 search.getHasLayerData(),
                 search.getHasSensorData()));
     }
