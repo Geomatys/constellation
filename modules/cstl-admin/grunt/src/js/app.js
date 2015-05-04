@@ -247,7 +247,11 @@ $(window).scroll(function(){
     if(window.location.hash.indexOf('/data') !== -1){
         limit = $('#contentList').height();
         scrollPos = $(this).scrollTop();
-        topHeight = $('#advancedSearchPanel').height() + 275;
+        var delta = 240;
+        if($('#navtabsData').get(0)){
+            delta = 275;
+        }
+        topHeight = $('#advancedSearchPanel').height() + delta;
         applyScrollValues(scrollPos,topHeight,blockHeight,blockInfo,limit);
     } else if(window.location.hash.indexOf('/metadata')!==-1){
         limit = $('#contentList').height();
