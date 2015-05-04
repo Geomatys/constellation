@@ -103,6 +103,11 @@
         </dependency>
         <dependency>
             <groupId>org.constellation.json-bindings</groupId>
+            <artifactId>cstl-json-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.json-bindings</groupId>
             <artifactId>cstl-json-metadata</artifactId>
             <version>${project.version}</version>
         </dependency>

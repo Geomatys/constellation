@@ -19,12 +19,24 @@
 
 package org.constellation.rest.api;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.base.Optional;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.exception.ConstellationException;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IMetadataBusiness;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.DataSetBrief;
+import org.constellation.dto.ParameterValues;
+import org.constellation.engine.register.domain.PageRequest;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.repository.DatasetRepository;
+import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.json.Sort;
+import org.constellation.model.DatasetSearch;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -36,22 +48,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.exception.ConstellationException;
-import org.constellation.business.IDataBusiness;
-import org.constellation.business.IDatasetBusiness;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.DataSetBrief;
-import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.repository.UserRepository;
-import org.springframework.stereotype.Component;
-
-import com.google.common.base.Optional;
-import org.constellation.business.IMetadataBusiness;
+import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  * RESTful API for dataset metadata.
@@ -82,6 +86,12 @@ public class DataSetRest {
      */
     @Inject
     private IMetadataBusiness metadataBusiness;
+
+    /**
+     * Injected dataset repository.
+     */
+    @Inject
+    private DatasetRepository datasetRepository;
 
     /**
      * Injected data business.
@@ -248,4 +258,30 @@ public class DataSetRest {
         return dsb;
     }
 
+    @POST
+    @Path("/")
+    public Response searchDataset(DatasetSearch search) {
+        PageRequest pageRequest = new PageRequest(search.getPage(), search.getSize());
+
+        // Apply sort criteria.
+        Sort sort = search.getSort();
+        if (sort != null) {
+            switch (sort.getOrder()) {
+                case DESC:
+                    pageRequest.desc(sort.getField());
+                    break;
+                case ASC:
+                default:
+                    pageRequest.asc(sort.getField());
+            }
+        }
+
+        // Perform search.
+        return ok(datasetRepository.fetchPage(
+                pageRequest,
+                search.isExcludeEmpty(),
+                search.getText(),
+                search.getHasLayerData(),
+                search.getHasSensorData()));
+    }
 }
