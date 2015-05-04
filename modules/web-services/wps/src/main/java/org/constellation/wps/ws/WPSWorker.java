@@ -809,7 +809,7 @@ public class WPSWorker extends AbstractWorker {
 
                         //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
                         //Complex type (XML, raster, ...)
-                    } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
+                    } else if (WPSIO.isSupportedComplexOutputClass(clazz)) {
                         Map<String, Object> userData = null;
                         if (paramDesc instanceof ExtendedParameterDescriptor) {
                             userData = ((ExtendedParameterDescriptor) paramDesc).getUserObject();
@@ -827,7 +827,7 @@ public class WPSWorker extends AbstractWorker {
 
                         out.setLiteralOutput(literal);
 
-                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
+                    } else if (WPSIO.isSupportedReferenceOutputClass(clazz)) {
                         Map<String, Object> userData = null;
                         if (paramDesc instanceof ExtendedParameterDescriptor) {
                             userData = ((ExtendedParameterDescriptor) paramDesc).getUserObject();
