@@ -250,7 +250,13 @@ public class TemplateWriter extends AbstractTemplateHandler {
             } else if (value instanceof Date) {
                 if (DATE_READ_ONLY.equals(n.render)) {
                     synchronized (DATE_HOUR_FORMAT) {
-                        p = DATE_HOUR_FORMAT.format(value);
+                        String dateTime = DATE_HOUR_FORMAT.format(value);
+                        // remove uneccesary time
+                        if (dateTime.endsWith(" 00:00:00")) {
+                            p = dateTime.substring(0, dateTime.lastIndexOf(" 00:00:00"));
+                        } else {
+                            p = dateTime;
+                        }
                     }
                 } else {
                     synchronized (DATE_FORMAT) {

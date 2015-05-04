@@ -40,9 +40,9 @@ public class JsonMetadataConstants {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
     
-    public static final DateFormat DATE_HOUR_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
+    public static final DateFormat DATE_HOUR_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
     static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+        DATE_HOUR_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
     
     public static String cleanNumeratedPath(final String numeratedPath) {
