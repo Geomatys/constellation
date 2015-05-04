@@ -568,27 +568,35 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
             link: function(scope) {
 
                 scope.leftModel = scope.leftModel || [];
+
                 scope.rightModel = scope.rightModel || [];
+
                 scope.leftSelect = [];
+
                 scope.rightSelect = [];
 
-                scope.move = function(direction, items) {
-                    var targetModel = (direction === 'left') ? scope.leftModel : scope.rightModel;
-                    var sourceModel = (direction === 'left') ? scope.rightModel : scope.leftModel;
+                scope.toLeft = function(items) {
+                    move(scope.rightModel, scope.leftModel, items);
+                };
 
+                scope.toRight = function(items) {
+                    move(scope.leftModel, scope.rightModel, items);
+                };
+
+                function move(source, target, items) {
                     // Move items.
                     var i = items.length;
                     while (i--) {
-                        if (targetModel.indexOf(items[i]) === -1) {
-                            targetModel.push(items[i]);
+                        if (target.indexOf(items[i]) === -1) {
+                            target.push(items[i]);
 
                             // Ensure that the moved item is properly removed from the opposite
                             // side model array. Note that the item array could be the side model
                             // array itself.
-                            if (items === sourceModel) {
+                            if (items === source) {
                                 items.splice(i, 1);
                             } else {
-                                sourceModel.splice(sourceModel.indexOf(items[i]), 1);
+                                source.splice(source.indexOf(items[i]), 1);
                             }
                         }
                     }
@@ -596,7 +604,7 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                     // Reset selection.
                     scope.leftSelect = [];
                     scope.rightSelect = [];
-                };
+                }
             },
             replace: true,
             template:
@@ -611,10 +619,10 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                         '</div>' +
                         '<div class="picklist-actions">' +
                             '<div class="centered">' +
-                                '<button type="button" class="btn btn-default" ng-click="move(\'left\',rightModel)" ng-disabled="!rightModel.length"><i class="fa fa-angle-double-left"></i></button>' +
-                                '<button type="button" class="btn btn-default" ng-click="move(\'left\',rightSelect)" ng-disabled="!rightSelect.length"><i class="fa fa-angle-left"></i></button>' +
-                                '<button type="button" class="btn btn-default" ng-click="move(\'right\',leftSelect)" ng-disabled="!leftSelect.length"><i class="fa fa-angle-right"></i></button>' +
-                                '<button type="button" class="btn btn-default" ng-click="move(\'right\',leftModel)" ng-disabled="!leftModel.length"><i class="fa fa-angle-double-right"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="toLeft(rightModel)" ng-disabled="!rightModel.length"><i class="fa fa-angle-double-left"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="toLeft(rightSelect)" ng-disabled="!rightSelect.length"><i class="fa fa-angle-left"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="toRight(leftSelect)" ng-disabled="!leftSelect.length"><i class="fa fa-angle-right"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="toRight(leftModel)" ng-disabled="!leftModel.length"><i class="fa fa-angle-double-right"></i></button>' +
                             '</div>' +
                         '</div>' +
                         '<div class="picklist-right">' +
