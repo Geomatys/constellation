@@ -681,7 +681,6 @@ angular.module('cstl-services', ['cstl-restapi'])
                         case 'ASC':
                             self.query.sort.order = 'DESC';
                             break;
-                        case 'DESC':
                         default:
                             self.query.sort.order = 'ASC';
                     }
