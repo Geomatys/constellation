@@ -61,7 +61,7 @@ public interface DatasetRepository {
 
     Page<DatasetItem> fetchPage(Pageable pageable,
                                 boolean excludeEmpty,
-                                String textFilter,
+                                String termFilter,
                                 Boolean hasVectorData,
                                 Boolean hasCoverageData,
                                 Boolean hasLayerData,

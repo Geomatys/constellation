@@ -184,15 +184,15 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     @Override
     public Page<DatasetItem> fetchPage(Pageable pageable,
                                        boolean excludeEmpty,
-                                       String textFilter,
+                                       String termFilter,
                                        Boolean hasVectorData,
                                        Boolean hasCoverageData,
                                        Boolean hasLayerData,
                                        Boolean hasSensorData) {
         // Query filters.
         Condition condition = DSL.trueCondition();
-        if (isNotBlank(textFilter)) {
-            condition = condition.and(DATASET.IDENTIFIER.likeIgnoreCase(textFilter));
+        if (isNotBlank(termFilter)) {
+            condition = condition.and(DATASET.IDENTIFIER.likeIgnoreCase('%' + termFilter + '%'));
         }
         if (excludeEmpty) {
             condition = condition.and(countDataInDataset(DATASET.ID).asField().greaterThan(0));
