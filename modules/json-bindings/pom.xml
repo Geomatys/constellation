@@ -51,6 +51,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <module>common</module>
     <module>style</module>
     <module>metadata</module>
   </modules>
