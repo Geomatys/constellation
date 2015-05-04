@@ -29,11 +29,9 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.FileBean;
-import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
@@ -307,7 +305,5 @@ public interface IDataBusiness {
 
     DefaultMetadata unmarshallMetadata(final File metadata) throws ConfigurationException;
     
-    DefaultMetadata getMetadataFromDimap(final File metadata)throws ConfigurationException;
-
     void uploadCleaner();
 }

@@ -51,7 +51,7 @@ import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Optional;
-import org.geotoolkit.util.FileUtilities;
+import org.constellation.business.IMetadataBusiness;
 
 /**
  * RESTful API for dataset metadata.
@@ -76,6 +76,12 @@ public class DataSetRest {
      */
     @Inject
     private IDatasetBusiness datasetBusiness;
+    
+    /**
+     * Injected metadata business.
+     */
+    @Inject
+    private IMetadataBusiness metadataBusiness;
 
     /**
      * Injected data business.
@@ -121,7 +127,7 @@ public class DataSetRest {
     public Response createDataset(@PathParam("domainId") final int domainId,
                                   final ParameterValues values) {
 
-        final String metafile = values.getValues().get("metadataFilePath");
+        final String metaPath = values.getValues().get("metadataFilePath");
         
         final String datasetIdentifier = values.getValues().get("datasetIdentifier");
         if (datasetIdentifier != null && !datasetIdentifier.isEmpty()) {
@@ -133,10 +139,17 @@ public class DataSetRest {
                 }
                 
                 String metadataXML = null;
-                if (metafile != null) {
-                    metadataXML = FileUtilities.getStringFromFile(new File(metafile));
+                if (metaPath != null) {
+                    final File f = new File(metaPath);
+                    DefaultMetadata metadata = null;
+                    if (metadataBusiness.isSpecialMetadataFormat(f)){
+                        metadata = metadataBusiness.getMetadataFromSpecialFormat(f);
+                    } else {
+                        metadata = dataBusiness.unmarshallMetadata(f);
+                    }
+                    metadataXML = dataBusiness.marshallMetadata(metadata);
                 }
-
+                
                 Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
                 Dataset dataSet = datasetBusiness.createDataset(datasetIdentifier, metadataXML, user.get().getId());
                 return Response.ok().status(Response.Status.CREATED)

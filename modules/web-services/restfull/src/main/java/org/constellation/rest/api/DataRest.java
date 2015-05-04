@@ -370,9 +370,9 @@ public class DataRest {
     private void extractIdentifierFromMetadataFile(final Map<String,String> hashMap,
                                                    final File newFileMetaData) throws ConstellationException{
         Object obj;
-        if (newFileMetaData.getName().endsWith(".dim")) {
+        if (metadataBusiness.isSpecialMetadataFormat(newFileMetaData)) {
             try {
-                obj = dataBusiness.getMetadataFromDimap(newFileMetaData);
+                obj = metadataBusiness.getMetadataFromSpecialFormat(newFileMetaData);
             } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, "Error when trying to read dimap metadata", ex);
                 throw new ConstellationException("Dimap metadata file is incorrect");
@@ -791,12 +791,13 @@ public class DataRest {
 
     private void proceedToSaveUploadedMetadata(final String providerId, final String mdPath) throws ConstellationException {
         if (mdPath != null && !mdPath.isEmpty()) {
+            final File f = new File(mdPath);
             try {
                 final DefaultMetadata metadata;
-                if (mdPath.endsWith(".dim")){
-                    metadata = dataBusiness.getMetadataFromDimap(new File(mdPath));
+                if (metadataBusiness.isSpecialMetadataFormat(f)){
+                    metadata = metadataBusiness.getMetadataFromSpecialFormat(f);
                 } else {
-                    metadata = dataBusiness.unmarshallMetadata(new File(mdPath));
+                    metadata = dataBusiness.unmarshallMetadata(f);
                 }
                 if (metadata == null) {
                     throw new ConstellationException("Cannot save uploaded metadata because it is not recognized as a valid file!");

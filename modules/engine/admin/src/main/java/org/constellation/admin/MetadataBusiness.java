@@ -51,17 +51,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
+import java.io.File;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.Types;
 import org.constellation.ServiceDef;
@@ -80,6 +81,8 @@ import org.constellation.ws.ICSWConfigurer;
 import org.constellation.ws.Refreshable;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
+import org.geotoolkit.metadata.dimap.DimapAccessor;
+import org.geotoolkit.util.DomUtilities;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.constraint.Classification;
 import org.opengis.metadata.constraint.Restriction;
@@ -93,6 +96,8 @@ import org.opengis.metadata.spatial.CellGeometry;
 import org.opengis.metadata.spatial.DimensionNameType;
 import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.metadata.spatial.PixelOrientation;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * Business facade for metadata.
@@ -1029,5 +1034,24 @@ public class MetadataBusiness implements IMetadataBusiness {
             }
         }
         return owner;
+    }
+    
+    @Override
+    public boolean isSpecialMetadataFormat(File metadataFile) {
+        return metadataFile.getName().endsWith(".dim");
+    }
+    
+    @Override
+    public DefaultMetadata getMetadataFromSpecialFormat(File metadataFile) throws ConfigurationException {
+        if (metadataFile.getName().endsWith(".dim")) {
+            try {
+                Document doc = DomUtilities.read(metadataFile);
+                final DefaultMetadata metadata = DimapAccessor.fillMetadata(doc.getDocumentElement(), null);
+                return metadata;
+            } catch (ParserConfigurationException | SAXException  | IOException ex) {
+                throw new ConfigurationException("Error while parsing dimap file", ex);
+            }
+        }
+        return null;
     }
 }

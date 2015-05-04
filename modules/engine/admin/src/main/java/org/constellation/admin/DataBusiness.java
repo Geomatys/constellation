@@ -999,16 +999,4 @@ public class DataBusiness implements IDataBusiness {
     public List<Data> getDataLinkedData(final int dataId){
         return dataRepository.getDataLinkedData(dataId);
     }
-
-    @Override
-    public DefaultMetadata getMetadataFromDimap(File metadataFile) throws ConfigurationException {
-        try {
-            Document doc = DomUtilities.read(metadataFile);
-            final DefaultMetadata metadata = DimapAccessor.fillMetadata(doc.getDocumentElement(), null);
-            return metadata;
-        } catch (ParserConfigurationException | SAXException  | IOException ex) {
-            throw new ConfigurationException("Error while parsing dimap file", ex);
-        }
-    }
-
 }

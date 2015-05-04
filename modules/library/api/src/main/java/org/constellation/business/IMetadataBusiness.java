@@ -18,6 +18,7 @@
  */
 package org.constellation.business;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
@@ -436,4 +437,8 @@ public interface IMetadataBusiness {
     List<User> getUsers();
     
     User getUser(int id);
+    
+    boolean isSpecialMetadataFormat(File metadataFile);
+    
+    DefaultMetadata getMetadataFromSpecialFormat(File metadataFile) throws ConfigurationException;
 }
