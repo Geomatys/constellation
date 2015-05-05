@@ -18,15 +18,9 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DATA;
-import static org.constellation.engine.register.jooq.Tables.METADATA;
-import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
-import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
-
-import java.util.List;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
@@ -37,21 +31,49 @@ import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.jooq.tables.records.DataXDataRecord;
 import org.constellation.engine.register.jooq.tables.records.MetadataXCswRecord;
+import org.constellation.engine.register.pojo.DataItem;
 import org.constellation.engine.register.repository.DataRepository;
 import org.jooq.Condition;
+import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Result;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.List;
+
+import static org.constellation.engine.register.jooq.Tables.CSTL_USER;
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DATA;
+import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+import static org.constellation.engine.register.jooq.Tables.SENSORED_DATA;
+import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
+
+    private static final Field[] ITEM_FIELDS = new Field[]{
+            DATA.ID.as("id"),
+            DATA.NAME.as("name"),
+            DATA.TYPE.as("type"),
+            DATA.SUBTYPE.as("subtype"),
+            DATA.DATE.as("creation_date"),
+            DATA.SENSORABLE.as("sensorable"),
+            DATA.DATASET_ID.as("dataset_id"),
+            DATA.PROVIDER.as("provider_id"),
+            DATA.OWNER.as("owner_id"),
+            CSTL_USER.LOGIN.as("owner_login"),
+            countLayer(DATA.ID).asField("layer_count"),
+            countSensor(DATA.ID).asField("sensor_count"),
+            selectConformPyramidDataId(DATA.ID).asField("pyramid_id")};
 
 
     public JooqDataRepository() {
@@ -282,5 +304,34 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
         return dsl.select().from(DATA)
                 .where(DATA.TYPE.eq("COVERAGE"))
                 .and(DATA.RENDERED.isNull().or(DATA.RENDERED.isFalse())).fetchInto(Data.class);
+    }
+
+    @Override
+    public List<DataItem> fetchByDatasetIds(Collection<Integer> datasetIds) {
+        return dsl.select(ITEM_FIELDS).from(DATA)
+                .leftOuterJoin(CSTL_USER).on(DATA.OWNER.eq(CSTL_USER.ID)) // data -> cstl_user
+                .where(DATA.DATASET_ID.in(datasetIds)).and(DATA.HIDDEN.eq(false))
+                .fetchInto(DataItem.class);
+    }
+
+    // -------------------------------------------------------------------------
+    //  Private utility methods
+    // -------------------------------------------------------------------------
+
+    private static SelectConditionStep<Record1<Integer>> countLayer(Field<Integer> dataId) {
+        return DSL.selectCount().from(LAYER)
+                .where(LAYER.DATA.eq(dataId));
+    }
+
+    private static SelectConditionStep<Record1<Integer>> countSensor(Field<Integer> dataId) {
+        return DSL.selectCount().from(SENSORED_DATA)
+                .where(SENSORED_DATA.DATA.eq(dataId));
+    }
+
+    private static SelectConditionStep<Record1<Integer>> selectConformPyramidDataId(Field<Integer> dataId) {
+        org.constellation.engine.register.jooq.tables.Data childData = DATA.as("child_data"); // avoid conflict
+        return DSL.select(childData.ID).from(DATA_X_DATA)
+                .join(childData).on(childData.ID.eq(DATA_X_DATA.CHILD_ID)) // data_x_data (child_id) -> data
+                .where(DATA_X_DATA.DATA_ID.eq(dataId)).and(childData.SUBTYPE.eq("pyramid").and(childData.RENDERED.eq(false)));
     }
 }

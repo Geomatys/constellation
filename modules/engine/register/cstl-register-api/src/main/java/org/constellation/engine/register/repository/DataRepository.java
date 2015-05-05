@@ -18,11 +18,13 @@
  */
 package org.constellation.engine.register.repository;
 
-import java.util.List;
-
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataXCsw;
+import org.constellation.engine.register.pojo.DataItem;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface DataRepository {
 
@@ -80,4 +82,6 @@ public interface DataRepository {
     void removeLinkedData(final int dataId);
 
     List<Data> getDataByLinkedStyle(final int styleId);
+
+    List<DataItem> fetchByDatasetIds(Collection<Integer> datasetIds);
 }
