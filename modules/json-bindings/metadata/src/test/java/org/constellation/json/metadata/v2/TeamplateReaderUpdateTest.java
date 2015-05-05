@@ -1125,8 +1125,54 @@ public class TeamplateReaderUpdateTest {
         bbox.setInclusion(null);
         
         final DefaultGeographicDescription desc = new DefaultGeographicDescription();
-        final DefaultIdentifier id = new DefaultIdentifier("Gard");
-        id.setCodeSpace("departement");
+        final ImmutableIdentifier id = new ImmutableIdentifier(null, "departement", "Gard");
+        desc.setGeographicIdentifier(id);
+        
+        ex.setGeographicElements(Arrays.asList(bbox, desc));
+        
+        dataIdent.setExtents(Arrays.asList(ex));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+
+    @Test
+    public void testReadFromFilledTemplateExtent3() throws IOException, FactoryException {
+        InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_extent2.json");
+        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        
+        final DefaultMetadata previous = new DefaultMetadata();
+        
+        final DefaultDataIdentification pdataIdent = new DefaultDataIdentification();
+        
+        final DefaultExtent pex = new DefaultExtent();
+        final DefaultGeographicBoundingBox pbbox = new DefaultGeographicBoundingBox(-11, 11, -11, 11);
+        pbbox.setInclusion(null);
+        
+        final DefaultGeographicDescription pdesc = new DefaultGeographicDescription();
+        final ImmutableIdentifier pid = new ImmutableIdentifier(null, "commune", "Gard");
+        pdesc.setGeographicIdentifier(pid);
+        
+        //inverted types
+        pex.setGeographicElements(Arrays.asList(pdesc, pbbox));
+        
+        pdataIdent.setExtents(Arrays.asList(pex));
+        previous.setIdentificationInfo(Arrays.asList(pdataIdent));
+        
+        
+        Object result = reader.readTemplate(root, previous);
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        
+        final DefaultExtent ex = new DefaultExtent();
+        final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(-10, 10, -10, 10);
+        bbox.setInclusion(null);
+        
+        final DefaultGeographicDescription desc = new DefaultGeographicDescription();
+        final ImmutableIdentifier id = new ImmutableIdentifier(null, "departement", "Gard");
         desc.setGeographicIdentifier(id);
         
         ex.setGeographicElements(Arrays.asList(bbox, desc));

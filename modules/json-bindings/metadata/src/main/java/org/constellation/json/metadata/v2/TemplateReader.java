@@ -1,6 +1,7 @@
 
 package org.constellation.json.metadata.v2;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.KeyNamePolicy;
@@ -39,7 +42,6 @@ import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gts.xml.PeriodDurationType;
 import org.geotoolkit.metadata.MetadataFactory;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
-import org.opengis.metadata.extent.GeographicDescription;
 import org.opengis.referencing.ReferenceSystem;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
@@ -97,7 +99,7 @@ public class TemplateReader extends AbstractTemplateHandler {
     }
 
     private void updateObjectFromRootObj(TemplateTree tree, final ValueNode root, final Object metadata, ReservedObjects reserved) throws ParseException {
-        
+        reOrder(root, metadata);
         final List<ValueNode> children = new ArrayList<>(root.children);
         for (ValueNode node : children) {
             
@@ -128,7 +130,7 @@ public class TemplateReader extends AbstractTemplateHandler {
                         updateObjectFromRootObj(tree, node, newValue, reserved);
                     }
                 }
-
+                
             } else if (obj != null){
                 if (node.isField()) {
                     putValue(node, metadata); // replace
@@ -319,6 +321,15 @@ public class TemplateReader extends AbstractTemplateHandler {
                 } else {
                     LOGGER.warning("TODO find a setter for null values");
                 }
+            } else if (metadata instanceof ImmutableIdentifier){
+                Field f = ReflectionUtilities.getFieldFromName(node.name, ImmutableIdentifier.class);
+                try {
+                    f.setAccessible(true);
+                    f.set(metadata, value);
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
+                
             } else {
                 final Map<String,Object> values = asMap(metadata);
                 values.put(node.name, value);
@@ -429,15 +440,11 @@ public class TemplateReader extends AbstractTemplateHandler {
                 Object o = it.next();
                 if (o instanceof ReferenceSystemMetadata) {
                     fixImmutableRs((ReferenceSystemMetadata)o);
-                } else if (o instanceof DefaultGeographicDescription) {
-                    fixImmutableGeodesc((DefaultGeographicDescription) o);
                 }
             }
         }
         if (obj instanceof ReferenceSystemMetadata) {
             fixImmutableRs((ReferenceSystemMetadata)obj);
-        } else if (obj instanceof DefaultGeographicDescription) {
-            fixImmutableGeodesc((DefaultGeographicDescription) obj);
         }
         return obj;
     }
@@ -446,13 +453,6 @@ public class TemplateReader extends AbstractTemplateHandler {
         if (rs.getName() instanceof ImmutableIdentifier) {
             final DefaultIdentifier newID = new DefaultIdentifier(rs.getName());
             rs.setName(newID);
-        }
-    }
-    
-    private static void fixImmutableGeodesc(final DefaultGeographicDescription desc) {
-        if (desc.getGeographicIdentifier() instanceof ImmutableIdentifier) {
-            final DefaultIdentifier newID = new DefaultIdentifier(desc.getGeographicIdentifier());
-            desc.setGeographicIdentifier(newID);
         }
     }
     
@@ -513,6 +513,53 @@ public class TemplateReader extends AbstractTemplateHandler {
             }
             c.remove(old);
             c.add(newValue);
+        }
+    }
+    
+    private void reOrder(ValueNode root, Object metadata) throws ParseException {
+        Map<String, List<ValueNode>> map = new HashMap<>();
+        ReservedObjects reserved = new ReservedObjects();
+        
+        // split the nodes which may cause trouble by their path
+        for (ValueNode child : root.children) {
+            if (!child.isField() && (child.strict || child.type != null) && child.blockName != null) {
+                if (map.containsKey(child.path)) {
+                    boolean add = true;
+                    List<ValueNode> nodes = map.get(child.path);
+                    for (ValueNode node : nodes) {
+                        if (node.blockName.equals(child.blockName)) {
+                            add = false;
+                        }
+                    }
+                    if (add) {
+                        map.get(child.path).add(child);
+                    }
+                } else {
+                    List<ValueNode> l = new ArrayList<>();
+                    l.add(child);
+                    map.put(child.path, l);
+                }
+            }
+        }
+        
+        for (String path : map.keySet()) {
+            List<ValueNode> nodes = map.get(path);
+            if (nodes.size() > 1) {
+                Collections.sort(nodes, new NodeOrdinalComparator());
+                final Collection c = new ArrayList<>();
+                for (ValueNode node : nodes) {
+                    NumeratedCollection coll = (NumeratedCollection) getValue(node, metadata, reserved);
+                    if (coll != null) {
+                        Iterator it = coll.iterator();
+                        while (it.hasNext()) {
+                            c.add(it.next());
+                        }
+                    }
+
+                }
+                asMap(metadata).put(nodes.get(0).name, c);
+            }
+            
         }
     }
     
@@ -579,5 +626,16 @@ public class TemplateReader extends AbstractTemplateHandler {
                 }
             }
         }
+    }
+    
+    private static class NodeOrdinalComparator implements Comparator<ValueNode> {
+
+        @Override
+        public int compare(ValueNode o1, ValueNode o2) {
+            return Integer.compare(o1.ordinal, o2.ordinal);
+        }
+
+       
+        
     }
 }
