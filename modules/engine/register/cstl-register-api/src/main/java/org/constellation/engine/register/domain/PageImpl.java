@@ -1,5 +1,8 @@
 package org.constellation.engine.register.domain;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
@@ -98,6 +101,11 @@ public class PageImpl<T> implements Page<T>, Serializable {
     @Override
     public List<T> getContent() {
         return content;
+    }
+
+    @Override
+    public <O> Page<O> transform(Function<T, O> function) {
+        return new PageImpl<>(pageable, Lists.transform(content, function), total);
     }
 
     // -------------------------------------------------------------------------

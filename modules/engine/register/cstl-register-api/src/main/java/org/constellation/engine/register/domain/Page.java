@@ -1,5 +1,7 @@
 package org.constellation.engine.register.domain;
 
+import com.google.common.base.Function;
+
 import java.util.List;
 
 /**
@@ -30,4 +32,6 @@ public interface Page<T> extends Iterable<T> {
     Pageable previousPageable();
 
     List<T> getContent();
+
+    <O> Page<O> transform(Function<T, O> function);
 }
