@@ -27,47 +27,53 @@ public class DatasetItem implements Serializable {
         return id;
     }
 
-    public void setId(Integer id) {
+    public DatasetItem setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(String identifier) {
+    public DatasetItem setIdentifier(String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     public Long getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Long creationDate) {
+    public DatasetItem setCreationDate(Long creationDate) {
         this.creationDate = creationDate;
+        return this;
     }
 
     public Integer getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Integer ownerId) {
+    public DatasetItem setOwnerId(Integer ownerId) {
         this.ownerId = ownerId;
+        return this;
     }
 
     public String getOwnerLogin() {
         return ownerLogin;
     }
 
-    public void setOwnerLogin(String ownerLogin) {
+    public DatasetItem setOwnerLogin(String ownerLogin) {
         this.ownerLogin = ownerLogin;
+        return this;
     }
 
     public Long getDataCount() {
         return dataCount;
     }
 
-    public void setDataCount(Long dataCount) {
+    public DatasetItem setDataCount(Long dataCount) {
         this.dataCount = dataCount;
+        return this;
     }
 }

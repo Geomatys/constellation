@@ -64,7 +64,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
             DATASET.DATE.as("creation_date"),
             DATASET.OWNER.as("owner_id"),
             CSTL_USER.LOGIN.as("owner_login"),
-            countDataInDataset(DATASET.ID).asField("data_count")};
+            countVisibleData(DATASET.ID).asField("data_count")};
 
  
     public JooqDatasetRepository() {
@@ -192,31 +192,34 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
         // Query filters.
         Condition condition = DSL.trueCondition();
         if (isNotBlank(termFilter)) {
-            condition = condition.and(DATASET.IDENTIFIER.likeIgnoreCase('%' + termFilter + '%'));
+            condition = condition.and(DATASET.IDENTIFIER.likeIgnoreCase('%' + termFilter + '%')
+                    .or(CSTL_USER.LOGIN.likeIgnoreCase('%' + termFilter + '%'))
+                    .or(DATA.NAME.likeIgnoreCase('%' + termFilter + '%')));
         }
         if (excludeEmpty) {
-            condition = condition.and(countDataInDataset(DATASET.ID).asField().greaterThan(0));
+            condition = condition.and(countVisibleData(DATASET.ID).asField().greaterThan(0));
         }
         if (hasVectorData != null) {
-            Field<Integer> countVectorData = countDataOfTypeInDataset(DATASET.ID, "VECTOR").asField();
+            Field<Integer> countVectorData = countDataOfType(DATASET.ID, "VECTOR").asField();
             condition = condition.and(hasVectorData ? countVectorData.greaterThan(0) : countVectorData.eq(0));
         }
         if (hasCoverageData != null) {
-            Field<Integer> countCoverageData = countDataOfTypeInDataset(DATASET.ID, "COVERAGE").asField();
+            Field<Integer> countCoverageData = countDataOfType(DATASET.ID, "COVERAGE").asField();
             condition = condition.and(hasCoverageData ? countCoverageData.greaterThan(0) : countCoverageData.eq(0));
         }
         if (hasLayerData != null) {
-            Field<Integer> countLayerData = countLayerDataInDataset(DATASET.ID).asField();
+            Field<Integer> countLayerData = countLayerData(DATASET.ID).asField();
             condition = condition.and(hasLayerData ? countLayerData.greaterThan(0) : countLayerData.eq(0));
         }
         if (hasSensorData != null) {
-            Field<Integer> countSensorData = countSensorDataInDataset(DATASET.ID).asField();
+            Field<Integer> countSensorData = countSensorData(DATASET.ID).asField();
             condition = condition.and(hasSensorData ? countSensorData.greaterThan(0) : countSensorData.eq(0));
         }
 
         // Content query.
-        List<DatasetItem> content = dsl.select(ITEM_FIELDS).from(DATASET)
-                .leftOuterJoin(CSTL_USER).on(DATASET.OWNER.eq(CSTL_USER.ID)) // style -> cstl_user
+        List<DatasetItem> content = dsl.selectDistinct(ITEM_FIELDS).from(DATASET)
+                .leftOuterJoin(CSTL_USER).on(CSTL_USER.ID.eq(DATASET.OWNER)) // dataset -> cstl_user
+                .leftOuterJoin(DATA).on(DATA.DATASET_ID.eq(DATASET.ID)) // dataset -> cstl_user
                 .where(condition)
                 .orderBy(JooqUtils.sortFields(pageable, ITEM_FIELDS))
                 .limit(pageable.getPageSize())
@@ -224,8 +227,9 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
                 .fetchInto(DatasetItem.class);
 
         // Total query.
-        Long total = dsl.select(DSL.countDistinct(DATASET.ID)).from(DATASET)
-                .leftOuterJoin(CSTL_USER).on(DATASET.OWNER.eq(CSTL_USER.ID)) // style -> cstl_user
+        Long total = dsl.selectDistinct(DSL.countDistinct(DATASET.ID)).from(DATASET)
+                .leftOuterJoin(CSTL_USER).on(DATASET.OWNER.eq(CSTL_USER.ID)) // dataset -> cstl_user
+                .leftOuterJoin(DATA).on(DATA.DATASET_ID.eq(DATASET.ID)) // dataset -> cstl_user
                 .where(condition)
                 .fetchOne(0, Long.class);
 
@@ -236,23 +240,23 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     //  Private utility methods
     // -------------------------------------------------------------------------
 
-    private static SelectConditionStep<Record1<Integer>> countDataInDataset(Field<Integer> datasetId) {
+    private static SelectConditionStep<Record1<Integer>> countVisibleData(Field<Integer> datasetId) {
         return DSL.selectCount().from(DATA)
-                .where(DATA.DATASET_ID.eq(datasetId));
+                .where(DATA.DATASET_ID.eq(datasetId)).and(DATA.HIDDEN.eq(false));
     }
 
-    private static SelectConditionStep<Record1<Integer>> countDataOfTypeInDataset(Field<Integer> datasetId, String type) {
+    private static SelectConditionStep<Record1<Integer>> countDataOfType(Field<Integer> datasetId, String type) {
         return DSL.selectCount().from(DATA)
                 .where(DATA.DATASET_ID.eq(datasetId)).and(DATA.TYPE.eq(type));
     }
 
-    private static SelectConditionStep<Record1<Integer>> countLayerDataInDataset(Field<Integer> datasetId) {
+    private static SelectConditionStep<Record1<Integer>> countLayerData(Field<Integer> datasetId) {
         return DSL.selectCount().from(LAYER)
                 .join(DATA).on(LAYER.DATA.eq(DATA.ID)) // layer -> data
                 .where(DATA.DATASET_ID.eq(datasetId));
     }
 
-    private static SelectConditionStep<Record1<Integer>> countSensorDataInDataset(Field<Integer> datasetId) {
+    private static SelectConditionStep<Record1<Integer>> countSensorData(Field<Integer> datasetId) {
         return DSL.selectCount().from(SENSORED_DATA)
                 .join(DATA).on(SENSORED_DATA.DATA.eq(DATA.ID)) // sensored_data -> data
                 .where(DATA.DATASET_ID.eq(datasetId));
