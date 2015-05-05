@@ -19,7 +19,10 @@
 
 package org.constellation.rest.api;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.exception.ConstellationException;
@@ -29,12 +32,17 @@ import org.constellation.business.IMetadataBusiness;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.dto.ParameterValues;
+import org.constellation.engine.register.domain.Page;
 import org.constellation.engine.register.domain.PageRequest;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.engine.register.pojo.DataItem;
+import org.constellation.engine.register.pojo.DatasetItem;
+import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.json.Sort;
+import org.constellation.model.DatasetItemWithData;
 import org.constellation.model.DatasetSearch;
 import org.springframework.stereotype.Component;
 
@@ -51,10 +59,14 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.constellation.json.util.TransferObjects.mapInto;
 import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
@@ -86,6 +98,12 @@ public class DataSetRest {
      */
     @Inject
     private IMetadataBusiness metadataBusiness;
+
+    /**
+     * Injected data repository.
+     */
+    @Inject
+    private DataRepository dataRepository;
 
     /**
      * Injected dataset repository.
@@ -258,9 +276,16 @@ public class DataSetRest {
         return dsb;
     }
 
+    /**
+     * Returns a {@link Page} of {@link DatasetItem}s matching the specified
+     * {@link DatasetSearch} criteria.
+     *
+     * @param search the search information.
+     * @return the {@link Page} of {@link DatasetItem}s.
+     */
     @POST
     @Path("/")
-    public Response searchDataset(DatasetSearch search) {
+    public Response searchDatasets(DatasetSearch search) {
         PageRequest pageRequest = new PageRequest(search.getPage(), search.getSize());
 
         // Apply sort criteria.
@@ -277,13 +302,45 @@ public class DataSetRest {
         }
 
         // Perform search.
-        return ok(datasetRepository.fetchPage(
-                pageRequest,
+        Page<DatasetItem> result = datasetRepository.fetchPage(pageRequest,
                 search.isExcludeEmpty(),
                 search.getText(),
                 search.getHasVectorData(),
                 search.getHasCoverageData(),
                 search.getHasLayerData(),
-                search.getHasSensorData()));
+                search.getHasSensorData());
+
+        // Extract ids of datasets that contain only one data ("singleton").
+        Collection<Integer> singletonIds = Lists.transform(result.getContent(), new Function<DatasetItem, Integer>() {
+            @Override
+            public Integer apply(DatasetItem dataset) {
+                return (dataset.getDataCount() == 1) ? dataset.getId() : null;
+            }
+        });
+        if (singletonIds.isEmpty()) { // no "singleton" datasets
+            return ok(result);
+        }
+
+        // Query the single data of these datasets.
+        List<DataItem> dataItems = dataRepository.fetchByDatasetIds(singletonIds);
+        final Map<Integer, DataItem> indexedData = Maps.uniqueIndex(dataItems, new Function<DataItem, Integer>() {
+            @Override
+            public Integer apply(DataItem data) {
+                return data.getDatasetId();
+            }
+        });
+
+        // Append the single data of each "singleton" dataset.
+        return ok(result.transform(new Function<DatasetItem, DatasetItem>() {
+            @Override
+            public DatasetItem apply(DatasetItem dataset) {
+                if (dataset.getDataCount() == 1 && indexedData.get(dataset.getId()) != null) {
+                    DatasetItemWithData singletonDataset = mapInto(dataset, DatasetItemWithData.class);
+                    singletonDataset.setData(Arrays.asList(indexedData.get(dataset.getId())));
+                    return singletonDataset;
+                }
+                return dataset;
+            }
+        }));
     }
 }
