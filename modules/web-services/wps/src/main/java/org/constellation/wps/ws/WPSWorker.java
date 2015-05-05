@@ -1027,7 +1027,14 @@ public class WPSWorker extends AbstractWorker {
             } catch (InterruptedException ex) {
                 throw new CstlServiceException("Process interrupted.", ex, NO_APPLICABLE_CODE);
             } catch (ExecutionException ex) {
-                throw new CstlServiceException("Process execution failed.", ex, NO_APPLICABLE_CODE);
+                Throwable cause = ex.getCause();
+                if(cause instanceof ProcessException){
+                    throw new CstlServiceException("Process execution failed."+ex.getCause().getMessage(), ex, NO_APPLICABLE_CODE);
+                }else if(cause != null){
+                    throw new CstlServiceException("Process execution failed."+ex.getCause().getMessage(), ex, NO_APPLICABLE_CODE);
+                }else{
+                    throw new CstlServiceException("Process execution failed.", ex, NO_APPLICABLE_CODE);
+                }
             }
             return createRawOutput(rawData, processOutputDesc, result);
 
