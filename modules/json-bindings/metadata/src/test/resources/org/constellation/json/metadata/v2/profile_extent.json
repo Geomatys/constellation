@@ -93,6 +93,19 @@
                                             "value": null,
                                             "completion" : "elementary"
                                         }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.geographicIdentifierCS",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.geographicIdentifierCS_help",
+                                            "path": "metadata.identificationInfo.extent.geographicElement.geographicIdentifier.codeSpace",
+                                            "render": "text",
+                                            "obligation": "M",
+                                            "defaultValue": null,
+                                            "value": null,
+                                            "completion" : "elementary"
+                                        }
                                     }
                                 ]
                             }

@@ -17,6 +17,7 @@ import org.apache.sis.metadata.iso.constraint.DefaultLegalConstraints;
 import org.apache.sis.metadata.iso.constraint.DefaultSecurityConstraints;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
 import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
@@ -297,6 +298,36 @@ public class TemplateReaderTest {
         final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(-10, 10, -10, 10);
         bbox.setInclusion(null);
         ex.setGeographicElements(Arrays.asList(bbox));
+        
+        dataIdent.setExtents(Arrays.asList(ex));
+        expResult.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        MetadataUtilities.metadataEquals(expResult, (DefaultMetadata) result);
+    }
+    
+    @Test
+    public void testReadFromFilledTemplateExtent2() throws IOException, FactoryException {
+        InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_extent2.json");
+        RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        TemplateReader reader = new TemplateReader(MetadataStandard.ISO_19115);
+        
+        Object result = reader.readTemplate(root, new DefaultMetadata());
+        
+        final DefaultMetadata expResult = new DefaultMetadata();
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        
+        final DefaultExtent ex = new DefaultExtent();
+        final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(-10, 10, -10, 10);
+        bbox.setInclusion(null);
+        
+        final DefaultGeographicDescription desc = new DefaultGeographicDescription();
+        final DefaultIdentifier id = new DefaultIdentifier("Gard");
+        id.setCodeSpace("departement");
+        desc.setGeographicIdentifier(id);
+        
+        ex.setGeographicElements(Arrays.asList(bbox, desc));
         
         dataIdent.setExtents(Arrays.asList(ex));
         expResult.setIdentificationInfo(Arrays.asList(dataIdent));

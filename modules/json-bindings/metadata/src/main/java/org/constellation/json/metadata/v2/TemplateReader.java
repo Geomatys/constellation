@@ -23,6 +23,7 @@ import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.TypeValuePolicy;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
 import org.apache.sis.util.Locales;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.iso.Types;
@@ -38,6 +39,7 @@ import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.gts.xml.PeriodDurationType;
 import org.geotoolkit.metadata.MetadataFactory;
 import org.geotoolkit.sml.xml.v101.SensorMLStandard;
+import org.opengis.metadata.extent.GeographicDescription;
 import org.opengis.referencing.ReferenceSystem;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
@@ -427,11 +429,15 @@ public class TemplateReader extends AbstractTemplateHandler {
                 Object o = it.next();
                 if (o instanceof ReferenceSystemMetadata) {
                     fixImmutableRs((ReferenceSystemMetadata)o);
+                } else if (o instanceof DefaultGeographicDescription) {
+                    fixImmutableGeodesc((DefaultGeographicDescription) o);
                 }
             }
         }
         if (obj instanceof ReferenceSystemMetadata) {
             fixImmutableRs((ReferenceSystemMetadata)obj);
+        } else if (obj instanceof DefaultGeographicDescription) {
+            fixImmutableGeodesc((DefaultGeographicDescription) obj);
         }
         return obj;
     }
@@ -440,6 +446,13 @@ public class TemplateReader extends AbstractTemplateHandler {
         if (rs.getName() instanceof ImmutableIdentifier) {
             final DefaultIdentifier newID = new DefaultIdentifier(rs.getName());
             rs.setName(newID);
+        }
+    }
+    
+    private static void fixImmutableGeodesc(final DefaultGeographicDescription desc) {
+        if (desc.getGeographicIdentifier() instanceof ImmutableIdentifier) {
+            final DefaultIdentifier newID = new DefaultIdentifier(desc.getGeographicIdentifier());
+            desc.setGeographicIdentifier(newID);
         }
     }
     

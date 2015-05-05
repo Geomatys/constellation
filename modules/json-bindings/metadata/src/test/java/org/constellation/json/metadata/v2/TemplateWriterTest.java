@@ -20,6 +20,7 @@ import org.apache.sis.metadata.iso.constraint.DefaultLegalConstraints;
 import org.apache.sis.metadata.iso.constraint.DefaultSecurityConstraints;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
 import org.apache.sis.metadata.iso.extent.DefaultTemporalExtent;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
@@ -783,6 +784,54 @@ public class TemplateWriterTest {
         
         
         final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_extent.json");
+        String expectedJson = FileUtilities.getStringFromStream(resStream);
+
+        
+        File resultFile = File.createTempFile("test", ".json");
+        
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.writeValue(new FileWriter(resultFile), rootFilled);
+        
+        String resultJson = FileUtilities.getStringFromFile(resultFile);
+        
+        assertEquals(expectedJson, resultJson);
+    }
+    
+    @Test
+    public void testWriteExtent3() throws IOException {
+        
+        final InputStream stream = TemplateWriterTest.class.getResourceAsStream("profile_extent.json");
+        final RootObj root       =  objectMapper.readValue(stream, RootObj.class);
+        
+        
+        final DefaultMetadata metadata = new DefaultMetadata();
+        
+        final ReferenceSystemMetadata rs = new ReferenceSystemMetadata(new DefaultIdentifier("EPSG:4326"));
+        metadata.setReferenceSystemInfo(Arrays.asList(rs));
+        
+        
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        
+        final DefaultExtent ex = new DefaultExtent();
+        final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(-10, 10, -10, 10);
+        
+        final DefaultGeographicDescription desc = new DefaultGeographicDescription();
+        final DefaultIdentifier id = new DefaultIdentifier("Gard");
+        id.setCodeSpace("departement");
+        desc.setGeographicIdentifier(id);
+        
+        
+        ex.setGeographicElements(Arrays.asList(bbox, desc));
+        dataIdent.setExtents(Arrays.asList(ex));
+        metadata.setIdentificationInfo(Arrays.asList(dataIdent));
+        
+        
+        TemplateWriter writer = new TemplateWriter(MetadataStandard.ISO_19115);
+        
+        final RootObj rootFilled = writer.writeTemplate(root, metadata, false, false);
+        
+        
+        final InputStream resStream = TemplateWriterTest.class.getResourceAsStream("result_extent2.json");
         String expectedJson = FileUtilities.getStringFromStream(resStream);
 
         
