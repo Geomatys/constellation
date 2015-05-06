@@ -769,6 +769,7 @@
     "login.title": "Authentication",
     "login.form.username": "Login",
     "login.form.username.placeholder": "Your login",
+    "login.form.forgot.password":"Forgot password ?",
     "login.form.password": "Password",
     "login.form.password.placeholder": "Your password",
     "login.form.rememberme": "Automatic Login",

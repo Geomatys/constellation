@@ -530,6 +530,7 @@
     "login.form.rememberme": "Garder ma connexion ouverte",
     "login.form.username": "Nom d'utilisateur",
     "login.form.username.placeholder": "Votre nom d'utilisateur",
+    "login.form.forgot.password":"Mot de passe oublié ?",
     "login.messages.error.authentication": "<strong>Erreur d'authentification!</strong> Veuillez vérifier vos identifiants de connexion.",
     "login.title": "S'authentifier",
     "login.error": "Identifiant ou mot de passe incorrect.",
