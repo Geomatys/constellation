@@ -116,12 +116,12 @@ public class MetadataBusiness implements IMetadataBusiness {
      * Injected data repository.
      */
     @Inject
-    private DataRepository dataRepository;
+    protected DataRepository dataRepository;
     /**
      * Injected dataset repository.
      */
     @Inject
-    private DatasetRepository datasetRepository;
+    protected DatasetRepository datasetRepository;
     /**
      * Injected service repository.
      */
@@ -180,7 +180,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException  {
+    public Metadata updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException  {
         return updateMetadata(metadataId, metadata, null, null, null);
     }
     
@@ -189,7 +189,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
+    public Metadata updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
         return updateMetadata(metadataId, xml, null, null, null);
     }
     
@@ -198,7 +198,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final String xml, final Integer owner) throws ConfigurationException  {
+    public Metadata updateMetadata(final String metadataId, final String xml, final Integer owner) throws ConfigurationException  {
         return updateMetadata(metadataId, xml, null, null, owner);
     }
     
@@ -207,7 +207,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException  {
+    public Metadata updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException  {
         final String xml = marshallMetadata(metadata);
         return updateMetadata(metadataId, xml, dataID, datasetID, owner);
     }
@@ -217,7 +217,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID,
+    public Metadata updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID,
                                   final Integer owner) throws ConfigurationException  {
         Metadata metadata          = metadataRepository.findByMetadataId(metadataId);
         final boolean update       = metadata != null;
@@ -323,7 +323,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             metadata.setId(id);
         }
         updateInternalCSWIndex(Arrays.asList(new MetadataWithState(metadata, previousPublishState)), true);
-        return true;
+        return metadata;
     }
 
     /**
@@ -404,10 +404,23 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     @Transactional
-    public void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier) {
+    public void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier)  throws ConfigurationException {
         final Service service = serviceRepository.findByIdentifierAndType(cswIdentifier, "csw");
         if (service != null) {
-            metadataRepository.addMetadataToCSW(metadataId, service.getId());
+            boolean partial = false;
+            try {
+                final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                final Automatic config = (Automatic) um.unmarshal(new StringReader(service.getConfig()));
+                if (config.getCustomparameters().containsKey("partial")) {
+                    partial = Boolean.parseBoolean(config.getParameter("partial"));
+                }
+                GenericDatabaseMarshallerPool.getInstance().recycle(um);
+            } catch (JAXBException ex) {
+                throw new ConfigurationException("Error while reading CSW configuration", ex);
+            }
+            if (partial) {
+                metadataRepository.addMetadataToCSW(metadataId, service.getId());
+            }
         }
     }
     

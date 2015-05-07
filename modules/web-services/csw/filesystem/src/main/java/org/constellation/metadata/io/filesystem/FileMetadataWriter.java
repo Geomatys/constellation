@@ -58,6 +58,7 @@ import javax.inject.Inject;
 import javax.xml.stream.XMLInputFactory;
 import org.constellation.admin.SpringHelper;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.configuration.ConfigurationException;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
@@ -431,7 +432,7 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
                 final Node n = document.getDocumentElement();
                 storeMetadata(n);
                 metadataBusiness.linkMetadataIDToCSW(metadataID, metadataID);
-            } catch (SAXException | IOException | ParserConfigurationException ex) {
+            } catch (SAXException | IOException | ParserConfigurationException | ConfigurationException ex) {
                 throw new MetadataIoException(ex);
             }
         }

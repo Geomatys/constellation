@@ -92,11 +92,11 @@ public interface IMetadataBusiness {
      * @param metadataId identifier of the metadata.
      * @param xml XML representation of the metadata.
      * 
-     * @return true if the update succeed.
+     * @return The created/update Metadata pojo.
      * 
      * @throws org.constellation.configuration.ConfigurationException
      */
-    boolean updateMetadata(final String metadataId, final String xml) throws ConfigurationException;
+    Metadata updateMetadata(final String metadataId, final String xml) throws ConfigurationException;
     
     /**
      * Update or create a new Metadata object.
@@ -105,11 +105,11 @@ public interface IMetadataBusiness {
      * @param xml XML representation of the metadata.
      * @param owner User who owes the metadata.
      * 
-     * @return true if the update succeed.
+     * @return The created/update Metadata pojo.
      * 
      * @throws org.constellation.configuration.ConfigurationException
      */
-    boolean updateMetadata(final String metadataId, final String xml, final Integer owner) throws ConfigurationException;
+    Metadata updateMetadata(final String metadataId, final String xml, final Integer owner) throws ConfigurationException;
     
     /**
      * Update or create a new Metadata pojo.
@@ -117,11 +117,11 @@ public interface IMetadataBusiness {
      * @param metadataId identifier of the metadata.
      * @param metadata Marshallable geotk metadata.
      * 
-     * @return true if the update succeed.
+     * @return The created/update Metadata pojo.
      * 
      * @throws org.constellation.configuration.ConfigurationException
      */
-    boolean updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException;
+    Metadata updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException;
     
     /**
      * Update or create a new Metadata pojo.
@@ -131,11 +131,11 @@ public interface IMetadataBusiness {
      * @param dataID Identifier of the linked data (can be {@code null})
      * @param datasetID Identifier of the linked dataset (can be {@code null})
      * @param owner User who owes the metadata.
-     * @return true if the update succeed.
+     * @return The created/update Metadata pojo.
      * 
      * @throws org.constellation.configuration.ConfigurationException
      */
-    boolean updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException;
+    Metadata updateMetadata(final String metadataId, final String xml, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException;
     
     /**
      * Update or create a new Metadata pojo.
@@ -146,10 +146,10 @@ public interface IMetadataBusiness {
      * @param datasetID Identifier of the linked dataset (can be {@code null}).
      * @param owner User who owes the metadata.
      *
-     * @return true if the update succeed.
+     * @return The created/update Metadata pojo.
      * @throws org.constellation.configuration.ConfigurationException
      */
-    boolean updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException;
+    Metadata updateMetadata(final String metadataId, final DefaultMetadata metadata, final Integer dataID, final Integer datasetID, final Integer owner) throws ConfigurationException;
     
     /**
      * Returns all the metadata identifier associated with a csw service.
@@ -169,8 +169,9 @@ public interface IMetadataBusiness {
      * 
      * @param metadataId Identifier of the geotk metadata object.
      * @param cswIdentifier identifer of the CSW instance.
+     * @throws org.constellation.configuration.ConfigurationException
      */
-    void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier);
+    void linkMetadataIDToCSW(final String metadataId, final String cswIdentifier) throws ConfigurationException;
     
     /**
      * Remove the link beetween a CSW service and a metadata.

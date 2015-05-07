@@ -104,11 +104,11 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
                 indexer.removeDocument(identifier);
                 indexer.indexDocument(original);
             }
-            boolean success = metadataBusiness.updateMetadata(identifier, sw.toString());
+            metadataBusiness.updateMetadata(identifier, sw.toString());
             if (partial) {
                 metadataBusiness.linkMetadataIDToCSW(identifier, id);
             }
-            return success;
+            return true;
         } catch (TransformerException | ConfigurationException ex) {
             throw new MetadataIoException("Unable to write the file.", ex, NO_APPLICABLE_CODE);
         }
@@ -183,8 +183,10 @@ public class InternalMetadataWriter extends AbstractMetadataWriter {
                     throw new MetadataIoException(ex);
                 }
             }
-            if (partial) {
+            try {
                 metadataBusiness.linkMetadataIDToCSW(metadataID, id);
+            } catch (ConfigurationException ex) {
+                throw new MetadataIoException(ex);
             }
         }
     }
