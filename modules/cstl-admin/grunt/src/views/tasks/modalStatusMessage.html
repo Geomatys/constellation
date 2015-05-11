@@ -2,9 +2,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title">{{taskStatus.title}} - {{taskStatus.status}}</h4>
+            <h4 class="modal-title">{{taskStatus.title}} - {{statusLabelKey(taskStatus) | translate}}</h4>
         </div>
-        <div class="modal-body modal-body-style" style="padding-top: 15px; overflow: auto;">
+        <div class="modal-body modal-body-style" class="task-status-body" >
 
             <div class="row">
                 <div class="col-xs-12 col-md-6">
@@ -17,25 +17,26 @@
                 </div>
             </div>
 
-            <div ng-if="showOutputs">
-                <div class="row" style="margin-top: 15px;">
+            <div ng-if="outputs.length > 0" class="output-block">
+                <div class="row">
                     <div class="col-xs-12 col-md-6">
-                        <h5 style="font-weight: bold;">Outputs :</h5>
+                        <h5 class="code-label" translate="task.status.outputs">Outputs :</h5>
                     </div>
                 </div>
-                <div ng-repeat='(key, value) in taskStatus.output track by key'>
-                    <span style="font-weight: bold;">{{key}}</span>
-                    <pre class="code-pre">{{value}}</pre>
+                <div ng-repeat='out in outputs'>
+                    <span class="code-label">{{out.identifier}}</span>
+                    <pre class="code-pre">{{out.value}}</pre>
                 </div>
             </div>
 
-            <div ng-if="showMessage">
-                <div class="row" style="margin-top: 15px;">
+            <div ng-if="showMessage" class="message-block">
+                <div class="row">
                     <div class="col-xs-12 col-md-6">
-                        <span translate="task.history.error.msg" style="font-weight: bold;">Error message</span>:
+
+                        <span translate="task.history.error.msg" class="code-label">Error message</span>:
                     </div>
                 </div>
-                <pre class="code-pre">{{taskStatus.message}}</pre>
+                <pre class="code-pre">{{message}}</pre>
             </div>
 
         </div>

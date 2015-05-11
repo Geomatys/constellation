@@ -1080,6 +1080,11 @@
     "tasks.history.show.success":"Voir les sorties",
     "task.start":"Date de début:",
     "task.end":"Date de fin:",
+    "task.status.outputs":"Sorties:",
+    "task.status.succeed":"Succès",
+    "task.status.warning":"Succès partiel",
+    "task.status.failed":"Echoué",
+    "task.status.cancelled":"Annulé",
 
     "mapcontext.information.title":"Compositions cartographiques disponibles",
 

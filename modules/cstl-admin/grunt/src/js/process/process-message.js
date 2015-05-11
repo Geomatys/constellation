@@ -22,38 +22,79 @@ angular.module('cstl-process-message', ['ui.bootstrap.modal'])
 
     .controller('ModalStatusMessageController', function($scope, $modalInstance, taskStatus) {
 
-        /**
-         * @param candidate
-         * @return {boolean} true if candidate is NOT null and NOT empty, false otherwise.
-         */
-        function checkNullEmpty(candidate) {
+        function isNullOrEmpty(candidate) {
             if (candidate !== null) {
                 if (angular.isString(candidate)) {
-                    return candidate.length > 0;
+                    return candidate.length === 0;
                 }
-                return true;
+                return false;
             }
-            return false;
+            return true;
+        }
+
+        function extractMessage(message) {
+            if (angular.isString(message)) {
+                return message;
+            }
+            if (angular.isArray(message)) {
+                return message[0];
+            }
+        }
+
+        function cleanOutput(output) {
+            if (!isNullOrEmpty(output) && angular.isArray(output) && output.length === 1) {
+                return output[0];
+            }
+            return output;
+        }
+
+        function prepareOutputs(rawOutputs) {
+            var outputs = [];
+
+            var i = 0;
+            for (var rawOutput in rawOutputs) {
+                if (rawOutputs.hasOwnProperty(rawOutput)) {
+                    var output = {};
+                    output.identifier = rawOutput;
+                    output.value = cleanOutput(rawOutputs[rawOutput]);
+                    outputs[i] = output;
+                    i++;
+                }
+            }
+            return outputs;
         }
 
         function init() {
-            if (checkNullEmpty($scope.taskStatus.output)) {
-                $scope.taskStatus.output = angular.fromJson($scope.taskStatus.output);
+            // convert json to object
+            if (!isNullOrEmpty($scope.taskStatus.output)) {
+                var rawOutputs = angular.fromJson($scope.taskStatus.output);
+                $scope.outputs = prepareOutputs(rawOutputs);
             }
 
-            if (angular.isArray($scope.taskStatus.output) && $scope.taskStatus.output.length > 0) {
-                $scope.taskStatus.output = $scope.taskStatus.output[0];
-                $scope.showOutputs = true;
-            } else {
-                $scope.showOutputs = checkNullEmpty($scope.taskStatus.output);
-            }
+            $scope.message = extractMessage($scope.taskStatus.message);
+            $scope.showMessage = !isNullOrEmpty($scope.message);
 
-            $scope.showMessage = checkNullEmpty($scope.taskStatus.message);
         }
+
+        $scope.messageType = taskStatus.status;
+        $scope.message = null;
+        $scope.showMessage = true;
+
+        $scope.outputs = [];
 
         $scope.taskStatus = taskStatus;
         $scope.close = $scope.cancel = $modalInstance.close;
 
         init();
+
+        $scope.statusLabelKey = function(status) {
+            switch(status.status) {
+                case 'SUCCEED' : return 'task.status.succeed';
+                case 'WARNING' : return 'task.status.warning';
+                case 'FAILED' : return 'task.status.failed';
+                case 'CANCELLED' : return 'task.status.cancelled';
+                default : return status.status;
+            }
+        };
     });
 

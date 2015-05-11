@@ -23,6 +23,7 @@ package org.constellation.scheduler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,6 +125,9 @@ public class QuartzJobListener implements JobListener {
         private final Task taskEntity;
         private IProcessBusiness processBusiness;
 
+        /** Used to store eventual warnings process could send us. */
+        private final ArrayList<ProcessEvent> warnings = new ArrayList<ProcessEvent>();
+
         public StateListener(String taskId, String title) {
             this.taskId = taskId;
             if (processBusiness == null) {
@@ -157,6 +161,10 @@ public class QuartzJobListener implements JobListener {
                 }
             }
 
+            if (event.getException() != null) {
+                warnings.add(event);
+            }
+
             updateTask(taskEntity);
         }
 
@@ -178,7 +186,6 @@ public class QuartzJobListener implements JobListener {
 
         @Override
         public void completed(ProcessEvent event) {
-            taskEntity.setState(TaskState.SUCCEED.name());
             taskEntity.setDateEnd(System.currentTimeMillis());
             taskEntity.setMessage(toString(event.getTask()));
             roundProgression(event);
@@ -192,18 +199,26 @@ public class QuartzJobListener implements JobListener {
                 }
             }
 
+            // If a warning occurred, send exception to the user.
+            if (!warnings.isEmpty()) {
+                taskEntity.setState(TaskState.WARNING.name());
+                taskEntity.setMessage(processWarningMessage());
+            } else {
+                taskEntity.setState(TaskState.SUCCEED.name());
+            }
+
             updateTask(taskEntity);
         }
+
 
         @Override
         public void failed(ProcessEvent event) {
             taskEntity.setState(TaskState.FAILED.name());
             taskEntity.setDateEnd(System.currentTimeMillis());
-            StringWriter errors = new StringWriter();
-            if (event.getException() != null) {
-                event.getException().printStackTrace(new PrintWriter(errors));
-            }
-            taskEntity.setMessage(toString(event.getTask()) + " cause : " + errors.toString());
+
+            final Exception exception = event.getException();
+            final String exceptionStr = printException(exception);
+            taskEntity.setMessage(toString(event.getTask()) + " cause : " + exceptionStr);
             //taskEntity.setProgress((double) event.getProgress());
             updateTask(taskEntity);
         }
@@ -228,6 +243,44 @@ public class QuartzJobListener implements JobListener {
             taskStatus.setOutput(taskEntity.getTaskOutput());
 
             SpringHelper.sendEvent(taskStatus);
+        }
+
+        /**
+         * Format :
+         * "
+         * Task1 description : exceptionMessage
+         * stacktrace
+         *
+         * Task2 description : exceptionMessage
+         * stacktrace
+         * "
+         * @return
+         */
+        private String processWarningMessage() {
+            final StringBuilder warningStr = new StringBuilder();
+            for (ProcessEvent warning : warnings) {
+                warningStr.append(warning.getTask().toString()).append(" : ");
+                warningStr.append(printException(warning.getException()));
+                warningStr.append('\n');
+            }
+            return warningStr.toString();
+        }
+
+        /**
+         * Print an exception.
+         * Format :
+         * "message
+         * stacktrace"
+         * @param exception
+         * @return
+         */
+        public String printException(Exception exception) {
+            StringWriter errors = new StringWriter();
+            if (exception != null) {
+                errors.append(exception.getMessage()).append('\n');
+                exception.printStackTrace(new PrintWriter(errors));
+            }
+            return errors.toString();
         }
 
         /**

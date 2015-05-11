@@ -30,5 +30,6 @@ public enum TaskState {
     SUCCEED,
     FAILED,
     CANCELLED,
-    PAUSED
+    PAUSED,
+    WARNING
 }

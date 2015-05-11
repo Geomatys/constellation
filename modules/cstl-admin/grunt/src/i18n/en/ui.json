@@ -1105,6 +1105,12 @@
     "tasks.history.show.success":"Show outputs",
     "task.start":"Start date:",
     "task.end":"End date:",
+    "task.status.outputs":"Outputs:",
+    "task.status.succeed":"Succeed",
+    "task.status.warning":"Partial success",
+    "task.status.failed":"Failed",
+    "task.status.cancelled":"Cancelled",
+
 
     "mapcontext.information.title":"Available map context",
 

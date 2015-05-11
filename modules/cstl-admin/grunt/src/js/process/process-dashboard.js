@@ -209,6 +209,9 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
             if (status.status === 'FAILED' || status.status === 'CANCELLED') {
                 return "danger";
             }
+            if (status.status === 'WARNING') {
+                return "warning";
+            }
             if (status.status === 'SUCCEED') {
                 return "success";
             }
@@ -217,6 +220,7 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
         $scope.statusHistoryFilter = function(status) {
             return (status.status === 'FAILED' ||
                 status.status === 'CANCELLED' ||
+                status.status === 'WARNING' ||
                 status.status === 'SUCCEED');
         };
 
@@ -224,8 +228,18 @@ angular.module('cstl-process-dashboard', ['cstl-restapi', 'cstl-services', 'ui.b
             if (status.status === 'FAILED' || status.status === 'CANCELLED') {
                 return 'tasks.history.show.error';
             }
-            if (status.status === 'SUCCEED') {
+            if (status.status === 'SUCCEED' || status.status === 'WARNING') {
                 return 'tasks.history.show.success';
+            }
+        };
+
+        $scope.statusLabelKey = function(status) {
+            switch(status.status) {
+                case 'SUCCEED' : return 'task.status.succeed';
+                case 'WARNING' : return 'task.status.warning';
+                case 'FAILED' : return 'task.status.failed';
+                case 'CANCELLED' : return 'task.status.cancelled';
+                default : return status.status;
             }
         };
 
