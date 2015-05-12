@@ -364,11 +364,11 @@ public class TemplateReader extends AbstractTemplateHandler {
             // special case
             if (type == ReferenceSystem.class) {
                 return new ReferenceSystemMetadata();
-            } else if (type == TemporalPrimitive.class) {
+            } else if (type == TemporalPrimitive.class || type == TimePeriodType.class) {
                 return new TimePeriodType();
             } else if (type == TimePositionType.class) {
                 return new TimePositionType();    
-            } else if (type == TimeInstantType.class) {
+            } else if (type == TimeInstantType.class || type == Instant.class) {
                 return new TimeInstantType();    
                 
             } else if (type != null) {
