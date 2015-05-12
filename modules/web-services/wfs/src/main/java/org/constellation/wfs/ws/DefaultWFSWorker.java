@@ -1695,7 +1695,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             filter = (Filter) filter.accept(new GMLNamespaceVisitor(), null);
             filter = (Filter) filter.accept(new BooleanVisitor(ft), null);
 
-            if (!CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)) {
+            if (exposedCrs!=null && trueCrs!=null && !CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)) {
                 filter = (Filter) filter.accept(FillCrsVisitor.VISITOR, exposedCrs);
                 filter = (Filter) filter.accept(new CrsAdjustFilterVisitor(exposedCrs, trueCrs), null);
             }
