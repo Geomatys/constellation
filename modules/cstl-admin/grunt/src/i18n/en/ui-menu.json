@@ -12,7 +12,7 @@
     "global.menu.mapcontext-min": "Map Context",
     "global.menu.viewer": "Map Viewer",
     "global.menu.tasks":"Process",
-    "global.menu.account.login": "Authenticate",
+    "global.menu.account.login": "Sign In",
     "global.menu.account.registation":"Register",
     "global.menu.admin.about":"About Constellation",
     "global.menu.admin.contact": "Contact",
