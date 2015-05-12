@@ -51,8 +51,9 @@ public class BooleanVisitor extends DuplicatingFilterVisitor {
 
                 // Add a support for a filter on boolean property using integer 0 or 1
                 if (ft != null) {
-                    final AttributeDescriptor descriptor = (AttributeDescriptor) property.evaluate(ft);
-                    if (descriptor != null) {
+                    final Object obj = property.evaluate(ft);
+                    if (obj instanceof AttributeDescriptor) {
+                        final AttributeDescriptor descriptor = (AttributeDescriptor) obj;
                         if (descriptor.getType().getBinding().equals(Boolean.class) && literal.getValue() instanceof Number) {
                             final Literal booleanLit;
                             if (literal.getValue().equals(1.0)) {
