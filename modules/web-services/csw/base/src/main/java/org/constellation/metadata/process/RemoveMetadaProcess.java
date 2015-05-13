@@ -64,7 +64,7 @@ public class RemoveMetadaProcess extends AbstractCstlProcess {
                 configurer.removeRecords(serviceID, metadataID);
             }
         } catch (ConfigurationException ex) {
-            throw new ProcessException(null, this, ex);
+            throw new ProcessException(ex.getMessage(), this, ex);
         }
     }
 }
