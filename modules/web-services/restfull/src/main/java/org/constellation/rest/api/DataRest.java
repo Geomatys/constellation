@@ -2190,7 +2190,7 @@ public class DataRest {
             }
             if (metadata != null) {
                 metadata.prune();
-                final String xmlStr = dataBusiness.marshallMetadata(metadata);
+                final String xmlStr = metadataBusiness.marshallMetadata(metadata);
                 return Response.ok(xmlStr, MediaType.APPLICATION_XML_TYPE)
                         .header("Content-Disposition", "attachment; filename=\"" + providerId + ".xml\"").build();
             }

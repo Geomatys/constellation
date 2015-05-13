@@ -147,7 +147,7 @@ public class DataSetRest {
                     } else {
                         metadata = dataBusiness.unmarshallMetadata(f);
                     }
-                    metadataXML = dataBusiness.marshallMetadata(metadata);
+                    metadataXML = metadataBusiness.marshallMetadata(metadata);
                 }
                 
                 Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
@@ -200,7 +200,7 @@ public class DataSetRest {
             final DefaultMetadata metadata  =  datasetBusiness.getMetadata(datasetIdentifier);
             if (metadata != null) {
                 metadata.prune();
-                final String xmlStr = dataBusiness.marshallMetadata(metadata);
+                final String xmlStr = metadataBusiness.marshallMetadata(metadata);
                 return Response.ok(xmlStr, MediaType.APPLICATION_XML_TYPE)
                         .header("Content-Disposition", "attachment; filename=\"" + datasetIdentifier + ".xml\"").build();
             }

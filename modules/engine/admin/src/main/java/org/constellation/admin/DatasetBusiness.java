@@ -61,7 +61,6 @@ import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.provider.DataProvider;
@@ -433,11 +432,12 @@ public class DatasetBusiness implements IDatasetBusiness {
                     FileUtilities.deleteDirectory(provDir);
                 }
             }
-            // 3. remove internal csw link
-            datasetRepository.removeDatasetFromAllCSW(ds.getId());
             
-            // 4. remove metadata
+            // 3. remove metadata
             metadataBusiness.deleteDatasetMetadata(ds.getId());
+            
+            // 4. remove internal csw link
+            datasetRepository.removeDatasetFromAllCSW(ds.getId());
             
             // 5. remove dataset
             indexEngine.removeDatasetMetadataFromIndex(ds.getId());

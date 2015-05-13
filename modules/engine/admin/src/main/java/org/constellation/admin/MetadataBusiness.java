@@ -485,13 +485,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public void updatePublication(final int id, final boolean newStatus) throws ConfigurationException {
-        final Metadata metadata = metadataRepository.findById(id);
-        if (metadata != null) {
-            metadataRepository.changePublication(id, newStatus);
-            final boolean prev = metadata.getIsPublished();
-            metadata.setIsPublished(newStatus);
-            updateInternalCSWIndex(Arrays.asList(new MetadataWithState(metadata, prev)), true);
-        }
+        updatePublication(Arrays.asList(id), newStatus);
     }
     
     /**
@@ -615,6 +609,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public void updateInternalCSWIndex(final List<MetadataWithState> metadatas, final boolean update) throws ConfigurationException {
+        if (metadatas.isEmpty()) return;
         try {
             final List<Service> services = serviceRepository.findByType("csw");
             for (Service service : services) {
@@ -622,8 +617,9 @@ public class MetadataBusiness implements IMetadataBusiness {
                 final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 // read config to determine CSW type
                 final Automatic conf = (Automatic) um.unmarshal(new StringReader(service.getConfig()));
+                GenericDatabaseMarshallerPool.getInstance().recycle(um);
                 
-                if (conf.getFormat().equals("internal")) {
+                if (isInternalCSW(conf.getFormat())) {
                     boolean partial       = conf.getBooleanParameter("partial", false);
                     boolean onlyPublished = conf.getBooleanParameter("onlyPublished", false);
                     final List<String> identifierToRemove = new ArrayList<>();
@@ -840,6 +836,9 @@ public class MetadataBusiness implements IMetadataBusiness {
         return mdList;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object unmarshallMetadata(final String metadata) throws ConfigurationException {
         try {
@@ -849,7 +848,11 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
-    protected String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String marshallMetadata(final Object metadata) throws ConfigurationException {
         try {
             return XML.marshal(metadata);
         } catch (JAXBException ex) {
@@ -1085,5 +1088,14 @@ public class MetadataBusiness implements IMetadataBusiness {
             }
         }
         return null;
+    }
+    
+    /**
+     * Return true if the specified CSW implementation handle internal metadata.
+     * @param implementation
+     * @return 
+     */
+    protected boolean isInternalCSW(String implementation) {
+        return "internal".equals(implementation);
     }
 }

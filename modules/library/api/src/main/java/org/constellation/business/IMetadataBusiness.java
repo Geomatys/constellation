@@ -433,7 +433,23 @@ public interface IMetadataBusiness {
      */
     int countValidated(final boolean status,final Map<String,Object> filterMap);
     
+    /**
+     * Unmarshall an xml metadata into geotk object.
+     * 
+     * @param metadata
+     * @return
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
     Object unmarshallMetadata(final String metadata) throws ConfigurationException;
+    
+    /**
+     * Marshall a geotk metadata object into a String.
+     * 
+     * @param metadata
+     * @return
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
+    String marshallMetadata(final Object metadata) throws ConfigurationException;
     
     String getTemplateFromMetadata(DefaultMetadata meta);
     
