@@ -278,27 +278,27 @@ public class WFSService extends GridWebService<WFSWorker> {
 
             } else if (request instanceof CreateStoredQuery) {
                 final CreateStoredQuery model = (CreateStoredQuery) request;
-                final WFSResponseWrapper response = new WFSResponseWrapper(worker.createStoredQuery(model));
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.createStoredQuery(model),version.version.toString());
                 return Response.ok(response, MediaType.TEXT_XML).build();
 
             } else if (request instanceof DropStoredQuery) {
                 final DropStoredQuery model = (DropStoredQuery) request;
-                final WFSResponseWrapper response = new WFSResponseWrapper(worker.dropStoredQuery(model));
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.dropStoredQuery(model),version.version.toString());
                 return Response.ok(response, MediaType.TEXT_XML).build();
 
             } else if (request instanceof ListStoredQueries) {
                 final ListStoredQueries model = (ListStoredQueries) request;
-                final WFSResponseWrapper response = new WFSResponseWrapper(worker.listStoredQueries(model));
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.listStoredQueries(model),version.version.toString());
                 return Response.ok(response, MediaType.TEXT_XML).build();
 
             } else if (request instanceof DescribeStoredQueries) {
                 final DescribeStoredQueries model = (DescribeStoredQueries) request;
-                final WFSResponseWrapper response = new WFSResponseWrapper(worker.describeStoredQueries(model));
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.describeStoredQueries(model),version.version.toString());
                 return Response.ok(response, MediaType.TEXT_XML).build();
 
             } else if (request instanceof GetGmlObject) {
                 final GetGmlObject model = (GetGmlObject) request;
-                final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model),version.version.toString());
                 return Response.ok(response, MediaType.TEXT_XML).build();
 
             } else if (request instanceof LockFeature) {

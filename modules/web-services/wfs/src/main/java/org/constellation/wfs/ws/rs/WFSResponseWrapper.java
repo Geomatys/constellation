@@ -28,9 +28,11 @@ import org.geotoolkit.wfs.xml.WFSResponse;
 public class WFSResponseWrapper implements WFSResponse {
 
     private final Object response;
+    private final String version;
 
-    public WFSResponseWrapper(final Object response) {
+    public WFSResponseWrapper(final Object response,String version) {
         this.response = response;
+        this.version = version;
     }
 
     /**
@@ -39,4 +41,10 @@ public class WFSResponseWrapper implements WFSResponse {
     public Object getResponse() {
         return response;
     }
+
+    @Override
+    public String getVersion() {
+        return version;
+    }
+    
 }
