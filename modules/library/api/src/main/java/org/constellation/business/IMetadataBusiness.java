@@ -288,6 +288,22 @@ public interface IMetadataBusiness {
     void deleteMetadata(final int id) throws ConfigurationException;
     
     /**
+     * Delete the linked metadata pojo for the specified data.
+     * 
+     * @param dataId identifier of the data pojo.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
+    void deleteDataMetadata(final int dataId) throws ConfigurationException;
+    
+    /**
+     * Delete the linked metadata pojo for the specified dataszt.
+     * 
+     * @param datasetId identifier of the dataset pojo.
+     * @throws org.constellation.configuration.ConfigurationException 
+     */
+    void deleteDatasetMetadata(final int datasetId) throws ConfigurationException;
+    
+    /**
      * Delete a list of metadata pojo.
      * 
      * @param ids List of metadata pojo identifiers.

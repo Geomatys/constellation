@@ -541,10 +541,28 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public void deleteMetadata(int id) throws ConfigurationException {
-        final Metadata metadata = metadataRepository.findById(id);
-        if (metadata != null) {
-            updateInternalCSWIndex(Arrays.asList(new MetadataWithState(metadata, metadata.getIsPublished())), false);
-            metadataRepository.delete(id);
+        deleteMetadata(Arrays.asList(id));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteDataMetadata(final int dataId) throws ConfigurationException {
+        final Metadata meta = metadataRepository.findByDataId(dataId);
+        if (meta != null) {
+            deleteMetadata(meta.getId());
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteDatasetMetadata(final int datasetId) throws ConfigurationException {
+        final Metadata meta = metadataRepository.findByDatasetId(datasetId);
+        if (meta != null) {
+            deleteMetadata(meta.getId());
         }
     }
     

@@ -39,7 +39,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -70,14 +69,12 @@ import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Layer;
-import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.LayerRepository;
-import org.constellation.engine.register.repository.MetadataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.StyleRepository;
@@ -88,8 +85,6 @@ import org.constellation.token.TokenUtils;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.metadata.ImageStatistics;
-import org.geotoolkit.metadata.dimap.DimapAccessor;
-import org.geotoolkit.util.DomUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.PropertyType;
 import org.slf4j.Logger;
@@ -102,15 +97,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
-import java.util.Arrays;
 import org.constellation.business.IMetadataBusiness;
-import org.constellation.engine.register.MetadataWithState;
 import org.constellation.engine.register.repository.ServiceRepository;
 
 
@@ -175,8 +166,6 @@ public class DataBusiness implements IDataBusiness {
      */
     @Inject
     protected IMetadataBusiness metadataBusiness;
-    @Inject
-    protected MetadataRepository metadataRepository;
     /**
      * Injected lucene index engine.
      */
@@ -218,7 +207,7 @@ public class DataBusiness implements IDataBusiness {
      */
     @Override
     public DefaultMetadata loadIsoDataMetadata(final String providerId,
-                                               final QName name) throws ConfigurationException{
+                                               final QName name) throws ConfigurationException {
         final Data data = dataRepository.findDataFromProvider(name.getNamespaceURI(), name.getLocalPart(), providerId);
         return metadataBusiness.getIsoMetadataForData(data.getId());
     }
@@ -246,11 +235,11 @@ public class DataBusiness implements IDataBusiness {
      * {@inheritDoc}
      */
     @Override
-    public List<Data> searchOnMetadata(final String queryString) throws IOException, ConstellationException {
+    public List<Data> searchOnMetadata(final String query) throws IOException, ConstellationException {
         final List<Data> result = new ArrayList<>();
         final Set<Integer> ids;
         try {
-            ids = indexEngine.searchOnMetadata(queryString, "dataId");
+            ids = indexEngine.searchOnMetadata(query, "dataId");
         } catch( ParseException ex) {
             throw new ConstellationException(ex);
         }
@@ -505,7 +494,7 @@ public class DataBusiness implements IDataBusiness {
      */
     @Override
     @Transactional
-    public void missingData(final QName name, final String providerIdentifier) {
+    public void missingData(final QName name, final String providerIdentifier) throws ConfigurationException {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
             final Data data = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), provider.getId());
@@ -514,6 +503,7 @@ public class DataBusiness implements IDataBusiness {
                 indexEngine.removeDataMetadataFromIndex(data.getId());
 
                 // delete data entry
+                metadataBusiness.deleteDataMetadata(data.getId());
                 dataBusinessListener.preDataDelete(data);
                 dataRepository.delete(data.getId());
                 dataBusinessListener.postDataDelete(data);
@@ -524,11 +514,12 @@ public class DataBusiness implements IDataBusiness {
         }
     }
 
-    protected void deleteDatasetIfEmpty(Integer datasetID) {
+    protected void deleteDatasetIfEmpty(Integer datasetID) throws ConfigurationException {
         if (datasetID != null) {
             List<Data> datas = dataRepository.findAllByDatasetId(datasetID);
             if (datas.isEmpty()) {
                 indexEngine.removeDatasetMetadataFromIndex(datasetID);
+                metadataBusiness.deleteDatasetMetadata(datasetID);
                 datasetRepository.remove(datasetID);
             }
         }
@@ -552,10 +543,11 @@ public class DataBusiness implements IDataBusiness {
      */
     @Override
     @Transactional
-    public void deleteAll() {
+    public void deleteAll() throws ConfigurationException {
         final List<Data> datas = dataRepository.findAll();
         for (final Data data : datas) {
             indexEngine.removeDataMetadataFromIndex(data.getId());
+            metadataBusiness.deleteDataMetadata(data.getId());
             dataBusinessListener.preDataDelete(data);
             dataRepository.delete(data.getId());
             dataBusinessListener.postDataDelete(data);
@@ -639,6 +631,8 @@ public class DataBusiness implements IDataBusiness {
                 //notify pre delete
                 for (Data pdata : providerData) {
                     dataBusinessListener.preDataDelete(pdata);
+                    // remove metadata
+                    metadataBusiness.deleteDataMetadata(pdata.getId());
                 }
 
                 final Provider p = providerRepository.findOne(providerID);
@@ -658,12 +652,6 @@ public class DataBusiness implements IDataBusiness {
 
             // Relevant erase dataset when there is no more data in it. for now we remove it
             deleteDatasetIfEmpty(data.getDatasetId());
-
-            // update internal CSW index
-            Metadata metadata = metadataRepository.findByDataId(data.getId());
-            if (metadata != null) {
-                metadataBusiness.updateInternalCSWIndex(Arrays.asList(new MetadataWithState(metadata, metadata.getIsPublished())), false); 
-            }
         }
     }
 
@@ -672,13 +660,14 @@ public class DataBusiness implements IDataBusiness {
      */
     @Override
     @Transactional
-    public synchronized void removeDataFromProvider(final String providerId) {
+    public synchronized void removeDataFromProvider(final String providerId) throws ConfigurationException {
         final Provider p = providerRepository.findByIdentifier(providerId);
         if (p != null) {
             final List<Data> datas = dataRepository.findByProviderId(p.getId());
             for (final Data data : datas) {
                 indexEngine.removeDataMetadataFromIndex(data.getId());
                 dataBusinessListener.preDataDelete(data);
+                metadataBusiness.deleteDataMetadata(data.getId());
                 dataRepository.delete(data.getId());
                 dataBusinessListener.postDataDelete(data);
                 // Relevant erase dataset when the is no more data in it. fr now we remove it

@@ -54,8 +54,9 @@ public interface IDataBusiness {
      *
      * @param name given data name.
      * @param providerIdentifier given provider identifier.
+     * @throws org.constellation.configuration.ConfigurationException
      */
-    void missingData(QName name, String providerIdentifier);
+    void missingData(QName name, String providerIdentifier) throws ConfigurationException;
 
     /**
      * Set {@code updated} attribute to {@code false} in removed data and his children.
@@ -63,9 +64,9 @@ public interface IDataBusiness {
      *
      * @see #updateDataIncluded(int, boolean)
      * @param dataId
-     * @throws ConfigurationException
+     * @throws org.constellation.configuration.ConfigurationException
      */
-    void removeData(Integer dataId)throws ConfigurationException;
+    void removeData(Integer dataId) throws ConfigurationException;
 
     /**
      * Proceed to create a new data for given parameters.
@@ -101,8 +102,9 @@ public interface IDataBusiness {
      * Proceed to remove data for given provider.
      * Synchronized method.
      * @param providerId given provider identifier.
+     * @throws org.constellation.configuration.ConfigurationException
      */
-    void removeDataFromProvider(String providerId);
+    void removeDataFromProvider(String providerId) throws ConfigurationException ;
 
     /**
      * Returns {@link DataBrief} for given data name and provider id as integer.
@@ -129,7 +131,7 @@ public interface IDataBusiness {
      * @param providerId given data provider id.
      * @param name given data name.
      * @return {@link DefaultMetadata}
-     * @throws ConfigurationException is thrown for UnsupportedEncodingException or JAXBException.
+     * @throws org.constellation.configuration.ConfigurationException is thrown for UnsupportedEncodingException or JAXBException.
      */
     DefaultMetadata loadIsoDataMetadata(String providerId, QName name)  throws ConfigurationException;
 
@@ -139,10 +141,19 @@ public interface IDataBusiness {
 
     /**
      * Proceed to remove all data.
+     * @throws org.constellation.configuration.ConfigurationException
      */
-    void deleteAll();
+    void deleteAll() throws ConfigurationException ;
 
-    List<Data> searchOnMetadata(String search) throws IOException, ConstellationException;
+    /**
+     * Search in the lucene index for data matching the supplied query.
+     * 
+     * @param query
+     * 
+     * @return A list
+     * @throws IOException
+     */
+    List<Data> searchOnMetadata(String query) throws IOException, ConstellationException;
 
     /**
      * Update data {@code included} attribute.
@@ -244,7 +255,7 @@ public interface IDataBusiness {
      * Returns {@link Data} instance for given data id.
      * @param id given data id.
      * @return {@link Data} object.
-     * @throws ConfigurationException
+     * @throws org.constellation.configuration.ConfigurationException
      */
     Data findById(final Integer id)throws ConfigurationException;
 
@@ -252,7 +263,7 @@ public interface IDataBusiness {
      * Get and parse data statistics.
      * @param dataId
      * @return ImageStatistics object or null if data is not a coverage or if Statistics were not computed.
-     * @throws ConfigurationException
+     * @throws org.constellation.configuration.ConfigurationException
      */
     ImageStatistics getDataStatistics(final int dataId) throws ConfigurationException;
 

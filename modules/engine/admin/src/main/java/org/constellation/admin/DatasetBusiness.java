@@ -58,7 +58,6 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DatasetRepository;
@@ -80,9 +79,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
-import java.util.Arrays;
 import org.constellation.business.IMetadataBusiness;
-import org.constellation.engine.register.MetadataWithState;
 
 /**
  *
@@ -132,18 +129,12 @@ public class DatasetBusiness implements IDatasetBusiness {
      */
     @Inject
     protected IMetadataBusiness metadataBusiness;
-    @Inject
-    protected MetadataRepository metadataRepository;
     /**
      * Injected lucene index engine.
      */
     @Inject
     protected IndexEngine indexEngine;
     
-    @Inject
-    private org.constellation.security.SecurityManager securityManager;
-
-
     @Autowired(required = false)
     private IDataBusinessListener dataBusinessListener = new DefaultDataBusinessListener();
 
@@ -417,10 +408,7 @@ public class DatasetBusiness implements IDatasetBusiness {
                 data.setDatasetId(null);
                 dataRepository.update(data);
                 involvedProvider.add(data.getProvider());
-                Metadata meta = metadataRepository.findByDataId(data.getId());
-                if (meta != null) {
-                    metadataBusiness.updateInternalCSWIndex(Arrays.asList(new MetadataWithState(meta, meta.getIsPublished())), false);
-                }
+                metadataBusiness.deleteDataMetadata(data.getId());
                 dataRepository.removeDataFromAllCSW(data.getId());
             }
 
@@ -448,15 +436,12 @@ public class DatasetBusiness implements IDatasetBusiness {
             // 3. remove internal csw link
             datasetRepository.removeDatasetFromAllCSW(ds.getId());
             
-            // 4. remove dataset
+            // 4. remove metadata
+            metadataBusiness.deleteDatasetMetadata(ds.getId());
+            
+            // 5. remove dataset
             indexEngine.removeDatasetMetadataFromIndex(ds.getId());
             datasetRepository.remove(ds.getId());
-            
-            // update internal CSW index
-            final Metadata meta = metadataRepository.findByDatasetId(ds.getId());
-            if (meta != null) {
-                metadataBusiness.updateInternalCSWIndex(Arrays.asList(new MetadataWithState(meta, meta.getIsPublished())), false);
-            }
         }
     }
     
