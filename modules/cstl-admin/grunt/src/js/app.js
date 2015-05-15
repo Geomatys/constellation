@@ -121,9 +121,10 @@ cstlAdminApp
                     templateUrl: 'views/data/description.html',
                     controller: 'EditMetadataController'
                 })
-                .when('/data/:tabindex?', {
+                .when('/data/:tab?', {
                     templateUrl: 'views/data/data.html',
-                    controller: 'DataController'
+                    controller: 'DatasetDashboardController',
+                    controllerAs: 'dc'
                 })
                 .when('/sensors/:id?', {
                     templateUrl: 'views/sensor/sensors.html',
@@ -195,7 +196,7 @@ cstlAdminApp
             	}
             }
             console.log("Token duration set to: " + tokenDuration);
-            
+
             $idleProvider.idleDuration(tokenDuration*2);
 
             //The warning duration in seconds.

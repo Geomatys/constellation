@@ -280,13 +280,17 @@ angular.module('cstl-sensor-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bo
         };
 
         $scope.choose = function() {
-            var sensorId = ($scope.sensorModalChooseCtrl.selectedSensorsChild) ? $scope.sensorModalChooseCtrl.selectedSensorsChild.id : $scope.sensorModalChooseCtrl.selectedSensor.id;
-            dataListing.linkToSensor({providerId: selectedData.Provider,
-                                      dataId: selectedData.Name,
-                                      sensorId: sensorId},
-                                     {value: selectedData.Namespace},
+            var sensor = ($scope.sensorModalChooseCtrl.selectedSensorsChild) ? $scope.sensorModalChooseCtrl.selectedSensorsChild : $scope.sensorModalChooseCtrl.selectedSensor;
+            dataListing.linkToSensor({providerId: selectedData.providerIdentifier,
+                                      dataId: selectedData.name,
+                                      sensorId: sensor.id},
+                                     {value: selectedData.namespace},
                 function() {
-                    selectedData.TargetSensor.push(sensorId);
+                    selectedData.sensors.push({
+                        identifier: sensor.id,
+                        type: sensor.type
+                    });
+                    selectedData.sensorCount++;
                 });
             $modalInstance.dismiss('close');
         };

@@ -1,12 +1,11 @@
-
-<ul class="nav nav-tabs" id="navtabsData">
-    <li class="active tab-data" style="margin-left: 10px;">
-        <a ng-click="selectTab('tabdata')" data-toggle="tab" id="dataTab">
+<ul id="navtabsData" class="nav nav-tabs">
+    <li class="tab-data" ng-class="{active: dc.tab === 'dataset'}">
+        <a id="dataTab" data-toggle="tab" ng-click="dc.tab = 'dataset'">
             <span translate="data.dashboard.tab.data">Data</span>
         </a>
     </li>
-    <li class="tab-metadata">
-        <a ng-click="selectTab('tabmetadata')" data-toggle="tab" id="metadataTab">
+    <li class="tab-metadata" ng-class="{active: dc.tab === 'metadata'}">
+        <a id="metadataTab" data-toggle="tab" ng-click="dc.tab = 'metadata'">
             <span translate="data.dashboard.tab.metadata">Metadata</span>
         </a>
     </li>

@@ -20,6 +20,518 @@
 
 angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
+    .constant('defaultDatasetQuery', {
+        page: 1,
+        size: 10,
+        sort: { field: 'creation_date', order: 'DESC' },
+        excludeEmpty: true,
+        hasVectorData: null,
+        hasCoverageData: null,
+        hasLayerData: null,
+        hasSensorData: null
+    })
+
+    .controller('DatasetListingController', function($scope, DashboardHelper, Dataset, defaultDatasetQuery) {
+
+        var self = this;
+
+        // Apply DashboardHelper features on the controller instance.
+        DashboardHelper.call(self, Dataset.search, angular.copy(defaultDatasetQuery));
+
+        // Immediate content loading.
+        self.search();
+
+        // Method used to modify a query filter and launch the search.
+        self.setFilter = function(key, value) {
+            self.query[key] = value;
+            self.search();
+        };
+
+        // Method used to filter dataset on their data types.
+        self.setTypeFilter = function(type) {
+            switch (type) {
+                case 'VECTOR':
+                    self.query.hasVectorData = true;
+                    self.query.hasCoverageData = null;
+                    break;
+                case 'COVERAGE':
+                    self.query.hasVectorData = null;
+                    self.query.hasCoverageData = true;
+                    break;
+                default:
+                    self.query.hasVectorData = null;
+                    self.query.hasCoverageData = null;
+            }
+            self.search();
+        };
+
+        // Method used to reset the search criteria.
+        self.resetCriteria = function() {
+            self.query = angular.copy(defaultDatasetQuery);
+            self.search();
+        };
+
+        // Observe the 'reloadDatasets' event to re-launch the search.
+        $scope.$on('reloadDatasets', self.search);
+    })
+
+    .controller('DatasetDashboardController', function($scope, $routeParams, $http, $cookieStore, $modal, Growl, Dataset, Data, dataListing, style, provider) {
+
+        var self = this;
+
+        // Active tab ('dataset' or 'metadata').
+        self.tab = $routeParams.tab || 'dataset';
+
+        // Variable to store dataset or/and data selection.
+        var selection = self.selection = { dataset: null, data: null };
+
+        // Array of available ways to add a data.
+        self.addDataWays = [
+            {
+                idHTML: 'uploadchoice',
+                name: 'localFile',
+                translateKey: 'label.file.local',
+                defaultTranslateValue: 'Local file',
+                bindFunction: function() { startDataImport('local', 'step1DataLocal', true); }
+            },
+            {
+                idHTML: 'filesystemchoice',
+                name: 'serverFile',
+                translateKey: 'label.file.server',
+                defaultTranslateValue: 'Server file',
+                bindFunction: function() { startDataImport('server', 'step1DataServer', true); }
+            },
+            {
+                idHTML: 'dbchoice',
+                name: 'database',
+                translateKey: 'label.file.db',
+                defaultTranslateValue: 'Database',
+                bindFunction: function() { startDataImport('database', 'step1Database', true); }
+            }
+        ];
+
+
+        // Select/unselect a dataset/data.
+        self.toggleSelect = function(dataset, data) {
+            // Update dataset selection.
+            if (!self.isSelected(dataset)) {
+                selection.dataset = dataset;
+                setupDatasetData(dataset);
+            } else if (!data) {
+                selection.dataset = null;
+            }
+
+            // Update data selection.
+            if (data && !self.isSelected(data)) {
+                selection.data = data;
+                setupDataAssociations(data);
+                setupDataGeographicalExtent(data);
+            } else {
+                selection.data = null;
+            }
+
+            // Update data preview.
+            self.displayPreview();
+        };
+
+        // Determines if a dataset/data is selected.
+        self.isSelected = function(object) {
+            if (angular.isNumber(object.datasetId)) {
+                return selection.data && selection.data.id === object.id; // object is a data
+            } else {
+                return selection.dataset && selection.dataset.id === object.id; // object is a dataset
+            }
+        };
+
+        // Returns the data to display for a dataset.
+        self.getDataToDisplay = function(dataset) {
+            // If the specified dataset is selected, return its data.
+            if (self.isSelected(dataset)) {
+                setupDatasetData(dataset); // ensure that data are well loaded
+                return dataset.data;
+            }
+            // Otherwise return its data only if the specified dataset contains an
+            // unique data.
+            return dataset.dataCount === 1 ? dataset.data : [];
+        };
+
+        // Display the data in the preview map.
+        self.displayPreview = function() {
+            // Reset map state.
+            if (DataDashboardViewer.map) {
+                DataDashboardViewer.map.setTarget(undefined);
+            }
+            DataDashboardViewer.initConfig();
+            DataDashboardViewer.fullScreenControl = true;
+
+            if (selection.data) {
+                // Generate layer name.
+                var layerName = selection.data.name;
+                if (selection.data.namespace) {
+                    layerName = '{' + selection.data.namespace + '}' + layerName;
+                }
+
+                // Use the pyramid provider identifier for better performances.
+                var providerId = selection.data.providerIdentifier;
+                if (angular.isString(selection.data.pyramidProviderIdentifier)) {
+                    providerId = selection.data.pyramidProviderIdentifier;
+                }
+
+                // Create layer instance.
+                var layer;
+                if (selection.data.styles.length) {
+                    layer = DataDashboardViewer.createLayerWithStyle(
+                        $cookieStore.get('cstlUrl'),
+                        layerName,
+                        providerId,
+                        selection.data.styles[0].name,
+                        null,
+                        null,
+                        selection.data.type !== 'VECTOR');
+                } else {
+                    layer = DataDashboardViewer.createLayer(
+                        $cookieStore.get('cstlUrl'),
+                        layerName,
+                        providerId,
+                        null,
+                        selection.data.type !== 'VECTOR');
+                }
+                layer.get('params').ts = new Date().getTime();
+
+                // Setup the layer list.
+                DataDashboardViewer.layers = [layer];
+
+                // Zoom on the data extent if possible.
+                selection.data.extent.$promise.then(onGetDataExtentSuccess, onGetDataExtentError);
+            } else {
+                DataDashboardViewer.initMap('dataPreviewMap');
+            }
+        };
+
+        // Delete the selected dataset.
+        self.deleteDataset = function() {
+            if (!selection.dataset) {
+                return;
+            }
+            $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    keyMsg: function() { return 'dialog.message.confirm.delete.dataset'; }
+                }
+            }).result.then(function(confirmation) {
+                if (confirmation) {
+                    Dataset.delete({ id: selection.dataset.id }, onDatasetDeleteSuccess, onDatasetDeleteError);
+                }
+            });
+        };
+
+        // Delete the selected data.
+        self.deleteData = function() {
+            if (!selection.data) {
+                return;
+            }
+            $modal.open({
+                templateUrl: 'views/modal-confirm.html',
+                controller: 'ModalConfirmController',
+                resolve: {
+                    'keyMsg': function() { return 'dialog.message.confirm.delete.data'; }
+                }
+            }).result.then(function(confirmation){
+                if (confirmation) {
+                    Data.delete({ dataId: selection.data.id }, onDataDeleteSuccess, onDataDeleteError);
+                }
+            });
+        };
+
+        // Displays the metadata of the selected data.
+        self.openMetadata = function() {
+            if (!selection.data) {
+                return;
+            }
+            $modal.open({
+                templateUrl: 'views/data/modalViewMetadata.html',
+                controller: 'ViewMetadataModalController',
+                resolve: {
+                    dashboardName: function() { return 'data'; },
+                    metadataValues: function(textService) {
+                        return textService.metadataJson(
+                            selection.data.providerIdentifier,
+                            selection.data.name,
+                            selection.data.type === 'coverage' ? 'raster' : selection.data.type, // TODO - harmonize 'coverage' and 'raster' types...
+                            true);
+                    }
+                }
+            });
+        };
+
+        // Open the modal allowing to choose new style associations.
+        self.associateStyle = function() {
+            if (!selection.data) {
+                return;
+            }
+            $modal.open({
+                templateUrl: 'views/style/modalStyleChoose.html',
+                controller: 'StyleModalController',
+                resolve: {
+                    exclude: function() {
+                        // TODO - harmonize style POJOs structure
+                        return selection.data.styles.map(function(style) {
+                            return {
+                                Name: style.name,
+                                Provider: style.providerIdentifier,
+                                Type: style.type
+                            };
+                        });
+                    },
+                    selectedLayer: function() {
+                        // TODO - harmonize data POJOs structure
+                        return {
+                            Name: selection.data.name,
+                            Namespace: selection.data.namespace,
+                            Provider: selection.data.providerIdentifier,
+                            Type: selection.data.type
+                        };
+                    },
+                    selectedStyle: function() { return null; },
+                    serviceName: function() { return null; },
+                    newStyle: function() { return null; },
+                    stylechooser: function() { return null; }
+                }
+            }).result.then(function(item) {
+                if (angular.isObject(item)) {
+                    style.link({ provider: item.Provider, name: item.Name }, {
+                        values: {
+                            dataProvider: selection.data.providerIdentifier,
+                            dataNamespace: selection.data.namespace,
+                            dataId: selection.data.name
+                        }
+                    }, function() {
+                        selection.data.styles.push({
+                            id: item.Id,
+                            name: item.Name,
+                            providerIdentifier: item.Provider
+                        });
+                        selection.data.styleCount++;
+                        self.displayPreview();
+                    });
+                }
+            });
+        };
+
+        // Break the association between the selected data and a style.
+        self.dissociateStyle = function(style) {
+            if (!selection.data) {
+                return;
+            }
+            Data.dissociateStyle({ dataId: selection.data.id, styleId: style.id }, function() {
+                selection.data.styles.splice(selection.data.styles.indexOf(style), 1);
+                selection.data.styleCount--;
+                self.displayPreview();
+            });
+        };
+
+        // Open the model allowing the edit the specified style.
+        self.editStyle = function(reference) {
+            if (!selection.data) {
+                return;
+            }
+            style.get({ provider: reference.providerIdentifier, name: reference.name }, function(response) {
+                $modal.open({
+                    templateUrl: 'views/style/modalStyleEdit.html',
+                    controller: 'StyleModalController',
+                    resolve: {
+                        newStyle: function() { return response; },
+                        selectedLayer: function() {
+                            // TODO - harmonize data POJOs structure
+                            return {
+                                Name: selection.data.name,
+                                Namespace: selection.data.namespace,
+                                Provider: selection.data.providerIdentifier,
+                                Type: selection.data.type
+                            };
+                        },
+                        selectedStyle: function() { return null; },
+                        serviceName: function() { return null; },
+                        exclude: function() {  return null; },
+                        stylechooser: function() { return 'edit'; }
+                    }
+                }).result.then(self.displayPreview);
+            });
+        };
+
+        // Open the modal allowing to choose new sensor associations.
+        self.associateSensor = function() {
+            if (!selection.data) {
+                return;
+            }
+            $modal.open({
+                templateUrl: 'views/sensor/modalSensorChoose.html',
+                controller: 'SensorModalChooseController',
+                resolve: {
+                    'selectedData': function() { return selection.data; }
+                }
+            });
+        };
+
+        // Break the association between the selected data and a sensor.
+        self.dissociateSensor = function(sensor) {
+            if (!selection.data) {
+                return;
+            }
+            Data.dissociateSensor({ dataId: selection.data.id, sensorIdentifier: sensor.identifier }, function() {
+                selection.data.sensors.splice(selection.data.sensors.indexOf(sensor), 1);
+                selection.data.sensorCount--;
+            });
+        };
+
+
+        // Starts the data import workflow.
+        function startDataImport(type, step, editMetadata) {
+            $modal.open({
+                templateUrl: 'views/data/modalImportData.html',
+                controller: 'ModalImportDataController',
+                resolve: {
+                    firstStep: function() { return step; },
+                    importType: function() { return type; }
+                }
+            }).result.then(function(result) {
+                if (!editMetadata || !result || !result.file) {
+                    return;
+                }
+
+                dataListing.initMetadata({}, {
+                    values: {
+                        providerId: result.file,
+                        dataType: result.type,
+                        mergeWithUploadedMD: result.completeMetadata
+                    }
+                }, function onMetadataInitializationSuccess() {
+                    startMetadataEdition(null, result.file, result.type, 'import', 'data');
+                }, function onMetadataInitializationError() {
+                    $scope.$broadcast('reloadDatasets');
+                    Growl('error', 'Error', 'Unable to prepare metadata for next step.');
+                });
+            });
+        }
+
+        // Starts the metadata edition for imported data.
+        function startMetadataEdition(provider, identifier, type, template, theme) {
+            $modal.open({
+                templateUrl: 'views/data/modalEditMetadata.html',
+                controller: 'EditMetadataModalController',
+                resolve: {
+                    'provider': function() { return provider; },
+                    'identifier': function() { return identifier; },
+                    'type': function() { return type; },
+                    'template': function() { return template; },
+                    'theme': function() { return theme; }
+                }
+            }).result.then(function() {
+                $scope.$broadcast('reloadDatasets');
+            });
+        }
+
+        // Loads the data list of the specified dataset.
+        function setupDatasetData(dataset, forceReload) {
+            if (forceReload === true || !dataset.data) {
+                dataset.data = Dataset.getData({ id: dataset.id });
+            }
+        }
+
+        // Loads the associations (styles, services, sensors) of the specified data.
+        function setupDataAssociations(data, forceReload) {
+            if (forceReload === true || !data.styles || !data.services || !data.sensors) {
+                data.styles = [];
+                data.services = [];
+                data.sensors = [];
+                Data.getAssociations({ dataId: data.id }, function(associations) {
+                    data.styles = associations.styles;
+                    data.services = associations.services;
+                    data.sensors = associations.sensors;
+                });
+            }
+        }
+
+        // Loads the geographical extent of the specified data.
+        function setupDataGeographicalExtent(data, forceReload) {
+            if (forceReload === true || !data.extent) {
+                data.extent = provider.dataGeoExtent({
+                    values: {
+                        providerId: data.providerIdentifier,
+                        dataId: data.name
+                    }
+                });
+            }
+        }
+
+        // Dataset deletion success callback.
+        function onDatasetDeleteSuccess() {
+            Growl('success', 'Success', 'Data set '+ selection.dataset.name + ' successfully deleted');
+            selection.dataset = selection.data = null;
+            $scope.$broadcast('reloadDatasets');
+        }
+
+        // Dataset deletion error callback.
+        function onDatasetDeleteError() {
+            Growl('error', 'Error', 'Dataset '+ selection.dataset.name + ' deletion failed');
+        }
+
+        // Data deletion success callback.
+        function onDataDeleteSuccess() {
+            Growl('success', 'Success', 'Data ' + selection.data.name + ' successfully deleted');
+            if (selection.dataset.dataCount === 1) {
+                selection.dataset = null;
+                $scope.$broadcast('reloadDatasets');
+            } else {
+                selection.dataset.dataCount--;
+                setupDatasetData(selection.dataset, true);
+            }
+            selection.data = null;
+            self.displayPreview();
+        }
+
+        // Data deletion error callback.
+        function onDataDeleteError() {
+            Growl('error', 'Error', 'Data ' + selection.data.name + ' deletion failed');
+        }
+
+        // Data geographical extent loading success callback.
+        function onGetDataExtentSuccess(description) {
+            DataDashboardViewer.extent = description.boundingBox;
+            DataDashboardViewer.initMap('dataPreviewMap');
+        }
+
+        // Data geographical extent loading error callback.
+        function onGetDataExtentError() {
+            DataDashboardViewer.initMap('dataPreviewMap');
+        }
+
+
+        // Load data import configuration.
+        $http.get("app/conf").success(function(config) {
+            if (config['cstl.import.empty']) {
+                self.addDataWays.push({
+                    name: 'emptyDataset',
+                    idHTML: 'emptychoice',
+                    translateKey: 'label.file.empty',
+                    defaultTranslateValue: 'Empty dataset',
+                    bindFunction: function() { startDataImport('empty', 'step2Metadata', true); }
+                });
+            }
+            if (config['cstl.import.custom']) {
+                self.addDataWays.push({
+                    name: 'customDataset',
+                    idHTML: 'customchoice',
+                    translateKey: 'label.file.custom',
+                    defaultTranslateValue: 'Other',
+                    bindFunction: function() { startDataImport('custom', 'step1Custom', true); }
+                });
+            }
+        });
+    })
+
+
     .controller('DataController', function($scope, $routeParams, $location, Dashboard, webService, dataListing, datasetListing, DomainResource,
                                             provider, $window, style, textService, $modal, Growl, StyleSharedService, $cookieStore,$http) {
         /**
@@ -31,12 +543,10 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         $scope.dataCtrl = {
             cstlUrl : $cookieStore.get('cstlUrl'),
             domainId : $cookieStore.get('cstlActiveDomainId'),
-            advancedDataSearch : false,
             advancedMetadataSearch : false,
             searchTerm : "",
             searchMetadataTerm : "",
             hideScroll : true,
-            currentTab : $routeParams.tabindex || 'tabdata',
             alphaPattern : /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/,
             published : null,
             observation : null,
@@ -45,65 +555,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         };
         $scope.search = {};
         $scope.searchMD = {};
-
-        /**
-         * Array of available ways to import data in Constellation.
-         * This array can be overrided by sub project to add its own data format.
-         */
-        $scope.dataCtrl.availableWays = [
-            {   name:'localFile',
-                idHTML:'uploadchoice',
-                translateKey:'label.file.local',
-                defaultTranslateValue:'Local file',
-                bindFunction:function(){$scope.showLocalFilePopup();}
-            },
-            {   name:'serverFile',
-                idHTML:'filesystemchoice',
-                translateKey:'label.file.server',
-                defaultTranslateValue:'Server file',
-                bindFunction:function(){$scope.showServerFilePopup();}
-            },
-            {   name:'database',
-                idHTML:'dbchoice',
-                translateKey:'label.file.db',
-                defaultTranslateValue:'Database',
-                bindFunction:function(){$scope.showDatabasePopup();}
-            }
-        ];
-
-        /**
-         * Get cstl config to check for methods to import data.
-         */
-        $http.get("app/conf").success(function(data){
-            if(data['cstl.import.empty']) {
-                $scope.dataCtrl.availableWays.push(
-                    {   name:'emptyDataset',
-                        idHTML:'emptychoice',
-                        translateKey:'label.file.empty',
-                        defaultTranslateValue:'Empty dataset',
-                        bindFunction:function(){$scope.showEmptyDataSetPopup();}
-                    }
-                );
-            }
-            if(data['cstl.import.custom']) {
-                $scope.dataCtrl.availableWays.push(
-                    {   name:'customDataset',
-                        idHTML:'customchoice',
-                        translateKey:'label.file.custom',
-                        defaultTranslateValue:'Other',
-                        bindFunction:function(){$scope.showCustomDataSetPopup();}
-                    }
-                );
-            }
-        });
-
-        /**
-         * Select appropriate tab 'tabdata' or 'tabmetadata'.
-         * @param item
-         */
-        $scope.selectTab = function(item) {
-            $scope.dataCtrl.currentTab = item;
-        };
 
         /**
          * Toggle selection of dataSet child item.
@@ -139,18 +590,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         };
 
         /**
-         * Toggle advanced data search view panel.
-         */
-        $scope.toggleAdvancedDataSearch = function(){
-            if ($scope.dataCtrl.advancedDataSearch){
-                $scope.dataCtrl.advancedDataSearch = false;
-            }  else {
-                $scope.dataCtrl.advancedDataSearch = true;
-                $scope.dataCtrl.searchTerm ="";
-            }
-        };
-
-        /**
          * Toggle advanced metadata search view panel.
          */
         $scope.toggleAdvancedMDSearch = function(){
@@ -160,13 +599,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 $scope.dataCtrl.advancedMetadataSearch = true;
                 $scope.dataCtrl.searchMetadataTerm ="";
             }
-        };
-
-        /**
-         * Clean advanced search inputs.
-         */
-        $scope.resetSearch = function(){
-            $scope.search = {};
         };
 
         /**
@@ -183,60 +615,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         $scope.checkIsValid = function(isInvalid){
             if (isInvalid){
                 Growl('error','Error','Invalid Chars');
-            }
-        };
-
-        /**
-         * Binding action for search button in data dashboard.
-         * the result is stored with Dashboard service.
-         */
-        $scope.callSearch = function(){
-            $scope.wrap.filtertext='';
-            if ($scope.dataCtrl.searchTerm){
-                datasetListing.findDataset({values: {'search': $scope.dataCtrl.searchTerm+'*'}},
-                    function(response) {
-                        Dashboard($scope, response, true);
-                    },
-                    function(response){
-                        console.error(response);
-                        Growl('error','Error','Search failed:'+ response.data);
-                    }
-                );
-            }else{
-                if (!$.isEmptyObject($scope.search)){
-                    var searchString = "";
-                    if ($scope.search.title){
-                        searchString += " title:"+$scope.search.title+'*';
-                    }
-                    if ($scope.search.abstract){
-                        searchString += " abstract:"+$scope.search.abstract+'*';
-                    }
-                    if ($scope.search.keywords){
-                        searchString += " keywords:"+$scope.search.keywords+'*';
-                    }
-                    if ($scope.search.topic){
-                        searchString += " topic:"+$scope.search.topic+'*';
-                    }
-                    if ($scope.search.data){
-                        searchString += " data:"+$scope.search.data+'*';
-                    }
-                    if ($scope.search.level){
-                        searchString += " level:"+$scope.search.level+'*';
-                    }
-                    if ($scope.search.area){
-                        searchString += " area:"+$scope.search.area+'*';
-                    }
-                    datasetListing.findDataset({values: {'search': searchString}},function(response) {
-                        Dashboard($scope, response, true);
-                    }, function(response){
-                        console.error(response);
-                        Growl('error','Error','Search failed:'+ response.data);
-                    });
-                } else {
-                    datasetListing.listAll({}, function(response) {
-                        Dashboard($scope, response, true);
-                    });
-                }
             }
         };
 
@@ -293,6 +671,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 }
             }
         };
+
         $scope.callSearchMD = function(){
             $scope.callSearchMDForTerm($scope.dataCtrl.searchMetadataTerm);
         };
@@ -304,32 +683,22 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             $scope.wrap.fullList = [];
             $scope.wrap.filtertext='';
             $scope.wrap.filtertype = undefined;
-            if($scope.dataCtrl.currentTab === 'tabdata'){
-                $scope.dataCtrl.searchTerm="";
-                datasetListing.listAll({}, function(response) {//success
-                    Dashboard($scope, response, true);
-                    $scope.wrap.ordertype = "Name";
-                }, function() {//error
-                    Growl('error','Error','Unable to load list of data!');
-                });
-            }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
-                $scope.dataCtrl.searchMetadataTerm="";
-                datasetListing.listAll({}, function(response){//success
-                    Dashboard($scope, response, true);
-                    $scope.wrap.ordertype = "Name";
-                    if($scope.selectedDS || $scope.dataCtrl.selectedDataSetChild){
-                        //then we need to highlight the metadata associated in MD dashboard
-                        var term = $scope.selectedDS?$scope.selectedDS.Name:$scope.dataCtrl.selectedDataSetChild.Name;
-                        $scope.wrap.filtertext = term;
-                    }else {
-                        //otherwise reset selection
-                        $scope.dataCtrl.selectedDataSetChild = null;
-                        $scope.selectedDS = null;
-                    }
-                }, function(response){//error
-                    Growl('error','Error','Unable to load list of dataset!');
-                });
-            }
+            $scope.dataCtrl.searchMetadataTerm="";
+            datasetListing.listAll({}, function(response){//success
+                Dashboard($scope, response, true);
+                $scope.wrap.ordertype = "Name";
+                if($scope.selectedDS || $scope.dataCtrl.selectedDataSetChild){
+                    //then we need to highlight the metadata associated in MD dashboard
+                    var term = $scope.selectedDS?$scope.selectedDS.Name:$scope.dataCtrl.selectedDataSetChild.Name;
+                    $scope.wrap.filtertext = term;
+                }else {
+                    //otherwise reset selection
+                    $scope.dataCtrl.selectedDataSetChild = null;
+                    $scope.selectedDS = null;
+                }
+            }, function(response){//error
+                Growl('error','Error','Unable to load list of dataset!');
+            });
             //display dashboard map
             setTimeout(function(){
                 $scope.showDataDashboardMap();
@@ -362,63 +731,25 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             $scope.showDataDashboardMap();
         };
 
+        // Reload datasets when needed.
+        $scope.$on('reloadDatasets', $scope.initAfterImport);
+
         /**
          * Reset filters for dashboard
          */
         $scope.resetFilters = function(){
             $scope.wrap.filtertext='';
             $scope.wrap.filtertype = undefined;
-            if($scope.dataCtrl.currentTab === 'tabdata'){
-                $scope.dataCtrl.searchTerm="";
-                $scope.dataCtrl.selectedDataSetChild = null;
-                $scope.selectedDS = null;
-                datasetListing.listAll({}, function(response) {//success
-                    Dashboard($scope, response, true);
-                    $scope.wrap.ordertype = "Name";
-                }, function() {//error
-                    Growl('error','Error','Unable to load list of data!');
-                });
-            }else if($scope.dataCtrl.currentTab === 'tabmetadata') {
-                $scope.dataCtrl.searchMetadataTerm="";
-                $scope.dataCtrl.selectedDataSetChild = null;
-                $scope.selectedDS = null;
-                datasetListing.listAll({}, function(response){//success
-                    Dashboard($scope, response, true);
-                    $scope.wrap.ordertype = "Name";
-                }, function(response){//error
-                    Growl('error','Error','Unable to load list of dataset!');
-                });
-            }
-            $scope.showDataDashboardMap();
-        };
-
-        /**
-         * Apply filter to show only published data in service depending on given flag.
-         * ie: data is linked to services.
-         * @param published if true then proceed to show only published data.
-         */
-        $scope.showPublished = function(published){
-            $scope.dataCtrl.published=published;
-            dataListing.listPublishedDS({published:published}, function(response) {//success
+            $scope.dataCtrl.searchMetadataTerm="";
+            $scope.dataCtrl.selectedDataSetChild = null;
+            $scope.selectedDS = null;
+            datasetListing.listAll({}, function(response){//success
                 Dashboard($scope, response, true);
-            }, function() { //error
-                Growl('error','Error','Unable to show published data!');
+                $scope.wrap.ordertype = "Name";
+            }, function(response){//error
+                Growl('error','Error','Unable to load list of dataset!');
             });
-        };
-
-        /**
-         * Apply filter to show only sensorable data depending on given flag.
-         * ie: data is linked to sensors
-         * @param observation if true then proceed to show only sensorable data.
-         */
-        $scope.showSensorable = function(observation){
-            $scope.dataCtrl.observation=observation;
-            dataListing.listSensorableDS({observation:observation},
-                function(response) {//success
-                    Dashboard($scope, response, true);
-                }, function() {//error
-                    Growl('error','Error','Unable to show sensorable data!');
-                });
+            $scope.showDataDashboardMap();
         };
 
         $scope.showDataDashboardMap = function() {
@@ -427,7 +758,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             }
             DataDashboardViewer.initConfig();
             DataDashboardViewer.fullScreenControl = true;
-            var mapId = $scope.dataCtrl.currentTab === 'tabdata' ? 'dataPreviewMap' : 'metadataPreviewMap';
             var selectedData = $scope.dataCtrl.selectedDataSetChild;
             if(selectedData) {
                 var layerName;
@@ -437,23 +767,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     layerName = selectedData.Name;
                 }
                 var providerId = selectedData.Provider;
-                if($scope.dataCtrl.currentTab === 'tabdata') {
-                    var layerData;
-                    var pyramidProviderId = selectedData.PyramidConformProviderId;
-                    var type = selectedData.Type.toLowerCase();
-                    if (selectedData.TargetStyle && selectedData.TargetStyle.length > 0) {
-                        layerData = DataDashboardViewer.createLayerWithStyle($scope.dataCtrl.cstlUrl,layerName,
-                            pyramidProviderId?pyramidProviderId:providerId,
-                            selectedData.TargetStyle[0].Name,
-                            null,null,type!=='vector');
-                    } else {
-                        layerData = DataDashboardViewer.createLayer($scope.dataCtrl.cstlUrl, layerName,
-                            pyramidProviderId?pyramidProviderId:providerId,null,type!=='vector');
-                    }
-                    //to force the browser cache reloading styled layer.
-                    layerData.get('params').ts=new Date().getTime();
-                    DataDashboardViewer.layers = [layerData];
-                }
 
                 provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
                     function(response) {//success
@@ -462,149 +775,47 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                         var overlay= null;
                         if (bbox) {
                             DataDashboardViewer.extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
-                            if($scope.dataCtrl.currentTab === 'tabmetadata') {
-                                var minX = bbox[0];
-                                var minY = bbox[1];
-                                var maxX = bbox[2];
-                                var maxY = bbox[3];
-                                //For pseudo Mercator we need to check against the validity,
-                                // the bbox crs is always defined as EPSG:4326
-                                //if the viewer use pseudo Mercator then fix Latitude to avoid Infinity values
-                                if(DataDashboardViewer.projection === 'EPSG:3857'){
-                                    if(minY < -85){minY=-85;}
-                                    if(maxY > 85){maxY=85;}
-                                }
-                                var coordinates = [[[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]]];
-                                var polygon = new ol.geom.Polygon(coordinates);
-                                polygon = polygon.transform('EPSG:4326',DataDashboardViewer.projection);
-                                var extentFeature = new ol.Feature(polygon);
-                                var stroke = new ol.style.Stroke({
-                                    color: '#66AADD',
-                                    width: 2.25
-                                });
-                                var styles = [
-                                    new ol.style.Style({
-                                        stroke: stroke
-                                    })
-                                ];
-                                overlay = new ol.FeatureOverlay({
-                                    features : [extentFeature],
-                                    style : styles
-                                });
+                            var minX = bbox[0];
+                            var minY = bbox[1];
+                            var maxX = bbox[2];
+                            var maxY = bbox[3];
+                            //For pseudo Mercator we need to check against the validity,
+                            // the bbox crs is always defined as EPSG:4326
+                            //if the viewer use pseudo Mercator then fix Latitude to avoid Infinity values
+                            if(DataDashboardViewer.projection === 'EPSG:3857'){
+                                if(minY < -85){minY=-85;}
+                                if(maxY > 85){maxY=85;}
                             }
+                            var coordinates = [[[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY]]];
+                            var polygon = new ol.geom.Polygon(coordinates);
+                            polygon = polygon.transform('EPSG:4326',DataDashboardViewer.projection);
+                            var extentFeature = new ol.Feature(polygon);
+                            var stroke = new ol.style.Stroke({
+                                color: '#66AADD',
+                                width: 2.25
+                            });
+                            var styles = [
+                                new ol.style.Style({
+                                    stroke: stroke
+                                })
+                            ];
+                            overlay = new ol.FeatureOverlay({
+                                features : [extentFeature],
+                                style : styles
+                            });
                         }
-                        DataDashboardViewer.initMap(mapId);
+                        DataDashboardViewer.initMap('metadataPreviewMap');
                         if(overlay) {
                             DataDashboardViewer.map.addOverlay(overlay);
                         }
                     }, function() {//error
                         // failed to find a metadata, just load the full map
-                        DataDashboardViewer.initMap(mapId);
+                        DataDashboardViewer.initMap('metadataPreviewMap');
                     }
                 );
             }else {
-                DataDashboardViewer.initMap(mapId);
+                DataDashboardViewer.initMap('metadataPreviewMap');
             }
-        };
-
-        /**
-         * Returns if the data is a pyramid (tiled data)
-         * this function is overrided by sub-projects.
-         * @param data
-         * @returns {boolean}
-         */
-        $scope.checkIsPyramid = function(data){
-            return (data && data.PyramidConformProviderId);
-        };
-
-        $scope.deleteData = function() {
-            var dlg = $modal.open({
-                templateUrl: 'views/modal-confirm.html',
-                controller: 'ModalConfirmController',
-                resolve: {
-                    'keyMsg':function(){return "dialog.message.confirm.delete.data";}
-                }
-            });
-            dlg.result.then(function(cfrm){
-                if(cfrm){
-                    var layerName = $scope.dataCtrl.selectedDataSetChild.Name;
-                    var dataId = $scope.dataCtrl.selectedDataSetChild.Id;
-                    dataListing.removeData({'dataId':dataId},{},
-                        function() {// on success
-                            Growl('success','Success','Data '+ layerName +' successfully deleted');
-                            datasetListing.listAll({}, function(response) {
-                                Dashboard($scope, response, true);
-                                $scope.dataCtrl.selectedDataSetChild=null;
-                                $scope.showDataDashboardMap();
-                            });
-                        },
-                        function() {//on error
-                            Growl('error','Error','Data '+ layerName +' deletion failed');
-                        }
-                    );
-                }
-            });
-        };
-
-        /**
-         * Delete selected dataset.
-         */
-        $scope.deleteDataset = function() {
-            var dlg = $modal.open({
-                templateUrl: 'views/modal-confirm.html',
-                controller: 'ModalConfirmController',
-                resolve: {
-                    'keyMsg':function(){return "dialog.message.confirm.delete.dataset";}
-                }
-            });
-            dlg.result.then(function(cfrm){
-                if(cfrm){
-                    datasetListing.deleteDataset({"datasetIdentifier":$scope.selectedDS.Name},function(response){//success
-                        Growl('success','Success','Data set '+ $scope.selectedDS.Name +' successfully deleted');
-                        datasetListing.listAll({}, function(response) {
-                            Dashboard($scope, response, true);
-                            $scope.dataCtrl.selectedDataSetChild=null;
-                            $scope.selectedDS = null;
-                            $scope.showDataDashboardMap();
-                        });
-                    },function(response){//error
-                        Growl('error','Error','Dataset '+ $scope.selectedDS.Name +' deletion failed');
-                    });
-                }
-            });
-        };
-
-        /**
-         * Open metadata viewer popup and display metadata
-         * in appropriate template depending on data type property.
-         * this function is called from data dashboard.
-         */
-        $scope.displayMetadataFromDD = function() {
-            var type = 'import';
-            if($scope.dataCtrl.selectedDataSetChild){
-                type = $scope.dataCtrl.selectedDataSetChild.Type.toLowerCase();
-            }else if($scope.selectedDS && $scope.selectedDS.Type){
-                type = $scope.selectedDS.Type.toLowerCase();
-            }
-            if(type.toLowerCase() === 'coverage'){
-                type = 'raster';
-            }
-            $modal.open({
-                templateUrl: 'views/data/modalViewMetadata.html',
-                controller: 'ViewMetadataModalController',
-                resolve: {
-                    'dashboardName':function(){return 'data';},
-                    'metadataValues':function(textService){
-                        if($scope.dataCtrl.selectedDataSetChild){
-                            return textService.metadataJson($scope.dataCtrl.selectedDataSetChild.Provider,
-                                                            $scope.dataCtrl.selectedDataSetChild.Name,
-                                                            type,true);
-                        }else if($scope.selectedDS){
-                            return textService.metadataJsonDS($scope.selectedDS.Name,type,true);
-                        }
-                    }
-                }
-            });
         };
 
         /**
@@ -705,194 +916,10 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             $location.path('/editmetadata/'+template+'/'+type+'/'+$scope.selectedDS.Name);
         };
 
-        // Style methods
-        $scope.showStyleList = function() {
-            StyleSharedService.showStyleList($scope, $scope.dataCtrl.selectedDataSetChild);
-        };
-
-        $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
-            StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style,$scope.dataCtrl.selectedDataSetChild);
-        };
-
-        $scope.editLinkedStyle = function(styleProvider, styleName, selectedData) {
-            style.get({provider: styleProvider, name: styleName}, function(response) {
-                StyleSharedService.editLinkedStyle($scope, response,selectedData);
-            });
-        };
-
-        $scope.showSensorsList = function() {
-            $modal.open({
-                templateUrl: 'views/sensor/modalSensorChoose.html',
-                controller: 'SensorModalChooseController',
-                resolve: {
-                    'selectedData': function() { return $scope.dataCtrl.selectedDataSetChild; }
-                }
-            });
-        };
-
-        $scope.unlinkSensor = function(sensorId) {
-            dataListing.unlinkSensor({providerId: $scope.dataCtrl.selectedDataSetChild.Provider,
-                    dataId: $scope.dataCtrl.selectedDataSetChild.Name,
-                    sensorId: sensorId},
-                {value: $scope.dataCtrl.selectedDataSetChild.Namespace},
-                function(response) {//success
-                    $scope.dataCtrl.selectedDataSetChild.TargetSensor.splice(0, 1);
-                });
-        };
-
-        $scope.toggleUpDownSelected = function() {
-            var $header = $('#dataDashboard').find('.selected-item').find('.block-header');
-            $header.next().slideToggle(200);
-            $header.find('i').toggleClass('fa-chevron-down fa-chevron-up');
-        };
         $scope.toggleUpDownSelectedMD = function() {
             var $header = $('#metadataDashboard').find('.selected-item').find('.block-header');
             $header.next().slideToggle(200);
             $header.find('i').toggleClass('fa-chevron-down fa-chevron-up');
-        };
-
-        // Data loading
-        $scope.showLocalFilePopup = function() {
-            var modal = $modal.open({
-                templateUrl: 'views/data/modalImportData.html',
-                controller: 'ModalImportDataController',
-                resolve: {
-                    'firstStep': function() { return 'step1DataLocal'; },
-                    'importType': function() { return 'local'; }
-                }
-            });
-            modal.result.then(function(result) {
-                if(!result){
-                    $scope.initAfterImport();
-                    return;
-                }
-                if(!result.file){
-                    $scope.initAfterImport();
-                    return;
-                }else {
-                    dataListing.initMetadata({}, {values: {"providerId": result.file,
-                                                          "dataType": result.type,
-                                                          "mergeWithUploadedMD":result.completeMetadata}},
-                       function () {//success
-                        $scope.initAfterImport();
-                        openModalEditor(null,result.file,result.type,"import",'data');
-                    }, function () {//error
-                        Growl('error', 'Error', 'Unable to prepare metadata for next step!');
-                        $scope.initAfterImport();
-                    });
-                }
-            });
-        };
-
-        $scope.showServerFilePopup = function() {
-            var modal = $modal.open({
-                templateUrl: 'views/data/modalImportData.html',
-                controller: 'ModalImportDataController',
-                resolve: {
-                    'firstStep': function() { return 'step1DataServer'; },
-                    'importType': function() { return 'server'; }
-                }
-            });
-            modal.result.then(function(result) {
-                if(!result){
-                    return;
-                }
-                if(!result.file){
-                    return;
-                }else {
-                    dataListing.initMetadata({}, {values: {"providerId": result.file,
-                                                          "dataType": result.type,
-                                                          "mergeWithUploadedMD":result.completeMetadata}},
-                       function () {//success
-                        $scope.initAfterImport();
-                        openModalEditor(null,result.file,result.type,"import",'data');
-                    }, function () {//error
-                        Growl('error', 'Error', 'Unable to save metadata');
-                    });
-                }
-            });
-        };
-
-        $scope.showDatabasePopup = function() {
-            var modal = $modal.open({
-                templateUrl: 'views/data/modalImportData.html',
-                controller: 'ModalImportDataController',
-                resolve: {
-                    'firstStep': function() { return 'step1Database'; },
-                    'importType': function() { return 'database'; }
-                }
-            });
-            modal.result.then(function(result) {
-                if(!result){
-                    return;
-                }
-                if(!result.file){
-                    return;
-                }else {
-                    dataListing.initMetadata({}, {values: {"providerId": result.file,
-                                                          "dataType": result.type,
-                                                          "mergeWithUploadedMD":result.completeMetadata}},
-                       function () {//success
-                        $scope.initAfterImport();
-                        openModalEditor(null,result.file,result.type,"import",'data');
-                    }, function () {//error
-                        Growl('error', 'Error', 'Unable to save metadata');
-                    });
-                }
-            });
-        };
-
-        $scope.showEmptyDataSetPopup = function() {
-            var modal = $modal.open({
-                templateUrl: 'views/data/modalImportData.html',
-                controller: 'ModalImportDataController',
-                resolve: {
-                    'firstStep': function() { return 'step2Metadata'; },
-                    'importType': function() { return 'empty'; }
-                }
-            });
-            modal.result.then(function(result) {
-                if(!result){
-                    return;
-                }
-                if(!result.file){
-                    return;
-                }else {
-                    dataListing.initMetadata({}, {values: {"providerId": result.file,
-                                                          "dataType": result.type}},
-                        function () {//success
-                            $scope.initAfterImport();
-                            openModalEditor(null,result.file,result.type,"import",'data');
-                        }, function () {//error
-                            Growl('error', 'Error', 'Unable to save metadata');
-                        });
-                }
-            });
-        };
-
-        $scope.showCustomDataSetPopup = function() {
-            var modal = $modal.open({
-                templateUrl: 'views/data/modalImportData.html',
-                controller: 'ModalImportDataController',
-                resolve: {
-                    'firstStep': function() { return 'step1Custom'; },
-                    'importType': function() { return 'custom'; }
-                }
-            });
-            modal.result.then(function() {
-                $scope.initAfterImport();
-            });
-        };
-
-        $scope.showDomains = function(){
-            var modal = $modal.open({
-                templateUrl: 'views/data/linkedDomains.html',
-                controller: 'ModalDataLinkedDomainsController',
-                resolve: {
-                    'domains': function() {return dataListing.domains({dataId: $scope.dataCtrl.selectedDataSetChild.Id}).$promise;},
-                    'dataId': function(){return $scope.dataCtrl.selectedDataSetChild.Id;}
-                }
-            });
         };
 
         $scope.truncate = function(small, text){

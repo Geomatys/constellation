@@ -24,3 +24,43 @@
   margin-bottom: 20px;
   padding-top: 15px;
 }
+
+.dashboard {
+
+  .quick-search {
+    float: right;
+
+    > .input-group {
+      margin-top: 5px;
+      width: 200px;
+
+      > input.form-control {
+        border-right: none;
+        height: 30px;
+        margin: 0;
+      }
+
+      > .input-group-btn > .btn {
+        padding: 4px 12px;
+        margin: 0;
+      }
+    }
+  }
+
+  .item-list .item {
+
+    > .top {
+      padding-right: 125px;
+      position: relative;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+
+      > .item-list-style {
+        position: absolute;
+        top: 0;
+        right: 8px;
+      }
+    }
+  }
+}
