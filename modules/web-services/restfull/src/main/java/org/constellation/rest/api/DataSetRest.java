@@ -29,6 +29,7 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.dto.ParameterValues;
@@ -276,9 +277,9 @@ public class DataSetRest {
         return dsb;
     }
 
+
     /**
-     * Returns a {@link Page} of {@link DatasetItem}s matching the specified
-     * {@link DatasetSearch} criteria.
+     * Returns a page of datasets matching the specified search criteria.
      *
      * @param search the search information.
      * @return the {@link Page} of {@link DatasetItem}s.
@@ -330,11 +331,11 @@ public class DataSetRest {
             }
         });
 
-        // Append the single data of each "singleton" dataset.
+        // Map single data of each "singleton" dataset in response.
         return ok(result.transform(new Function<DatasetItem, DatasetItem>() {
             @Override
             public DatasetItem apply(DatasetItem dataset) {
-                if (dataset.getDataCount() == 1 && indexedData.get(dataset.getId()) != null) {
+                if (dataset.getDataCount() == 1 && indexedData.containsKey(dataset.getId())) {
                     DatasetItemWithData singletonDataset = mapInto(dataset, DatasetItemWithData.class);
                     singletonDataset.setData(Arrays.asList(indexedData.get(dataset.getId())));
                     return singletonDataset;
@@ -342,5 +343,37 @@ public class DataSetRest {
                 return dataset;
             }
         }));
+    }
+
+    /**
+     * Deletes the dataset with the specified {@literal datasetId}.
+     *
+     * @param datasetId the dataset id.
+     * @return a {@link Response} with the appropriate HTTP status (and entity).
+     * @throws ConfigurationException if the dataset deletion has failed for any reason.
+     */
+    @DELETE
+    @Path("/{datasetId}")
+    public Response deleteDataset(@PathParam("datasetId") int datasetId) throws ConfigurationException {
+        if (datasetRepository.existsById(datasetId)) {
+            datasetBusiness.removeDataset(datasetId);
+            return Response.noContent().build();
+        }
+        return Response.status(404).build();
+    }
+
+    /**
+     * Lists the data of the dataset with the specified {@literal datasetId}.
+     *
+     * @param datasetId the dataset id.
+     * @return the {@link List} of {@link DataItem}s.
+     */
+    @GET
+    @Path("/{datasetId}/data")
+    public Response getDatasetData(@PathParam("datasetId") int datasetId) {
+        if (datasetRepository.existsById(datasetId)) {
+            return ok(dataRepository.fetchByDatasetId(datasetId));
+        }
+        return Response.status(404).build();
     }
 }
