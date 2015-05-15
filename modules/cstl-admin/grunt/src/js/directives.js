@@ -675,4 +675,26 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                 });
             }
         };
+    })
+
+    .directive('slideToggle', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, $element, attr) {
+                var duration = scope.$eval(attr.duration) || 200;
+
+                // Handler for 'slideToggle' attribute changes.
+                function watchAction(value) {
+                    if (!value && $element.hasClass('collapsed')) {
+                        $element.removeClass('collapsed').slideDown(duration);
+                    }
+                    else if (value && !$element.hasClass('collapsed')) {
+                        $element.slideUp(duration, function() { $element.addClass('collapsed'); });
+                    }
+                }
+
+                // Watch for 'slideToggle' attribute changes.
+                scope.$watch(attr.slideToggle, watchAction, true);
+            }
+        };
     });
