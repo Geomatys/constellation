@@ -56,6 +56,7 @@ import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.metadata.ImageStatistics;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.style.DefaultDescription;
 import org.geotoolkit.style.DefaultLineSymbolizer;
@@ -113,11 +114,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import static org.constellation.utils.RESTfulUtilities.ok;
-import static org.constellation.utils.RESTfulUtilities.noContent;
-import static org.constellation.utils.RESTfulUtilities.internalError;
 import static org.constellation.utils.RESTfulUtilities.badRequest;
-import org.geotoolkit.metadata.ImageStatistics;
+import static org.constellation.utils.RESTfulUtilities.noContent;
+import static org.constellation.utils.RESTfulUtilities.ok;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DISPLACEMENT;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_UOM;
@@ -176,8 +175,9 @@ public final class StyleRest {
     @PUT
     @Path("{id}/style/create")
     public Response createStyleJson(final @PathParam("id") String id, final Style style) throws Exception {
-        styleBusiness.createStyle(id, style.toType());
-        return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully added to provider with id \"" + id + "\"."));
+        org.constellation.engine.register.jooq.tables.pojos.Style created = styleBusiness.createStyle(id, style.toType());
+        created.setBody(null);
+        return ok(created);
     }
 
     /**
