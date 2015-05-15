@@ -614,6 +614,20 @@ angular.module('cstl-services', ['cstl-restapi'])
     })
 
     // -------------------------------------------------------------------------
+    //  Upload File
+    // -------------------------------------------------------------------------
+
+    .filter('cstlContext', function($cookieStore) {
+        return function(value, putAuth) {
+            value = $cookieStore.get('cstlUrl') + value;
+            if (putAuth === true) {
+                value += (value.indexOf('?') === -1 ? '?' : '&') + 'token=' + $cookieStore.get('access_token');
+            }
+            return value;
+        };
+    })
+
+    // -------------------------------------------------------------------------
     //  DashboardHelper
     // -------------------------------------------------------------------------
 
