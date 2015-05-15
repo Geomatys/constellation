@@ -697,4 +697,37 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                 scope.$watch(attr.slideToggle, watchAction, true);
             }
         };
+    })
+
+    .directive('scrollTop', function($window) {
+        return {
+            restrict: 'E',
+            link: function(scope, $element) {
+
+                // Window "scroll" event callback.
+                function onScroll() {
+                    if ($window.pageYOffset < 220) {
+                        $element.hide();
+                    } else {
+                        $element.show();
+                    }
+                }
+
+                // Immediate sync.
+                onScroll();
+
+                // Observe window "scroll" event.
+                angular.element($window).bind('scroll', onScroll);
+
+                // No longer observe "scroll" event on directive destroy.
+                $element.on('$destroy', function() {
+                    angular.element($window).unbind('scroll', onScroll);
+                });
+            },
+            replace: true,
+            template:
+                '<div scroll-to class="backtotop" style="display:none;">' +
+                    '<span class="glyphicon glyphicon-chevron-up"></span>' +
+                '</div>'
+        };
     });

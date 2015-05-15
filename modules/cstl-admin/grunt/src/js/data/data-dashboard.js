@@ -546,7 +546,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             advancedMetadataSearch : false,
             searchTerm : "",
             searchMetadataTerm : "",
-            hideScroll : true,
             alphaPattern : /^([0-9A-Za-z\u00C0-\u017F\*\?]+|\s)*$/,
             published : null,
             observation : null,
@@ -703,11 +702,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             setTimeout(function(){
                 $scope.showDataDashboardMap();
             },300);
-            //display button that allow to scroll to top of the page from a certain height.
-            angular.element($window).bind("scroll", function() {
-                $scope.dataCtrl.hideScroll = this.pageYOffset < 220;
-                $scope.$apply();
-            });
         };
 
         /**
