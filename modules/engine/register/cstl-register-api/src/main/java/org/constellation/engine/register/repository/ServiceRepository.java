@@ -26,6 +26,7 @@ import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
 import org.constellation.engine.register.jooq.tables.pojos.ServiceExtraConfig;
+import org.constellation.engine.register.pojo.ServiceReference;
 
 public interface ServiceRepository {
 	
@@ -68,5 +69,7 @@ public interface ServiceRepository {
     List<Data> findDataByServiceId(Integer id);
 
     Metadata getMetadata(Integer id);
+
+    public List<ServiceReference> fetchByDataId(int dataId);
     
 }

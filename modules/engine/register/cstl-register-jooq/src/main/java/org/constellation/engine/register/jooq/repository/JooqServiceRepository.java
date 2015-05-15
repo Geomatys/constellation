@@ -18,22 +18,6 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.LAYER;
-import static org.constellation.engine.register.jooq.Tables.METADATA;
-import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
-import static org.constellation.engine.register.jooq.Tables.SERVICE;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_DETAILS;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
@@ -43,7 +27,9 @@ import org.constellation.engine.register.jooq.tables.pojos.ServiceExtraConfig;
 import org.constellation.engine.register.jooq.tables.records.ServiceDetailsRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
+import org.constellation.engine.register.pojo.ServiceReference;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Result;
@@ -52,8 +38,29 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.METADATA;
+import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+import static org.constellation.engine.register.jooq.Tables.SERVICE;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_DETAILS;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
+
 @Component
 public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord, Service> implements ServiceRepository {
+
+    public static final Field[] REFERENCE_FIELDS = new Field[]{
+            SERVICE.ID.as("id"),
+            SERVICE.IDENTIFIER.as("identifier"),
+            SERVICE.TYPE.as("type")};
 
 
     public JooqServiceRepository() {
@@ -65,12 +72,12 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
             SelectConditionStep<Record> from = dsl.select().from(SERVICE).join(Tables.LAYER).onKey()
                 .where(Tables.LAYER.DATA.eq(dataId));
         final List<Service> layerServices = from.fetchInto(Service.class);
-        
+
         final List<Service> cswServices = dsl.select(SERVICE.fields()).from(Arrays.asList(SERVICE,METADATA_X_CSW,METADATA))
                 .where(METADATA_X_CSW.CSW_ID.eq(SERVICE.ID))
                 .and(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID))
                 .and(METADATA.DATA_ID.eq(dataId)).fetchInto(Service.class);
-        
+
         layerServices.addAll(cswServices);
         return layerServices;
     }
@@ -79,7 +86,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     public Service findByIdentifierAndType(String identifier, String type) {
         return  dsl.select().from(SERVICE)
                 .where(SERVICE.IDENTIFIER.eq(identifier).and(SERVICE.TYPE.equalIgnoreCase(type))).fetchOneInto(Service.class);
-       
+
     }
 
     @Override
@@ -109,7 +116,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     public List<String> findIdentifiersByType(String type) {
         return dsl.select(SERVICE.IDENTIFIER).from(SERVICE).where(SERVICE.TYPE.eq(type)).fetch(SERVICE.IDENTIFIER);
     }
-    
+
     @Override
     public List<Service> findByType(String type) {
         SelectConditionStep<Record> from = dsl.select().from(SERVICE).where(SERVICE.TYPE.eq(type.toLowerCase()));
@@ -129,7 +136,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
             return dsl.select().from(SERVICE_DETAILS).where(SERVICE_DETAILS.ID.eq(serviceId)).and(SERVICE_DETAILS.DEFAULT_LANG.eq(true)).fetchOneInto(ServiceDetails.class);
         }
     }
-    
+
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void createOrUpdateServiceDetails(ServiceDetails serviceDetails) {
@@ -245,4 +252,11 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         return dsl.select().from(METADATA).where(METADATA.SERVICE_ID.eq(id)).fetchOneInto(Metadata.class);
     }
 
+    @Override
+    public List<ServiceReference> fetchByDataId(int dataId) {
+        return dsl.select(REFERENCE_FIELDS).from(SERVICE)
+                .join(LAYER).on(LAYER.SERVICE.eq(SERVICE.ID))
+                .where(LAYER.DATA.eq(dataId))
+                .fetchInto(ServiceReference.class);
+    }
 }
