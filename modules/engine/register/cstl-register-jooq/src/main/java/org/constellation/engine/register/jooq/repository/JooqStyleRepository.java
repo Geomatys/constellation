@@ -1,11 +1,8 @@
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.STYLE;
-import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
-import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
-
-import java.util.List;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.constellation.engine.register.i18n.StyleWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
@@ -15,7 +12,9 @@ import org.constellation.engine.register.jooq.tables.pojos.StyleI18n;
 import org.constellation.engine.register.jooq.tables.records.StyleRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledDataRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledLayerRecord;
+import org.constellation.engine.register.pojo.StyleReference;
 import org.constellation.engine.register.repository.StyleRepository;
+import org.jooq.Field;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -24,12 +23,22 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.List;
+
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
+import static org.constellation.engine.register.jooq.Tables.STYLE;
+import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
+import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
 
 @Component
 public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, Style> implements StyleRepository {
+
+    public static final Field[] REFERENCE_FIELDS = new Field[]{
+            STYLE.ID.as("id"),
+            STYLE.NAME.as("name"),
+            STYLE.PROVIDER.as("provider_id"),
+            PROVIDER.IDENTIFIER.as("provider_identifier")};
+
 
     public JooqStyleRepository() {
         super(Style.class, STYLE);
@@ -179,5 +188,21 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
             }
         });
         return new StyleWithI18N(style, styleI18ns);
+    }
+
+    @Override
+    public boolean existsById(int styleId) {
+        return dsl.selectCount().from(STYLE)
+                .where(STYLE.ID.eq(styleId))
+                .fetchOne(0, Integer.class) > 0;
+    }
+
+    @Override
+    public List<StyleReference> fetchByDataId(int dataId) {
+        return dsl.select(REFERENCE_FIELDS).from(STYLE)
+                .join(STYLED_DATA).on(STYLED_DATA.STYLE.eq(STYLE.ID)) // style -> styled_data
+                .join(PROVIDER).on(PROVIDER.ID.eq(STYLE.PROVIDER)) // style -> provider
+                .where(STYLED_DATA.DATA.eq(dataId))
+                .fetchInto(StyleReference.class);
     }
 }

@@ -24,6 +24,7 @@ import org.constellation.engine.register.i18n.StyleWithI18N;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Layer;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
+import org.constellation.engine.register.pojo.StyleReference;
 
 public interface StyleRepository {
 
@@ -64,4 +65,8 @@ public interface StyleRepository {
     Style save(Style s);
     
     StyleWithI18N getStyleWithI18Ns(Style style);
+
+    public boolean existsById(int styleId);
+
+    public List<StyleReference> fetchByDataId(int dataId);
 }
