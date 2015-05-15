@@ -83,5 +83,9 @@ public interface DataRepository {
 
     List<Data> getDataByLinkedStyle(final int styleId);
 
+    boolean existsById(int dataId);
+
+    List<DataItem> fetchByDatasetId(int datasetId);
+
     List<DataItem> fetchByDatasetIds(Collection<Integer> datasetIds);
 }

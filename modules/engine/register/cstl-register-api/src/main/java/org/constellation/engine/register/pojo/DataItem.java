@@ -12,6 +12,8 @@ public class DataItem implements Serializable {
 
     protected Integer id;
 
+    protected String namespace;
+
     protected String name;
 
     protected String type;
@@ -28,13 +30,19 @@ public class DataItem implements Serializable {
 
     protected Integer ownerId;
 
+    protected String providerIdentifier;
+
     protected String ownerLogin;
+
+    protected Long styleCount;
 
     protected Long layerCount;
 
+    protected Long serviceCount;
+
     protected Long sensorCount;
 
-    protected Integer pyramidId;
+    protected String pyramidProviderIdentifier;
 
 
     public Integer getId() {
@@ -44,6 +52,14 @@ public class DataItem implements Serializable {
     public DataItem setId(Integer id) {
         this.id = id;
         return this;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     public String getName() {
@@ -77,16 +93,18 @@ public class DataItem implements Serializable {
         return creationDate;
     }
 
-    public void setCreationDate(Long creationDate) {
+    public DataItem setCreationDate(Long creationDate) {
         this.creationDate = creationDate;
+        return this;
     }
 
     public Boolean getSensorable() {
         return sensorable;
     }
 
-    public void setSensorable(Boolean sensorable) {
+    public DataItem setSensorable(Boolean sensorable) {
         this.sensorable = sensorable;
+        return this;
     }
 
     public Integer getDatasetId() {
@@ -116,12 +134,30 @@ public class DataItem implements Serializable {
         return this;
     }
 
+    public String getProviderIdentifier() {
+        return providerIdentifier;
+    }
+
+    public DataItem setProviderIdentifier(String providerIdentifier) {
+        this.providerIdentifier = providerIdentifier;
+        return this;
+    }
+
     public String getOwnerLogin() {
         return ownerLogin;
     }
 
     public DataItem setOwnerLogin(String ownerLogin) {
         this.ownerLogin = ownerLogin;
+        return this;
+    }
+
+    public Long getStyleCount() {
+        return styleCount;
+    }
+
+    public DataItem setStyleCount(Long styleCount) {
+        this.styleCount = styleCount;
         return this;
     }
 
@@ -134,6 +170,15 @@ public class DataItem implements Serializable {
         return this;
     }
 
+    public Long getServiceCount() {
+        return serviceCount;
+    }
+
+    public DataItem setServiceCount(Long serviceCount) {
+        this.serviceCount = serviceCount;
+        return this;
+    }
+
     public Long getSensorCount() {
         return sensorCount;
     }
@@ -143,11 +188,12 @@ public class DataItem implements Serializable {
         return this;
     }
 
-    public Integer getPyramidId() {
-        return pyramidId;
+    public String getPyramidProviderIdentifier() {
+        return pyramidProviderIdentifier;
     }
 
-    public void setPyramidId(Integer pyramidId) {
-        this.pyramidId = pyramidId;
+    public DataItem setPyramidProviderIdentifier(String pyramidProviderIdentifier) {
+        this.pyramidProviderIdentifier = pyramidProviderIdentifier;
+        return this;
     }
 }

@@ -44,6 +44,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -54,14 +55,17 @@ import static org.constellation.engine.register.jooq.Tables.DATA_X_DATA;
 import static org.constellation.engine.register.jooq.Tables.LAYER;
 import static org.constellation.engine.register.jooq.Tables.METADATA;
 import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import static org.constellation.engine.register.jooq.Tables.SENSORED_DATA;
+import static org.constellation.engine.register.jooq.Tables.SERVICE;
 import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
 
-    private static final Field[] ITEM_FIELDS = new Field[]{
+    public static final Field[] ITEM_FIELDS = new Field[]{
             DATA.ID.as("id"),
+            DATA.NAMESPACE.as("namespace"),
             DATA.NAME.as("name"),
             DATA.TYPE.as("type"),
             DATA.SUBTYPE.as("subtype"),
@@ -70,10 +74,13 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
             DATA.DATASET_ID.as("dataset_id"),
             DATA.PROVIDER.as("provider_id"),
             DATA.OWNER.as("owner_id"),
+            PROVIDER.IDENTIFIER.as("provider_identifier"),
             CSTL_USER.LOGIN.as("owner_login"),
-            countLayer(DATA.ID).asField("layer_count"),
-            countSensor(DATA.ID).asField("sensor_count"),
-            selectConformPyramidDataId(DATA.ID).asField("pyramid_id")};
+            countStyles(DATA.ID).asField("style_count"),
+            countLayers(DATA.ID).asField("layer_count"),
+            countServices(DATA.ID).asField("service_count"),
+            countSensors(DATA.ID).asField("sensor_count"),
+            selectConformPyramidProviderIdentifier(DATA.ID).asField("pyramid_provider_identifier")};
 
 
     public JooqDataRepository() {
@@ -307,10 +314,23 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     }
 
     @Override
+    public boolean existsById(int dataId) {
+        return dsl.selectCount().from(DATA)
+                .where(DATA.ID.eq(dataId))
+                .fetchOne(0, Integer.class) > 0;
+    }
+
+    @Override
+    public List<DataItem> fetchByDatasetId(int datasetId) {
+        return fetchByDatasetIds(Arrays.asList(datasetId));
+    }
+
+    @Override
     public List<DataItem> fetchByDatasetIds(Collection<Integer> datasetIds) {
         return dsl.select(ITEM_FIELDS).from(DATA)
                 .leftOuterJoin(CSTL_USER).on(DATA.OWNER.eq(CSTL_USER.ID)) // data -> cstl_user
-                .where(DATA.DATASET_ID.in(datasetIds)).and(DATA.HIDDEN.eq(false))
+                .join(PROVIDER).on(DATA.PROVIDER.eq(PROVIDER.ID)) // data -> provider
+                .where(DATA.DATASET_ID.in(datasetIds)).and(DATA.HIDDEN.eq(false)).and(DATA.INCLUDED.eq(true))
                 .fetchInto(DataItem.class);
     }
 
@@ -318,20 +338,33 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     //  Private utility methods
     // -------------------------------------------------------------------------
 
-    private static SelectConditionStep<Record1<Integer>> countLayer(Field<Integer> dataId) {
+    private static SelectConditionStep<Record1<Integer>> countStyles(Field<Integer> dataId) {
+        return DSL.selectCount().from(STYLED_DATA)
+                .where(STYLED_DATA.DATA.eq(dataId));
+    }
+
+    private static SelectConditionStep<Record1<Integer>> countLayers(Field<Integer> dataId) {
         return DSL.selectCount().from(LAYER)
                 .where(LAYER.DATA.eq(dataId));
     }
 
-    private static SelectConditionStep<Record1<Integer>> countSensor(Field<Integer> dataId) {
+    private static SelectConditionStep<Record1<Integer>> countServices(Field<Integer> dataId) {
+        return DSL.select(DSL.countDistinct(SERVICE.ID)).from(SERVICE)
+                .join(LAYER).on(SERVICE.ID.eq(LAYER.SERVICE)) // service -> layer
+                .where(LAYER.DATA.eq(dataId));
+    }
+
+    private static SelectConditionStep<Record1<Integer>> countSensors(Field<Integer> dataId) {
         return DSL.selectCount().from(SENSORED_DATA)
                 .where(SENSORED_DATA.DATA.eq(dataId));
     }
 
-    private static SelectConditionStep<Record1<Integer>> selectConformPyramidDataId(Field<Integer> dataId) {
-        org.constellation.engine.register.jooq.tables.Data childData = DATA.as("child_data"); // avoid conflict
-        return DSL.select(childData.ID).from(DATA_X_DATA)
-                .join(childData).on(childData.ID.eq(DATA_X_DATA.CHILD_ID)) // data_x_data (child_id) -> data
-                .where(DATA_X_DATA.DATA_ID.eq(dataId)).and(childData.SUBTYPE.eq("pyramid").and(childData.RENDERED.eq(false)));
+    private static SelectConditionStep<Record1<String>> selectConformPyramidProviderIdentifier(Field<Integer> dataId) {
+        org.constellation.engine.register.jooq.tables.Data dataAlias = DATA.as("child_data");
+        org.constellation.engine.register.jooq.tables.Provider providerAlias = PROVIDER.as("child_provider");
+        return DSL.select(providerAlias.IDENTIFIER).from(DATA_X_DATA)
+                .join(dataAlias).on(dataAlias.ID.eq(DATA_X_DATA.CHILD_ID)) // data_x_data (child_id) -> data
+                .join(providerAlias).on(providerAlias.ID.eq(dataAlias.PROVIDER)) // data -> provider
+                .where(DATA_X_DATA.DATA_ID.eq(dataId)).and(dataAlias.SUBTYPE.eq("pyramid").and(dataAlias.RENDERED.eq(false)));
     }
 }
