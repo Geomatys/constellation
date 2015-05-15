@@ -42,7 +42,7 @@ public class JooqUserRepositoryTestCase extends AbstractJooqTestTestCase {
     @Transactional()
     public void crude() throws Throwable {
         
-        CstlUser insert = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
+        CstlUser insert = userRepository.insert(TestSamples.newAdminUser());
         Assert.assertNotNull(insert);
         
         Assert.assertEquals("Should have deleled 1 record",1, userRepository.delete(insert.getId()));

@@ -197,8 +197,20 @@ module.exports = function(grunt) {
             login: {
               files : {
                 '<%= target_dir %>/js/login.js': [
-                    '<%= src_dir %>/js/login.js']
+                    '<%= src_dir %>/js/login.js',
+                    '<%= src_dir %>/js/directives.js',
+                    '<%= src_dir %>/js/restapi.js',
+                    '<%= src_dir %>/js/services.js']
               }
+            },
+            reset_password: {
+                files : {
+                    '<%= target_dir %>/js/reset-password.js': [
+                        '<%= src_dir %>/js/reset-password.js',
+                        '<%= src_dir %>/js/directives.js',
+                        '<%= src_dir %>/js/restapi.js',
+                        '<%= src_dir %>/js/services.js']
+                }
             },
             lib: {
                 files: {

@@ -162,6 +162,46 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
         };
     })
 
+    .controller('UserAccountController', function($scope, $rootScope, $location, $cookieStore, Growl, cfpLoadingBar, user, roles) {
+        $scope.user = user;
+        $scope.roles = roles;
+
+        $scope.password = "";
+        $scope.password2 = "";
+
+        //disabled role select
+        $scope.enableRole = false;
+
+        $scope.save = function(){
+            var formData = new FormData(document.getElementById('userForm'));
+            $.ajax({
+                headers: {
+                    'access_token': $rootScope.access_token
+                },
+                url: $cookieStore.get('cstlUrl') + 'api/1/user/my_account',
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function(){
+                    cfpLoadingBar.start();
+                    cfpLoadingBar.inc();
+                },
+                success: function(result) {
+                    Growl('success', 'Success', 'The changes have been successfully applied!');
+                    cfpLoadingBar.complete();
+                    $location.url('/');
+                },
+                error: function(result){
+                    Growl('error', 'Error', 'Unable to edit user!');
+                    cfpLoadingBar.complete();
+                }
+            });
+        };
+    })
+
     .controller('LanguageController', function($scope, $translate) {
 
         $scope.currentLang = 'en';

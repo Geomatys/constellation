@@ -1,0 +1,257 @@
+<div class="row">
+    <div class="col-sm-12">
+        <form class="form-horizontal" role="form" name="$root.userForm" id="userForm">
+            <div class="frame dashboard">
+                <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" translate="label.user">User</a>
+                    </div>
+                </div>
+
+                <div class="dash-inner row">
+                    <div class="col-md-12 contact-form" style="margin-bottom:0;">
+                        <div class="row profile-picture">
+                        </div>
+
+                        <input type="number" name="userId" ng-model="user.id" style="display: none"/>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.login" autofocus>Login</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               ng-class="{error: userForm.login.$invalid}"
+                                               name="login"
+                                               type="text"
+                                               ng-model="user.login"
+                                               required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.email">Email</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               ng-class="{error: userForm.email.$invalid}"
+                                               name="email"
+                                               type="text"
+                                               ng-model="user.email"
+                                               required />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="name">Name</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               ng-class="{error: userForm.lastname.$invalid}"
+                                               name="lastname"
+                                               type="text"
+                                               ng-model="user.lastname"
+                                               required/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.firstname">First name</label>
+                                    <div class="col-sm-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               ng-class="{error: userForm.firstname.$invalid}"
+                                               name="firstname"
+                                               ng-model="user.firstname"
+                                               required/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.address">Address</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               name="address"
+                                               type="text"
+                                               ng-model="user.address"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.additional.address">Additional address</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               name="additionalAddress"
+                                               type="text"
+                                               ng-model="user.additionalAddress"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.zip">Zip</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               name="zip"
+                                               type="text"
+                                               ng-model="user.zip"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.city">City</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               name="city"
+                                               type="text"
+                                               ng-model="user.city"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.country">Country</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               name="country"
+                                               type="text"
+                                               ng-model="user.country"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="settings.form.phone">Phone</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control"
+                                               name="phone"
+                                               type="text"
+                                               ng-model="user.phone"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="error" ng-show="userForm.$error">
+                            <div ng-show="userForm.login.$error.required ||
+                            userForm.email.$error.required ||
+                            userForm.lastname.$error.required ||
+                            userForm.firstname.$error.required">
+                                <small class="errorTip" translate="validate.required.fields">
+                                    Required fields.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="frame dashboard">
+                <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" translate="settings.form.password">Password</a>
+                    </div>
+                </div>
+                <div class="dash-inner row">
+                    <div class="col-md-12 contact-form" style="margin-bottom:0;">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="profile.password.new" >Nouveau mot de passe</label>
+                                    <div class="col-sm-8">
+                                        <input type="password"
+                                               class="form-control"
+                                               ng-class="{error: userForm.password.$invalid}"
+                                               name="password"
+                                               id="password"
+                                               ng-model="password"
+                                               ng-required="passwordRequired" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="profile.password.verify" >Vérification du mot de passe</label>
+                                    <div class="col-sm-8">
+                                        <input type="password"
+                                               class="form-control"
+                                               ng-class="{error: userForm.password2.$invalid}"
+                                               name="password2"
+                                               id="password2"
+                                               ng-model="password2"
+                                               ng-required="passwordRequired"
+                                               pw-check="password" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="error" ng-show="userForm.$error">
+                            <div ng-show="userForm.password.$error.required || userForm.password2.$error.required">
+                                <small class="errorTip" translate="validate.required.fields">
+                                    Required fields.
+                                </small>
+                            </div>
+                            <div ng-show="userForm.password2.$error.pwmatch">
+                                <small class="errorTip" translate="validate.users.password">
+                                    Passwords don't match.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="frame dashboard">
+                <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" translate="settings.form.role">Role</a>
+                    </div>
+                </div>
+                <div class="dash-inner row">
+                    <div class="col-md-12 contact-form" style="margin-bottom:0;">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="role" class="col-sm-4 control-label" translate="settings.form.role">Role</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                ng-class="{error: userForm.role.$invalid}"
+                                                name="role"
+                                                id="role"
+                                                ng-model="user.roles[0]"
+                                                ng-disabled="!enableRole"
+                                                required>
+                                            <option ng-repeat="role in roles track by role.name" ng-value="role.name">{{ role.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="error" ng-show="userForm.$error">
+                            <div ng-show="userForm.role.$error.required">
+                                <small class="errorTip" translate="validate.required.fields">
+                                    Required fields.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -848,6 +848,25 @@
     "sessions.table.useragent": "User Agent",
     "sessions.title": "Sessions actives de [<b>{{username}}</b>]",
 
+    "label.user":"Utilisateur",
+    "confirm.delete.dialog":"Confirmer la suppression ?",
+    "validate.users.password":"Les mots de passe ne correspondent pas.",
+    "validate.required.fields":"Champs requis.",
+    "label.user.search":"Recherche sur l'identifiant",
+    "label.users.edit":"Editer l'utilisateur",
+    "label.users.enable":"Activé",
+    "label.users.disable":"Désactivé",
+
+
+    "settings.form.state":"Etat",
+    "settings.form.role":"Role",
+    "settings.form.registration.date":"Date d'inscription",
+    "settings.form.address":"Adresse",
+    "settings.form.additional.address":"Adresse additionnelle",
+    "settings.form.zip":"Code postal",
+    "settings.form.city":"Ville",
+    "settings.form.country":"Pays",
+    "settings.form.phone":"Téléphone",
     "settings.form.button": "Sauvegarder",
     "settings.form.domains": "Domaines",
     "settings.form.email": "Email",
@@ -924,8 +943,12 @@
 
     "users.add": "Ajouter un utilisateur",
     "users.title": "Gestion des utilisateurs",
-    "users.count": "Il y a {{ total }} Utilisateurs.",
+    "users.count": "Il y a {{ total }} utilisateur(s).",
     "users.filter": "Filtrer: ",
+
+    "password.reset.success":"Votre mot de passe a été changé",
+    "password.forgot.success":"Un email a été envoyé à l'adresse indiquée",
+    "password.reset":"Changer le mot de passe",
 
     "sldeditor.raster.1band.titleTab": "Bande Unique",
     "sldeditor.raster.1band.band": "Bande",

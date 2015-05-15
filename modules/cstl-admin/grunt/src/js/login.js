@@ -8,7 +8,12 @@ jQuery(document).ready(function() {
 /**
  * Angular login app.
  */
-var cstlLoginApp = angular.module("cstlLoginApp", ['pascalprecht.translate']);
+var cstlLoginApp = angular.module("cstlLoginApp",
+        ['pascalprecht.translate',
+        'ui.bootstrap.modal',
+        'cstl-directives',
+        'cstl-services']);
+
 cstlLoginApp.config(['$translateProvider', '$translatePartialLoaderProvider',
     function ($translateProvider, $translatePartialLoaderProvider) {
         // Initialize angular-translate
@@ -18,6 +23,9 @@ cstlLoginApp.config(['$translateProvider', '$translatePartialLoaderProvider',
         $translatePartialLoaderProvider.addPart('ui-menu');
         $translatePartialLoaderProvider.addPart('ui');
         $translateProvider.preferredLanguage('en');
+
+        // remember language
+        $translateProvider.useCookieStorage();
     }
 ]);
 
@@ -43,7 +51,7 @@ cstlLoginApp.directive('formAutofillFix', function() {
 /**
  * Login controller.
  */
-cstlLoginApp.controller("login", function($scope, $http){
+cstlLoginApp.controller("login", function($scope, $http, $modal){
 
     var cstlUrl;
     $scope.formInputs = {
@@ -67,6 +75,15 @@ cstlLoginApp.controller("login", function($scope, $http){
             });
     };
 
+    $scope.forgotPassword = function(){
+        $modal.open({
+
+            templateUrl: 'views/forgot-password.html',
+            controller: 'forgotPasswordController as fpCtrl',
+            size: 'sm'
+        });
+    };
+
     $http.get('app/conf', {isArray: false}).success(function(conf){
         cstlUrl = conf.cstl;
         if(cstlUrl.indexOf('http://')===-1){
@@ -75,4 +92,19 @@ cstlLoginApp.controller("login", function($scope, $http){
         }
         $.cookie('cstlUrl', cstlUrl );
     });
+})
+.controller("forgotPasswordController", function($scope, $modalInstance, $http, $translate, Growl){
+        var self = this;
+        self.userEmail = '';
+
+        self.validate = function(){
+           $http.post($.cookie('cstlUrl') + 'spring/forgotPassword', {email: self.userEmail})
+               .success(function(resp){
+                   $translate(['Success', 'password.forgot.success']).then(function (translations) {
+                       Growl('success', translations.Success, translations['password.forgot.success']);
+                   });
+
+                   $modalInstance.close();
+               });
+   };
 });

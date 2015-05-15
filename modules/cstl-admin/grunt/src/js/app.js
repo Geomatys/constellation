@@ -143,7 +143,15 @@ cstlAdminApp
                 })
                 .when('/profile', {
                     templateUrl: 'views/profile.html',
-                    controller: 'MainController'
+                    controller: 'UserAccountController',
+                    resolve: {
+                        'user': function(UserResource){
+                            return UserResource.myAccount().$promise;
+                        },
+                        'roles': function(RoleResource){
+                            return RoleResource.getAll().$promise;
+                        }
+                    }
                 })
                 .when('/disclaimer', {
                     templateUrl: 'views/disclaimer.html',

@@ -37,6 +37,4 @@ public interface PropertyRepository {
     List<? extends Property> findAll();
 
     String getValue(String key, String defaultValue);
-
-	
 }

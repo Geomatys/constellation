@@ -29,18 +29,12 @@ import com.google.common.base.Optional;
 public interface UserRepository {
 
     List<CstlUser> findAll();
-    
-    
 
-    CstlUser insert(CstlUser user, List<String> roles);
+    CstlUser insert(CstlUser user);
 
-    /**
-     * Update user, should not update password.
-     * @param user
-     * @param roles
-     * @return
-     */
-    CstlUser update(CstlUser user, List<String> roles);
+    CstlUser update(CstlUser user);
+
+    void addUserToRole(Integer userId, String roleName);
     
     int delete(int userId);
     
@@ -55,6 +49,10 @@ public interface UserRepository {
 
     Optional<CstlUser> findById(Integer id);
 
+    Optional<CstlUser> findByEmail(String email);
+
+    Optional<CstlUser> findByForgotPasswordUuid(String uuid);
+
     List<String> getRoles(int userId);
     
     
@@ -64,12 +62,12 @@ public interface UserRepository {
     boolean loginAvailable(String login);
 
 
+    Optional<UserWithRole> findOneWithRole(Integer id);
 
     Optional<UserWithRole> findOneWithRole(String name);
 
-
-
 	List<UserWithRole> findActivesWithRole();
 
-    
+    List<UserWithRole> search(String search, int size, int page, String sortFieldName, String order);
+    long searchCount(String search);
 }

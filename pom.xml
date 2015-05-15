@@ -403,6 +403,12 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.1</version>
             </dependency>
+            <!--mail commons-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-email</artifactId>
+                <version>1.2</version>
+            </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>

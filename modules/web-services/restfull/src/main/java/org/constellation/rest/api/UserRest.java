@@ -33,13 +33,22 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import org.constellation.admin.dto.metadata.Page;
+import org.constellation.admin.dto.metadata.PagedSearch;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.engine.register.UserWithRole;
+import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.security.*;
 import org.geotoolkit.util.StringUtilities;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
 
 /**
  * RestFull user configuration service
@@ -58,16 +67,85 @@ public class UserRest {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	private org.constellation.security.SecurityManager securityManager;
+
 	@GET
 	@RolesAllowed("cstl-admin")
 	public Response findAll(@QueryParam("withRoles") boolean withRole) {
 		return Response.ok(userRepository.findActivesWithRole()).build();
 	}
 
+	/**
+	 * search pageable on user
+	 * @param pagedSearch
+	 * @return
+	 */
+	@POST
+	@Path("/search")
+	@RolesAllowed("cstl-admin")
+	public Page<UserWithRole> search(PagedSearch pagedSearch){
+		String text = pagedSearch.getText(), sortFieldName = null, sortOrder = null;
+		int page = pagedSearch.getPage(), size = pagedSearch.getSize();
+		if(pagedSearch.getSort() != null) {
+			sortFieldName = pagedSearch.getSort().getField();
+			sortOrder = pagedSearch.getSort().getOrder().name();
+		}
+
+		return new Page<UserWithRole>()
+				.setNumber(pagedSearch.getPage())
+				.setSize(pagedSearch.getSize())
+				.setContent(userRepository.search(text, size, page, sortFieldName, sortOrder))
+				.setTotal(userRepository.searchCount(pagedSearch.getText()));
+	}
+
+	@PUT
+	@Path("/updateValidation/{id}")
+	@Transactional
+	public Response updateValidation(@PathParam("id") int id){
+		Optional<CstlUser> user = userRepository.findById(id);
+		if(user.isPresent()){
+			boolean active = user.get().getActive();
+			if(active){
+				if (userRepository.isLastAdmin(id)){
+					return Response.serverError().entity("admin.user.last.admin").build();
+				} else {
+					userRepository.desactivate(id);
+				}
+			} else {
+				userRepository.activate(id);
+			}
+		}
+		return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
+	}
+
 	@GET
 	@Path("{id}")
 	public Response findOne(@PathParam("id") int id) {
 		return Response.ok(userRepository.findById(id)).build();
+	}
+
+	@GET
+	@Path("{id}/withRole")
+	public Response findOneWithRole(@PathParam("id") int id) {
+		return userRepository.findOneWithRole(id).transform(new Function<UserWithRole, Response>() {
+			@Override
+			public Response apply(UserWithRole userWithRole) {
+				return Response.ok(userWithRole).build();
+			}
+		}).or(Response.status(404).build());
+	}
+
+	@GET
+	@Path("/myAccount")
+	public Response myAccount() {
+		String currentUserLogin = securityManager.getCurrentUserLogin();
+		return userRepository.findOneWithRole(currentUserLogin).transform(new Function<UserWithRole, Response>() {
+			@Override
+			public Response apply(UserWithRole userWithRole) {
+				return Response.ok(userWithRole).build();
+			}
+		}).or(Response.status(404).build());
 	}
 
 	@DELETE
@@ -82,25 +160,166 @@ public class UserRest {
 		return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
 	}
 
+	/**
+	 * Add user,
+	 * this method take FormDataParam to support upload (logo or avatar)
+	 * @param userId
+	 * @param login
+	 * @param email
+	 * @param lastname
+	 * @param firstname
+	 * @param address
+	 * @param additionalAddress
+	 * @param zip
+	 * @param city
+	 * @param country
+	 * @param phone
+	 * @param password
+	 * @return
+	 */
 	@POST
-	@Transactional
+	@Path("/add")
 	@RolesAllowed("cstl-admin")
-	public Response post(UserWithRole userDTO) {
-		if (StringUtils.hasText(userDTO.getPassword()))
-			userDTO.setPassword(StringUtilities.MD5encode(userDTO.getPassword()));
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Transactional(rollbackFor = Exception.class)
+	public Response add(@FormDataParam("userId") Integer userId,
+						@FormDataParam("login") String login,
+						@FormDataParam("email") String email,
+						@FormDataParam("lastname") String lastname,
+						@FormDataParam("firstname") String firstname,
+						@FormDataParam("address") String address,
+						@FormDataParam("additionalAddress") String additionalAddress,
+						@FormDataParam("zip") String zip,
+						@FormDataParam("city") String city,
+						@FormDataParam("country") String country,
+						@FormDataParam("phone") String phone,
+						@FormDataParam("password") String password,
+						@FormDataParam("role") String role){
 
-		userRepository.insert(userDTO, userDTO.getRoles());
+		//add user
+		CstlUser user = new CstlUser();
+		user.setId(null);
+		user.setLogin(login);
+		user.setFirstname(firstname);
+		user.setLastname(lastname);
+		user.setEmail(email);
+		user.setActive(true);
+		user.setAddress(address);
+		user.setAdditionalAddress(additionalAddress);
+		user.setZip(zip);
+		user.setCity(city);
+		user.setCountry(country);
+		user.setPhone(phone);
+		user.setPassword(StringUtilities.MD5encode(password));
 
-		return Response.ok(userDTO).build();
+		user = userRepository.insert(user);
+
+		//add user to role
+		userRepository.addUserToRole(user.getId(), role);
+
+		return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
 	}
 
-	@PUT
-	@Transactional
+	@POST
+	@Path("/edit")
 	@RolesAllowed("cstl-admin")
-	public Response put(UserWithRole userDTO) {
-		userRepository.update(userDTO, userDTO.getRoles());
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Transactional(rollbackFor = Exception.class)
+	public Response edit(@FormDataParam("userId") Integer userId,
+						 @FormDataParam("login") String login,
+						 @FormDataParam("email") String email,
+						 @FormDataParam("lastname") String lastname,
+						 @FormDataParam("firstname") String firstname,
+						 @FormDataParam("address") String address,
+						 @FormDataParam("additionalAddress") String additionalAddress,
+						 @FormDataParam("zip") String zip,
+						 @FormDataParam("city") String city,
+						 @FormDataParam("country") String country,
+						 @FormDataParam("phone") String phone,
+						 @FormDataParam("password") String password,
+						 @FormDataParam("group") Integer group,
+						 @FormDataParam("role") String role) {
+		Optional<CstlUser> optionalUser = userRepository.findById(userId);
+		if(optionalUser.isPresent()){
+			CstlUser user = optionalUser.get();
+			user.setLogin(login);
+			user.setFirstname(firstname);
+			user.setLastname(lastname);
+			user.setEmail(email);
+			user.setAddress(address);
+			user.setAdditionalAddress(additionalAddress);
+			user.setZip(zip);
+			user.setCity(city);
+			user.setCountry(country);
+			user.setPhone(phone);
 
-		return Response.ok(userDTO).build();
+			//check password update
+			String newPassword = StringUtilities.MD5encode(password);
+			if(password != null
+					&& !password.isEmpty()
+					&& !newPassword.equals(user.getPassword())){
+				user.setPassword(newPassword);
+			}
+
+			userRepository.update(user);
+
+			//add user to role
+			userRepository.addUserToRole(user.getId(), role);
+
+			return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
+		}
+		return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).status(Response.Status.NOT_FOUND).build();
+	}
+
+	@POST
+	@Path("/my_account")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Transactional(rollbackFor = Exception.class)
+	public Response myAccount(@FormDataParam("userId") Integer userId,
+						 @FormDataParam("login") String login,
+						 @FormDataParam("email") String email,
+						 @FormDataParam("lastname") String lastname,
+						 @FormDataParam("firstname") String firstname,
+						 @FormDataParam("address") String address,
+						 @FormDataParam("additionalAddress") String additionalAddress,
+						 @FormDataParam("zip") String zip,
+						 @FormDataParam("city") String city,
+						 @FormDataParam("country") String country,
+						 @FormDataParam("phone") String phone,
+						 @FormDataParam("password") String password,
+						 @FormDataParam("group") Integer group,
+						 @FormDataParam("role") String role) {
+		String currentUserLogin = securityManager.getCurrentUserLogin();
+		if(currentUserLogin != null){
+			Optional<CstlUser> optionalUser = userRepository.findOne(currentUserLogin);
+			if(optionalUser.isPresent()){
+				CstlUser user = optionalUser.get();
+				user.setLogin(login);
+				user.setFirstname(firstname);
+				user.setLastname(lastname);
+				user.setEmail(email);
+				user.setAddress(address);
+				user.setAdditionalAddress(additionalAddress);
+				user.setZip(zip);
+				user.setCity(city);
+				user.setCountry(country);
+				user.setPhone(phone);
+
+				//check password update
+				String newPassword = StringUtilities.MD5encode(password);
+				if(password != null
+						&& !password.isEmpty()
+						&& !newPassword.equals(user.getPassword())){
+					user.setPassword(newPassword);
+				}
+
+				userRepository.update(user);
+
+				return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).build();
+			}
+		}
+
+		return Response.noContent().type(MediaType.TEXT_PLAIN_TYPE).status(Response.Status.NOT_FOUND).build();
 	}
 
 	/**

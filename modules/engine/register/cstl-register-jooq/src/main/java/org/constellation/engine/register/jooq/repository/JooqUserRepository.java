@@ -32,12 +32,7 @@ import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.records.CstlUserRecord;
 import org.constellation.engine.register.jooq.tables.records.UserXRoleRecord;
 import org.constellation.engine.register.repository.UserRepository;
-import org.jooq.DeleteConditionStep;
-import org.jooq.InsertSetMoreStep;
-import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.Result;
-import org.jooq.UpdateConditionStep;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -60,52 +55,38 @@ public class JooqUserRepository extends
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public CstlUser update(CstlUser user, List<String> roles) {
-
-		UpdateConditionStep<CstlUserRecord> update = dsl.update(CSTL_USER)
-				.set(CSTL_USER.EMAIL, user.getEmail())
-				.set(CSTL_USER.LASTNAME, user.getLastname())
-				.set(CSTL_USER.FIRSTNAME, user.getFirstname())
-				.where(CSTL_USER.LOGIN.eq(user.getLogin()));
-
-		update.execute();
-
-		DeleteConditionStep<UserXRoleRecord> deleteRoles = dsl.delete(
-				USER_X_ROLE).where(USER_X_ROLE.USER_ID.eq(user.getId()));
-
-		deleteRoles.execute();
-
-		insertRoles(user, roles);
-
-		return user;
+	public CstlUser insert(CstlUser user) {
+		CstlUserRecord record = dsl.newRecord(CSTL_USER);
+		record.from(user);
+		record.store();
+		return record.into(CstlUser.class);
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
-	public CstlUser insert(CstlUser user, List<String> roles) {
-
-		user.setActive(true);
-		CstlUserRecord newRecord = dsl.newRecord(CSTL_USER);
-
-		newRecord.from(user);
-
-		if (newRecord.store() > 0) {
-			user.setId(newRecord.getId());
-		}
-
-		insertRoles(user, roles);
-
-		return user;
+	public CstlUser update(CstlUser user) {
+		CstlUserRecord record = dsl.newRecord(CSTL_USER);
+		record.from(user);
+		dsl.executeUpdate(record);
+		return record.into(CstlUser.class);
 	}
 
-	private void insertRoles(CstlUser user, List<String> roles) {
-		for (String role : roles) {
-			InsertSetMoreStep<UserXRoleRecord> insertRole = dsl
-					.insertInto(USER_X_ROLE)
-					.set(USER_X_ROLE.USER_ID, user.getId())
-					.set(USER_X_ROLE.ROLE, role);
-			insertRole.execute();
-		}
+	/**
+	 * This method remove current user role and add new role to user
+	 * @param userId
+	 * @param roleName
+	 */
+	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void addUserToRole(Integer userId, String roleName) {
+		//remove old role
+		dsl.delete(USER_X_ROLE).where(USER_X_ROLE.USER_ID.eq(userId)).execute();
+
+		//set new role
+		UserXRoleRecord record = dsl.newRecord(USER_X_ROLE);
+		record.setUserId(userId);
+		record.setRole(roleName);
+		record.store();
 	}
 
 	@Override
@@ -168,6 +149,22 @@ public class JooqUserRepository extends
 	}
 
 	@Override
+	public Optional<CstlUser> findByEmail(String email) {
+		if (email == null)
+			return Optional.absent();
+		return Optional.fromNullable(dsl.select().from(CSTL_USER)
+				.where(CSTL_USER.EMAIL.eq(email)).fetchOneInto(CstlUser.class));
+	}
+
+	@Override
+	public Optional<CstlUser> findByForgotPasswordUuid(String uuid) {
+		if (uuid == null)
+			return Optional.absent();
+		return Optional.fromNullable(dsl.select().from(CSTL_USER)
+				.where(CSTL_USER.FORGOT_PASSWORD_UUID.eq(uuid)).fetchOneInto(CstlUser.class));
+	}
+
+	@Override
 	public List<String> getRoles(int userId) {
 		return dsl.select().from(CSTL_USER)
 				.where(USER_X_ROLE.USER_ID.eq(userId)).fetch(USER_X_ROLE.ROLE);
@@ -183,7 +180,75 @@ public class JooqUserRepository extends
 
 		return mapUserWithRole(fetchGroups);
 	}
-	
+
+	/**
+	 * search pageable on cstl_user
+	 * @param search
+	 * @param size
+	 * @param page
+	 * @param sortFieldName fieldMapping[0] => table (ex: cstl_user), fieldMapping[1] => attribute (e.g name)
+	 * @param order
+	 * @return
+	 */
+	@Override
+	public List<UserWithRole> search(String search, int size, int page, String sortFieldName, String order) {
+		//prepare sort
+		SortField<?> sortField = null;
+		if(sortFieldName != null && !sortFieldName.isEmpty()){
+			String[] fieldMapping = sortFieldName.split("\\.");
+			if(fieldMapping.length == 2){
+				String tableName = fieldMapping[0], attributeName = fieldMapping[1];
+				Field<?> field = null;
+
+				if("user_x_role".equals(tableName)){
+					field = USER_X_ROLE.field(attributeName.toUpperCase());
+				} else if("cstl_user".equals(tableName)){
+					field = CSTL_USER.field(attributeName.toUpperCase());
+				}
+
+				if(field != null){
+					sortField = field.sort(SortOrder.valueOf(order));
+				} else {
+					LOGGER.warn("Sort on " + sortFieldName + " is not supported.");
+				}
+			} else {
+				LOGGER.warn("Wrong sort value : " + sortFieldName + ", expected 'TABLE.ATTRIBUTE'");
+			}
+		}
+
+		Map<CstlUserRecord, Result<Record>> result = dsl.select().from(CSTL_USER)
+				.leftOuterJoin(USER_X_ROLE).on(CSTL_USER.ID.eq(USER_X_ROLE.USER_ID))
+				.where(CSTL_USER.LOGIN.like(getLikePattern(search)))
+				.orderBy(sortField)
+				.limit(size)
+				.offset((page - 1) * size)
+				.fetchGroups(CSTL_USER);
+
+		return mapUserWithRole(result);
+	}
+
+	@Override
+	public long searchCount(String search) {
+		return dsl.selectCount().from(CSTL_USER)
+				.where(CSTL_USER.LOGIN.like(getLikePattern(search)))
+				.fetchOne(0, Long.class);
+	}
+
+	@Override
+	public Optional<UserWithRole> findOneWithRole(Integer id) {
+		Map<CstlUserRecord, Result<Record>> fetchGroups = dsl.select()
+				.from(CSTL_USER).leftOuterJoin(Tables.USER_X_ROLE).onKey()
+				.where(CSTL_USER.ID.eq(id)).fetchGroups(CSTL_USER);
+
+		if (fetchGroups.isEmpty()) {
+			return Optional.absent();
+		}
+
+		List<UserWithRole> users = mapUserWithRole(fetchGroups);
+		return Optional.of(users.get(0));
+
+	}
+
 	@Override
 	public Optional<UserWithRole> findOneWithRole(String name) {
 		Map<CstlUserRecord, Result<Record>> fetchGroups = dsl.select()
@@ -227,6 +292,11 @@ public class JooqUserRepository extends
 				.where(CSTL_USER.LOGIN.eq(login)).fetchOne().value1() == 0;
 	}
 
-	
 
+	private String getLikePattern(String foo){
+		if(foo == null || foo.isEmpty()){
+			return "%";
+		}
+		return "%" + foo + "%";
+	}
 }

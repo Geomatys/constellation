@@ -777,6 +777,24 @@
     "login.login.messages.error.authentication": "<strong>Authentication failed!</strong> Please check your credentials and try again.",
     "login.error": "Login or password incorrect.",
 
+    "label.user":"User",
+    "confirm.delete.dialog":"Confirm delete ?",
+    "validate.users.password":"Passwords don't match.",
+    "validate.required.fields":"Required fields.",
+    "label.user.search":"research on login",
+    "label.users.edit":"Edit user",
+    "label.users.enable":"Enabled",
+    "label.users.disable":"Disabled",
+
+    "settings.form.state":"State",
+    "settings.form.role":"Role",
+    "settings.form.registration.date":"Registration date",
+    "settings.form.address":"Address",
+    "settings.form.additional.address":"Additional address",
+    "settings.form.zip":"Zip",
+    "settings.form.city":"City",
+    "settings.form.country":"Country",
+    "settings.form.phone":"Phone",
     "settings.title": "User settings for [<b>{{username}}</b>]",
     "settings.form.login": "Login",
     "settings.form.password": "Password",
@@ -947,8 +965,12 @@
 
     "users.add": "Add user",
     "users.title": "Users Dashboard",
-    "users.count": "There are {{ total }} users.",
+    "users.count": "There are {{ total }} user(s).",
     "users.filter": "User filter: ",
+
+    "password.reset.success":"Your password has been changed",
+    "password.forgot.success":"An email was sent to the indicated address",
+    "password.reset":"Reset password",
 
     "sldeditor.raster.1band.titleTab": "Unique band",
     "sldeditor.raster.1band.band": "Band",

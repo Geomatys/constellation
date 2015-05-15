@@ -36,10 +36,6 @@ angular.module('CstlIndexApp', [
         
         // Configure routes.
         $routeProvider
-            .when('/registration', {
-                templateUrl: 'views/registration.html',
-                controller: 'RegisterController'
-            })
             .when('/disclaimer', {
                 templateUrl: 'views/disclaimer.html'
             })

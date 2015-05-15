@@ -35,92 +35,157 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
         };
     })
 
-    .controller('UserController', function($scope, UserResource, $modal, Growl, $translate) {
-        $scope.list = UserResource.query({"withRoles": true});
-        $scope.details = function(i) {
+    .controller('UserController', function($scope, UserResource, RoleResource, Growl, $modal) {
+        $scope.search = {
+            page: 1,
+            size: 5,
+            text: '',
+            sort: {
+                field: 'cstl_user.login',
+                order: 'ASC'
+            }
+        };
+
+        $scope.loadPage = function(page) {
+            $scope.search.page = page;
+            UserResource.search($scope.search, function(data){
+                $scope.response = data;
+            });
+        };
+
+        $scope.sortOn = function(column) {
+            if ($scope.search.sort && $scope.search.sort.field === column) {
+                switch ($scope.search.sort.order) {
+                    case 'ASC':
+                        $scope.search.sort = null; // reset
+                        break;
+                    case 'DESC':
+                        $scope.search.sort.order = 'ASC';
+                        break;
+                    default:
+                        $scope.search.sort.order = 'DESC';
+                        break;
+                }
+            } else {
+                $scope.search.sort = { field: column, order: 'DESC' };
+            }
+            $scope.loadPage($scope.response.number);
+        };
+
+        $scope.edit = function(id){
             $modal.open({
-                templateUrl: 'views/admin/user/details.html',
+                templateUrl: 'views/admin/user/edit.html',
                 controller: 'UserDetailsController',
                 resolve: {
-                    'isUpdate': function() {return true;},
-                    'user': function(){
-                        return angular.copy($scope.list[i]);
+                    'user': function(UserResource){
+                        return UserResource.getWithRole({id: id}).$promise;
+                    },
+                    'roles': function(RoleResource){
+                        return RoleResource.getAll().$promise;
                     }
                 }
-            }).result.then(function(user){
-                    if(user){
-                        $scope.list[i] = user;
-                    }
-                });
+            }).result.then(function(){
+                $scope.loadPage($scope.response.number);
+            });
         };
-        $scope.add = function(i) {
+
+        $scope.add = function(id){
             $modal.open({
                 templateUrl: 'views/admin/user/add.html',
                 controller: 'UserDetailsController',
                 resolve: {
-                    'isUpdate': function() {return false;},
                     'user': function(){
-                        return { roles: ['cstl-data'] };
+                        return {roles: [""]};
+                    },
+                    'roles': function(RoleResource){
+                        return RoleResource.getAll().$promise;
                     }
                 }
-            }).result.then(function(user){
-                    if(user){
-                        $scope.list[$scope.list.length] = user;
-                    }
-                });
-        };
-        $scope.deleteUser = function(i){
-            UserResource.delete({id: $scope.list[i].id}, {} , function(resp){
-                $scope.list.splice(i, 1);
-            }, function(err){
-                var errorCode = err.data;
-                $translate(['Error',errorCode]).then(function (translations) {
-                    Growl('error', translations.Error,  translations[errorCode]);
-                });
+            }).result.then(function(){
+                $scope.loadPage($scope.response.number);
             });
         };
+
+        $scope.updateValidation = function(id){
+            UserResource.updateValidation({id: id}, {}, function(){
+                $scope.loadPage($scope.response.number);
+            });
+        };
+
+        //init response
+        $scope.loadPage(1);
     })
-    
-    .controller('UserDetailsController', function($scope, $modalInstance, GeneralService, user, isUpdate, UserResource, Growl, $translate) {
+
+    .controller('UserDetailsController', function($rootScope, $scope, $modalInstance, $cookieStore, Growl, UserResource, cfpLoadingBar, user, roles) {
         $scope.user = user;
+        $scope.roles = roles;
+
+        $scope.password = "";
+        $scope.password2 = "";
+
+        //set password required : true case create user, false otherwise
+        $scope.passwordRequired = Boolean(!$scope.user.id);
+
+        //enable role
+        $scope.enableRole = true;
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
 
-        var timeout=null;
-        $scope.checkLogin = function(login){
-            if(timeout){
-                window.clearTimeout(timeout);
-                timeout = null;
-            }
-            timeout = setTimeout(function(){
-                if($scope.user.login && $scope.user.login.length > 2){
-                    GeneralService.checkLogin($scope.user.login).success(function(res){
-                        $scope.loginInUse=res.available==="false";
-                    }).error(function(){
-                    });
-                }
-            }, 400);
-        };
-
         $scope.save = function(){
-            var userResource = new UserResource($scope.user);
-            if(isUpdate){
-                userResource.$update(function(updated){
-                    $modalInstance.close(updated);
-                }, function(){
-                    $translate(['Error','admin.user.save.error']).then(function (translations) {
-                        Growl('error', translations.Error,  translations['admin.user.save.error']);
-                    });});
-            }
-            else{
-                userResource.$save(function(saved){
-                    $modalInstance.close(saved);
-                }, function(){
-                    $translate(['Error','admin.user.save.error']).then(function (translations) {
-                        Growl('error', translations.Error,  translations['admin.user.save.error']);
-                    });
+            var formData = new FormData(document.getElementById('userForm'));
+            if($scope.user.id){
+                //edit
+                $.ajax({
+                    headers: {
+                        'access_token': $rootScope.access_token
+                    },
+                    url: $cookieStore.get('cstlUrl') + 'api/1/user/edit',
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function(){
+                        cfpLoadingBar.start();
+                        cfpLoadingBar.inc();
+                    },
+                    success: function(result) {
+                        cfpLoadingBar.complete();
+                        $modalInstance.close();
+                    },
+                    error: function(result){
+                        Growl('error', 'Error', 'Unable to edit user!');
+                        cfpLoadingBar.complete();
+                    }
+                });
+            } else {
+                //add
+                $.ajax({
+                    headers: {
+                        'access_token': $rootScope.access_token
+                    },
+                    url: $cookieStore.get('cstlUrl') + 'api/1/user/add',
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function(){
+                        cfpLoadingBar.start();
+                        cfpLoadingBar.inc();
+                    },
+                    success: function(result) {
+                        cfpLoadingBar.complete();
+                        $modalInstance.close();
+                    },
+                    error: function(result){
+                        Growl('error', 'Error', 'Unable to add user!');
+                        cfpLoadingBar.complete();
+                    }
                 });
             }
         };

@@ -21,10 +21,14 @@ package org.constellation.services.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.mail.EmailException;
+import org.constellation.admin.mail.MailService;
 import org.constellation.auth.transfer.TokenTransfer;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.services.component.TokenService;
+import org.geotoolkit.util.StringUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -38,11 +42,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.google.common.base.Optional;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.ArrayList;
 
 @Controller
 @Profile("standard")
@@ -70,6 +78,39 @@ public class AuthController {
         private String password;
     }
 
+    static class ForgotPassword {
+        private String email;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+    }
+
+    static class ResetPassword{
+        private String password;
+        private String uuid;
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    }
+
     @Autowired
     private TokenService tokenService;
     
@@ -79,6 +120,8 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MailService mailService;
 
     @Autowired
     @Qualifier("authenticationManager")
@@ -126,8 +169,57 @@ public class AuthController {
         return new ResponseEntity<TokenTransfer>(new TokenTransfer(createToken, id), HttpStatus.OK);
     }
 
-   
+    @RequestMapping(value="/forgotPassword", method=RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity forgotPassword(HttpServletRequest request, @RequestBody final ForgotPassword forgotPassword) throws EmailException {
+        final String email = forgotPassword.getEmail();
+        String uuid = DigestUtils.sha256Hex(email + System.currentTimeMillis());
+        Optional<CstlUser> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isPresent()){
+            CstlUser user = userOptional.get();
+            user.setForgotPasswordUuid(uuid);
+            userRepository.update(user);
 
+            String baseUrl = "http://" + request.getHeader("host") + request.getContextPath();
+            String resetPasswordUrl = baseUrl + "/reset-password.html?uuid=" + uuid;
+
+            mailService.send("Reset of the password of your account",
+                    "<html>" +
+                        "<body>" +
+                            "<p>Dear,</p>" +
+                            "<br />" +
+                            "<p>You asked to reset your password.</p>" +
+                            "<p>Please click the link below.</p>" +
+                            "<p>You will be redirected to a page where you can change your password.</p>" +
+                            "<p><a href='" + resetPasswordUrl + "'>" + resetPasswordUrl + "</a></p>" +
+                            "<br />" +
+                            "<p>Regards</p>" +
+                        "</body>" +
+                    "</html>",
+                    new ArrayList<String>(){{add(email);}});
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+
+    @RequestMapping(value="/resetPassword", method=RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity resetPassword(@RequestBody final ResetPassword resetPassword){
+        String newPassword = resetPassword.getPassword(), uuid = resetPassword.getUuid();
+
+        if(newPassword != null && uuid != null && !newPassword.isEmpty() && !uuid.isEmpty()){
+            Optional<CstlUser> userOptional = userRepository.findByForgotPasswordUuid(uuid);
+            if (userOptional.isPresent()){
+                CstlUser cstlUser = userOptional.get();
+                cstlUser.setPassword(StringUtilities.MD5encode(newPassword));
+                cstlUser.setForgotPasswordUuid(null);
+                userRepository.update(cstlUser);
+                return new ResponseEntity(HttpStatus.OK);
+            }
+        }
+
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
    
 
     public static UserDetails extractUserDetail() {

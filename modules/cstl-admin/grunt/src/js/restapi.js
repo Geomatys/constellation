@@ -68,7 +68,33 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     .factory('UserResource', function($resource) {
         return $resource('@cstl/api/1/user/:id', null, {
             'update': { method:'PUT' },
-            'domainRoles': {url: '@cstl/api/1/user/$userId/domainroles/:domainId', isArray:true}
+            'domainRoles': {url: '@cstl/api/1/user/$userId/domainroles/:domainId', isArray:true},
+            getWithRole : {
+                url: '@cstl/api/1/user/:id/withRole',
+                method : 'GET'
+            },
+            myAccount : {
+                url: '@cstl/api/1/user/myAccount',
+                method : 'GET'
+            },
+            search : {
+                url: '@cstl/api/1/user/search',
+                method : 'POST'
+            },
+            updateValidation : {
+                url: '@cstl/api/1/user/updateValidation/:id',
+                method : 'PUT'
+            }
+        });
+    })
+
+    .factory('RoleResource', function($resource){
+        return $resource('@cstl/api/1/role/:id', null, {
+            getAll : {
+                url: '@cstl/api/1/role',
+                method : 'GET',
+                isArray : true
+            }
         });
     })
 

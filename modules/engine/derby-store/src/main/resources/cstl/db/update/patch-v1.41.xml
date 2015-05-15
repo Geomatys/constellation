@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.41" author="ltisseyre">
+        <!-- set unique role to user for cstl_user_x_role relation -->
+        <addUniqueConstraint tableName="user_x_role" columnNames="user_id" schemaName="admin" />
+
+        <!-- set unique email to user -->
+        <update tableName="cstl_user" schemaName="admin">
+            <column name="email" value="NULL"/>
+            <where>email = ''</where>
+        </update>
+        <addUniqueConstraint tableName="cstl_user" columnNames="email" schemaName="admin" />
+
+        <!--update cstl_user fields-->
+        <addColumn schemaName="admin" tableName="cstl_user">
+            <column name="avatar" type="VARCHAR(64)" />
+        </addColumn>
+        <addColumn schemaName="admin" tableName="cstl_user">
+            <column name="address" type="VARCHAR(64)" />
+        </addColumn>
+        <addColumn schemaName="admin" tableName="cstl_user">
+            <column name="additional_address" type="VARCHAR(64)" />
+        </addColumn>
+        <addColumn schemaName="admin" tableName="cstl_user">
+            <column name="zip" type="VARCHAR(64)" />
+        </addColumn>
+        <addColumn schemaName="admin" tableName="cstl_user">
+            <column name="city" type="VARCHAR(64)" />
+        </addColumn>
+        <addColumn schemaName="admin" tableName="cstl_user">
+            <column name="country" type="VARCHAR(64)" />
+        </addColumn>
+        <addColumn schemaName="admin" tableName="cstl_user">
+            <column name="phone" type="VARCHAR(64)" />
+        </addColumn>
+        <addColumn schemaName="admin" tableName="cstl_user">
+            <column name="forgot_password_uuid" type="VARCHAR(64)" />
+        </addColumn>
+
+        <addUniqueConstraint tableName="cstl_user" columnNames="forgot_password_uuid" schemaName="admin" />
+
+        <!--add email preference-->
+        <insert schemaName="admin" tableName="property">
+            <column name="name" value="email.smtp.from" />
+            <column name="value" value="no-reply@localhost" />
+        </insert>
+        <insert schemaName="admin" tableName="property">
+            <column name="name" value="email.smtp.host" />
+            <column name="value" value="localhost" />
+        </insert>
+        <insert schemaName="admin" tableName="property">
+            <column name="name" value="email.smtp.port" />
+            <column name="value" value="25" />
+        </insert>
+        <insert schemaName="admin" tableName="property">
+            <column name="name" value="email.smtp.username" />
+            <column name="value" value="no-reply@localhost" />
+        </insert>
+        <insert schemaName="admin" tableName="property">
+            <column name="name" value="email.smtp.password" />
+            <column name="value" value="mypassword" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

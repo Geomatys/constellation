@@ -623,4 +623,48 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                     '</div>' +
                 '</div>'
         };
+    })
+
+    //directive to check password
+    .directive('pwCheck', [function () {
+        return {
+            require: 'ngModel',
+            link: function (scope, elem, attrs, ctrl) {
+                var firstPassword = '#' + attrs.pwCheck;
+                elem.add(firstPassword).on('keyup', function () {
+                    scope.$apply(function () {
+                        var v = elem.val()===$(firstPassword).val();
+                        ctrl.$setValidity('pwmatch', v);
+                    });
+                });
+            }
+        };
+    }])
+
+    //directive to bind enter key
+    .directive('ngEnter', function () {
+        return function (scope, element, attrs) {
+            element.bind("keydown keypress", function (event) {
+                if(event.which === 13) {
+                    scope.$apply(function (){
+                        scope.$eval(attrs.ngEnter);
+                    });
+                    event.preventDefault();
+                }
+            });
+        };
+    })
+
+    .directive('ngConfirmClick', function(){
+        return {
+            link: function (scope, element, attr) {
+                var msg = attr.ngConfirmClick;
+                var clickAction = attr.confirmedClick;
+                element.bind('click',function (event) {
+                    if ( window.confirm(msg) ) {
+                        scope.$eval(clickAction);
+                    }
+                });
+            }
+        };
     });
