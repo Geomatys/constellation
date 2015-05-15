@@ -16,6 +16,7 @@
     "zip": "ZIP",
     "save": "Save",
     "address":"Address",
+    "unknown":"Unknown",
 
     "adddata.popup.datalist.subtitle.label":"Select data to import and click on continue.",
     "adddata.popup.informations.name.label":"Alias",

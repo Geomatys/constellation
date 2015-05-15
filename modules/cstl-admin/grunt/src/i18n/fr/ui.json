@@ -16,6 +16,7 @@
     "zip": "Code postal",
     "save": "Enregistrer",
     "address":"Adresse",
+    "unknown":"Inconnu",
 
     "adddata.popup.datalist.subtitle.label": "Sélectionnez la donnée à importer puis cliquez sur continuer.",
     "adddata.popup.informations.name.label": "Alias",
