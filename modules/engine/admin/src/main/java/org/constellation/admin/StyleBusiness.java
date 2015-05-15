@@ -18,24 +18,7 @@
  */
 package org.constellation.admin;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-
+import com.google.common.base.Optional;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.StyleType;
@@ -86,7 +69,22 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -213,9 +211,9 @@ public class StyleBusiness implements IStyleBusiness {
      */
     @Override
     @Transactional
-    public void createStyle(final String providerId, final MutableStyle style) throws ConfigurationException {
+    public Style createStyle(final String providerId, final MutableStyle style) throws ConfigurationException {
         ensureExistingProvider(providerId);
-        createOrUpdateStyle(providerId, style.getName(), style);
+        return createOrUpdateStyle(providerId, style.getName(), style);
     }
 
     /**
@@ -508,7 +506,7 @@ public class StyleBusiness implements IStyleBusiness {
      *             if the operation has failed for any reason
      */
     @Transactional
-    private synchronized void createOrUpdateStyle(final String providerId, String styleName, final MutableStyle style) throws ConfigurationException {
+    private synchronized Style createOrUpdateStyle(final String providerId, String styleName, final MutableStyle style) throws ConfigurationException {
         // Proceed style name.
         if (isBlank(styleName)) {
             if (isBlank(style.getName())) {
@@ -535,7 +533,7 @@ public class StyleBusiness implements IStyleBusiness {
         final Style s = styleRepository.findByNameAndProvider(provider.getId(), styleName);
         if (s != null) {
             s.setBody(sw.toString());
-            styleRepository.save(s);
+            return styleRepository.save(s);
         } else {
             Integer userId = userRepository.findOne(securityManager.getCurrentUserLogin()).transform(new com.google.common.base.Function<CstlUser, Integer>() {
                 @Override
@@ -550,7 +548,8 @@ public class StyleBusiness implements IStyleBusiness {
             newStyle.setDate(new Date().getTime());
             newStyle.setBody(sw.toString());
             newStyle.setOwner(userId);
-            styleRepository.create(newStyle);
+            newStyle.setId(styleRepository.create(newStyle));
+            return newStyle;
         }
     }
 

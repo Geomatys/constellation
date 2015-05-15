@@ -23,6 +23,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.filter.expression.Function;
 
@@ -49,7 +50,7 @@ public interface IStyleBusiness {
     void removeStyleFromLayer(String serviceIdentifier, String serviceType, String layerName, String styleProviderId,
                               String styleName) throws TargetNotFoundException;
 
-    void createStyle(String sld, MutableStyle style) throws ConfigurationException;
+    Style createStyle(String sld, MutableStyle style) throws ConfigurationException;
 
     Function getFunctionColorMap(String id, String styleId, String ruleName) throws TargetNotFoundException;
 
