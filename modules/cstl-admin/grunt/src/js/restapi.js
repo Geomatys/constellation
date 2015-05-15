@@ -155,6 +155,25 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         });
     })
 
+    .factory('Dataset', function($resource) {
+        var rootPath = '@cstl/api/1/domain/$domainId/dataset/:id';
+        return $resource(rootPath, null, {
+            'search':  { method: 'POST' },
+            'getData': { method: 'GET', url: rootPath + '/data' , isArray: true },
+            'delete':  { method: 'DELETE' }
+        });
+    })
+
+    .factory('Data', function($resource) {
+        var rootPath = '@cstl/api/1/domain/$domainId/data/:dataId';
+        return $resource(rootPath, null, {
+            'delete':           { method: 'DELETE' },
+            'getAssociations':  { method: 'GET',    url: rootPath + '/associations' },
+            'dissociateStyle':  { method: 'DELETE', url: rootPath + '/associations/styles/:styleId' },
+            'dissociateSensor': { method: 'DELETE', url: rootPath + '/associations/sensors/:sensorIdentifier' }
+        });
+    })
+
     .factory('dataListing', function($resource) {
         return $resource('@cstl/api/1/domain/$domainId/data/list/top/:filter;jsessionid=', {}, {
             'listAll':              {method: 'GET',     isArray: true},
