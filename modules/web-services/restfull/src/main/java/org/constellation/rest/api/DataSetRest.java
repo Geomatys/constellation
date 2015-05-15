@@ -130,24 +130,24 @@ public class DataSetRest {
     @Inject
     private org.constellation.security.SecurityManager securityManager;
 
-    /**
-     * Proceed to remove a dataset
-     * @param domainId
-     * @param datasetIdentifier
-     * @return
-     */
-    @DELETE
-    @Path("{datasetIdentifier}")
-    public Response removeDataSet(@PathParam("domainId") final int domainId,
-                                  @PathParam("datasetIdentifier") final String datasetIdentifier) {
-        try{
-            datasetBusiness.removeDataset(datasetIdentifier);
-            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
-        }catch(Exception ex){
-            LOGGER.log(Level.WARNING, "Failed to remove dataset with identifier "+datasetIdentifier,ex);
-            return Response.status(500).entity("failed").build();
-        }
-    }
+//    /**
+//     * Proceed to remove a dataset
+//     * @param domainId
+//     * @param datasetIdentifier
+//     * @return
+//     */
+//    @DELETE
+//    @Path("{datasetIdentifier}")
+//    public Response removeDataSet(@PathParam("domainId") final int domainId,
+//                                  @PathParam("datasetIdentifier") final String datasetIdentifier) {
+//        try{
+//            datasetBusiness.removeDataset(datasetIdentifier);
+//            return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+//        }catch(Exception ex){
+//            LOGGER.log(Level.WARNING, "Failed to remove dataset with identifier "+datasetIdentifier,ex);
+//            return Response.status(500).entity("failed").build();
+//        }
+//    }
 
     @POST
     @Path("create")
