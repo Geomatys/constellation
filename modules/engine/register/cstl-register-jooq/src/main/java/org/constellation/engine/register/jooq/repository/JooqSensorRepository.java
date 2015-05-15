@@ -1,21 +1,28 @@
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.SENSOR;
-import static org.constellation.engine.register.jooq.Tables.SENSORED_DATA;
-
-import java.util.List;
-
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Sensor;
 import org.constellation.engine.register.jooq.tables.records.SensorRecord;
+import org.constellation.engine.register.pojo.SensorReference;
 import org.constellation.engine.register.repository.SensorRepository;
+import org.jooq.Field;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.SENSOR;
+import static org.constellation.engine.register.jooq.Tables.SENSORED_DATA;
+
 @Component
 public class JooqSensorRepository extends AbstractJooqRespository<SensorRecord, Sensor> implements SensorRepository {
+
+    public static final Field[] REFERENCE_FIELDS = new Field[]{
+            SENSOR.ID.as("id"),
+            SENSOR.IDENTIFIER.as("identifier")};
+
 
     public JooqSensorRepository() {
         super(Sensor.class, SENSOR);
@@ -86,5 +93,27 @@ public class JooqSensorRepository extends AbstractJooqRespository<SensorRecord, 
                 .set(SENSOR.TYPE, sensor.getType())
                 .where(SENSOR.ID.eq(sensor.getId()))
                 .execute();
+    }
+
+    @Override
+    public boolean existsById(int sensorId) {
+        return dsl.selectCount().from(SENSOR)
+                .where(SENSOR.ID.eq(sensorId))
+                .fetchOne(0, Integer.class) > 0;
+    }
+
+    @Override
+    public boolean existsByIdentifier(String sensorId) {
+        return dsl.selectCount().from(SENSOR)
+                .where(SENSOR.IDENTIFIER.eq(sensorId))
+                .fetchOne(0, Integer.class) > 0;
+    }
+
+    @Override
+    public List<SensorReference> fetchByDataId(int dataId) {
+        return dsl.select(REFERENCE_FIELDS).from(SENSOR)
+                .join(SENSORED_DATA).on(SENSORED_DATA.SENSOR.eq(SENSOR.ID))
+                .where(SENSORED_DATA.DATA.eq(dataId))
+                .fetchInto(SensorReference.class);
     }
 }

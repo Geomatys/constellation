@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Sensor;
+import org.constellation.engine.register.pojo.SensorReference;
 
 public interface SensorRepository {
 
@@ -26,4 +27,10 @@ public interface SensorRepository {
     public Sensor create(Sensor sensor);
 
     public void update(Sensor sensor);
+
+    public boolean existsById(int sensorId);
+
+    public boolean existsByIdentifier(String sensorIdentifier);
+
+    public List<SensorReference> fetchByDataId(int dataId);
 }
