@@ -19,25 +19,7 @@
 
 package org.constellation.admin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import com.google.common.base.Optional;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
@@ -50,6 +32,7 @@ import org.constellation.admin.listener.DefaultDataBusinessListener;
 import org.constellation.admin.listener.IDataBusinessListener;
 import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IMetadataBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
@@ -77,8 +60,23 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
-import org.constellation.business.IMetadataBusiness;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -380,10 +378,19 @@ public class DatasetBusiness implements IDatasetBusiness {
         }
     }
 
-    @Override
     @Transactional
+    @Override
+    public void removeDataset(int datasetId) throws ConfigurationException {
+        removeDataset(datasetRepository.findById(datasetId));
+    }
+
+    @Transactional
+    @Override
     public void removeDataset(String datasetIdentifier) throws ConfigurationException {
-        final Dataset ds = datasetRepository.findByIdentifier(datasetIdentifier);
+        removeDataset(datasetRepository.findByIdentifier(datasetIdentifier));
+    }
+
+    private void removeDataset(Dataset ds) throws ConfigurationException {
         if (ds != null) {
             final Set<Integer> involvedProvider = new HashSet<>();
             final Set<Data> linkedData = new HashSet<>();
