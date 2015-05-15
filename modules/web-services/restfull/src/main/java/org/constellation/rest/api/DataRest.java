@@ -18,51 +18,8 @@
  */
 package org.constellation.rest.api;
 
-import java.awt.Dimension;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.CRC32;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.base.Optional;
+import org.apache.sis.geometry.Envelopes;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -75,6 +32,7 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IMapContextBusiness;
+import org.constellation.business.IMetadataBusiness;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.ISensorBusiness;
@@ -82,6 +40,7 @@ import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.DataCustomConfiguration;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.configuration.StringList;
@@ -98,7 +57,12 @@ import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Mapcontext;
 import org.constellation.engine.register.jooq.tables.pojos.MapcontextStyledLayer;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.jooq.tables.pojos.Sensor;
 import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
+import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.SensorRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.engine.security.WorkspaceService;
 import org.constellation.json.metadata.binding.RootObj;
@@ -116,6 +80,8 @@ import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.CoverageStoreFactory;
+import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.CoverageUtilities;
 import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
@@ -125,11 +91,12 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
+import org.geotoolkit.data.FeatureStoreFactory;
+import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
-import org.apache.sis.geometry.Envelopes;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.parameter.ParametersExt;
@@ -148,6 +115,9 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.opengis.geometry.Envelope;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
@@ -157,18 +127,54 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
-import org.constellation.business.IMetadataBusiness;
-import org.constellation.configuration.DataCustomConfiguration;
-import org.geotoolkit.coverage.CoverageStoreFactory;
-import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.data.FeatureStoreFactory;
-import org.geotoolkit.data.FeatureStoreFinder;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.CRC32;
+
+import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  * Manage data sending
@@ -188,6 +194,18 @@ public class DataRest {
 
     @Inject
     private UserRepository userRepository;
+
+    @Inject
+    private DataRepository dataRepository;
+
+    @Inject
+    private StyleRepository styleRepository;
+
+    @Inject
+    private ServiceRepository serviceRepository;
+
+    @Inject
+    private SensorRepository sensorRepository;
 
     @Inject
     private IStyleBusiness styleBusiness;
@@ -2136,7 +2154,7 @@ public class DataRest {
     }
 
     @DELETE
-    @Path("/remove/{dataId}")
+    @Path("/{dataId}")
     public Response removeData(final @PathParam("dataId") int dataId) {
         try {
             dataBusiness.removeData(dataId);
@@ -2367,4 +2385,43 @@ public class DataRest {
         return Response.ok(dataBusiness.getVectorDataColumns(id)).build();
     }
 
+
+    @GET
+    @Path("/{dataId}/associations")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getAssociations(@PathParam("dataId") int dataId) {
+        if (dataRepository.existsById(dataId)) {
+            Map<String, Object> entity = new HashMap<>();
+            entity.put("styles", styleRepository.fetchByDataId(dataId));
+            entity.put("services", serviceRepository.fetchByDataId(dataId));
+            entity.put("sensors", sensorRepository.fetchByDataId(dataId));
+            return ok(entity);
+        }
+        return Response.status(404).build();
+    }
+
+    @DELETE
+    @Path("/{dataId}/associations/styles/{styleId}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Transactional
+    public Response deleteStyleAssociation(@PathParam("dataId") int dataId, @PathParam("styleId") int styleId) {
+        if (dataRepository.existsById(dataId) && styleRepository.existsById(styleId)) {
+            styleRepository.unlinkStyleToData(styleId, dataId);
+            return Response.noContent().build();
+        }
+        return Response.status(404).build();
+    }
+
+    @DELETE
+    @Path("/{dataId}/associations/sensors/{sensorId}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Transactional
+    public Response deleteSensorAssociation(@PathParam("dataId") int dataId, @PathParam("sensorId") String sensorIdentifier) {
+        Sensor sensor = sensorRepository.findByIdentifier(sensorIdentifier);
+        if (sensor != null && dataRepository.existsById(dataId)) {
+            sensorRepository.unlinkDataToSensor(dataId, sensor.getId());
+            return Response.noContent().build();
+        }
+        return Response.status(404).build();
+    }
 }
