@@ -59,6 +59,8 @@ public interface DatasetRepository {
     
     void removeAllDatasetFromCSW(final int serviceID);
 
+    boolean existsById(int datasetId);
+
     Page<DatasetItem> fetchPage(Pageable pageable,
                                 boolean excludeEmpty,
                                 String termFilter,

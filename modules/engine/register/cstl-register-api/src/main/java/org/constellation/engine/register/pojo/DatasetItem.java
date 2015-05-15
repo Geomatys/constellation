@@ -12,7 +12,7 @@ public class DatasetItem implements Serializable {
 
     protected Integer id;
 
-    protected String identifier;
+    protected String name;
 
     protected Long creationDate;
 
@@ -32,12 +32,12 @@ public class DatasetItem implements Serializable {
         return this;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getName() {
+        return name;
     }
 
-    public DatasetItem setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public DatasetItem setName(String name) {
+        this.name = name;
         return this;
     }
 
