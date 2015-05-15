@@ -2173,9 +2173,9 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
             } else {
                 $scope.newStyle.name = $scope.optionsSLD.userStyleName;
                 //write style in server side.
-                style.createjson({provider: 'sld'}, $scope.newStyle, function(response) {
+                style.createjson({provider: 'sld'}, $scope.newStyle, function(created) {
                     Growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully created');
-                    $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
+                    $modalInstance.close({"Id": created.id, "Provider": "sld", "Name": $scope.newStyle.name});
                 }, function() {
                     Growl('error', 'Error', 'Unable to create style ' + $scope.newStyle.name);
                     $modalInstance.close();
