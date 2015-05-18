@@ -22,9 +22,9 @@ var cstlAdminApp = angular.module('CstlAdminApp', ['CstlAdminDep']);
 
 cstlAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider', '$translatePartialLoaderProvider',
-        '$keepaliveProvider','$idleProvider',
+        '$keepaliveProvider','$idleProvider', 'PermissionResolver',
         function ($routeProvider, $httpProvider, $translateProvider, $translatePartialLoaderProvider,
-                  $keepaliveProvider, $idleProvider) {
+                  $keepaliveProvider, $idleProvider, PermissionResolver) {
     	 $httpProvider.defaults.useXDomain = true;
 
          $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
@@ -35,45 +35,55 @@ cstlAdminApp
             $routeProvider
                 .when('/admin', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/system_state', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/system_settings', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/system_logs', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/system_contact', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/system_about', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/tasks_manager', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/planning', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/users', {
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/admin/domainmembers/:domainId', {
                     //templateUrl: 'views/admin/domain/members.html',
                     //controller: 'DomainMembersController'
                     templateUrl: 'views/admin/main.html',
-                    controller: 'AdminController'
+                    controller: 'AdminController',
+                    resolve: angular.extend({},PermissionResolver.factory('admin'))
                 })
                 .when('/settings', {
                     templateUrl: 'views/settings.html',
@@ -103,44 +113,54 @@ cstlAdminApp
                 })
                 .when('/webservice', {
                     templateUrl: 'views/webservice/webservice.html',
-                    controller: 'WebServiceController'
+                    controller: 'WebServiceController',
+                    resolve: angular.extend({},PermissionResolver.factory('publish'))
                 })
                 .when('/webservice/:type/:id', {
                     templateUrl: 'views/webservice/edit.html',
-                    controller: 'WebServiceEditController'
+                    controller: 'WebServiceEditController',
+                    resolve: angular.extend({},PermissionResolver.factory('publish'))
                 })
                 .when('/webservice/:type/:id/source', {
                     templateUrl: 'views/webservice/source.html',
-                    controller: 'WebServiceChooseSourceController'
+                    controller: 'WebServiceChooseSourceController',
+                    resolve: angular.extend({},PermissionResolver.factory('publish'))
                 })
                 .when('/webservice/:type', {
                     templateUrl: 'views/webservice/create.html',
-                    controller: 'WebServiceCreateController'
+                    controller: 'WebServiceCreateController',
+                    resolve: angular.extend({},PermissionResolver.factory('publish'))
                 })
                 .when('/editmetadata/:template/:type/:id', {
                     templateUrl: 'views/data/description.html',
-                    controller: 'EditMetadataController'
+                    controller: 'EditMetadataController',
+                    resolve: angular.extend({},PermissionResolver.factory('data'))
                 })
                 .when('/data/:tab?', {
                     templateUrl: 'views/data/data.html',
                     controller: 'DatasetDashboardController',
-                    controllerAs: 'dc'
+                    controllerAs: 'dc',
+                    resolve: angular.extend({},PermissionResolver.factory('data'))
                 })
                 .when('/sensors/:id?', {
                     templateUrl: 'views/sensor/sensors.html',
-                    controller: 'SensorsController'
+                    controller: 'SensorsController',
+                    resolve: angular.extend({},PermissionResolver.factory('data'))
                 })
                 .when('/styles', {
                     templateUrl: 'views/style/styles.html',
-                    controller: 'StylesController'
+                    controller: 'StylesController',
+                    resolve: angular.extend({},PermissionResolver.factory('data'))
                 })
                 .when('/mapcontext', {
                     templateUrl: 'views/mapcontext/mapcontext.html',
-                    controller: 'MapcontextController'
+                    controller: 'MapcontextController',
+                    resolve: angular.extend({},PermissionResolver.factory('data'))
                 })
                 .when('/tasks', {
                     templateUrl: 'views/tasks/tasks.html',
-                    controller: 'TasksController'
+                    controller: 'TasksController',
+                    resolve: angular.extend({},PermissionResolver.factory('data'))
                 })
                 .when('/profile', {
                     templateUrl: 'views/profile.html',

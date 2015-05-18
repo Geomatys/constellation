@@ -24,9 +24,11 @@ var dataNotReady = function(){alert("data not ready");};
 
 angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('HeaderController', function ($rootScope, $scope, $http, TokenService, Account, $idle, $modal, CstlConfig) {
+    .controller('HeaderController', function ($rootScope, $scope, $http, TokenService, Account, $idle, $modal, CstlConfig,Permission) {
 
         $scope.navigationArray = CstlConfig['cstl.navigation'];
+
+        $scope.permissionService = Permission;
 
         function closeModals() {
             if ($scope.warning) {

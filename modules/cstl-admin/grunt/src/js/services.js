@@ -108,6 +108,30 @@ angular.module('cstl-services', ['cstl-restapi'])
     })
 
     // -------------------------------------------------------------------------
+    //  Constant to resolve permission
+    // -------------------------------------------------------------------------
+    .constant('PermissionResolver', {
+        'factory' : function(permName) {
+            return {
+                'continue' : function($q, Permission,$location,Growl){
+                    var defer = $q.defer();
+                    Permission.promise.then(function(){
+                        if (Permission.hasPermission(permName)) {
+                            defer.resolve();
+                        } else {
+                            defer.reject();
+                            //redirect to root path
+                            $location.path('/');
+                            Growl('error', 'Error', 'Access denied!');
+                        }
+                    }).catch(defer.reject);
+                    return defer.promise;
+                }
+            };
+        }
+    })
+
+    // -------------------------------------------------------------------------
     //  Constellation Utilities
     // -------------------------------------------------------------------------
 
@@ -625,6 +649,49 @@ angular.module('cstl-services', ['cstl-restapi'])
             }
             return value;
         };
+    })
+
+    // -------------------------------------------------------------------------
+    //  Permission Factory
+    // -------------------------------------------------------------------------
+
+    .factory('Permission', function(Account) {
+
+        var self = {};
+
+        var _account = null;
+
+        self.getAccount = function() {
+            return _account;
+        };
+
+        self.setAccount = function(acc) {
+            _account = acc;
+        };
+
+        self.hasRole = function(role) {
+            if(_account && _account.roles) {
+                return _account.roles.indexOf(role) !== -1;
+            }
+            return false;
+        };
+
+        self.hasPermission = function(perm) {
+            if(self.hasRole('cstl-admin')){
+                return true;
+            }else if(self.hasRole('cstl-publish')){
+                return perm === "publish" ||  perm === "data";
+            } else if(self.hasRole('cstl-data')){
+                return perm === "data";
+            }
+            return false;
+        };
+
+        self.promise = Account.get(function(response){
+            _account = response;
+        }).$promise;
+
+        return self;
     })
 
     // -------------------------------------------------------------------------
