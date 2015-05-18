@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Update the version number declared in the pom.xml files
+     and in a few Java source files. The Geotk version number
+     must be specified as a property on the command line. -->
+
+<project name="UpdateVersion" default="update">
+
+    <target name="update" depends="updateGeotkVersion">
+        <replace dir="${cstl.dir}" failOnNoReplacements="true">
+            <include name="**/pom.xml"/>
+            <replacefilter token="&lt;version&gt;${cstl.oldversion}&lt;/version&gt;"
+                           value="&lt;version&gt;${cstl.version}&lt;/version&gt;"/>
+        </replace>
+    </target>
+    <target name="updateGeotkVersion" depends="updateSisVersion">
+        <replace dir="${cstl.dir}" failOnNoReplacements="true">
+            <include name="pom.xml"/>
+            <replacefilter token="&lt;geotoolkit.version&gt;${geotk.oldversion}&lt;/geotoolkit.version&gt;"
+                           value="&lt;geotoolkit.version&gt;${geotk.version}&lt;/geotoolkit.version&gt;"/>
+        </replace>
+    </target>
+    <target name="updateSisVersion" depends="updateGeoapiVersion">
+        <replace dir="${cstl.dir}" failOnNoReplacements="true">
+            <include name="pom.xml"/>
+            <replacefilter token="&lt;sis.version&gt;${sis.oldversion}&lt;/sis.version&gt;"
+                           value="&lt;sis.version&gt;${sis.version}&lt;/sis.version&gt;"/>
+        </replace>
+    </target>
+    <target name="updateGeoapiVersion">
+        <replace dir="${cstl.dir}" failOnNoReplacements="true">
+            <include name="pom.xml"/>
+            <replacefilter token="&lt;geoapi.version&gt;${geoapi.oldversion}&lt;/geoapi.version&gt;"
+                           value="&lt;geoapi.version&gt;${geoapi.version}&lt;/geoapi.version&gt;"/>
+        </replace>
+    </target>
+</project>
