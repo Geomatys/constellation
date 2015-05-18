@@ -93,8 +93,10 @@ angular.module('cstl-services', ['cstl-restapi'])
         'cstl.version': (new Date()).getFullYear(),
 
         // Navigation additional buttons
-        'cstl.navigation' : [] //keep empty since cstl declare its own links directly in the header, this array is overrided by subprojects.
+        'cstl.navigation' : [], //keep empty since cstl declare its own links directly in the header, this array is overrided by subprojects.
 
+        // Defines if the conform pyramid must be used to render the data overview.
+        'data.overview.use_pyramid': true
     })
 
     // -------------------------------------------------------------------------

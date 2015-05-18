@@ -75,7 +75,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         $scope.$on('reloadDatasets', self.search);
     })
 
-    .controller('DatasetDashboardController', function($scope, $routeParams, $http, $cookieStore, $modal, Growl, Dataset, Data, dataListing, style, provider) {
+    .controller('DatasetDashboardController', function($scope, $routeParams, $http, $cookieStore, $modal, CstlConfig, Growl, Dataset, Data, dataListing, style, provider) {
 
         var self = this;
 
@@ -171,9 +171,9 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     layerName = '{' + selection.data.namespace + '}' + layerName;
                 }
 
-                // Use the pyramid provider identifier for better performances.
+                // Use the pyramid provider identifier for better performances (if expected).
                 var providerId = selection.data.providerIdentifier;
-                if (angular.isString(selection.data.pyramidProviderIdentifier)) {
+                if (CstlConfig['data.overview.use_pyramid'] === true && selection.data.pyramidProviderIdentifier) {
                     providerId = selection.data.pyramidProviderIdentifier;
                 }
 
