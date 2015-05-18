@@ -119,7 +119,11 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             // Update dataset selection.
             if (!self.isSelected(dataset)) {
                 selection.dataset = dataset;
-                setupDatasetData(dataset);
+                if (dataset.dataCount > 1) {
+                    setupDatasetData(dataset);
+                } else if (dataset.dataCount === 1 && !data) {
+                    data = dataset.data[0];
+                }
             } else if (!data) {
                 selection.dataset = null;
             }
@@ -148,7 +152,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
 
         // Determines if a dataset/data should be visible.
         self.shouldDisplayDataset = function(dataset) {
-            return self.showSingleton || dataset.dataCount > 1;
+            return self.showSingleton || dataset.dataCount !== 1;
         };
 
         // Returns the data to display for a dataset.
