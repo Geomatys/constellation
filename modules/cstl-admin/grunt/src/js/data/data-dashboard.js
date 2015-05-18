@@ -271,7 +271,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                         return textService.metadataJson(
                             selection.data.providerIdentifier,
                             selection.data.name,
-                            selection.data.type === 'coverage' ? 'raster' : selection.data.type, // TODO - harmonize 'coverage' and 'raster' types...
+                            selection.data.type === 'COVERAGE' ? 'raster' : selection.data.type.toLowerCase(), // TODO - harmonize 'coverage' and 'raster' types...
                             true);
                     }
                 }
