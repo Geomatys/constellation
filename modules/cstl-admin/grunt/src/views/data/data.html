@@ -257,18 +257,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="block-action">
-                                                    <div class="row">
-                                                        <div class="col-sm-2">
-                                                            <span class="tooltipicon">
-                                                                <button id="deleteDataset" type="button" class="btn btn-danger" tooltip-placement="bottom" tooltip-html-unsafe="{{'layer.listing.selected.delete.button' | translate }}"
-                                                                        ng-click="dc.deleteDataset()">
-                                                                    <i class="glyphicon glyphicon-trash"></i>
-                                                                </button>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <div class="block-action" ng-include="'views/data/dataset_actions.html'"></div>
                                                 <div class="block-content" ng-if="dc.selection.data"
                                                      ng-class="{'block-vector': dc.selection.data.type === 'VECTOR', 'block-raster': dc.selection.data.type === 'COVERAGE'}">
                                                     <h6 translate="label.title">Title</h6>
@@ -284,34 +273,7 @@
                                                 </div>
                                             </div>
                                             <div ng-if="dc.selection.data">
-                                                <div class="block-action">
-                                                    <div class="row">
-                                                        <div class="col-sm-2">
-                                                            <span class="tooltipicon">
-                                                                <button id="seeMetadata" type="button" class="btn btn-warning" tooltip-html-unsafe="{{'layer.listing.selected.metadata.button' | translate }}" tooltip-placement="bottom"
-                                                                        ng-click="dc.openMetadata()">
-                                                                    <i class="glyphicon glyphicon-file"></i>
-                                                                </button>
-                                                            </span>
-                                                        </div>
-                                                        <div class="col-sm-2">
-                                                            <span class="tooltipicon">
-                                                                <a id="exportData" class="btn btn-info" tooltip-placement="bottom" tooltip-html-unsafe="{{'layer.listing.selected.export.button' | translate }}"
-                                                                   ng-href="{{'api/1/domain/1/data/export/' + dc.selection.data.providerIdentifier + '/' + dc.selection.data.name | cstlContext:true}}">
-                                                                    <i class="fa fa-download"></i>
-                                                                </a>
-                                                            </span>
-                                                        </div>
-                                                        <div class="col-sm-2">
-                                                            <span class="tooltipicon">
-                                                                <button id="deleteLayer" type="button" class="btn btn-danger" tooltip-placement="bottom" tooltip-html-unsafe="{{'layer.listing.selected.delete.button' | translate }}"
-                                                                        ng-click="dc.deleteData()">
-                                                                    <i class="glyphicon glyphicon-trash"></i>
-                                                                </button>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <div class="block-action" ng-include="'views/data/data_actions.html'"></div>
                                             </div>
                                         </div>
                                     </div>
