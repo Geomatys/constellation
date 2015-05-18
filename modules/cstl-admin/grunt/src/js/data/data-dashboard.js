@@ -79,6 +79,9 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
 
         var self = this;
 
+        // Indicates if "singleton" datasets must be displayed.
+        self.showSingleton = CstlConfig['dataset.listing.show_singleton'];
+
         // Active tab ('dataset' or 'metadata').
         self.tab = $routeParams.tab || 'dataset';
 
@@ -143,6 +146,11 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             }
         };
 
+        // Determines if a dataset/data should be visible.
+        self.shouldDisplayDataset = function(dataset) {
+            return self.showSingleton || dataset.dataCount > 1;
+        };
+
         // Returns the data to display for a dataset.
         self.getDataToDisplay = function(dataset) {
             // If the specified dataset is selected, return its data.
@@ -150,9 +158,10 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 setupDatasetData(dataset); // ensure that data are well loaded
                 return dataset.data;
             }
-            // Otherwise return its data only if the specified dataset contains an
-            // unique data.
-            return dataset.dataCount === 1 ? dataset.data : [];
+            // If the dataset contains a single data and if the 'dataset.listing.show_singleton'
+            // configuration variable is set to false, return the single data in order to display
+            // it instead of the dataset.
+            return (!self.showSingleton && dataset.dataCount === 1) ? dataset.data : [];
         };
 
         // Display the data in the preview map.

@@ -95,8 +95,13 @@ angular.module('cstl-services', ['cstl-restapi'])
         // Navigation additional buttons
         'cstl.navigation' : [], //keep empty since cstl declare its own links directly in the header, this array is overrided by subprojects.
 
-        // Defines if the conform pyramid must be used to render the data overview.
-        'data.overview.use_pyramid': true
+        // Defines if the data overview must use the "conform pyramid" associated
+        // to the selected data (if exists). If false, always use the "raw" data.
+        'data.overview.use_pyramid': true,
+
+        // Defines if the datasets which contain a single data must be visible.
+        // If false, the single data will be displayed instead of the dataset.
+        'dataset.listing.show_singleton': false
     })
 
     // -------------------------------------------------------------------------

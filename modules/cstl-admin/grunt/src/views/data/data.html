@@ -151,7 +151,7 @@
                                 <div class="item-list" ng-init="selectall=false">
                                     <div ng-repeat="dataset in lc.page.content" ng-class="{'col-xs-6': smallDisplay}" style="padding-left:0;">
 
-                                        <div class="item dataset-data" ng-if="dataset.dataCount !== 1" ng-click="dc.toggleSelect(dataset)"
+                                        <div class="item dataset-data" ng-if="dc.shouldDisplayDataset(dataset)" ng-click="dc.toggleSelect(dataset)"
                                              ng-class="{'style-small': smallDisplay, 'selected': dc.isSelected(dataset)}">
                                             <div class="top">
                                                 <span class="item-title" title="{{dataset.name}}" ng-bind="dataset.name"></span>
@@ -184,7 +184,7 @@
                                         </div>
 
                                         <div class="item {{data.type | lowercase}}" ng-repeat="data in dc.getDataToDisplay(dataset)" ng-click="dc.toggleSelect(dataset, data)"
-                                             ng-class="{'style-small': smallDisplay, 'selected': dc.isSelected(data), 'child': dataset.data.length > 1}">
+                                             ng-class="{'style-small': smallDisplay, 'selected': dc.isSelected(data), 'child': dc.shouldDisplayDataset(dataset)}">
                                             <div class="top">
                                                 <span class="item-title" title="{{data.name}}" ng-bind="data.name"></span>
                                                 <span class="text-right item-list-style" ng-bind="data.type"></span>
