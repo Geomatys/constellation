@@ -189,13 +189,13 @@
                                                 <span class="item-title" title="{{data.name}}" ng-bind="data.name"></span>
                                                 <span class="text-right item-list-style" ng-bind="data.type"></span>
                                                 <span class="coverage-type-nd item-list-style" ng-if="data.type === 'COVERAGE' && data.subtype=='multiDimentions'" style="color:#30718c;">nD </span>
-                                                <img class="pull-right" ng-if="data.type === 'VECTOR' && (data.subtype=='Point' || data.subtype=='MultiPoint')" style="margin-top:6px; margin-right:10px;"
+                                                <img class="pull-right vector-symbol" ng-if="data.type === 'VECTOR' && (data.subtype=='Point' || data.subtype=='MultiPoint')" style="margin-top:6px; margin-right:10px;"
                                                      ng-src="{{dc.isSelected(data) ? 'img/vector-multipoint-selected.svg' : 'img/vector-multipoint.svg'}}"/>
-                                                <img class="pull-right" ng-if="data.type === 'VECTOR' && data.subtype=='Geometry'" style="margin-top:6px; margin-right:10px; width:22px;"
+                                                <img class="pull-right vector-symbol" ng-if="data.type === 'VECTOR' && data.subtype=='Geometry'" style="margin-top:6px; margin-right:10px; width:22px;"
                                                      ng-src="{{dc.isSelected(data) ? 'img/vector-multigeometry-selected.svg' : 'img/vector-multigeometry.svg'}}"/>
-                                                <img class="pull-right" ng-if="data.type === 'VECTOR' && (data.subtype=='Polygon' || data.subtype=='MultiPolygon')" style="margin-top:6px; margin-right:10px;"
+                                                <img class="pull-right vector-symbol" ng-if="data.type === 'VECTOR' && (data.subtype=='Polygon' || data.subtype=='MultiPolygon')" style="margin-top:6px; margin-right:10px;"
                                                      ng-src="{{dc.isSelected(data) ? 'img/vector-poly-selected.svg' : 'img/vector-poly.svg'}}"/>
-                                                <img class="pull-right" ng-if="data.type === 'VECTOR' && (data.subtype=='LineString' || data.subtype=='MultiLineString')" style="margin-top:6px; margin-right:10px;"
+                                                <img class="pull-right vector-symbol" ng-if="data.type === 'VECTOR' && (data.subtype=='LineString' || data.subtype=='MultiLineString')" style="margin-top:6px; margin-right:10px;"
                                                      ng-src="{{dc.isSelected(data) ? 'img/vector-polyline-selected.svg' : 'img/vector-polyline.svg'}}"/>
                                             </div>
                                             <div class="bottom">
@@ -215,12 +215,12 @@
                                                         <i class="fa fa-user"></i>{{data.ownerLogin || ('unknown'|translate)}}
                                                     </div>
                                                 </div>
-                                                <img class="pull-right" src="img/icon-sensor-non-active.svg" style="margin-top:6px; margin-right:10px;" ng-if="data.sensorable && !data.sensorCount.length"/>
-                                                <div class="pull-right" style="text-shadow:none;" ng-if="data.sensorCount.length">
+                                                <img class="pull-right" src="img/icon-sensor-non-active.svg" style="margin-top:6px; margin-right:10px;" ng-if="data.sensorable && !data.sensorCount"/>
+                                                <div class="pull-right" style="text-shadow:none;" ng-if="data.sensorCount">
                                                     <a href="#/sensors" tooltip-html-unsafe="{{'data.listing.selected.goto.sensor' | translate}}" tooltip-placement="top">
                                                         <img src="img/icon-sensor-active.svg" style="margin-top:0; margin-right:10px;" />
                                                     </a>
-                                                    <span ng-class="{'blanc': data.Id === dataCtrl.selectedDataSetChild.Id, 'hide': smallDisplay}" class="text-right item-list-style" style="margin-right:10px; font-weight:bold;" translate="sensor.observation">Sensor observation</span>
+                                                    <span ng-class="{'blanc': dc.isSelected(data), 'hide': smallDisplay}" class="text-right item-list-style" style="margin-right:10px; font-weight:bold;" translate="sensor.observation">Sensor observation</span>
                                                 </div>
                                                 <div ng-if="data.pyramidProviderIdentifier" class="pull-right" style="margin-top:6px; margin-right:10px;text-shadow:none;">
                                                     <img src="img/icon-pyramid.svg" class="pull-right" tooltip-html-unsafe="{{'data.listing.selected.raster.pyramid' | translate}}" tooltip-placement="top"/>
