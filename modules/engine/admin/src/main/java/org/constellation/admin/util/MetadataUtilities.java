@@ -28,7 +28,6 @@ import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
-import org.apache.sis.xml.XML;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -71,21 +70,17 @@ import org.opengis.util.GenericName;
 import org.opengis.util.NoSuchIdentifierException;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.ValueExistencePolicy;
-import org.apache.sis.xml.MarshallerPool;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -179,7 +174,6 @@ public final class MetadataUtilities {
      * @throws CoverageStoreException
      * @throws org.opengis.util.NoSuchIdentifierException
      * @throws org.geotoolkit.process.ProcessException
-     * @throws javax.xml.bind.JAXBException
      */
     public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final DefaultMetadata metadata, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException {
 
@@ -523,25 +517,14 @@ public final class MetadataUtilities {
         }
     }
     
-    public static DefaultMetadata getTemplateMetadata(final Properties prop, final String templatePath, final MarshallerPool pool) {
+    public static String getTemplateMetadata(final Properties prop, final String templatePath) {
         try {
             final TemplateEngine templateEngine = TemplateEngineFactory.getInstance(TemplateEngineFactory.GROOVY_TEMPLATE_ENGINE);
             final InputStream stream = Util.getResourceAsStream(templatePath);
             final File templateFile = File.createTempFile("mdTemplDataset", ".xml");
             FileUtilities.buildFileFromStream(stream, templateFile);
-            final String templateApplied = templateEngine.apply(templateFile, prop);
-            
-            //unmarshall the template
-            if (pool != null) {
-                final Unmarshaller m = pool.acquireUnmarshaller();
-                final DefaultMetadata meta = (DefaultMetadata) m.unmarshal(new StringReader(templateApplied));
-                pool.recycle(m);
-                return meta;
-            } else {
-                final DefaultMetadata meta = (DefaultMetadata) XML.unmarshal(templateApplied);
-                return meta;
-            }
-        } catch (TemplateEngineException | IOException | JAXBException ex) {
+            return templateEngine.apply(templateFile, prop);
+        } catch (TemplateEngineException | IOException ex) {
            LOGGER.log(Level.WARNING, null, ex);
         }
         return null;

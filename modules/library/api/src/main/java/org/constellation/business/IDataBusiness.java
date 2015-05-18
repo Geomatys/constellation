@@ -18,7 +18,6 @@
  */
 package org.constellation.business;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -309,12 +308,6 @@ public interface IDataBusiness {
     void linkDataToData(final int dataId, final int childId);
 
     List<Data> getDataLinkedData(final int dataId);
-    
-    String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException;
-    
-    DefaultMetadata unmarshallMetadata(final String metadata) throws ConfigurationException;
-
-    DefaultMetadata unmarshallMetadata(final File metadata) throws ConfigurationException;
     
     void uploadCleaner();
 }

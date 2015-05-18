@@ -442,6 +442,8 @@ public interface IMetadataBusiness {
      */
     Object unmarshallMetadata(final String metadata) throws ConfigurationException;
     
+    Object unmarshallMetadata(final File metadata) throws ConfigurationException;
+    
     /**
      * Marshall a geotk metadata object into a String.
      * 

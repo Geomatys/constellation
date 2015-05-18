@@ -24,8 +24,6 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.XML;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
 import org.constellation.admin.listener.DefaultDataBusinessListener;
@@ -61,12 +59,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -172,7 +165,7 @@ public class DatasetBusiness implements IDatasetBusiness {
 
         ds = datasetRepository.insert(ds);
         if (metadataXml != null) {
-            final DefaultMetadata meta = unmarshallMetadata(metadataXml);
+            final DefaultMetadata meta = (DefaultMetadata) metadataBusiness.unmarshallMetadata(metadataXml);
             updateMetadata(identifier, meta);
         }
         return ds;
@@ -291,7 +284,8 @@ public class DatasetBusiness implements IDatasetBusiness {
             }
         }
 
-        final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop, "org/constellation/engine/template/mdTemplDataset.xml", getMarshallerPool());
+        final String xml = MetadataUtilities.getTemplateMetadata(prop, "org/constellation/engine/template/mdTemplDataset.xml");
+        final DefaultMetadata templateMetadata = (DefaultMetadata) metadataBusiness.unmarshallMetadata(xml);
 
         DefaultMetadata mergedMetadata;
         if (extractedMetadata != null) {
@@ -452,48 +446,6 @@ public class DatasetBusiness implements IDatasetBusiness {
         }
     }
     
-    protected MarshallerPool getMarshallerPool() {
-        return null; //in constellation this should always return null, since this method can be overrided by sub-project.
-    }
-
-    @Deprecated
-    protected String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException {
-        try {
-            final MarshallerPool pool = getMarshallerPool();
-            if (pool != null) {
-                final Marshaller marshaller = pool.acquireMarshaller();
-                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                marshaller.marshal(metadata, outputStream);
-                pool.recycle(marshaller);
-                return outputStream.toString();
-            } else {
-                return XML.marshal(metadata);
-            }
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
-        }
-    }
-
-    @Deprecated
-    protected DefaultMetadata unmarshallMetadata(final String metadataStr) throws ConfigurationException {
-        try {
-            final MarshallerPool pool = getMarshallerPool();
-            final DefaultMetadata metadata;
-            if(pool != null) {
-                final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-                final byte[] byteArray = metadataStr.getBytes();
-                final ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-                metadata = (DefaultMetadata) unmarshaller.unmarshal(bais);
-                pool.recycle(unmarshaller);
-            } else {
-                metadata = (DefaultMetadata) XML.unmarshal(metadataStr);
-            }
-            return metadata;
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("Unable to unmarshall the dataset metadata", ex);
-        }
-    }
-
     @Override
     public DataSetBrief getDatasetBrief(Integer dataSetId, List<DataBrief> children) {
         final Dataset dataset = datasetRepository.findById(dataSetId);

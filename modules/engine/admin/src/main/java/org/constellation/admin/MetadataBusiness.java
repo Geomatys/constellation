@@ -848,6 +848,15 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
     }
     
+    @Override
+    public Object unmarshallMetadata(final File metadata) throws ConfigurationException {
+        try {
+            return XML.unmarshal(metadata);
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Unable to unmarshall metadata", ex);
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */

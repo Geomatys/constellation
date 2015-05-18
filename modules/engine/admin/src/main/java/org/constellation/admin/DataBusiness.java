@@ -820,66 +820,6 @@ public class DataBusiness implements IDataBusiness {
         }
     }
 
-
-    protected MarshallerPool getMarshallerPool() {
-        return null; //in constellation this should always return null, since this method can be overrided by sub-project.
-    }
-
-    @Override
-    public String marshallMetadata(final DefaultMetadata metadata) throws ConfigurationException {
-        try {
-            final MarshallerPool pool = getMarshallerPool();
-            if (pool != null) {
-                final Marshaller marshaller = pool.acquireMarshaller();
-                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                marshaller.marshal(metadata, outputStream);
-                pool.recycle(marshaller);
-                return outputStream.toString();
-            } else {
-                return XML.marshal(metadata);
-            }
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("Unable to marshall the dataset metadata", ex);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public DefaultMetadata unmarshallMetadata(final String metadata) throws ConfigurationException {
-        try {
-            final MarshallerPool pool = getMarshallerPool();
-            if (pool != null) {
-                final InputStream sr = new ByteArrayInputStream(metadata.getBytes("UTF-8"));
-                final Unmarshaller m = pool.acquireUnmarshaller();
-                final DefaultMetadata result = (DefaultMetadata) m.unmarshal(sr);
-                pool.recycle(m);
-                return result;
-            } else {
-                return (DefaultMetadata) XML.unmarshal(metadata);
-            }
-        } catch (UnsupportedEncodingException | JAXBException ex) {
-            throw new ConfigurationException(ex);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public DefaultMetadata unmarshallMetadata(final File metadata) throws ConfigurationException {
-        try {
-            final MarshallerPool pool = getMarshallerPool();
-            if (pool != null) {
-                final Unmarshaller m = pool.acquireUnmarshaller();
-                final DefaultMetadata result = (DefaultMetadata) m.unmarshal(metadata);
-                pool.recycle(m);
-                return result;
-            } else {
-                return (DefaultMetadata) XML.unmarshal(metadata);
-            }
-        } catch (JAXBException ex) {
-            throw new ConfigurationException(ex);
-        }
-    }
-
     /**
      * {@inheritDoc }
      */

@@ -174,7 +174,7 @@ public class DataSetRest {
                     if (metadataBusiness.isSpecialMetadataFormat(f)){
                         metadata = metadataBusiness.getMetadataFromSpecialFormat(f);
                     } else {
-                        metadata = dataBusiness.unmarshallMetadata(f);
+                        metadata = (DefaultMetadata) metadataBusiness.unmarshallMetadata(f);
                     }
                     metadataXML = metadataBusiness.marshallMetadata(metadata);
                 }

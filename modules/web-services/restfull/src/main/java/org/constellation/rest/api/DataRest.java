@@ -397,7 +397,7 @@ public class DataRest {
             }
         } else {
             try {
-                obj = dataBusiness.unmarshallMetadata(newFileMetaData);
+                obj = metadataBusiness.unmarshallMetadata(newFileMetaData);
             } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
                 throw new ConstellationException("metadata file is incorrect");
@@ -815,7 +815,7 @@ public class DataRest {
                 if (metadataBusiness.isSpecialMetadataFormat(f)){
                     metadata = metadataBusiness.getMetadataFromSpecialFormat(f);
                 } else {
-                    metadata = dataBusiness.unmarshallMetadata(f);
+                    metadata = (DefaultMetadata) metadataBusiness.unmarshallMetadata(f);
                 }
                 if (metadata == null) {
                     throw new ConstellationException("Cannot save uploaded metadata because it is not recognized as a valid file!");
