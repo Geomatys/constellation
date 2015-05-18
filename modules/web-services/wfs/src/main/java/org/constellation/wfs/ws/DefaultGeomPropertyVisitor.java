@@ -45,6 +45,9 @@ public class DefaultGeomPropertyVisitor extends DuplicatingFilterVisitor{
 
     @Override
     public Object visit(BBOX filter, Object extraData) {
+        if(ft.getGeometryDescriptor()==null){
+            return super.visit(filter, extraData);
+        }
 
         Expression exp1 = visit(filter.getExpression1(),extraData);
         if (exp1 instanceof PropertyName) {
