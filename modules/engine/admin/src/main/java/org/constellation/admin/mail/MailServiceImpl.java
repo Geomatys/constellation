@@ -96,6 +96,13 @@ public class MailServiceImpl implements MailService {
     @Override
     public void send(String subject, String htmlMsg, List<String> recipients, File attachment) throws EmailException {
 
+        //For debugging purposes, we can disable mail sender by passing system property.
+        final String mailEnabled = System.getProperty("cstl.mail.enabled", "true");
+        if(!Boolean.valueOf(mailEnabled)) {
+            LOGGER.info("Mail service is disabled, run the server with option -Dcstl.mail.enabled=true to enable it.");
+            return;
+        }
+
         // Build recipients internet addresses.
         List<InternetAddress> addresses = Lists.transform(recipients, new Function<String, InternetAddress>() {
             @Override
