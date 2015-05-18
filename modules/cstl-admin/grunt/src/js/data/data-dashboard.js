@@ -396,6 +396,8 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     importType: function() { return type; }
                 }
             }).result.then(function(result) {
+                $scope.$broadcast('reloadDatasets');
+
                 if (!editMetadata || !result || !result.file) {
                     return;
                 }
@@ -409,7 +411,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 }, function onMetadataInitializationSuccess() {
                     startMetadataEdition(null, result.file, result.type, 'import', 'data');
                 }, function onMetadataInitializationError() {
-                    $scope.$broadcast('reloadDatasets');
                     Growl('error', 'Error', 'Unable to prepare metadata for next step.');
                 });
             });
@@ -427,8 +428,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     'template': function() { return template; },
                     'theme': function() { return theme; }
                 }
-            }).result.then(function() {
-                $scope.$broadcast('reloadDatasets');
             });
         }
 
