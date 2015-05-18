@@ -524,7 +524,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     idHTML: 'customchoice',
                     translateKey: 'label.file.custom',
                     defaultTranslateValue: 'Other',
-                    bindFunction: function() { startDataImport('custom', 'step1Custom', true); }
+                    bindFunction: function() { startDataImport('custom', 'step1Custom', false); }
                 });
             }
         });
