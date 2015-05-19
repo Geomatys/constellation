@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.44" author="qboileau">
+
+        <preConditions>
+            <not>
+                <viewExists viewName="AUTHORITIES"/>
+            </not>
+        </preConditions>
+
+        <createView viewName="AUTHORITIES">SELECT u.LOGIN AS username, uXr.role AS authority
+            FROM admin.cstl_user u LEFT JOIN admin.user_x_role uXr ON u.id = uXr.user_id</createView>
+
+    </changeSet>
+</databaseChangeLog>
