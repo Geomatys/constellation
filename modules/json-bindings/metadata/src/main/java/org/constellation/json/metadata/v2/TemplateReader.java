@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.measure.unit.Unit;
 import org.apache.sis.internal.jaxb.metadata.replace.ReferenceSystemMetadata;
 import org.apache.sis.metadata.AbstractMetadata;
 import org.apache.sis.metadata.KeyNamePolicy;
@@ -332,7 +333,16 @@ public class TemplateReader extends AbstractTemplateHandler {
                 
             } else {
                 final Map<String,Object> values = asMap(metadata);
-                values.put(node.name, value);
+                try {
+                    values.put(node.name, value);
+                    
+                // better msg send to the user in case of a bad unit code    
+                } catch (ClassCastException ex) {
+                    if (type.equals(Unit.class)) {
+                        throw new ParseException("Impossible de trouvé une unité de mesure correspondant au code:" + value, ex);
+                    }
+                    throw ex;
+                }
             }
         }
     }
