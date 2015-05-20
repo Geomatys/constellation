@@ -911,7 +911,9 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     if(!bandIdentified){
                         bandIdentified = $scope.dataBands[0];
                     }
-                    $scope.optionsSLD.rasterPalette.band.selected = bandIdentified;
+                    if(bandIdentified) {
+                        $scope.optionsSLD.rasterPalette.band.selected = bandIdentified;
+                    }
                     $scope.optionsSLD.rasterPalette.palette.rasterMinValue = Number($scope.optionsSLD.rasterPalette.band.selected.minValue);
                     $scope.optionsSLD.rasterPalette.palette.rasterMaxValue = Number($scope.optionsSLD.rasterPalette.band.selected.maxValue);
                 }
