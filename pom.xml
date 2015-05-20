@@ -178,8 +178,8 @@
         <!-- Define parent projects versions -->
         <shiro.version>1.2.1</shiro.version>
         <geoapi.version>4.0.0-MC0002</geoapi.version>
-        <sis.version>0.6-jdk7-MC0013</sis.version>
-        <geotoolkit.version>4.0.0-MC0037</geotoolkit.version>
+        <sis.version>0.6-jdk7-MC0015</sis.version>
+        <geotoolkit.version>4.0.0-MC0044</geotoolkit.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jersey.version>2.12</jersey.version>
 	    <jaxws.version>2.2.8</jaxws.version>
