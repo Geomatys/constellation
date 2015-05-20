@@ -2,6 +2,7 @@ package org.constellation.rest.api;
 
 import com.google.common.base.Optional;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.dto.metadata.ValidationList;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
@@ -359,6 +360,8 @@ public class MetadataRest {
         mdb.setIsValidated(md.getIsValidated());
         mdb.setIsPublished(md.getIsPublished());
         mdb.setResume(md.getResume());
+        mdb.setValidationRequired(md.getValidationRequired());
+        mdb.setComment(md.getComment());
         return mdb;
     }
 
@@ -620,16 +623,49 @@ public class MetadataRest {
     /**
      * Change the validation state for given metadata list.
      * @param isvalid given state of validation
-     * @param metadataList the metadata list to apply changes
+     * @param validationList the metadata list to apply changes
+     *                       with optional comment in case of discarding validation.
      * @return Response
      */
     @POST
     @Path("/changeValidation/{isvalid}")
-    public Response changeValidation(@PathParam("isvalid") final boolean isvalid,final List<MetadataBrief> metadataList) {
-        for (MetadataBrief brief : metadataList) {
-            metadataBusiness.updateValidation(brief.getId(), isvalid);
+    public Response changeValidation(@PathParam("isvalid") final boolean isvalid,
+                                     final ValidationList validationList) {
+        final List<MetadataBrief> metadataList = validationList.getMetadataList();
+        final String comment = validationList.getComment();
+
+        boolean canContinue = true;
+        final List<Metadata> list = new ArrayList<>();
+        for (final MetadataBrief brief : metadataList) {
+            final int metadataId = brief.getId();
+            final Metadata metadata = metadataBusiness.getMetadataById(metadataId);
+            if(metadata == null) {
+                //skip if null, never happen
+                continue;
+            }
+            list.add(metadata);
+            if(isvalid && "NONE".equalsIgnoreCase(metadata.getLevel())) {
+                canContinue = false;
+                break; //no needs to continue in the loop because there are metadata with level=NONE.
+            }
         }
-        return Response.ok("validation applied with success!").build();
+        final Map<String,String> map = new HashMap<>();
+        if(canContinue) {
+            for (final Metadata md : list) {
+                if(isvalid) {
+                    metadataBusiness.acceptValidation(md.getId());
+                } else if("REQUIRED".equalsIgnoreCase(md.getValidationRequired())){
+                    metadataBusiness.denyValidation(md.getId(),comment);
+                } else {
+                    metadataBusiness.updateValidation(md.getId(),false);
+                }
+            }
+            map.put("status","ok");
+            return Response.ok(map).build();
+        }
+        map.put("notLevel","true");
+        map.put("status","failed");
+        return Response.status(403).entity(map).build();
     }
 
     /**
@@ -641,12 +677,85 @@ public class MetadataRest {
     @POST
     @Path("/changePublication/{ispublished}")
     public Response changePublication(@PathParam("ispublished") final boolean ispublished,final List<MetadataBrief> metadataList) throws ConfigurationException {
-        List<Integer> ids = new ArrayList<>();
-        for (MetadataBrief brief : metadataList) {
-            ids.add(brief.getId());
+        boolean canContinue = true;
+
+        for (final MetadataBrief brief : metadataList) {
+            final int metadataId = brief.getId();
+            final Metadata metadata = metadataBusiness.getMetadataById(metadataId);
+            if(metadata == null) {
+                //skip if null, never happen
+                continue;
+            }
+            if(!metadata.getIsValidated()) {
+                canContinue = false;
+                break; //no needs to continue in the loop because there are not valid metadata.
+            }
         }
-        metadataBusiness.updatePublication(ids, ispublished);
-        return Response.ok("Published state applied with success!").build();
+        final Map<String,String> map = new HashMap<>();
+        if(canContinue) {
+            final List<Integer> ids = new ArrayList<>();
+            for (final MetadataBrief brief : metadataList) {
+                ids.add(brief.getId());
+            }
+            metadataBusiness.updatePublication(ids, ispublished);
+            map.put("status","ok");
+            return Response.ok(map).build();
+        }
+
+        map.put("notValidExists","true");
+        map.put("status","failed");
+        return Response.status(403).entity(map).build();
+    }
+
+    @POST
+    @Path("/askForValidation/{userId}")
+    public Response askForValidation(@PathParam("userId") final Integer userId,
+                                     final List<MetadataBrief> metadataList,
+                                     @Context HttpServletRequest req) {
+        boolean canContinue = true;
+        boolean validExists = false;
+        boolean notOwner = false;
+        for (final MetadataBrief brief : metadataList) {
+            final int metadataId = brief.getId();
+
+            //we need to get the ownerId of metadata, the given brief.getUser can be null
+            // especially in case of when using selectAll to call this action by batch.
+            //So we get the owner from the metadata pojo to prevent this case
+            // and make sure we have the owner of metadata.
+
+            final Metadata metadata = metadataBusiness.getMetadataById(metadataId);
+            if(metadata == null) {
+                //skip if null, never happen
+                continue;
+            }
+            if(!metadata.getIsValidated()) {
+                if(!userId.equals(metadata.getOwner())) {
+                    notOwner = true;
+                    canContinue = false;
+                }
+            }else {
+                validExists = true;
+                canContinue = false;
+            }
+        }
+        final Map<String,String> map = new HashMap<>();
+        if(canContinue) {
+            for (final MetadataBrief brief : metadataList) {
+                metadataBusiness.askForValidation(brief.getId());
+            }
+            map.put("status","ok");
+            return Response.ok(map).build();
+        }
+
+
+        //TODO send email to moderator here?
+
+
+        map.put("notOwner",""+notOwner);
+        map.put("validExists",""+validExists);
+        map.put("status","failed");
+        return Response.status(403).entity(map).build();
+
     }
 
     /**
