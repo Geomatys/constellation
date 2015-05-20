@@ -432,7 +432,8 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         Collections.addAll(fields,METADATA.ID,METADATA.METADATA_ID,
                 METADATA.TITLE,METADATA.PROFILE,METADATA.OWNER,METADATA.DATESTAMP,
                 METADATA.DATE_CREATION,METADATA.MD_COMPLETION,METADATA.LEVEL,
-                METADATA.IS_VALIDATED,METADATA.IS_PUBLISHED,METADATA.RESUME);
+                METADATA.IS_VALIDATED,METADATA.IS_PUBLISHED,METADATA.RESUME,
+                METADATA.VALIDATION_REQUIRED,METADATA.COMMENT);
         Select query = null;
         if(filterMap != null) {
             for(final Map.Entry<String,Object> entry : filterMap.entrySet()) {
