@@ -28,7 +28,7 @@
     <groupId>org.constellation</groupId>
     <artifactId>constellation-sdi</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <name>Constellation Spatial Data Infrastructure</name>
     <url>http://www.constellation-sdi.org</url>
 
@@ -177,9 +177,9 @@
     <properties>
         <!-- Define parent projects versions -->
         <shiro.version>1.2.1</shiro.version>
-        <geoapi.version>4.0-SNAPSHOT</geoapi.version>
-        <sis.version>0.6-jdk7-SNAPSHOT</sis.version>
-        <geotoolkit.version>4.0-SNAPSHOT</geotoolkit.version>
+        <geoapi.version>4.0.0-MC0002</geoapi.version>
+        <sis.version>0.6-jdk7-MC0013</sis.version>
+        <geotoolkit.version>4.0.0-MC0037</geotoolkit.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jersey.version>2.12</jersey.version>
 	    <jaxws.version>2.2.8</jaxws.version>

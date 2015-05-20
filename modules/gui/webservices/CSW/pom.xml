@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.constellation</groupId>
         <artifactId>webservices</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.constellation.gui</groupId>
     <artifactId>CSW</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>CSW common gui part</name>
@@ -20,12 +20,12 @@
         <dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.constellation</groupId>
             <artifactId>cstl-client</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.constellation</groupId>
     <artifactId>to-move</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
   </parent>
 
 
@@ -22,7 +22,7 @@
   <groupId>org.constellation</groupId>
   <artifactId>widgets</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <name>Widgets</name>
   <description>
     Interfaces graphiques pilotant les connections à la base de données et l'affichage des résultats.
