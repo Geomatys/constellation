@@ -37,6 +37,10 @@ public class MetadataBrief implements Serializable {
 
     private Boolean isPublished;
 
+    private String validationRequired;
+
+    private String comment;
+
     private List<String> keywords = new ArrayList<>();
 
     private List<MetadataBrief> linkedMetadata = new ArrayList<>();
@@ -163,5 +167,21 @@ public class MetadataBrief implements Serializable {
 
     public void setIsPublished(Boolean isPublished) {
         this.isPublished = isPublished;
+    }
+
+    public String getValidationRequired() {
+        return validationRequired;
+    }
+
+    public void setValidationRequired(String validationRequired) {
+        this.validationRequired = validationRequired;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
