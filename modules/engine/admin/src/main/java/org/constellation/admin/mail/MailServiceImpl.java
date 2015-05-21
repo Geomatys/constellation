@@ -20,27 +20,28 @@
 package org.constellation.admin.mail;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.jooq.tables.pojos.Property;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,6 +51,7 @@ import java.util.List;
  * Geomatys
  */
 @Component
+@DependsOn({"database-initer"})
 public class MailServiceImpl implements MailService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -57,28 +59,14 @@ public class MailServiceImpl implements MailService {
     @Autowired
     private PropertyRepository propertyRepository;
 
-    private final static List<String> SMTP_PROPS = Arrays.asList("email.smtp.from", "email.smtp.host", "email.smtp.port", "email.smtp.username", "email.smtp.password");
-    private static String FROM;
-    private static String HOST;
-    private static Integer PORT;
-    private static String USERNAME;
-    private static String PASSWORD;
+    private static final String FROM_KEY = "email.smtp.from";
+    private static final String HOST_KEY = "email.smtp.host";
+    private static final String PORT_KEY = "email.smtp.port";
+    private static final String USERNAME_KEY = "email.smtp.username";
+    private static final String PASSWORD_KEY = "email.smtp.password";
+    private final static List<String> SMTP_PROPS = Arrays.asList(FROM_KEY, HOST_KEY, PORT_KEY, USERNAME_KEY, PASSWORD_KEY);
 
-    @PostConstruct
-    public void init() {
-        ImmutableMap<String, ? extends Property> properties = Maps.uniqueIndex(propertyRepository.findIn(SMTP_PROPS), new Function<Property, String>(){
-            @Override
-            public String apply(Property property) {
-                return property.getName();
-            }
-        });
-        System.out.println("lol");
-        FROM = properties.get("email.smtp.from").getValue();
-        HOST = properties.get("email.smtp.host").getValue();
-        PORT = Integer.valueOf(properties.get("email.smtp.port").getValue());
-        USERNAME = properties.get("email.smtp.username").getValue();
-        PASSWORD = properties.get("email.smtp.password").getValue();
-    }
+    private volatile Map<String, Object> emailConfiguration = null;
 
     @Override
     public void send(String subject, String htmlMsg, List<String> recipients) throws EmailException {
@@ -119,31 +107,73 @@ public class MailServiceImpl implements MailService {
             return;
         }
 
-        // Send HTML email.
-        HtmlEmail htmlEmail = new HtmlEmail();
-        htmlEmail.setFrom(FROM);
-        htmlEmail.setHostName(HOST);
-        htmlEmail.setSmtpPort(PORT);
-        htmlEmail.setAuthentication(USERNAME, PASSWORD);
-        htmlEmail.setTo(addresses);
-        htmlEmail.setSubject(subject);
-        htmlEmail.setHtmlMsg(htmlMsg);
-        htmlEmail.setCharset("UTF-8");
+        try {
+            // Send HTML email.
+            HtmlEmail htmlEmail = createHtmlEmail();
+            htmlEmail.setTo(addresses);
+            htmlEmail.setSubject(subject);
+            htmlEmail.setHtmlMsg(htmlMsg);
+            htmlEmail.setCharset("UTF-8");
 
-        //append attachment
-        if(attachment != null){
-            try {
-                EmailAttachment emailAttachment = new EmailAttachment();
-                emailAttachment.setDisposition(EmailAttachment.ATTACHMENT);
-                emailAttachment.setDescription(attachment.getName());
-                emailAttachment.setName(attachment.getName());
-                emailAttachment.setURL(attachment.toURI().toURL());
-                htmlEmail.attach(emailAttachment);
-            } catch (MalformedURLException e) {
-                LOGGER.error("Unable to get attachment", e);
+            //append attachment
+            if (attachment != null) {
+                try {
+                    EmailAttachment emailAttachment = new EmailAttachment();
+                    emailAttachment.setDisposition(EmailAttachment.ATTACHMENT);
+                    emailAttachment.setDescription(attachment.getName());
+                    emailAttachment.setName(attachment.getName());
+                    emailAttachment.setURL(attachment.toURI().toURL());
+                    htmlEmail.attach(emailAttachment);
+                } catch (MalformedURLException e) {
+                    throw new EmailException("Unable to get attachment", e);
+                }
+            }
+
+            htmlEmail.send();
+        } catch (ConfigurationException ex) {
+            throw new EmailException("Unable to create a new mail from configuration.", ex);
+        }
+    }
+
+    private HtmlEmail createHtmlEmail() throws EmailException, ConfigurationException {
+
+        //load properties from database
+        loadEmailConfiguration();
+
+        HtmlEmail htmlEmail = new HtmlEmail();
+        htmlEmail.setFrom((String) emailConfiguration.get(FROM_KEY));
+        htmlEmail.setHostName((String) emailConfiguration.get(HOST_KEY));
+        htmlEmail.setSmtpPort((int) emailConfiguration.get(PORT_KEY));
+        htmlEmail.setAuthentication((String) emailConfiguration.get(USERNAME_KEY), (String) emailConfiguration.get(PASSWORD_KEY));
+        return htmlEmail;
+    }
+
+    /**
+     * Lazy loading configuration from database.
+     *
+     * @throws ConfigurationException
+     */
+    private synchronized void loadEmailConfiguration() throws ConfigurationException {
+        if (emailConfiguration == null) {
+
+            emailConfiguration = new HashMap<>();
+            final List<? extends Property> repositoryProperties = propertyRepository.findIn(SMTP_PROPS);
+            for (Property repositoryProperty : repositoryProperties) {
+                final String name = repositoryProperty.getName();
+                final String stringValue = repositoryProperty.getValue();
+
+                Object value = stringValue;
+                if (PORT_KEY.equals(name)) {
+                    value = Integer.valueOf(stringValue);
+                }
+                emailConfiguration.put(name, value);
+            }
+
+            //test non missing parameters
+            for (String expectedKey : SMTP_PROPS) {
+                if (emailConfiguration.get(expectedKey) == null)
+                    throw new ConfigurationException("Missing \""+expectedKey+"\" property.");
             }
         }
-
-        htmlEmail.send();
     }
 }
