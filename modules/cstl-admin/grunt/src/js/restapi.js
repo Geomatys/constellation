@@ -235,6 +235,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
             search:             {method: 'POST',    url: '@cstl/api/1/metadata/search',isArray: false},
             create:             {method: 'PUT' },
             profiles:           {method: 'GET',     url: '@cstl/api/1/metadata/profiles',isArray: true},
+            allProfiles:        {method: 'GET',     url: '@cstl/api/1/metadata/allProfiles',isArray: true},
             usersList:          {method: 'GET',     url: '@cstl/api/1/metadata/usersList',isArray:true},
             searchIds:          {method: 'POST',    url: '@cstl/api/1/metadata/searchIds',isArray: false},
             delete:             {method: 'POST',    url: '@cstl/api/1/metadata/delete'},

@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,6 +113,23 @@ public class MetadataRest {
             for(final Map.Entry<String,Integer> entry : map.entrySet()){
                 result.add(new Profile(entry.getKey(),entry.getValue()));
             }
+        }
+        return result;
+    }
+
+    /**
+     * Returns the list of all profiles.
+     * @return List of {@link Profile}
+     */
+    @GET
+    @Path("/allProfiles")
+    public List<Profile> getAllProfilesList() {
+        final List<Profile> result = new ArrayList<>();
+        final Set<String> names = Template.getAvailableNames();
+        final Map<String,Integer> map = metadataBusiness.getProfilesCount(new HashMap<String, Object>());
+        for(final String profile : names){
+            final int count = map != null && map.get(profile) != null ? map.get(profile) : 0;
+            result.add(new Profile(profile,count));
         }
         return result;
     }
@@ -630,7 +648,7 @@ public class MetadataRest {
     @POST
     @Path("/changeValidation/{isvalid}")
     public Response changeValidation(@PathParam("isvalid") final boolean isvalid,
-                                     final ValidationList validationList) {
+                                     final ValidationList validationList) throws ConfigurationException{
         final List<MetadataBrief> metadataList = validationList.getMetadataList();
         final String comment = validationList.getComment();
 
@@ -657,6 +675,9 @@ public class MetadataRest {
                 } else if("REQUIRED".equalsIgnoreCase(md.getValidationRequired())){
                     metadataBusiness.denyValidation(md.getId(),comment);
                 } else {
+                    if(md.getIsPublished()) {
+                        metadataBusiness.updatePublication(md.getId(),false);
+                    }
                     metadataBusiness.updateValidation(md.getId(),false);
                 }
             }
