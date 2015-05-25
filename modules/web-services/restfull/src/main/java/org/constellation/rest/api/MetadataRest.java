@@ -646,7 +646,7 @@ public class MetadataRest {
             ids.add(brief.getId());
         }
         try {
-            metadataBusiness.updateOwner(ids,ownerId);
+            metadataBusiness.updateOwner(ids, ownerId);
             return Response.ok("owner applied with success!!").build();
         }catch(Exception ex) {
             LOGGER.log(Level.WARNING,"Cannot change the owner for metadata list due to exception error : "+ ex.getLocalizedMessage());
@@ -687,20 +687,26 @@ public class MetadataRest {
         }
         final Map<String,String> map = new HashMap<>();
         if(canContinue) {
-            for (final Metadata md : list) {
-                if(isvalid) {
-                    metadataBusiness.acceptValidation(md.getId());
-                } else if("REQUIRED".equalsIgnoreCase(md.getValidationRequired())){
-                    metadataBusiness.denyValidation(md.getId(),comment);
-                } else {
-                    if(md.getIsPublished()) {
-                        metadataBusiness.updatePublication(md.getId(),false);
+            try {
+                for (final Metadata md : list) {
+                    if(isvalid) {
+                        metadataBusiness.acceptValidation(md.getId());
+                    } else if("REQUIRED".equalsIgnoreCase(md.getValidationRequired())){
+                        metadataBusiness.denyValidation(md.getId(),comment);
+                    } else {
+                        if(md.getIsPublished()) {
+                            metadataBusiness.updatePublication(md.getId(),false);
+                        }
+                        metadataBusiness.updateValidation(md.getId(),false);
                     }
-                    metadataBusiness.updateValidation(md.getId(),false);
                 }
+                map.put("status","ok");
+                return Response.ok(map).build();
+            }catch(Exception ex) {
+                LOGGER.log(Level.WARNING,"Cannot change the validation for metadata list due to exception error : "+ ex.getLocalizedMessage());
+                map.put("msg",ex.getLocalizedMessage());
+                return Response.status(403).entity(map).build();
             }
-            map.put("status","ok");
-            return Response.ok(map).build();
         }
         map.put("notLevel","true");
         map.put("status","failed");
@@ -726,7 +732,7 @@ public class MetadataRest {
                 //skip if null, never happen
                 continue;
             }
-            if(!metadata.getIsValidated()) {
+            if(ispublished && !metadata.getIsValidated()) {
                 canContinue = false;
                 break; //no needs to continue in the loop because there are not valid metadata.
             }
@@ -737,9 +743,15 @@ public class MetadataRest {
             for (final MetadataBrief brief : metadataList) {
                 ids.add(brief.getId());
             }
-            metadataBusiness.updatePublication(ids, ispublished);
-            map.put("status","ok");
-            return Response.ok(map).build();
+            try {
+                metadataBusiness.updatePublication(ids, ispublished);
+                map.put("status","ok");
+                return Response.ok(map).build();
+            }catch(Exception ex) {
+                LOGGER.log(Level.WARNING,"Cannot change the publication state for metadata list due to exception error : "+ ex.getLocalizedMessage());
+                map.put("msg",ex.getLocalizedMessage());
+                return Response.status(403).entity(map).build();
+            }
         }
 
         map.put("notValidExists","true");
@@ -780,11 +792,17 @@ public class MetadataRest {
         }
         final Map<String,String> map = new HashMap<>();
         if(canContinue) {
-            for (final MetadataBrief brief : metadataList) {
-                metadataBusiness.askForValidation(brief.getId());
+            try {
+                for (final MetadataBrief brief : metadataList) {
+                    metadataBusiness.askForValidation(brief.getId());
+                }
+                map.put("status","ok");
+                return Response.ok(map).build();
+            }catch(Exception ex) {
+                LOGGER.log(Level.WARNING,"Cannot proceed to ask validation for metadata list due to exception error : "+ ex.getLocalizedMessage());
+                map.put("msg",ex.getLocalizedMessage());
+                return Response.status(403).entity(map).build();
             }
-            map.put("status","ok");
-            return Response.ok(map).build();
         }
 
 
