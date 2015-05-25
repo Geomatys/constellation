@@ -971,6 +971,7 @@
 
     "password.reset.success":"Your password has been changed",
     "password.forgot.success":"An email was sent to the indicated address",
+    "password.forgot.error":"The email address does not seem to exist",
     "password.reset":"Reset password",
 
     "sldeditor.raster.1band.titleTab": "Unique band",

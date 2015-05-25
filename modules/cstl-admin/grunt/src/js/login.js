@@ -98,13 +98,18 @@ cstlLoginApp.controller("login", function($scope, $http, $modal){
         self.userEmail = '';
 
         self.validate = function(){
-           $http.post($.cookie('cstlUrl') + 'spring/forgotPassword', {email: self.userEmail})
-               .success(function(resp){
+           $http.post($.cookie('cstlUrl') + 'spring/forgotPassword', {email: self.userEmail}).
+               success(function(resp){
                    $translate(['Success', 'password.forgot.success']).then(function (translations) {
                        Growl('success', translations.Success, translations['password.forgot.success']);
                    });
 
                    $modalInstance.close();
+               }).
+               error(function(resp) {
+                   $translate(['Error', 'password.forgot.error']).then(function (translations) {
+                       Growl('error', translations.Error, translations['password.forgot.error']);
+                   });
                });
    };
 });

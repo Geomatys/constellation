@@ -949,6 +949,7 @@
 
     "password.reset.success":"Votre mot de passe a été changé",
     "password.forgot.success":"Un email a été envoyé à l'adresse indiquée",
+    "password.forgot.error":"L'adresse email ne semble pas exister",
     "password.reset":"Changer le mot de passe",
 
     "sldeditor.raster.1band.titleTab": "Bande Unique",
