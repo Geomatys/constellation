@@ -534,6 +534,16 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    public void updateOwner(List<Integer> ids, int newOwner) {
+        for (final Integer id : ids) {
+            metadataRepository.changeOwner(id, newOwner);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void deleteMetadata(int id) throws ConfigurationException {
         deleteMetadata(Arrays.asList(id));
     }

@@ -278,6 +278,15 @@ public interface IMetadataBusiness {
      * 
      */
     void updateOwner(final int id, final int newOwner);
+
+    /**
+     * Update the owner for a list of metadata.
+     *
+     * @param ids list of metadata identifiers to change.
+     * @param newOwner new owner identifier to set.
+     *
+     */
+    void updateOwner(final List<Integer> ids, final int newOwner);
     
     /**
      * Delete a metadata pojo.

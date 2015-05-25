@@ -517,28 +517,30 @@ public class MetadataRest {
     /**
      * Proceed to delete a list of metadata.
      * the http request provide the user that should be passed to check if the user can delete all record in the list.
-     * the method must returns an appropriate response in case of user does not have the permission to delete all records
-     * we need to return the id of metadata that cannot be deleted.
+     * the method must returns an appropriate response in case of user does not have the permission to delete all records.
      *
      * @param metadataList given metadata list to delete.
-     * @param req http request that contains the user.
-     * @return Response that contains all neccessary info to inform the user about what records fails.
-     * @throws ConfigurationException
+     * @return Response that contains all necessary info to inform the user about what records fails.
      */
     @POST
     @Path("/delete")
-    public Response delete(final List<MetadataBrief> metadataList,@Context HttpServletRequest req) throws ConfigurationException {
-        //@TODO GEOC-113 implements delete method with permission of user
+    public Response delete(final List<MetadataBrief> metadataList) {
         //the user can select multiple records to delete,
         // but some of records can have a restricted permission for this user.
         //So we need to send an error message to prevent this case.
-        //It would be great if we can returns the ids of metadata which cannot be deleted
-        List<Integer> ids = new ArrayList<>();
-        for (MetadataBrief brief : metadataList) {
+        final List<Integer> ids = new ArrayList<>();
+        for (final MetadataBrief brief : metadataList) {
             ids.add(brief.getId());
         }
-        metadataBusiness.deleteMetadata(ids);
-        return Response.ok("records deleted with success!").build();
+        try {
+            metadataBusiness.deleteMetadata(ids);
+            return Response.ok("records deleted with success!").build();
+        }catch(Exception ex) {
+            LOGGER.log(Level.WARNING,"Cannot delete metadata list due to exception error : "+ ex.getLocalizedMessage());
+            final Map<String,String> map = new HashMap<>();
+            map.put("msg",ex.getLocalizedMessage());
+            return Response.status(403).entity(map).build();
+        }
     }
 
     /**
@@ -632,10 +634,19 @@ public class MetadataRest {
     @POST
     @Path("/changeOwner/{ownerId}")
     public Response changeOwner(@PathParam("ownerId") final int ownerId,final List<MetadataBrief> metadataList) {
-        for (MetadataBrief brief : metadataList) {
-            metadataBusiness.updateOwner(brief.getId(), ownerId);
+        final List<Integer> ids = new ArrayList<>();
+        for (final MetadataBrief brief : metadataList) {
+            ids.add(brief.getId());
         }
-        return Response.ok("owner applied with success!").build();
+        try {
+            metadataBusiness.updateOwner(ids,ownerId);
+            return Response.ok("owner applied with success!!").build();
+        }catch(Exception ex) {
+            LOGGER.log(Level.WARNING,"Cannot change the owner for metadata list due to exception error : "+ ex.getLocalizedMessage());
+            final Map<String,String> map = new HashMap<>();
+            map.put("msg",ex.getLocalizedMessage());
+            return Response.status(403).entity(map).build();
+        }
     }
 
     /**
@@ -697,7 +708,8 @@ public class MetadataRest {
      */
     @POST
     @Path("/changePublication/{ispublished}")
-    public Response changePublication(@PathParam("ispublished") final boolean ispublished,final List<MetadataBrief> metadataList) throws ConfigurationException {
+    public Response changePublication(@PathParam("ispublished") final boolean ispublished,
+                                      final List<MetadataBrief> metadataList) throws ConfigurationException {
         boolean canContinue = true;
 
         for (final MetadataBrief brief : metadataList) {
