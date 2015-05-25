@@ -129,7 +129,7 @@ public class ProviderRestOld {
                 return ok(new AcknowlegementType("Failure", ex.getLocalizedMessage()));
             }
 
-            return ok(new AcknowlegementType("Success", "The source has been deleted"));
+            return ok(new AcknowlegementType("Success", "The provider has been restarted"));
 
         } catch (NoSuchIdentifierException | InvalidParameterValueException ex) {
            throw new CstlServiceException(ex);

@@ -58,6 +58,7 @@ import java.util.zip.ZipOutputStream;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.business.IConfigurationBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.json.metadata.v2.Template;
 
@@ -83,6 +84,12 @@ public class MetadataRest {
      */
     @Inject
     private IMetadataBusiness metadataBusiness;
+    
+    /**
+     * Inject configuration business
+     */
+    @Inject
+    private IConfigurationBusiness configurationBusiness;
 
     /**
      * Inject user repository.
@@ -673,7 +680,7 @@ public class MetadataRest {
                 continue;
             }
             list.add(metadata);
-            if(isvalid && "NONE".equalsIgnoreCase(metadata.getLevel())) {
+            if(isvalid && "NONE".equalsIgnoreCase(metadata.getLevel()) && isLevelRequiredForValidation()) {
                 canContinue = false;
                 break; //no needs to continue in the loop because there are metadata with level=NONE.
             }
@@ -1030,5 +1037,17 @@ public class MetadataRest {
         return Response.ok(map).build();
     }
 
+    /**
+     * Allow to deactivate the requirement of level completion for metadata validation.
+     * Used for developement purpose.
+     * @return 
+     */
+    private boolean isLevelRequiredForValidation() {
+        String value = configurationBusiness.getProperty("validation.require.level");
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return true;
+    }
 
 }
