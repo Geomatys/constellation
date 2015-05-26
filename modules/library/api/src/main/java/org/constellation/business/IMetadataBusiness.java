@@ -431,6 +431,12 @@ public interface IMetadataBusiness {
      * @return Map
      */
     Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap);
+
+    /**
+     * Return all profiles.
+     * @return List of string profile names
+     */
+    List<String> getAllProfiles();
     
     /**
      * Count the number of metadata stored in the database whith the specified validation flag.

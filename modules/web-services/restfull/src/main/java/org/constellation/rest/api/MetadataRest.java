@@ -49,7 +49,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,11 +131,9 @@ public class MetadataRest {
     @Path("/allProfiles")
     public List<Profile> getAllProfilesList() {
         final List<Profile> result = new ArrayList<>();
-        final Set<String> names = Template.getAvailableNames();
-        final Map<String,Integer> map = metadataBusiness.getProfilesCount(new HashMap<String, Object>());
-        for(final String profile : names){
-            final int count = map != null && map.get(profile) != null ? map.get(profile) : 0;
-            result.add(new Profile(profile,count));
+        final List<String> allProfiles = metadataBusiness.getAllProfiles();
+        for(final String p : allProfiles){
+            result.add(new Profile(p,0));
         }
         return result;
     }

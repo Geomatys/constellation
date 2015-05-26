@@ -1010,6 +1010,14 @@ public class MetadataBusiness implements IMetadataBusiness {
     public Map<String,Integer> getProfilesCount(final Map<String,Object> filterMap) {
         return metadataRepository.getProfilesCount(filterMap);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getAllProfiles() {
+        return new ArrayList<>(Template.getAvailableNames());
+    }
     
     @Override
     public void askForValidation(final int metadataID) {
