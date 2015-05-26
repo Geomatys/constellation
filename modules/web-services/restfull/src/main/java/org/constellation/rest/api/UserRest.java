@@ -194,7 +194,8 @@ public class UserRest {
 						@FormDataParam("country") String country,
 						@FormDataParam("phone") String phone,
 						@FormDataParam("password") String password,
-						@FormDataParam("role") String role){
+						@FormDataParam("role") String role,
+						@FormDataParam("locale") String locale){
 
 		//add user
 		CstlUser user = new CstlUser();
@@ -211,6 +212,7 @@ public class UserRest {
 		user.setCountry(country);
 		user.setPhone(phone);
 		user.setPassword(StringUtilities.MD5encode(password));
+		user.setLocale(locale);
 
 		user = userRepository.insert(user);
 
@@ -238,7 +240,8 @@ public class UserRest {
 						 @FormDataParam("phone") String phone,
 						 @FormDataParam("password") String password,
 						 @FormDataParam("group") Integer group,
-						 @FormDataParam("role") String role) {
+						 @FormDataParam("role") String role,
+						 @FormDataParam("locale") String locale) {
 		Optional<CstlUser> optionalUser = userRepository.findById(userId);
 		if(optionalUser.isPresent()){
 			CstlUser user = optionalUser.get();
@@ -252,6 +255,7 @@ public class UserRest {
 			user.setCity(city);
 			user.setCountry(country);
 			user.setPhone(phone);
+			user.setLocale(locale);
 
 			//check password update
 			String newPassword = StringUtilities.MD5encode(password);
@@ -288,7 +292,8 @@ public class UserRest {
 						 @FormDataParam("phone") String phone,
 						 @FormDataParam("password") String password,
 						 @FormDataParam("group") Integer group,
-						 @FormDataParam("role") String role) {
+						 @FormDataParam("role") String role,
+						 @FormDataParam("locale") String locale) {
 		String currentUserLogin = securityManager.getCurrentUserLogin();
 		if(currentUserLogin != null){
 			Optional<CstlUser> optionalUser = userRepository.findOne(currentUserLogin);
@@ -304,6 +309,7 @@ public class UserRest {
 				user.setCity(city);
 				user.setCountry(country);
 				user.setPhone(phone);
+				user.setLocale(locale);
 
 				//check password update
 				String newPassword = StringUtilities.MD5encode(password);

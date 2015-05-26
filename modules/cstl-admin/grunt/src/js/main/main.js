@@ -141,7 +141,7 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
         };
     })
 
-    .controller('UserAccountController', function($scope, $rootScope, $location, $cookieStore, Growl, cfpLoadingBar, user, roles) {
+    .controller('UserAccountController', function($scope, $rootScope, $location, $cookieStore, $translate, Growl, cfpLoadingBar, user, roles) {
         $scope.user = user;
         $scope.roles = roles;
 
@@ -150,6 +150,9 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
 
         //disabled role select
         $scope.enableRole = false;
+
+        //update language when update select tag
+        $scope.shouldUpdateLanguage = true;
 
         $scope.save = function(){
             var formData = new FormData(document.getElementById('userForm'));
@@ -179,11 +182,15 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
                 }
             });
         };
+
+        $scope.changeLanguage = function(){
+            $translate.use($scope.user.locale);
+        };
     })
 
     .controller('LanguageController', function($scope, $translate) {
 
-        $scope.currentLang = 'en';
+        $scope.currentLang = $translate.use();
 
         $scope.changeLanguage = function () {
             $translate.use($scope.currentLang);

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.mail.EmailException;
 import org.constellation.admin.mail.MailService;
 import org.constellation.auth.transfer.TokenTransfer;
@@ -48,9 +49,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.google.common.base.Optional;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.ResourceBundle;
 
 @Controller
 @Profile("standard")
@@ -183,20 +185,12 @@ public class AuthController {
             String baseUrl = "http://" + request.getHeader("host") + request.getContextPath();
             String resetPasswordUrl = baseUrl + "/reset-password.html?uuid=" + uuid;
 
-            mailService.send("Reset of the password of your account",
-                    "<html>" +
-                        "<body>" +
-                            "<p>Dear,</p>" +
-                            "<br />" +
-                            "<p>You asked to reset your password.</p>" +
-                            "<p>Please click the link below.</p>" +
-                            "<p>You will be redirected to a page where you can change your password.</p>" +
-                            "<p><a href='" + resetPasswordUrl + "'>" + resetPasswordUrl + "</a></p>" +
-                            "<br />" +
-                            "<p>Regards</p>" +
-                        "</body>" +
-                    "</html>",
-                    new ArrayList<String>(){{add(email);}});
+            ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/admin/mail/mail", LocaleUtils.toLocale(user.getLocale()));
+            Object[] args = {user.getFirstname(), user.getLastname(), resetPasswordUrl};
+
+            mailService.send(bundle.getString("account.password.reset.subject"),
+                    MessageFormat.format(bundle.getString("account.password.reset.body"), args),
+                    Collections.singletonList(email));
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);

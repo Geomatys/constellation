@@ -254,6 +254,42 @@
                     </div>
                 </div>
             </div>
+            <div class="frame dashboard">
+                <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" translate="global.menu.language">Language</a>
+                    </div>
+                </div>
+                <div class="dash-inner row">
+                    <div class="col-md-12 contact-form" style="margin-bottom:0;">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" translate="profile.language.choice">Language choice</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control"
+                                                ng-class="{error: userForm.locale.$invalid}"
+                                                ng-model="user.locale"
+                                                name="locale"
+                                                ng-change="shouldUpdateLanguage && changeLanguage()"
+                                                required>
+                                            <option translate="global.language.en" value="en">English</option>
+                                            <option translate="global.language.fr" value="fr">French</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="error" ng-show="userForm.$error">
+                            <div ng-show="userForm.locale.$error.required">
+                                <small class="errorTip" translate="validate.required.fields">
+                                    Required fields.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </div>

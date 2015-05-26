@@ -230,8 +230,8 @@ cstlAdminApp
             $keepaliveProvider.interval(tokenDuration);
 
         }])
-        .run(['$rootScope', '$location', 'TokenService', 'Account', 'StompService','$idle',
-            function($rootScope, $location, TokenService, Account, StompService,$idle) {
+        .run(['$rootScope', '$location', 'TokenService', 'Account', 'StompService','$idle', 'Permission', '$translate',
+            function($rootScope, $location, TokenService, Account, StompService,$idle, Permission, $translate) {
 
             $rootScope.authenticated=true;
           
@@ -255,6 +255,12 @@ cstlAdminApp
 
             //starts watching for idleness, or resets the idle/warning state and continues watching.
             $idle.watch();
+
+            // set language from user locale preferences
+            Permission.promise.then(function(){
+                var account= Permission.getAccount();
+                $translate.use(account.locale ? account.locale :'en');
+            });
 
         }]);
 
