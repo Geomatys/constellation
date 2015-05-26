@@ -56,6 +56,7 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Set;
@@ -949,7 +950,15 @@ public class MetadataBusiness implements IMetadataBusiness {
             feeder.setTitle(title);
             final String newMetadataID = UUID.randomUUID().toString();
             metaObj.setFileIdentifier(newMetadataID);
+            final long dateStamp = System.currentTimeMillis();
+            metaObj.setDateStamp(new Date(dateStamp));
             
+            final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            if (user.isPresent()) {
+                meta.setOwner(user.get().getId());
+            }
+            
+            meta.setDateCreation(dateStamp);
             meta.setMetadataIso(marshallMetadata(metaObj));
             meta.setMetadataId(newMetadataID);
             meta.setTitle(title);
