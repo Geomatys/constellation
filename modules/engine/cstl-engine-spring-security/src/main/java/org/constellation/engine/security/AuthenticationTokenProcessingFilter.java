@@ -59,10 +59,6 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = getAsHttpRequest(request);
 
         UserDetails userDetails = userDetailsExtractor.userDetails(httpRequest);
-
-        if(LOGGER.isDebugEnabled()) {
-        	LOGGER.debug(userDetails.getUsername() + ": " + userDetails.getAuthorities());
-        }
         
         if (userDetails == null) {
             if( ! unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
@@ -71,6 +67,10 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
             }
             chain.doFilter(request, response);
             return;
+        }
+
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug(userDetails.getUsername() + ": " + userDetails.getAuthorities());
         }
         
         try {
