@@ -1,0 +1,425 @@
+.metadataContainer {
+    color: #555555;
+    font-size: 11px;
+}
+.headerMetadata{
+    font-weight:bold;
+    width:680px;
+    font-size:14px;
+    background-color: #fff;
+    color:#000;
+    margin-left:6px;
+    margin-top:6px;
+    margin-bottom:0px;
+    margin-right:0px;
+}
+.headerMdCol1{
+    width: 10%;
+}
+.headerMdCol2{
+    width: 80%;
+}
+.headerMdCol3{
+    width: 10%;
+}
+#advancedViewMetadata {
+    width:680px;
+    font-size: 11px;
+    margin-left:3pt;
+    margin-top:0pt;
+    margin-bottom:0pt;
+    margin-right:0pt;
+}
+#advancedViewMetadata .table-mimic {
+    display: table;
+    background: #FFF;
+    border-top: 1px solid #CCC;
+    width: 100%;
+}
+#advancedViewMetadata .table-mimic table.ie {
+    width: 100%;
+}
+#advancedViewMetadata .table-mimic .fieldset {
+    padding: 15px 20px;
+    border: medium none;
+    *zoom: 1;
+}
+#advancedViewMetadata .table-mimic ,
+#advancedViewMetadata .table-mimic {
+    display: table;
+    content: "";
+}
+#advancedViewMetadata .table-mimic {
+    clear: both;
+}
+#advancedViewMetadata .table-mimic .fieldset .control-group {
+    *zoom: 1;
+}
+#advancedViewMetadata .table-mimic .fieldset,
+#advancedViewMetadata .table-mimic .fieldset {
+    display: table;
+    content: "";
+}
+#advancedViewMetadata .table-mimic .fieldset {
+    clear: both;
+}
+#advancedViewMetadata .table-mimic .fieldset .control-group .controls [class*="span"] {
+    float: left;
+    *margin: 1px;
+    *padding: 4px 0;
+}
+#advancedViewMetadata .table-mimic .fieldset {
+    padding: 5px 2px;
+    border: medium none;
+    *zoom: 1;
+}
+#advancedViewMetadata .table-mimic .table-row {
+    display: table-row;
+}
+#advancedViewMetadata .table-mimic .table-cell {
+    display: table-cell;
+}
+#advancedViewMetadata .table-mimic {
+    display: block;
+    background: #FFF;
+    border-top: 1px solid #CCC;
+    width: 100%;
+}
+#advancedViewMetadata .heading-block {
+    background: #2e8bbf;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 300;
+    padding: 10px 20px;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    *zoom: 1;
+}
+#advancedViewMetadata .small-block {
+    border-bottom: 1px solid #DDDDDD;
+}
+#advancedViewMetadata .small-block p {
+    margin: 5px 7px;
+    color: #555555;
+    font-size:10px;
+}
+
+#advancedViewMetadata .metadata-list {
+    margin: 0;
+    list-style: none;
+}
+#advancedViewMetadata .metadata-list li {
+    overflow: visible;
+    padding: 1px 0px;
+}
+#advancedViewMetadata .metadata-list li .label-data {
+    margin-right: 10px;
+    color: #333;
+    display: block;
+    float: left;
+    font-size: 11px;
+    width: 240px;
+}
+#advancedViewMetadata .metadata-list li .data {
+    display: block;
+    margin-top: 1px;
+    min-width: 550px;
+    font-size: 10px;
+    white-space: pre-wrap;
+}
+#advancedViewMetadata .metadata-list > li > a > span.datalink {
+    font-size: 10px;
+}
+#advancedViewMetadata .block-row {
+    padding: 10px 2px;
+    border-bottom: 1px solid #AAA;
+}
+#advancedViewMetadata .block-row {
+    background:none repeat scroll 0 0 #f5f5f5;
+}
+
+#advancedViewMetadata .collapse-row-wrapper {
+    padding-bottom: 5px;
+}
+#advancedViewMetadata .collapse-row-wrapper .collapse-row-heading {
+    padding: 16px 20px;
+    border-top: 1px solid #ffffff;
+    cursor: pointer;
+    box-shadow: 0 1px 0 #eeeeee;
+    *zoom: 1;
+}
+#advancedViewMetadata .collapse-row-wrapper {
+    clear: both;
+}
+#advancedViewMetadata .collapse-row-wrapper .collapse-row-heading .text {
+    line-height: 12px;
+    display: block;
+    float: left;
+    color: #2e8bbf;
+    margin-left: 8px;
+}
+#advancedViewMetadata .collapse-row-wrapper .collapse-row-inner {
+    background: #ffffff;
+    border-bottom: 1px solid #eeeeee;
+    padding: 0 20px 15px;
+}
+#advancedViewMetadata .collapse-row-heading {
+    background: #ffffff;
+}
+#advancedViewMetadata .collapse-row-wrapper .collapse-row-heading:hover {
+    background: #f7f7f7;
+    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.25);
+}
+#advancedViewMetadata a {
+    color: #333;
+    text-decoration: none;
+}
+#advancedViewMetadata .row-fluid {
+    width: 100%;
+    *zoom: 1;
+}
+#advancedViewMetadata .row-fluid{
+    display: table;
+    content: "";
+}
+#advancedViewMetadata .row-fluid [class*="span"] {
+    display: block;
+    width: 100%;
+    min-height: 28px;
+    box-sizing: border-box;
+    float: left;
+}
+#advancedViewMetadata .row-fluid [class*="span"]:first-child {
+    margin-left: 0;
+}
+#advancedViewMetadata .row-fluid .span12 {
+    width: 99.99999998999999%;
+    *width: 99.94680850063828%;
+}
+#advancedViewMetadata .row-fluid .span11 {
+    width: 91.489361693%;
+    *width: 91.4361702036383%;
+}
+#advancedViewMetadata .row-fluid .span10 {
+    width: 82.97872339599999%;
+    *width: 82.92553190663828%;
+}
+#advancedViewMetadata .row-fluid .span9 {
+    width: 74.468085099%;
+    *width: 74.4148936096383%;
+}
+#advancedViewMetadata .row-fluid .span8 {
+    width: 65.95744680199999%;
+    *width: 65.90425531263828%;
+}
+#advancedViewMetadata .row-fluid .span7 {
+    width: 57.446808505%;
+    *width: 57.3936170156383%;
+}
+#advancedViewMetadata .row-fluid .span6 {
+    width: 48.93617020799999%;
+    *width: 48.88297871863829%;
+}
+#advancedViewMetadata .row-fluid .span5 {
+    width: 40.425531911%;
+    *width: 40.3723404216383%;
+}
+#advancedViewMetadata .row-fluid .span4 {
+    width: 31.914893614%;
+    *width: 31.8617021246383%;
+}
+#advancedViewMetadata .row-fluid .span3 {
+    width: 23.404255317%;
+    *width: 23.3510638276383%;
+}
+#advancedViewMetadata .row-fluid .span2 {
+    width: 14.89361702%;
+    *width: 14.8404255306383%;
+}
+#advancedViewMetadata .row-fluid .span1 {
+    width: 6.382978723%;
+    *width: 6.329787233638298%;
+}
+#advancedViewMetadata h1,
+#advancedViewMetadata h2,
+#advancedViewMetadata h3,
+#advancedViewMetadata h4,
+#advancedViewMetadata h5,
+#advancedViewMetadata h6 {
+    margin: 0;
+    font-weight: normal;
+    color: inherit;
+    text-rendering: optimizelegibility;
+}
+#advancedViewMetadata h1 small,
+#advancedViewMetadata h2 small,
+#advancedViewMetadata h3 small,
+#advancedViewMetadata h4 small,
+#advancedViewMetadata h5 small,
+#advancedViewMetadata h6 small {
+    font-weight: normal;
+    color: #dddddd;
+}
+#advancedViewMetadata h1 {
+    font-size: 30px;
+    line-height: 36px;
+}
+#advancedViewMetadata h1 small {
+    font-size: 18px;
+}
+#advancedViewMetadata h2 {
+    font-size: 24px;
+    line-height: 36px;
+}
+#advancedViewMetadata h2 small {
+    font-size: 18px;
+}
+#advancedViewMetadata h3 {
+    font-size: 18px;
+    line-height: 27px;
+}
+#advancedViewMetadata h3 small {
+    font-size: 14px;
+}
+#advancedViewMetadata h4,
+#advancedViewMetadata h5,
+#advancedViewMetadata h6 {
+    line-height: 18px;
+}
+#advancedViewMetadata h4 {
+    font-size: 14px;
+}
+#advancedViewMetadata h4 small {
+    font-size: 12px;
+}
+#advancedViewMetadata h5 {
+    font-size: 12px;
+}
+#advancedViewMetadata h6 {
+    font-size: 11px;
+    color: #dddddd;
+    text-transform: uppercase;
+}
+#advancedViewMetadata table {
+    max-width: 100%;
+    background-color: #ffffff;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+#advancedViewMetadata table .span1 {
+    float: none;
+    width: 44px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span2 {
+    float: none;
+    width: 124px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span3 {
+    float: none;
+    width: 204px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span4 {
+    float: none;
+    width: 284px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span5 {
+    float: none;
+    width: 364px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span6 {
+    float: none;
+    width: 444px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span7 {
+    float: none;
+    width: 524px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span8 {
+    float: none;
+    width: 604px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span9 {
+    float: none;
+    width: 684px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span10 {
+    float: none;
+    width: 764px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span11 {
+    float: none;
+    width: 844px;
+    margin-left: 0;
+}
+#advancedViewMetadata table .span12 {
+    float: none;
+    width: 924px;
+    margin-left: 0;
+}
+.advancedLink {
+    color: #000;
+    cursor: pointer;
+    font-size: 13px;
+}
+.advancedLink:hover {
+    color: gray;
+}
+.colorCol{
+    width: 20px;
+    vertical-align: top;
+}
+.colStylekywd1KWDadv{
+    width:20%;
+}
+.colStylekywd2KWDadv{
+    width:20%;
+}
+.colStylekywd3KWDadv{
+    width:20%;
+}
+.colStylebbox1{width:20%;}
+.colStylebbox2{width:10%;}
+.vignetteCol{
+    height:80px;
+    width:80px;
+    text-align: center;
+}
+.metadataPre ul{
+    margin:0pt;
+}
+.metadataPre li {
+    list-style: disc outside none;
+    overflow: visible !important;
+    padding: 0px !important;
+}
+.metadataPre {
+    font-family: Arial Unicode MS, Lucida Sans Unicode, Arial, verdana, arial, helvetica, sans-serif !important;
+    font-size: 10px;
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: pre-line; /*conserve indentation but justify text is lost*/
+    /*white-space: normal; //conserve justify text but indentation is lost*/
+    width:594px;
+    text-align: left;
+}
+br {display:block;line-height: 1pt;}
+ol {margin: 0;}
+/* To fix unicode characters with PDF generation by flying saucer. */
+@font-face {
+    src: url('fonts/arialuni.ttf');
+    -fs-pdf-font-embed: embed;
+    -fs-pdf-font-encoding: Identity-H;
+}
+body {
+    font-family: Arial Unicode MS, Lucida Sans Unicode, Arial, verdana, arial, helvetica, sans-serif !important;
+}
