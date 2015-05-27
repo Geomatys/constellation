@@ -16,10 +16,9 @@
     <intercept-url pattern="/WS/*/admin/**" access="hasRole('cstl-admin')" />
   </http>
 
-  
   <http pattern="/api/**" create-session="never" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="unauthorizedEntryPoint">
     <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
-    <!--<intercept-url pattern="/api/user/authenticate" access="permitAll()" />-->
+    <intercept-url pattern="/api/1/metadata/metadataJson/resolve/**" access="permitAll()" />
     <intercept-url pattern="/api/**" access="isAuthenticated()" />
   </http>
 

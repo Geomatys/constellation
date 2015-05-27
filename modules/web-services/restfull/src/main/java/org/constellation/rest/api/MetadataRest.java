@@ -844,6 +844,30 @@ public class MetadataRest {
         return Response.ok(buffer.toString()).build();
     }
 
+    @GET
+    @Path("/metadataJson/resolve/{fileIdentifier}")
+    public Response resolveIsoMetadataJson(final @PathParam("fileIdentifier") String fileIdentifier) {
+        final StringWriter buffer = new StringWriter();
+        try{
+            //Resolve metadata by fileIdentifier
+            final Metadata md = metadataBusiness.searchFullMetadata(fileIdentifier, false, false);
+            if(md != null) {
+                final DefaultMetadata metadata = metadataBusiness.getMetadata(md.getId());
+                if (metadata != null) {
+                    metadata.prune();
+                    //get template name
+                    final String templateName = md.getProfile();
+                    final Template template = Template.getInstance(templateName);
+                    template.write(metadata,buffer,true, false);
+                }
+            }
+        } catch(Exception ex) {
+            LOGGER.log(Level.WARNING, "error while writing metadata json.", ex);
+            return Response.status(500).entity(ex.getLocalizedMessage()).build();
+        }
+        return Response.ok(buffer.toString()).build();
+    }
+
     /**
      * Returns the json representation of metadata by using template for new metadata with default values.
      *
