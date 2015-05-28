@@ -459,7 +459,7 @@
     "label.mdfilter.profile.header":"Profil",
     "label.mdfilter.profile.all":"Tous",
     "label.mdfilter.completion.header":"Complétion",
-    "label.mdfilter.completion.none":"Aucune",
+    "label.mdfilter.completion.none":"Incomplète",
     "label.mdfilter.completion.elementary":"Élémentaire",
     "label.mdfilter.completion.extended":"Étendue",
     "label.mdfilter.completion.completed":"Complète",

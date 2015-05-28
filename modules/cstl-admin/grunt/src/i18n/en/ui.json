@@ -445,7 +445,7 @@
     "label.mdfilter.profile.header":"Profile",
     "label.mdfilter.profile.all":"All profiles",
     "label.mdfilter.completion.header":"Completion",
-    "label.mdfilter.completion.none":"None",
+    "label.mdfilter.completion.none":"Not completed",
     "label.mdfilter.completion.elementary":"Elementary",
     "label.mdfilter.completion.extended":"Extended",
     "label.mdfilter.completion.completed":"Completed",
