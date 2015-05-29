@@ -91,7 +91,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.referencing.CRS;
@@ -210,14 +209,13 @@ public class WFSWorkerTest implements ApplicationContextAware {
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
                     final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                    final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                    final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
                     pgconfig.parameter(DATABASE .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_name"));
                     pgconfig.parameter(HOST     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_host"));
                     pgconfig.parameter(SCHEMA   .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_schema"));
                     pgconfig.parameter(USER     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_user"));
                     pgconfig.parameter(PASSWORD .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_pass"));
                     pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                    choice.values().add(pgconfig);
 
                     providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
@@ -235,7 +233,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
                 getOrCreateValue(sourcef, "load_all").setValue(true);
 
                 final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
-                final ParameterValueGroup shpconfig = createGroup(choice2, "ShapefileParametersFolder");
+                final ParameterValueGroup shpconfig = getOrCreateGroup(choice2, "ShapefileParametersFolder");
                 getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
@@ -272,7 +270,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
                 getOrCreateValue(sourceOM, "load_all").setValue(true);    
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
-                final ParameterValueGroup omconfig = createGroup(choiceOM, " SOSDBParameters");
+                final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 
@@ -301,7 +299,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
                     getOrCreateValue(sourceSML, "load_all").setValue(true);             
 
                     final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
-                    final ParameterValueGroup smlconfig = createGroup(choiceSML, "SMLParameters");
+                    final ParameterValueGroup smlconfig = getOrCreateGroup(choiceSML, "SMLParameters");
                     getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
                     getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
 

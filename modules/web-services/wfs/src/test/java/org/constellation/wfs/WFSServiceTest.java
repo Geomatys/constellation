@@ -62,7 +62,6 @@ import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
@@ -136,7 +135,7 @@ public class WFSServiceTest implements ApplicationContextAware {
                 getOrCreateValue(sourceOM, "load_all").setValue(true);    
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
-                final ParameterValueGroup omconfig = createGroup(choiceOM, " SOSDBParameters");
+                final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 

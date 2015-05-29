@@ -440,8 +440,8 @@
             <ns8:OtherCRS>urn:ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-6.005569537102804 27.138853294791637</ns9:LowerCorner>
-                <ns9:UpperCorner>-2.7284896314336695 49.88198714415787</ns9:UpperCorner>
+                <ns9:LowerCorner>-6.005569537102808 27.138853294791605</ns9:LowerCorner>
+                <ns9:UpperCorner>-2.728489631433671 49.88198714415783</ns9:UpperCorner>
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>

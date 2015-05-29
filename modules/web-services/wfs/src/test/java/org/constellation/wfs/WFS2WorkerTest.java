@@ -101,7 +101,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.referencing.CRS;
@@ -250,14 +249,13 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
                     final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                    final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                    final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
                     pgconfig.parameter(DATABASE .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_name"));
                     pgconfig.parameter(HOST     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_host"));
                     pgconfig.parameter(SCHEMA   .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_schema"));
                     pgconfig.parameter(USER     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_user"));
                     pgconfig.parameter(PASSWORD .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_pass"));
                     pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                    choice.values().add(pgconfig);
 
                     providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
@@ -274,7 +272,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 getOrCreateValue(sourcef, "load_all").setValue(true);
 
                 final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
-                final ParameterValueGroup shpconfig = createGroup(choice2, "ShapefileParametersFolder");
+                final ParameterValueGroup shpconfig = getOrCreateGroup(choice2, "ShapefileParametersFolder");
                 getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml/3.2");
 
@@ -311,7 +309,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 getOrCreateValue(sourceOM, "load_all").setValue(true);    
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
-                final ParameterValueGroup omconfig = createGroup(choiceOM, " SOSDBParameters");
+                final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 
@@ -340,7 +338,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                     getOrCreateValue(sourceSML, "load_all").setValue(true);             
 
                     final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
-                    final ParameterValueGroup smlconfig = createGroup(choiceSML, "SMLParameters");
+                    final ParameterValueGroup smlconfig = getOrCreateGroup(choiceSML, "SMLParameters");
                     getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
                     getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
 
@@ -1996,7 +1994,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         final List<StoredQueryListItemType> items = new ArrayList<>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:query:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         final ListStoredQueriesResponseType expResult = new ListStoredQueriesResponseType(items);
 
@@ -2098,7 +2096,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         final List<StoredQueryListItemType> items = new ArrayList<>();
         items.add(new StoredQueryListItemType("nameQuery",     Arrays.asList(new Title("Name query")),     Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:query:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         items.add(new StoredQueryListItemType("geomQuery",     Arrays.asList(new Title("Geom query")),     Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges"))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
@@ -2157,7 +2155,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         final List<StoredQueryListItemType> items = new ArrayList<>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
+        items.add(new StoredQueryListItemType("urn:ogc:def:query:OGC-WFS::GetFeatureById", Arrays.asList(new Title("Identifier query")), alltypes));
         items.add(new StoredQueryListItemType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", Arrays.asList(new Title("By type query")), Arrays.asList(new QName(""))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
@@ -2260,7 +2258,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         params = new ArrayList<>();
         params.add(new ParameterType("id", "station-001"));
-        query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", null, params);
+        query = new StoredQueryType("urn:ogc:def:query:OGC-WFS::GetFeatureById", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
 
         result = worker.getFeature(request);
@@ -2350,7 +2348,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         ObjectFactory factory = new ObjectFactory();
         List<ParameterType> params = new ArrayList<>();
         params.add(new ParameterType("id", "station-001"));
-        StoredQueryType query = new StoredQueryType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", null, params);
+        StoredQueryType query = new StoredQueryType("urn:ogc:def:query:OGC-WFS::GetFeatureById", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
 
         Object result = worker.getFeature(request);

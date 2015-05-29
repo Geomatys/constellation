@@ -62,7 +62,7 @@ import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
@@ -143,14 +143,13 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
                 final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
                 pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
                 pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
                 pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
                 pgconfig.parameter(USER.getName().getCode()).setValue("test");
                 pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
                 pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                choice.values().add(pgconfig);
 
                 providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 

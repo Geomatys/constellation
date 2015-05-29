@@ -255,7 +255,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         // we verify if the identifier query is loaded (if not we load it)
        boolean foundID = false;
        for (StoredQueryDescription squery : storedQueries) {
-           if ("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById".equals(squery.getId())) {
+           if ("urn:ogc:def:query:OGC-WFS::GetFeatureById".equals(squery.getId())) {
                foundID = true;
                break;
            }

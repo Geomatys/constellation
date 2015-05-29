@@ -17,14 +17,12 @@ public class TestSamples {
         user.setLogin("olivier");
         user.setEmail("olvier.nouguier@gmail.com");
         user.setPassword("zozozozo");
-
         user.setFirstname("olivier");
-
+        user.setActive(Boolean.TRUE);
+        user.setLocale("fr");
 
         return user;
     }
-
-    
     
     public static Data newData(CstlUser owner, Provider provider) {
         Data data = new Data();

@@ -70,7 +70,6 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
@@ -147,7 +146,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
                     final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                    final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                    final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
                     pgconfig.parameter(DATABASE .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_name"));
                     pgconfig.parameter(HOST     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_host"));
                     pgconfig.parameter(SCHEMA   .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_schema"));
@@ -160,8 +159,6 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                     getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
                     getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
                     getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
-
-                    choice.values().add(pgconfig);
 
                     providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
@@ -177,7 +174,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 getOrCreateValue(sourcef, "load_all").setValue(true);
 
                 final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
-                final ParameterValueGroup shpconfig = createGroup(choice2, "ShapefileParametersFolder");
+                final ParameterValueGroup shpconfig = getOrCreateGroup(choice2, "ShapefileParametersFolder");
                 getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
@@ -214,7 +211,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 getOrCreateValue(sourceOM, "load_all").setValue(true);    
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
-                final ParameterValueGroup omconfig = createGroup(choiceOM, " SOSDBParameters");
+                final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 

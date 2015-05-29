@@ -95,7 +95,6 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
@@ -204,14 +203,13 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
                     final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                    final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                    final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
                     pgconfig.parameter(DATABASE .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_name"));
                     pgconfig.parameter(HOST     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_host"));
                     pgconfig.parameter(SCHEMA   .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_schema"));
                     pgconfig.parameter(USER     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_user"));
                     pgconfig.parameter(PASSWORD .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_pass"));
                     pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                    choice.values().add(pgconfig);
                     
                     //add a custom sql query layer
                     final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
@@ -238,7 +236,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 getOrCreateValue(sourcef, "load_all").setValue(true);
 
                 final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
-                final ParameterValueGroup shpconfig = createGroup(choice2, "ShapefileParametersFolder");
+                final ParameterValueGroup shpconfig = getOrCreateGroup(choice2, "ShapefileParametersFolder");
                 getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
@@ -275,7 +273,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 getOrCreateValue(sourceOM, "load_all").setValue(true);    
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
-                final ParameterValueGroup omconfig = createGroup(choiceOM, " SOSDBParameters");
+                final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 
@@ -304,7 +302,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                     getOrCreateValue(sourceSML, "load_all").setValue(true);             
 
                     final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
-                    final ParameterValueGroup smlconfig = createGroup(choiceSML, "SMLParameters");
+                    final ParameterValueGroup smlconfig = getOrCreateGroup(choiceSML, "SMLParameters");
                     getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
                     getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
 
