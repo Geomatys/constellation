@@ -377,6 +377,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.IS_VALIDATED.equal((Boolean) entry.getValue()));
                     }
+                }else if("validation_required".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.VALIDATION_REQUIRED.equal((String)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.VALIDATION_REQUIRED.equal((String) entry.getValue()));
+                    }
                 }else if("published".equals(entry.getKey())) {
                     if(query == null) {
                         query = dsl.select(fields).from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
@@ -415,12 +421,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
      * Returns a singleton map that contains the total count of records as key,
      * and the list of records as value.
      * the list is resulted by filters, it use pagination and sorting.
-      
-     * @param filterMap
-     * @param sortEntry
-     * @param pageNumber
-     * @param rowsPerPage
-     * @return
+
+     * @param filterMap given filters
+     * @param sortEntry given sort
+     * @param pageNumber pagination page
+     * @param rowsPerPage count of rows per page
+     * @return Map
      */
     @Override
     public Map<Integer, List> filterAndGet(final Map<String,Object> filterMap,
@@ -454,6 +460,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                         query = dsl.select(fields).from(METADATA).where(METADATA.IS_VALIDATED.equal((Boolean)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.IS_VALIDATED.equal((Boolean) entry.getValue()));
+                    }
+                }else if("validation_required".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.VALIDATION_REQUIRED.equal((String)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.VALIDATION_REQUIRED.equal((String) entry.getValue()));
                     }
                 }else if("published".equals(entry.getKey())) {
                     if(query == null) {
@@ -615,12 +627,16 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     public int countValidated(boolean status, final Map<String,Object> filterMap) {
         final Integer owner   = (Integer) filterMap.get("owner");
         final Long period     = (Long)    filterMap.get("period");
+        final String validationReq = (String) filterMap.get("validation_required");
         SelectConditionStep cond = dsl.select().from(METADATA).where(METADATA.IS_VALIDATED.equal(status));
         if (owner != null) {
             cond = cond.and(METADATA.OWNER.eq(owner));
         }
         if (period != null) {
             cond = cond.and(METADATA.DATESTAMP.greaterOrEqual(period));
+        }
+        if (validationReq != null) {
+            cond = cond.and(METADATA.VALIDATION_REQUIRED.eq(validationReq));
         }
         return dsl.fetchCount(cond);
     }
@@ -629,6 +645,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     public int countPublished(boolean status, final Map<String,Object> filterMap) {
         final Integer owner   = (Integer) filterMap.get("owner");
         final Long period     = (Long)    filterMap.get("period");
+        final Boolean validated = (Boolean) filterMap.get("validated");
         
         SelectConditionStep cond = dsl.select().from(METADATA).where(METADATA.IS_PUBLISHED.equal(status));
         if (owner != null) {
@@ -636,6 +653,9 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
         }
         if (period != null) {
             cond = cond.and(METADATA.DATESTAMP.greaterOrEqual(period));
+        }
+        if(validated != null) {
+            cond = cond.and(METADATA.IS_VALIDATED.equal(validated));
         }
         return dsl.fetchCount(cond);
     }

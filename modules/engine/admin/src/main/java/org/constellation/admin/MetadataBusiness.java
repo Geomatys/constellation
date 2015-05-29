@@ -21,6 +21,7 @@ package org.constellation.admin;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -1071,8 +1072,14 @@ public class MetadataBusiness implements IMetadataBusiness {
         final List<OwnerStatBrief> briefs = new ArrayList<>();
         for (CstlUser user : userRepository.findAll()) {
             filter.put("owner", user.getId());
-            final int toValidate = metadataRepository.countValidated(false, filter);
-            final int toPublish  = metadataRepository.countPublished(false, filter);
+            final Map<String,Object> reqFilter = new HashMap<>();
+            reqFilter.putAll(filter);
+            reqFilter.put("validation_required","REQUIRED");
+            final int toValidate = metadataRepository.countValidated(false, reqFilter);
+            final Map<String,Object> toPublishFilter = new HashMap<>();
+            toPublishFilter.putAll(filter);
+            toPublishFilter.put("validated",Boolean.TRUE);
+            final int toPublish  = metadataRepository.countPublished(false, toPublishFilter);
             final int published  = metadataRepository.countPublished(true, filter);
             final User userBrief = new User(user.getId(), user.getLogin(), user.getEmail(), user.getLastname(), user.getFirstname(), user.getActive(), null);
             briefs.add(new OwnerStatBrief(userBrief, toValidate, toPublish, published));

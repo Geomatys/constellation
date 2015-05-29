@@ -314,6 +314,11 @@ public class MetadataRest {
                     }else {
                         filterMap.put(f.getField(),Boolean.FALSE);
                     }
+                } else if("validation_required".equals(f.getField())) {
+                    final String value = f.getValue();
+                    if(value != null) {
+                        filterMap.put(f.getField(),value);
+                    }
                 }else if("published".equals(f.getField())) {
                     final String value = f.getValue();
                     if("_all".equals(value)){
@@ -406,7 +411,9 @@ public class MetadataRest {
     /**
      * Return stats counts of metadata as map object :
      *  total count of metadata
+     *  total of metadata validated
      *  total of metadata not validated
+     *  total of metadata waiting to validate
      *  total of metadata not published
      *  total of metadata published
      *
@@ -419,19 +426,29 @@ public class MetadataRest {
 
         final Map<String, Object> emptyFilter = new HashMap<>();
         final int total             = metadataBusiness.countTotal(emptyFilter);
-        final int waitingToValidate = metadataBusiness.countValidated(false, emptyFilter);
-        final int waitingToPublish  = metadataBusiness.countPublished(false, emptyFilter);
+        final int validated         = metadataBusiness.countValidated(true, emptyFilter);
+        final int notValid          = metadataBusiness.countValidated(false, emptyFilter);
+        final Map<String, Object> filter = new HashMap<>();
+        filter.put("validation_required","REQUIRED");
+        final int waitingToValidate = metadataBusiness.countValidated(false, filter);
+        final int notPublish        = metadataBusiness.countPublished(false, emptyFilter);
         final int published         = metadataBusiness.countPublished(true,  emptyFilter);
+        final Map<String, Object> filter2 = new HashMap<>();
+        filter2.put("validated",Boolean.TRUE);
+        final int waitingToPublish  = metadataBusiness.countPublished(false,  filter2);
 
         map.put("total", total);
+        map.put("validated", validated);
+        map.put("notValid", notValid);
         map.put("waitingToValidate", waitingToValidate);
-        map.put("waitingToPublish", waitingToPublish);
         map.put("published", published);
+        map.put("notPublish", notPublish);
+        map.put("waitingToPublish", waitingToPublish);
         return Response.ok(map).build();
     }
 
     /**
-     * TODO get all needed stats for given filters
+     * Get all needed stats for given filters
      *
      * @param search pojo that contains filters.
      * @return Response map with all metadata stats.
@@ -484,14 +501,26 @@ public class MetadataRest {
         Map<String,Integer> general = new HashMap<>();
         
         final int total             = metadataBusiness.countTotal(filterMap);
-        final int waitingToValidate = metadataBusiness.countValidated(false, filterMap);
-        final int waitingToPublish  = metadataBusiness.countPublished(false, filterMap);
+        final int validated         = metadataBusiness.countValidated(true,filterMap);
+        final int notValid          = metadataBusiness.countValidated(false, filterMap);
+        final Map<String,Object> filter = new HashMap<>();
+        filter.putAll(filterMap);
+        filter.put("validation_required","REQUIRED");
+        final int waitingToValidate = metadataBusiness.countValidated(false, filter);
+        final int notPublish        = metadataBusiness.countPublished(false, filterMap);
         final int published         = metadataBusiness.countPublished(true,filterMap);
+        final Map<String, Object> filter2 = new HashMap<>();
+        filter2.putAll(filterMap);
+        filter2.put("validated",Boolean.TRUE);
+        final int waitingToPublish  = metadataBusiness.countPublished(false,  filter2);
 
         general.put("total", total);
+        general.put("validated", validated);
+        general.put("notValid", notValid);
         general.put("waitingToValidate", waitingToValidate);
-        general.put("waitingToPublish", waitingToPublish);
+        general.put("notPublish", notPublish);
         general.put("published", published);
+        general.put("waitingToPublish", waitingToPublish);
 
         //Get profiles distribution counts
         final List<Profile> profiles = new ArrayList<>();
