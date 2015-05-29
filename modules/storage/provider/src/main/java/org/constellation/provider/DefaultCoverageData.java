@@ -52,7 +52,7 @@ import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import org.apache.sis.measure.NumberRange;
-import org.geotoolkit.image.coverage.GridCombineIterator;
+import org.geotoolkit.coverage.combineIterator.GridCombineIterator;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.filestore.FileCoverageReference;

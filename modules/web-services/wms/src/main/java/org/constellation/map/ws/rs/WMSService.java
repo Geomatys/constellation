@@ -47,7 +47,7 @@ import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.TimeParser;
+import org.geotoolkit.temporal.util.TimeParser;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.wms.xml.DescribeLayer;
 import org.geotoolkit.wms.xml.GetCapabilities;
