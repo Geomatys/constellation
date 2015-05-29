@@ -173,6 +173,19 @@
 							<includes>.*</includes>
 							<excludes></excludes>
 							<inputSchema>ADMIN</inputSchema>
+                                                        <customTypes>
+                                                            <customType>
+                                                                <name>CustomString</name>
+                                                                <type>java.lang.String</type>
+                                                                <binding>org.constellation.jooq.util.StringBinding</binding>
+                                                            </customType>
+                                                        </customTypes>
+                                                        <forcedTypes>
+                                                            <forcedType>
+                                                                <name>CustomString</name>
+                                                                <expression>.*\.METADATA_ISO.*</expression>
+                                                            </forcedType>
+                                                        </forcedTypes>
 						</database>
 						<generate>
 							<relations>true</relations>
