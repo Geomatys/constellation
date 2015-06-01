@@ -1044,8 +1044,22 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
 
     @Override
+    public void askForValidation(final List<Integer> ids, final String metadataLink, final boolean sendEmails) {
+        if(ids != null) {
+            for(final Integer id : ids) {
+                askForValidation(id);
+            }
+        }
+    }
+
+    @Override
     public void denyValidation(final int metadataID, final String comment) {
         metadataRepository.denyValidation(metadataID, comment);
+    }
+
+    @Override
+    public void denyValidation(final Metadata metadata, final String comment, final String metadataLink) {
+        metadataRepository.denyValidation(metadata.getId(), comment);
     }
     
     @Override
@@ -1054,6 +1068,14 @@ public class MetadataBusiness implements IMetadataBusiness {
         if (metadata != null) {
             metadataRepository.changeValidation(metadataID, true);
             metadataRepository.setValidationRequired(metadataID, "NONE", metadata.getMetadataIso());
+        }
+    }
+
+    @Override
+    public void acceptValidation(final Metadata metadata, final String metadataLink) {
+        if (metadata != null) {
+            metadataRepository.changeValidation(metadata.getId(), true);
+            metadataRepository.setValidationRequired(metadata.getId(), "NONE", metadata.getMetadataIso());
         }
     }
     

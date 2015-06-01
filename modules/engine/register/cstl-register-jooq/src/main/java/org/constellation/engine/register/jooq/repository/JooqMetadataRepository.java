@@ -383,6 +383,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.VALIDATION_REQUIRED.equal((String) entry.getValue()));
                     }
+                }else if("id".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.METADATA_ID.equal((String)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.METADATA_ID.equal((String) entry.getValue()));
+                    }
                 }else if("published".equals(entry.getKey())) {
                     if(query == null) {
                         query = dsl.select(fields).from(METADATA).where(METADATA.IS_PUBLISHED.equal((Boolean)entry.getValue()));
@@ -466,6 +472,12 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                         query = dsl.select(fields).from(METADATA).where(METADATA.VALIDATION_REQUIRED.equal((String)entry.getValue()));
                     }else {
                         query = ((SelectConditionStep)query).and(METADATA.VALIDATION_REQUIRED.equal((String) entry.getValue()));
+                    }
+                }else if("id".equals(entry.getKey())) {
+                    if(query == null) {
+                        query = dsl.select(fields).from(METADATA).where(METADATA.METADATA_ID.equal((String)entry.getValue()));
+                    }else {
+                        query = ((SelectConditionStep)query).and(METADATA.METADATA_ID.equal((String) entry.getValue()));
                     }
                 }else if("published".equals(entry.getKey())) {
                     if(query == null) {

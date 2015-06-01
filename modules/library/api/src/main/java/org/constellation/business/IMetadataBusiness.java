@@ -471,10 +471,16 @@ public interface IMetadataBusiness {
     String getTemplateFromMetadata(DefaultMetadata meta);
     
     void askForValidation(final int metadataID);
+
+    void askForValidation(final List<Integer> ids, final String metadataLink, final boolean sendEmails);
     
     void denyValidation(final int metadataID, final String comment);
+
+    void denyValidation(final Metadata metadata, final String comment, final String metadataLink);
     
     void acceptValidation(final int metadataID);
+
+    void acceptValidation(final Metadata metadata, final String metadataLink);
     
     Map<Integer, List> filterAndGet(final Map<String,Object> filterMap, final Map.Entry<String,String> sortEntry,final int pageNumber,final int rowsPerPage);
     

@@ -319,6 +319,11 @@ public class MetadataRest {
                     if(value != null) {
                         filterMap.put(f.getField(),value);
                     }
+                }else if("id".equals(f.getField())) {
+                    final String value = f.getValue();
+                    if(value != null) {
+                        filterMap.put(f.getField(),value);
+                    }
                 }else if("published".equals(f.getField())) {
                     final String value = f.getValue();
                     if("_all".equals(value)){
@@ -692,7 +697,8 @@ public class MetadataRest {
     @POST
     @Path("/changeValidation/{isvalid}")
     public Response changeValidation(@PathParam("isvalid") final boolean isvalid,
-                                     final ValidationList validationList) throws ConfigurationException{
+                                     final ValidationList validationList,
+                                     @Context HttpServletRequest req) throws ConfigurationException{
         final List<MetadataBrief> metadataList = validationList.getMetadataList();
         final String comment = validationList.getComment();
 
@@ -714,11 +720,14 @@ public class MetadataRest {
         final Map<String,String> map = new HashMap<>();
         if(canContinue) {
             try {
+                final String url = req.getRequestURL().toString();
+                final String baseUrl = url.substring(0,url.indexOf("api/1/metadata"));
+                final String tmplMDLink = baseUrl+"admin.html#/metadata?tab=metadata&id=";
                 for (final Metadata md : list) {
                     if(isvalid) {
-                        metadataBusiness.acceptValidation(md.getId());
+                        metadataBusiness.acceptValidation(md,tmplMDLink);
                     } else if("REQUIRED".equalsIgnoreCase(md.getValidationRequired())){
-                        metadataBusiness.denyValidation(md.getId(),comment);
+                        metadataBusiness.denyValidation(md,comment,tmplMDLink);
                     } else {
                         if(md.getIsPublished()) {
                             metadataBusiness.updatePublication(md.getId(),false);
@@ -819,9 +828,14 @@ public class MetadataRest {
         final Map<String,String> map = new HashMap<>();
         if(canContinue) {
             try {
+                final List<Integer> ids = new ArrayList<>();
                 for (final MetadataBrief brief : metadataList) {
-                    metadataBusiness.askForValidation(brief.getId());
+                    ids.add(brief.getId());
                 }
+                final String url = req.getRequestURL().toString();
+                final String baseUrl = url.substring(0,url.indexOf("api/1/metadata"));
+                final String tmplMDLink = baseUrl+"admin.html#/metadata?tab=metadata&id=";
+                metadataBusiness.askForValidation(ids,tmplMDLink,true);
                 map.put("status","ok");
                 return Response.ok(map).build();
             }catch(Exception ex) {
@@ -830,10 +844,6 @@ public class MetadataRest {
                 return Response.status(403).entity(map).build();
             }
         }
-
-
-        //TODO send email to moderator here?
-
 
         map.put("notOwner",""+notOwner);
         map.put("validExists",""+validExists);
