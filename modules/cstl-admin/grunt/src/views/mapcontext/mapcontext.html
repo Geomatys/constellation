@@ -164,23 +164,23 @@
                                                   class="pull-right text-right item-list-style">{{layer.Type ? layer.Type : ''}} {{layer.iswms ? 'WMS':''}}</span>
                                             <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint')"
                                                  ng-src="{{layer.id!=values.selectedLayer.id?'img/vector-multipoint-mapcontext.svg':'img/vector-multipoint-mapcontext-selected.svg'}}"
-                                                 class="pull-right"
+                                                 class="pull-right vector-symbol"
                                                  style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.Subtype=='Geometry'"
                                                  ng-src="{{layer.id!=values.selectedLayer.id?'img/vector-multigeometry-mapcontext.svg':'img/vector-multigeometry-mapcontext-selected.svg'}}"
-                                                 class="pull-right"
+                                                 class="pull-right vector-symbol"
                                                  style="margin-top:6px; margin-right:10px; width:22px" />
                                             <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon')"
                                                  ng-src="{{layer.id!=values.selectedLayer.id?'img/vector-poly-mapcontext.svg':'img/vector-poly-mapcontext-selected.svg'}}"
-                                                 class="pull-right"
+                                                 class="pull-right vector-symbol"
                                                  style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.Type.toLowerCase()=='vector' && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString')"
                                                  ng-src="{{layer.id!=values.selectedLayer.id?'img/vector-polyline-mapcontext.svg':'img/vector-polyline-mapcontext-selected.svg'}}"
-                                                 class="pull-right"
+                                                 class="pull-right vector-symbol"
                                                  style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.externalLayer"
                                                  ng-src="{{layer.id!==values.selectedLayer.id?'img/layer-external.svg':'img/layer-external-selected.svg'}}"
-                                                 class="pull-right"
+                                                 class="pull-right vector-symbol"
                                                  style="margin-top:6px; margin-right:10px;" />
                                         </div>
                                         <div class="bottom">

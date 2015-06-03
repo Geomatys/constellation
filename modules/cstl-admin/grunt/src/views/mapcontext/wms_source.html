@@ -43,19 +43,19 @@
                                                                     <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                                     <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint')"
                                                                          ng-src="{{(selection.layer && layer.Id==selection.layer.Id)?'img/vector-multipoint-selected.svg':'img/vector-multipoint.svg'}}"
-                                                                         class="pull-right"
+                                                                         class="pull-right vector-symbol"
                                                                          style="margin-top:6px; margin-right:10px;" />
                                                                     <img ng-if="layer.Subtype=='Geometry'"
                                                                          ng-src="{{(selection.layer && layer.Id==selection.layer.Id)?'img/vector-multigeometry-selected.svg':'img/vector-multigeometry.svg'}}"
-                                                                         class="pull-right"
+                                                                         class="pull-right vector-symbol"
                                                                          style="margin-top:6px; margin-right:10px; width:22px" />
                                                                     <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon')"
                                                                          ng-src="{{(selection.layer && layer.Id==selection.layer.Id)?'img/vector-poly-selected.svg':'img/vector-poly.svg'}}"
-                                                                         class="pull-right"
+                                                                         class="pull-right vector-symbol"
                                                                          style="margin-top:6px; margin-right:10px;" />
                                                                     <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString')"
                                                                          ng-src="{{(selection.layer && layer.Id==selection.layer.Id)?'img/vector-polyline-selected.svg':'img/vector-polyline.svg'}}"
-                                                                         class="pull-right"
+                                                                         class="pull-right vector-symbol"
                                                                          style="margin-top:6px; margin-right:10px;" />
                                                                 </div>
                                                                 <div class="bottom">

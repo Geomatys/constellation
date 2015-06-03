@@ -95,19 +95,19 @@
                                           style="font-size:14px;">{{data.Type}}</span>
                                     <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint')"
                                          ng-src="{{(selection.internalData && data.Id == selection.internalData.Id)? 'img/vector-multipoint-selected.svg':'img/vector-multipoint.svg'}}"
-                                         class="pull-right"
+                                         class="pull-right vector-symbol"
                                          style="margin-top:6px; margin-right:10px;" />
                                     <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon')"
                                          ng-src="{{(selection.internalData && data.Id == selection.internalData.Id)?'img/vector-poly-selected.svg':'img/vector-poly.svg'}}"
-                                         class="pull-right"
+                                         class="pull-right vector-symbol"
                                          style="margin-top:6px; margin-right:10px;" />
                                     <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString')"
                                          ng-src="{{(selection.internalData && data.Id == selection.internalData.Id)?'img/vector-polyline-selected.svg':'img/vector-polyline.svg'}}"
-                                         class="pull-right"
+                                         class="pull-right vector-symbol"
                                          style="margin-top:6px; margin-right:10px;" />
                                     <img ng-if="data.Subtype=='Geometry'"
                                          ng-src="{{(selection.internalData && data.Id == selection.internalData.Id)?'img/vector-multigeometry-selected.svg':'img/vector-multigeometry.svg'}}"
-                                         class="pull-right"
+                                         class="pull-right vector-symbol"
                                          style="margin-top:6px; margin-right:10px; width:22px;" />
                                 </div>
                                 <div class="bottom">

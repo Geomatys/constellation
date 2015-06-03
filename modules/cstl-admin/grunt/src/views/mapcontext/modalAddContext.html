@@ -188,23 +188,23 @@
                                                                           style="margin-right: 7px;">{{layerToAdd.layer.Type ? layerToAdd.layer.Type : ''}} {{layerToAdd.isWms ? 'WMS':''}}</span>
                                                                             <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint')"
                                                                                  ng-src="{{layerToAdd!=selection.item ? 'img/vector-multipoint-mapcontext.svg':'img/vector-multipoint-mapcontext-selected.svg'}}"
-                                                                                 class="pull-right"
+                                                                                 class="pull-right vector-symbol"
                                                                                  style="margin-top:4px; margin-right:10px;" />
                                                                             <img ng-if="layerToAdd.layer.Subtype=='Geometry'"
                                                                                  ng-src="{{layerToAdd!=selection.item ? 'img/vector-multigeometry-mapcontext.svg':'img/vector-multigeometry-mapcontext-selected.svg'}}"
-                                                                                 class="pull-right"
+                                                                                 class="pull-right vector-symbol"
                                                                                  style="margin-top:4px; margin-right:10px; width:22px" />
                                                                             <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon')"
                                                                                  ng-src="{{layerToAdd!=selection.item ? 'img/vector-poly-mapcontext.svg':'img/vector-poly-mapcontext-selected.svg'}}"
-                                                                                 class="pull-right"
+                                                                                 class="pull-right vector-symbol"
                                                                                  style="margin-top:4px; margin-right:10px;" />
                                                                             <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString')"
                                                                                  ng-src="{{layerToAdd!=selection.item ? 'img/vector-polyline-mapcontext.svg':'img/vector-polyline-mapcontext-selected.svg'}}"
-                                                                                 class="pull-right"
+                                                                                 class="pull-right vector-symbol"
                                                                                  style="margin-top:4px; margin-right:10px;" />
                                                                             <img ng-if="layerToAdd.layer.externalLayer"
                                                                                  ng-src="{{layerToAdd!==selection.item ? 'img/layer-external.svg':'img/layer-external-selected.svg'}}"
-                                                                                 class="pull-right"
+                                                                                 class="pull-right vector-symbol"
                                                                                  style="margin-top:4px; margin-right:10px;" />
                                                                     <div class="hidden-xs hidden-md hidden-lg">
                                                                         <div class="block tooltipicon"
