@@ -403,9 +403,9 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                     }
                 }else if("term".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(fields).from(METADATA).where(METADATA.TITLE.likeIgnoreCase("%"+entry.getValue()+"%")).or(METADATA.RESUME.likeIgnoreCase("%"+entry.getValue()+"%"));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.TITLE.likeIgnoreCase("%"+entry.getValue()+"%").or(METADATA.RESUME.likeIgnoreCase("%"+entry.getValue()+"%")));
                     }else {
-                        query = ((SelectConditionStep)query).and(METADATA.TITLE.likeIgnoreCase("%"+entry.getValue()+"%")).or(METADATA.RESUME.likeIgnoreCase("%"+entry.getValue()+"%"));
+                        query = ((SelectConditionStep)query).and(METADATA.TITLE.likeIgnoreCase("%"+entry.getValue()+"%").or(METADATA.RESUME.likeIgnoreCase("%"+entry.getValue()+"%")));
                     }
                 }else if ("period".equals(entry.getKey())) {
                     if(query == null) {
@@ -493,9 +493,9 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
                     }
                 }else if("term".equals(entry.getKey())) {
                     if(query == null) {
-                        query = dsl.select(fields).from(METADATA).where(METADATA.TITLE.likeIgnoreCase("%"+entry.getValue()+"%")).or(METADATA.RESUME.likeIgnoreCase("%"+entry.getValue()+"%"));
+                        query = dsl.select(fields).from(METADATA).where(METADATA.TITLE.likeIgnoreCase("%"+entry.getValue()+"%").or(METADATA.RESUME.likeIgnoreCase("%"+entry.getValue()+"%")));
                     }else {
-                        query = ((SelectConditionStep)query).and(METADATA.TITLE.likeIgnoreCase("%"+entry.getValue()+"%")).or(METADATA.RESUME.likeIgnoreCase("%"+entry.getValue()+"%"));
+                        query = ((SelectConditionStep)query).and(METADATA.TITLE.likeIgnoreCase("%"+entry.getValue()+"%").or(METADATA.RESUME.likeIgnoreCase("%"+entry.getValue()+"%")));
                     }
                 }else if ("period".equals(entry.getKey())) {
                     if(query == null) {
