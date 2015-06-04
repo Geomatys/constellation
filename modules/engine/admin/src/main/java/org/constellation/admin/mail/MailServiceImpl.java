@@ -38,10 +38,7 @@ import javax.mail.internet.InternetAddress;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -92,17 +89,15 @@ public class MailServiceImpl implements MailService {
         }
 
         // Build recipients internet addresses.
-        List<InternetAddress> addresses = Lists.transform(recipients, new Function<String, InternetAddress>() {
-            @Override
-            public InternetAddress apply(String address) {
-                try {
-                    return new InternetAddress(address);
-                } catch (AddressException ex) {
-                    LOGGER.warn("Recipient ignored due to previous error(s)" + address, ex);
-                    return null;
-                }
+        List<InternetAddress> addresses = new ArrayList<>();
+        for (String recipient : recipients) {
+            try {
+                addresses.add(new InternetAddress(recipient));
+            } catch (AddressException ex) {
+                LOGGER.warn("Recipient ignored due to previous error(s) " + recipient, ex);
             }
-        });
+        }
+
         if (addresses.isEmpty()) {
             return;
         }
