@@ -413,7 +413,7 @@ public class ProviderBusiness implements IProviderBusiness {
                         final FeatureStoreFactory featureFactory = FeatureStoreFinder.getFactoryById(subType);
                         final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
                         final ParameterValueGroup choice = ParametersExt.getOrCreateGroup(sources.groups("choice").get(0),cvgConfig.getDescriptor().getName().getCode());
-                        org.apache.sis.parameter.Parameters.copy(cvgConfig, choice);
+                        ParametersExt.deepCopy(cvgConfig, choice);
                         foundProvider = true;
                     }
 

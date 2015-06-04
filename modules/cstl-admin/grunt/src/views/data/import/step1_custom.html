@@ -12,11 +12,26 @@
             <hr/>
             <p><label>Description:</label> {{options.selectedType.description}}</p>
             <div class="form-group" ng-repeat="property in options.selectedType.property.Property">
-                <label>{{property.id}} {{property.optional ? '' : '(*)'}}</label>
-                <input type="text"
-                       class="form-control form-control-fix"
-                       ng-model="property.value"
-                       ng-required="! property.optional"/>
+              <div ng-if="!property.Property">
+									<label>{{property.id}} {{property.optional ? '' : '(*)'}}</label>
+                  <input type="text"
+                         class="form-control form-control-fix"
+                         ng-model="property.value"
+                         ng-required="! property.optional"/>
+                </div>
+                <div ng-if="property.Property">
+									<div class="alert alert-info"><h4>{{property.id}}</h4>
+		                <div class="form-group row" ng-repeat="innerprop in property.Property">
+		                  <label class="col-xs-4">{{innerprop.id}} {{innerprop.optional ? '' : '(*)'}}</label>
+											<div class="col-xs-8">
+		                  <input type="text"
+		                         class="form-control form-control-fix"
+		                         ng-model="innerprop.value"
+		                         ng-required="! innerprop.optional"/>
+											</div>
+		                </div>
+									</div>
+                </div>
             </div>
         </div>
     </form>
