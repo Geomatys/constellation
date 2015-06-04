@@ -19,8 +19,6 @@
 
 package org.constellation.admin.mail;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
@@ -92,7 +90,12 @@ public class MailServiceImpl implements MailService {
         List<InternetAddress> addresses = new ArrayList<>();
         for (String recipient : recipients) {
             try {
-                addresses.add(new InternetAddress(recipient));
+                InternetAddress address = new InternetAddress(recipient);
+
+                //throw exception if invalid
+                address.validate();
+
+                addresses.add(address);
             } catch (AddressException ex) {
                 LOGGER.warn("Recipient ignored due to previous error(s) " + recipient, ex);
             }
