@@ -725,7 +725,11 @@ public class MetadataRest {
                 final String tmplMDLink = baseUrl+"admin.html#/metadata?tab=metadata&id=";
                 for (final Metadata md : list) {
                     if(isvalid) {
-                        metadataBusiness.acceptValidation(md,tmplMDLink);
+                        if("REQUIRED".equalsIgnoreCase(md.getValidationRequired())){
+                            metadataBusiness.acceptValidation(md,tmplMDLink);
+                        }else {
+                            metadataBusiness.updateValidation(md.getId(),true);
+                        }
                     } else if("REQUIRED".equalsIgnoreCase(md.getValidationRequired())){
                         metadataBusiness.denyValidation(md,comment,tmplMDLink);
                     } else {
