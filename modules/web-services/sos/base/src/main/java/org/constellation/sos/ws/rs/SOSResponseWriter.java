@@ -76,10 +76,8 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
             }
             if (t instanceof SOSResponseWrapper) {
                 m.marshal(((SOSResponseWrapper)t).getCollection(),  out);
-                m.marshal(((SOSResponseWrapper)t).getCollection(), System.out);
             } else {
                 m.marshal(t, out);
-                m.marshal(t, System.out);
             }
              SOSMarshallerPool.getInstance().recycle(m);
         } catch (JAXBException ex) {
