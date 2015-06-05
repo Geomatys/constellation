@@ -49,6 +49,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,7 +65,6 @@ import org.constellation.provider.ProviderFactory;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
-import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import org.constellation.test.utils.TestDatabaseHandler;
 import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
@@ -72,7 +72,9 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import static org.geotoolkit.parameter.ParametersExt.*;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 // Constellation dependencies
 
@@ -241,23 +243,39 @@ public final class GrizzlyServer {
         final File sensorDirectory = new File(configDir, "dataSOS");
         sensorDirectory.mkdir();
 
-        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.261A");
-        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.2626");
-        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-SunSpot-2");
+        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-GEOM-2");
+        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-GEOM-3");
+        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-GEOM-4");
+        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-GEOM-5");
+        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-GEOM-7");
+        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-GEOM-8");
+        writeDataFile(sensorDirectory, "urn-ogc-object-sensor-GEOM-9");
 
         final Automatic smlConfig = new Automatic(null, sensorDirectory.getPath());
-        final Automatic omCOnfig = new Automatic(null, new BDD("org.postgresql.Driver", "jdbc:postgresql://flupke.geomatys.com:5432/observation", "test", "test"));
-        final SOSConfiguration sosconf = new SOSConfiguration(smlConfig, omCOnfig);
-        sosconf.setObservationFilterType(DataSourceType.POSTGRID);
-        sosconf.setObservationReaderType(DataSourceType.POSTGRID);
-        sosconf.setObservationWriterType(DataSourceType.POSTGRID);
+        
+        String sosurl = "jdbc:derby:memory:CITEOM2Test2;create=true";
+        DefaultDataSource ds = new DefaultDataSource(sosurl);
+
+        Connection con = ds.getConnection();
+
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.setEncoding("UTF-8");
+        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2-cite.sql"));
+        
+        Automatic OMConfiguration  = new Automatic();
+        BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", sosurl, "", "");
+        OMConfiguration.setBdd(bdd);
+        SOSConfiguration sosconf = new SOSConfiguration(smlConfig, OMConfiguration);
+        sosconf.setObservationReaderType(DataSourceType.OM2);
+        sosconf.setObservationWriterType(DataSourceType.OM2);
+        sosconf.setObservationFilterType(DataSourceType.OM2);
         sosconf.setSMLType(DataSourceType.FILESYSTEM);
+        sosconf.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
         sosconf.setProfile("transactional");
-        sosconf.setObservationIdBase("urn:ogc:object:observation:SunSpot:");
-        sosconf.setSensorIdBase("urn:ogc:object:sensor:SunSpot:");
-        sosconf.setPhenomenonIdBase("urn:phenomenon:");
-        sosconf.setObservationTemplateIdBase("urn:ogc:object:observationTemplate:SunSpot:");
-        sosconf.setVerifySynchronization(false);
+        sosconf.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+        sosconf.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+        sosconf.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
         sosconf.getParameters().put("transactionSecurized", "false");
         sosconf.getParameters().put("multipleVersion", "false");
         sosconf.getParameters().put("singleVersion", "1.0.0");

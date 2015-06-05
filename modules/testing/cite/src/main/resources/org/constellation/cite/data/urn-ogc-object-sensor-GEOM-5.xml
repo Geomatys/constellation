@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SensorML xmlns="http://www.opengis.net/sensorML/1.0" xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" xmlns:swe="http://www.opengis.net/swe/1.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0">
+	<member xlink:role="urn:x-ogx:def:sensor:OGC:detector">
+		<Component gml:id="sensor-0014.4F01.0000.261A">
+			<gml:name>Capteur Profondeur de FONTESTRAMAR</gml:name>
+                        <gml:boundedBy>
+                            <gml:Null>unknown</gml:Null>
+                        </gml:boundedBy>
+			<keywords>
+				<KeywordList codeSpace="urn:x-brgm:def:gcmd:keywords">
+					<keyword>piezometer</keyword>
+					<keyword>geosciences</keyword>
+					<keyword>point d'eau</keyword>
+				</KeywordList>
+			</keywords>
+			<identification>
+				<IdentifierList>
+                                         <identifier name="URN">
+                                            <Term definition="urn:ogc:def:identifierType:OGC:uniqueID">
+                                                      <value>urn:ogc:object:sensor:GEOM:5</value>
+                                            </Term>
+                                        </identifier>
+					<identifier name="supervisorCode">
+						<Term definition="urn:x-ogc:def:identifier:OGC:modelNumber">
+							<codeSpace xlink:href="urn:x-brgm:def:sensorSystem:hydras"/>
+							<value>0FE_VASQUE_2000</value>
+						</Term>
+					</identifier>
+					<identifier name="longName">
+						<Term definition="urn:x-ogc:def:identifier:OGC:longname">
+							<value>Bulle a bulle</value>
+						</Term>
+					</identifier>
+				</IdentifierList>
+			</identification>
+			<classification>
+				<ClassifierList>
+					<classifier name="intendedApplication">
+						<Term definition="urn:x-ogc:def:classifier:OGC:application">
+							<value>eaux souterraines</value>
+						</Term>
+					</classifier>
+					<classifier name="sensorType">
+						<Term definition="urn:sensor:classifier:sensorType">
+							<codeSpace xlink:href="urn:x-brgm:def:GeoPoint:bss"/>
+							<value>Profondeur</value>
+						</Term>
+					</classifier>
+				</ClassifierList>
+			</classification>
+			<validTime>
+				<gml:TimePeriod gml:id="validTime-0014.4F01.0000.261A">
+					<gml:beginPosition>2002-02-27</gml:beginPosition>
+					<gml:endPosition indeterminatePosition="now"/>
+				</gml:TimePeriod>
+			</validTime>
+			<capabilities>
+				<swe:DataRecord gml:id="record-0014.4F01.0000.261A" definition="urn:x-brgm:def:property:periodOfData">
+					<swe:field name="periodOfData" xlink:role="urn:x-brgm:def:property:periodOfData">
+						<swe:TimeRange gml:id="range-0014.4F01.0000.261A">
+							<swe:value>2002-02-27 now</swe:value>
+						</swe:TimeRange>
+					</swe:field>
+				</swe:DataRecord>
+			</capabilities>
+			<contact xlink:role="urn:x-ogc:def:role:manufacturer">
+				<ResponsibleParty>
+					<organizationName>OTT</organizationName>
+				</ResponsibleParty>
+			</contact>
+			<position name="conductivitePosition" xlink:href="piezometer#piezoPosition"/>
+			<inputs>
+				<InputList>
+					<input name="level">
+						<swe:ObservableProperty gml:id="level" definition="urn:x-ogc:def:phenomenon:OGC:level"/>
+					</input>
+				</InputList>
+			</inputs>
+			<outputs>
+				<OutputList>
+					<output name="depth">
+						<swe:ObservableProperty gml:id="depth" definition="urn:x-ogc:def:phenomenon:OGC:depth"/>
+					</output>
+				</OutputList>
+			</outputs>
+			<parameters>
+				<ParameterList>
+					<parameter name="frequency" xlink:role="urn:x-ogc:def:property:frequency">
+						<swe:Quantity gml:id="frequency" definition="urn:x-ogc:def:property:frequency">
+							<swe:uom xlink:href="urn:ogc:unit:minuts"/>
+							<swe:value>60</swe:value>
+						</swe:Quantity>
+					</parameter>
+					<parameter name="precision" xlink:role="urn:x-ogc:def:property:precision">
+						<swe:Quantity gml:id="precision" definition="urn:x-ogc:def:property:precision">
+							<swe:uom code="m"/>
+							<swe:value>0.01</swe:value>
+						</swe:Quantity>
+					</parameter>
+				</ParameterList>
+			</parameters>
+		</Component>
+	</member>
+</SensorML>
+

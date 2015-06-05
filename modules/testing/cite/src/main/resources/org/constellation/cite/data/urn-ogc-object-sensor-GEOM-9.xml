@@ -17,7 +17,7 @@
 				<IdentifierList>
                                          <identifier name="URN">
                                             <Term definition="urn:ogc:def:identifierType:OGC:uniqueID">
-                                                      <value>urn:ogc:object:sensor:SunSpot:0014.4F01.0000.261A</value>
+                                                      <value>urn:ogc:object:sensor:GEOM:9</value>
                                             </Term>
                                         </identifier>
 					<identifier name="supervisorCode">

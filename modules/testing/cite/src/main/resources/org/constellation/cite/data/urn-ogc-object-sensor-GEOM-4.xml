@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SensorML xmlns="http://www.opengis.net/sensorML/1.0" xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" xmlns:swe="http://www.opengis.net/swe/1.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0">
 	<member xlink:role="urn:x-ogx:def:sensor:OGC:detector">
-		<Component gml:id="sensor-0014.4F01.0000.2626">
+		<Component gml:id="sensor-0014.4F01.0000.261A">
 			<gml:name>Capteur Profondeur de FONTESTRAMAR</gml:name>
                         <gml:boundedBy>
                             <gml:Null>unknown</gml:Null>
@@ -17,7 +17,7 @@
 				<IdentifierList>
                                          <identifier name="URN">
                                             <Term definition="urn:ogc:def:identifierType:OGC:uniqueID">
-                                                      <value>urn:ogc:object:sensor:SunSpot:0014.4F01.0000.2626</value>
+                                                      <value>urn:ogc:object:sensor:GEOM:4</value>
                                             </Term>
                                         </identifier>
 					<identifier name="supervisorCode">
@@ -49,15 +49,15 @@
 				</ClassifierList>
 			</classification>
 			<validTime>
-				<gml:TimePeriod gml:id="validTime-0014.4F01.0000.2626">
+				<gml:TimePeriod gml:id="validTime-0014.4F01.0000.261A">
 					<gml:beginPosition>2002-02-27</gml:beginPosition>
 					<gml:endPosition indeterminatePosition="now"/>
 				</gml:TimePeriod>
 			</validTime>
 			<capabilities>
-				<swe:DataRecord gml:id="record-0014.4F01.0000.2626" definition="urn:x-brgm:def:property:periodOfData">
+				<swe:DataRecord gml:id="record-0014.4F01.0000.261A" definition="urn:x-brgm:def:property:periodOfData">
 					<swe:field name="periodOfData" xlink:role="urn:x-brgm:def:property:periodOfData">
-						<swe:TimeRange gml:id="range-0014.4F01.0000.2626">
+						<swe:TimeRange gml:id="range-0014.4F01.0000.261A">
 							<swe:value>2002-02-27 now</swe:value>
 						</swe:TimeRange>
 					</swe:field>

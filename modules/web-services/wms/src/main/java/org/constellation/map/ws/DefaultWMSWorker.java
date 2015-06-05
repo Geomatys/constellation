@@ -327,6 +327,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Details skeleton = getStaticCapabilitiesObject("wms", currentLanguage);
         final AbstractWMSCapabilities inCapabilities = WMSConstant.createCapabilities(queryVersion, skeleton);
 
+        Collections.sort(GFI_MIME_TYPES);
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
