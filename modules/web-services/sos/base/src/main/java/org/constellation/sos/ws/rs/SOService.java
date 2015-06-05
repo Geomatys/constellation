@@ -698,8 +698,8 @@ public class SOService extends OGCWebService<SOSworker> {
             }
             return buildGetObservation(currentVersion, service, offering, observedProperties, procedures, foids, responseFormat, temporalFilters, spatialFilter, null, null, null, null);
         } else {
-            throwUnsupportedGetMethod("GetObservation");
-            return null;
+            throw new CstlServiceException("The operation GetObservation is only requestable in XML via POST method for 1.0.0 version",
+                                                  OPERATION_NOT_SUPPORTED, "GetObservation");
         }
     }
     

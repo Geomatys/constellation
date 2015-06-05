@@ -42,25 +42,17 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import org.constellation.test.utils.TestDatabaseHandler;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
@@ -70,14 +62,10 @@ import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeTrue;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -125,7 +113,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     /**
      * The layer to test.
      */
-    private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
+    private static final DefaultName LAYER_TEST = new DefaultName("SSTMDE200305");
 
     /**
      * URLs which will be tested on the server.
@@ -156,11 +144,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     private static final String WCS_GETCAPABILITIES2 ="request=GetCapabilities&service=WCS&version=1.0.0";
 
-    private static final String WCS_DESCRIBECOVERAGE ="request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
+    private static final String WCS_DESCRIBECOVERAGE ="request=DescribeCoverage&coverage=SSTMDE200305&service=wcs&version=1.0.0";
 
     private static boolean initialized = false;
-    
-    protected static boolean localdb_active = true;
     
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -177,37 +163,32 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                // coverage-sql datastore
-                localdb_active = TestDatabaseHandler.hasLocalDatabase();
-                if (localdb_active) {
-                    final String rootDir                = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    final ProviderFactory factory       = DataProviders.getInstance().getFactory("coverage-sql");
-                    final ParameterValueGroup source    = factory.getProviderDescriptor().createValue();
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    
-                    srcconfig.parameter(URL_DESCRIPTOR           .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_url"));
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR      .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_pass"));
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR          .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_user"));
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR        .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_schema"));
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR     .getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR   .getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR        .getName().getCode()).setValue("coverageTestSrc");
-                    providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-sql", source);
+                final String rootDir                = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                
+                final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
+                final ParameterValueGroup sourceCF = covFilefactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourceCF, "id").setValue("coverageTestSrc");
+                getOrCreateValue(sourceCF, "load_all").setValue(true);
+                final ParameterValueGroup choice3 = getOrCreateGroup(sourceCF, "choice");
 
-                    dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
-                } else {
-                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
-                }
+                final ParameterValueGroup srcCFConfig = getOrCreateGroup(choice3, "FileCoverageStoreParameters");
+
+                getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + rootDir + "/Monde/SST/SSTMDE200305.png"));
+                getOrCreateValue(srcCFConfig, "type").setValue("AUTO");
+                getOrCreateValue(srcCFConfig, NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+
+                providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
+
+                dataBusiness.create(new QName("SSTMDE200305"), "coverageTestSrc", "COVERAGE", false, true, null, null);      
                 
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
 
                 serviceBusiness.create("wcs", "default", config, null);
-                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "wcs", null);
+                layerBusiness.add("SSTMDE200305", null, "coverageTestSrc", null, "default", "wcs", null);
 
                 serviceBusiness.create("wcs", "test", config, null);
-                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "wcs", null);
+                layerBusiness.add("SSTMDE200305", null, "coverageTestSrc", null, "test",    "wcs", null);
 
                 initServer(null, null);
 
@@ -292,7 +273,6 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     @Test
     @Order(order=2)
     public void testWCSGetCoverage() throws Exception {
-        assumeTrue(localdb_active);
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
         try {
@@ -324,8 +304,6 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     @Ignore
     @Order(order=3)
     public void testWCSGetCoverageMatrixFormat() throws Exception {
-        assumeTrue(localdb_active);
-
         // Creates a valid GetCoverage url.
         final URL getCovMatrixUrl;
         try {
@@ -346,8 +324,6 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     @Test
     @Order(order=4)
     public void testWCSGetCapabilities() throws Exception {
-        assumeTrue(localdb_active);
-        
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
@@ -360,7 +336,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         // Try to marshall something from the response returned by the server.
         // The response should be a WCSCapabilitiesType.
         Object obj = unmarshallResponse(getCapsUrl);
-        assertTrue(obj instanceof WCSCapabilitiesType);
+        assertTrue(obj.toString(), obj instanceof WCSCapabilitiesType);
 
         WCSCapabilitiesType responseCaps = (WCSCapabilitiesType)obj;
         final List<CoverageOfferingBriefType> coverages = responseCaps.getContentMetadata().getCoverageOfferingBrief();
@@ -429,8 +405,6 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     @Test
     @Order(order=5)
     public void testWCSDescribeCoverage() throws Exception {
-        assumeTrue(localdb_active);
-        
         // Creates a valid DescribeCoverage url.
         final URL getCapsUrl;
         try {

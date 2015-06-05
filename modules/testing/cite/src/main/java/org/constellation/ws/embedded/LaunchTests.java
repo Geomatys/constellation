@@ -25,6 +25,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
+import org.constellation.admin.SpringHelper;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.constellation.provider.DataProviders;
 
 
 /**
@@ -87,8 +90,23 @@ public final class LaunchTests implements Runnable {
      * @throws MojoFailureException if a regression is detected.
      */
     public static void main(String[] args) throws Exception {
+        Class.forName("javax.servlet.ServletContext");
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
+        
+        GrizzlyServer server = new GrizzlyServer();
+        applicationContext.getEnvironment().setActiveProfiles("standard","derby");
+        
+        applicationContext.setConfigLocation("classpath:/cstl/spring/test-derby.xml");
+        applicationContext.refresh();
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(server);
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(DataProviders.getConfigurator());
+        SpringHelper.setApplicationContext(applicationContext);
+        
+        
+        
+        
         // Launch the server.
-        GrizzlyServer.initServer();
+        server.initServer();
 
         // Launch the test suite.
         if (args.length == 0) {

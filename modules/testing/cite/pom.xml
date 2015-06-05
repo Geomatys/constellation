@@ -114,16 +114,6 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-sos-postgrid</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-csw-mdw</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-csw-filesystem</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -149,11 +139,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-style-unnormalize</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.testing</groupId>
       <artifactId>cstl-test-embedded</artifactId>
       <version>${project.version}</version>
@@ -167,6 +152,11 @@
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-grizzly2-servlet</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>

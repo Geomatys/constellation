@@ -207,7 +207,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 // PostGIS datastore
                 localdb_active = TestDatabaseHandler.hasLocalDatabase();
                 if (localdb_active) {
-                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();;
+                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
@@ -246,7 +246,13 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
                 final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
                 final ParameterValueGroup shpconfig = getOrCreateGroup(choice2, "ShapefileParametersFolder");
-                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                String path;
+                if (outputDir.getAbsolutePath().endsWith("org/constellation/ws/embedded/wms111/styles")) {
+                    path = outputDir.getAbsolutePath().substring(0, outputDir.getAbsolutePath().indexOf("org/constellation/ws/embedded/wms111/styles"));
+                } else {
+                    path = outputDir.getAbsolutePath();
+                }
+                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+path + "/org/constellation/ws/embedded/wms111/shapefiles"));
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
                 final ParameterValueGroup layer2 = getOrCreateGroup(sourcef, "Layer");
@@ -356,7 +362,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                     layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
                     layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
                     layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
-                    layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
+                    layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
                 }
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test", "wfs", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);

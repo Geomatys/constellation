@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.test.utils.TestDatabaseHandler;
 
 // Geotoolkit dependencies
 
@@ -64,15 +65,6 @@ public class ResultsDatabase {
      * The pattern for the ouput of a date.
      */
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-
-    /**
-     * Database connection parameters.
-     */
-    private static final String DB_NAME  = "cite_resultsV2";
-    private static final String PROTOCOL = "jdbc:postgresql";
-    private static final String HOST     = "flupke.geomatys.com";
-    private static final String USER     = "cite";
-    private static final String PASS     = "WreewnUg";
 
     /**
      * Insertion requests.
@@ -125,17 +117,17 @@ public class ResultsDatabase {
     /**
      * List of existing services, already checked from the database as present.
      */
-    private final List<Service> existingServices = new ArrayList<Service>();
+    private final List<Service> existingServices = new ArrayList<>();
 
     /**
      * List of existing suites, already checked from the database as present.
      */
-    private final List<Suite> existingSuites = new ArrayList<Suite>();
+    private final List<Suite> existingSuites = new ArrayList<>();
 
     /**
      * Stores the ids for a session, and their number of occurrences.
      */
-    private final Map<String,Integer> ids = new HashMap<String,Integer>();
+    private final Map<String,Integer> ids = new HashMap<>();
 
     /**
      * Initialize the connection to the database.
@@ -143,6 +135,12 @@ public class ResultsDatabase {
      * @throws SQLException if an exception occurs while trying to connect to the database.
      */
     public ResultsDatabase() throws SQLException {
+        final String DB_NAME  = TestDatabaseHandler.testProperties.getProperty("results_db_name");
+        final String PROTOCOL = TestDatabaseHandler.testProperties.getProperty("results_db_protocol");
+        final String HOST     = TestDatabaseHandler.testProperties.getProperty("results_db_host");
+        final String USER     = TestDatabaseHandler.testProperties.getProperty("results_db_user");
+        final String PASS     = TestDatabaseHandler.testProperties.getProperty("results_db_pass");
+        
         final DefaultDataSource ds = new DefaultDataSource(PROTOCOL +"://"+ HOST +"/"+ DB_NAME);
         connection = ds.getConnection(USER, PASS);
     }
@@ -172,15 +170,15 @@ public class ResultsDatabase {
         final List<Result> previousTestsPassed;
 
         // Will contain the tests that have passed for the last session, but not for the current one.
-        final List<Result> problematicTests = new ArrayList<Result>();
+        final List<Result> problematicTests = new ArrayList<>();
         // Will contain the groupNode tests that have passed for the last session, but not for the current one (not problematic).
-        final List<Result> problematicGroupNodeTests = new ArrayList<Result>();
+        final List<Result> problematicGroupNodeTests = new ArrayList<>();
         // Will contain the tests that have passed for the current session, but not for the last one.
-        final List<Result> newlyPassedTests = new ArrayList<Result>();
+        final List<Result> newlyPassedTests = new ArrayList<>();
         // Will contain the tests that have been activated for the current session.
-        final List<Result> newlyActivatedTests = new ArrayList<Result>();
+        final List<Result> newlyActivatedTests = new ArrayList<>();
         // Will contain the tests that have been deactivated for the current session.
-        final List<Result> disapearTests = new ArrayList<Result>();
+        final List<Result> disapearTests = new ArrayList<>();
 
         final boolean missingTest;
         if (previousSuite != null) {
@@ -561,7 +559,7 @@ public class ResultsDatabase {
         final PreparedStatement psCurrent = connection.prepareStatement(SELECT_TESTS_FAILED);
         psCurrent.setTimestamp(1, new Timestamp(date.getTime()));
 
-        final List<Result> results = new ArrayList<Result>();
+        final List<Result> results = new ArrayList<>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
             final String id           = rs.getString(2);
@@ -599,7 +597,7 @@ public class ResultsDatabase {
         final PreparedStatement psCurrent = connection.prepareStatement(SELECT_TESTS_PASSED);
         psCurrent.setTimestamp(1, new Timestamp(date.getTime()));
 
-        final List<Result> results = new ArrayList<Result>();
+        final List<Result> results = new ArrayList<>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
             final String id           = rs.getString(2);

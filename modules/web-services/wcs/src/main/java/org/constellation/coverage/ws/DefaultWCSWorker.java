@@ -588,6 +588,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         try {
             for (Layer configLayer : layers) {
                 final Data layer = getLayerReference(configLayer);
+                
+                if (layer == null) {
+                    throw new CstlServiceException("There is no existing layer named:" + configLayer.getName());
+                }
 
                 if (layer.getType().equals(Data.TYPE.FEATURE)) {
                     continue;

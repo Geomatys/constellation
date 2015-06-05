@@ -97,7 +97,7 @@ public class CoverageStoreProviderService extends AbstractProviderFactory
         }
 
         final CoverageStoreProvider provider = new CoverageStoreProvider(providerId,this,ps);
-        getLogger().log(Level.INFO, "[PROVIDER]> coverage-store provider created.");
+        getLogger().log(Level.INFO, "[PROVIDER]> coverage-store " + providerId + " provider created.");
         return provider;
     }
 

@@ -358,8 +358,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          *  layer providers
          */
         final List<QName> layerNames    = getConfigurationLayerNames(userLogin);
-            Collections.sort(layerNames, new QnameLocalComparator());
-            for (final QName layerName : layerNames) {
+        Collections.sort(layerNames, new QnameLocalComparator());
+        for (final QName layerName : layerNames) {
             final Data layer = getLayerReference(userLogin, layerName);
             final Layer configLayer  = getConfigurationLayer(layerName, userLogin);
 

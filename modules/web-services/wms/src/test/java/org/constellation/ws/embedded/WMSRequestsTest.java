@@ -181,6 +181,12 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                                       "layers=Lakes&styles=&" +
                                       "query_layers=Lakes&info_format=text/plain&" +
                                       "X=60&Y=60";
+    
+    private static final String WMS_GETFEATUREINFO3 = "QuErY_LaYeRs=BasicPolygons&I=50&"
+                                                    + "LaYeRs=BasicPolygons&StYlEs=&WiDtH=100&CrS=CRS:84&"
+                                                    + "ReQuEsT=GetFeatureInfo&InFo_fOrMaT=text/plain&BbOx=-2,2,2,6"
+                                                    + "&HeIgHt=100&J=50&VeRsIoN=1.3.0&FoRmAt=image/gif";
+    
     private static final String WMS_GETLEGENDGRAPHIC = "request=GetLegendGraphic&service=wms&" +
             "width=200&height=40&layer="+ LAYER_TEST +"&format=image/png&version=1.1.0";
 
@@ -260,7 +266,14 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
                 final ParameterValueGroup choice = getOrCreateGroup(sourcef, "choice");
                 final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                String path;
+                if (outputDir.getAbsolutePath().endsWith("org/constellation/ws/embedded/wms111/styles")) {
+                    path = outputDir.getAbsolutePath().substring(0, outputDir.getAbsolutePath().indexOf("org/constellation/ws/embedded/wms111/styles"));
+                } else {
+                    path = outputDir.getAbsolutePath();
+                }
+                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+path + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
                 final ParameterValueGroup layer = getOrCreateGroup(sourcef, "Layer");
@@ -841,6 +854,43 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertNotNull(fullResponse, value);
         assertTrue   (value.startsWith("28.5"));
     }
+    
+    @Test
+    @Ignore
+    @Order(order=12)
+    public void testWMSGetFeatureInfo3() throws Exception {
+        waitForStart();
+        // Creates a valid GetFeatureInfo url.
+        final URL gfi;
+        try {
+            gfi = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETFEATUREINFO3);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        String value = null;
+        final InputStream inGfi = gfi.openStream();
+        final InputStreamReader isr = new InputStreamReader(inGfi);
+        final BufferedReader reader = new BufferedReader(isr);
+        String fullResponse = "";
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Verify that the line starts with a number, only the one with the value
+            // should begin like this.
+            if (line.matches("[0-9]+.*")) {
+                // keep the line with the value
+                value = line;
+            }
+            fullResponse = fullResponse + line + '\n';
+        }
+        System.out.println("FULLRESPONSE: " + fullResponse);
+        reader.close();
+
+        // Tests on the returned value
+        assertNotNull(fullResponse, value);
+        assertTrue   (value.startsWith("28.5"));
+    }
 
     /**
      * Ensures that a valid GetLegendGraphic request returns indeed a {@link BufferedImage}.
@@ -850,7 +900,6 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      * @throws java.io.Exception
      */
     @Test
-    @Order(order=12)
     @Ignore
     public void testWMSGetLegendGraphic() throws Exception {
         waitForStart();
@@ -876,7 +925,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      * Ensures that a valid DescribeLayer request produces a valid document.
      */
     @Test
-    @Order(order=13)
+    @Order(order=14)
     public void testWMSDescribeLayer() throws JAXBException, Exception {
         waitForStart();
         // Creates a valid DescribeLayer url.
@@ -905,7 +954,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
 
     @Test
-    @Order(order=14)
+    @Order(order=15)
     public void testWMSGetMapLakePostKvp() throws Exception {
         waitForStart();
         // Creates a valid GetMap url.

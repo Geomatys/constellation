@@ -99,7 +99,7 @@ public class FeatureStoreProviderService extends AbstractProviderFactory
 
         try {
             final FeatureStoreProvider provider = new FeatureStoreProvider(providerId,this,ps);
-            getLogger().log(Level.INFO, "[PROVIDER]> feature-store provider created.");
+            getLogger().log(Level.INFO, "[PROVIDER]> feature-store {0} provider created.", providerId);
             return provider;
         } catch (Exception ex) {
             // we should not catch exception, but here it's better to start all source we can

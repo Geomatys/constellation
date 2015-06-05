@@ -253,7 +253,9 @@ public abstract class LayerWorker extends AbstractWorker {
             } else {
                 layerRef = namedProxy.get(fullName.name, fullName.providerID);
             }
-            if (layerRef == null) {throw new CstlServiceException("Unable to find  the Layer named:" + layerName + " in the provider proxy", NO_APPLICABLE_CODE);}
+            if (layerRef == null) {
+                throw new CstlServiceException("Unable to find  the Layer named:{"+layerName.getNamespaceURI() + '}' + layerName.getLocalPart() + " in the provider proxy", NO_APPLICABLE_CODE);
+            }
         } else {
             throw new CstlServiceException("Unknown Layer name:" + layerName, LAYER_NOT_DEFINED);
         }

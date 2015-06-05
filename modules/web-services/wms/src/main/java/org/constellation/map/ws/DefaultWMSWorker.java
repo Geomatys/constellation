@@ -166,6 +166,7 @@ import org.geotoolkit.image.coverage.GridCombineIterator;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_UPDATE_SEQUENCE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_QUERYABLE;
@@ -1070,7 +1071,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         if (featureInfo == null) {
-            throw new CstlServiceException("INFO_FORMAT="+infoFormat+" not supported for layers : "+layerNames, NO_APPLICABLE_CODE);
+            throw new CstlServiceException("INFO_FORMAT="+infoFormat+" not supported for layers : "+layerNames, INVALID_FORMAT);
         }
 
         try {

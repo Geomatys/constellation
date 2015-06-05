@@ -60,10 +60,16 @@ import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
+import org.geotoolkit.ogc.xml.v110.AndType;
+import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.LiteralType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import org.geotoolkit.wfs.xml.ResultTypeType;
+import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.junit.After;
@@ -138,7 +144,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
 
                 // Defines a PostGis data provider
-                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();;
+                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                 source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                 source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
@@ -192,6 +198,11 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
     public void tearDown() throws Exception {
     }
 
+    @Test
+    public void getCapabilitiesTest() throws Exception {
+        
+        worker.getCapabilities(new GetCapabilitiesType("WFS"));
+    }
      /**
      * test the feature marshall
      *
@@ -229,7 +240,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
         /**
          * Test 1 : query on typeName aggragateGeofeature
-
+         */
 
         queries = new ArrayList<QueryType>();
         BBOXType bbox = new BBOXType("http://cite.opengeospatial.org/gmlsf:pointProperty", 30, -12, 60, -6, "urn:ogc:def:crs:EPSG:4326");
@@ -243,18 +254,17 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
         result = worker.getFeature(request);
 
-        assertTrue(result instanceof FeatureCollection);
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        
+        collection = ((FeatureCollectionWrapper)result).getFeatureCollection();
 
-        collection = (FeatureCollection)result;
-
-        xmlResult    = featureWriter.write(collection);
+        writer = new StringWriter();
+        featureWriter.write(collection, writer);
+        writer.flush();
+        xmlResult = writer.toString();
         System.out.println(xmlResult);
 
         assertEquals(1, collection.size());
-        */
-
-
-
 
     }
     

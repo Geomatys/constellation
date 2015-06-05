@@ -21,27 +21,17 @@ package org.constellation.ws.embedded;
 // J2SE dependencies
 
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Processes;
 import org.constellation.configuration.SOSConfiguration;
-import org.constellation.configuration.Source;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
-import org.constellation.provider.StyleProviders;
-import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.sld.SLDProviderService;
-import org.constellation.util.DataReference;
 import org.constellation.util.Util;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
@@ -59,14 +49,29 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
+import org.constellation.api.ProviderType;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.map.featureinfo.FeatureInfoUtilities;
+import org.constellation.provider.ProviderFactory;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import org.constellation.test.utils.TestDatabaseHandler;
+import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import static org.geotoolkit.parameter.ParametersExt.*;
 
 // Constellation dependencies
@@ -81,7 +86,8 @@ import static org.geotoolkit.parameter.ParametersExt.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.4
  */
-public final class GrizzlyServer {
+
+public final class GrizzlyServer { 
     /**
      * The default logger for this server.
      */
@@ -92,22 +98,35 @@ public final class GrizzlyServer {
      */
     static GrizzlyThread grizzly = null;
 
+    @Inject
+    private IServiceBusiness serviceBusiness;
+    
+    @Inject
+    protected IProviderBusiness providerBusiness;
+    
+    @Inject
+    protected IDataBusiness dataBusiness;
+    
+    @Inject
+    protected ILayerBusiness layerBusiness;
+    
     /**
      * Prevents instanciation.
      */
-    private GrizzlyServer() {}
+    public GrizzlyServer() {
+    }
 
     /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
      */
-    public static synchronized void initServer() throws Exception {
+    public synchronized void initServer() throws Exception {
         // Protective test in order not to launch a new instance of the grizzly server for
         // each sub classes.
         if (grizzly != null) {
             return;
         }
-
+        
         // Initialises the postgrid testing raster.
         CoverageSQLTestCase.init();
 
@@ -115,8 +134,79 @@ public final class GrizzlyServer {
         WMSPortrayal.setEmptyExtension(true);
 
         // setup configuration database
+        TestDatabaseHandler.hasLocalDatabase();
+        final File configDir = ConfigDirectory.setupTestEnvironement("CITE_CONFIGURATION");
+        
+        //SHAPEFILE
+        final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
+        final File outputDir = initDataDirectory();
+        final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
+        getOrCreateValue(sourcef, "id").setValue("shapeSrc");
+        getOrCreateValue(sourcef, "load_all").setValue(true);
 
-        final File configDir = ConfigurationEngine.setupTestEnvironement("CITE_CONFIGURATION");
+        final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
+        final ParameterValueGroup shpconfig = getOrCreateGroup(choice2, "ShapefileParametersFolder");
+        getOrCreateValue(shpconfig, "url").setValue(new URL("file:" + outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+        getOrCreateValue(shpconfig, "namespace").setValue("cite");
+
+        final ParameterValueGroup layer2 = getOrCreateGroup(sourcef, "Layer");
+        getOrCreateValue(layer2, "name").setValue("NamedPlaces");
+        getOrCreateValue(layer2, "style").setValue("cite_style_NamedPlaces");
+
+        providerBusiness.storeProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
+
+        dataBusiness.create(new QName("cite", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "Bridges"),         "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "Streams"),         "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "Lakes"),           "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "NamedPlaces"),     "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "Buildings"),       "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "RoadSegments"),    "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "DividedRoutes"),   "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "Forests"),         "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "MapNeatline"),     "shapeSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("cite", "Ponds"),           "shapeSrc", "VECTOR", false, true, null, null);
+
+        final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();
+        getOrCreateValue(source, SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+        getOrCreateValue(source, SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+
+        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+        final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
+        getOrCreateValue(pgconfig, DATABASE .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_name"));
+        getOrCreateValue(pgconfig, HOST     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_host"));
+        getOrCreateValue(pgconfig, SCHEMA   .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_schema"));
+        getOrCreateValue(pgconfig, USER     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_user"));
+        getOrCreateValue(pgconfig, PASSWORD .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_pass"));
+        getOrCreateValue(pgconfig, NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+        
+        providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
+        
+        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+          
+        
+        final String rootDir                = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+        final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
+        final ParameterValueGroup sourceCF = covFilefactory.getProviderDescriptor().createValue();
+        getOrCreateValue(sourceCF, "id").setValue("postgridSrc");
+        getOrCreateValue(sourceCF, "load_all").setValue(true);
+        final ParameterValueGroup choice3 = getOrCreateGroup(sourceCF, "choice");
+
+        final ParameterValueGroup srcCFConfig = getOrCreateGroup(choice3, "FileCoverageStoreParameters");
+
+        getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + rootDir + "/Monde/SST/SSTMDE200305.png"));
+        getOrCreateValue(srcCFConfig, "type").setValue("AUTO");
+        getOrCreateValue(srcCFConfig, NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+
+        providerBusiness.storeProvider("postgridSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
+
+        dataBusiness.create(new QName("SSTMDE200305"), "postgridSrc", "COVERAGE", false, true, null, null);
+                
+        
+        DataProviders.getInstance().reload();
 
         /*---------------------------------------------------------------*/
         /*------------------------- CSW ---------------------------------*/
@@ -141,7 +231,8 @@ public final class GrizzlyServer {
         final Automatic config = new Automatic("filesystem", dataDirectory.getPath());
         config.putParameter("transactionSecurized", "false");
         config.putParameter("shiroAccessible", "false");
-        ConfigurationEngine.storeConfiguration("CSW", "default", config);
+        
+        serviceBusiness.create("csw", "default", config, null);
 
         /*---------------------------------------------------------------*/
         /*------------------------- SOS ---------------------------------*/
@@ -171,61 +262,60 @@ public final class GrizzlyServer {
         sosconf.getParameters().put("multipleVersion", "false");
         sosconf.getParameters().put("singleVersion", "1.0.0");
 
-        ConfigurationEngine.storeConfiguration("SOS", "default", sosconf);
+        serviceBusiness.create("sos", "default", sosconf, null);
 
         /*---------------------------------------------------------------*/
         /*------------------------- WCS ---------------------------------*/
         /*---------------------------------------------------------------*/
 
-        final List<Source> sources = Arrays.asList(new Source("postgisSrc", true, null, null),
-                                                   new Source("postgridSrc", true, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext wcsConfig = new LayerContext(layers);
+        final LayerContext wcsConfig = new LayerContext();
         wcsConfig.getCustomParameters().put("shiroAccessible", "false");
 
-        ConfigurationEngine.storeConfiguration("WCS", "default", wcsConfig);
-
+        serviceBusiness.create("wcs", "default", wcsConfig, null);
+        
+        layerBusiness.add("SSTMDE200305", null, "postgridSrc", null, "default", "wcs", null);
+        
         /*---------------------------------------------------------------*/
         /*------------------------- WFS ---------------------------------*/
         /*---------------------------------------------------------------*/
 
-        final List<Source> sourcesWFS = Arrays.asList(new Source("postgisSrc", true, null, null));
-        final Layers layersWFS = new Layers(sourcesWFS);
-        final LayerContext wfsConfig = new LayerContext(layersWFS);
+        final LayerContext wfsConfig = new LayerContext();
         wfsConfig.getCustomParameters().put("shiroAccessible", "false");
         wfsConfig.getCustomParameters().put("multipleVersion", "false");
         wfsConfig.getCustomParameters().put("transactionSecurized", "false");
         wfsConfig.getCustomParameters().put("transactionnal", "true");
-
+        
         //wfsConfig.getCustomParameters().put("requestValidationActivated", "true");
         //wfsConfig.getCustomParameters().put("requestValidationSchema", "http://schemas.opengis.net/wfs/1.1.0/wfs.xsd");
-
-        ConfigurationEngine.storeConfiguration("WFS", "default", wfsConfig);
+        
+        serviceBusiness.create("wfs", "default", wfsConfig, null);
+        
+        layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+        layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+        layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+        
 
         /*---------------------------------------------------------------*/
         /*------------------------- WMS ---------------------------------*/
         /*---------------------------------------------------------------*/
-        final List<Layer> includes = new ArrayList<>();
-        includes.add(new Layer(new QName("cite", "BasicPolygons"),   Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_BasicPolygons}"))));
-        includes.add(new Layer(new QName("cite", "Bridges"),         Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Bridges}"))));
-        includes.add(new Layer(new QName("cite", "BuildingCenters"), Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_BuildingCenters}"))));
-        includes.add(new Layer(new QName("cite", "Buildings"),       Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Buildings}"))));
-        includes.add(new Layer(new QName("cite", "DividedRoutes"),   Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_DividedRoutes}"))));
-        includes.add(new Layer(new QName("cite", "Forests"),         Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Forests}"))));
-        includes.add(new Layer(new QName("cite", "Lakes"),           Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Lakes}"))));
-        includes.add(new Layer(new QName("cite", "MapNeatline"),     Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_MapNeatLine}"))));
-        includes.add(new Layer(new QName("cite", "NamedPlaces"),     Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_NamedPlaces}"))));
-        includes.add(new Layer(new QName("cite", "Ponds"),           Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Ponds}"))));
-        includes.add(new Layer(new QName("cite", "RoadSegments"),    Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_RoadSegments}"))));
-        includes.add(new Layer(new QName("cite", "Streams"),         Arrays.asList(new DataReference("${providerStyleType|sldSrc|cite_style_Streams}"))));
 
-        final Source shapeSrc = new Source("shapeSrc", true, includes, null);
-        final List<Source> sourcesWMS = Arrays.asList(shapeSrc);
-        final Layers layersWMS = new Layers(sourcesWMS);
-        final LayerContext wmsConfig = new LayerContext(layersWMS);
+        final LayerContext wmsConfig = new LayerContext();
         wmsConfig.getCustomParameters().put("shiroAccessible", "false");
-
-        ConfigurationEngine.storeConfiguration("WMS", "default", wmsConfig);
+        wmsConfig.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+        serviceBusiness.create("wms", "default", wmsConfig, null);
+        
+        layerBusiness.add("BuildingCenters",     "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("BasicPolygons",       "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("Bridges",             "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("Streams",             "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("Lakes",               "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("NamedPlaces",         "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("Buildings",           "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("RoadSegments",        "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("DividedRoutes",       "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("Forests",             "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("MapNeatline",         "cite",           "shapeSrc",   null, "default", "wms", null);
+        layerBusiness.add("Ponds",               "cite",           "shapeSrc",   null, "default", "wms", null);
 
         /*---------------------------------------------------------------*/
         /*------------------------- WPS ---------------------------------*/
@@ -234,140 +324,7 @@ public final class GrizzlyServer {
         final Processes processes = new Processes(Arrays.asList(new ProcessFactory("jts", true)));
         final ProcessContext wpsConfig = new ProcessContext(processes);
 
-        ConfigurationEngine.storeConfiguration("WPS", "default", wpsConfig);
-
-        // Extracts the zip data into a temporary folder
-        final File outputDir = initDataDirectory();
-
-        final Configurator layerConfig = new Configurator() {
-            @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-                final String serviceName = service.getName();
-
-                if("coverage-sql".equals(serviceName)){
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgridSrc");
-
-                }else if("feature-store".equals(serviceName)){
-                    try{ 
-                                                
-                        {//SHAPEFILE
-                        final File outputDir = initDataDirectory();
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
-                        getOrCreateValue(source, "id").setValue("shapeSrc");
-                        getOrCreateValue(source, "load_all").setValue(false);    
-                        
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                        getOrCreateValue(shpconfig, "namespace").setValue("cite");        
-                        
-                        ParameterValueGroup layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("BasicPolygons");
-                        getOrCreateValue(layer, "style").setValue("cite_style_BasicPolygons");     
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Bridges");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Bridges");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("BuildingCenters");
-                        getOrCreateValue(layer, "style").setValue("cite_style_BuildingCenters");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Buildings");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Buildings");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("DividedRoutes");
-                        getOrCreateValue(layer, "style").setValue("cite_style_DividedRoutes");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Forests");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Forests");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Lakes");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Lakes");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("MapNeatline");
-                        getOrCreateValue(layer, "style").setValue("cite_style_MapNeatLine");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Ponds");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Ponds");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("RoadSegments");
-                        getOrCreateValue(layer, "style").setValue("cite_style_RoadSegments");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Streams");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Streams");
-                        }
-                        
-                        {//POSTGIS
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
-                        getOrCreateValue(source, "id").setValue("postgisSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);                        
-                        
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
-                        getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
-                        getOrCreateValue(pgconfig,"port").setValue(5432);
-                        getOrCreateValue(pgconfig,"database").setValue("cite-wfs-2");
-                        getOrCreateValue(pgconfig,"schema").setValue("public");
-                        getOrCreateValue(pgconfig,"user").setValue("test");
-                        getOrCreateValue(pgconfig,"password").setValue("test");
-                        getOrCreateValue(pgconfig,"namespace").setValue("http://cite.opengeospatial.org/gmlsf");                     
-                        }
-                                                
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
-                    }
-                }
-                
-
-                return config;
-            }
-
-            @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-        };
-        DataProviders.getInstance().setConfigurator(layerConfig);
-
-        final Configurator styleconfig = new Configurator() {
-            @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-                final String serviceName = service.getName();
-
-                if("sld".equals(serviceName)){
-
-                    final ParameterValueGroup source = config.addGroup(
-                            SLDProviderService.SOURCE_DESCRIPTOR.getName().getCode());
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("sldSrc");
-                    final ParameterValueGroup sourceConfig = source.groups(SLDProviderService.SOURCE_CONFIG_DESCRIPTOR.getName().getCode()).get(0);
-                    sourceConfig.parameter(SLDProviderService.FOLDER_DESCRIPTOR.getName().getCode()).setValue(
-                            outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/styles");
-                }
-
-                return config;
-            }
-
-            @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-        };
-        StyleProviders.getInstance().setConfigurator(styleconfig);
-
+        serviceBusiness.create("wps", "default", wpsConfig, null);
 
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
@@ -488,7 +445,7 @@ public final class GrizzlyServer {
             grizzly.interrupt();
         }
         deleteDataDirectory();
-        ConfigurationEngine.shutdownTestEnvironement("CITE_CONFIGURATION");
+        ConfigDirectory.shutdownTestEnvironement("CITE_CONFIGURATION");
     }
 
     /**

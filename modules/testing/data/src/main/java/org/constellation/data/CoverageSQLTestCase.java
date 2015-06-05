@@ -23,6 +23,7 @@ package org.constellation.data;
 import org.junit.BeforeClass;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,17 +60,22 @@ public abstract class CoverageSQLTestCase {
 
         // Write the image in resources into the temporary directory previously created.
         if (fileNeedsToBeWritten) {
-            final String imageName = "SSTMDE200305.png";
-            final InputStream in = CoverageSQLTestCase.class.getResourceAsStream(imageName);
-            final OutputStream os = new FileOutputStream(new File(sstDir, imageName));
-            final byte buffer[] = new byte[4096];
-            int len;
-            while ((len = in.read(buffer)) > 0) {
-                os.write(buffer, 0, len);
-            }
-            os.close();
-            in.close();
+            writeFile(sstDir, "SSTMDE200305.png");
+            writeFile(sstDir, "SSTMDE200305.prj");
+            writeFile(sstDir, "SSTMDE200305.tfw");
         }
+    }
+    
+    private static void writeFile(final File sstDir, String fileName) throws IOException {
+        final InputStream in = CoverageSQLTestCase.class.getResourceAsStream(fileName);
+        final OutputStream os = new FileOutputStream(new File(sstDir, fileName));
+        final byte buffer[] = new byte[4096];
+        int len;
+        while ((len = in.read(buffer)) > 0) {
+            os.write(buffer, 0, len);
+        }
+        os.close();
+        in.close();
     }
 
     /**

@@ -38,6 +38,11 @@ public class TestDatabaseHandler {
     
     public static Properties testProperties = new Properties();
     
+    static {
+        // load the properties
+        hasLocalDatabase();
+    }
+    
     public static boolean hasLocalDatabase() {
         final File home = ConfigDirectory.getUserHomeDirectory();
         if (home != null && home.isDirectory()) {
