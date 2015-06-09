@@ -252,6 +252,8 @@ public final class WMSConstant {
         AbstractOnlineResource orgUrl = null;
         AbstractContactInformation contact = null;
         if (currentContact != null) {
+            currentContact.setFullname();
+            
             final AbstractContactAddress address = WmsXmlFactory.createContactAddress(version,"POSTAL",
                     currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
                     currentContact.getZipCode(), currentContact.getCountry());

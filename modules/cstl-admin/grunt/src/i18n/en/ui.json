@@ -43,6 +43,7 @@
     "create.contact.address.postcode.label":"Zip code",
     "create.contact.address.state.label":"State",
     "create.contact.email.label":"Email",
+    "create.contact.url.label":"Url",
     "create.contact.fax.label":"Fax",
     "create.contact.firstname.label":"First name",
     "create.contact.lastname.label":"Last name",
