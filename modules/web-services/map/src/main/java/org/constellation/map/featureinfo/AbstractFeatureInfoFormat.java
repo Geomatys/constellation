@@ -52,12 +52,12 @@ public abstract class AbstractFeatureInfoFormat implements FeatureInfoFormat {
     /**
      * Contains the values for all coverage layers requested.
      */
-    protected final Map<String, List<ProjectedCoverage>> coverages = new HashMap<String, List<ProjectedCoverage>>();
+    protected final Map<String, List<ProjectedCoverage>> coverages = new HashMap<>();
 
     /**
      * Contains all features that cover the point requested, for feature layers.
      */
-    protected final Map<String, java.util.List<ProjectedFeature>> features = new HashMap<String, java.util.List<ProjectedFeature>>();
+    protected final Map<String, java.util.List<ProjectedFeature>> features = new HashMap<>();
 
     /**
      * GetFeatureInfo configuration.
@@ -170,7 +170,7 @@ public abstract class AbstractFeatureInfoFormat implements FeatureInfoFormat {
         final String layerName = layer.getName();
         List<ProjectedFeature> feat = features.get(layerName);
         if (feat == null) {
-            feat = new ArrayList<ProjectedFeature>();
+            feat = new ArrayList<>();
             features.put(layerName, feat);
         }
         feat.add(graphic);
@@ -190,7 +190,7 @@ public abstract class AbstractFeatureInfoFormat implements FeatureInfoFormat {
         final String layerName = layer.getName();
         List<ProjectedCoverage> cov = coverages.get(layerName);
         if (cov == null) {
-            cov = new ArrayList<ProjectedCoverage>();
+            cov = new ArrayList<>();
             coverages.put(layerName, cov);
         }
         cov.add(graphic);

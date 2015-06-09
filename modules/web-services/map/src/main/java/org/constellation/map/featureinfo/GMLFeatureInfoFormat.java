@@ -99,7 +99,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
     /**
      * A Map of namespace / prefix
      */
-    private final Map<String, String> prefixMap = new HashMap<String, String>();
+    private final Map<String, String> prefixMap = new HashMap<>();
 
     private static final MarshallerPool pool;
     static {
@@ -363,7 +363,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             final String layerName = layer.getName();
             List<String> strs = features.get(layerName);
             if (strs == null) {
-                strs = new ArrayList<String>();
+                strs = new ArrayList<>();
                 features.put(layerName, strs);
             }
             strs.add(result.substring(0, result.length()));
@@ -460,18 +460,27 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             builder.append(">\n");
         }
 
-        final Map<String, List<String>> values = new HashMap<String, List<String>>();
+        final Map<String, List<String>> values = new HashMap<>();
         values.putAll(features);
         values.putAll(coverages);
 
+        // optimization move this filter to getCandidates
+        Integer maxValue = getFeatureCount(getFI);
+        if (maxValue == null) {
+            maxValue = 1;
+        }
+        
         for (String layerName : values.keySet()) {
 
             if (mode == 0) {
                 builder.append("<").append(encodeXML(layerName)).append("_layer").append(">\n");
             }
 
+            int cpt = 0;
             for (final String record : values.get(layerName)) {
                 builder.append(record);
+                cpt++;
+                if (cpt >= maxValue) break;
             }
 
             if (mode == 0) {
@@ -496,7 +505,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
      */
     @Override
     public List<String> getSupportedMimeTypes() {
-        final List<String> mimes = new ArrayList<String>();
+        final List<String> mimes = new ArrayList<>();
         mimes.add(MimeType.APP_GML);//will return map server GML
         mimes.add(MimeType.APP_GML_XML);//will return GML 3
         return mimes;

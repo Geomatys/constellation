@@ -111,7 +111,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         if (builder.length() > 0) {
             List<String> strs = coverages.get(layerName);
             if (strs == null) {
-                strs = new ArrayList<String>();
+                strs = new ArrayList<>();
                 coverages.put(layerName, strs);
             }
             strs.add(builder.toString());
@@ -308,7 +308,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             final String layerName = layer.getName();
             List<String> strs = features.get(layerName);
             if (strs == null) {
-                strs = new ArrayList<String>();
+                strs = new ArrayList<>();
                 features.put(layerName, strs);
             }
             strs.add(result.substring(0, result.length()));
@@ -372,13 +372,22 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n")
                 .append("<FeatureInfo>").append("\n");
 
-        final Map<String, List<String>> values = new HashMap<String, List<String>>();
+        final Map<String, List<String>> values = new HashMap<>();
         values.putAll(features);
         values.putAll(coverages);
+        
+        // optimization move this filter to getCandidates
+        Integer maxValue = getFeatureCount(getFI);
+        if (maxValue == null) {
+            maxValue = 1;
+        }
 
+        int cpt = 0;
         for (String layerName : values.keySet()) {
             for (final String record : values.get(layerName)) {
                 builder.append(record);
+                cpt++;
+                if (cpt >= maxValue) break;
             }
         }
 
@@ -392,7 +401,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
      */
     @Override
     public List<String> getSupportedMimeTypes() {
-        final List<String> mimes = new ArrayList<String>();
+        final List<String> mimes = new ArrayList<>();
 
         //will return map server GML
         mimes.add(MimeType.APP_XML);

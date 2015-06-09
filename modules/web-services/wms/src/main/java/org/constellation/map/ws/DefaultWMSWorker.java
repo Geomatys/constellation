@@ -133,6 +133,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -243,9 +244,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             GFI_MIME_TYPES.clear();
             final LayerContext config = (LayerContext)getConfiguration();
             GFI_MIME_TYPES.addAll(FeatureInfoUtilities.allSupportedMimeTypes(config));
-        } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (ConfigurationException | ClassNotFoundException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         }
 
@@ -327,7 +326,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Details skeleton = getStaticCapabilitiesObject("wms", currentLanguage);
         final AbstractWMSCapabilities inCapabilities = WMSConstant.createCapabilities(queryVersion, skeleton);
 
-        Collections.sort(GFI_MIME_TYPES);
+        Collections.sort(GFI_MIME_TYPES, new TemporaryComparator());
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
@@ -1594,5 +1593,19 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new CstlServiceException("The update sequence must be an integer", ex, INVALID_PARAMETER_VALUE, "updateSequence");
         }
 
+    }
+    
+    private static class TemporaryComparator implements Comparator<String> {
+
+        @Override
+        public int compare(String o1, String o2) {
+            if ("text/xml".equals(o1)) {
+                return -1;
+            } else if ("text/xml".equals(o2)) {
+                return 1;
+            }
+            return o1.compareTo(o2);
+        }
+        
     }
 }

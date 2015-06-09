@@ -62,10 +62,10 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
     private static final class LayerResult{
         private String layerName;
-        private final List<String> values = new ArrayList<String>();
+        private final List<String> values = new ArrayList<>();
     }
     
-    private final Map<String,LayerResult> results = new HashMap<String, LayerResult>();
+    private final Map<String,LayerResult> results = new HashMap<>();
     
     
     public HTMLFeatureInfoFormat() {
@@ -260,12 +260,22 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                 .append("    </style>\n")
                 
                 .append("    <body>\n");
+        
+        // optimization move this filter to getCandidates
+        Integer maxValue = getFeatureCount(getFI);
+        if (maxValue == null) {
+            maxValue = 1;
+        }
 
         for(LayerResult result : results.values()){
             response.append("<h2>").append(result.layerName).append("</h2>");
             response.append("<br/>");
+            
+            int cpt = 0;
             for (final String record : result.values) {
                 response.append(record);
+                cpt++;
+                if (cpt >= maxValue) break;
             }
             response.append("<br/>");
         }

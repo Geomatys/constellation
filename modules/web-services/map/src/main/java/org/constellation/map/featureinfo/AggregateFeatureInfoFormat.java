@@ -76,10 +76,10 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
     public List<String> getSupportedMimeTypes() {
         try {
             if (layersConfig == null) {
-                if (!ckeckConfiguration()) return new ArrayList<String>();
+                if (!ckeckConfiguration()) return new ArrayList<>();
             }
 
-            final Set<String> supportedMimes = new HashSet<String>();
+            final Set<String> supportedMimes = new HashSet<>();
             for (List<GetFeatureInfoCfg> infoCfgs : layersConfig.values()) {
                 for (GetFeatureInfoCfg gfiCfg : infoCfgs) {
                     if (gfiCfg.getMimeType() != null && !(gfiCfg.getMimeType().isEmpty())) {
@@ -88,11 +88,11 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
                 }
             }
 
-            return new ArrayList<String>(supportedMimes);
+            return new ArrayList<>(supportedMimes);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -143,9 +143,7 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
 
                                 try {
                                     subFormat = FeatureInfoUtilities.getFeatureInfoFormatFromConf(gfiCfg);
-                                } catch (ClassNotFoundException e) {
-                                    LOGGER.log(Level.WARNING, e.getMessage(), e);
-                                } catch (ConfigurationException e) {
+                                } catch (ClassNotFoundException | ConfigurationException e) {
                                     LOGGER.log(Level.WARNING, e.getMessage(), e);
                                 }
                                 stop = true;
@@ -226,7 +224,7 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
         }
 
 
-        layersConfig = new HashMap<String, List<GetFeatureInfoCfg>>();
+        layersConfig = new HashMap<>();
         final List<MapLayer> mapLayers = getMapLayers(mapContext);
         for (MapLayer layer : mapLayers) {
             final Object original = layer.getUserProperty(ConvertersJaxbToGeotk.ORIGINAL_CONFIG);
@@ -245,7 +243,7 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
      * @return
      */
     private List<MapLayer> getMapLayers(MapContext mapContext) {
-        final List<MapLayer> layers = new ArrayList<MapLayer>();
+        final List<MapLayer> layers = new ArrayList<>();
         getMapLayers(mapContext, layers);
         return layers;
     }

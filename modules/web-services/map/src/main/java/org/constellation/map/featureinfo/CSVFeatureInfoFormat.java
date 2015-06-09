@@ -61,10 +61,10 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
     private static final class LayerResult{
         private String layerName;
         private String layerType;
-        private final List<String> values = new ArrayList<String>();
+        private final List<String> values = new ArrayList<>();
     }
     
-    private final Map<String,LayerResult> results = new HashMap<String, LayerResult>();
+    private final Map<String,LayerResult> results = new HashMap<>();
         
     public CSVFeatureInfoFormat() {
     }
@@ -170,11 +170,21 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         final StringBuilder builder = new StringBuilder();
 
+        // optimization move this filter to getCandidates
+        Integer maxValue = getFeatureCount(getFI);
+        if (maxValue == null) {
+            maxValue = 1;
+        }
+        
         for(LayerResult result : results.values()){
             builder.append(result.layerName).append('\n');
             builder.append(result.layerType).append('\n');
+           
+            int cpt = 0;
             for (final String record : result.values) {
                 builder.append(record).append('\n');
+                cpt++;
+                if (cpt >= maxValue) break;
             }
             builder.append('\n');
         }

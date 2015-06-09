@@ -44,10 +44,10 @@ public abstract class AbstractTextFeatureInfoFormat extends AbstractFeatureInfoF
     /**
      * Contains the values for all coverage layers requested.
      */
-    protected final Map<String, List<String>> coverages = new HashMap<String, List<String>>();
+    protected final Map<String, List<String>> coverages = new HashMap<>();
 
 
-    protected final Map<String, List<String>> features = new HashMap<String, List<String>>();
+    protected final Map<String, List<String>> features = new HashMap<>();
 
     /**
      * {@inheritDoc}
@@ -64,7 +64,7 @@ public abstract class AbstractTextFeatureInfoFormat extends AbstractFeatureInfoF
         final String layerName = ref.getName().getLocalPart();
         List<String> strs = coverages.get(layerName);
         if (strs == null) {
-            strs = new ArrayList<String>();
+            strs = new ArrayList<>();
             coverages.put(layerName, strs);
         }
 
@@ -116,7 +116,7 @@ public abstract class AbstractTextFeatureInfoFormat extends AbstractFeatureInfoF
             final String layerName = layer.getName();
             List<String> strs = features.get(layerName);
             if (strs == null) {
-                strs = new ArrayList<String>();
+                strs = new ArrayList<>();
                 features.put(layerName, strs);
             }
             strs.add(result.substring(0, result.length() - 1));
