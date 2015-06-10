@@ -68,6 +68,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -242,7 +243,7 @@ public class DatasetBusiness implements IDatasetBusiness {
         prop.put("fileId", metadataID);
         prop.put("dataTitle", metadataID);
         prop.put("dataAbstract", "");
-        final String dateIso = TemporalUtilities.toISO8601(new Date());
+        final String dateIso = TemporalUtilities.toISO8601Z(new Date(), TimeZone.getTimeZone("UTC"));
         prop.put("isoCreationDate", dateIso);
         prop.put("creationDate", dateIso);
         if("raster".equalsIgnoreCase(dataType)){

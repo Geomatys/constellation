@@ -276,7 +276,13 @@ public final class WMSConstant {
         if (serviceConstraints == null) {
             serviceConstraints = new AccessConstraint();
         }
-        final AbstractService newService = WmsXmlFactory.createService(version, metadata.getName(),
+        final String name;
+        if ("1.1.1".equals(version)) {
+            name = "OGC:WMS";
+        } else {
+            name = metadata.getName();
+        }
+        final AbstractService newService = WmsXmlFactory.createService(version, name,
                 metadata.getIdentifier(), metadata.getDescription(), keywordList, orgUrl, contact,
                 serviceConstraints.getFees(), serviceConstraints.getAccessConstraint(),
                 serviceConstraints.getLayerLimit(), serviceConstraints.getMaxWidth(),
