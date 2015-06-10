@@ -21,7 +21,7 @@
 <div ng-include="'views/data/data-nav-tabs.html'"></div>
 
 <div class="tab-content">
-    <div class="tab-pane active" ng-if="dc.tab === 'dataset'" style="padding-top:0;" ng-init="dc.displayPreview()">
+    <div class="tab-pane active" ng-if="dc.tab === 'dataset'" style="padding-top:0;" ng-init="dc.updatePreview()">
         <div id="dataDashboard" class="row" ng-controller="DatasetListingController as lc">
             <div class="col-sm-12">
                 <div class="frame dashboard">
