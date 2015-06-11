@@ -71,6 +71,11 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.engine.register.domain.Page;
+import org.constellation.engine.register.domain.Pageable;
+import org.constellation.engine.register.pojo.DataItem;
+import org.constellation.engine.register.pojo.DatasetItem;
+import org.constellation.engine.register.pojo.DatasetItemWithData;
 
 /**
  *
@@ -325,9 +330,9 @@ public class DatasetBusiness implements IDatasetBusiness {
      */
     @Override
     @Transactional
-    public void linkDataTodataset(final Dataset ds, final List<Data> datas) {
+    public void linkDataTodataset(final Dataset dataset, final List<Data> datas) {
         for (final Data data : datas) {
-            data.setDatasetId(ds.getId());
+            data.setDatasetId(dataset.getId());
             dataRepository.update(data);
         }
     }
@@ -470,5 +475,20 @@ public class DatasetBusiness implements IDatasetBusiness {
                 completion);
 
         return dsb;
+    }
+
+    @Override
+    public Page<DatasetItem> fetchPage(Pageable pageable, boolean excludeEmpty, String termFilter, Boolean hasVectorData, Boolean hasCoverageData, Boolean hasLayerData, Boolean hasSensorData) {
+        return datasetRepository.fetchPage(pageable, excludeEmpty, termFilter, hasVectorData, hasCoverageData, hasLayerData, hasSensorData);
+    }
+
+    @Override
+    public boolean existsById(int datasetId) {
+        return datasetRepository.existsById(datasetId);
+    }
+    
+    @Override
+    public DatasetItemWithData getSingletonDatasetItem(DatasetItem dsItem, List<DataItem> items) {
+        return new DatasetItemWithData(dsItem, items);
     }
 }

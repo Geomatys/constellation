@@ -19,6 +19,7 @@
 package org.constellation.business;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -35,6 +36,7 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.engine.register.pojo.DataItem;
 import org.geotoolkit.metadata.ImageStatistics;
 
 /**
@@ -310,4 +312,10 @@ public interface IDataBusiness {
     List<Data> getDataLinkedData(final int dataId);
     
     void uploadCleaner();
+    
+    boolean existsById(int dataId);
+    
+    List<DataItem> fetchByDatasetId(int datasetId);
+
+    List<DataItem> fetchByDatasetIds(Collection<Integer> datasetIds);
 }

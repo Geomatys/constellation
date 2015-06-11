@@ -196,9 +196,6 @@ public class DataRest {
     private UserRepository userRepository;
 
     @Inject
-    private DataRepository dataRepository;
-
-    @Inject
     private StyleRepository styleRepository;
 
     @Inject
@@ -2390,7 +2387,7 @@ public class DataRest {
     @Path("/{dataId}/associations")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getAssociations(@PathParam("dataId") int dataId) {
-        if (dataRepository.existsById(dataId)) {
+        if (dataBusiness.existsById(dataId)) {
             Map<String, Object> entity = new HashMap<>();
             entity.put("styles", styleRepository.fetchByDataId(dataId));
             entity.put("services", serviceRepository.fetchByDataId(dataId));
@@ -2405,7 +2402,7 @@ public class DataRest {
     @Produces({ MediaType.APPLICATION_JSON })
     @Transactional
     public Response deleteStyleAssociation(@PathParam("dataId") int dataId, @PathParam("styleId") int styleId) {
-        if (dataRepository.existsById(dataId) && styleRepository.existsById(styleId)) {
+        if (dataBusiness.existsById(dataId) && styleRepository.existsById(styleId)) {
             styleRepository.unlinkStyleToData(styleId, dataId);
             return Response.noContent().build();
         }
@@ -2418,7 +2415,7 @@ public class DataRest {
     @Transactional
     public Response deleteSensorAssociation(@PathParam("dataId") int dataId, @PathParam("sensorId") String sensorIdentifier) {
         Sensor sensor = sensorRepository.findByIdentifier(sensorIdentifier);
-        if (sensor != null && dataRepository.existsById(dataId)) {
+        if (sensor != null && dataBusiness.existsById(dataId)) {
             sensorRepository.unlinkDataToSensor(dataId, sensor.getId());
             return Response.noContent().build();
         }

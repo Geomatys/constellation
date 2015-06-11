@@ -39,11 +39,8 @@ import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.pojo.DataItem;
 import org.constellation.engine.register.pojo.DatasetItem;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.DatasetRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.json.Sort;
-import org.constellation.model.DatasetItemWithData;
 import org.constellation.model.DatasetSearch;
 import org.springframework.stereotype.Component;
 
@@ -67,7 +64,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.constellation.json.util.TransferObjects.mapInto;
 import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
@@ -99,18 +95,6 @@ public class DataSetRest {
      */
     @Inject
     private IMetadataBusiness metadataBusiness;
-
-    /**
-     * Injected data repository.
-     */
-    @Inject
-    private DataRepository dataRepository;
-
-    /**
-     * Injected dataset repository.
-     */
-    @Inject
-    private DatasetRepository datasetRepository;
 
     /**
      * Injected data business.
@@ -303,7 +287,7 @@ public class DataSetRest {
         }
 
         // Perform search.
-        Page<DatasetItem> result = datasetRepository.fetchPage(pageRequest,
+        Page<DatasetItem> result = datasetBusiness.fetchPage(pageRequest,
                 search.isExcludeEmpty(),
                 search.getText(),
                 search.getHasVectorData(),
@@ -323,7 +307,7 @@ public class DataSetRest {
         }
 
         // Query the single data of these datasets.
-        List<DataItem> dataItems = dataRepository.fetchByDatasetIds(singletonIds);
+        List<DataItem> dataItems = dataBusiness.fetchByDatasetIds(singletonIds);
         final Map<Integer, DataItem> indexedData = Maps.uniqueIndex(dataItems, new Function<DataItem, Integer>() {
             @Override
             public Integer apply(DataItem data) {
@@ -336,9 +320,7 @@ public class DataSetRest {
             @Override
             public DatasetItem apply(DatasetItem dataset) {
                 if (dataset.getDataCount() == 1 && indexedData.containsKey(dataset.getId())) {
-                    DatasetItemWithData singletonDataset = mapInto(dataset, DatasetItemWithData.class);
-                    singletonDataset.setData(Arrays.asList(indexedData.get(dataset.getId())));
-                    return singletonDataset;
+                    return datasetBusiness.getSingletonDatasetItem(dataset, Arrays.asList(indexedData.get(dataset.getId())));
                 }
                 return dataset;
             }
@@ -355,7 +337,7 @@ public class DataSetRest {
     @DELETE
     @Path("/{datasetId}")
     public Response deleteDataset(@PathParam("datasetId") int datasetId) throws ConfigurationException {
-        if (datasetRepository.existsById(datasetId)) {
+        if (datasetBusiness.existsById(datasetId)) {
             datasetBusiness.removeDataset(datasetId);
             return Response.noContent().build();
         }
@@ -371,8 +353,8 @@ public class DataSetRest {
     @GET
     @Path("/{datasetId}/data")
     public Response getDatasetData(@PathParam("datasetId") int datasetId) {
-        if (datasetRepository.existsById(datasetId)) {
-            return ok(dataRepository.fetchByDatasetId(datasetId));
+        if (datasetBusiness.existsById(datasetId)) {
+            return ok(dataBusiness.fetchByDatasetId(datasetId));
         }
         return Response.status(404).build();
     }

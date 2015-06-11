@@ -20,11 +20,9 @@
 package org.constellation.admin;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +34,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
@@ -44,7 +41,6 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.index.IndexEngine;
@@ -101,7 +97,9 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
+import java.util.Collection;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.engine.register.pojo.DataItem;
 import org.constellation.engine.register.repository.ServiceRepository;
 
 
@@ -927,5 +925,20 @@ public class DataBusiness implements IDataBusiness {
     @Override
     public List<Data> getDataLinkedData(final int dataId){
         return dataRepository.getDataLinkedData(dataId);
+    }
+
+    @Override
+    public List<DataItem> fetchByDatasetId(int datasetId) {
+        return dataRepository.fetchByDatasetId(datasetId);
+    }
+
+    @Override
+    public List<DataItem> fetchByDatasetIds(Collection<Integer> datasetIds) {
+        return dataRepository.fetchByDatasetIds(datasetIds);
+    }
+
+    @Override
+    public boolean existsById(int dataId) {
+        return dataRepository.existsById(dataId);
     }
 }

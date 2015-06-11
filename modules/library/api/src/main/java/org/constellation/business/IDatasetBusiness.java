@@ -28,6 +28,11 @@ import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 
 import java.io.IOException;
 import java.util.List;
+import org.constellation.engine.register.domain.Page;
+import org.constellation.engine.register.domain.Pageable;
+import org.constellation.engine.register.pojo.DataItem;
+import org.constellation.engine.register.pojo.DatasetItemWithData;
+import org.constellation.engine.register.pojo.DatasetItem;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -40,6 +45,7 @@ public interface IDatasetBusiness {
      * @param metadataXml metadata content as xml string.
      * @param owner
      * @return {@link Dataset}.
+     * @throws org.constellation.configuration.ConfigurationException
      */
     Dataset createDataset(String identifier, String metadataXml, Integer owner) throws ConfigurationException;
     
@@ -93,9 +99,9 @@ public interface IDatasetBusiness {
      * Proceed to link data to dataset.
      *
      * @param dataset given dataset.
-     * @param datasFromProviderId given data to link.
+     * @param datas given data to link.
      */
-    void linkDataTodataset(Dataset dataset, List<Data> datasFromProviderId);
+    void linkDataTodataset(Dataset dataset, List<Data> datas);
 
     /**
      * Search and returns result as list of {@link Dataset} for given query string.
@@ -109,5 +115,16 @@ public interface IDatasetBusiness {
     void addProviderDataToDataset(final String datasetId, final String providerId) throws ConfigurationException;
     
     DataSetBrief getDatasetBrief(final Integer dataSetId, List<DataBrief> children);
+    
+    boolean existsById(int datasetId);
+    
+    Page<DatasetItem> fetchPage(Pageable pageable,
+                                boolean excludeEmpty,
+                                String termFilter,
+                                Boolean hasVectorData,
+                                Boolean hasCoverageData,
+                                Boolean hasLayerData,
+                                Boolean hasSensorData);
 
+    DatasetItemWithData getSingletonDatasetItem(DatasetItem dsItem, List<DataItem> items);
 }
