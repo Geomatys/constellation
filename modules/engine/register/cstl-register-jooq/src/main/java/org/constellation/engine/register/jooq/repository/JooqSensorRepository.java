@@ -91,6 +91,7 @@ public class JooqSensorRepository extends AbstractJooqRespository<SensorRecord, 
                 .set(SENSOR.OWNER, sensor.getOwner())
                 .set(SENSOR.PARENT, sensor.getParent())
                 .set(SENSOR.TYPE, sensor.getType())
+                .set(SENSOR.DATE, sensor.getDate())
                 .where(SENSOR.ID.eq(sensor.getId()))
                 .execute();
     }

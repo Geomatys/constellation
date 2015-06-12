@@ -30,6 +30,7 @@ import org.constellation.engine.register.jooq.tables.pojos.Sensor;
  * @author Cédric Briançon (Geomatys)
  */
 public interface ISensorBusiness {
+    
     void linkDataToSensor(QName name, String providerId, String sensorId);
 
     void unlinkDataToSensor(QName name, String providerId, String sensorId) throws TargetNotFoundException;
@@ -42,7 +43,10 @@ public interface ISensorBusiness {
 
     Sensor getSensor(String sensorid);
 
+    @Deprecated
     Sensor create(String id, String type, String parentID, String sml);
+    
+    Sensor create(String id, String type, String parentID, String sml, final Long date);
 
     void update(Sensor childRecord);
 

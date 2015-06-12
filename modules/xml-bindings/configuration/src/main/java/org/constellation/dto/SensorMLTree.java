@@ -21,6 +21,7 @@ package org.constellation.dto;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,15 +43,20 @@ public class SensorMLTree {
     
     @XmlTransient
     private SensorMLTree parent;
+    
+    private Date createDate;
 
     public SensorMLTree() {
         
     }
     
-    public SensorMLTree(final String id, final String type, final String owner) {
+    public SensorMLTree(final String id, final String type, final String owner, final Long time) {
         this.id   = id;
         this.type = type;
         this.owner = owner;
+        if (time != null) {
+            this.createDate = new Date(time);
+        }
     }
     
     /**
@@ -79,6 +85,20 @@ public class SensorMLTree {
      */
     public void setId(String id) {
         this.id = id;
+    }
+    
+    /**
+     * @return the creationDate
+     */
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    /**
+     * @param creationDate the creationDate to set
+     */
+    public void setCreateDate(Date creationDate) {
+        this.createDate = creationDate;
     }
 
     public String getOwner() {
@@ -173,7 +193,7 @@ public class SensorMLTree {
     }
 
     public static SensorMLTree buildTree(final List<SensorMLTree> nodeList) {
-        final SensorMLTree root = new SensorMLTree("root", "System", null);
+        final SensorMLTree root = new SensorMLTree("root", "System", null, null);
         
         for (SensorMLTree node : nodeList) {
             final SensorMLTree parent = getParent(node, nodeList);
@@ -199,6 +219,7 @@ public class SensorMLTree {
     public int hashCode() {
         int hash = 3;
         hash = 47 * hash + Objects.hashCode(this.type);
+        hash = 47 * hash + Objects.hashCode(this.createDate);
         hash = 47 * hash + Objects.hashCode(this.id);
         return hash;
     }
@@ -211,8 +232,9 @@ public class SensorMLTree {
 
         if (object instanceof SensorMLTree) {
             final SensorMLTree that = (SensorMLTree) object;
-            return Objects.equals(this.id,    that.id)   &&
-                   Objects.equals(this.type, that.type);
+            return Objects.equals(this.id,           that.id)   &&
+                   Objects.equals(this.createDate, that.createDate)   &&
+                   Objects.equals(this.type,         that.type);
         }
         return false;
     }
@@ -224,6 +246,9 @@ public class SensorMLTree {
         }
         if (type != null) {
             sb.append("type=").append(type).append("\n");
+        }
+        if (createDate != null) {
+            sb.append("creationDate=").append(createDate).append("\n");
         }
         if (parent != null) {
             sb.append("parent=").append(parent.id).append("\n");

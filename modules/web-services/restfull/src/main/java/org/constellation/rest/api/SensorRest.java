@@ -144,7 +144,7 @@ public class SensorRest {
                     owner = user.getLogin();
                 }
             }
-            final SensorMLTree t = new SensorMLTree(sensor.getIdentifier(), sensor.getType(), owner);
+            final SensorMLTree t = new SensorMLTree(sensor.getIdentifier(), sensor.getType(), owner, sensor.getDate());
             final List<SensorMLTree> children = new ArrayList<>();
             final List<Sensor> records = sensorBusiness.getChildren(sensor);
             for (final Sensor record : records) {
@@ -156,7 +156,7 @@ public class SensorRest {
                         ownerChild = user.getLogin();
                     }
                 }
-                children.add(new SensorMLTree(record.getIdentifier(), record.getType(), ownerChild));
+                children.add(new SensorMLTree(record.getIdentifier(), record.getType(), ownerChild, record.getDate()));
             }
             t.setChildren(children);
             values.add(t);
@@ -362,7 +362,7 @@ public class SensorRest {
         
         Sensor sensor = sensorBusiness.getSensor(process.id);
         if (sensor == null) {
-            sensor = sensorBusiness.create(process.id, process.type, parentID, null);
+            sensor = sensorBusiness.create(process.id, process.type, parentID, null, System.currentTimeMillis());
 
         }
         
@@ -460,7 +460,7 @@ public class SensorRest {
                 final String sensorID       = getSmlID(sml);
                 final List<String> children = getChildrenIdentifiers(sml);
 
-                final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml));
+                final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml), System.currentTimeMillis());
                 sensorsImported.add(sensor);
                 parents.put(sensorID, children);
             }
@@ -476,7 +476,7 @@ public class SensorRest {
             final AbstractSensorML sml = unmarshallSensor(imported);
             final String type          = getSensorMLType(sml);
             final String sensorID      = getSmlID(sml);
-            final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml));
+            final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml), System.currentTimeMillis());
             sensorsImported.add(sensor);
         }
         return sensorsImported;

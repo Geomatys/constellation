@@ -296,6 +296,7 @@ public final class SOSUtils {
      *
      * @param version
      * @param observations
+     * @param srsName
      * @return
      */
     public static Envelope getCollectionBound(final String version, final List<Observation> observations, final String srsName) {
@@ -541,9 +542,9 @@ public final class SOSUtils {
             if (compos != null && compos.getComponentList() != null) {
                 for (ComponentProperty cp : compos.getComponentList().getComponent()){
                     if (cp.getHref() != null) {
-                        results.add(new SensorMLTree(cp.getHref(), "unknown", null));
+                        results.add(new SensorMLTree(cp.getHref(), "unknown", null, null));
                     } else if (cp.getAbstractProcess()!= null) {
-                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess()), null));
+                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess()), null, null));
                     } else {
                         LOGGER.warning("SML system component has no href or embedded object");
                     }
@@ -555,9 +556,9 @@ public final class SOSUtils {
             if (compos != null && compos.getComponentList() != null) {
                 for (ComponentProperty cp : compos.getComponentList().getComponent()){
                     if (cp.getHref() != null) {
-                        results.add(new SensorMLTree(cp.getHref(), "unknown", null));
+                        results.add(new SensorMLTree(cp.getHref(), "unknown", null, null));
                     } else if (cp.getAbstractProcess()!= null) {
-                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess()),null));
+                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess()),null, null));
                     } else {
                         LOGGER.warning("SML system component has no href or embedded object");
                     }

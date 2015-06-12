@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
+import java.util.Date;
 
 @Component
 @Primary
@@ -125,6 +126,12 @@ public class SensorBusiness implements ISensorBusiness {
     @Override
     @Transactional
     public Sensor create(final String identifier, final String type, final String parent, final String metadata) {
+        return create(identifier, type, parent, metadata, null);
+    }
+    
+    @Override
+    @Transactional
+    public Sensor create(final String identifier, final String type, final String parent, final String metadata, final Long date) {
         Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
         Sensor sensor = new Sensor();
         sensor.setIdentifier(identifier);
@@ -134,6 +141,8 @@ public class SensorBusiness implements ISensorBusiness {
         }
         sensor.setParent(parent);
         sensor.setMetadata(metadata);
+        sensor.setDate(date);
+        
         return sensorRepository.create(sensor);
     }
 
