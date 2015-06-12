@@ -200,7 +200,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
     @Test
     public void getCapabilitiesTest() throws Exception {
-        
+        assumeTrue(TestDatabaseHandler.hasLocalDatabase());
         worker.getCapabilities(new GetCapabilitiesType("WFS"));
     }
      /**
