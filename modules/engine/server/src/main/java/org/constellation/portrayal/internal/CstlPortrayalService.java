@@ -124,7 +124,7 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
      */
     @Override
     public BufferedImage writeInImage(Exception e, Dimension dim){
-        return DefaultPortrayalService.writeException(e, dim);
+        return DefaultPortrayalService.writeException(e, dim, false, Color.BLACK);
     }
 
     /**
