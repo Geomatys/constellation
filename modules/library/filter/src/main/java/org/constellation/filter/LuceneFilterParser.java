@@ -45,6 +45,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -369,7 +370,9 @@ public class LuceneFilterParser extends FilterParser {
                 if (literal instanceof Date) {
                     return LUCENE_DATE_FORMAT.format((Date)literal);
                 } else {
-                    return LUCENE_DATE_FORMAT.format(TemporalUtilities.parseDate(String.valueOf(literal)));
+                    Calendar c = TemporalUtilities.parseDateCal(String.valueOf(literal));
+                    c.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    return LUCENE_DATE_FORMAT.format(c.getTime());
                 }
             }
         } catch (ParseException ex) {

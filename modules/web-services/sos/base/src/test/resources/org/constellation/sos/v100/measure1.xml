@@ -18,7 +18,7 @@
             <gml:description>Geology traverse</gml:description>
             <gml:name>cycle1</gml:name>
             <gml:boundedBy>
-                <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582" gml:id="bound-1">
+                <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
                     <gml:upperCorner>-30.702 134.205</gml:upperCorner>
                 </gml:Envelope>
@@ -34,7 +34,6 @@
                     <gml:pos>-30.702 134.199</gml:pos>
                 </gml:LineString>
             </sa:shape>
-            <sa:length/>
         </sa:SamplingCurve>
     </om:featureOfInterest>
     <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="om:MeasureType" uom="m">18.5</om:result>

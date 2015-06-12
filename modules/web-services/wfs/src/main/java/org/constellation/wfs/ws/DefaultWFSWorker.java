@@ -169,6 +169,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
+import org.apache.sis.metadata.iso.citation.Citations;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.wfs.ws.WFSConstants.GetXSD;
 
@@ -458,7 +459,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             if (id == null) {
                 id = IdentifiedObjects.getIdentifierOrName(crs);
             }
-
+            
             if (id != null) {
                 defaultCRS = "urn:ogc:def:crs:" + id.replaceAll(":", ":7.01:");
 //                final String defaultCRS = IdentifiedObjects.lookupIdentifier(Citations.URN_OGC,

@@ -9,7 +9,7 @@
     <wfs:member>
         <gml:NamedPlaces gml:id="NamedPlaces.2">
             <gml:the_geom>
-                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326"  gml:id="NamedPlaces.2">
                     <gml:surfaceMember>
                         <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
                             <gml:exterior>

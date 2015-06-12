@@ -12,7 +12,7 @@
             <gml:name>10972X0137-PONT</gml:name>
             <sampling:sampledFeature>urn:-sandre:object:bdrhf:123X</sampling:sampledFeature>
             <sampling:position>
-                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="station-001">
                     <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">65400.0 1731368.0</ns3:pos>
                 </ns3:Point>
             </sampling:position>
@@ -24,7 +24,7 @@
             <gml:name>10972X0137-PLOUF</gml:name>
             <sampling:sampledFeature>urn:-sandre:object:bdrhf:123X</sampling:sampledFeature>
             <sampling:position>
-                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="station-002">
                     <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">65400.0 1731368.0</ns3:pos>
                 </ns3:Point>
             </sampling:position>

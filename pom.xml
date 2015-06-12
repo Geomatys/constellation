@@ -1289,7 +1289,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <useSystemClassLoader>true</useSystemClassLoader>
-                    <argLine>-Xmx1024m -XX:MaxPermSize=512m</argLine>
+                    <argLine>-Xmx1024m -XX:MaxPermSize=512m -Djava.util.Arrays.useLegacyMergeSort=true</argLine>
                     <systemPropertyVariables>
                       <spring.profiles.active>${spring.profiles.active}</spring.profiles.active>
                     </systemPropertyVariables>

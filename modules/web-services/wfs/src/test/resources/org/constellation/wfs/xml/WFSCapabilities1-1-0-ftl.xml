@@ -4,12 +4,12 @@
         <wfs:FeatureType>
             <wfs:Name>{gmlPrefix}:BasicPolygons</wfs:Name>
             <wfs:Title>BasicPolygons</wfs:Title>
-            <wfs:DefaultSRS>urn:ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:DefaultSRS>urn:ogc:def:crs:CRS:7.01:84</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ows:LowerCorner>-1.0 -2.0</ows:LowerCorner>
-                <ows:UpperCorner>6.0 2.0</ows:UpperCorner>
+                <ows:LowerCorner>-2.0 -1.0</ows:LowerCorner>
+                <ows:UpperCorner>2.0 6.0</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>

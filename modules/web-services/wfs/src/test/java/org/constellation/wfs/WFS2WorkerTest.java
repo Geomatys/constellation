@@ -152,6 +152,7 @@ import org.geotoolkit.wfs.xml.v200.TransactionType;
 import org.geotoolkit.wfs.xml.v200.UpdateActionType;
 import org.geotoolkit.wfs.xml.v200.UpdateType;
 import org.geotoolkit.wfs.xml.v200.ValueReference;
+import org.geotoolkit.xsd.xml.v2001.ComplexType;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -428,7 +429,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 final List<StoredQueryDescription> descriptions = new ArrayList<>();
                 final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
                 final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-                final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
+                final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("${name}"), "name", true);
                 final FilterType filter = new FilterType(pis);
                 final QueryType query = new QueryType(filter, types, "2.0.0");
                 final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
@@ -1674,9 +1675,12 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         Schema result = (Schema) worker.describeFeatureType(request);
 
-        Schema ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/bridge2.xsd"));
-
-        assertEquals(ExpResult, result);
+        Schema expResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/bridge2.xsd"));
+        // fix for equlity on empty list / null list
+        for (ComplexType type : expResult.getComplexTypes()) {
+            type.getAttributeOrAttributeGroup();
+        }
+        assertEquals(expResult, result);
 
         /**
          * Test 2 : describe Feature type Sampling point
@@ -1687,9 +1691,12 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         result = (Schema) worker.describeFeatureType(request);
 
-        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling2.xsd"));
-
-        assertEquals(ExpResult, result);
+        expResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling2.xsd"));
+        // fix for equlity on empty list / null list
+        for (ComplexType type : expResult.getComplexTypes()) {
+            type.getAttributeOrAttributeGroup();
+        }
+        assertEquals(expResult, result);
 
         /**
          * Test 3 : describe Feature type System
@@ -1701,21 +1708,21 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
             result = (Schema) worker.describeFeatureType(request);
 
-            ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system2.xsd"));
+            expResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system2.xsd"));
 
-            assertEquals(ExpResult.getElements().size(), result.getElements().size());
-            for (int i = 0; i < ExpResult.getElements().size(); i++) {
-                TopLevelElement expElem = ExpResult.getElements().get(i);
+            assertEquals(expResult.getElements().size(), result.getElements().size());
+            for (int i = 0; i < expResult.getElements().size(); i++) {
+                TopLevelElement expElem = expResult.getElements().get(i);
                 TopLevelElement resElem = result.getElements().get(i);
                 assertEquals(expElem, resElem);
             }
-            assertEquals(ExpResult.getComplexTypes().size(), result.getComplexTypes().size());
-            for (int i = 0; i < ExpResult.getComplexTypes().size(); i++) {
-                TopLevelComplexType expElem = ExpResult.getComplexTypes().get(i);
+            assertEquals(expResult.getComplexTypes().size(), result.getComplexTypes().size());
+            for (int i = 0; i < expResult.getComplexTypes().size(); i++) {
+                TopLevelComplexType expElem = expResult.getComplexTypes().get(i);
                 TopLevelComplexType resElem = result.getComplexTypes().get(i);
                 assertEquals(expElem, resElem);
             }
-            assertEquals(ExpResult, result);
+            assertEquals(expResult, result);
         }
 
         XSDMarshallerPool.getInstance().recycle(unmarshaller);
@@ -2026,7 +2033,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         final List<StoredQueryDescriptionType> descriptions = new ArrayList<>();
         final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
+        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("${name}"), "name", true);
         final FilterType filter = new FilterType(pis);
         final QueryType query = new QueryType(filter, types, "2.0.0");
         final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
@@ -2054,7 +2061,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         final ParameterExpressionType param = new ParameterExpressionType("name2", "name Parameter 2 ", "A parameter on the geometry \"the_geom\" of the feature", new QName("http://www.opengis.net/gml/3.2", "AbstractGeometryType", "gml"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges"));
-        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$geom"), "the_geom", true);
+        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("${geom}"), "the_geom", true);
         final FilterType filter = new FilterType(pis);
         final QueryType query = new QueryType(filter, types, "2.0.0");
         final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
@@ -2065,7 +2072,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         final ParameterExpressionType envParam = new ParameterExpressionType("envelope", "envelope parameter", "A parameter on the geometry \"the_geom\" of the feature", new QName("http://www.opengis.net/gml/3.2", "EnvelopeType", "gml"));
         final List<QName> types2 = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-        final SpatialOpsType bbox = new BBOXType("{http://www.opengis.net/sampling/1.0}position", "$envelope");
+        final SpatialOpsType bbox = new BBOXType("{http://www.opengis.net/sampling/1.0}position", "${envelope}");
         final FilterType filter2 = new FilterType(bbox);
         final QueryType query2 = new QueryType(filter2, types2, "2.0.0");
         final QueryExpressionTextType queryEx2 = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types2);

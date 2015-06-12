@@ -10,7 +10,7 @@
         <sampling:SamplingPoint gml:id="station-001">
             <gml:name>10972X0137-PONT</gml:name>
             <sampling:position>
-                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="station-001">
                     <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">65400.0 1731368.0</ns3:pos>
                 </ns3:Point>
             </sampling:position>
@@ -20,7 +20,7 @@
         <sampling:SamplingPoint gml:id="station-002">
             <gml:name>10972X0137-PLOUF</gml:name>
             <sampling:position>
-                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582"  xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582"  xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="station-002">
                     <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">65400.0 1731368.0</ns3:pos>
                 </ns3:Point>
             </sampling:position>
@@ -30,7 +30,7 @@
         <sampling:SamplingPoint gml:id="station-003">
             <gml:name>66685X4587-WARP</gml:name>
             <sampling:position>
-                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" gml:id="station-003">
                      <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">70800.0 1891659.0</gml:pos>
                 </gml:Point>
             </sampling:position>
@@ -40,7 +40,7 @@
         <sampling:SamplingPoint gml:id="station-004">
             <gml:name>99917X9856-FRAG</gml:name>
             <sampling:position>
-                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" gml:id="station-004">
                      <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">41945.0 2567987.0</gml:pos>
                 </gml:Point>
             </sampling:position>
@@ -50,7 +50,7 @@
         <sampling:SamplingPoint gml:id="station-005">
             <gml:name>44499X4517-TRUC</gml:name>
             <sampling:position>
-                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" gml:id="station-005">
                      <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">62500.0 1625236.0</gml:pos>
                 </gml:Point>
             </sampling:position>
@@ -60,7 +60,7 @@
          <sampling:SamplingPoint gml:id="station-006">
             <gml:name>cycle1</gml:name>
             <sampling:position>
-                <gml:LineString srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+                <gml:LineString srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" gml:id="station-006">
                     <gml:pos srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" srsDimension="2">-30.711 134.205</gml:pos>
                     <gml:pos srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" srsDimension="2">-30.71 134.204</gml:pos>
                     <gml:pos srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" srsDimension="2">-30.709 134.203</gml:pos>

@@ -5,7 +5,7 @@
             <ns16:description>Geology traverse</ns16:description>
             <ns16:name>cycle1</ns16:name>
             <ns16:boundedBy>
-                <ns16:Envelope ns16:id="bound-1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                <ns16:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <ns16:lowerCorner>-30.711 134.196</ns16:lowerCorner>
                     <ns16:upperCorner>-30.702 134.205</ns16:upperCorner>
                 </ns16:Envelope>
@@ -21,7 +21,6 @@
                     <ns16:pos>-30.702 134.199</ns16:pos>
                 </ns16:LineString>
             </sampling:shape>
-            <sampling:length>0.0</sampling:length>
         </sampling:SamplingCurve>
     </env:Body>
 </env:Envelope>

@@ -1520,7 +1520,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     @Test
     @Order(order=28)
     public void testWFSStoredQueriesREST() throws Exception {
-
+        waitForStart();
+        
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1");
 

@@ -120,6 +120,7 @@ import org.geotoolkit.wfs.xml.v200.ObjectFactory;
 import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
 import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
 import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
+import org.geotoolkit.xsd.xml.v2001.ComplexType;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
@@ -1324,9 +1325,13 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         Schema result = (Schema) worker.describeFeatureType(request);
 
-        Schema ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/bridge.xsd"));
+        Schema expResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/bridge.xsd"));
 
-        assertEquals(ExpResult, result);
+        // fix for equlity on empty list / null list
+        for (ComplexType type : expResult.getComplexTypes()) {
+            type.getAttributeOrAttributeGroup();
+        }
+        assertEquals(expResult, result);
 
         /**
          * Test 2 : describe Feature type Sampling point
@@ -1337,9 +1342,13 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         result = (Schema) worker.describeFeatureType(request);
 
-        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling.xsd"));
+        expResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling.xsd"));
+        // fix for equlity on empty list / null list
+        for (ComplexType type : expResult.getComplexTypes()) {
+            type.getAttributeOrAttributeGroup();
+        }
 
-        assertEquals(ExpResult, result);
+        assertEquals(expResult, result);
 
         /**
          * Test 3 : describe Feature type System
@@ -1351,22 +1360,22 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
             result = (Schema) worker.describeFeatureType(request);
 
-            ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
+            expResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
 
-            assertEquals(ExpResult.getElements().size(), result.getElements().size());
-            for (int i = 0; i < ExpResult.getElements().size(); i++) {
-                TopLevelElement expElem = ExpResult.getElements().get(i);
+            assertEquals(expResult.getElements().size(), result.getElements().size());
+            for (int i = 0; i < expResult.getElements().size(); i++) {
+                TopLevelElement expElem = expResult.getElements().get(i);
                 TopLevelElement resElem = result.getElements().get(i);
                 assertEquals(expElem, resElem);
             }
-            assertEquals(ExpResult.getComplexTypes().size(), result.getComplexTypes().size());
-            for (int i = 0; i < ExpResult.getComplexTypes().size(); i++) {
-                TopLevelComplexType expElem = ExpResult.getComplexTypes().get(i);
+            assertEquals(expResult.getComplexTypes().size(), result.getComplexTypes().size());
+            for (int i = 0; i < expResult.getComplexTypes().size(); i++) {
+                TopLevelComplexType expElem = expResult.getComplexTypes().get(i);
                 TopLevelComplexType resElem = result.getComplexTypes().get(i);
                 assertEquals(expElem, resElem);
             }
 
-            assertEquals(ExpResult, result);
+            assertEquals(expResult, result);
         }
 
         XSDMarshallerPool.getInstance().recycle(unmarshaller);
