@@ -53,6 +53,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
@@ -169,8 +171,23 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
 
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetCapabilitiesResponseSOAP.xml");
+        
+        // try to fix an error with gml 
+        String gmlPrefix = null;
+        final Pattern p  = Pattern.compile("xmlns[^\"]+\"[^\"]+\"");
+        final Matcher m  = p.matcher(result) ;  
+        while (m.find()) {
+            String s = m.group();
+            String namespace = s.substring(s.indexOf('"') + 1, s.length() - 1);
+            String prefix = s.substring(6, s.indexOf('='));
+            if (namespace.equals("http://www.opengis.net/gml")) {
+                gmlPrefix = prefix;
+            }
+        }
 
-        // System.out.println("result:\n" + result);
+        if (gmlPrefix != null) {
+            result = result.replace("gml:", gmlPrefix + ':');
+        }
         
         domCompare(result, expResult);
     }
