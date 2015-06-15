@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,14 +30,15 @@ import org.constellation.admin.security.CstlAdminLoginConfigurationService;
 import org.constellation.token.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/conf")
 public class ConfigController {
 	
     
@@ -50,7 +52,11 @@ public class ConfigController {
     public ConfigController() {
          LOGGER.info("***** ConfigController contruct *****");
     }
-    
+
+
+	@Inject
+	@Named("build")
+	private Properties buildProperties;
     
 	@Inject
 	private Environment env;
@@ -65,7 +71,7 @@ public class ConfigController {
 	 * @param request {@code HttpServletRequest}
 	 * @return Map
 	 */
-	@RequestMapping(method=RequestMethod.GET)
+	@RequestMapping(value = "/conf", method=RequestMethod.GET)
 	public @ResponseBody
 	Map<Object, Object> get(final HttpServletRequest request) {
         final ServletContext servletCtxt = request.getServletContext();
@@ -87,5 +93,13 @@ public class ConfigController {
         properties.put("cstl.import.custom","true".equals(servletCtxt.getInitParameter("cstl.import.custom")));
 		return properties;
 	}
+
+
+	@RequestMapping(value = "/build", method=RequestMethod.GET)
+	public @ResponseBody
+	Properties getBuildInfo(final HttpServletRequest request) {
+		return buildProperties;
+	}
+
 
 }

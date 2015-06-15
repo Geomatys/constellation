@@ -65,4 +65,13 @@ public class ApplicationConfiguration {
             }
         }
     }
+
+    @Bean(name = "build")
+    public Properties getBuildProperties() throws IOException {
+        Properties properties = new Properties();
+        try(InputStream inputStream = getClass().getResourceAsStream("/META-INF/constellation-build.properties")){
+            properties.load(inputStream);
+        }
+        return properties;
+    }
 }
