@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -49,7 +50,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Launches a Grizzly server in a thread at the beginning of the testing process
@@ -449,70 +452,49 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     protected static Object unmarshallResponsePut(final URLConnection conec) throws JAXBException, IOException {
         HttpURLConnection httpCon = (HttpURLConnection) conec;
         httpCon.setRequestMethod("PUT");
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(conec.getInputStream());
-
-        pool.recycle(unmarshaller);
-
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
-        return obj;
+        return unmarshallStream(conec.getInputStream());
     }
     
     protected static Object unmarshallResponsePost(final URLConnection conec) throws JAXBException, IOException {
         HttpURLConnection httpCon = (HttpURLConnection) conec;
         httpCon.setRequestMethod("POST");
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(conec.getInputStream());
-
-        pool.recycle(unmarshaller);
-
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
-        return obj;
+        return unmarshallStream(conec.getInputStream());
     }
     
     protected static Object unmarshallResponseDelete(final URLConnection conec) throws JAXBException, IOException {
         HttpURLConnection httpCon = (HttpURLConnection) conec;
         httpCon.setRequestMethod("DELETE");
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(conec.getInputStream());
-
-        pool.recycle(unmarshaller);
-
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
-        return obj;
+        return unmarshallStream(conec.getInputStream());
     }
     
     protected static Object unmarshallResponse(final URLConnection conec) throws JAXBException, IOException {
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(conec.getInputStream());
-
-        pool.recycle(unmarshaller);
-
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
-        return obj;
+        return unmarshallStream(conec.getInputStream());
     }
 
     protected static Object unmarshallResponse(final URL url) throws JAXBException, IOException {
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        
         InputStream is;
         if (conn.getResponseCode() == 200) {
             is = conn.getInputStream();
         } else {
             is = conn.getErrorStream();
         }
-        Object obj = unmarshaller.unmarshal(is);
-
-        pool.recycle(unmarshaller);
+        return unmarshallStream(is);
+    }
+    
+    private static Object unmarshallStream(final InputStream is) throws IOException, JAXBException {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        StringWriter writer = new StringWriter();
+        IOUtils.copy(is, writer, "UTF-8");
+        
+        Object obj;
+        try {
+            obj = unmarshaller.unmarshal(new StringReader(writer.toString()));
+            pool.recycle(unmarshaller);
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "JAXB Error received while trying to read:{0}", writer.toString());
+            throw ex;
+        }
 
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
