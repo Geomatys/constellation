@@ -30,9 +30,10 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 @Configuration
-@PropertySource({"classpath:/META-INF/cstl-admin/cstl-admin.properties"})
 @ComponentScan(basePackages = {
         "org.constellation.admin.service",
         "org.constellation.admin.security"})

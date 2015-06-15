@@ -53,7 +53,6 @@ import java.util.List;
 @Configuration
 @ComponentScan("org.constellation.admin.web")
 @EnableWebMvc
-@PropertySource({"classpath:/META-INF/cstl-admin/cstl-admin.properties"})
 public class DispatcherServletConfiguration extends WebMvcConfigurerAdapter {
 
     private final Logger log = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
