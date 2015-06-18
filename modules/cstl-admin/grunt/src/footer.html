@@ -1,13 +1,29 @@
-<ul class="nav navbar nav-pills" >
-    <li class="copy">&copy;{{footer.cstlVersion}}</li>
-    <li><a href="#/disclaimer" translate="label.disclaimer">About Constellation</a></li>
-    <li><a href="#/help" translate="label.help">Getting started</a></li>
-</ul>
-<ul class="nav navbar-right nav-pills" >
-    <li class="copy launchedby" translate="label.lauchedby">developed by </li>
-    <li>
-        <a class="logo-geomatys-a" href="http://www.geomatys.com" target="_blank">
-            <img class="logo-geomatys" src="img/logo-geomatys.svg" alt="Geomatys"/>
-        </a>
-    </li>
-</ul>
+<div>
+    <ul class="nav navbar-left nav-pills" >
+        <li>
+            <a class="logo-cstl" href="http://www.constellation-sdi.org" target="_blank">
+                <img class="logo-cstl" src="img/logo-cstl-footer.svg" alt="Constellation-sdi"/>
+            </a>
+        </li>
+        <li><p class="copy">{{buildInfo['cstl.version']}}</p></li>
+        <li class="invisible"><p class="copy">java version : {{buildInfo['java.version']}}</p></li>
+        <li class="invisible"><p class="copy">commit id : {{buildInfo['git.commit.id']}}</p></li>
+        <li class="invisible"><p class="copy">tags : {{buildInfo['git.tags']}}</p></li>
+        <li class="invisible"><p class="copy">build time : {{buildInfo['git.build.time']}}</p></li>
+        <li class="invisible"><p class="copy">branch : {{buildInfo['git.branch']}}</p></li>
+    </ul>
+</div>
+<div>
+    <ul class="nav navbar-right nav-pills" >
+        <li><a href="#/disclaimer" translate="label.disclaimer">About Constellation</a></li>
+        <li><p class="pipe">|</p></li>
+        <li><a href="#/help" translate="label.help">Getting started</a></li>
+        <li><p class="pipe">|</p></li>
+        <li><p class="copy">&copy;2015</p></li>
+        <li>
+            <a class="logo-geomatys-a" href="http://www.geomatys.com" target="_blank">
+                <img class="logo-geomatys" src="img/logo-geomatys-footer.svg" alt="Geomatys"/>
+            </a>
+        </li>
+    </ul>
+</div>

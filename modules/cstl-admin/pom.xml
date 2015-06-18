@@ -363,6 +363,14 @@
           <runOrder>alphabetical</runOrder>
         </configuration>
       </plugin>
+     <plugin>
+	<groupId>org.eclipse.jetty</groupId>
+	  <artifactId>jetty-maven-plugin</artifactId>
+	  <version>9.2.5.v20141112</version>
+	  <configuration>
+	   <war>target/cstl-admin.war</war>
+  </configuration>
+</plugin>
       <plugin>
         <groupId>org.apache.tomcat.maven</groupId>
         <artifactId>tomcat7-maven-plugin</artifactId>
