@@ -41,6 +41,10 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         });
     })
 
+    .factory('Build', function($resource) {
+        return $resource('@cstl/app/build');
+    })
+
     .factory('Metrics', function($resource) {
         return $resource('@cstl/metrics/metrics;jsessionid=', {}, {
             'get': { method: 'GET'}

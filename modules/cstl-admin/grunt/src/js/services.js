@@ -976,4 +976,11 @@ angular.module('cstl-services', ['cstl-restapi'])
             initDatasets();
         };
     })
-;
+
+    // -------------------------------------------------------------------------
+    //  Build service
+    // -------------------------------------------------------------------------
+
+    .factory('BuildService', function(Build) {
+        return Build.get();
+    });
