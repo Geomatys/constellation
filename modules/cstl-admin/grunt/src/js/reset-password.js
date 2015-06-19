@@ -60,12 +60,8 @@ cstlResetPasswordApp.controller("resetPasswordController", function($scope, $htt
             });
     };
 
-    $http.get('app/conf', {isArray: false}).success(function(conf){
+    $http.get('app/conf').success(function(conf) {
         cstlUrl = conf.cstl;
-        if(cstlUrl.indexOf('http://')===-1){
-            var currentUrl = window.location.href;
-            cstlUrl = currentUrl.substring(0,currentUrl.indexOf('/',7))+cstlUrl;
-        }
-        $.cookie('cstlUrl', cstlUrl );
+        $.cookie('cstlUrl', cstlUrl);
     });
 });
