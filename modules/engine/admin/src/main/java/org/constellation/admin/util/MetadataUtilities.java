@@ -39,21 +39,16 @@ import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
-import org.geotoolkit.process.metadata.merge.MergeDescriptor;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.util.FileUtilities;
@@ -82,6 +77,10 @@ import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.ValueExistencePolicy;
 import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
+import org.geotoolkit.processing.metadata.MetadataProcessingRegistry;
+import org.geotoolkit.processing.metadata.merge.MergeDescriptor;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.metadata.extent.GeographicExtent;
@@ -111,9 +110,9 @@ public final class MetadataUtilities {
         final SimplyMetadataTreeNode procedures = new SimplyMetadataTreeNode("Procedures:", true, "procedures", 10, "root");
         results.add(procedures);
         int i = 0;
-        for (Name procedure : store.getProcedureNames()) {
-            final SimplyMetadataTreeNode procNode = new SimplyMetadataTreeNode(procedure.getLocalPart(), false, "proc" + i, 9, "procedures");
-            procNode.setValue(procedure.getLocalPart());
+        for (GenericName procedure : store.getProcedureNames()) {
+            final SimplyMetadataTreeNode procNode = new SimplyMetadataTreeNode(procedure.tip().toString(), false, "proc" + i, 9, "procedures");
+            procNode.setValue(procedure.tip().toString());
             results.add(procNode);
         }
         
@@ -270,7 +269,7 @@ public final class MetadataUtilities {
      * @return
      * @throws DataStoreException 
      */
-    public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException {
+    public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider, final GenericName dataName) throws DataStoreException {
 
     	final DataStore dataStore = dataProvider.getMainStore();
     	final CoverageStore coverageStore = (CoverageStore) dataStore;
@@ -301,10 +300,10 @@ public final class MetadataUtilities {
 
         //if the coverage metadata still null that means it is not implemented yet
         // so we return the metadata iso from the reader
-        final Set<Name> names= coverageStore.getNames();
+        final Set<GenericName> names= coverageStore.getNames();
         DefaultMetadata metadata = new DefaultMetadata();
         if(names != null){
-            for(final Name n : names){
+            for(final GenericName n : names){
                 final CoverageReference cr = coverageStore.getCoverageReference(n);
                 final GridCoverageReader reader = cr.acquireReader();
                 try {
@@ -333,10 +332,10 @@ public final class MetadataUtilities {
     public static String getRasterCRSName(final DataProvider dataProvider) throws DataStoreException {
         final DataStore dataStore = dataProvider.getMainStore();
         final CoverageStore coverageStore = (CoverageStore) dataStore;
-        final Set<Name> names= coverageStore.getNames();
+        final Set<GenericName> names= coverageStore.getNames();
         CoordinateReferenceSystem candidat = null;
         if(names != null){
-            for(final Name n : names){
+            for(final GenericName n : names){
                 try{
                     final CoverageReference cr = coverageStore.getCoverageReference(n);
                     final GridCoverageReader reader = cr.acquireReader();
@@ -371,7 +370,7 @@ public final class MetadataUtilities {
         final DataStore dataStore = dataProvider.getMainStore();
         final FeatureStore featureStore = (FeatureStore) dataStore;
         CoordinateReferenceSystem candidat = null;
-        for (Name dataName : featureStore.getNames()) {
+        for (GenericName dataName : featureStore.getNames()) {
             Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
             if (env == null) {
                 continue;
@@ -401,7 +400,7 @@ public final class MetadataUtilities {
      * @return
      * @throws DataStoreException
      */
-    public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException, TransformException {
+    public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider, final GenericName dataName) throws DataStoreException, TransformException {
     	
     	final DataStore dataStore = dataProvider.getMainStore();
     	final FeatureStore featureStore = (FeatureStore) dataStore;
@@ -435,7 +434,7 @@ public final class MetadataUtilities {
         final DefaultDataIdentification ident = new DefaultDataIdentification();
         md.getIdentificationInfo().add(ident);
         DefaultGeographicBoundingBox bbox = null;
-        for (Name dataName : featureStore.getNames()) {
+        for (GenericName dataName : featureStore.getNames()) {
             Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
             if (env == null) {
                 continue;
@@ -530,7 +529,7 @@ public final class MetadataUtilities {
         return null;
     }
     
-    public static void overrideProperties(final Properties prop, final DataMetadata overridenValue, final Name dataName, final String formatName) {
+    public static void overrideProperties(final Properties prop, final DataMetadata overridenValue, final GenericName dataName, final String formatName) {
         final String metadataId = CstlMetadatas.getMetadataIdForData(overridenValue.getDataName(), dataName);
         prop.put("fileId", metadataId);
         if (overridenValue.getAnAbstract() != null) {

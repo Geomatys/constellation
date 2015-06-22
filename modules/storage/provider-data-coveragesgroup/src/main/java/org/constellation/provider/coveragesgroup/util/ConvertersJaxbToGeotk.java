@@ -30,10 +30,6 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.util.DataReference;
 import org.geotoolkit.client.Client;
-import org.geotoolkit.coverage.AbstractCoverageReference;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.io.GridCoverageWriter;
@@ -46,8 +42,6 @@ import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
 import org.geotoolkit.data.wfs.WebFeatureClient;
 import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.EmptyMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
@@ -75,6 +69,12 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.configuration.TargetNotFoundException;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.storage.coverage.AbstractCoverageReference;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.geotoolkit.storage.coverage.CoverageStoreFinder;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -174,7 +174,7 @@ public final class ConvertersJaxbToGeotk {
         try {
             DataReference dataReference = new DataReference(styleRefStr);
             providerID = dataReference.getProviderOrServiceId();
-            styleName = dataReference.getLayerId().getLocalPart();
+            styleName = dataReference.getLayerId().tip().toString();
         } catch (IllegalArgumentException ex) {
             //style reference is a simple StyleReference which contain only the name of the style.
             styleName = styleRefStr;
@@ -197,7 +197,7 @@ public final class ConvertersJaxbToGeotk {
         }
 
         CoverageReference coverageReference = null;
-        final Name layerName = source.getLayerId();
+        final GenericName layerName = source.getLayerId();
 
         /*
          * Search in Provider layers
@@ -330,7 +330,7 @@ public final class ConvertersJaxbToGeotk {
         }
 
         FeatureCollection featureColl = null;
-        final Name layerName = source.getLayerId();
+        final GenericName layerName = source.getLayerId();
 
         // build query
         final QueryBuilder builder = new QueryBuilder();
@@ -449,7 +449,7 @@ public final class ConvertersJaxbToGeotk {
         private final String name;
 
         public CoverageReferenceWrapper(final String name, final CoverageReference ref) {
-            super(ref.getStore(), new DefaultName(null, name));
+            super(ref.getStore(), NamesExt.create(name));
             this.name = name;
             this.reference = ref;
         }

@@ -24,7 +24,6 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.provider.Data;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
@@ -39,7 +38,6 @@ import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.GeometryAttribute;
 import org.geotoolkit.feature.Property;
 import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
@@ -60,6 +58,8 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.opengis.util.GenericName;
 
 /**
  * A generic FeatureInfoFormat that produce XML output for Features and Coverages.
@@ -93,8 +93,8 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         }
 
         final CoverageReference ref = coverage.getLayer().getCoverageReference();
-        final Name fullLayerName = ref.getName();
-        String layerName = fullLayerName.getLocalPart();
+        final GenericName fullLayerName = ref.getName();
+        String layerName = fullLayerName.tip().toString();
 
         StringBuilder builder = new StringBuilder();
         String margin = "\t";
@@ -124,7 +124,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         StringBuilder builder = new StringBuilder();
         final CoverageReference ref = coverage.getLayer().getCoverageReference();
-        final Name fullLayerName = ref.getName();
+        final GenericName fullLayerName = ref.getName();
 
         Data layerPostgrid = null;
 
@@ -288,7 +288,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         // featureType mark
         if (featureType != null) {
-            String ftLocal = featureType.getName().getLocalPart();
+            String ftLocal = featureType.getName().tip().toString();
 
             builder.append(margin).append("<Layer>").append(encodeXML(layer.getName())).append("</Layer>\n");
             builder.append(margin).append("<Name>").append(encodeXML(ftLocal)).append("</Name>\n");
@@ -320,11 +320,11 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             if (prop == null) {
                 continue;
             }
-            final Name propName = prop.getName();
+            final GenericName propName = prop.getName();
             if (propName == null) {
                 continue;
             }
-            String pLocal = propName.getLocalPart();
+            String pLocal = propName.tip().toString();
 
             if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
                 GeometryAttribute geomProp = (GeometryAttribute) prop;

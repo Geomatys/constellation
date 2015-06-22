@@ -19,7 +19,7 @@
 
 package org.constellation.process;
 
-import org.geotoolkit.process.AbstractProcessDescriptor;
+import org.geotoolkit.processing.AbstractProcessDescriptor;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.parameter.ParameterDescriptorGroup;

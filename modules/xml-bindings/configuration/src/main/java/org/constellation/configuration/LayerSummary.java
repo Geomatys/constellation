@@ -77,7 +77,7 @@ public class LayerSummary {
             for (final DataReference ref: refs) {
                 final StyleBrief styleToAdd = new StyleBrief();
                 styleToAdd.setProvider(ref.getProviderId());
-                final String styleName = ref.getLayerId().getLocalPart();
+                final String styleName = ref.getLayerId().tip().toString();
                 styleToAdd.setName(styleName);
                 styleToAdd.setTitle(styleName);
                 briefs.add(styleToAdd);

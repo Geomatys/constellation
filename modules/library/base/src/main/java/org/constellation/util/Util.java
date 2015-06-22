@@ -43,8 +43,8 @@ import javax.xml.namespace.QName;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.lib.base.CstlLibBaseRuntimeException;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.NamesExt;
+import org.opengis.util.GenericName;
 
 /**
  * Utility methods of general use.
@@ -157,14 +157,14 @@ public final class Util {
      * @param layerName
      * @return
      */
-    public static Name parseLayerName(final String layerName) {
-        final Name name;
+    public static GenericName parseLayerName(final String layerName) {
+        final GenericName name;
         if (layerName != null && layerName.lastIndexOf(':') != -1) {
             final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
             final String localPart = layerName.substring(layerName.lastIndexOf(':') + 1);
-            name = new DefaultName(namespace, localPart);
+            name = NamesExt.create(namespace, localPart);
         } else {
-            name = new DefaultName(layerName);
+            name = NamesExt.create(layerName);
         }
         return name;
     }

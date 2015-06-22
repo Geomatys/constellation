@@ -23,7 +23,6 @@ import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.geometry.Envelope;
@@ -35,6 +34,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -42,7 +42,7 @@ import java.util.TreeSet;
  */
 public class DefaultObservationData extends AbstractData implements ObservationData {
 
-    public DefaultObservationData(final Name name) {
+    public DefaultObservationData(final GenericName name) {
         super(name, new ArrayList<String>());
     }
     

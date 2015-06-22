@@ -203,7 +203,7 @@ public class Layer {
     public DataReference getStyle(final String styleID) {
         if (styles != null) {
             for (DataReference styleRef : styles) {
-                if (styleRef.getLayerId().getLocalPart().equals(styleID)) {
+                if (styleRef.getLayerId().tip().toString().equals(styleID)) {
                     return styleRef;
                 }
             }

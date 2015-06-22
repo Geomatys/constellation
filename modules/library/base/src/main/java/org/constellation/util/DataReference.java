@@ -18,11 +18,10 @@
  */
 package org.constellation.util;
 
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
-
 import javax.xml.bind.annotation.XmlValue;
 import java.util.Date;
+import org.geotoolkit.feature.type.NamesExt;
+import org.opengis.util.GenericName;
 
 /**
  * Reference to a provider or service layer.
@@ -319,8 +318,8 @@ public class DataReference implements CharSequence, Comparable<DataReference>{
      * Read the layer id part of the data.
      * @return Name
      */
-    public Name getLayerId(){
-        return DefaultName.valueOf(layerId);
+    public GenericName getLayerId(){
+        return NamesExt.valueOf(layerId);
     }
 
     /**

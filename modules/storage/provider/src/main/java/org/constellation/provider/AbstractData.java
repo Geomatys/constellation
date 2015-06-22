@@ -30,7 +30,6 @@ import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
@@ -52,6 +51,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -73,9 +73,9 @@ public abstract class AbstractData implements Data{
     /**
      * Layer name
      */
-    protected final Name name;
+    protected final GenericName name;
 
-    public AbstractData(Name name, List<String> favorites){
+    public AbstractData(GenericName name, List<String> favorites){
         this.name = name;
 
         if(favorites == null){
@@ -90,7 +90,7 @@ public abstract class AbstractData implements Data{
      * {@inheritDoc}
      */
     @Override
-    public Name getName() {
+    public GenericName getName() {
         return name;
     }
 

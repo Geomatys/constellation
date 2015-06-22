@@ -22,9 +22,6 @@ import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
-import org.geotoolkit.coverage.CoverageStoreFactory;
-import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -37,6 +34,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
+import org.geotoolkit.storage.coverage.CoverageStoreFactory;
+import org.geotoolkit.storage.coverage.CoverageStoreFinder;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -45,7 +45,7 @@ import static org.constellation.provider.configuration.ProviderParameters.create
  * @author Johann Sorel (Geomatys)
  */
 public class CoverageStoreProviderService extends AbstractProviderFactory
-        <Name,Data,DataProvider> implements DataProviderFactory {
+        <GenericName,Data,DataProvider> implements DataProviderFactory {
 
     /**
      * Service name

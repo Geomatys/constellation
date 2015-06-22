@@ -52,18 +52,13 @@ import org.constellation.process.StyleProcessReference;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Providers;
-import org.geotoolkit.coverage.AbstractCoverageStoreFactory;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.GridCoverageStack;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
@@ -71,6 +66,10 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.referencing.OutOfDomainOfValidityException;
+import org.geotoolkit.storage.coverage.AbstractCoverageStoreFactory;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.geotoolkit.storage.coverage.PyramidalCoverageReference;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
@@ -78,6 +77,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+import org.opengis.util.GenericName;
 import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -152,13 +152,13 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
         }
 
         if (pyramidName == null) {
-            pyramidName = inCovRef.getName().getLocalPart();
+            pyramidName = inCovRef.getName().tip().toString();
         }
 
         Provider providerEntity = providerBusiness.getProvider(providerID);
         DataProvider dataProvider = null;
         CoverageStore outputCoverageStore = null;
-        Name referenceName = null;
+        GenericName referenceName = null;
 
         if (providerEntity != null) {
             dataProvider = DataProviders.getInstance().getProvider(providerID);
@@ -177,8 +177,8 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
             }
 
             try {
-                final Set<Name> names = outputCoverageStore.getNames();
-                referenceName = new DefaultName(namespace, pyramidName);
+                final Set<GenericName> names = outputCoverageStore.getNames();
+                referenceName = NamesExt.create(namespace, pyramidName);
 
                 final CoverageReference coverageReference;
                 if (names.contains(referenceName)) {
@@ -199,7 +199,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
             //create XMLCoverageStore
             try {
                 final File finalPyramidFolder = new File(pyramidFolder, pyramidName);
-                referenceName = new DefaultName(pyramidName);
+                referenceName = NamesExt.create(pyramidName);
                 outputCoverageStore = getOrCreateXMLCoverageStore(finalPyramidFolder);
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
@@ -253,7 +253,7 @@ public class StyledPyramidCoverageProcess extends AbstractPyramidCoverageProcess
 
         // link original data with the tiled data.
         if (originalData != null) {
-            final QName qName = new QName(referenceName.getNamespaceURI(), referenceName.getLocalPart());
+            final QName qName = new QName(NamesExt.getNamespace(referenceName), referenceName.tip().toString());
             final DataBrief pyramidDataBrief = dataBusiness.getDataBrief(qName, providerEntity.getId());
             dataBusiness.linkDataToData(originalData.getId(), pyramidDataBrief.getId());
         }

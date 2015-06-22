@@ -22,16 +22,10 @@ import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.provider.configuration.Configurator.ProviderInformation;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.ElevationModel;
-import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -51,6 +45,10 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.opengis.util.GenericName;
 
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for
@@ -64,7 +62,7 @@ public final class DataProviders extends Providers implements PropertyChangeList
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     private long lastUpdateTime = System.currentTimeMillis();
-    protected final Class<Name> keyClass = Name.class;
+    protected final Class<GenericName> keyClass = GenericName.class;
     protected final Class<Data> valClass = Data.class;
     
     //all loaded providers
@@ -73,14 +71,14 @@ public final class DataProviders extends Providers implements PropertyChangeList
     /**
      * {@inheritDoc}
      */
-    public boolean contains(Name key) {
+    public boolean contains(GenericName key) {
         return getKeys().contains(key);
     }
 
     /**
      * Empty implementation.
      */
-    public void remove(Name key) {
+    public void remove(GenericName key) {
     }
 
     protected synchronized void fireUpdateEvent(){
@@ -155,12 +153,12 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return provider;
     }
 
-    public Set<Name> testProvider(String id, final DataProviderFactory factory,
+    public Set<GenericName> testProvider(String id, final DataProviderFactory factory,
                                   final ParameterValueGroup params) throws DataStoreException {
         getProviders();
         final DataProvider provider = factory.createProvider(id, params);
         //test to read data
-        Set<Name> names = new HashSet<>();
+        Set<GenericName> names = new HashSet<>();
         final DataStore ds = provider.getMainStore();
         if (ds instanceof FeatureStore) {
             names = ((FeatureStore) ds).getNames();
@@ -170,16 +168,16 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return names;
     }
 
-    public HashMap<Name, CoordinateReferenceSystem> getCRS(String id) throws DataStoreException {
-        HashMap<Name,CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = new HashMap<>();
+    public HashMap<GenericName, CoordinateReferenceSystem> getCRS(String id) throws DataStoreException {
+        HashMap<GenericName,CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = new HashMap<>();
         getProviders();
         final DataProvider provider = getProvider(id);
         //test getting CRS from data
         final DataStore store = provider.getMainStore();
         if (store instanceof FeatureStore) {
             final FeatureStore fs = (FeatureStore) store;
-            final Set<Name> names =  fs.getNames();
-            for (final Name name : names){
+            final Set<GenericName> names =  fs.getNames();
+            for (final GenericName name : names){
                 final FeatureType ft = fs.getFeatureType(name);
                 final CoordinateReferenceSystem crs = ft.getCoordinateReferenceSystem();
                 if(crs!=null) {
@@ -188,8 +186,8 @@ public final class DataProviders extends Providers implements PropertyChangeList
             }
         } else if (store instanceof CoverageStore) {
             final CoverageStore cs = (CoverageStore) store;
-            final Set<Name> names = cs.getNames();
-            for (final Name name : names){
+            final Set<GenericName> names = cs.getNames();
+            for (final GenericName name : names){
                 final CoverageReference coverageReference = cs.getCoverageReference(name);
                 final GridCoverageReader coverageReader = coverageReference.acquireReader();
                 try {
@@ -221,15 +219,15 @@ public final class DataProviders extends Providers implements PropertyChangeList
     /**
      * {@inheritDoc }
      */
-    public Set<Name> getKeys() {
+    public Set<GenericName> getKeys() {
         return getKeys(null);
     }
 
     /**
      * {@inheritDoc }
      */
-    public Set<Name> getKeys(final String sourceId) {
-        final Set<Name> keys = new HashSet<>();
+    public Set<GenericName> getKeys(final String sourceId) {
+        final Set<GenericName> keys = new HashSet<>();
         for(final DataProvider provider : getProviders()){
             keys.addAll(provider.getKeys(sourceId));
         }
@@ -241,10 +239,10 @@ public final class DataProviders extends Providers implements PropertyChangeList
      * @deprecated use get(key, providerID) instead because two provider can have the same named layer
      */
     @Deprecated
-    public Data get(final Name key) {
+    public Data get(final GenericName key) {
         final List<Data> candidates = new ArrayList<>();
 
-        for(final Provider<Name,Data> provider : getProviders()){
+        for(final Provider<GenericName,Data> provider : getProviders()){
             final Data layer = provider.get(key);
             if(layer != null) candidates.add(layer);
         }
@@ -254,11 +252,11 @@ public final class DataProviders extends Providers implements PropertyChangeList
         }else if(candidates.size()>1){
             if(Data.class.isAssignableFrom(valClass)){
                 //make a more accurate search testing both namespace and local part are the same.
-                final Name nk = (Name) key;
+                final GenericName nk = (GenericName) key;
                 for(int i=0;i<candidates.size();i++){
                     final Data ld = (Data) candidates.get(i);
-                    if(Objects.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
-                            && Objects.equals(ld.getName().getLocalPart(), nk.getLocalPart())) {
+                    if(Objects.equals(NamesExt.getNamespace(ld.getName()), NamesExt.getNamespace(nk))
+                            && Objects.equals(ld.getName().tip().toString(), nk.tip().toString())) {
                         return (Data)ld;
                     }
                 }
@@ -273,8 +271,8 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return null;
     }
 
-    public Data get(final Name key, final String providerID) {
-        final Provider<Name,Data> provider = getProvider(providerID);
+    public Data get(final GenericName key, final String providerID) {
+        final Provider<GenericName,Data> provider = getProvider(providerID);
         if (provider == null) {
             return null;
         }
@@ -283,8 +281,8 @@ public final class DataProviders extends Providers implements PropertyChangeList
 
     public List<Data> getAll() {
         final List<Data> values = new ArrayList<>();
-        for(Provider<Name,Data> provider : getProviders()){
-            for(Name key : provider.getKeys()){
+        for(Provider<GenericName,Data> provider : getProviders()){
+            for(GenericName key : provider.getKeys()){
                 values.add(provider.get(key));
             }
         }
@@ -369,7 +367,7 @@ public final class DataProviders extends Providers implements PropertyChangeList
 
         try{
             //sproviders were loaded, dispose each of them
-            for(final Provider<Name,Data> provider : getProviders()){
+            for(final Provider<GenericName,Data> provider : getProviders()){
                 try{
                     provider.removePropertyListener(this);
                     provider.dispose();
@@ -400,7 +398,7 @@ public final class DataProviders extends Providers implements PropertyChangeList
     /**
      * {@inheritDoc }
      */
-    public ElevationModel getElevationModel(final Name name) {
+    public ElevationModel getElevationModel(final GenericName name) {
         for(final DataProvider provider : getProviders()){
             final ElevationModel model = provider.getElevationModel(name);
             if(model != null) return model;
@@ -408,7 +406,7 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return null;
     }
 
-    public Data get(final Name key, final Date version) {
+    public Data get(final GenericName key, final Date version) {
         final List<Data> candidates = new ArrayList<>();
 
         for(final DataProvider provider : getProviders()){
@@ -423,11 +421,11 @@ public final class DataProviders extends Providers implements PropertyChangeList
         }else if(candidates.size()>1){
             if(Data.class.isAssignableFrom(valClass)){
                 //make a more accurate search testing both namespace and local part are the same.
-                final Name nk = (Name) key;
+                final GenericName nk = (GenericName) key;
                 for(int i=0;i<candidates.size();i++){
                     final Data ld = candidates.get(i);
-                    if(Objects.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
-                            && Objects.equals(ld.getName().getLocalPart(), nk.getLocalPart())){
+                    if(Objects.equals(NamesExt.getNamespace(ld.getName()), NamesExt.getNamespace(nk))
+                            && Objects.equals(ld.getName().tip().toString(), nk.tip().toString())){
                         return ld;
                     }
                 }
@@ -442,7 +440,7 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return null;
     }
 
-    public Data get(final Name key, final String providerID, final Date version) {
+    public Data get(final GenericName key, final String providerID, final Date version) {
         final DataProvider provider = getProvider(providerID);
         if (provider == null) {
             return null;
@@ -466,12 +464,12 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return null;
     }
 
-    public Data getByIdentifier(Name key) {
+    public Data getByIdentifier(GenericName key) {
         Data result = null;
-        for(final Name n : getKeys()){
+        for(final GenericName n : getKeys()){
             if(n.equals(key)){
                 return get(n);
-            } else if (DefaultName.match(n, key)) {
+            } else if (NamesExt.match(n, key)) {
                 result = get(n);
             }
         }

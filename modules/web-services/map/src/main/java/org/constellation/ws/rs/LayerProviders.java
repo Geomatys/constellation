@@ -41,7 +41,6 @@ import org.constellation.provider.FeatureData;
 import org.constellation.provider.ObservationData;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -58,9 +57,7 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
@@ -108,11 +105,14 @@ import java.util.Map;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.storage.coverage.CoverageReference;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
 import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
+import org.opengis.util.GenericName;
 
 /**
  * Utility class for layer provider management/configuration.
@@ -471,7 +471,7 @@ public final class LayerProviders {
      * @throws CstlServiceException if the layer does not exists
      */
     private static Data getLayer(final DataProvider provider, final String layerName) throws CstlServiceException {
-        final Name name = DefaultName.valueOf(layerName);
+        final GenericName name = NamesExt.valueOf(layerName);
         final Data layer = provider.get(name);
         if (layer == null) {
             throw new CstlServiceException("No layer named \"" + layerName + "\" in provider with id \"" + provider.getId() + "\".");
@@ -552,13 +552,13 @@ public final class LayerProviders {
             // Feature attributes description.
             final PropertyDescriptor geometryDesc = featureType.getGeometryDescriptor();
             description.setGeometryProperty(new PropertyDescription(
-                    geometryDesc.getName().getNamespaceURI(),
-                    geometryDesc.getName().getLocalPart(),
+                    NamesExt.getNamespace(geometryDesc.getName()),
+                    geometryDesc.getName().tip().toString(),
                     geometryDesc.getType().getBinding() != null ? geometryDesc.getType().getBinding() : Geometry.class));
             for (final PropertyDescriptor desc : featureType.getDescriptors()) {
                 description.getProperties().add(new PropertyDescription(
-                        desc.getName().getNamespaceURI(),
-                        desc.getName().getLocalPart(),
+                        NamesExt.getNamespace(desc.getName()),
+                        desc.getName().tip().toString(),
                         desc.getType().getBinding()));
             }
         }

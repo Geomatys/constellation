@@ -51,13 +51,7 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.ParamUtilities;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStoreFactory;
-import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.coverage.CoverageUtilities;
 import org.geotoolkit.coverage.GridSampleDimension;
-import org.geotoolkit.coverage.Pyramid;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -68,8 +62,6 @@ import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.FileFeatureStoreFactory;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.observation.ObservationStoreFactory;
 import org.geotoolkit.parameter.Parameters;
@@ -93,6 +85,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 
 import com.google.common.base.Optional;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStoreFactory;
+import org.geotoolkit.storage.coverage.CoverageStoreFinder;
+import org.geotoolkit.storage.coverage.CoverageUtilities;
+import org.geotoolkit.storage.coverage.Pyramid;
+import org.geotoolkit.storage.coverage.PyramidalCoverageReference;
+import org.opengis.util.GenericName;
 
 @Component("providerBusiness")
 @Primary
@@ -225,7 +225,7 @@ public class ProviderBusiness implements IProviderBusiness {
     }
 
     @Override
-    public Set<Name> test(final String providerIdentifier, final ProviderConfiguration configuration) throws DataStoreException, ConfigurationException {
+    public Set<GenericName> test(final String providerIdentifier, final ProviderConfiguration configuration) throws DataStoreException, ConfigurationException {
         final String type = configuration.getType();
         final String subType = configuration.getSubType();
         final Map<String, String> inParams = configuration.getParameters();
@@ -562,7 +562,7 @@ public class ProviderBusiness implements IProviderBusiness {
         final String namespace = inData.getNamespace();
         final String providerId = inData.getProvider();
         final Integer datasetID = inData.getDatasetId();
-        Name name = new DefaultName(namespace,dataName);
+        GenericName name = NamesExt.create(namespace,dataName);
 
         //get data
         final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
@@ -642,7 +642,7 @@ public class ProviderBusiness implements IProviderBusiness {
             // Update the parent attribute of the created provider
             updateParent(outProvider.getId(), providerId);
 
-            final QName qName = new QName(name.getNamespaceURI(), name.getLocalPart());
+            final QName qName = new QName(NamesExt.getNamespace(name), name.tip().toString());
             //set rendered attribute to false to indicates that this pyramid can have stats.
             dataBusiness.updateDataRendered(qName, outProvider.getId(), false);
 
@@ -724,7 +724,7 @@ public class ProviderBusiness implements IProviderBusiness {
             input.parameter("coverageref").setValue(inRef);
             input.parameter("in_coverage_store").setValue(outRef.getStore());
             input.parameter("tile_size").setValue(new Dimension(tileSize, tileSize));
-            input.parameter("pyramid_name").setValue(outRef.getName().getLocalPart());
+            input.parameter("pyramid_name").setValue(outRef.getName().tip().toString());
             input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
             input.parameter("resolution_per_envelope").setValue(resolutionPerEnvelope);
             final org.geotoolkit.process.Process p = desc.createProcess(input);

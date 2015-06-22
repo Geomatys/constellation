@@ -58,6 +58,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.feature.type.NamesExt;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -157,7 +158,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(layers.size() == 1);
         
         final Layer outLayer = layers.get(0);
-        assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
+        assertEquals(COUNTRIES_DATA_REF.getLayerId().tip().toString(),outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
@@ -202,7 +203,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
 
         final Layer outLayer = layers.get(0);
-        assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
+        assertEquals(COUNTRIES_DATA_REF.getLayerId().tip().toString() ,outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
@@ -225,11 +226,11 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         createCustomInstance("addLayer3", inputContext);
         startInstance("addLayer3");
         
-        Layer layer = new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), COUNTRIES_DATA_REF.getLayerId().getLocalPart()));
+        Layer layer = new Layer(new QName(NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()), COUNTRIES_DATA_REF.getLayerId().tip().toString()));
         layer.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
         
-        layerBusiness.add(COUNTRIES_DATA_REF.getLayerId().getLocalPart(), 
-                          COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), 
+        layerBusiness.add(COUNTRIES_DATA_REF.getLayerId().tip().toString(),
+                          NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()),
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
                           null, 
                           "addLayer3", 
@@ -264,7 +265,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(outputLayer.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
 
         final Layer outLayer = layers.get(0);
-        assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
+        assertEquals(COUNTRIES_DATA_REF.getLayerId().tip().toString(),outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
@@ -290,20 +291,20 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         createCustomInstance("addLayer5", inputContext);
         startInstance("addLayer5");
         
-        Layer layer1 = new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), COUNTRIES_DATA_REF.getLayerId().getLocalPart()));
+        Layer layer1 = new Layer(new QName(NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()), COUNTRIES_DATA_REF.getLayerId().tip().toString()));
         layer1.setGetFeatureInfoCfgs(gfi);
-        layerBusiness.add(COUNTRIES_DATA_REF.getLayerId().getLocalPart(), 
-                          COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), 
+        layerBusiness.add(COUNTRIES_DATA_REF.getLayerId().tip().toString(),
+                          NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()),
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
                           null, 
                           "addLayer5", 
                           serviceName.toLowerCase(), 
                           layer1);
         
-        Layer layer2 = new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), "city"));
+        Layer layer2 = new Layer(new QName(NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()), "city"));
         layer2.setGetFeatureInfoCfgs(gfi);
         layerBusiness.add("city", 
-                          COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), 
+                          NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()),
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
                           null, 
                           "addLayer5", 
@@ -338,7 +339,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
         final Layer outLayer = layers.get(0);
         assertNotNull(outLayer);
-        assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
+        assertEquals(COUNTRIES_DATA_REF.getLayerId().tip().toString(),outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
@@ -383,7 +384,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
 
         final Layer outLayer = layers.get(0);
-        assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
+        assertEquals(COUNTRIES_DATA_REF.getLayerId().tip().toString(),outLayer.getName().getLocalPart());
         assertNull(outLayer.getAlias());
         assertNull(outLayer.getFilter());
         assertTrue(outLayer.getStyles().isEmpty());
@@ -433,7 +434,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
 
         final Layer outLayer = layers.get(0);
-        assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
+        assertEquals(COUNTRIES_DATA_REF.getLayerId().tip().toString(),outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
         assertEquals(STYLE_DATA_REF, outLayer.getStyles().get(0));

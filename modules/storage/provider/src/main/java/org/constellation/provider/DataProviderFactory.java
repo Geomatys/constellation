@@ -18,8 +18,8 @@
  */
 package org.constellation.provider;
 
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -28,7 +28,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface DataProviderFactory extends ProviderFactory<Name,Data,DataProvider>{
+public interface DataProviderFactory extends ProviderFactory<GenericName,Data,DataProvider>{
 
     @Override
     DataProvider createProvider(String providerId, ParameterValueGroup config);

@@ -61,20 +61,20 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.io.wkt.PrjFiles;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.storage.DataFileStore;
+import org.geotoolkit.storage.coverage.CoverageReference;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.FactoryException;
+import org.opengis.util.GenericName;
 import org.springframework.stereotype.Component;
 
 /**
@@ -110,7 +110,7 @@ public class ProviderRest {
     @Path("/{id}/test")
     public Response test( final @PathParam("domainId") int domainId, final @PathParam("id") String providerIdentifier, final ProviderConfiguration configuration) {
         try {
-            final Set<Name> names = providerBusiness.test(providerIdentifier, configuration);
+            final Set<GenericName> names = providerBusiness.test(providerIdentifier, configuration);
             if (names.isEmpty()){
                 LOGGER.warning("non data found for provider: " + providerIdentifier);
                 return Response.status(500).build();
@@ -215,7 +215,7 @@ public class ProviderRest {
     @Path("/{id}/crs")
     public Response verifyCRS(final @PathParam("domainId") int domainId, final @PathParam("id") String providerIdentifier){
         try {
-            final HashMap<Name, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
+            final HashMap<GenericName, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
             for( CoordinateReferenceSystem crs : nameCoordinateReferenceSystemHashMap.values()){
                 if (crs == null || crs instanceof ImageCRS){
                     return Response.status(500).build();

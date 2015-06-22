@@ -35,7 +35,6 @@ import org.constellation.provider.ProviderFactory;
 import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.test.Commons;
@@ -76,11 +75,13 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
 import org.junit.BeforeClass;
+import org.opengis.util.GenericName;
 import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
@@ -123,7 +124,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     /**
      * The layer to test.
      */
-    private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
+    private static final GenericName LAYER_TEST = NamesExt.create("SST_tests");
 
     /**
      * Checksum value on the returned image expressed in a geographic CRS for the SST_tests layer.

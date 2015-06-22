@@ -28,10 +28,7 @@ import org.constellation.provider.DefaultFeatureData;
 import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.client.Client;
 import org.geotoolkit.client.ClientFinder;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.version.VersionControl;
 import org.geotoolkit.version.VersioningException;
 import org.opengis.parameter.GeneralParameterValue;
@@ -41,6 +38,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -49,7 +49,7 @@ import java.util.logging.Level;
 public class ServerStoreProvider extends AbstractDataProvider{
 
     private Client server;
-    private Set<Name> names;
+    private Set<GenericName> names;
 
     public ServerStoreProvider(String providerId,ProviderFactory service, ParameterValueGroup param){
         super(providerId,service,param);
@@ -114,7 +114,7 @@ public class ServerStoreProvider extends AbstractDataProvider{
     }
 
     @Override
-    public Set<Name> getKeys() {
+    public Set<GenericName> getKeys() {
         if(names == null){
             reload();
         }
@@ -125,7 +125,7 @@ public class ServerStoreProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Data get(final Name key) {
+    public Data get(final GenericName key) {
         return get(key, null);
     }
 
@@ -133,7 +133,7 @@ public class ServerStoreProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Data get(Name key, Date version) {
+    public Data get(GenericName key, Date version) {
         key = fullyQualified(key);
         if(!contains(key)){
             return null;

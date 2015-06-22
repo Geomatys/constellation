@@ -65,8 +65,6 @@ import org.constellation.engine.register.repository.TaskRepository;
 import org.constellation.scheduler.QuartzJobListener;
 import org.constellation.scheduler.QuartzTask;
 import org.constellation.util.ParamUtilities;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.io.DirectoryWatcher;
 import org.geotoolkit.io.PathChangeListener;
 import org.geotoolkit.io.PathChangedEvent;
@@ -77,10 +75,6 @@ import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessingRegistry;
-import org.geotoolkit.process.chain.ChainProcessDescriptor;
-import org.geotoolkit.process.chain.model.Chain;
-import org.geotoolkit.process.chain.model.ChainMarshallerPool;
-import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
@@ -109,6 +103,12 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.processing.chain.ChainProcessDescriptor;
+import org.geotoolkit.processing.chain.model.Chain;
+import org.geotoolkit.processing.chain.model.ChainMarshallerPool;
+import org.geotoolkit.processing.quartz.ProcessJobDetail;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -237,8 +237,8 @@ public class ProcessBusiness implements IProcessBusiness {
      * {@inheritDoc}
      */
     @Override
-    public List<Name> listProcess(){
-        final List<Name> names = new ArrayList<>();
+    public List<GenericName> listProcess(){
+        final List<GenericName> names = new ArrayList<>();
 
         final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
         while(ite.hasNext()){
@@ -247,7 +247,7 @@ public class ProcessBusiness implements IProcessBusiness {
                     .getIdentifiers().iterator().next().getCode();
 
             for(String processCode : factory.getNames()){
-                names.add(new DefaultName(authorityCode, processCode));
+                names.add(NamesExt.create(authorityCode, processCode));
             }
         }
 

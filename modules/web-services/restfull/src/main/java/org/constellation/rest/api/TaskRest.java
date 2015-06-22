@@ -65,11 +65,9 @@ import org.constellation.process.DatasetProcessReference;
 import org.constellation.process.ServiceProcessReference;
 import org.constellation.process.StyleProcessReference;
 import org.constellation.util.ParamUtilities;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.process.chain.model.Chain;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -79,6 +77,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
 import org.constellation.process.UserProcessReference;
+import org.geotoolkit.processing.chain.model.Chain;
+import org.opengis.util.GenericName;
 
 /**
  * RestFull API for task management/operations.
@@ -126,9 +126,9 @@ public class TaskRest {
     @GET
     @Path("listProcesses")
     public Response listProcess(){
-        final List<Name> names = processBusiness.listProcess();
+        final List<GenericName> names = processBusiness.listProcess();
         final StringList lst = new StringList();
-        for(Name n : names){
+        for(GenericName n : names){
             lst.getList().add(Names.toExpandedString(n));
         }
         return Response.ok(lst).build();
@@ -140,7 +140,7 @@ public class TaskRest {
     @GET
     @Path("countProcesses")
     public Response countAvailableProcess(){
-        final List<Name> names = processBusiness.listProcess();
+        final List<GenericName> names = processBusiness.listProcess();
         StringMap stringMap = new StringMap();
         stringMap.getMap().put("value",""+names.size());
         return Response.ok(stringMap).build();

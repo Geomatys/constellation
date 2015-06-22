@@ -19,10 +19,10 @@
 package org.constellation.provider;
 
 import org.apache.sis.storage.DataStore;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.ElevationModel;
 
 import java.util.Date;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -30,7 +30,7 @@ import java.util.Date;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface DataProvider extends Provider<Name,Data>{
+public interface DataProvider extends Provider<GenericName,Data>{
 
     /**
      * Original data store.
@@ -39,7 +39,7 @@ public interface DataProvider extends Provider<Name,Data>{
     DataStore getMainStore();
     
     
-    ElevationModel getElevationModel(Name name);
+    ElevationModel getElevationModel(GenericName name);
 
     Data get(String key);
     
@@ -47,5 +47,5 @@ public interface DataProvider extends Provider<Name,Data>{
      * Get the data related to the given key in given version.
      * @return LayerDetails if it is in the data provider, or null if not.
      */
-    Data get(Name key, Date version);
+    Data get(GenericName key, Date version);
 }

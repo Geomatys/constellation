@@ -22,7 +22,6 @@ import org.apache.sis.util.UnconvertibleObjectException;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.style.Description;
 import org.opengis.style.FeatureTypeStyle;
 import org.opengis.style.Style;
@@ -31,6 +30,7 @@ import org.opengis.style.Symbolizer;
 
 import java.util.Collection;
 import java.util.List;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -53,7 +53,7 @@ public final class DataReferenceConverter {
         final String dataType = source.getDataType();
 
         Style style = null;
-        final Name layerName = source.getLayerId();
+        final GenericName layerName = source.getLayerId();
 
         /*
          * Search in Provider layers

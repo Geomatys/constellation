@@ -22,8 +22,6 @@ package org.constellation.management;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProviders;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.util.iso.Names;
+import org.opengis.util.GenericName;
 
 /**
  * Providers MBean implementation.
@@ -58,7 +57,7 @@ public final class Providers implements ProvidersMBean{
     public List<String> getLayerList() {
         final List<String> names = new ArrayList<String>();
         try {
-            for (Name n : DataProviders.getInstance().getKeys()) {
+            for (GenericName n : DataProviders.getInstance().getKeys()) {
                 names.add(Names.toExpandedString(n));
             }
             Collections.sort(names);

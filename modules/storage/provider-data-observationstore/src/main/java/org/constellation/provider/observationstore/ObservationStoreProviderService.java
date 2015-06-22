@@ -23,7 +23,6 @@ import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.observation.ObservationStoreFactory;
 import org.geotoolkit.observation.ObservationStoreFinder;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -38,13 +37,14 @@ import java.util.List;
 import java.util.logging.Level;
 
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
+import org.opengis.util.GenericName;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class ObservationStoreProviderService extends AbstractProviderFactory
-        <Name,Data,DataProvider> implements DataProviderFactory {
+        <GenericName,Data,DataProvider> implements DataProviderFactory {
 
     /**
      * Service name

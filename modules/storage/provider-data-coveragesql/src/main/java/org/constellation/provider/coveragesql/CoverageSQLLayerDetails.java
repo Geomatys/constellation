@@ -25,7 +25,6 @@ import org.constellation.provider.AbstractData;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProviders;
-import org.geotoolkit.coverage.DefaultCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -36,7 +35,6 @@ import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.map.CoverageMapLayer;
@@ -66,6 +64,8 @@ import java.util.SortedSet;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.storage.coverage.DefaultCoverageReference;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -77,7 +77,7 @@ class CoverageSQLLayerDetails extends AbstractData implements CoverageData {
 
     private final LayerCoverageReader reader;
 
-    private final Name elevationModel;
+    private final GenericName elevationModel;
 
     /**
      * Stores information about a {@linkplain Layer layer} in a {@code PostGRID}
@@ -89,7 +89,7 @@ class CoverageSQLLayerDetails extends AbstractData implements CoverageData {
      * @param name           The name of the layer.
      */
     CoverageSQLLayerDetails(final LayerCoverageReader reader, final List<String> favorites,
-            final Name elevationModel, final Name name) {
+            final GenericName elevationModel, final GenericName name) {
         super(name,favorites);
 
         this.reader = reader;
@@ -169,7 +169,7 @@ class CoverageSQLLayerDetails extends AbstractData implements CoverageData {
             style = RandomStyleBuilder.createDefaultRasterStyle();
         }
 
-        final String title = getName().getLocalPart();
+        final String title = getName().tip().toString();
         final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
         final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reference, style);
         mapLayer.setDescription(StyleProviders.STYLE_FACTORY.description(title,title));

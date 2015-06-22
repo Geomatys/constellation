@@ -41,7 +41,6 @@ import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -74,6 +73,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.geotoolkit.feature.type.NamesExt;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -300,8 +301,8 @@ public class ProviderRestOld {
             for (final DataProvider p : layerProviders) {
                 if (p.getFactory().equals(service)) {
                     final List<DataBrief> keys = new ArrayList<>();
-                    for(Name n : p.getKeys()){
-                        final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
+                    for(GenericName n : p.getKeys()){
+                        final QName name = new QName(NamesExt.getNamespace(n), n.tip().toString());
                         final DataBrief db = dataBusiness.getDataBrief(name,p.getId());
                         keys.add(db);
                     }

@@ -51,10 +51,8 @@ import org.geotoolkit.factory.Hints;
 import org.geotoolkit.factory.HintsPending;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.FeatureTypeUtilities;
-import org.geotoolkit.feature.SchemaException;
 import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.feature.type.GeometryType;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.feature.type.PropertyType;
 import org.geotoolkit.feature.xml.Utils;
@@ -182,6 +180,7 @@ import static org.constellation.wfs.ws.WFSConstants.UNKNOW_TYPENAME;
 import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.data.session.Session;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.feature.xml.XSDFeatureStore;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
@@ -203,6 +202,7 @@ import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildValueCollection;
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildWFSCapabilities;
 import org.geotoolkit.xsd.xml.v2001.FormChoice;
 import org.geotoolkit.xsd.xml.v2001.Import;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -381,7 +381,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     if (configLayer.getTitle() != null) {
                         title = configLayer.getTitle();
                     } else {
-                        title = fld.getName().getLocalPart();
+                        title = fld.getName().tip().toString();
                     }
                     ftt = buildFeatureType(
                             currentVersion,
@@ -508,7 +508,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     FeatureData fLayer = (FeatureData)layer;
                     ExtendedFeatureStore store = (ExtendedFeatureStore) fLayer.getStore();
                     if (store.getWrapped() instanceof XSDFeatureStore) {
-                        locations.putAll(((XSDFeatureStore)store.getWrapped()).getSchema(layer.getName()));
+                        locations.putAll((Map)((XSDFeatureStore)store.getWrapped()).getSchema(layer.getName()));
                     } else {
                         types.add(getFeatureTypeFromLayer(fLayer));
                     }
@@ -522,7 +522,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             for (final QName name : names) {
                 if (name == null) {continue;}
 
-                final Name n = Utils.getNameFromQname(name);
+                final GenericName n = Utils.getNameFromQname(name);
                 if (layersContainsKey(userLogin, n) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name, INVALID_PARAMETER_VALUE, "typenames");
                 }
@@ -536,7 +536,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     FeatureData fLayer = (FeatureData)layer;
                     ExtendedFeatureStore store = (ExtendedFeatureStore) fLayer.getStore();
                     if (store.getWrapped() instanceof XSDFeatureStore) {
-                        locations.putAll(((XSDFeatureStore)fLayer.getStore()).getSchema(layer.getName()));
+                        locations.putAll((Map)((XSDFeatureStore)fLayer.getStore()).getSchema(layer.getName()));
                     } else {
                         types.add(getFeatureTypeFromLayer(fLayer));
                     }
@@ -550,7 +550,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         for (int i = 0; i < size; i++) {
             try {
                 types.set(i, FeatureTypeUtilities.excludePrimaryKeyFields(types.get(i)));
-            } catch (SchemaException ex) {
+            } catch (IllegalArgumentException ex) {
                 LOGGER.log(Level.SEVERE, "error while excluding primary keys", ex);
             }
         }
@@ -565,8 +565,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final Schema schema;
         if (size == 1) {
             final FeatureType type = types.get(0);
-            final String tn        = type.getName().getLocalPart();
-            final String tnmsp     = type.getName().getNamespaceURI();
+            final String tn        = type.getName().tip().toString();
+            final String tnmsp     = NamesExt.getNamespace(type.getName());
             schema = writer.getSchemaFromFeatureType(type);
             final Set<String> nmsps = Utils.listAllNamespaces(type);
             nmsps.remove(tnmsp);
@@ -584,7 +584,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             for (FeatureType type : types) {
                 nmsps.addAll(Utils.listAllNamespaces(type));
             }
-            nmsps.remove(types.get(0).getName().getNamespaceURI());
+            nmsps.remove(NamesExt.getNamespace(types.get(0).getName()));
             nmsps.remove(Namespaces.GML);
             nmsps.remove("http://www.opengis.net/gml");
             for (String nmsp : nmsps) {
@@ -608,7 +608,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 final List<FeatureType> fts = typeMap.get(nmsp);
                 StringBuilder sb = new StringBuilder();
                 for (FeatureType ft : fts) {
-                    sb.append("ns:").append(ft.getName().getLocalPart()).append(',');
+                    sb.append("ns:").append(ft.getName().tip().toString()).append(',');
                 }
                 sb.delete(sb.length() -1, sb.length());
                 final String schemaLocation = getServiceUrl() + "request=DescribeFeatureType&service=WFS&version=" + currentVersion + "&typename=" + sb.toString() + "&namespace=xmlns(ns=" + nmsp + ")";
@@ -626,10 +626,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     private boolean AllInSameNamespace(final List<FeatureType> types) {
         if (!types.isEmpty() || types.size() == 1) {
-            String firstNmsp = types.get(0).getName().getNamespaceURI();
+            String firstNmsp = NamesExt.getNamespace(types.get(0).getName());
             for (int i = 1; i < types.size(); i++) {
                 FeatureType type = types.get(i);
-                if (!firstNmsp.equals(type.getName().getNamespaceURI())) {
+                if (!firstNmsp.equals(NamesExt.getNamespace(type.getName()))) {
                     return false;
                 }
             }
@@ -642,7 +642,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     private Map<String, List<FeatureType>> splitByNamespace(final List<FeatureType> types) {
         Map<String, List<FeatureType>> results = new HashMap<>();
         for (FeatureType type : types) {
-            final String nmsp = type.getName().getNamespaceURI();
+            final String nmsp = NamesExt.getNamespace(type.getName());
             if (results.containsKey(nmsp)) {
                 results.get(nmsp).add(type);
             } else {
@@ -681,7 +681,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
             suffix = "";
         } else {
-            final Name n = Utils.getNameFromQname(request.featureType);
+            final GenericName n = Utils.getNameFromQname(request.featureType);
             if (layersContainsKey(userLogin, n) == null) {
                 throw new CstlServiceException(UNKNOW_TYPENAME + request.featureType, INVALID_PARAMETER_VALUE, "typenames");
             }
@@ -812,27 +812,27 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
     }
 
-    private Name[] verifyPropertyNames(final QName typeName, final FeatureType ft, final List<String> requestPropNames) throws CstlServiceException {
+    private GenericName[] verifyPropertyNames(final QName typeName, final FeatureType ft, final List<String> requestPropNames) throws CstlServiceException {
         if (!requestPropNames.isEmpty()) {
-            final List<Name> propertyNames = new ArrayList<>();
+            final List<GenericName> propertyNames = new ArrayList<>();
             for (PropertyDescriptor pdesc : ft.getDescriptors()) {
-                final Name propName = pdesc.getName();
+                final GenericName propName = pdesc.getName();
 
                 if (!pdesc.isNillable()) {
                     if (!propertyNames.contains(propName)) {
                         propertyNames.add(propName);
                     }
-                } else if (requestPropNames.contains(propName.getLocalPart())) {
+                } else if (requestPropNames.contains(propName.tip().toString())) {
                     propertyNames.add(propName);
                 }
 
-                requestPropNames.remove(propName.getLocalPart());
+                requestPropNames.remove(propName.tip().toString());
             }
             // if the requestPropNames is not empty there is unKnown propertyNames
             if (!requestPropNames.isEmpty()) {
                 throw new CstlServiceException("The feature Type " + typeName + " does not have such a property:" + requestPropNames.get(0), INVALID_PARAMETER_VALUE);
             }
-            return propertyNames.toArray(new Name[propertyNames.size()]);
+            return propertyNames.toArray(new GenericName[propertyNames.size()]);
         } else {
             return null;
         }
@@ -902,7 +902,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             for (QName typeName : typeNames) {
 
-                final Name fullTypeName = Utils.getNameFromQname(typeName);
+                final GenericName fullTypeName = Utils.getNameFromQname(typeName);
                 if (layersContainsKey(userLogin, fullTypeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typenames");
                 }
@@ -1082,7 +1082,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             for (QName typeName : typeNames) {
 
-                final Name fullTypeName = Utils.getNameFromQname(typeName);
+                final GenericName fullTypeName = Utils.getNameFromQname(typeName);
                 if (layersContainsKey(userLogin, fullTypeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typenames");
                 }
@@ -1255,7 +1255,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     } catch (IOException | XMLStreamException ex) {
                         throw new CstlServiceException(ex);
                     }
-                    final Name typeName;
+                    final GenericName typeName;
                     FeatureCollection featureCollection;
 
                     if (featureObject instanceof Feature) {
@@ -1317,7 +1317,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 final Filter filter = extractJAXBFilter(deleteRequest.getFilter(), Filter.EXCLUDE, namespaceMapping, currentVersion);
 
-                final Name typeName = Utils.getNameFromQname(deleteRequest.getTypeName());
+                final GenericName typeName = Utils.getNameFromQname(deleteRequest.getTypeName());
                 if (layersContainsKey(userLogin, typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typename");
                 }
@@ -1362,7 +1362,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 //decode crs--------------------------------------------------------
                 final CoordinateReferenceSystem crs = extractCRS(updateRequest.getSrsName());
 
-                final Name typeName = Utils.getNameFromQname(updateRequest.getTypeName());
+                final GenericName typeName = Utils.getNameFromQname(updateRequest.getTypeName());
                 if (layersContainsKey(userLogin, typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE, "typename");
                 }
@@ -1484,7 +1484,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 } catch (IOException | XMLStreamException ex) {
                     throw new CstlServiceException(ex);
                 }
-                final Name typeName;
+                final GenericName typeName;
                 FeatureCollection featureCollection;
 
                 if (featureObject instanceof Feature) {
@@ -1683,10 +1683,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 // look to remove featureType prefix
                 String ftName = "";
-                if (ft.getName().getNamespaceURI() != null) {
-                    ftName = "{" + ft.getName().getNamespaceURI() + "}";
+                if (NamesExt.getNamespace(ft.getName()) != null) {
+                    ftName = "{" + NamesExt.getNamespace(ft.getName()) + "}";
                 }
-                ftName = ftName + ft.getName().getLocalPart();
+                ftName = ftName + ft.getName().tip().toString();
                 if (filterProperty.startsWith(ftName)) {
                     filterProperty = filterProperty.substring(ftName.length());
                 }
@@ -1700,10 +1700,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 final Binding pa = Bindings.getBinding(FeatureType.class, filterProperty);
                 if (pa == null || pa.get(ft, filterProperty, null) == null) {
                     String s = "";
-                    if (ft.getName().getNamespaceURI() != null) {
-                        s = "{" + ft.getName().getNamespaceURI() + "}";
+                    if (NamesExt.getNamespace(ft.getName()) != null) {
+                        s = "{" + NamesExt.getNamespace(ft.getName()) + "}";
                     }
-                    s = s + ft.getName().getLocalPart();
+                    s = s + ft.getName().tip().toString();
                     throw new CstlServiceException("The feature Type " + s + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
                 }
             }
@@ -1746,7 +1746,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * Extract the WGS84 BBOx from a featureSource.
      * what ? may not be wgs84 exactly ? why is there a CRS attribute on a wgs84 bbox ?
      */
-    private static Object toBBox(final FeatureStore source, final Name groupName, final String version) throws CstlServiceException{
+    private static Object toBBox(final FeatureStore source, final GenericName groupName, final String version) throws CstlServiceException{
         try {
             Envelope env = source.getEnvelope(QueryBuilder.all(groupName));
             final CoordinateReferenceSystem epsg4326 = CRS.decode("urn:ogc:def:crs:OGC:2:84");

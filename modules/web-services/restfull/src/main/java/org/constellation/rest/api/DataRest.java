@@ -78,12 +78,6 @@ import org.constellation.util.ParamUtilities;
 import org.constellation.util.Util;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.CoverageStoreFactory;
-import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.coverage.CoverageUtilities;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -95,8 +89,6 @@ import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.parameter.ParametersExt;
@@ -175,6 +167,14 @@ import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.geotoolkit.storage.coverage.CoverageStoreFactory;
+import org.geotoolkit.storage.coverage.CoverageStoreFinder;
+import org.geotoolkit.storage.coverage.CoverageUtilities;
+import org.geotoolkit.storage.coverage.PyramidalCoverageReference;
+import org.opengis.util.GenericName;
 
 /**
  * Manage data sending
@@ -512,7 +512,7 @@ public class DataRest {
 
                 //verify CRS
                 try {
-                    final Map<Name, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
+                    final Map<GenericName, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
                     for(final CoordinateReferenceSystem crs : nameCoordinateReferenceSystemHashMap.values()){
                         if (crs == null || crs instanceof ImageCRS) {
                             throw new DataStoreException("CRS is null or is instance of ImageCRS");
@@ -540,7 +540,7 @@ public class DataRest {
 
                 //verify CRS
                 try {
-                    final Map<Name, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
+                    final Map<GenericName, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
                     for(final CoordinateReferenceSystem crs : nameCoordinateReferenceSystemHashMap.values()){
                         if (crs == null || crs instanceof ImageCRS) {
                             throw new DataStoreException("CRS is null or is instance of ImageCRS");
@@ -1313,7 +1313,7 @@ public class DataRest {
                 LOGGER.log(Level.WARNING,"Provider "+providerIdentifier+" does not exist");
                 continue;
             }
-            final Data inData = inProvider.get(new DefaultName(dataName));
+            final Data inData = inProvider.get(NamesExt.create(dataName));
             if(inData==null){
                 LOGGER.log(Level.WARNING,"Data "+dataName+" does not exist in provider "+providerIdentifier);
                 continue;
@@ -1369,7 +1369,7 @@ public class DataRest {
         try {
             //create the output pyramid coverage reference
             CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
-            outRef = (XMLCoverageReference) pyramidStore.create(new DefaultName(dataName));
+            outRef = (XMLCoverageReference) pyramidStore.create(NamesExt.create(dataName));
             outRef.setPackMode(ViewType.RENDERED);
             ((XMLCoverageReference) outRef).setPreferredFormat(tileFormat);
             //this produces an update event which will create the DataRecord
@@ -1379,7 +1379,7 @@ public class DataRest {
             outRef = (XMLCoverageReference) pyramidStore.getCoverageReference(outRef.getName());
 
             //set data as RENDERED
-            final QName outDataQName = new QName(outRef.getName().getNamespaceURI(), outRef.getName().getLocalPart());
+            final QName outDataQName = new QName(NamesExt.getNamespace(outRef.getName()), outRef.getName().tip().toString());
             dataBusiness.updateDataRendered(outDataQName, outProvider.getId(), true);
 
             //set hidden value to true for the pyramid styled map
@@ -1540,7 +1540,7 @@ public class DataRest {
                     LOGGER.log(Level.WARNING,"Provider "+providerIdentifier+" does not exist");
                     continue;
                 }
-                final Data inData = inProvider.get(new DefaultName(dataName));
+                final Data inData = inProvider.get(NamesExt.create(dataName));
                 if(inData==null){
                     LOGGER.log(Level.WARNING,"Data "+dataName+" does not exist in provider "+providerIdentifier);
                     continue;
@@ -1624,7 +1624,7 @@ public class DataRest {
             try {
                 //create the output pyramid coverage reference
                 CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
-                outRef = (XMLCoverageReference) pyramidStore.create(new DefaultName(dataName));
+                outRef = (XMLCoverageReference) pyramidStore.create(NamesExt.create(dataName));
                 outRef.setPackMode(ViewType.RENDERED);
                 ((XMLCoverageReference) outRef).setPreferredFormat(tileFormat);
                 //this produces an update event which will create the DataRecord
@@ -1634,7 +1634,7 @@ public class DataRest {
                 outRef = (XMLCoverageReference) pyramidStore.getCoverageReference(outRef.getName());
 
                 //set data as RENDERED
-                final QName outDataQName = new QName(outRef.getName().getNamespaceURI(), outRef.getName().getLocalPart());
+                final QName outDataQName = new QName(NamesExt.getNamespace(outRef.getName()), outRef.getName().tip().toString());
                 dataBusiness.updateDataRendered(outDataQName, outProvider.getId(), true);
 
                 //set hidden value to true for the pyramid styled map
@@ -1747,7 +1747,7 @@ public class DataRest {
         if(inProvider==null){
             throw new ConstellationException("Provider "+providerId+" does not exist");
         }
-        final Data inData = inProvider.get(new DefaultName(dataId));
+        final Data inData = inProvider.get(NamesExt.create(dataId));
         if(inData==null){
             throw new ConstellationException("Data "+dataId+" does not exist in provider "+providerId);
         }
@@ -1846,10 +1846,10 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCoverageList(final SimpleValue value) {
         final DataProvider provider = DataProviders.getInstance().getProvider(value.getValue());
-        final Set<Name> nameSet = provider.getKeys();
+        final Set<GenericName> nameSet = provider.getKeys();
         final List<String> names = new ArrayList<>();
-        for (Name n : nameSet) {
-            names.add(n.getLocalPart());
+        for (GenericName n : nameSet) {
+            names.add(n.tip().toString());
         }
         Collections.sort(names);
 

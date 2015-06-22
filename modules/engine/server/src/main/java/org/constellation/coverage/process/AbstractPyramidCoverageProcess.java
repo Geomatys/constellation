@@ -31,19 +31,11 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactoryType;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.coverage.AbstractCoverageStoreFactory;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.coverage.Pyramid;
-import org.geotoolkit.coverage.PyramidSet;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.GridGeometry2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.internal.coverage.CoverageUtilities;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.parameter.ParametersExt;
@@ -51,6 +43,13 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.OutOfDomainOfValidityException;
+import org.geotoolkit.storage.coverage.AbstractCoverageStoreFactory;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.geotoolkit.storage.coverage.CoverageStoreFinder;
+import org.geotoolkit.storage.coverage.Pyramid;
+import org.geotoolkit.storage.coverage.PyramidSet;
+import org.geotoolkit.storage.coverage.PyramidalCoverageReference;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -58,6 +57,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.SingleCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+import org.opengis.util.GenericName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -111,11 +111,11 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
         return store;
     }
 
-    protected CoverageReference getOrCreateCRef(XMLCoverageStore coverageStore, Name coverageName, String tileFormat, ViewType type)
+    protected CoverageReference getOrCreateCRef(XMLCoverageStore coverageStore, GenericName coverageName, String tileFormat, ViewType type)
             throws DataStoreException {
         CoverageReference cv = null;
-        for (Name n : coverageStore.getNames()) {
-            if (n.getLocalPart().equals(coverageName.getLocalPart())) {
+        for (GenericName n : coverageStore.getNames()) {
+            if (n.tip().toString().equals(coverageName.tip().toString())) {
                 cv = coverageStore.getCoverageReference(n);
             }
         }
@@ -149,7 +149,7 @@ public abstract class AbstractPyramidCoverageProcess extends AbstractCstlProcess
             finalPyramidEnv = GeneralEnvelope.castOrCopy(CRSUtilities.appendMissingDimensions(finalPyramidEnv, (CompoundCRS) coverageCRS));
             assert finalPyramidEnv != null;
 
-            final int minOrdi0 = org.geotoolkit.coverage.CoverageUtilities.getMinOrdinate(coverageCRS);
+            final int minOrdi0 = org.geotoolkit.storage.coverage.CoverageUtilities.getMinOrdinate(coverageCRS);
             final int minOrdi1 = minOrdi0 + 1;
             final int nbDim   = coverageCRS.getCoordinateSystem().getDimension();
 

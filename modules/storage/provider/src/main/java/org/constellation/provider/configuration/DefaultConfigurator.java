@@ -66,23 +66,21 @@ import org.constellation.provider.StyleProviders;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.ParamUtilities;
 import org.constellation.util.SimplyMetadataTreeNode;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.feature.type.AttributeDescriptor;
 import org.geotoolkit.feature.type.AttributeType;
 import org.geotoolkit.feature.type.ComplexType;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.feature.type.GeometryDescriptor;
-import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.feature.type.PropertyType;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.image.io.metadata.SpatialMetadataFormat;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.PyramidalCoverageReference;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
@@ -243,14 +241,14 @@ public final class DefaultConfigurator implements Configurator {
             for (final org.constellation.engine.register.jooq.tables.pojos.Data data : list) {
                 boolean found = false;
                 for (final Object keyObj : provider.getKeys()) {
-                    final Name key = (Name) keyObj;
-                    if (data.getName().equals(key.getLocalPart())) {
+                    final GenericName key = (GenericName) keyObj;
+                    if (data.getName().equals(key.tip().toString())) {
                         found = true;
                         break;
-                    } else if (key.getLocalPart().contains(data.getName()) &&
+                    } else if (key.tip().toString().contains(data.getName()) &&
                             providerBusiness.getProvider(data.getProvider()).getIdentifier().equalsIgnoreCase(provider.getId())) {
                         //save metadata
-                        metadata.put(key.getLocalPart(), data.getMetadata());
+                        metadata.put(key.tip().toString(), data.getMetadata());
                     }
                 }
                 if (!found) {
@@ -263,8 +261,8 @@ public final class DefaultConfigurator implements Configurator {
             boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
 
             // Add new layer.
-            for (final Name key : provider.getKeys()) {
-                final QName name = new QName(key.getNamespaceURI(), key.getLocalPart());
+            for (final GenericName key : provider.getKeys()) {
+                final QName name = new QName(NamesExt.getNamespace(key), key.tip().toString());
                 boolean found = false;
                 for (final org.constellation.engine.register.jooq.tables.pojos.Data data : list) {
                     if (name.equals(new QName(data.getNamespace(),data.getName()))) {
@@ -282,7 +280,7 @@ public final class DefaultConfigurator implements Configurator {
                         final FeatureStore fs = (FeatureStore)store;
                         FeatureType fType = null;
                         try {
-                            fType = fs.getFeatureType(new DefaultName(name));
+                            fType = fs.getFeatureType(NamesExt.create(name));
                         } catch (DataStoreException ex) {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
@@ -299,7 +297,7 @@ public final class DefaultConfigurator implements Configurator {
                     if (currentMetadata != null) {
                         metadataXml = currentMetadata;
                     } else {
-                        final Data layer = (Data) provider.get(new DefaultName(name));
+                        final Data layer = (Data) provider.get(NamesExt.create(name));
                         final Object origin = layer.getOrigin();
                         if (origin instanceof CoverageReference) {
                             final CoverageReference fcr = (CoverageReference) origin;

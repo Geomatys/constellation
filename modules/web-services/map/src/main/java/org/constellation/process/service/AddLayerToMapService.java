@@ -23,11 +23,8 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DimensionDefinition;
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.configuration.Layer;
-import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.process.AbstractCstlProcess;
-import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.constellation.util.DataReference;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -44,8 +41,10 @@ import java.util.Date;
 import java.util.List;
 
 import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
+import org.opengis.util.GenericName;
 
 /**
  * Process that add a new layer layerContext from a webMapService configuration.
@@ -121,8 +120,8 @@ public class AddLayerToMapService extends AbstractCstlProcess {
         //extract provider identifier and layer name
         final String providerID = layerRef.getProviderOrServiceId();
         final Date dataVersion = layerRef.getDataVersion();
-        final Name layerName = layerRef.getLayerId();
-        final QName layerQName = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
+        final GenericName layerName = layerRef.getLayerId();
+        final QName layerQName = new QName(NamesExt.getNamespace(layerName), layerName.tip().toString());
 
         //create future new layer
         final Layer newLayer = new Layer(layerQName);
@@ -168,7 +167,7 @@ public class AddLayerToMapService extends AbstractCstlProcess {
         }
 
         try {
-            layerBusiness.add(layerName.getLocalPart(), layerName.getNamespaceURI(), providerID, layerAlias, serviceInstance, serviceType, newLayer);
+            layerBusiness.add(layerName.tip().toString(), NamesExt.getNamespace(layerName), providerID, layerAlias, serviceInstance, serviceType, newLayer);
         } catch (ConfigurationException ex) {
             throw new ProcessException("Error while saving layer", this, ex);
         }

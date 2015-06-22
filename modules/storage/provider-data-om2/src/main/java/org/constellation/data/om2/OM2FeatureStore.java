@@ -40,9 +40,7 @@ import org.geotoolkit.feature.Property;
 import org.geotoolkit.feature.simple.DefaultSimpleFeatureType;
 import org.geotoolkit.feature.type.AttributeDescriptor;
 import org.geotoolkit.feature.type.DefaultGeometryDescriptor;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.filter.identity.DefaultFeatureId;
 import org.geotoolkit.jdbc.ManageableDataSource;
@@ -70,6 +68,8 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import static org.constellation.data.om2.OM2FeatureStoreFactory.SGBDTYPE;
+import org.geotoolkit.feature.type.NamesExt;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -82,13 +82,13 @@ public class OM2FeatureStore extends AbstractFeatureStore {
     private static final FeatureFactory FF = FeatureFactory.LENIENT;
 
     private static final String CSTL_NAMESPACE = "http://constellation.org/om2";
-    private static final Name CSTL_TN_SENSOR = new DefaultName(CSTL_NAMESPACE, "Sensor");
-    protected static final Name ATT_ID = new DefaultName(CSTL_NAMESPACE,  "id");
-    protected static final Name ATT_POSITION = new DefaultName(CSTL_NAMESPACE,  "position");
+    private static final GenericName CSTL_TN_SENSOR = NamesExt.create(CSTL_NAMESPACE, "Sensor");
+    protected static final GenericName ATT_ID = NamesExt.create(CSTL_NAMESPACE,  "id");
+    protected static final GenericName ATT_POSITION = NamesExt.create(CSTL_NAMESPACE,  "position");
 
     private static final QueryCapabilities capabilities = new DefaultQueryCapabilities(false);
 
-    private final Map<Name, FeatureType> types = new HashMap<>();
+    private final Map<GenericName, FeatureType> types = new HashMap<>();
 
     private final ManageableDataSource source;
 
@@ -145,7 +145,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public FeatureWriter getFeatureWriterAppend(final Name typeName, final Hints hints) throws DataStoreException {
+    public FeatureWriter getFeatureWriterAppend(final GenericName typeName, final Hints hints) throws DataStoreException {
         return handleWriterAppend(typeName,hints);
     }
 
@@ -153,7 +153,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public FeatureWriter getFeatureWriter(final Name typeName, final Filter filter, final Hints hints) throws DataStoreException {
+    public FeatureWriter getFeatureWriter(final GenericName typeName, final Filter filter, final Hints hints) throws DataStoreException {
         final FeatureType sft = getFeatureType(typeName);
         try {
             return handleRemaining(new OMWriter(sft), filter);
@@ -179,7 +179,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public Set<Name> getNames() throws DataStoreException {
+    public Set<GenericName> getNames() throws DataStoreException {
         return types.keySet();
     }
 
@@ -187,7 +187,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public FeatureType getFeatureType(final Name typeName) throws DataStoreException {
+    public FeatureType getFeatureType(final GenericName typeName) throws DataStoreException {
         typeCheck(typeName);
         return types.get(typeName);
     }
@@ -204,7 +204,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public List<FeatureId> addFeatures(final Name groupName, final Collection<? extends Feature> newFeatures,
+    public List<FeatureId> addFeatures(final GenericName groupName, final Collection<? extends Feature> newFeatures,
             final Hints hints) throws DataStoreException {
         final FeatureType featureType = getFeatureType(groupName); //raise an error if type doesn't exist
         final List<FeatureId> result = new ArrayList<>();
@@ -317,7 +317,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public void createFeatureType(final Name typeName, final FeatureType featureType) throws DataStoreException {
+    public void createFeatureType(final GenericName typeName, final FeatureType featureType) throws DataStoreException {
         throw new DataStoreException("Not Supported.");
     }
 
@@ -325,7 +325,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public void updateFeatureType(final Name typeName, final FeatureType featureType) throws DataStoreException {
+    public void updateFeatureType(final GenericName typeName, final FeatureType featureType) throws DataStoreException {
         throw new DataStoreException("Not Supported.");
     }
 
@@ -333,7 +333,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public void deleteFeatureType(final Name typeName) throws DataStoreException {
+    public void deleteFeatureType(final GenericName typeName) throws DataStoreException {
         throw new DataStoreException("Not Supported.");
     }
 
@@ -341,7 +341,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public void updateFeatures(final Name groupName, final Filter filter, final Map<? extends PropertyDescriptor, ? extends Object> values) throws DataStoreException {
+    public void updateFeatures(final GenericName groupName, final Filter filter, final Map<? extends PropertyDescriptor, ? extends Object> values) throws DataStoreException {
         throw new DataStoreException("Not supported.");
     }
 
@@ -349,7 +349,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public void removeFeatures(final Name groupName, final Filter filter) throws DataStoreException {
+    public void removeFeatures(final GenericName groupName, final Filter filter) throws DataStoreException {
         handleRemoveWithFeatureWriter(groupName, filter);
     }
 

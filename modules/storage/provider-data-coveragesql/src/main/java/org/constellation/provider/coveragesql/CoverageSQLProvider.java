@@ -23,13 +23,9 @@ import org.constellation.api.DataType;
 import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.DefaultCoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.opengis.parameter.ParameterValueGroup;
@@ -49,7 +45,11 @@ import static org.constellation.provider.configuration.ProviderParameters.getLay
 import static org.constellation.provider.configuration.ProviderParameters.isLoadAll;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.parameter.Parameters.value;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.DefaultCoverageReference;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -59,7 +59,7 @@ public class CoverageSQLProvider extends AbstractDataProvider{
 
     private CoverageDatabase database;
 
-    private final Set<Name> index = new HashSet<>();
+    private final Set<GenericName> index = new HashSet<>();
 
     protected CoverageSQLProvider(String providerId, final CoverageSQLProviderService service,
             final ParameterValueGroup source) {
@@ -95,7 +95,7 @@ public class CoverageSQLProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Set<Name> getKeys() {
+    public Set<GenericName> getKeys() {
         return Collections.unmodifiableSet(index);
     }
 
@@ -103,7 +103,7 @@ public class CoverageSQLProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Data get(final Name key) {
+    public Data get(final GenericName key) {
         return get(key, null);
     }
 
@@ -111,7 +111,7 @@ public class CoverageSQLProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Data get(final Name key, Date version) {
+    public Data get(final GenericName key, Date version) {
         // If the key is not present for this provider, it is not necessary to go further.
         // Without this test, an exception will be logged whose message is a warning about
         // the non presence of the requested key into the "Layers" table.
@@ -125,17 +125,17 @@ public class CoverageSQLProvider extends AbstractDataProvider{
 
         LayerCoverageReader reader = null;
         try {
-            reader = database.createGridCoverageReader(key.getLocalPart());
+            reader = database.createGridCoverageReader(key.tip().toString());
         } catch (CoverageStoreException ex) {
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
 
 
         if (reader != null) {
-            final String name = key.getLocalPart();
+            final String name = key.tip().toString();
             final ParameterValueGroup layer = getLayer(getSource(), name);
             final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
-            final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
+            final GenericName em = (layer == null || elemodel == null) ? null : NamesExt.valueOf(elemodel);
             return new CoverageSQLLayerDetails(reader,null,em,key);
         }
 
@@ -208,17 +208,17 @@ public class CoverageSQLProvider extends AbstractDataProvider{
             } else if (nmsp.equals(NO_NAMESPACE)){
                 nmsp = null;
             }
-            index.add(new DefaultName(nmsp,name));
+            index.add(NamesExt.create(nmsp,name));
         }
     }
 
     @Override
-    public ElevationModel getElevationModel(Name name) {
+    public ElevationModel getElevationModel(GenericName name) {
         if(name == null){
             return null;
         }
 
-        final ParameterValueGroup layer = getLayer(getSource(), name.getLocalPart());
+        final ParameterValueGroup layer = getLayer(getSource(), name.tip().toString());
         if(layer != null){
             Boolean isEleModel = value(LAYER_IS_ELEVATION_MODEL_DESCRIPTOR, layer);
 

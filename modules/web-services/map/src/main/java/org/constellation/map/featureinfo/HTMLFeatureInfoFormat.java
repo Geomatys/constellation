@@ -123,7 +123,7 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         if(att instanceof ComplexAttribute){
             if(depth!=0){
                 typeBuilder.append("<li>\n");
-                typeBuilder.append(att.getDescriptor().getName().getLocalPart());
+                typeBuilder.append(att.getDescriptor().getName().tip().toString());
                 typeBuilder.append("</li>\n");
                 dataBuilder.append("<br/>\n");
             }
@@ -137,7 +137,7 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             
         }else{
             typeBuilder.append("<li>\n");
-            typeBuilder.append(att.getDescriptor().getName().getLocalPart());
+            typeBuilder.append(att.getDescriptor().getName().tip().toString());
             typeBuilder.append("</li>\n");
             
             final Object value = att.getValue();
@@ -175,7 +175,7 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             return;
         }
 
-        final String layerName = graphic.getLayer().getCoverageReference().getName().getLocalPart();
+        final String layerName = graphic.getLayer().getCoverageReference().getName().tip().toString();
         
         LayerResult result = results.get(layerName);
         if(result==null){

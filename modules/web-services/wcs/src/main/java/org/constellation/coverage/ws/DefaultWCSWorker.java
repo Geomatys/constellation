@@ -41,7 +41,6 @@ import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
@@ -143,6 +142,7 @@ import org.constellation.ws.ExceptionCode;
 import static org.constellation.ws.ExceptionCode.AXIS_LABEL_INVALID;
 import org.geotoolkit.coverage.Category;
 import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.gml.xml.v321.AssociationRoleType;
 import org.geotoolkit.gml.xml.v321.FileType;
 import org.geotoolkit.gmlcov.geotiff.xml.v100.CompressionType;
@@ -178,6 +178,7 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.util.GenericName;
 
 // GeoAPI dependencies
 
@@ -247,7 +248,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final List<CoverageInfo> coverageOfferings = new ArrayList<>();
         for (String coverage : request.getIdentifier()) {
 
-            final Name tmpName = parseCoverageName(coverage);
+            final GenericName tmpName = parseCoverageName(coverage);
             final Data layerRef = getLayerReference(userLogin, tmpName);
             if (layerRef.getType().equals(Data.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
@@ -266,15 +267,15 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
 
             final Layer configLayer = getConfigurationLayer(layerRef.getName(), userLogin);
-            final Name fullCoverageName = coverageRef.getName();
+            final GenericName fullCoverageName = coverageRef.getName();
             final String coverageName;
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
                 coverageName = configLayer.getAlias().trim().replaceAll(" ", "_");
             } else {
-                if (fullCoverageName.getNamespaceURI() != null && !fullCoverageName.getNamespaceURI().isEmpty()) {
-                    coverageName = fullCoverageName.getNamespaceURI() + ':' + fullCoverageName.getLocalPart();
+                if (NamesExt.getNamespace(fullCoverageName) != null && !NamesExt.getNamespace(fullCoverageName).isEmpty()) {
+                    coverageName = NamesExt.getNamespace(fullCoverageName) + ':' + fullCoverageName.tip().toString();
                 } else {
-                    coverageName = fullCoverageName.getLocalPart();
+                    coverageName = fullCoverageName.tip().toString();
                 }
             }
             if (version.equals("1.0.0")) {
@@ -650,15 +651,15 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      */
     private CoverageInfo getCoverageInfo100(final Data layer, final Layer configLayer) throws DataStoreException {
 
-        final Name fullLayerName = layer.getName();
+        final GenericName fullLayerName = layer.getName();
         final String layerName;
         if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
             layerName = configLayer.getAlias().trim().replaceAll(" ", "_");
         } else {
-            if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
-                layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+            if (NamesExt.getNamespace(fullLayerName) != null && !NamesExt.getNamespace(fullLayerName).isEmpty()) {
+                layerName = NamesExt.getNamespace(fullLayerName) + ':' + fullLayerName.tip().toString();
             } else {
-                layerName = fullLayerName.getLocalPart();
+                layerName = fullLayerName.tip().toString();
             }
         }
         final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
@@ -699,10 +700,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
             identifier = configLayer.getAlias().trim().replaceAll(" ", "_");
         } else {
-            identifier = coverageLayer.getName().getLocalPart();
+            identifier = coverageLayer.getName().tip().toString();
         }
 
-        final String title       = coverageLayer.getName().getLocalPart();
+        final String title       = coverageLayer.getName().tip().toString();
         final CharSequence remark = CharSequences.toASCII(coverageLayer.getRemarks());
 
         final GeographicBoundingBox inputGeoBox = coverageLayer.getGeographicBoundingBox();
@@ -742,7 +743,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             throw new CstlServiceException("You must specify the parameter: COVERAGE" , INVALID_PARAMETER_VALUE,
                     KEY_COVERAGE.toLowerCase());
         }
-        final Name tmpName = parseCoverageName(request.getCoverage());
+        final GenericName tmpName = parseCoverageName(request.getCoverage());
         final Data tmplayerRef = getLayerReference(userLogin, tmpName);
         if (!tmplayerRef.isQueryable(ServiceDef.Query.WCS_ALL) || tmplayerRef.getType().equals(Data.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
@@ -805,7 +806,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 if (envelope.getMaximum(i) < axis.getMinimumValue() ||
                     envelope.getMinimum(i) > axis.getMaximumValue())
                 {
-                    throw new CstlServiceException(Errors.format(Errors.Keys.ILLEGAL_RANGE_2,
+                    throw new CstlServiceException(Errors.format(Errors.Keys.IllegalRange_2,
                             envelope.getMinimum(i), envelope.getMaximum(i)),
                             INVALID_DIMENSION_VALUE, KEY_BBOX.toLowerCase());
                 }
@@ -1084,7 +1085,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 if (isMultiPart) {
                     final File img = File.createTempFile(coverage.getName().toString(), ".nc");
                     GridCoverageNCWriter.writeInStream(response, new FileOutputStream(img));
-                    final WCSResponseWrapper xml = buildXmlPart(describeCoverage200(layerRef.getName().getLocalPart(), layerRef), format);
+                    final WCSResponseWrapper xml = buildXmlPart(describeCoverage200(layerRef.getName().tip().toString(), layerRef), format);
                     final MultiPart multiPart = new MultiPart();
                     multiPart.bodyPart(new BodyPart(xml, MediaType.APPLICATION_XML_TYPE))
                              .bodyPart(new BodyPart(img,MediaType.valueOf(format)));
@@ -1140,7 +1141,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 }
                 if (isMultiPart) {
                     final File img = GridCoverageWriter.writeInFile(response);
-                    final WCSResponseWrapper xml = buildXmlPart(describeCoverage200(layerRef.getName().getLocalPart(), layerRef), format);
+                    final WCSResponseWrapper xml = buildXmlPart(describeCoverage200(layerRef.getName().tip().toString(), layerRef), format);
                     final MultiPart multiPart = new MultiPart();
                     multiPart.bodyPart(new BodyPart(xml, MediaType.APPLICATION_XML_TYPE))
                              .bodyPart(new BodyPart(img,MediaType.valueOf(format)));

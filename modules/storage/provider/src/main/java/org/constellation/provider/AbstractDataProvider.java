@@ -21,8 +21,6 @@ package org.constellation.provider;
 
 import org.constellation.api.ProviderType;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.gui.swing.tree.Trees;
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.parameter.ParameterValueGroup;
@@ -35,7 +33,9 @@ import java.util.logging.Level;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_NAME_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getLayers;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.parameter.Parameters.stringValue;
+import org.opengis.util.GenericName;
 
 /**
  * Abstract implementation of LayerProvider which only handle the
@@ -43,7 +43,7 @@ import static org.geotoolkit.parameter.Parameters.stringValue;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> implements DataProvider{
+public abstract class AbstractDataProvider extends AbstractProvider<GenericName,Data> implements DataProvider{
 
     protected static final String DEFAULT_NAMESPACE = "http://geotoolkit.org";
     protected static final String NO_NAMESPACE = "no namespace";
@@ -58,8 +58,8 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
      * {@inheritDoc }
      */
     @Override
-    public Class<Name> getKeyClass() {   
-        return Name.class;
+    public Class<GenericName> getKeyClass() {
+        return GenericName.class;
     }
 
     /**
@@ -71,9 +71,9 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
     }
 
     @Override
-    public boolean contains(final Name key) {
-        for(Name n : getKeys()){
-            if(DefaultName.match(n, key)){
+    public boolean contains(final GenericName key) {
+        for(GenericName n : getKeys()){
+            if(NamesExt.match(n, key)){
                 return true;
             }
         }
@@ -82,16 +82,16 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
 
     @Override
     public Data get(String key){
-        final Name name = new DefaultName(ProviderParameters.getNamespace(this), key);
+        final GenericName name = NamesExt.create(ProviderParameters.getNamespace(this), key);
         return get(name);
     }
     
     /**
      * Fill namespace on name is not present.
      */
-    protected Name fullyQualified(final Name key){
-        for(Name n : getKeys()){
-            if(DefaultName.match(n, key)){
+    protected GenericName fullyQualified(final GenericName key){
+        for(GenericName n : getKeys()){
+            if(NamesExt.match(n, key)){
                 return n;
             }
         }
@@ -102,8 +102,8 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
      * {@inheritDoc }
      */
     @Override
-    public Data getByIdentifier(final Name key) {
-        for(final Name n : getKeys()){
+    public Data getByIdentifier(final GenericName key) {
+        for(final GenericName n : getKeys()){
             if(n.equals(key)){
                 return get(n);
             }
@@ -115,7 +115,7 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
      * {@inheritDoc }
      */
     @Override
-    public ElevationModel getElevationModel(final Name name) {
+    public ElevationModel getElevationModel(final GenericName name) {
         return null;
     }
 
@@ -126,15 +126,15 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
      */
     protected void visit(){
         final ParameterValueGroup config = getSource();
-        final Set<Name> keys = getKeys();
+        final Set<GenericName> keys = getKeys();
 
         final List<String> missingLayers = new ArrayList<>();
 
         loop:
         for(final ParameterValueGroup declaredLayer : getLayers(config)){
             final String layerName = stringValue(LAYER_NAME_DESCRIPTOR, declaredLayer);
-            for(Name n : keys){
-                if(DefaultName.match(n, layerName)) continue loop;
+            for(GenericName n : keys){
+                if(NamesExt.match(n, layerName)) continue loop;
             }
 
             missingLayers.add(layerName);
@@ -149,11 +149,11 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
         }
     }
 
-    public static Name containsOnlyLocalPart(final Collection<Name> index, final Name layerName) {
+    public static GenericName containsOnlyLocalPart(final Collection<GenericName> index, final GenericName layerName) {
         if (layerName != null) {
-            if (layerName.getNamespaceURI() == null) {
-                for (Name name : index) {
-                    if (name.getLocalPart().equals(layerName.getLocalPart())) {
+            if (NamesExt.getNamespace(layerName) == null) {
+                for (GenericName name : index) {
+                    if (name.tip().toString().equals(layerName.tip().toString())) {
                         return name;
                     }
                 }
@@ -162,10 +162,10 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
         return null;
     }
 
-    public static Name containsWithNamespaceError(final Collection<Name> index, final Name layerName) {
+    public static GenericName containsWithNamespaceError(final Collection<GenericName> index, final GenericName layerName) {
         if (layerName != null) {
-            for (Name name : index) {
-                if (name.getLocalPart().equals(layerName.getLocalPart())) {
+            for (GenericName name : index) {
+                if (name.tip().toString().equals(layerName.tip().toString())) {
                     return name;
                 }
             }

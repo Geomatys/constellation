@@ -74,9 +74,8 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
@@ -167,6 +166,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.GenericName;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -1849,7 +1849,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         /**
          * Test 1 : transaction replace for Feature type NamedPlaces
          */
-        final Name tName = new DefaultName("http://www.opengis.net/gml/3.2", "NamedPlaces");
+        final GenericName tName = NamesExt.create("http://www.opengis.net/gml/3.2", "NamedPlaces");
         final FeatureType ft = ((FeatureData) DataProviders.getInstance().get(tName)).getStore().getFeatureType(tName);
         final JAXPStreamFeatureReader fr = new JAXPStreamFeatureReader(ft);
         fr.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");

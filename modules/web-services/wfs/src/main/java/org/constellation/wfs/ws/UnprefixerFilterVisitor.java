@@ -20,6 +20,7 @@
 package org.constellation.wfs.ws;
 
 import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
 import org.opengis.filter.expression.PropertyName;
 
@@ -38,10 +39,10 @@ public class UnprefixerFilterVisitor extends DuplicatingFilterVisitor{
     @Override
     public Object visit(final PropertyName expression, final Object extraData) {
         String prefix = "";
-        if (ft.getName().getNamespaceURI() != null) {
-            prefix = "{" + ft.getName().getNamespaceURI() + "}";
+        if (NamesExt.getNamespace(ft.getName()) != null) {
+            prefix = "{" + NamesExt.getNamespace(ft.getName()) + "}";
         }
-        prefix = prefix + ft.getName().getLocalPart();
+        prefix = prefix + ft.getName().tip().toString();
         if (expression.getPropertyName().startsWith(prefix)) {
             final String newPropertyName = expression.getPropertyName().substring(prefix.length());
             return getFactory(extraData).property(newPropertyName);

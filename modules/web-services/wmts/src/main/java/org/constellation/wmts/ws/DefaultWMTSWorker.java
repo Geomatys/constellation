@@ -36,18 +36,11 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.coverage.CoverageUtilities;
-import org.geotoolkit.coverage.GridMosaic;
-import org.geotoolkit.coverage.Pyramid;
-import org.geotoolkit.coverage.PyramidSet;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
-import org.geotoolkit.coverage.TileReference;
 import org.geotoolkit.coverage.finder.StrictlyCoverageFinder;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
@@ -118,6 +111,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.storage.coverage.CoverageUtilities;
+import org.geotoolkit.storage.coverage.GridMosaic;
+import org.geotoolkit.storage.coverage.Pyramid;
+import org.geotoolkit.storage.coverage.PyramidSet;
+import org.geotoolkit.storage.coverage.PyramidalCoverageReference;
+import org.geotoolkit.storage.coverage.TileReference;
+import org.opengis.util.GenericName;
 
 /**
  * Working part of the WMTS service.
@@ -593,7 +593,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         //       -- get the List of layer references
         final GetTile getTile       = request.getGetTile();
         final String userLogin      = getUserLogin();
-        final Name layerName        = Util.parseLayerName(getTile.getLayer());
+        final GenericName layerName = Util.parseLayerName(getTile.getLayer());
         final Data layerRef = getLayerReference(userLogin, layerName);
         final Layer configLayer     = getConfigurationLayer(layerName, userLogin);
 
@@ -698,7 +698,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     public TileReference getTile(final GetTile request) throws CstlServiceException {
 
         //1 LAYER NOT USED FOR NOW
-        final Name layerName = Util.parseLayerName(request.getLayer());
+        final GenericName layerName = Util.parseLayerName(request.getLayer());
         final String userLogin  = getUserLogin();
 //        final Layer configLayer = getConfigurationLayer(layerName, userLogin);
 

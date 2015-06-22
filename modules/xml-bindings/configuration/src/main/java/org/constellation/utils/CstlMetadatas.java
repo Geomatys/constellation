@@ -22,7 +22,6 @@ package org.constellation.utils;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.ArgumentChecks;
 import org.constellation.dto.Details;
-import org.geotoolkit.feature.type.Name;
 
 import java.util.Date;
 import java.util.List;
@@ -30,6 +29,7 @@ import java.util.List;
 import static org.constellation.utils.CstlMetadataTemplate.DATA;
 import static org.constellation.utils.CstlMetadataTemplate.PROVIDER;
 import static org.constellation.utils.CstlMetadataTemplate.SERVICE;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -87,10 +87,10 @@ public class CstlMetadatas {
 //        return PROVIDER.getPrefix()+ '_' + providerId;
 //    }
     
-    public static String getMetadataIdForData(final String providerId, final Name dataName){
+    public static String getMetadataIdForData(final String providerId, final GenericName dataName){
         ArgumentChecks.ensureNonNull("dataName", dataName);
         ArgumentChecks.ensureNonNull("providerId", providerId);
-        return  providerId + '_' + dataName.getLocalPart(); // TODO namespace?
+        return  providerId + '_' + dataName.tip().toString(); // TODO namespace?
     }
     
     public static String getMetadataIdForDataset(final String providerId){

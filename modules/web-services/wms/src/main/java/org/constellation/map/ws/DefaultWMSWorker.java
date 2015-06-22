@@ -63,8 +63,6 @@ import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.inspire.xml.vs.LanguagesType;
@@ -160,10 +158,10 @@ import static org.constellation.map.ws.WMSConstant.KEY_EXTRA_PARAMETERS;
 import static org.constellation.map.ws.WMSConstant.KEY_LAYER;
 import static org.constellation.map.ws.WMSConstant.KEY_LAYERS;
 import static org.constellation.map.ws.WMSConstant.KEY_TIME;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.combineIterator.GridCombineIterator;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
@@ -173,6 +171,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_QUERYABLE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
+import org.geotoolkit.storage.coverage.CoverageReference;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createBoundingBox;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createDimension;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createGeographicBoundingBox;
@@ -181,6 +180,7 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.createLegendURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
+import org.opengis.util.GenericName;
 
 //Geoapi dependencies
 
@@ -568,18 +568,18 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
              * LegendUrl generation
              * TODO: Use a StringBuilder or two
              */
-            final Name fullLayerName = layer.getName();
+            final GenericName fullLayerName = layer.getName();
             final String layerName;
 
             //Use layer alias from config if exist.
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
                 layerName = configLayer.getAlias();
             } else {
-
-                if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
-                    layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+                final String ns = NamesExt.getNamespace(fullLayerName);
+                if (ns != null && !ns.isEmpty()) {
+                    layerName = ns + ':' + fullLayerName.tip().toString();
                 } else {
-                    layerName = fullLayerName.getLocalPart();
+                    layerName = fullLayerName.tip().toString();
                 }
             }
             final String beginLegendUrl = getServiceUrl() + "REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=";
@@ -834,7 +834,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             for (DataReference styleRef : configLayer.getStyles()) {
                 MutableStyle ms = null;
                 try {
-                    final MutableStyle style = styleBusiness.getStyle(styleRef.getProviderId(), styleRef.getLayerId().getLocalPart());
+                    final MutableStyle style = styleBusiness.getStyle(styleRef.getProviderId(), styleRef.getLayerId().tip().toString());
                     if (style != null) {
                         ms = style;
                     } else {
@@ -950,7 +950,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         String styleName = ms.getName();
         if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
             final DataReference dataRef = new DataReference(styleName);
-            styleName = dataRef.getLayerId().getLocalPart();
+            styleName = dataRef.getLayerId().tip().toString();
         }
         return createStyle(currentVersion, styleName, styleName, null, legendURL1, legendURL2);
     }
@@ -972,7 +972,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 1. SCENE
         //       -- get the List of layer references
         final String userLogin             = getUserLogin();
-        final List<Name> layerNames        = getFI.getQueryLayers();
+        final List<GenericName> layerNames        = getFI.getQueryLayers();
         final List<Data> layerRefs;
         final List<Layer> layerConfig;
         try{
@@ -1212,7 +1212,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         // 1. SCENE
         //       -- get the List of layer references
-        final List<Name> layerNames = getMap.getLayers();
+        final List<GenericName> layerNames = getMap.getLayers();
         final List<Data> layerRefs;
         final List<Layer> layerConfig;
         try{
@@ -1421,7 +1421,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
     }
 
-    private MutableStyle extractStyle(final Name layerName, final Layer configLayer, final StyledLayerDescriptor sld) throws CstlServiceException{
+    private MutableStyle extractStyle(final GenericName layerName, final Layer configLayer, final StyledLayerDescriptor sld) throws CstlServiceException{
         if(sld == null){
             throw new IllegalArgumentException("SLD should not be null");
         }
@@ -1441,7 +1441,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 continue;
             }
             // If it matches, then we return it.
-            if (layerName.getLocalPart().equals(sldLayerName)) {
+            if (layerName.tip().toString().equals(sldLayerName)) {
                 for (final MutableLayerStyle mls : mnl.styles()) {
                     if (mls instanceof MutableNamedStyle) {
                         final MutableNamedStyle mns = (MutableNamedStyle) mls;
@@ -1471,7 +1471,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         for (int i=0; i<layerConfig.size(); i++) {
             final Layer config = layerConfig.get(i);
             if (config != null) {
-                final Name layerName = new DefaultName(config.getName());
+                final GenericName layerName = NamesExt.create(config.getName());
 
                 final MutableStyle style;
                 if (sld != null) {

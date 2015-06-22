@@ -81,7 +81,7 @@ import java.util.logging.Level;
              org.geotoolkit.feature.catalog.InheritanceRelationImpl.class,
              org.geotoolkit.feature.catalog.ListedValueImpl.class,
              org.geotoolkit.feature.catalog.PropertyTypeImpl.class,
-             org.geotoolkit.util.Multiplicity.class})
+             org.geotoolkit.feature.catalog.util.Multiplicity.class})
 public class CSWService extends OGCWebService<CSWworker>{
 
     /**
