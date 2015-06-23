@@ -498,6 +498,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final List<FeatureType> types       = new ArrayList<>();
         final Map<String, String> locations = new HashMap<>();
 
+        //XSDFeatureStore may provide the xsd themselves
+        final Map<FeatureType,Schema> declaredSchema = new HashMap<>();
         if (names.isEmpty()) {
             //search all types
             for (final QName name : getConfigurationLayerNames(userLogin)) {
@@ -508,7 +510,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     FeatureData fLayer = (FeatureData)layer;
                     ExtendedFeatureStore store = (ExtendedFeatureStore) fLayer.getStore();
                     if (store.getWrapped() instanceof XSDFeatureStore) {
-                        locations.putAll((Map)((XSDFeatureStore)store.getWrapped()).getSchema(layer.getName()));
+                        final Map params = (Map)((XSDFeatureStore)store.getWrapped()).getSchema(layer.getName());
+                        if(params.size()==1 && params.get(params.keySet().iterator().next()) instanceof Schema){
+                            final FeatureType ft = getFeatureTypeFromLayer(fLayer);
+                            declaredSchema.put(ft, (Schema) params.get(params.keySet().iterator().next()));
+                            types.add(ft);
+                        }else{
+                            locations.putAll(params);
+                        }
                     } else {
                         types.add(getFeatureTypeFromLayer(fLayer));
                     }
@@ -536,7 +545,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     FeatureData fLayer = (FeatureData)layer;
                     ExtendedFeatureStore store = (ExtendedFeatureStore) fLayer.getStore();
                     if (store.getWrapped() instanceof XSDFeatureStore) {
-                        locations.putAll((Map)((XSDFeatureStore)fLayer.getStore()).getSchema(layer.getName()));
+                        final Map params = (Map)((XSDFeatureStore)store.getWrapped()).getSchema(layer.getName());
+                        if(params.size()==1 && params.get(params.keySet().iterator().next()) instanceof Schema){
+                            final FeatureType ft = getFeatureTypeFromLayer(fLayer);
+                            declaredSchema.put(ft, (Schema) params.get(params.keySet().iterator().next()));
+                            types.add(ft);
+                        }else{
+                            locations.putAll(params);
+                        }
                     } else {
                         types.add(getFeatureTypeFromLayer(fLayer));
                     }
@@ -558,7 +574,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (request.getOutputFormat().equals("application/schema+json")) {
             return new org.constellation.wfs.ws.rs.FeatureTypeList(types);
         }
-        
+
         /*
          * Most simple case. we have only one feature type
          */
@@ -567,13 +583,17 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             final FeatureType type = types.get(0);
             final String tn        = type.getName().tip().toString();
             final String tnmsp     = NamesExt.getNamespace(type.getName());
-            schema = writer.getSchemaFromFeatureType(type);
-            final Set<String> nmsps = Utils.listAllNamespaces(type);
-            nmsps.remove(tnmsp);
-            nmsps.remove(Namespaces.GML);
-            nmsps.remove("http://www.opengis.net/gml");
-            for (String nmsp : nmsps) {
-                schema.addImport(new Import(nmsp, getServiceUrl() + "request=xsd&version=" + currentVersion + "&targetNamespace=" + nmsp + "&typename=ns:" + tn + "&namespace=xmlns(ns=" + tnmsp + ")"));
+            if(declaredSchema.containsKey(type)){
+                schema = declaredSchema.get(type);
+            }else{
+                schema = writer.getSchemaFromFeatureType(type);
+                final Set<String> nmsps = Utils.listAllNamespaces(type);
+                nmsps.remove(tnmsp);
+                nmsps.remove(Namespaces.GML);
+                nmsps.remove("http://www.opengis.net/gml");
+                for (String nmsp : nmsps) {
+                    schema.addImport(new Import(nmsp, getServiceUrl() + "request=xsd&version=" + currentVersion + "&targetNamespace=" + nmsp + "&typename=ns:" + tn + "&namespace=xmlns(ns=" + tnmsp + ")"));
+                }
             }
         /*
          * Second case. we have many feature type in the same namespace
