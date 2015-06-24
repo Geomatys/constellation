@@ -1,5 +1,9 @@
 <?xml version='1.0'?>
-<wfs:FeatureCollection gml:id="id" timeStamp="" numberOfFeatures="8" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+<wfs:FeatureCollection gml:id="id" timeStamp="" numberOfFeatures="8" 
+                       xmlns:gml="http://www.opengis.net/gml"
+                       xmlns:wfs="http://www.opengis.net/wfs"
+                       xmlns:sampling="http://www.opengis.net/sampling/1.0"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <gml:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
             <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
@@ -70,6 +74,7 @@
         <sampling:SamplingPoint gml:id="station-006">
             <gml:description>Geology traverse</gml:description>
             <gml:name>cycle1</gml:name>
+            <sampling:sampledFeature xsi:nil="1"/>
             <sampling:position>
                 <gml:LineString srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <gml:posList>-30.711 134.205 -30.71 134.204 -30.709 134.203 -30.708 134.201 -30.706 134.196 -30.703 134.197 -30.702 134.199</gml:posList>

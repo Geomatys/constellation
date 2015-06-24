@@ -9,9 +9,9 @@
     <wfs:member>
         <gml:NamedPlaces gml:id="NamedPlaces.1">
             <gml:the_geom>
-                <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="NamedPlaces.1">
+                <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="NamedPlaces.1_g0">
                     <ns3:surfaceMember>
-                        <ns3:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+                        <ns3:Polygon srsName="urn:ogc:def:crs:epsg:4326" gml:id="NamedPlaces.1_g1">
                             <ns3:exterior>
                                 <ns3:LinearRing srsName="urn:ogc:def:crs:epsg:4326">
                                     <ns3:posList>0.002 0.0024 0.0042 0.0024 0.0042 6.0E-4 0.0014 6.0E-4 0.0014 0.001 0.002 0.0024</ns3:posList>
@@ -28,9 +28,9 @@
     <wfs:member>
         <gml:NamedPlaces gml:id="NamedPlaces.2">
             <gml:the_geom>
-                <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="NamedPlaces.2">
+                <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="NamedPlaces.2_g0">
                     <ns3:surfaceMember>
-                        <ns3:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+                        <ns3:Polygon srsName="urn:ogc:def:crs:epsg:4326" gml:id="NamedPlaces.2_g1">
                             <ns3:exterior>
                                 <ns3:LinearRing srsName="urn:ogc:def:crs:epsg:4326">
                                     <ns3:posList>0.0017 -0.0011 0.0017 -6.0E-4 0.0025 -6.0E-4 0.0025 -0.0011 0.0017 -0.0011</ns3:posList>

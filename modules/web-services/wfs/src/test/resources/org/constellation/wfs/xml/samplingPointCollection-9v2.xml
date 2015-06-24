@@ -11,7 +11,7 @@
             <gml:name>66685X4587-WARP</gml:name>
             <sampling:sampledFeature>urn:-sandre:object:bdrhf:123X</sampling:sampledFeature>
             <sampling:position>
-                <gml:Point xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ns7="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gco="http://www.isotc211.org/2005/gco" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" gml:id="station-003">
+                <gml:Point xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ns7="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gco="http://www.isotc211.org/2005/gco" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" gml:id="station-003_g0">
                     <gml:pos srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" srsDimension="2">70800.0 1891659.0</gml:pos>
                 </gml:Point>
             </sampling:position>
@@ -23,7 +23,7 @@
             <gml:name>44499X4517-TRUC</gml:name>
             <sampling:sampledFeature>urn:-sandre:object:bdrhf:123X</sampling:sampledFeature>
             <sampling:position>
-                <gml:Point xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ns7="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gco="http://www.isotc211.org/2005/gco" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" gml:id="station-005">
+                <gml:Point xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ns7="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gco="http://www.isotc211.org/2005/gco" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" gml:id="station-005_g0">
                     <gml:pos srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" srsDimension="2">62500.0 1625236.0</gml:pos>
                 </gml:Point>
             </sampling:position>
