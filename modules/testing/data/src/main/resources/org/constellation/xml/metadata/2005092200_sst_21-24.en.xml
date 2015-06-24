@@ -211,7 +211,7 @@
                                             <gml:domainOfValidity>
                                                 <gmd:EX_Extent>
                                                     <gmd:description>
-                                                        <gco:CharacterString>World</gco:CharacterString>
+                                                        <gco:CharacterString>Monde</gco:CharacterString>
                                                     </gmd:description>
                                                     <gmd:geographicElement>
                                                         <gmd:EX_GeographicBoundingBox>
