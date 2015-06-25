@@ -29,7 +29,6 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -61,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import org.geotoolkit.storage.coverage.CoverageReference;
 
 /**
  * Set of utilities methods for FeatureInfoFormat and GetFeatureInfoCfg manipulation.

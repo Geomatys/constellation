@@ -5,7 +5,7 @@ import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
 import org.constellation.process.test.testprocess.TestDescriptor;
-import org.geotoolkit.process.AbstractProcessingRegistry;
+import org.geotoolkit.processing.AbstractProcessingRegistry;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
 

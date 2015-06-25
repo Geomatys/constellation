@@ -20,7 +20,6 @@ package org.constellation.wps.ws;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -32,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.geotoolkit.processing.quartz.ProcessJobDetail;
 /**
  * 
  * @author Quentin Boileau (Geomatys)

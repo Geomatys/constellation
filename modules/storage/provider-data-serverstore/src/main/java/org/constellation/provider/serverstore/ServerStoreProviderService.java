@@ -24,7 +24,6 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.geotoolkit.client.ClientFactory;
 import org.geotoolkit.client.ClientFinder;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -45,7 +45,7 @@ import static org.constellation.provider.configuration.ProviderParameters.create
  * @author Johann Sorel (Geomatys)
  */
 public class ServerStoreProviderService extends AbstractProviderFactory
-        <Name,Data,DataProvider> implements DataProviderFactory {
+        <GenericName,Data,DataProvider> implements DataProviderFactory {
 
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
 

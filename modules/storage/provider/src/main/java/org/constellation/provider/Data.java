@@ -24,7 +24,6 @@ import org.constellation.ServiceDef;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
@@ -39,6 +38,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.SortedSet;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -150,7 +150,7 @@ public interface Data {
     /**
      * @see Layer#getName
      */
-    Name getName();
+    GenericName getName();
 
     /**
      * @see Layer#getSampleValueRanges

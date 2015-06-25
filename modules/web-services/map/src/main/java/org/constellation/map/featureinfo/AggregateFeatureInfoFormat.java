@@ -36,7 +36,6 @@ import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
@@ -53,6 +52,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opengis.util.GenericName;
 
 /**
  * FeatureInfoFormat designed to be used with a CoverageGroup provider.
@@ -205,7 +205,7 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
         }
 
         final CoveragesGroupProvider cgProvider = (CoveragesGroupProvider) provider;
-        final Set<Name> layers = cgProvider.getKeys();
+        final Set<GenericName> layers = cgProvider.getKeys();
 
         MapContext mapContext = null;
         if (layers.size() > 0) {

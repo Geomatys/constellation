@@ -24,15 +24,16 @@ import org.constellation.configuration.Layer;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.DataReference;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.constellation.process.service.RemoveLayerFromMapServiceDescriptor.*;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
+import org.opengis.util.GenericName;
 
 /**
  * Process that remove a layer from a webMapService configuration.
@@ -74,7 +75,7 @@ public class RemoveLayerFromMapService extends AbstractCstlProcess {
         if (dataType.equals(DataReference.PROVIDER_STYLE_TYPE) || dataType.equals(DataReference.SERVICE_TYPE)) {
             throw new ProcessException("Layer Reference must be a from a layer provider.", this, null);
         }
-        final Name layerName = layerRef.getLayerId();
+        final GenericName layerName = layerRef.getLayerId();
 
         Layer oldLayer = null;
         try {
@@ -84,8 +85,8 @@ public class RemoveLayerFromMapService extends AbstractCstlProcess {
             } catch (RuntimeException ex) {
                //do nothing
             }
-            oldLayer = layerBusiness.getLayer(serviceType, serviceInstance, layerName.getLocalPart(), layerName.getNamespaceURI(), login);
-            layerBusiness.remove(serviceType, serviceInstance, layerName.getLocalPart(), layerName.getNamespaceURI());
+            oldLayer = layerBusiness.getLayer(serviceType, serviceInstance, layerName.tip().toString(), NamesExt.getNamespace(layerName), login);
+            layerBusiness.remove(serviceType, serviceInstance, layerName.tip().toString(), NamesExt.getNamespace(layerName));
         } catch (ConfigurationException ex) {
             throw new ProcessException("Error while saving layer", this, ex);
         }

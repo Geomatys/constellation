@@ -20,14 +20,12 @@ package org.constellation.provider;
 
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.storage.DataStoreException;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
@@ -56,6 +54,8 @@ import org.geotoolkit.coverage.combineIterator.GridCombineIterator;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.filestore.FileCoverageReference;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.opengis.util.GenericName;
 
 /**
  * Regroups information about a {@linkplain org.constellation.provider.LayerDetails layer}.
@@ -69,7 +69,7 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
 
     private final CoverageReference ref;
 
-    public DefaultCoverageData(final Name name, final CoverageReference ref){
+    public DefaultCoverageData(final GenericName name, final CoverageReference ref){
         super(name, Collections.EMPTY_LIST);
         this.ref = ref;
     }

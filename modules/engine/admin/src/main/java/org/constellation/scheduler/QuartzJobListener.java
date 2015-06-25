@@ -37,8 +37,6 @@ import org.constellation.engine.register.jooq.tables.pojos.Task;
 import org.constellation.util.ParamUtilities;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
-import org.geotoolkit.process.quartz.ProcessJob;
-import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 import org.quartz.Job;
@@ -47,6 +45,8 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.geotoolkit.processing.quartz.ProcessJob;
+import org.geotoolkit.processing.quartz.ProcessJobDetail;
 
 /**
  * Quartz Job listener attaching a listener on geotoolkit processes to track their state.

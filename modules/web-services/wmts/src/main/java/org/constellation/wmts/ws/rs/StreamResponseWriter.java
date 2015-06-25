@@ -21,7 +21,6 @@ package org.constellation.wmts.ws.rs;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.coverage.TileReference;
 import org.geotoolkit.util.ImageIOUtilities;
 
 import javax.imageio.ImageIO;
@@ -48,6 +47,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.storage.coverage.TileReference;
 
 /**
  *

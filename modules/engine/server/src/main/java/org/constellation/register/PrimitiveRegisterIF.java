@@ -21,9 +21,9 @@ package org.constellation.register;
 
 import org.constellation.ServiceDef;
 import org.constellation.provider.Data;
-import org.geotoolkit.feature.type.Name;
 
 import java.util.List;
+import org.opengis.util.GenericName;
 
 /**
  * This interface does *not* aim to be a general abstraction of the register but 
@@ -45,9 +45,9 @@ public interface PrimitiveRegisterIF {
 
 	List<Data> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException ;
 	
-	List<Data> getLayerReferences(ServiceDef serviceDef, List<Name> layerNames) throws RegisterException ;
+	List<Data> getLayerReferences(ServiceDef serviceDef, List<GenericName> layerNames) throws RegisterException ;
 	
-	Data getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException ;
+	Data getLayerReference(ServiceDef serviceDef, GenericName layerName) throws RegisterException ;
 
         List<String> getRootDirectory() throws RegisterException;
 

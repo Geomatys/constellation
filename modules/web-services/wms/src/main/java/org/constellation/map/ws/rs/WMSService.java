@@ -36,7 +36,6 @@ import org.constellation.ws.rs.MapUtilities;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 import org.geotoolkit.client.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.ows.xml.RequestBase;
@@ -125,6 +124,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
+import org.opengis.util.GenericName;
 
 //J2SE dependencies
 
@@ -405,7 +405,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = StringUtilities.toStringList(strQueryLayers);
         final List<String> queryableLayers = MapUtilities.areQueryableLayers(queryLayers, null);
-        final List<Name> namedQueryableLayers = parseNamespaceLayerList(queryableLayers);
+        final List<GenericName> namedQueryableLayers = parseNamespaceLayerList(queryableLayers);
         if (infoFormat == null) {
             infoFormat = MimeType.TEXT_XML;
         }
@@ -437,8 +437,8 @@ public class WMSService extends GridWebService<WMSWorker> {
      * @param layerNames
      * @return
      */
-    private List<Name> parseNamespaceLayerList(List<String> layerNames) {
-        final List<Name> result = new ArrayList<>();
+    private List<GenericName> parseNamespaceLayerList(List<String> layerNames) {
+        final List<GenericName> result = new ArrayList<>();
         for (String layerName : layerNames) {
             result.add(Util.parseLayerName(layerName));
         }
@@ -453,7 +453,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      * @throws CstlServiceException
      */
     private GetLegendGraphic adaptGetLegendGraphic() throws CstlServiceException {
-        final Name strLayer  = Util.parseLayerName(getParameter(KEY_LAYER,  true));
+        final GenericName strLayer  = Util.parseLayerName(getParameter(KEY_LAYER,  true));
         final String strFormat = getParameter(KEY_FORMAT, true );
         // Verify that the format is known, otherwise returns an exception.
         final String format;
@@ -610,7 +610,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             throw new CstlServiceException(i, INVALID_FORMAT, KEY_FORMAT.toLowerCase());
         }
         final List<String> layers  = StringUtilities.toStringList(strLayers);
-        final List<Name> namedLayers  = parseNamespaceLayerList(layers);
+        final List<GenericName> namedLayers  = parseNamespaceLayerList(layers);
         final List<String> styles = StringUtilities.toStringList(strStyles);
         MutableStyledLayerDescriptor sld = null;
         final Double elevation;

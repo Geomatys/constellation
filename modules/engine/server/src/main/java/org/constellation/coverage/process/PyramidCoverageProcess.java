@@ -47,30 +47,30 @@ import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.geotoolkit.coverage.AbstractCoverageStoreFactory;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.CoverageUtilities;
 import org.geotoolkit.coverage.GridCoverageStack;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.referencing.OutOfDomainOfValidityException;
+import org.geotoolkit.storage.coverage.AbstractCoverageStoreFactory;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.geotoolkit.storage.coverage.CoverageUtilities;
+import org.geotoolkit.storage.coverage.PyramidalCoverageReference;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+import org.opengis.util.GenericName;
 import org.opengis.util.NoSuchIdentifierException;
 
 /**
@@ -138,13 +138,13 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         }
 
         if (pyramidName == null) {
-            pyramidName = inCovRef.getName().getLocalPart();
+            pyramidName = inCovRef.getName().tip().toString();
         }
 
         Provider providerEntity = providerBusiness.getProvider(providerID);
         DataProvider dataProvider = null;
         CoverageStore outputCoverageStore = null;
-        Name referenceName = null;
+        GenericName referenceName = null;
 
         //provider already exist -> try to get pyramid Reference
         if (providerEntity != null) {
@@ -162,7 +162,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
             if (namespace!= null && namespace.equals("no namespace")) {
                 namespace = null;
             }
-            referenceName = new DefaultName(namespace, pyramidName);
+            referenceName = NamesExt.create(namespace, pyramidName);
 
         }
 
@@ -170,7 +170,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
             //create XMLCoverageStore
             try {
                 final File finalPyramidFolder = new File(pyramidFolder, pyramidName);
-                referenceName = new DefaultName(pyramidName);
+                referenceName = NamesExt.create(pyramidName);
                 outputCoverageStore = getOrCreateXMLCoverageStore(finalPyramidFolder);
             } catch (DataStoreException | MalformedURLException e) {
                 throw new ProcessException(e.getMessage(), this, e);
@@ -224,7 +224,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
 
         // link original data with the tiled data.
         if (originalData != null) {
-            final QName qName = new QName(referenceName.getNamespaceURI(), referenceName.getLocalPart());
+            final QName qName = new QName(NamesExt.getNamespace(referenceName), referenceName.tip().toString());
             final DataBrief pyramidDataBrief = dataBusiness.getDataBrief(qName, providerEntity.getId());
             dataBusiness.linkDataToData(originalData.getId(), pyramidDataBrief.getId());
         }
@@ -242,7 +242,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
      * @param update
      * @throws ProcessException
      */
-    private void pyramidData(CoverageReference inRef, CoverageStore outCoverageStore, Name outName,
+    private void pyramidData(CoverageReference inRef, CoverageStore outCoverageStore, GenericName outName,
                              Map<Envelope, double[]> envScales, Dimension tileDim, Boolean update) throws ProcessException {
 
         final ProcessDescriptor desc;
@@ -256,7 +256,7 @@ public class PyramidCoverageProcess extends AbstractPyramidCoverageProcess {
         input.parameter("coverageref").setValue(inRef);
         input.parameter("in_coverage_store").setValue(outCoverageStore);
         input.parameter("tile_size").setValue(tileDim);
-        input.parameter("pyramid_name").setValue(outName.getLocalPart());
+        input.parameter("pyramid_name").setValue(outName.tip().toString());
         input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
         input.parameter("resolution_per_envelope").setValue(envScales);
         input.parameter("reuse_tiles").setValue(update);

@@ -25,10 +25,10 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.jooq.tables.pojos.ChainProcess;
 import org.constellation.engine.register.jooq.tables.pojos.Task;
 import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.chain.model.Chain;
+import org.geotoolkit.processing.chain.model.Chain;
+import org.opengis.util.GenericName;
 import org.quartz.JobListener;
 
 /**
@@ -46,7 +46,7 @@ public interface IProcessBusiness {
      *
      * @return List of all available process.
      */
-    List<Name> listProcess();
+    List<GenericName> listProcess();
 
     /**
      * The returned list is a subset of what can be found with ProcessFinder.

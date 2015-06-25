@@ -2,9 +2,8 @@ package org.constellation.process.converter;
 
 import org.apache.sis.util.UnconvertibleObjectException;
 import org.constellation.process.CRSProcessReference;
-import org.geotoolkit.util.converter.SimpleConverter;
-
 import java.util.LinkedHashMap;
+import org.geotoolkit.feature.util.converter.SimpleConverter;
 
 /**
  * @author Fabien Bernard (Geomatys).

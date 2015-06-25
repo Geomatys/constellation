@@ -22,8 +22,6 @@ package org.constellation.provider;
 import org.apache.sis.storage.DataStore;
 import org.constellation.api.DataType;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.Parameters;
@@ -36,13 +34,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.geotoolkit.feature.type.NamesExt;
+import org.opengis.util.GenericName;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
 public class MockLayerProviderFactory extends AbstractProviderFactory
-        <Name,Data,DataProvider> implements DataProviderFactory {
+        <GenericName,Data,DataProvider> implements DataProviderFactory {
 
     public static final ParameterDescriptor<String> LAYERS =
              new DefaultParameterDescriptor<>("layers","", String.class, null, false);
@@ -101,16 +101,16 @@ public class MockLayerProviderFactory extends AbstractProviderFactory
         }
 
         @Override
-        public Set<Name> getKeys() {
+        public Set<GenericName> getKeys() {
             final String ctr = Parameters.value(LAYERS, getConfig());
             if(ctr == null){
                 return Collections.emptySet();
             }
 
             final String[] str = ctr.split(",");
-            final Set<Name> names = new HashSet<>();
+            final Set<GenericName> names = new HashSet<>();
             for(final String st : str){
-                names.add(DefaultName.valueOf(st));
+                names.add(NamesExt.valueOf(st));
             }
             return names;
         }
@@ -119,7 +119,7 @@ public class MockLayerProviderFactory extends AbstractProviderFactory
          * {@inheritDoc }
          */
         @Override
-        public Data get(final Name key) {
+        public Data get(final GenericName key) {
             return get(key, null);
         }
 
@@ -127,7 +127,7 @@ public class MockLayerProviderFactory extends AbstractProviderFactory
          * {@inheritDoc }
          */
         @Override
-        public Data get(final Name key, Date version) {
+        public Data get(final GenericName key, Date version) {
             throw new UnsupportedOperationException("Not supported.");
         }
 

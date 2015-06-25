@@ -33,7 +33,6 @@ import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.feature.type.AttributeDescriptor;
 import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapBuilder;
@@ -56,6 +55,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import org.geotoolkit.feature.Feature;
+import org.opengis.util.GenericName;
 
 /**
  * Default layer details for a datastore type.
@@ -92,7 +92,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
      * @param store FeatureStore
      * @param favorites style names
      */
-    public DefaultFeatureData(Name name, FeatureStore store, List<String> favorites){
+    public DefaultFeatureData(GenericName name, FeatureStore store, List<String> favorites){
         this(name,store,favorites,null,null,null,null,null);
     }
 
@@ -104,7 +104,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
      * @param favorites style names
      * @param versionDate data version date of the layer (can be null)
      */
-    public DefaultFeatureData(Name name, FeatureStore store, List<String> favorites, Date versionDate){
+    public DefaultFeatureData(GenericName name, FeatureStore store, List<String> favorites, Date versionDate){
         this(name,store,favorites,null,null,null,null, versionDate);
     }
 
@@ -119,7 +119,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
      * @param elevationStart elevation filter start
      * @param elevationEnd elevation filter end
      */
-    public DefaultFeatureData(Name name, FeatureStore store, List<String> favorites,
+    public DefaultFeatureData(GenericName name, FeatureStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         this(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd , null);
     }
@@ -137,7 +137,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
      * @param elevationEnd elevation filter end
      * @param versionDate data version date of the layer (can be null)
      */
-    public DefaultFeatureData(Name name, FeatureStore store, List<String> favorites,
+    public DefaultFeatureData(GenericName name, FeatureStore store, List<String> favorites,
                                         String dateStart, String dateEnd, String elevationStart, String elevationEnd, Date versionDate){
         
         super(name,favorites);
@@ -188,7 +188,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
 
         final FeatureMapLayer layer = MapBuilder.createFeatureLayer((FeatureCollection)getOrigin(), style);
 
-        final String title = getName().getLocalPart();
+        final String title = getName().tip().toString();
         layer.setName(title);
         layer.setDescription(StyleProviders.STYLE_FACTORY.description(title,title));
 
@@ -246,7 +246,7 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
                     if (filter instanceof PropertyIsEqualTo) {
                         final String propName = ((PropertyName)((PropertyIsEqualTo)filter).getExpression1()).getPropertyName();
                         for (PropertyDescriptor desc : type.getDescriptors()) {
-                            if (desc.getName().getLocalPart().equalsIgnoreCase(propName)) {
+                            if (desc.getName().tip().toString().equalsIgnoreCase(propName)) {
                                 fml.setQuery(QueryBuilder.filtered(type.getName(), filter));
                                 break;
                             }

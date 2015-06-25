@@ -19,7 +19,6 @@
 package org.constellation.map.featureinfo;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
@@ -27,7 +26,6 @@ import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.Property;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.FeatureMapLayer;
 
 import javax.measure.unit.Unit;
@@ -35,6 +33,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.opengis.util.GenericName;
 
 /**
  * @author Quentin Boileau (Geomatys)
@@ -61,7 +61,7 @@ public abstract class AbstractTextFeatureInfoFormat extends AbstractFeatureInfoF
             return;
         }
         final CoverageReference ref = graphic.getLayer().getCoverageReference();
-        final String layerName = ref.getName().getLocalPart();
+        final String layerName = ref.getName().tip().toString();
         List<String> strs = coverages.get(layerName);
         if (strs == null) {
             strs = new ArrayList<>();
@@ -98,7 +98,7 @@ public abstract class AbstractTextFeatureInfoFormat extends AbstractFeatureInfoF
             if (prop == null) {
                 continue;
             }
-            final Name propName = prop.getName();
+            final GenericName propName = prop.getName();
             if (propName == null) {
                 continue;
             }

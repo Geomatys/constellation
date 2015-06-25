@@ -22,7 +22,6 @@ package org.constellation.process;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
-import org.geotoolkit.process.AbstractProcessingRegistry;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
@@ -36,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigurationException;
+import org.geotoolkit.processing.AbstractProcessingRegistry;
 
 /**
  *

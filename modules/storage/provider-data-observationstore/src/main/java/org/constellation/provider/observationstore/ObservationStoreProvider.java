@@ -27,7 +27,6 @@ import org.constellation.provider.DefaultFeatureData;
 import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.observation.ObservationStoreFinder;
 import org.geotoolkit.parameter.ParametersExt;
@@ -38,6 +37,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -47,7 +47,7 @@ public class ObservationStoreProvider extends AbstractDataProvider {
 
     private FeatureStore featureStore;
     private ObservationStore observationStore;
-    private Set<Name> names;
+    private Set<GenericName> names;
     
     public ObservationStoreProvider(final String providerId, final ProviderFactory service, final ParameterValueGroup param){
         super(providerId,service,param);
@@ -55,7 +55,7 @@ public class ObservationStoreProvider extends AbstractDataProvider {
     }
     
     @Override
-    public Set<Name> getKeys() {
+    public Set<GenericName> getKeys() {
         if(names == null){
             reload();
         }
@@ -63,7 +63,7 @@ public class ObservationStoreProvider extends AbstractDataProvider {
     }
 
     @Override
-    public Data get(final Name key) {
+    public Data get(final GenericName key) {
         return get(key, null);
     }
 
@@ -88,11 +88,11 @@ public class ObservationStoreProvider extends AbstractDataProvider {
     }
 
     @Override
-    public Data get(final Name key, final Date version) {
+    public Data get(final GenericName key, final Date version) {
         if(!contains(key)){
             return null;
         }
-        final Name goodKey = fullyQualified(key);
+        final GenericName goodKey = fullyQualified(key);
         
         if (featureStore != null) {
             return new DefaultFeatureData(goodKey, featureStore, null, null, null, null, null, version);

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.sis.util.ObjectConverters;
 import org.apache.sis.util.Static;
 import org.apache.sis.util.UnconvertibleObjectException;
-import org.geotoolkit.feature.IllegalAttributeException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,9 +35,9 @@ class JsonUtils extends Static {
      * @param value
      * @param writer
      * @throws java.io.IOException
-     * @throws org.geotoolkit.feature.IllegalAttributeException
+     * @throws IllegalArgumentException
      */
-    static void writeValue(Object value, JsonGenerator writer) throws IOException, IllegalAttributeException {
+    static void writeValue(Object value, JsonGenerator writer) throws IOException, IllegalArgumentException {
 
         if (value == null) {
             writer.writeNull();

@@ -19,7 +19,6 @@
 package org.constellation.admin;
 
 import static org.geotoolkit.parameter.Parameters.value;
-import static org.geotoolkit.process.coverage.statistics.StatisticsDescriptor.OUTCOVERAGE;
 
 import java.util.List;
 import java.util.concurrent.Future;
@@ -39,14 +38,8 @@ import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.metadata.ImageStatistics;
 import org.geotoolkit.process.ProcessEvent;
-import org.geotoolkit.process.ProcessListenerAdapter;
-import org.geotoolkit.process.coverage.statistics.Statistics;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
@@ -58,6 +51,13 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.processing.ProcessListenerAdapter;
+import org.geotoolkit.processing.coverage.statistics.Statistics;
+import static org.geotoolkit.processing.coverage.statistics.StatisticsDescriptor.OUTCOVERAGE;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -117,9 +117,9 @@ public class DataCoverageJob implements IDataCoverageJob {
                 if (store instanceof CoverageStore) {
                     final CoverageStore coverageStore = (CoverageStore) store;
 
-                    Name name = new DefaultName(data.getNamespace(), data.getName());
+                    GenericName name = NamesExt.create(data.getNamespace(), data.getName());
                     if (data.getNamespace() == null || data.getNamespace().isEmpty()) {
-                        name = new DefaultName(data.getName());
+                        name = NamesExt.create(data.getName());
                     }
                     final CoverageReference covRef = coverageStore.getCoverageReference(name);
 

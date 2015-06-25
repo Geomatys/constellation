@@ -11,7 +11,6 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragesgroup.CoveragesGroupProvider;
 import org.constellation.provider.coveragesgroup.xml.*;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -21,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.constellation.process.service.RemoveDataFromMapContextDescriptor.*;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -69,7 +70,7 @@ public class RemoveDataFromMapContext extends AbstractCstlProcess {
 
             final DataReference dataRef = new DataReference("${providerLayerType|" + layerProvider + "|" + layerName + "}");
             try {
-                final DefaultName key = new DefaultName(groupName);
+                final GenericName key = NamesExt.create(groupName);
                 MapContext rawMapContext = coveragesGroupProvider.getRawMapContext(key);
 
                 if (rawMapContext == null) {

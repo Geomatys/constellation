@@ -18,10 +18,10 @@
  */
 package org.constellation.util;
 
-import org.geotoolkit.feature.type.DefaultName;
 import org.junit.Test;
 
 import java.util.Date;
+import org.geotoolkit.feature.type.NamesExt;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -41,7 +41,7 @@ public class StyleReferenceTest {
         StyleReference styleReference = new StyleReference("${providerStyleType|myStyleProvider|myStyle}");
         assertEquals("providerStyleType", styleReference.getDataType());
         assertEquals("myStyleProvider", styleReference.getProviderId());
-        assertEquals(DefaultName.valueOf("myStyle"), styleReference.getLayerId());
+        assertEquals(NamesExt.valueOf("myStyle"), styleReference.getLayerId());
         assertNull(styleReference.getDataVersion());
         assertNull(styleReference.getServiceSpec());
         assertNull(styleReference.getServiceURL());
@@ -51,7 +51,7 @@ public class StyleReferenceTest {
         styleReference =new StyleReference("myStyleProvider", "myStyle");
         assertEquals("providerStyleType", styleReference.getDataType());
         assertEquals("myStyleProvider", styleReference.getProviderId());
-        assertEquals(DefaultName.valueOf("myStyle"), styleReference.getLayerId());
+        assertEquals(NamesExt.valueOf("myStyle"), styleReference.getLayerId());
         assertNull(styleReference.getDataVersion());
         assertNull(styleReference.getServiceSpec());
         assertNull(styleReference.getServiceURL());

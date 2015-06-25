@@ -507,20 +507,20 @@ public class WCSService extends GridWebService<WCSWorker> {
             try {
                 if (minimumLon > maximumLon) {
                     throw new IllegalArgumentException(
-                            Errors.format(Errors.Keys.ILLEGAL_RANGE_2, minimumLon, maximumLon));
+                            Errors.format(Errors.Keys.IllegalRange_2, minimumLon, maximumLon));
                 }
                 final double minimumLat = RequestsUtilities.toDouble(bboxValues.get(1));
                 final double maximumLat = RequestsUtilities.toDouble(bboxValues.get(3));
                 if (minimumLat > maximumLat) {
                     throw new IllegalArgumentException(
-                            Errors.format(Errors.Keys.ILLEGAL_RANGE_2, minimumLat, maximumLat));
+                            Errors.format(Errors.Keys.IllegalRange_2, minimumLat, maximumLat));
                 }
                 if (bboxValues.size() > 4) {
                     final double minimumDepth = RequestsUtilities.toDouble(bboxValues.get(4));
                     final double maximumDepth = RequestsUtilities.toDouble(bboxValues.get(5));
                     if (minimumLat > maximumLat) {
                         throw new IllegalArgumentException(
-                                Errors.format(Errors.Keys.ILLEGAL_RANGE_2, minimumDepth, maximumDepth));
+                                Errors.format(Errors.Keys.IllegalRange_2, minimumDepth, maximumDepth));
                     }
                     pos.add(new DirectPositionType(minimumLon, minimumLat, minimumDepth));
                     pos.add(new DirectPositionType(maximumLon, maximumLat, maximumDepth));

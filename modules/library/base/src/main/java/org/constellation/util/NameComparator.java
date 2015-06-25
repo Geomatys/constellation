@@ -18,20 +18,19 @@
  */
 package org.constellation.util;
 
-import org.geotoolkit.feature.type.Name;
-
 import java.util.Comparator;
+import org.opengis.util.GenericName;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class NameComparator implements Comparator<Name>{
+public class NameComparator implements Comparator<GenericName>{
 
     @Override
-    public int compare(final Name o1, final Name o2) {
-        if (o1 != null && o1.getLocalPart() != null && o2 != null) {
-            return o1.getLocalPart().compareTo(o2.getLocalPart());
+    public int compare(final GenericName o1, final GenericName o2) {
+        if (o1 != null && o1.tip().toString() != null && o2 != null) {
+            return o1.tip().toString().compareTo(o2.tip().toString());
         }
         return -1;
     }

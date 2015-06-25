@@ -56,7 +56,6 @@ import org.geotoolkit.ows.xml.v110.ServiceIdentification;
 import org.geotoolkit.ows.xml.v110.ServiceProvider;
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
 import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -143,6 +142,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.STORAGE_NOT_SUPPORTED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import org.geotoolkit.processing.AbstractProcess;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -757,8 +757,8 @@ public class WPSWorker extends AbstractWorker {
                     FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) param);
 
                     // Build the schema xsd, and store it into temporary folder.
-                    String placeToStore = schemaFolder + "/" + ft.getName().getLocalPart() + ".xsd";
-                    String publicAddress = schemaURL + "/" + ft.getName().getLocalPart() + ".xsd";
+                    String placeToStore = schemaFolder + "/" + ft.getName().tip().toString()+ ".xsd";
+                    String publicAddress = schemaURL + "/" + ft.getName().tip().toString() + ".xsd";
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -848,8 +848,8 @@ public class WPSWorker extends AbstractWorker {
 
                     // Input class
                     final Class clazz = ft.getClass();
-                    String placeToStore = schemaFolder + "/" + ft.getName().getLocalPart() + ".xsd";
-                    String publicAddress = schemaURL + "/" + ft.getName().getLocalPart() + ".xsd";
+                    String placeToStore = schemaFolder + "/" + ft.getName().tip().toString() + ".xsd";
+                    String publicAddress = schemaURL + "/" + ft.getName().tip().toString() + ".xsd";
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -1683,7 +1683,7 @@ public class WPSWorker extends AbstractWorker {
         for (GeneralParameterDescriptor desc : source.getInputDescriptor().descriptors()) {
             if (desc instanceof ParameterDescriptorGroup) {
                 FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) desc);
-                String placeToStore = schemaFolder + "/" + ft.getName().getLocalPart() + ".xsd";
+                String placeToStore = schemaFolder + "/" + ft.getName().tip().toString() + ".xsd";
                 File xsdStore = new File(placeToStore);
                 WPSUtils.storeFeatureSchema(ft, xsdStore);
             }
@@ -1691,7 +1691,7 @@ public class WPSWorker extends AbstractWorker {
         for (GeneralParameterDescriptor desc : source.getOutputDescriptor().descriptors()) {
             if (desc instanceof ParameterDescriptorGroup) {
                 FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) desc);
-                String placeToStore = schemaFolder + "/" + ft.getName().getLocalPart() + ".xsd";
+                String placeToStore = schemaFolder + "/" + ft.getName().tip().toString() + ".xsd";
                 File xsdStore = new File(placeToStore);
                 WPSUtils.storeFeatureSchema(ft, xsdStore);
             }

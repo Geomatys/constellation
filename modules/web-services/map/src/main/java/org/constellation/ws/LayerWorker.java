@@ -33,8 +33,6 @@ import org.constellation.provider.DataProviders;
 import org.constellation.util.DataReference;
 import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.factory.FactoryNotFoundException;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.style.MutableStyle;
 
 import javax.annotation.PostConstruct;
@@ -47,10 +45,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
+import org.geotoolkit.feature.type.NamesExt;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
+import org.opengis.util.GenericName;
 
 /**
  * A super class for all the web service worker dealing with layers (WMS, WCS, WMTS, WFS, ...)
@@ -146,18 +146,18 @@ public abstract class LayerWorker extends AbstractWorker {
         
     }
 
-    protected List<Layer> getConfigurationLayers(final String login, final List<Name> layerNames) {
+    protected List<Layer> getConfigurationLayers(final String login, final List<GenericName> layerNames) {
         final List<Layer> layerConfigs = new ArrayList<>();
-        for (Name layerName : layerNames) {
+        for (GenericName layerName : layerNames) {
             Layer l = getConfigurationLayer(layerName, login);
             layerConfigs.add(l);
         }
         return layerConfigs;
     }
     
-    protected Layer getConfigurationLayer(final Name layerName, final String login) {
-        if (layerName != null && layerName.getLocalPart() != null) {
-            final QName qname = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
+    protected Layer getConfigurationLayer(final GenericName layerName, final String login) {
+        if (layerName != null && layerName.tip().toString()!= null) {
+            final QName qname = new QName(NamesExt.getNamespace(layerName), layerName.tip().toString());
             return getConfigurationLayer(qname, login);
         }
         return null;
@@ -220,20 +220,20 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return a list of LayerDetails
      * @throws CstlServiceException
      */
-    protected List<Data> getLayerReferences(final String login, final Collection<Name> layerNames) throws CstlServiceException {
+    protected List<Data> getLayerReferences(final String login, final Collection<GenericName> layerNames) throws CstlServiceException {
         final List<Data> layerRefs = new ArrayList<>();
-        for (Name layerName : layerNames) {
+        for (GenericName layerName : layerNames) {
             layerRefs.add(getLayerReference(login, layerName));
         }
         return layerRefs;
     }
 
     protected Data getLayerReference(final Layer layer) throws CstlServiceException {
-        return DataProviders.getInstance().get(new DefaultName(layer.getName()), layer.getProviderID(), layer.getDate());
+        return DataProviders.getInstance().get(NamesExt.create(layer.getName()), layer.getProviderID(), layer.getDate());
     }
 
     protected Data getLayerReference(final String login, final QName layerName) throws CstlServiceException {
-        return getLayerReference(login, new DefaultName(layerName));
+        return getLayerReference(login, NamesExt.create(layerName));
     }
 
     /**
@@ -243,7 +243,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return a LayerDetails
      * @throws CstlServiceException
      */
-    protected Data getLayerReference(final String login, final Name layerName) throws CstlServiceException {
+    protected Data getLayerReference(final String login, final GenericName layerName) throws CstlServiceException {
         final Data layerRef;
         final DataProviders namedProxy = DataProviders.getInstance();
         final NameInProvider fullName = layersContainsKey(login, layerName);
@@ -254,7 +254,7 @@ public abstract class LayerWorker extends AbstractWorker {
                 layerRef = namedProxy.get(fullName.name, fullName.providerID);
             }
             if (layerRef == null) {
-                throw new CstlServiceException("Unable to find  the Layer named:{"+layerName.getNamespaceURI() + '}' + layerName.getLocalPart() + " in the provider proxy", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Unable to find  the Layer named:{"+NamesExt.getNamespace(layerName) + '}' + layerName.tip().toString()+ " in the provider proxy", NO_APPLICABLE_CODE);
             }
         } else {
             throw new CstlServiceException("Unknown Layer name:" + layerName, LAYER_NOT_DEFINED);
@@ -267,7 +267,7 @@ public abstract class LayerWorker extends AbstractWorker {
      * @param login
      * @param name
      */
-    protected NameInProvider layersContainsKey(final String login, final Name name) {
+    protected NameInProvider layersContainsKey(final String login, final GenericName name) {
         if (name == null) {
             return null;
         }
@@ -282,7 +282,7 @@ public abstract class LayerWorker extends AbstractWorker {
 
             //search with only localpart
             for (QName layerName : layerNames) {
-                if (layerName.getLocalPart().equals(name.getLocalPart())) {
+                if (layerName.getLocalPart().equals(name.tip().toString())) {
                     final Layer layerConfig = getConfigurationLayer(layerName, login);
                     Date version = null;
                     if (layerConfig.getVersion() != null) {
@@ -297,7 +297,7 @@ public abstract class LayerWorker extends AbstractWorker {
                 final Layer layer = getConfigurationLayer(l, login);
                 if (layer.getAlias() != null && !layer.getAlias().isEmpty()) {
                     final String alias = layer.getAlias();
-                    if (alias.equals(name.getLocalPart())) {
+                    if (alias.equals(name.tip().toString())) {
                         Date version = null;
                         if (layer.getVersion() != null) {
                             version = new Date(layer.getVersion());
@@ -322,7 +322,7 @@ public abstract class LayerWorker extends AbstractWorker {
         MutableStyle style;
         if (styleReference != null) {
             try {
-                style = styleBusiness.getStyle(styleReference.getProviderId(), styleReference.getLayerId().getLocalPart());
+                style = styleBusiness.getStyle(styleReference.getProviderId(), styleReference.getLayerId().tip().toString());
             } catch (TargetNotFoundException e) {
                 throw new CstlServiceException("Style provided: " + styleReference.getReference() + " not found.", STYLE_NOT_DEFINED);
             }
@@ -386,36 +386,36 @@ public abstract class LayerWorker extends AbstractWorker {
      * @param layerName
      * @return
      */
-    protected Name parseCoverageName(final String layerName) {
-        final Name namedLayerName;
+    protected GenericName parseCoverageName(final String layerName) {
+        final GenericName namedLayerName;
         if (layerName != null && layerName.lastIndexOf(':') != -1) {
             final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
             final String localPart = layerName.substring(layerName.lastIndexOf(':') + 1);
-            namedLayerName = new DefaultName(namespace, localPart);
+            namedLayerName = NamesExt.create(namespace, localPart);
         } else {
-            namedLayerName = new DefaultName(layerName);
+            namedLayerName = NamesExt.create(layerName);
         }
         return namedLayerName;
     }
     
     public static class NameInProvider {
-        public Name name;
+        public GenericName name;
         public String providerID;
         public Date dataVersion;
      
-        public NameInProvider(final Name name, final String providerID) {
+        public NameInProvider(final GenericName name, final String providerID) {
             this(name, providerID, null);
         }
         
         public NameInProvider(final QName name, final String providerID) {
-            this(new DefaultName(name), providerID, null);
+            this(NamesExt.create(name), providerID, null);
         }
 
         public NameInProvider(final QName name, final String providerID, final Date dataVersion) {
-            this(new DefaultName(name), providerID, dataVersion);
+            this(NamesExt.create(name), providerID, dataVersion);
         }
 
-        public NameInProvider(final Name name, final String providerID, final Date dataVersion) {
+        public NameInProvider(final GenericName name, final String providerID, final Date dataVersion) {
             this.name = name;
             this.providerID = providerID;
             this.dataVersion= dataVersion;

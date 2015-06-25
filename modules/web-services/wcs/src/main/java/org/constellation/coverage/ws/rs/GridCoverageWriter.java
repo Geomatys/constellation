@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageWriteParam;
 import org.geotoolkit.image.io.plugin.TiffImageWriteParam;
 import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.coverage.resample.ResampleProcess;
+import org.geotoolkit.processing.coverage.resample.ResampleProcess;
 import org.opengis.referencing.crs.CompoundCRS;
 
 /**

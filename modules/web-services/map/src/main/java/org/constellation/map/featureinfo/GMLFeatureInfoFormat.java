@@ -27,7 +27,6 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
@@ -42,7 +41,6 @@ import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.GeometryAttribute;
 import org.geotoolkit.feature.Property;
 import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.isoonjts.JTSUtils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.internal.jaxb.ObjectFactory;
@@ -71,6 +69,9 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.opengis.util.GenericName;
 
 /**
  * A generic FeatureInfoFormat that produce GML output for Features and Coverages.
@@ -153,8 +154,8 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         }
 
         final CoverageReference ref = coverage.getLayer().getCoverageReference();
-        final Name fullLayerName = ref.getName();
-        String layerName = fullLayerName.getLocalPart();
+        final GenericName fullLayerName = ref.getName();
+        String layerName = fullLayerName.tip().toString();
 
         List<String> strs = coverages.get(layerName);
         if (strs == null) {
@@ -316,7 +317,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
             // featureType mark
             if (featureType != null) {
-                final String ftLocal = featureType.getName().getLocalPart();
+                final String ftLocal = featureType.getName().tip().toString();
                 builder.append(margin).append("<").append(encodeXML(ftLocal)).append("_feature").append(">\n");
 
                 margin += "\t";
@@ -337,8 +338,8 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
             // featureType mark
             if (featureType != null) {
-                String ftLocal = featureType.getName().getLocalPart();
-                String ftPrefix  = acquirePrefix(featureType.getName().getNamespaceURI());
+                String ftLocal = featureType.getName().tip().toString();
+                String ftPrefix  = acquirePrefix(NamesExt.getNamespace(featureType.getName()));
 
                 builder.append(margin).append('<').append(ftPrefix).append(ftLocal).append(">\n");
                 margin += "\t";
@@ -375,12 +376,12 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             if (prop == null) {
                 continue;
             }
-            final Name propName = prop.getName();
+            final GenericName propName = prop.getName();
             if (propName == null) {
                 continue;
             }
-            String pLocal = propName.getLocalPart();
-            String pPrefix  = acquirePrefix(propName.getNamespaceURI());
+            String pLocal = propName.tip().toString();
+            String pPrefix  = acquirePrefix(NamesExt.getNamespace(propName));
 
             if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
                 GeometryAttribute geomProp = (GeometryAttribute) prop;

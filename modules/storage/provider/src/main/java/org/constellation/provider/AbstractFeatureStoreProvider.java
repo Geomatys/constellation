@@ -27,8 +27,6 @@ import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.data.memory.MemoryFeatureStore;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.Parameters;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -51,7 +49,9 @@ import static org.constellation.provider.configuration.ProviderParameters.getLay
 import static org.constellation.provider.configuration.ProviderParameters.getLayers;
 import static org.constellation.provider.configuration.ProviderParameters.getQueryLayers;
 import static org.constellation.provider.configuration.ProviderParameters.isLoadAll;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.parameter.Parameters.value;
+import org.opengis.util.GenericName;
 
 /**
  * Abstract provider which handle a Datastore.
@@ -61,7 +61,7 @@ import static org.geotoolkit.parameter.Parameters.value;
 public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
 
 
-    private final Set<Name> index = new LinkedHashSet<>();
+    private final Set<GenericName> index = new LinkedHashSet<>();
     private ExtendedFeatureStore store;
 
     public AbstractFeatureStoreProvider(final String id, final ProviderFactory service,
@@ -84,7 +84,7 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Set<Name> getKeys() {
+    public Set<GenericName> getKeys() {
         return Collections.unmodifiableSet(index);
     }
 
@@ -92,7 +92,7 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Data get(final Name key) {
+    public Data get(final GenericName key) {
         return get(key, null);
     }
 
@@ -100,8 +100,8 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Data get(final Name key, Date version) {
-        Name goodKey;
+    public Data get(final GenericName key, Date version) {
+        GenericName goodKey;
         if (!index.contains(key)) {
             goodKey = containsOnlyLocalPart(index, key);
             if (goodKey == null) {
@@ -113,7 +113,7 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
         } else {
             goodKey = key;
         }
-        final ParameterValueGroup layer = getLayer(getSource(), goodKey.getLocalPart());
+        final ParameterValueGroup layer = getLayer(getSource(), goodKey.tip().toString());
         if (layer == null) {
             return new DefaultFeatureData(goodKey, store, null, null, null, null, null, version);
 
@@ -187,7 +187,7 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
             final String layerName = value(LAYER_NAME_DESCRIPTOR, queryLayer);
             final String language = value(LAYER_QUERY_LANGUAGE, queryLayer);
             final String statement = value(LAYER_QUERY_STATEMENT, queryLayer);
-            final Name name = new DefaultName(namespace, layerName);
+            final GenericName name = NamesExt.create(namespace, layerName);
             final Query query = QueryBuilder.language(language, statement, name);
             store.addQuery(query);
             index.add(name);
@@ -198,8 +198,8 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
         if (loadAll || !getLayers(source).isEmpty()) {
 
             try {
-                for (final Name name : store.getNames()) {
-                    if ((loadAll || containLayer(getSource(), name.getLocalPart())) && !index.contains(name)) {
+                for (final GenericName name : store.getNames()) {
+                    if ((loadAll || containLayer(getSource(), name.tip().toString())) && !index.contains(name)) {
                         index.add(name);
                     }
                 }
@@ -214,7 +214,7 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
     }
 
     @Override
-    public void remove(Name key) {
+    public void remove(GenericName key) {
         if (store == null) {
             reload();
         }

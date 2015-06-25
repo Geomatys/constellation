@@ -46,7 +46,7 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
@@ -70,6 +70,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.GenericName;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -113,7 +114,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     /**
      * The layer to test.
      */
-    private static final DefaultName LAYER_TEST = new DefaultName("SSTMDE200305");
+    private static final GenericName LAYER_TEST = NamesExt.create("SSTMDE200305");
 
     /**
      * URLs which will be tested on the server.
@@ -346,7 +347,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         boolean layerTestFound = false;
         for (CoverageOfferingBriefType coverage : coverages) {
             for (JAXBElement<String> elem : coverage.getRest()) {
-                if (elem.getValue().equals(LAYER_TEST.getLocalPart())) {
+                if (elem.getValue().equals(LAYER_TEST.tip().toString())) {
                     layerTestFound = true;
                     final LonLatEnvelopeType env = coverage.getLonLatEnvelope();
                     assertTrue(env.getPos().get(0).getValue().get(0) == -180d);
@@ -423,7 +424,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertNotNull(responseDesc);
         final List<CoverageOfferingType> coverageOffs = responseDesc.getCoverageOffering();
         assertFalse (coverageOffs.isEmpty());
-        assertEquals(LAYER_TEST.getLocalPart(), coverageOffs.get(0).getRest().get(1).getValue());
+        assertEquals(LAYER_TEST.tip().toString(), coverageOffs.get(0).getRest().get(1).getValue());
         // TODO: add more tests on returned XML doc
     }
 

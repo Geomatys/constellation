@@ -22,7 +22,7 @@ import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.provider.ProviderDescriptorConstant;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.process.AbstractProcessDescriptor;
+import org.geotoolkit.processing.AbstractProcessDescriptor;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;

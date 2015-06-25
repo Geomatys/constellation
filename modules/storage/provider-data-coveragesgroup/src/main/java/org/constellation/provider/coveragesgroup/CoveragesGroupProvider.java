@@ -41,12 +41,12 @@ import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.URL;
 import org.constellation.provider.coveragesgroup.util.MapContextIO;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.GenericName;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -58,7 +58,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
 
     public static final String KEY_PATH = "path";
 
-    private Map<Name,File> index = null;
+    private Map<GenericName,File> index = null;
     private boolean visited;
     private File path;
 
@@ -81,7 +81,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
      * {@inheritDoc}
      */
     @Override
-    public Set<Name> getKeys() {
+    public Set<GenericName> getKeys() {
         if (index == null) {
             visit();
         }
@@ -92,7 +92,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
      * {@inheritDoc}
      */
     @Override
-    public Data get(final Name key) {
+    public Data get(final GenericName key) {
         return get(key, null);
     }
 
@@ -100,14 +100,14 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
      * {@inheritDoc}
      */
     @Override
-    public Data get(final Name key, Date version) {
+    public Data get(final GenericName key, Date version) {
         return get(key, null, null);
     }
 
     /**
      * hacked method to pass the login/pass to WebMapServer
      */
-    public Data get(final Name key, final String login, final String password) {
+    public Data get(final GenericName key, final String login, final String password) {
         if (index == null) {
             visit();
         }
@@ -126,7 +126,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
      * @return MapContext or null if layer name doesn't exist.
      * @throws JAXBException
      */
-    public MapContext getMapContext(final Name key, final String login, final String password) throws JAXBException {
+    public MapContext getMapContext(final GenericName key, final String login, final String password) throws JAXBException {
         if (index == null) {
             visit();
         }
@@ -141,7 +141,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
      * @return
      * @throws JAXBException
      */
-    public org.constellation.provider.coveragesgroup.xml.MapContext getRawMapContext(final Name key) throws JAXBException  {
+    public org.constellation.provider.coveragesgroup.xml.MapContext getRawMapContext(final GenericName key) throws JAXBException  {
         if (index == null) {
             visit();
         }
@@ -156,7 +156,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
      * @throws JAXBException
      * @throws IOException
      */
-    public void addRawMapContext(final Name key, org.constellation.provider.coveragesgroup.xml.MapContext mapContext)
+    public void addRawMapContext(final GenericName key, org.constellation.provider.coveragesgroup.xml.MapContext mapContext)
             throws JAXBException, IOException {
         if (index == null) {
             visit();
@@ -164,7 +164,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
 
         File mapContextFile = index.get(key);
         if (mapContextFile == null) {
-            mapContextFile = new File(path, key.getLocalPart() + ".xml");
+            mapContextFile = new File(path, key.tip().toString()+ ".xml");
         }
         MapContextIO.writeMapContext(mapContextFile, mapContext);
         index.put(key, mapContextFile);
@@ -246,7 +246,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
             try {
                 final MapContext mapContext = MapContextIO.readMapContextFile(candidate, "", "", styleBusiness);
                 if (mapContext != null) {
-                    final DefaultName name = new DefaultName(mapContext.getName());
+                    final GenericName name = NamesExt.create(mapContext.getName());
                     index.put(name, candidate);
                 }
             } catch (JAXBException e) {

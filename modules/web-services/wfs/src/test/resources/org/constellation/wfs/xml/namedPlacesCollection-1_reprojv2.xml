@@ -9,9 +9,9 @@
     <wfs:member>
         <gml:NamedPlaces gml:id="NamedPlaces.1">
             <gml:the_geom>
-                <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:7.9:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="NamedPlaces.1">
+                <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:7.9:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="NamedPlaces.1_g0">
                     <ns3:surfaceMember>
-                        <ns3:Polygon srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                        <ns3:Polygon srsName="urn:ogc:def:crs:epsg:7.9:27582" gml:id="NamedPlaces.1_g1">
                             <ns3:exterior>
                                 <ns3:LinearRing srsName="urn:ogc:def:crs:epsg:7.9:27582">
                                     <ns3:posList>251209.63301375904 -3541050.5913909804 251219.3300443582 -3540724.1764852703 250950.4672208384 -3540716.186112495 250938.11598495784 -3541131.624557527 250997.86537744408 -3541133.4007908404 251209.63301375904 -3541050.5913909804</ns3:posList>
@@ -28,9 +28,9 @@
     <wfs:member>
         <gml:NamedPlaces gml:id="NamedPlaces.2">
             <gml:the_geom>
-                <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:7.9:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="NamedPlaces.2">
+                <ns3:MultiSurface srsName="urn:ogc:def:crs:epsg:7.9:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="NamedPlaces.2_g0">
                     <ns3:surfaceMember>
-                        <ns3:Polygon srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                        <ns3:Polygon srsName="urn:ogc:def:crs:epsg:7.9:27582" gml:id="NamedPlaces.2_g1">
                             <ns3:exterior>
                                 <ns3:LinearRing srsName="urn:ogc:def:crs:epsg:7.9:27582">
                                     <ns3:posList>250685.50549803657 -3541079.560237253 250760.19190888596 -3541081.7820883207 250763.72267679335 -3540963.084393669 250689.0370210139 -3540960.8625650574 250685.50549803657 -3541079.560237253</ns3:posList>

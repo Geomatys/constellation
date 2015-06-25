@@ -24,11 +24,11 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.register.PrimitiveRegisterIF;
 import org.constellation.register.RegisterException;
-import org.geotoolkit.feature.type.Name;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.opengis.util.GenericName;
 
 /**
  * First attempt at a Register, we merely want something functional for now.
@@ -82,7 +82,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     @Override
     public List<Data> getLayerReferences(ServiceDef serviceDef,
-            List<Name> layerNames) throws RegisterException {
+            List<GenericName> layerNames) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
             return getLayerRefs(layerNames);
@@ -94,7 +94,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     }
 
     @Override
-    public Data getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException {
+    public Data getLayerReference(ServiceDef serviceDef, GenericName layerName) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
             return getLayerRef(layerName);
@@ -108,8 +108,8 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     private List<Data> getAllLayerRefs(ServiceDef serviceDef) throws RegisterException {
 
         final List<Data> layerRefs = new ArrayList<Data>();
-        final Set<Name> layerNames = DataProviders.getInstance().getKeys(serviceDef.specification.name());
-        for (Name layerName : layerNames) {
+        final Set<GenericName> layerNames = DataProviders.getInstance().getKeys(serviceDef.specification.name());
+        for (GenericName layerName : layerNames) {
             final Data layerRef = DataProviders.getInstance().get(layerName);
 
             if (null == layerRef) {
@@ -123,10 +123,10 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     }
 
-    private List<Data> getLayerRefs(List<Name> layerNames) throws RegisterException {
+    private List<Data> getLayerRefs(List<GenericName> layerNames) throws RegisterException {
 
         final List<Data> layerRefs = new ArrayList<Data>();
-        for (Name layerName : layerNames) {
+        for (GenericName layerName : layerNames) {
             final Data layerRef = DataProviders.getInstance().getByIdentifier(layerName);
 
             if (null == layerRef) {
@@ -138,7 +138,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
         return layerRefs;
     }
 
-    private Data getLayerRef(Name layerName) throws RegisterException {
+    private Data getLayerRef(GenericName layerName) throws RegisterException {
 
         final Data layerRef = DataProviders.getInstance().getByIdentifier(layerName);
 

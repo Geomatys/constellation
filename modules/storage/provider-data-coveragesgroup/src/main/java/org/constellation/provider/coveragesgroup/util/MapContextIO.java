@@ -72,7 +72,7 @@ public final class MapContextIO {
                     finalMapItem.getMapItems().add(ml);
                 } else if (mapItem instanceof CoverageMapLayer) {
                     final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
-                    final String id = cml.getCoverageReference().getName().getLocalPart();
+                    final String id = cml.getCoverageReference().getName().tip().toString();
                     final MutableStyle ms = cml.getStyle();
                     final StyleReference styleRef = (ms == null) ? null :
                             new StyleReference(ms.getName());
@@ -130,7 +130,7 @@ public final class MapContextIO {
                 finalMapItem.getMapItems().add(ml);
             } else if (mapItem instanceof CoverageMapLayer) {
                 final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
-                final String id = cml.getCoverageReference().getName().getLocalPart();
+                final String id = cml.getCoverageReference().getName().tip().toString();
                 final MutableStyle ms = cml.getStyle();
                 final org.constellation.provider.coveragesgroup.xml.StyleReference styleRef = (ms == null) ? null :
                         new org.constellation.provider.coveragesgroup.xml.StyleReference(ms.getName());

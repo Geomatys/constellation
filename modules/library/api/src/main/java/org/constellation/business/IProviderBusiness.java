@@ -32,10 +32,10 @@ import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.storage.DataStoreFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.GenericName;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -89,7 +89,7 @@ public interface IProviderBusiness {
      */
     Provider create(final String id, final String providerSPIName, final ParameterValueGroup providerConfig) throws ConfigurationException;
 
-    Set<Name> test(String providerIdentifier, ProviderConfiguration configuration) throws DataStoreException, ConfigurationException;
+    Set<GenericName> test(String providerIdentifier, ProviderConfiguration configuration) throws DataStoreException, ConfigurationException;
 
     void update( String id, ProviderConfiguration config) throws ConfigurationException;
 

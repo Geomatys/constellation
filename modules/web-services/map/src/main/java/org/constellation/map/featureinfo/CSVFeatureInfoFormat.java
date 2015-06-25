@@ -31,7 +31,6 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.feature.ComplexAttribute;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.Property;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
@@ -45,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opengis.util.GenericName;
 
 /**
  * A generic FeatureInfoFormat that produce CSV output for Features and Coverages.
@@ -89,7 +89,7 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             //feature type
             final StringBuilder typeBuilder = new StringBuilder();
             for(PropertyDescriptor pd : descs){
-                final Name propName = pd.getName();
+                final GenericName propName = pd.getName();
                 typeBuilder.append(propName.toString());
                 typeBuilder.append(':');
                 typeBuilder.append(pd.getType().getBinding().getSimpleName());
@@ -122,7 +122,7 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             return;
         }
 
-        final String layerName = graphic.getLayer().getCoverageReference().getName().getLocalPart();
+        final String layerName = graphic.getLayer().getCoverageReference().getName().tip().toString();
         
         LayerResult result = results.get(layerName);
         if(result==null){

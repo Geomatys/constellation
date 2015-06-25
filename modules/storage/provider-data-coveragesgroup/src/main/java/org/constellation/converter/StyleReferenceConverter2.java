@@ -7,7 +7,7 @@
 package org.constellation.converter;
 
 import org.apache.sis.util.UnconvertibleObjectException;
-import org.geotoolkit.util.converter.SimpleConverter;
+import org.geotoolkit.feature.util.converter.SimpleConverter;
 
 /**
  *

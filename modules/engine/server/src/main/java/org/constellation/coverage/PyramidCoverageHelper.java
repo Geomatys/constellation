@@ -29,8 +29,6 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.memory.MPCoverageStore;
 import org.geotoolkit.coverage.postgresql.PGCoverageStoreFactory;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.ProcessListener;
@@ -55,6 +53,12 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import org.constellation.admin.SpringHelper;
 import org.constellation.engine.register.repository.PropertyRepository;
+import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.geotoolkit.storage.coverage.CoverageStoreFinder;
+import org.geotoolkit.storage.coverage.PyramidCoverageBuilder;
+import org.opengis.util.GenericName;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -143,7 +147,7 @@ public class PyramidCoverageHelper {
             DataStoreException {
         final List<GridCoverage2D> coverages = new ArrayList<>(0);
 
-        for (Name name : store.getNames()) {
+        for (GenericName name : store.getNames()) {
             final CoverageReference ref = store.getCoverageReference(name);
             final GridCoverageReader reader = ref.acquireReader();
 
@@ -247,7 +251,7 @@ public class PyramidCoverageHelper {
          * @param n
          * @return
          */
-        DefaultName getName(String baseName, int n);
+        GenericName getName(String baseName, int n);
     }
 
     /**
@@ -507,8 +511,8 @@ public class PyramidCoverageHelper {
         private CoverageNamer coverageNamer = new CoverageNamer() {
 
             @Override
-            public DefaultName getName(String baseName, int n) {
-                return new DefaultName(baseName + n);
+            public GenericName getName(String baseName, int n) {
+                return NamesExt.create(baseName + n);
             }
         };
         private WithInputImpl input;

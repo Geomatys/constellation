@@ -24,7 +24,6 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.internal.sql.table.ConfigurationKey;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -37,6 +36,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -46,7 +46,7 @@ import java.util.logging.Level;
  * @author Johann Sorel (Geomatys)
  */
 public class CoverageSQLProviderService extends AbstractProviderFactory
-        <Name,Data,DataProvider> implements DataProviderFactory {
+        <GenericName,Data,DataProvider> implements DataProviderFactory {
 
     private static final String ERROR_MSG = "[PROVIDER]> Invalid coverage-sql provider config";
 

@@ -22,7 +22,6 @@ import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -37,6 +36,7 @@ import static org.constellation.provider.configuration.ProviderParameters.create
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
 import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.KEY_PATH;
 import static org.geotoolkit.parameter.Parameters.value;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -46,7 +46,7 @@ import static org.geotoolkit.parameter.Parameters.value;
  * @author Quentin Boileau (Geomatys)
  */
 public class CoveragesGroupProviderService extends AbstractProviderFactory
-        <Name,Data,DataProvider> implements DataProviderFactory {
+        <GenericName,Data,DataProvider> implements DataProviderFactory {
 
     public static final String NAME = "coverages-group";
 

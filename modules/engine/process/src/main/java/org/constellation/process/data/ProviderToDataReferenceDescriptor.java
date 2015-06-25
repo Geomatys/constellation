@@ -27,7 +27,7 @@ import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.util.DataReference;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.process.AbstractProcessDescriptor;
+import org.geotoolkit.processing.AbstractProcessDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;

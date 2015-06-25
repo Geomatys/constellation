@@ -41,8 +41,6 @@ import org.geotoolkit.data.AbstractReadingTests;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.feature.FeatureTypeBuilder;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.referencing.CRS;
@@ -57,6 +55,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.geotoolkit.feature.type.NamesExt;
+import org.opengis.util.GenericName;
 
 
 /**
@@ -68,7 +68,7 @@ public class OM2DataStoreTest extends AbstractReadingTests{
 
     private static DefaultDataSource ds;
     private static FeatureStore store;
-    private static Set<Name> names = new HashSet<>();
+    private static Set<GenericName> names = new HashSet<>();
     private static List<ExpectedResult> expecteds = new ArrayList<>();
     static{
         try{
@@ -90,14 +90,14 @@ public class OM2DataStoreTest extends AbstractReadingTests{
 
             final String nsCstl = "http://constellation.org/om2";
             final String nsGML = "http://www.opengis.net/gml";
-            final Name name = new DefaultName(nsCstl, "Sensor");
+            final GenericName name = NamesExt.create(nsCstl, "Sensor");
             names.add(name);
 
             final FeatureTypeBuilder featureTypeBuilder = new FeatureTypeBuilder();
             featureTypeBuilder.setName(name);
-            featureTypeBuilder.add(new DefaultName(nsCstl, "id"),String.class,1,1,false,null);
-            featureTypeBuilder.add(new DefaultName(nsCstl, "position"),Geometry.class,1,1,false,null);
-            featureTypeBuilder.setDefaultGeometry(new DefaultName(nsCstl, "position"));
+            featureTypeBuilder.add(NamesExt.create(nsCstl, "id"),String.class,1,1,false,null);
+            featureTypeBuilder.add(NamesExt.create(nsCstl, "position"),Geometry.class,1,1,false,null);
+            featureTypeBuilder.setDefaultGeometry(NamesExt.create(nsCstl, "position"));
 
             int size = 10;
             GeneralEnvelope env = new GeneralEnvelope(CRS.decode("EPSG:27582"));
@@ -120,7 +120,7 @@ public class OM2DataStoreTest extends AbstractReadingTests{
     }
 
     @Override
-    protected Set<Name> getExpectedNames() {
+    protected Set<GenericName> getExpectedNames() {
         return names;
     }
 

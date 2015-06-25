@@ -9,9 +9,9 @@
     <wfs:member>
         <gml:NamedPlaces gml:id="NamedPlaces.2">
             <gml:the_geom>
-                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326"  gml:id="NamedPlaces.2">
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326"  gml:id="NamedPlaces.2_g0">
                     <gml:surfaceMember>
-                        <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+                        <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326" gml:id="NamedPlaces.2_g1">
                             <gml:exterior>
                                 <gml:LinearRing srsName="urn:ogc:def:crs:epsg:4326">
                                     <gml:posList>0.1 0.1 0.5 0.5 0.4 0.4 0.3 0.3 0.2 0.2 0.1 0.1</gml:posList>

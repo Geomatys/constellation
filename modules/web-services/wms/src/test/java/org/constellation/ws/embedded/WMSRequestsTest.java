@@ -40,7 +40,6 @@ import org.constellation.provider.ProviderFactory;
 import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
@@ -96,6 +95,7 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
@@ -106,6 +106,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import org.junit.BeforeClass;
+import org.opengis.util.GenericName;
 import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
@@ -146,7 +147,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     /**
      * The layer to test.
      */
-    private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
+    private static final GenericName LAYER_TEST = NamesExt.create("SST_tests");
 
     /**
      * URLs which will be tested on the server.
@@ -620,7 +621,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
         if (localdb_active) {
         
-            Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());
+            Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.tip().toString());
 
             assertNotNull(layer);
             assertEquals("EPSG:4326", layer.getSRS().get(0));
@@ -651,7 +652,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
         if (localdb_active) {
             // The layer test must be excluded
-            Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());
+            Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.tip().toString());
             assertNull(layer);
         }
 
@@ -948,7 +949,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertFalse(layerDescs.isEmpty());
         final List<TypeNameType> typeNames = layerDescs.get(0).getTypeName();
         assertFalse(typeNames.isEmpty());
-        final DefaultName name = new DefaultName(typeNames.get(0).getCoverageName());
+        final GenericName name = NamesExt.create(typeNames.get(0).getCoverageName());
         assertEquals(LAYER_TEST, name);
     }
 

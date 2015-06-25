@@ -54,8 +54,6 @@ import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.metadata.ImageStatistics;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.style.DefaultDescription;
@@ -117,9 +115,11 @@ import java.util.logging.Logger;
 import static org.constellation.utils.RESTfulUtilities.badRequest;
 import static org.constellation.utils.RESTfulUtilities.noContent;
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DISPLACEMENT;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_UOM;
+import org.opengis.util.GenericName;
 
 /**
  * RESTful API for style providers configuration.
@@ -249,7 +249,7 @@ public final class StyleRest {
         final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
         final DataStore dataStore = dataprovider.getMainStore();
         final QName qName = Util.parseQName(layerName);
-        final Name typeName = new DefaultName(qName);
+        final GenericName typeName = NamesExt.create(qName);
         final QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.setTypeName(typeName);
         queryBuilder.setProperties(new String[]{attribute});
@@ -474,7 +474,7 @@ public final class StyleRest {
         final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
         final DataStore dataStore = dataprovider.getMainStore();
         final QName qName = Util.parseQName(layerName);
-        final Name typeName = new DefaultName(qName);
+        final GenericName typeName = NamesExt.create(qName);
         final QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.setTypeName(typeName);
         queryBuilder.setProperties(new String[]{attribute});
@@ -682,7 +682,7 @@ public final class StyleRest {
         final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
         final DataStore dataStore = dataprovider.getMainStore();
         final QName qName =  Util.parseQName(layerName);
-        final Name typeName = new DefaultName(qName);
+        final GenericName typeName = NamesExt.create(qName);
         final QueryBuilder queryBuilder = new QueryBuilder();
         queryBuilder.setTypeName(typeName);
         queryBuilder.setProperties(new String[]{attribute});

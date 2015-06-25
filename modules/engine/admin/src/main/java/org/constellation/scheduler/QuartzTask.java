@@ -18,12 +18,11 @@
  */
 package org.constellation.scheduler;
 
-import org.geotoolkit.process.quartz.ProcessJobDetail;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 
 import java.util.Date;
 import java.util.UUID;
+import org.geotoolkit.processing.quartz.ProcessJobDetail;
 
 /**
  *

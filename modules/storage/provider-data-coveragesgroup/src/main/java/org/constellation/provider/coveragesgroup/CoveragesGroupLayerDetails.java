@@ -46,7 +46,6 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.GO2Utilities;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.filter.visitor.DefaultFilterVisitor;
 import org.geotoolkit.map.FeatureMapLayer;
@@ -59,6 +58,7 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -73,14 +73,14 @@ public class CoveragesGroupLayerDetails extends AbstractData {
     private MarshallerPool pool;
     private Unmarshaller unmarshaller;
 
-    public CoveragesGroupLayerDetails(final Name name, final File file, final IStyleBusiness styleBusiness) {
+    public CoveragesGroupLayerDetails(final GenericName name, final File file, final IStyleBusiness styleBusiness) {
         this(name, file, null, null, styleBusiness);
     }
 
     /**
      * hacked method to pass the login/pass to WebMapServer
      */
-    public CoveragesGroupLayerDetails(final Name name, final File file, final String login, final String password, final IStyleBusiness styleBusiness) {
+    public CoveragesGroupLayerDetails(final GenericName name, final File file, final String login, final String password, final IStyleBusiness styleBusiness) {
         super(name, Collections.EMPTY_LIST);
 
         // Parsing ctxt : MapBuilder.createContext
@@ -192,7 +192,7 @@ public class CoveragesGroupLayerDetails extends AbstractData {
                 final String propName = ((PropertyName)(tempProp).getExpression1()).getPropertyName();
                 boolean found = false;
                 for (PropertyDescriptor prop : propsDesc) {
-                    if (prop.getName().getLocalPart().equalsIgnoreCase(propName)) {
+                    if (prop.getName().tip().toString().equalsIgnoreCase(propName)) {
                         found = true;
                         break;
                     }

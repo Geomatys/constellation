@@ -25,11 +25,7 @@ import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
 import org.constellation.provider.DefaultCoverageData;
 import org.constellation.provider.ProviderFactory;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.postgresql.PGCoverageStore;
-import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.observation.file.FileObservationStore;
 import org.geotoolkit.parameter.ParametersExt;
@@ -44,6 +40,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+import org.geotoolkit.storage.coverage.CoverageReference;
+import org.geotoolkit.storage.coverage.CoverageStore;
+import org.geotoolkit.storage.coverage.CoverageStoreFinder;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -52,7 +52,7 @@ import java.util.logging.Level;
 public class CoverageStoreProvider extends AbstractDataProvider{
 
     private CoverageStore store;
-    private Set<Name> names;
+    private Set<GenericName> names;
 
     public CoverageStoreProvider(String providerId,ProviderFactory service, ParameterValueGroup param){
         super(providerId,service,param);
@@ -116,7 +116,7 @@ public class CoverageStoreProvider extends AbstractDataProvider{
     }
 
     @Override
-    public Set<Name> getKeys() {
+    public Set<GenericName> getKeys() {
         if(names == null){
             reload();
         }
@@ -127,7 +127,7 @@ public class CoverageStoreProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Data get(final Name key) {
+    public Data get(final GenericName key) {
         return get(key, null);
     }
 
@@ -141,7 +141,7 @@ public class CoverageStoreProvider extends AbstractDataProvider{
      * {@inheritDoc }
      */
     @Override
-    public Data get(Name key, Date version) {
+    public Data get(GenericName key, Date version) {
         key = fullyQualified(key);
         if(!contains(key)){
             return null;
@@ -167,7 +167,7 @@ public class CoverageStoreProvider extends AbstractDataProvider{
     }
 
     @Override
-    public void remove(Name key) {
+    public void remove(GenericName key) {
         if (store == null) {
             reload();
         }
@@ -183,7 +183,7 @@ public class CoverageStoreProvider extends AbstractDataProvider{
     @Override
     public void removeAll() {
         try {
-            for (Name name : names) {
+            for (GenericName name : names) {
                 store.delete(name);
             }
             reload();
