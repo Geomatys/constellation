@@ -97,9 +97,10 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
         });
     })
 
-    .controller('FooterController', function($scope,CstlConfig) {
+    .controller('FooterController', function($scope,CstlConfig,BuildService) {
         var self = this;
         self.cstlVersion=CstlConfig['cstl.version'];
+        $scope.buildInfo = BuildService;
     })
 
     .controller('MainController', function($scope, $location, webService, dataListing, ProcessService, Growl, UserResource, GeneralService, TaskService) {

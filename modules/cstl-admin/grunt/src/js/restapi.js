@@ -42,7 +42,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     })
 
     .factory('Build', function($resource) {
-        return $resource('@cstl/app/build');
+        return $resource('app/build');
     })
 
     .factory('Metrics', function($resource) {
