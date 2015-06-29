@@ -263,6 +263,9 @@ public final class DefaultConfigurator implements Configurator {
             // Add new layer.
             for (final GenericName key : provider.getKeys()) {
                 final QName name = new QName(NamesExt.getNamespace(key), key.tip().toString());
+                String ns = name.getNamespaceURI();
+                if(ns.isEmpty()) ns = null;
+                final GenericName gname = NamesExt.create(ns, name.getLocalPart());
                 boolean found = false;
                 for (final org.constellation.engine.register.jooq.tables.pojos.Data data : list) {
                     if (name.equals(new QName(data.getNamespace(),data.getName()))) {
@@ -280,7 +283,7 @@ public final class DefaultConfigurator implements Configurator {
                         final FeatureStore fs = (FeatureStore)store;
                         FeatureType fType = null;
                         try {
-                            fType = fs.getFeatureType(NamesExt.create(name));
+                            fType = fs.getFeatureType(gname);
                         } catch (DataStoreException ex) {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
@@ -297,7 +300,7 @@ public final class DefaultConfigurator implements Configurator {
                     if (currentMetadata != null) {
                         metadataXml = currentMetadata;
                     } else {
-                        final Data layer = (Data) provider.get(NamesExt.create(name));
+                        final Data layer = (Data) provider.get(gname);
                         final Object origin = layer.getOrigin();
                         if (origin instanceof CoverageReference) {
                             final CoverageReference fcr = (CoverageReference) origin;
