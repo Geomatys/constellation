@@ -53,6 +53,7 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNoException;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -76,12 +77,17 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
     
     private static boolean initialized = false;
     
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WPSSoapRequestTest");
+    }
+    
+    
     @PostConstruct
     public void initLayerList() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("WPSSoapRequestTest");
                 serviceBusiness.deleteAll();
                 
                 final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));

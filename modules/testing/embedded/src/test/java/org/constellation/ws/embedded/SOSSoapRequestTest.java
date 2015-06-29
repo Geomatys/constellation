@@ -59,6 +59,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import static org.junit.Assume.assumeNoException;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -86,6 +87,13 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
     
     private static DefaultDataSource ds = null;
     
+    private static File configDirectory;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        configDirectory = ConfigDirectory.setupTestEnvironement("SOSSoapRequestTest");
+    }
+    
     @PostConstruct
     public void initLayerList() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -95,8 +103,6 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                     serviceBusiness.delete("sos", "default");
                 } catch (ConfigurationException ex) {}
                 
-                final File configDirectory = ConfigDirectory.setupTestEnvironement("SOSSoapRequestTest");
-
                 final File dataDirectory = new File(configDirectory, "dataSos");
                 dataDirectory.mkdir();
 
@@ -186,7 +192,10 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         }
 
         if (gmlPrefix != null) {
-            result = result.replace("gml:", gmlPrefix + ':');
+            LOGGER.log(Level.INFO, "GML Prefix found:{0}", gmlPrefix);
+            result = result.replace(gmlPrefix + ':', "gml:");
+        } else {
+            LOGGER.info("No GML Prefix found.");
         }
         
         domCompare(result, expResult);

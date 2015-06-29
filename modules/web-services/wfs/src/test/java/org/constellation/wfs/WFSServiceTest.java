@@ -66,6 +66,7 @@ import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
@@ -107,13 +108,16 @@ public class WFSServiceTest implements ApplicationContextAware {
 
     private static boolean initialized = false;
     
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WFSServiceTest");
+    }
+    
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("WFSServiceTest");
-
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();

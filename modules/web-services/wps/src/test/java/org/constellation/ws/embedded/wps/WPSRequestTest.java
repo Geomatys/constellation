@@ -57,6 +57,7 @@ import org.constellation.webdav.WebdavService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -86,12 +87,16 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
     
     private static boolean initialized = false;
     
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WPSRequestTest");
+    }
+    
     @PostConstruct
     public void initLayerList() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("WPSRequestTest");
                 serviceBusiness.deleteAll();
                 
                 final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));

@@ -83,14 +83,14 @@ public class TreeCloseTest implements ApplicationContextAware {
     
     private static CSWworker worker;
 
+    private static File configDir;
     private static File dataDirectory;
     
     private boolean initialized = false;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-        deleteTemporaryFile();
-
+        configDir = ConfigDirectory.setupTestEnvironement("TreeCloseTest");
     }
     
     @PostConstruct
@@ -99,7 +99,6 @@ public class TreeCloseTest implements ApplicationContextAware {
         try {
             if (!initialized) {
                 serviceBusiness.deleteAll();
-                final File configDir = ConfigDirectory.setupTestEnvironement("TreeCloseTest");
                 File CSWDirectory  = new File(configDir, "data/services/CSW");
                 CSWDirectory.mkdir();
                 final File instDirectory = new File(CSWDirectory, "default");
@@ -135,10 +134,6 @@ public class TreeCloseTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteTemporaryFile();
-    }
-
-    public static void deleteTemporaryFile() {
         if (worker != null) {
             worker.destroy();
         }

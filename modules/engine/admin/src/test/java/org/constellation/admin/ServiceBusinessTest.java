@@ -32,6 +32,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
+import org.constellation.configuration.ConfigDirectory;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -42,6 +44,11 @@ public class ServiceBusinessTest {
     @Autowired
     private IServiceBusiness serviceBusiness;
 
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("ServiceBusinessTest");
+    }
+    
     @Test
     public void createService() throws ConfigurationException {
        /* ServiceDTO serviceDTO = new ServiceDTO();

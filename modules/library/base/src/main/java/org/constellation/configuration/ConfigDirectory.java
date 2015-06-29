@@ -134,7 +134,7 @@ public final class ConfigDirectory {
      */
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.configuration");
 
-    private static Config config = new Config.Builder().build();
+    private static Config config;
 
     /**
      * Specifies if the process is running on a Glassfish application server.
@@ -404,7 +404,9 @@ public final class ConfigDirectory {
     }
 
     public static void init() {
-        config = new Config.Builder().build();
+        if (config == null) {
+            config = new Config.Builder().build();
+        }
     }
 
     public static String getServiceURL() {

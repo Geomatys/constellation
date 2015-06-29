@@ -18,8 +18,10 @@
  */
 package org.constellation.admin.process;
 
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.AbstractProcessTest;
-import org.constellation.admin.process.RefreshIndexDescriptor;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  *
@@ -27,8 +29,18 @@ import org.constellation.admin.process.RefreshIndexDescriptor;
  */
 public class RefreshIndexTest extends AbstractProcessTest {
 
-   public RefreshIndexTest() {
-       super(RefreshIndexDescriptor.NAME);
-   }
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("RefreshIndexTest");
+    }
+
+    public RefreshIndexTest() {
+        super(RefreshIndexDescriptor.NAME);
+    }
+
+    @AfterClass
+    public static void shutDown() {
+        ConfigDirectory.shutdownTestEnvironement("RefreshIndexTest");
+    }
 
 }

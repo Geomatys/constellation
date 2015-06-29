@@ -19,9 +19,11 @@
 package org.constellation.admin;
 
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.jooq.tables.pojos.Metadata;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,11 @@ public class MetadataBusinessTest {
     
     @Autowired
     private IMetadataBusiness metadataBusiness;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("MetadataBusinessTest");
+    }
 
     @Test
     public void createMetadata() throws ConfigurationException {

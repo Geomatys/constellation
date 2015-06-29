@@ -18,8 +18,10 @@
  */
 package org.constellation.admin.process;
 
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.AbstractProcessTest;
-import org.constellation.admin.process.RestartDescriptor;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  *
@@ -27,8 +29,17 @@ import org.constellation.admin.process.RestartDescriptor;
  */
 public class RestartTest extends AbstractProcessTest {
 
-   public RestartTest() {
-       super(RestartDescriptor.NAME);
-   }
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("RestartTest");
+    }
 
+    public RestartTest() {
+        super(RestartDescriptor.NAME);
+    }
+    
+    @AfterClass
+    public static void shutDown() {
+        ConfigDirectory.shutdownTestEnvironement("RestartTest");
+    }
 }

@@ -18,6 +18,7 @@
  */
 package org.constellation.cite;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,6 +79,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
@@ -124,6 +126,11 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
     private static boolean initialized = false;
     
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WFSCiteWorkerTest");
+    }
+    
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -134,7 +141,6 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 return;
             }
             try {
-                ConfigDirectory.setupTestEnvironement("WFSCiteWorkerTest");
 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();

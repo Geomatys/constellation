@@ -31,6 +31,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.repository.ServiceRepository;
@@ -84,13 +85,13 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        //ConfigurationEngine.setupTestEnvironement("SOSWorkerInitialisationTest");
+        ConfigDirectory.setupTestEnvironement("SOSWorkerInitialisationTest");
         pool = SOSMarshallerPool.getInstance();
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        //ConfigurationEngine.shutdownTestEnvironement("SOSWorkerInitialisationTest");
+        ConfigDirectory.shutdownTestEnvironement("SOSWorkerInitialisationTest");
     }
 
     @After

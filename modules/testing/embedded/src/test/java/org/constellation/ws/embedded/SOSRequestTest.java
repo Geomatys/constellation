@@ -74,6 +74,7 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -105,6 +106,12 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
         return "http://localhost:" +  grizzly.getCurrentPort() + "/sos/test?";
     }
 
+    private static File configDirectory;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        configDirectory = ConfigDirectory.setupTestEnvironement("SOSRequestTest");
+    }
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -114,8 +121,6 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                final File configDirectory = ConfigDirectory.setupTestEnvironement("SOSRequestTest");
-
                 final String url = "jdbc:derby:memory:TestOM2;create=true";
                 final DefaultDataSource ds = new DefaultDataSource(url);
                 Connection con = ds.getConnection();

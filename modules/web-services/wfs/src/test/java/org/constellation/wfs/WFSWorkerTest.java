@@ -131,6 +131,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
@@ -188,12 +189,16 @@ public class WFSWorkerTest implements ApplicationContextAware {
     
     private static boolean localdb_active = true;
     
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WFSWorkerTest");
+    }
+    
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("WFSWorkerTest");
                 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();

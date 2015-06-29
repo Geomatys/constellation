@@ -58,7 +58,6 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-        deleteTemporaryFile();
         final File configDir = ConfigDirectory.setupTestEnvironement("FSCSWWorkerTest");
             
         File CSWDirectory  = new File(configDir, "CSW");
@@ -126,10 +125,6 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteTemporaryFile();
-    }
-
-    public static void deleteTemporaryFile() {
         if (worker != null) {
             worker.destroy();
         }
