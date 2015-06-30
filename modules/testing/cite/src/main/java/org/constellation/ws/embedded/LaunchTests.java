@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
 import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigDirectory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.constellation.provider.DataProviders;
 
@@ -92,6 +93,8 @@ public final class LaunchTests implements Runnable {
     public static void main(String[] args) throws Exception {
         Class.forName("javax.servlet.ServletContext");
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
+        
+        ConfigDirectory.setupTestEnvironement("CITE_CONFIGURATION");
         
         GrizzlyServer server = new GrizzlyServer();
         applicationContext.getEnvironment().setActiveProfiles("standard","derby");
