@@ -48,6 +48,7 @@ import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -64,20 +65,24 @@ public class InternalCSWworkerTest extends CSWworkerTest {
     @Inject
     private IMetadataBusiness metadataBusiness;
     
+    private static File configDirectory;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        configDirectory = ConfigDirectory.setupTestEnvironement("InternalCSWWorkerTest");
+    }
+    
     @PostConstruct
     public void setUpClass() {
         onlyIso = true;
         SpringHelper.setApplicationContext(applicationContext);
         try {
             if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
-                deleteTemporaryFile();
 
                 pool = EBRIMMarshallerPool.getInstance();
                 fillPoolAnchor((AnchoredMarshallerPool) pool);
 
-                final File configDir = ConfigDirectory.setupTestEnvironement("InternalCSWWorkerTest");
-
-                File CSWDirectory  = new File(configDir, "CSW");
+                File CSWDirectory  = new File(configDirectory, "CSW");
                 CSWDirectory.mkdir();
                 final File instDirectory = new File(CSWDirectory, "default");
                 instDirectory.mkdir();
@@ -113,10 +118,6 @@ public class InternalCSWworkerTest extends CSWworkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteTemporaryFile();
-    }
-
-    public static void deleteTemporaryFile() {
         if (worker != null) {
             worker.destroy();
         }

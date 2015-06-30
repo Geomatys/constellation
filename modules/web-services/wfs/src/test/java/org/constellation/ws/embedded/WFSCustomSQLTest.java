@@ -76,6 +76,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
@@ -121,6 +122,12 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
 
     private static boolean initialized = false;
     
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WFSCustomSQLTest");
+    }
+    
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -129,8 +136,6 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("WFSCustomSQLTest");
-
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();

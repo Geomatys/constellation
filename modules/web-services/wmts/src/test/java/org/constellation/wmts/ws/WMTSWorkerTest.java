@@ -55,6 +55,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 
@@ -80,15 +81,17 @@ public class WMTSWorkerTest implements ApplicationContextAware {
     private static MarshallerPool pool;
     private static WMTSWorker worker ;
 
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WMTSWorkerTest");
+    }
+    
     @PostConstruct
     public void setUpClass(){
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            ConfigDirectory.setupTestEnvironement("WMTSWorkerTest");
             pool = WMTSMarshallerPool.getInstance();
             
-
-
             serviceBusiness.create("wmts", "default", new LayerContext(), null);
 
 

@@ -67,6 +67,7 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -85,19 +86,23 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         this.applicationContext = applicationContext;
     }
 
-    private static File configDirectory;
-
     @Inject
     private IServiceBusiness serviceBusiness;
     
     private static boolean initialized = false;
+    
+    private static File configDirectory;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        configDirectory = ConfigDirectory.setupTestEnvironement("ConfigurationRequestTest");
+    }
     
     @PostConstruct
     public void initPool() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                configDirectory = ConfigDirectory.setupTestEnvironement("ConfigurationRequestTest");
 
                 try {
                     serviceBusiness.delete("csw", "default");

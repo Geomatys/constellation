@@ -80,6 +80,7 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
@@ -105,6 +106,13 @@ public class CSWRequestTest extends AbstractGrizzlyServer implements Application
     
     private static boolean initialized = false;
     
+    private static File configDirectory;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        configDirectory = ConfigDirectory.setupTestEnvironement("CSWRequestTest");
+    }
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -119,8 +127,6 @@ public class CSWRequestTest extends AbstractGrizzlyServer implements Application
                     serviceBusiness.delete("csw", "csw2");
                 } catch (ConfigurationException ex) {}
                 
-                final File configDirectory = ConfigDirectory.setupTestEnvironement("CSWRequestTest");
-
                 final File dataDirectory2 = new File(configDirectory, "dataCsw2");
                 dataDirectory2.mkdir();
 

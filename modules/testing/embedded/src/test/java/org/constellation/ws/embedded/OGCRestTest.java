@@ -70,6 +70,7 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
@@ -110,6 +111,14 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
     private static ConstellationClient client;
     
     private static boolean initialized = false;
+    
+    private static File configDirectory;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        configDirectory = ConfigDirectory.setupTestEnvironement("OGCRestTest");
+    }
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -118,7 +127,6 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                final File configDirectory = ConfigDirectory.setupTestEnvironement("OGCRestTest");
                 final File dataDirectory2 = new File(configDirectory, "dataCsw2");
                 dataDirectory2.mkdir();
 

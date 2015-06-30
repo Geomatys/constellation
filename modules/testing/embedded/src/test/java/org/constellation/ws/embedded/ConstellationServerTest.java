@@ -52,6 +52,7 @@ import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFi
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -76,18 +77,24 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
     
     private static boolean initialized = false;
     
+    private static File configDirectory;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        configDirectory = ConfigDirectory.setupTestEnvironement("ConstellationServerTest");
+    }
+    
     @PostConstruct
     public void initPool() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
+                
                 try {
                     serviceBusiness.delete("csw", "default");
                     serviceBusiness.delete("csw", "csw2");
                 } catch (ConfigurationException ex) {}
                 
-                final File configDirectory = ConfigDirectory.setupTestEnvironement("ConstellationServerTest");
-
                 final File dataDirectory2 = new File(configDirectory, "dataCsw2");
                 dataDirectory2.mkdir();
 

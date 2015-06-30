@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.constellation.business.IProviderBusiness;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.provider.DataProvider;
@@ -30,6 +31,7 @@ import org.geotoolkit.coverage.filestore.FileCoverageStoreFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.storage.coverage.CoverageStoreFactory;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
@@ -55,6 +57,11 @@ public class ProviderBusinessTest implements ApplicationContextAware {
     @Autowired
     private IProviderBusiness pBusiness;
 
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("ProviderBusinessTest");
+    }
+    
     @Test
     public void createFromDataStoreFactory() throws ConfigurationException, MalformedURLException {
         final String id = "teeeeeeeeeeeest";

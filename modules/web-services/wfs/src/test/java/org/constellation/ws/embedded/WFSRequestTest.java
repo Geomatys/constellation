@@ -108,6 +108,7 @@ import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -187,6 +188,11 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     private static boolean mdweb_active = true;
     
     private static boolean localdb_active = true;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WFSRequestTest");
+    }
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -194,9 +200,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     public void initPool() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
-        try {
-                ConfigDirectory.setupTestEnvironement("WFSRequestTest");
-            
+            try {
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
