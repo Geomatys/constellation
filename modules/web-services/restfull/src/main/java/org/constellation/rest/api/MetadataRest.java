@@ -324,6 +324,14 @@ public class MetadataRest {
                     if(value != null) {
                         filterMap.put(f.getField(),value);
                     }
+                }else if("parent".equals(f.getField())) {
+                    String value = f.getValue();
+                    try{
+                        final int parentId = Integer.valueOf(value);
+                        filterMap.put("parent",parentId);
+                    }catch(Exception ex) {
+                        LOGGER.log(Level.WARNING,"Filter by parent id value should be an integer: "+ex.getLocalizedMessage(),ex);
+                    }
                 }else if("published".equals(f.getField())) {
                     final String value = f.getValue();
                     if("_all".equals(value)){
