@@ -130,8 +130,6 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
 
     .factory('webService', function($resource) {
         return $resource('@cstl/api/1/admin/domain/$domainId/instances/:lang', {}, {
-            'permissionByDomainRole' : {method: 'GET',     url: '@cstl/api/1/servicepermission/access', isArray: true},
-            'domains':                 {method: 'GET',     url: '@cstl/api/1/servicepermission/user/$userId/service/:id', isArray: true},
             'linkToDomain':            {method: 'POST',    url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
             'unlinkFromDomain':        {method: 'DELETE',  url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
             'listAll':                 {method: 'GET',     isArray: true},

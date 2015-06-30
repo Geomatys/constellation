@@ -58,12 +58,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
 
         webService.get({type: $scope.type, id: $routeParams.id, lang: $scope.getCurrentLang()}, function (service) {
             $scope.service = service;
-            webService.permissionByDomainRole(function (domainroles) {
-                $scope.domainroles = domainroles;
-            });
-            webService.domains({id: service.id}, function (domains) {
-                $scope.domains = domains;
-            });
 
             $scope.toggleDomain = function (i) {
                 var pathParams = {domainId: $scope.domains[i].id, serviceId: service.id};
@@ -73,9 +67,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         $scope.domains[i].linked = false;
                     }, function (response) {
                         Growl('error', 'error', response.data.message);
-                        webService.domains({id: service.id}, function (domains) {
-                            $scope.domains = domains;
-                        });
                     });
                 } else {
                     webService.linkToDomain(pathParams, {}, function () {
