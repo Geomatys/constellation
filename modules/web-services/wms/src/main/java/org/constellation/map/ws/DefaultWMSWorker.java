@@ -326,7 +326,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Details skeleton = getStaticCapabilitiesObject("wms", currentLanguage);
         final AbstractWMSCapabilities inCapabilities = WMSConstant.createCapabilities(queryVersion, skeleton);
 
-        Collections.sort(GFI_MIME_TYPES, new TemporaryComparator());
+        // temporary sort in order to fix cite test
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
@@ -1595,17 +1595,4 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     }
     
-    private static class TemporaryComparator implements Comparator<String> {
-
-        @Override
-        public int compare(String o1, String o2) {
-            if ("text/xml".equals(o1)) {
-                return -1;
-            } else if ("text/xml".equals(o2)) {
-                return 1;
-            }
-            return o1.compareTo(o2);
-        }
-        
-    }
 }

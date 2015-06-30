@@ -380,7 +380,8 @@ longitude</td>
                <xsl:value-of select="string(//Layer[Title = 'cite:Streams']/Name)"/>
             </xsl:variable>
             <xsl:variable name="VAR_GET_FEATURE_INFO_FORMAT">
-               <xsl:value-of select="string((/WMT_MS_Capabilities/Capability/Request/GetFeatureInfo/Format[(position() = 1 and last() = 1) or . != 'application/vnd.ogc.gml'])[1])"/>
+               <!-- change from glegal xsl:value-of select="string((/WMT_MS_Capabilities/Capability/Request/GetFeatureInfo/Format[(position() = 1 and last() = 1) or . != 'application/vnd.ogc.gml'])[1])"/-->
+               <xsl:value-of select="string('application/vnd.ogc.gml')"/>
             </xsl:variable>
             <xsl:variable name="updatesequence" select="string-length($VAR_CURRENT_UPDATESEQUENCE) &gt;0"/>
             <xsl:variable name="expression">

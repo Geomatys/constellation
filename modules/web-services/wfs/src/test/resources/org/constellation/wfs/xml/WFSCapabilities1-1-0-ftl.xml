@@ -70,12 +70,12 @@
         <wfs:FeatureType>
             <wfs:Name>{gmlPrefix}:Lakes</wfs:Name>
             <wfs:Title>Lakes</wfs:Title>
-            <wfs:DefaultSRS>urn:ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:DefaultSRS>urn:ogc:def:crs:CRS:7.01:84</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ows:LowerCorner>-0.0018 6.0E-4</ows:LowerCorner>
-                <ows:UpperCorner>-1.0E-4 0.0031</ows:UpperCorner>
+                <ows:LowerCorner>6.0E-4 -0.0018</ows:LowerCorner>
+                <ows:UpperCorner>0.0031 -1.0E-4</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>

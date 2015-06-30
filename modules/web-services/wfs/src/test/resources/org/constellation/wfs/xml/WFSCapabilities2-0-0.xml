@@ -383,12 +383,12 @@
         <ns8:FeatureType>
             <ns8:Name>gml:Lakes</ns8:Name>
             <ns8:Title>Lakes</ns8:Title>
-            <ns8:DefaultCRS>urn:ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:DefaultCRS>urn:ogc:def:crs:CRS:7.01:84</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-0.0018 6.0E-4</ns9:LowerCorner>
-                <ns9:UpperCorner>-1.0E-4 0.0031</ns9:UpperCorner>
+                <ns9:LowerCorner>6.0E-4 -0.0018</ns9:LowerCorner>
+                <ns9:UpperCorner>0.0031 -1.0E-4</ns9:UpperCorner>
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
