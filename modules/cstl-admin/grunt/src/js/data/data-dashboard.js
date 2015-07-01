@@ -119,9 +119,8 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             // Update dataset selection.
             if (!self.isSelected(dataset)) {
                 selection.dataset = dataset;
-                if (dataset.dataCount > 1) {
-                    setupDatasetLazyInfo(dataset);
-                } else if (dataset.dataCount === 1 && !data) {
+                setupDatasetLazyInfo(dataset);
+                if (dataset.dataCount === 1 && !data) {
                     data = dataset.data[0]; // auto-select the single data in singleton dataset
                 }
             } else if (!data) {
@@ -193,31 +192,36 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 }
 
                 // Wait for lazy loading completion.
-                selection.data.$infoPromise.then(function() {
+                var lastSelection = selection.data;
+                lastSelection.$infoPromise.then(function() {
+                    if (lastSelection !== selection.data) {
+                        return; // the selection has changed before the promise is resolved
+                    }
+
                     // Create layer instance.
                     var layer;
-                    if (selection.data && selection.data.styles.length) {
+                    if (lastSelection.styles.length) {
                         layer = DataDashboardViewer.createLayerWithStyle(
                             $cookieStore.get('cstlUrl'),
                             layerName,
                             providerId,
-                            selection.data.styles[0].name,
+                            lastSelection.styles[0].name,
                             null,
                             null,
-                            selection.data.type !== 'VECTOR');
+                            lastSelection.type !== 'VECTOR');
                     } else {
                         layer = DataDashboardViewer.createLayer(
                             $cookieStore.get('cstlUrl'),
                             layerName,
                             providerId,
                             null,
-                            selection.data.type !== 'VECTOR');
+                            lastSelection.type !== 'VECTOR');
                     }
                     layer.get('params').ts = new Date().getTime();
 
                     // Display the layer and zoom on its extent.
                     DataDashboardViewer.layers = [layer];
-                    DataDashboardViewer.extent = selection.data.extent;
+                    DataDashboardViewer.extent = lastSelection.extent;
                     DataDashboardViewer.initMap('dataPreviewMap');
                 });
             } else {
@@ -451,18 +455,19 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         // Loads asynchronously dataset advanced information.
         function setupDatasetLazyInfo(dataset, forceReload) {
             if (forceReload === true || !dataset.$infoPromise) {
-                // Load the data list.
-                var data = Dataset.getData({ id: dataset.id });
+                // Load the data list (if should be reloaded or if not returned by the server).
+                var data = dataset.data;
+                if (forceReload || !data) {
+                    data = Dataset.getData({ id: dataset.id }).$promise;
+                }
 
                 // Combines multiple promises into a single promise.
-                dataset.$infoPromise = $q.all([data.$promise]);
-
-                // Promise result placeholder(s).
-                dataset.data = [];
+                dataset.$infoPromise = $q.all([data]);
 
                 // Handle promise results.
                 dataset.$infoPromise.then(function(results) {
                     dataset.data = results[0];
+                    dataset.dataCount = results[0].length;
                 });
             }
         }
@@ -473,20 +478,15 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 // Load the geographical extent.
                 var description = provider.dataGeoExtent({
                     values: { providerId: data.providerIdentifier, dataId: data.name }
-                });
+                }).$promise;
+
                 // Load the associations (styles, services, sensors).
                 var associations = Data.getAssociations({
                     dataId: data.id
-                });
+                }).$promise;
 
                 // Combines multiple promises into a single promise.
-                data.$infoPromise = $q.all([description.$promise, associations.$promise]);
-
-                // Promise result placeholder(s).
-                data.extent = [-180, -85, 180, 85];
-                data.styles = [];
-                data.services = [];
-                data.sensors = [];
+                data.$infoPromise = $q.all([description, associations]);
 
                 // Handle promise results.
                 data.$infoPromise.then(function(results) {
@@ -517,7 +517,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 selection.dataset = null;
                 $scope.$broadcast('reloadDatasets');
             } else {
-                selection.dataset.dataCount--;
                 setupDatasetLazyInfo(selection.dataset, true);
             }
             selection.data = null;
