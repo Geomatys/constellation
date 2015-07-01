@@ -1,9 +1,3 @@
-/**
- * On document ready set focus to username input
- */
-jQuery(document).ready(function() {
-  jQuery('#username').focus();
-});
 
 /**
  * Angular login app.
