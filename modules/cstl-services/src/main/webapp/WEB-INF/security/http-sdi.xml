@@ -44,11 +44,4 @@
    </http>
 
 
-    <http pattern="/sql.jsp" create-session="never" use-expressions="true" entry-point-ref="unauthorizedEntryPoint" auto-config="false">
-    <custom-filter ref="cstlAuthenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
-    <intercept-url pattern="/sql.jsp" access="hasRole('cstl-admin')" />
-    <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
-  </http>
-
-
 </beans:beans>

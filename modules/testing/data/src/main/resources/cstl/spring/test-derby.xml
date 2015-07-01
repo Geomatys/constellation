@@ -17,12 +17,6 @@
   <tx:annotation-driven transaction-manager="transactionManager" />
 
 
-
-
-
-
-
-
   <bean id="database-initer" class="liquibase.integration.spring.SpringLiquibase">
     <property name="dataSource" ref="dataSource" />
     <property name="changeLog" value="classpath:/cstl/db/db-changelog.xml" />
@@ -51,21 +45,8 @@
       p:url="jdbc:derby:memory:db;create=true" />
   </beans>
 
-<!--   <beans profile="derby"> -->
-<!--     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" -->
-<!--       p:url="jdbc:derby:/Users/cheleb/.constellation/mydbamoi;create=true" /> -->
-
-<!--   </beans> -->
-
-  <beans profile="h2">
-    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close" p:driverClassName="org.h2.Driver"
-      p:url="jdbc:h2:mem:cstl" />
-
-  </beans>
-
   <beans profile="postgresql">
   <!-- DataSource configuration for the tomcat jdbc connection pool -->
-
     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close" p:driverClassName="org.postgresql.Driver"
       p:url="jdbc:postgresql:constellation_test" />
 

@@ -7,11 +7,6 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
-  <util:properties id="constellation.properties" location="classpath:/constellation.properties"
-    local-override="true" />
-
-  <context:property-placeholder properties-ref="constellation.properties" />
-
   <context:component-scan base-package="org.constellation.services.component" />
 
   <bean id="securityManager" class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance" />

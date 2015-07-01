@@ -46,7 +46,7 @@
     </context-param>
     <context-param>
         <param-name>spring.profiles.active</param-name>
-        <param-value>standard,derby</param-value>
+        <param-value>standard</param-value>
     </context-param>
 
   <!-- Filter to allow AJAX cross-origin requests -->

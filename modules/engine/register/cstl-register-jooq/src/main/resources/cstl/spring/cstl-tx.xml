@@ -65,17 +65,8 @@
     <qualifier value="dsl" />
   </bean>
 
-<!--   <beans profile="postgresql"> -->
-<!--   </beans> -->
-
-
-
   <beans profile="postgresql">
     <bean class="org.constellation.engine.register.configuration.JooqPostgreSQLConfiguration" />
-  </beans>
-
-  <beans profile="h2">
-    <bean class="org.constellation.engine.register.configuration.JooqH2Configuration" />
   </beans>
 
   <beans profile="derby">
