@@ -112,6 +112,7 @@ public final class EmbeddedDatabase extends Static {
          */
         final Properties config = new Properties();
         try {
+            ConfigDirectory.init();
             final File configDirectory = ConfigDirectory.getAdminConfigDirectory();
             final File configFile      = new File(configDirectory, "admin-db.properties");
 
