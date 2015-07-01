@@ -161,6 +161,23 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
     })
 
     // -------------------------------------------------------------------------
+    //  Auto Focus
+    // -------------------------------------------------------------------------
+    /**
+     * simple directive to enable focus on element.
+     */
+    .directive('autofocus', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attrs) {
+                jQuery(element).focus();
+            }
+        };
+    })
+
+
+
+    // -------------------------------------------------------------------------
     //  Tag Input
     // -------------------------------------------------------------------------
 
